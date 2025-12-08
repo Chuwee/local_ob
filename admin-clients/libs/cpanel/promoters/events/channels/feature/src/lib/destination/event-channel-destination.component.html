@@ -1,5 +1,191 @@
 <app-form-container (cancel)="cancel()" (save)="save()" [disabled]="$isInProgress() || !form.dirty">
     <mat-accordion [multi]="true" [togglePosition]="'before'">
+        <!-- Provider Plan Settings -->
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>Provider Plan Settings</mat-panel-title>
+            </mat-expansion-panel-header>
+            
+            <div class="flex flex-col gap-8 p-4" [formGroup]="providerPlanSettingsForm">
+                <!-- General Sync Settings -->
+                <div class="flex flex-col gap-4">
+                    <h3 class="text-lg font-semibold">General Sync Settings</h3>
+                    
+                    <mat-checkbox formControlName="sync_sessions_as_hidden" class="align-top">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">Sync Sessions as Hidden</span>
+                            <span class="text-sm text-gray-500 leading-snug">Check this to synchronize sessions as hidden</span>
+                        </div>
+                    </mat-checkbox>
+                    
+                    <mat-checkbox formControlName="sync_prices" class="align-top">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">Sync Prices</span>
+                            <span class="text-sm text-gray-500 leading-snug">Check this to synchronize prices</span>
+                        </div>
+                    </mat-checkbox>
+                    
+                    <mat-checkbox formControlName="sync_surcharges" class="align-top">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">Sync Surcharges</span>
+                            <span class="text-sm text-gray-500 leading-snug">Check this to synchronize surcharges</span>
+                        </div>
+                    </mat-checkbox>
+                    
+                    <mat-checkbox formControlName="round_prices_up" class="align-top">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">Round Prices Up</span>
+                            <span class="text-sm text-gray-500 leading-snug">Check this to round prices up</span>
+                        </div>
+                    </mat-checkbox>
+                    
+                    <mat-checkbox formControlName="sync_session_labels" class="align-top">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">Sync Session Labels</span>
+                            <span class="text-sm text-gray-500 leading-snug">Check this to synchronize session labels</span>
+                        </div>
+                    </mat-checkbox>
+                    
+                    <mat-checkbox formControlName="sync_session_pics" class="align-top">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">Sync Session Pictures</span>
+                            <span class="text-sm text-gray-500 leading-snug">Check this to synchronize session pictures</span>
+                        </div>
+                    </mat-checkbox>
+                    
+                    <mat-checkbox formControlName="sync_session_key_dates" class="align-top">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">Sync Session Key Dates</span>
+                            <span class="text-sm text-gray-500 leading-snug">Check this to synchronize session key dates</span>
+                        </div>
+                    </mat-checkbox>
+                    
+                    <mat-checkbox formControlName="sync_session_type_ordering" class="align-top">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">Sync Session Type Ordering</span>
+                            <span class="text-sm text-gray-500 leading-snug">Check this to synchronize session type ordering</span>
+                        </div>
+                    </mat-checkbox>
+                    
+                    <mat-checkbox formControlName="sync_hidden_status" class="align-top">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">Sync Hidden Status</span>
+                            <span class="text-sm text-gray-500 leading-snug">Check this to synchronize hidden status</span>
+                        </div>
+                    </mat-checkbox>
+                    
+                    <mat-checkbox formControlName="sync_session_type_details" class="align-top">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">Sync Session Type Details</span>
+                            <span class="text-sm text-gray-500 leading-snug">Check this to synchronize session type details</span>
+                        </div>
+                    </mat-checkbox>
+                    
+                    <mat-checkbox formControlName="sync_billing_terms" class="align-top">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">Sync Billing Terms</span>
+                            <span class="text-sm text-gray-500 leading-snug">Check this to synchronize billing terms</span>
+                        </div>
+                    </mat-checkbox>
+                    
+                    <mat-checkbox formControlName="sync_allowed_num_tickets" class="align-top">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">Sync Allowed Number of Tickets</span>
+                            <span class="text-sm text-gray-500 leading-snug">Check this to synchronize allowed number of tickets</span>
+                        </div>
+                    </mat-checkbox>
+                    
+                    <mat-checkbox formControlName="sync_instructions" class="align-top">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">Sync Instructions</span>
+                            <span class="text-sm text-gray-500 leading-snug">Check this to synchronize instructions</span>
+                        </div>
+                    </mat-checkbox>
+                </div>
+
+                <!-- Cancellation -->
+                <div class="flex flex-col gap-4">
+                    <h3 class="text-lg font-semibold">Cancellation</h3>
+                    
+                    <mat-checkbox formControlName="enforce_cancellation" class="align-top">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">Enforce Cancellation</span>
+                            <span class="text-sm text-gray-500 leading-snug">Check this to enforce cancellation policies</span>
+                        </div>
+                    </mat-checkbox>
+                    
+                    <mat-form-field class="w-full">
+                        <mat-label>Price Modifier</mat-label>
+                        <input matInput type="number" formControlName="price_modifier" />
+                        <mat-hint>Modifies price per session</mat-hint>
+                    </mat-form-field>
+                    
+                    <mat-checkbox formControlName="session_price_comes_with_taxes" class="align-top">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">Session Price Comes with Taxes</span>
+                            <span class="text-sm text-gray-500 leading-snug">Check this if session price includes taxes</span>
+                        </div>
+                    </mat-checkbox>
+                </div>
+
+                <!-- Real-Time & Availability -->
+                <div class="flex flex-col gap-4">
+                    <h3 class="text-lg font-semibold">Real-Time & Availability</h3>
+                    
+                    <mat-checkbox formControlName="enable_real_time" class="align-top">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">Enable Real-Time</span>
+                            <span class="text-sm text-gray-500 leading-snug">Check this to enable real-time synchronization</span>
+                        </div>
+                    </mat-checkbox>
+                    
+                    <mat-checkbox formControlName="sync_available_tickets" class="align-top">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">Sync Available Tickets</span>
+                            <span class="text-sm text-gray-500 leading-snug">Check this to synchronize available tickets</span>
+                        </div>
+                    </mat-checkbox>
+                    
+                    <mat-checkbox formControlName="sync_sold_out_status" class="align-top">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">Sync Sold Out Status</span>
+                            <span class="text-sm text-gray-500 leading-snug">Check this to synchronize sold out status</span>
+                        </div>
+                    </mat-checkbox>
+                </div>
+
+                <!-- Session Types -->
+                <div class="flex flex-col gap-4">
+                    <h3 class="text-lg font-semibold">Session Types</h3>
+                    
+                    <mat-checkbox formControlName="sync_session_type" class="align-top">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">Sync Session Type</span>
+                            <span class="text-sm text-gray-500 leading-snug">Check this to synchronize session types</span>
+                        </div>
+                    </mat-checkbox>
+                    
+                    <mat-checkbox formControlName="use_real_time_api" class="align-top">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">Use Real-Time API</span>
+                            <span class="text-sm text-gray-500 leading-snug">Check this to use real-time API</span>
+                        </div>
+                    </mat-checkbox>
+                    
+                    <mat-form-field class="w-full">
+                        <mat-label>Channels to Autopublish Session Types</mat-label>
+                        <mat-select formControlName="channels_to_autopublish_session_types" multiple>
+                            @if ($channel(); as channel) {
+                                <mat-option [value]="channel.id">{{ channel.name }}</mat-option>
+                            }
+                        </mat-select>
+                        <mat-hint>Select channels for autopublishing session types</mat-hint>
+                    </mat-form-field>
+                </div>
+            </div>
+        </mat-expansion-panel>
+
+        <!-- Synchronization options (existing) -->
         <mat-expansion-panel [expanded]="true">
             <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
                 <mat-panel-title>Synchronization options</mat-panel-title>

@@ -1,6 +1,6 @@
 import { scrollIntoFirstInvalidFieldOrErrorMsg } from '@OneboxTM/feature-form-control-errors';
 import { ChannelSurcharge } from '@admin-clients/cpanel/channels/data-access';
-import { EventChannelRequestStatus, EventChannelsService } from '@admin-clients/cpanel/promoters/events/channels/data-access';
+import { EventChannelRequestStatus, EventChannelsService, ProviderPlanSettings } from '@admin-clients/cpanel/promoters/events/channels/data-access';
 import { EventsService } from '@admin-clients/cpanel/promoters/events/data-access';
 import { ArchivedEventMgrComponent } from '@admin-clients/cpanel/promoters/events/feature';
 import { TaxesMode } from '@admin-clients/cpanel-promoters-events-prices-data-access';
@@ -65,7 +65,41 @@ export class EventChannelDestinationComponent implements OnInit, OnDestroy, Writ
         this.#eventChannelsSrv.isEventChannelSurchargesSaving$()
     ]));
 
-    readonly form = this.#fb.nonNullable.group({});
+    readonly providerPlanSettingsForm = this.#fb.nonNullable.group({
+        // General Sync Settings
+        sync_sessions_as_hidden: [false],
+        sync_prices: [false],
+        sync_surcharges: [false],
+        round_prices_up: [false],
+        sync_session_labels: [false],
+        sync_session_pics: [false],
+        sync_session_key_dates: [false],
+        sync_session_type_ordering: [false],
+        sync_hidden_status: [false],
+        sync_session_type_details: [false],
+        sync_billing_terms: [false],
+        sync_allowed_num_tickets: [false],
+        sync_instructions: [false],
+
+        // Cancellation
+        enforce_cancellation: [false],
+        price_modifier: [0],
+        session_price_comes_with_taxes: [false],
+
+        // Real-Time & Availability
+        enable_real_time: [false],
+        sync_available_tickets: [false],
+        sync_sold_out_status: [false],
+
+        // Session Types
+        sync_session_type: [false],
+        use_real_time_api: [false],
+        channels_to_autopublish_session_types: [[] as number[]]
+    });
+
+    readonly form = this.#fb.nonNullable.group({
+        providerPlanSettings: this.providerPlanSettingsForm
+    });
     readonly surchargesRequestCtrl = this.#fb.nonNullable.control([] as ChannelSurcharge[]);
     readonly taxesMode = TaxesMode;
     simulationExpanded = false;
@@ -80,6 +114,11 @@ export class EventChannelDestinationComponent implements OnInit, OnDestroy, Writ
                 this.#eventChannelsSrv.loadEventChannelSurcharges(eventChannel.event.id, eventChannel.channel.id);
                 if (eventChannel.status.request === EventChannelRequestStatus.accepted) {
                     this.#eventChannelsSrv.loadEventChannelChannelSurcharges(eventChannel.event.id, eventChannel.channel.id);
+                }
+                
+                // Load provider plan settings
+                if (eventChannel.provider_plan_settings) {
+                    this.providerPlanSettingsForm.patchValue(eventChannel.provider_plan_settings);
                 }
             });
     }
@@ -105,16 +144,30 @@ export class EventChannelDestinationComponent implements OnInit, OnDestroy, Writ
             return this.#eventChannelsSrv.eventChannel.get$()
                 .pipe(
                     first(),
-                    switchMap(eventChannel => this.#eventChannelsSrv.saveChannelSurcharges(
-                        eventChannel.event.id,
-                        eventChannel.channel.id,
-                        this.surchargesRequestCtrl.value
-                    ).pipe(
-                        tap(() => {
-                            this.simulationExpanded = false;
-                            this.#ephemeralMessageSrv.showSuccess({ msgKey: 'EVENTS.CHANNEL.PROMOTER_SURCHARGES.UPDATE_SUCCESS' });
-                        })
-                    ))
+                    switchMap(eventChannel => {
+                        const providerPlanSettings: ProviderPlanSettings = this.providerPlanSettingsForm.getRawValue();
+                        
+                        return this.#eventChannelsSrv.updateEventChannel(
+                            eventChannel.event.id,
+                            eventChannel.channel.id,
+                            {
+                                settings: eventChannel.settings,
+                                use_all_quotas: eventChannel.use_all_quotas,
+                                quotas: eventChannel.quotas.filter(q => q.selected).map(q => q.id),
+                                provider_plan_settings: providerPlanSettings
+                            }
+                        ).pipe(
+                            switchMap(() => this.#eventChannelsSrv.saveChannelSurcharges(
+                                eventChannel.event.id,
+                                eventChannel.channel.id,
+                                this.surchargesRequestCtrl.value
+                            )),
+                            tap(() => {
+                                this.simulationExpanded = false;
+                                this.#ephemeralMessageSrv.showSuccess({ msgKey: 'EVENTS.CHANNEL.PROMOTER_SURCHARGES.UPDATE_SUCCESS' });
+                            })
+                        );
+                    })
                 );
         } else {
             this.form.markAllAsTouched();
@@ -131,6 +184,12 @@ export class EventChannelDestinationComponent implements OnInit, OnDestroy, Writ
                 this.form.markAsPristine();
                 this.form.markAsUntouched();
                 this.surchargesRequestCtrl.reset([], { emitEvent: false });
+                
+                // Reload provider plan settings
+                if (eventChannel.provider_plan_settings) {
+                    this.providerPlanSettingsForm.patchValue(eventChannel.provider_plan_settings);
+                }
+                
                 this.#eventChannelsSrv.loadEventChannelSurcharges(eventChannel.event.id, eventChannel.channel.id);
             });
     }
