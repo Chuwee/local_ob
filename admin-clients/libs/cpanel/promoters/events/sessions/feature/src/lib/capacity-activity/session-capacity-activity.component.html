@@ -1,0 +1,80 @@
+@if(isSmartBooking) {
+    <div slot="top-content" class="actions-container">
+        <button mat-stroked-button color="secondary" type="button"
+            class="ob-button small" [attr.aria-label]="'ACTIONS.UPDATE_CAPACITY' | translate"
+            (click)="refreshExternalAvailability()">
+            <mat-icon>published_with_changes</mat-icon>
+            {{'ACTIONS.UPDATE_CAPACITY' | translate}}
+        </button>
+    </div>
+}
+<app-form-container [disabled]="!(form?.dirty)" (cancel)="cancelChanges()" (save)="save()">
+    <div [formGroup]="form" fxLayout="column">
+        <!-- PRICE TYPES AND QUOTAS LIMITS -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.SESSION_ACTIVITY_CAPACITIES' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="template-form-section" fxLayout="column" fxLayoutAlign="start stretch">
+                @if(!isSmartBooking) {
+                    <p class="limits-description">{{'EVENTS.SESSION_ACTIVITY_CAPACITIES_INFO' | translate}}</p>
+                    <mat-form-field hidden-outline class="ob-form-field" formGroupName="mainForm">
+                        <input fxHide matInput aria-label="use venue template config">
+                        <mat-checkbox formControlName="useVenueTemplateCapacityConfig" color="primary">
+                            <mat-label>
+                                {{'EVENTS.VENUE_TEMPLATE.USE_TEMPLATE_CONFIG' | translate}}
+                            </mat-label>
+                        </mat-checkbox>
+                    </mat-form-field>
+                }
+                <app-activity-venue-template-limits [form]="limitsForm" [session]="session$ | async"
+                    [isSmartBooking]="isSmartBooking" />
+            </div>
+        </mat-expansion-panel>
+        <!-- PRICE TYPES GATES -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.SESSION_ACTIVITY_GATES' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="template-form-section" fxLayout="column" fxLayoutAlign="start stretch">
+                @if(!isSmartBooking) {
+                    <mat-form-field hidden-outline class="ob-form-field" formGroupName="mainForm">
+                        <input fxHide matInput aria-label="use venue template gates config">
+                        <mat-checkbox formControlName="useVenueTemplateGatesConfig" color="primary">
+                            <mat-label>
+                                {{'EVENTS.VENUE_TEMPLATE.USE_TEMPLATE_CONFIG' | translate}}
+                            </mat-label>
+                        </mat-checkbox>
+                    </mat-form-field>
+                }
+                <app-activity-venue-template-price-types-gates [form]="gatesForm" [session]="session$ | async" />
+            </div>
+        </mat-expansion-panel>
+        <!-- PRICE TYPES GATES -->
+        @if((session$ | async).settings.activity_sale_type !== activitySaleType.individual) {
+            <mat-expansion-panel expanded togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.SESSION_ACTIVITY_GROUPS' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="template-form-section" fxLayout="column" fxLayoutAlign="start stretch">
+                    @if(!isSmartBooking) {
+                        <mat-form-field hidden-outline class="ob-form-field">
+                            <input fxHide matInput aria-label="use venue template gates config">
+                            <mat-checkbox formControlName="useTemplateGroupConfig" color="primary">
+                                <mat-label>
+                                    {{('EVENTS.VENUE_TEMPLATE.USE_TEMPLATE_CONFIG' | translate) + ' (' + (venueTemplateName$ | async) + ')'}}
+                                </mat-label>
+                            </mat-checkbox>
+                        </mat-form-field>
+                    }
+                    <app-activity-venue-template-groups [form]="groupsForm" [session]="session$ | async" />
+                </div>
+            </mat-expansion-panel>
+        }
+    </div>
+</app-form-container>
+@if(loading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

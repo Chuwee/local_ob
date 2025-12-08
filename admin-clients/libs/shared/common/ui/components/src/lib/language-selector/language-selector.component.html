@@ -1,0 +1,38 @@
+<div fxLayout="row" [class.ob-error]="form.controls.defaultLanguage?.hasError('required')">
+    <p class="section-description">{{description}}</p>
+</div>
+<div fxLayout="column">
+    <div fxLayout="row wrap" class="language-selector">
+        @for (language of languages; track language) {
+            @if (!form.disabled || getSelectedLanguages().includes(language)) {
+                <div fxLayout="column" fxFlex="25%" class="lang-item">
+                    <div fxFlex="1 1 32px">
+                        <mat-checkbox color="primary" fxLayoutAlign="start center" fxFlex="0 1 auto"
+                            [formControl]="languagesGroup.controls[language]">
+                            {{( 'LANGUAGES.' + language ) | translate }}
+                        </mat-checkbox>
+                        @if (form.controls.defaultLanguage.enabled) {
+                            <div fxFlex="0 1 auto" fxLayoutAlign="start center">
+                                @if (form.controls.defaultLanguage.value !== language && !form.controls.defaultLanguage.disabled) {
+                                    <mat-icon class="not-selected" (click)="setDefaultLanguage(language)">
+                                        star_border
+                                    </mat-icon>
+                                } @else {
+                                    <mat-icon class="selected" (click)="setDefaultLanguage(language)">
+                                        star
+                                    </mat-icon>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@if(form.controls.defaultLanguage.errors) {
+    <div fxLayout="column">
+        <mat-error fxFlex="0 1 24px" [ob-form-errors]="form.controls.defaultLanguage" />
+    </div>
+}

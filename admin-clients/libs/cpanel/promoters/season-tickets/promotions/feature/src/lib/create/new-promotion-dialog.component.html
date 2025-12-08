@@ -1,0 +1,158 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div fxLayout="column">
+        <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+            <h2 fxFlex="100%" class="secondary title">{{'SEASON_TICKET.PROMOTIONS.NEW' | translate}}</h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+        <div mat-dialog-content fxLayout="column">
+            <div fxFlex>
+                <mat-form-field fxFlex="0 1 550px" appearance="outline" class="ob-form-field">
+                    <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                    <input matInput aria-label="name" [placeholder]="'FORMS.LABELS.NAME' | translate"
+                        [formControl]="form.controls.name" autocomplete="off">
+                    <mat-error [ob-form-errors]="form.controls.name" />
+                </mat-form-field>
+            </div>
+            <mat-divider class="ob-form-divider" />
+            <mat-radio-group [formControl]="form.controls.type" fxFlex="100%" fxLayout="row wrap" fxLayout.lt-md="column"
+                fxLayoutGap="10px" fxLayoutAlign="center" class="promotion-type-options">
+                <mat-radio-button fxFlex="0 1 calc(33% - 10px)" fxFlex.lt-md="100%" class="ob-radio-card-button"
+                    [value]="creationTypes.fromTemplate">
+                    <div class="option-title">{{'SEASON_TICKET.PROMOTIONS.NEW_FROM_TEMPLATE' | translate}}</div>
+                    <div>
+                        {{'SEASON_TICKET.PROMOTIONS.INFO_FROM_TEMPLATE' | translate}}
+                    </div>
+                </mat-radio-button>
+                <mat-radio-button fxFlex="0 1 calc(33% - 10px)" fxFlex.lt-md="100%" class="ob-radio-card-button"
+                    [value]="creationTypes.automatic">
+                    <div class="option-title">{{'SEASON_TICKET.PROMOTIONS.NEW_AUTOMATIC' | translate}}</div>
+                    <div>
+                        {{'SEASON_TICKET.PROMOTIONS.INFO_AUTOMATIC' | translate}}
+                    </div>
+                </mat-radio-button>
+                <mat-radio-button fxFlex="0 1 calc(33% - 10px)" fxFlex.lt-md="100%" class="ob-radio-card-button"
+                    [value]="creationTypes.manual">
+                    <div class="option-title">{{'SEASON_TICKET.PROMOTIONS.NEW_MANUAL' | translate}}</div>
+                    <div>
+                        {{'SEASON_TICKET.PROMOTIONS.INFO_MANUAL' | translate}}
+                    </div>
+                </mat-radio-button>
+            </mat-radio-group>
+            <div fxLayout="column" [fxShow]="form.get('type').value === creationTypes.manual">
+                <mat-divider class="ob-form-divider" />
+                <div fxFlex fxLayoutGap="33px" fxLayout.lt-md="column">
+                    <div fxFlex="30%" fxLayout="column" fxLayoutAlign="center" fxLayoutGap="35px">
+                        <mat-radio-group [formControl]="form.controls.manualType" fxLayout="column" fxLayoutGap="20px"
+                            fxLayoutAlign="center">
+                            <mat-radio-button fxFlex="0 1 calc(50% - 10px)" fxFlex.lt-md="100%"
+                                class="ob-radio-card-button" [value]="creationSubtypes.basic">
+                                <div class="option-title">{{'SEASON_TICKET.PROMOTIONS.NEW_BASIC' | translate}}</div>
+                                <div>{{'SEASON_TICKET.PROMOTIONS.INFO_BASIC' | translate}}</div>
+                            </mat-radio-button>
+                            <mat-radio-button fxFlex="0 1 calc(50% - 10px)" fxFlex.lt-md="100%"
+                                class="ob-radio-card-button" [value]="creationSubtypes.plus">
+                                <div class="option-title">{{'SEASON_TICKET.PROMOTIONS.NEW_PLUS' | translate}}</div>
+                                <div>{{'SEASON_TICKET.PROMOTIONS.INFO_PLUS' | translate}}</div>
+                            </mat-radio-button>
+                        </mat-radio-group>
+                        <div fxLayoutAlign="start start" fxLayoutAlign.lt-md="center start" class="combination-info">
+                            <mat-icon [class.info]="(!form.get('manualType').value)"
+                                [class.alert]="(!!form.get('manualType').value)">
+                                {{ (!form.get('manualType').value) ? 'info' : 'warning'}}
+                            </mat-icon>
+                            {{ (form.get('manualType').value === creationSubtypes.plus) ?
+                            ('SEASON_TICKET.PROMOTIONS.COMBINATION_INFO_PLUS' | translate) :
+                            ((form.get('manualType').value === creationSubtypes.basic) ?
+                            ('SEASON_TICKET.PROMOTIONS.COMBINATION_INFO_BASIC' | translate) :
+                            ('SEASON_TICKET.PROMOTIONS.COMBINATION_INFO' | translate))
+                            }}
+                        </div>
+                    </div>
+                    <div fxFlex="70%" fxLayout="column" [ngStyle.gt-md]="{minHeight:'350px'}">
+                        <p fxLayoutAlign="center">
+                            {{ (form.get('manualType').value === creationSubtypes.plus) ?
+                            ('SEASON_TICKET.PROMOTIONS.SELECTION_TABLE_TITLE_PLUS' | translate) :
+                            ((form.get('manualType').value === creationSubtypes.basic) ?
+                            ('SEASON_TICKET.PROMOTIONS.SELECTION_TABLE_TITLE_BASIC' | translate) :
+                            ('SEASON_TICKET.PROMOTIONS.SELECTION_TABLE_TITLE' | translate))
+                            }}
+                        </p>
+                        <div class="table-container">
+                            <mat-table class="ob-table not-touchable" matSort [dataSource]="promotions$ | async">
+                                <ng-container matColumnDef="name">
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                                        {{'FORMS.LABELS.NAME' | translate}}
+                                    </mat-header-cell>
+                                    <mat-cell *matCellDef="let row">
+                                        {{row.name}}
+                                    </mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="type">
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                                        {{'FORMS.LABELS.TYPE' | translate}}
+                                    </mat-header-cell>
+                                    <mat-cell *matCellDef="let row">
+                                        {{'SEASON_TICKET.PROMOTIONS.TYPE_OPTS.' + row.type.toUpperCase() + '.LONG' |
+                                        translate}}
+                                    </mat-cell>
+                                </ng-container>
+                                <mat-header-row *matHeaderRowDef="tableColumns; sticky: true" class="dense-row" />
+                                <mat-row *matRowDef="let row; columns: tableColumns" class="dense-row" />
+                            </mat-table>
+                        </div>
+                        <div *ngIf="(promotions$ | async)?.data.length === 0" class="context-notification-container"
+                            fxFlex="140px" fxLayoutAlign="center center">
+                            <app-context-notification class="ob-context-notification" contextType="info" fxFlex="80%">
+                                <span>{{'LIST.EMPTY' | translate}}</span>
+                            </app-context-notification>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="form.get('type').value === creationTypes.fromTemplate">
+                <mat-divider class="ob-form-divider" />
+                <p class="mat-subtitle-2">{{'SEASON_TICKET.PROMOTIONS.NEW_FROM_TPL_INFO' | translate}}</p>
+                <div fxLayout="row" class="promo-tpls-list-container">
+                    <mat-selection-list fxFlex gdColumns="1fr" gdColumns.gt-sm="1fr 1fr"
+                        [formControl]="form.controls.fromTemplate" class="ob-grid-select-list" [multiple]="false">
+                        <mat-list-option color="primary"
+                            *ngFor="let promotionTpl of promotionTpls$ | async" [value]="promotionTpl">
+                            <div fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+                                <p class="card-title" appEllipsify [matTooltip]="promotionTpl.name">
+                                    {{promotionTpl.name}}
+                                </p>
+                                <p class="promotion-type-badge"
+                                    [matTooltip]="('SEASON_TICKET.PROMOTIONS.TYPE' | translate) + ': ' +
+                                    ('SEASON_TICKET.PROMOTIONS.TYPE_OPTS.' + promotionTpl.type.toUpperCase() + '.LONG' | translate)">
+                                    {{'SEASON_TICKET.PROMOTIONS.TYPE_OPTS.' + promotionTpl.type.toUpperCase() + '.LONG'
+                                    | translate}}
+                                </p>
+                            </div>
+                        </mat-list-option>
+                    </mat-selection-list>
+                    <div *ngIf="(promotionTpls$ | async)?.length === 0" fxFlex="100%" fxLayout="row"
+                        fxLayoutAlign="center start" class="context-notification-container">
+                        <app-context-notification class="ob-context-notification" contextType="info" fxFlex="80%"
+                            fxLayoutAlign="center start">
+                            <span>{{'LIST.EMPTY' | translate}}</span>
+                        </app-context-notification>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div mat-dialog-actions fxLayoutAlign="end">
+            <button type="button" mat-button class="ob-button" (click)="close()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button [disabled]="!form.valid || (loading$ | async)" mat-flat-button color="primary" class="ob-button"
+                (click)="create()">
+                {{'FORMS.ACTIONS.CREATE' | translate}}
+            </button>
+        </div>
+    </div>
+</div>
+<div class="spinner-container" *ngIf="loading$ | async">
+    <mat-spinner />
+</div>

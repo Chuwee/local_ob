@@ -1,0 +1,28 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" class="overflow-y-auto"
+    [formGroup]="form" [disabled]="!form.dirty || (reqInProgress$ | async)">
+    <app-language-bar [languages]="languageList$ | async" [selected]="selectedLanguage$ | async" slot="outside"
+        [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)" />
+
+    <p class="mat-body-2 section-description">
+        {{ 'CHANNELS.EMAILS_COMMUNICATION.VOUCHER_REFUND_EMAIL.DESCRIPTION' | translate }}
+    </p>
+    <div class="flex">
+        <mat-form-field appearance="outline" class="ob-form-field field-with-label basis-1/2">
+            <mat-label>{{'CHANNELS.EMAILS_COMMUNICATION.VOUCHER_REFUND_EMAIL.SUBJECT' | translate}}</mat-label>
+            <input matInput aria-label="subject"
+                [placeholder]="'CHANNELS.EMAILS_COMMUNICATION.TICKETS_EMAIL.SUBJECT' | translate"
+                formControlName="subject" />
+        </mat-form-field>
+    </div>
+    <mat-form-field appearance="outline" class="ob-form-field no-padding field-with-label">
+        <mat-label>{{'CHANNELS.EMAILS_COMMUNICATION.VOUCHER_REFUND_EMAIL.BODY' | translate}}</mat-label>
+        <app-rich-text-area [autoresize]="{min: 100, max: 400}" formControlName="body"
+            [autocompleterItems]="placeholdersMap['body']" class="vertical-stretch" />
+    </mat-form-field>
+</app-form-container>
+
+@if (reqInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

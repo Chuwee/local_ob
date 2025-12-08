@@ -1,0 +1,17 @@
+@let ranges = $policyRanges();
+@if(ranges){
+<app-form-container layout="main" class="overflow-y-auto"  (cancel)="cancel()" (save)="save()" 
+    [formGroup]="form" [disabled]="!form.dirty || form.invalid || $isInProgress()">
+    <div class="section-block">
+        <p class="section-description">{{'INSURERS.FORMS.LABELS.POLICY.PRICES.DESCRIPTION' | translate}}</p>
+        <app-range-table [form]="form" [data]="ranges" [currencyFormat]="'narrow'" type="generic"/>
+    </div>
+</app-form-container>
+} 
+@if ($isInProgress()) {
+    <div class="spinner-container">
+        <mat-spinner></mat-spinner>
+    </div>
+}
+
+

@@ -1,0 +1,42 @@
+<app-searchable-paginated-selection
+    [placeholder]="'FORMS.SEARCH.SESSIONS' | translate"
+    [hideSearch]="false"
+    [data$]="$sessionsData()"
+    [metadata$]="$sessionsMetadata()"
+    [loading$]="sessionsLoading$"
+    [pageSize]="pageSize"
+    [form]="sessionsCtrl"
+    (loadData)="filterChange($event)"
+    (selected)="onSelected($event)">
+    <div slot="filter" class="badge-container">
+        {{$selectedSessions()?.length}} / {{$total()}}
+    </div>
+    <button mat-icon-button slot="filter" type="button" class="show-selected-only-button ob-button" color="tertiary"
+        [class.active]="$selectedOnly()" [disabled]="$selectedSessions()?.length === 0"
+        [matTooltip]="'CHANNELS.REVIEWS.SHOW_SELECTED_TOOLTIP' | translate"
+        (click)="updateSelectedOnly()">
+        <mat-icon fontIcon="visibility" />
+    </button>
+    <div slot="filter" class="filter-container">
+        <ob-review-config-sessions-filter (filterChange)="filterChange($event)" />
+    </div>
+    <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data" let-selectionChanged="selectionChanged">
+        <app-selection-list class="small-rows custom-disabled-option"
+            [data]="data"
+            [selectionChanged]="selectionChanged"
+            [pageForm]="pageForm">
+            <div slot="subheader" class="list-header">
+                <div class="flex">
+                    <span class="list-header-label flex-1">{{'FORMS.LABELS.SESSIONS' | translate}}</span>
+                    <span class="list-header-label">{{'FORMS.LABELS.DATE' | translate}}</span>
+                </div>
+            </div>
+            <ng-template #optionTemplate let-row>
+                <div class="flex">
+                    <span class="flex-1">{{row.name}}</span>
+                    <span>{{row.startDate | dateTime : dateTimeFormats.shortDateTimeWithWeek}}</span>
+                </div>
+            </ng-template>
+        </app-selection-list>
+    </ng-template>
+</app-searchable-paginated-selection>

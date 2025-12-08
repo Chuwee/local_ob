@@ -1,0 +1,61 @@
+<div class="details-container" fxFlex="0 1 100%" fxLayout="column">
+    <div class="heading-container" fxLayoutAlign="start center">
+        <h1 class="secondary mat-headline-3">
+            {{'TITLES.VISIBILITY' | translate}}
+        </h1>
+    </div>
+    <div class="main-content" fxFlex="0 1 100%" fxLayout="column">
+        <app-form-container [formGroup]="form" (cancel)="cancel()" (save)="save()" [disabled]="!form.dirty" layout="main">
+            <p>{{'VISIBILITY.ENTITY_ORIGIN' | translate }}</p>
+            <form fxLayout="row wrap">
+                <div fxLayout="column" [formGroup]="originForm" fxFlex="100%" fxFlex.gt-sm="35%">
+                    <!-- Operator -->
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                        <mat-label>{{'FORMS.LABELS.OPERATOR' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate" formControlName="operator_id">
+                            <mat-option>
+                                <app-select-search #operatorSelectSearch [options$]="operators$"
+                                    [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" requireSelection="true">
+                                </app-select-search>
+                            </mat-option>
+                            <mat-option *ngFor="let operator of operatorSelectSearch.getFilteredOptions$() | async" [value]="operator.id">
+                                {{operator.name}}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error [ob-form-errors]="originForm.controls.operator_id"></mat-error>
+                    </mat-form-field>
+                    <!-- Entity -->
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                        <mat-label>{{'FORMS.LABELS.ENTITY' | translate}}</mat-label>
+                        <app-select-server-search #entitySelectSearch [multiple]="false"
+                            [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate"
+                            [formControl]="originForm.controls.entity"
+                            [options$]="entities$" [moreOptionsAvailable$]="moreEntitiesAvailable$"
+                            (loadOptions)="loadEntities($event.q, $event.nextPage)">
+                        </app-select-server-search>
+                        <mat-error [ob-form-errors]="originForm.controls.entity"></mat-error>
+                    </mat-form-field>
+                </div>
+                <div fxLayout="column" fxLayoutGap="20px" fxFlex="100%">
+                    <p class="mat-subtitle-2">{{'VISIBILITY.ENTITY_DESTINY' | translate }}</p>
+                    <mat-radio-group formControlName="type" fxLayoutGap="16px" fxLayout="column">
+                        <mat-radio-button class="ob-radio-button" [value]="type" *ngFor="let type of visibilityTypesList">
+                            <div class="option-title">
+                                {{('VISIBILITY.FILTER_TYPES.' + type + '.TITLE') | translate}}
+                            </div>
+                            <div>
+                                {{('VISIBILITY.FILTER_TYPES.' + type + '.INFO') | translate}}
+                            </div>
+                        </mat-radio-button>
+                    </mat-radio-group>
+                    <app-visibility-configuration-entities fxFlex *ngIf="form.controls.type.value === 'FILTERED'"
+                        [operators]="operators$ | async" [visibility]="visibility$ | async" [form]="form">
+                    </app-visibility-configuration-entities>
+                </div>
+            </form>
+        </app-form-container>
+        <div class="spinner-container" *ngIf="reqInProgress$ | async">
+            <mat-spinner></mat-spinner>
+        </div>
+    </div>
+</div>

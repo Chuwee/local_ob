@@ -1,0 +1,108 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="!form.dirty" [formGroup]="form">
+    <!-- ENTITY CONTACT INFO -->
+    <mat-expansion-panel expanded togglePosition="before">
+        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+            <mat-panel-title>{{'ENTITY.GENERAL_DATA.INVOICE_DATA' | translate}}</mat-panel-title>
+        </mat-expansion-panel-header>
+        <div fxLayout="column">
+            <div fxLayout="row">
+                <!-- ADDRESS -->
+                <mat-form-field id="address" fxFlex="100%" fxFlex.gt-sm="0 1 45%" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.ADDRESS' | translate}}</mat-label>
+                    <input formControlName="address" matInput [placeholder]="'FORMS.LABELS.ADDRESS' | translate">
+                    <mat-error [ob-form-errors]="form" field="address" />
+                </mat-form-field>
+            </div>
+            <div fxLayout="row">
+                <!-- COUNTRY -->
+                <mat-form-field id="country" fxFlex="100%" fxFlex.gt-sm="0 1 45%" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.COUNTRY' | translate}}</mat-label>
+                    <mat-select formControlName="country" [placeholder]="'FORMS.ACTIONS.SELECT' | translate">
+                        <mat-option>
+                            <app-select-search #countrySelectSearch [options$]="countries$"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" requireSelection="true" />
+                        </mat-option>
+                        @for (country of countrySelectSearch.getFilteredOptions$() | async; track country.code) {
+                            <mat-option [value]="country.code">
+                                {{country.name}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form" field="country" />
+                </mat-form-field>
+            </div>
+            <div fxLayout="row">
+                <!-- REGION -->
+                <mat-form-field id="region" fxFlex="100%" fxFlex.gt-sm="0 1 45%" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.COUNTRY_SUBDIVISION' | translate}}</mat-label>
+                    <mat-select formControlName="region" [placeholder]="'FORMS.ACTIONS.SELECT' | translate">
+                        <mat-option [value]="null">{{'FORMS.ACTIONS.SELECT' | translate}}</mat-option>
+                        @for (region of regions$ | async; track region.code) {
+                            <mat-option [value]="region.code">
+                                {{region.name}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form" field="region" />
+                </mat-form-field>
+            </div>
+            <div fxLayout="row">
+                <!-- CITY -->
+                <mat-form-field id="city" fxFlex="100%" fxFlex.gt-sm="0 1 45%" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.CITY' | translate}}</mat-label>
+                    <input formControlName="city" matInput [placeholder]="'FORMS.LABELS.CITY' | translate">
+                    <mat-error [ob-form-errors]="form" field="city" />
+                </mat-form-field>
+            </div>
+            <div fxLayout="row">
+                <!-- POSTAL CODE -->
+                <mat-form-field id="postalCode" fxFlex="100%" fxFlex.gt-sm="0 1 45%" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.POSTAL_CODE' | translate}}</mat-label>
+                    <input formControlName="postalCode" matInput
+                        [placeholder]="'FORMS.LABELS.POSTAL_CODE' | translate">
+                    <mat-error [ob-form-errors]="form" field="postalCode" />
+                </mat-form-field>
+            </div>
+            <div fxLayout="row" fxLayoutGap="5px" formGroupName="iban">
+                <mat-form-field id="bankAccount" fxFlex="0 1 62px" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.BANK_ACCOUNT' | translate}}</mat-label>
+                    <input formControlName="countryCode" matInput [placeholder]="'ES00'" maxlength="4">
+                </mat-form-field>
+                <mat-form-field id="bankEntity" fxFlex="0 1 62px" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <input formControlName="bankEntity" matInput [placeholder]="'0000'" maxlength="4">
+                </mat-form-field>
+                <mat-form-field id="office" fxFlex="0 1 62px" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <input formControlName="office" matInput [placeholder]="'0000'" maxlength="4">
+                </mat-form-field>
+                <mat-form-field id="control" fxFlex="0 1 42px" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <input formControlName="control" matInput [placeholder]="'00'" maxlength="2">
+                </mat-form-field>
+                <mat-form-field id="account" fxFlex="0 1 120px" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <input formControlName="account" matInput [placeholder]="'0000000000'" maxlength="10">
+                </mat-form-field>
+            </div>
+            @if (form.get('iban.countryCode').dirty
+                    && form.get('iban.bankEntity').dirty
+                    && form.get('iban.office').dirty
+                    && form.get('iban.control').dirty
+                    && form.get('iban.account').dirty) {
+                <mat-error [ob-form-errors]="form" field="iban" />
+            }
+        </div>
+    </mat-expansion-panel>
+</app-form-container>
+@if (reqInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,77 @@
+<mat-accordion class="details-form-container notification-summary" fxLayout="column" [multi]="true" togglePosition="before">
+    <mat-expansion-panel [expanded]="true">
+        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+            <mat-panel-title>{{'NOTIFICATIONS.EMAIL_NOTIFICATION.EMAIL_SUMMARY' | translate}}
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div fxLayout="column" fxLayoutAlign="start stretch">
+            <div class="row">
+                <div class="details-non-editable-field ob-form-field" fxFlex="50%" fxLayout="column">
+                    <span class="field-label">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.SENDER' | translate}}</span>
+                    <span>noreply&#64;oneboxtds.com</span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-md="50%" fxLayout="column">
+                    <span class="field-label">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.SENT_DATE' | translate}}</span>
+                    <span>{{notificationDetail.summary?.sent_date | dateTime : dateTimeFormats.shortDate}}</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="details-non-editable-field ob-form-field" fxFlex="50%" fxLayout="column">
+                    <span class="field-label">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.SUBJECT' | translate}}</span>
+                    <span>{{ subject }}</span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="50%" fxLayout="column">
+                    <span class="field-label">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.EVENT' | translate}}</span>
+                    <span>{{(event$ | async)?.name}}</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-md="50%" fxLayout="column">
+                    <span class="field-label">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.SESSION' | translate}}</span>
+                    <span *ngIf="!!!(sessionNames$ | async)">-</span>
+                    <ul *ngIf="sessionNames$ | async">
+                        <li *ngFor="let sessionName of (sessionNames$ | async)">
+                            {{sessionName}}
+                        </li>
+                    </ul>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="50%" fxLayout="column">
+                    <span class="field-label">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.CHANNEL' | translate}}</span>
+                    <span *ngIf="!!!(channelNames$ | async)">-</span>
+                    <ul *ngIf="channelNames$ | async">
+                        <li *ngFor="let channelName of (channelNames$ | async)">
+                            {{channelName}}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row">
+                <div class="details-non-editable-field ob-form-field" fxFlex="50%" fxLayout="column">
+                    <span class="field-label">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.TOTAL_SENT_ERROR' | translate}}</span>
+                    <span>{{ 'NOTIFICATIONS.EMAIL_NOTIFICATION.DETAIL.TOTAL_SENT_ERROR_DATA' | translate: {
+                        sentError: notificationDetail.summary?.errors,
+                        totalEmails: notificationDetail.summary?.total} }}</span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-md="50%" fxLayout="column">
+                    <span class="field-label">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.TOTAL_SENT_SUCCESS' | translate}}</span>
+                    <span>{{ 'NOTIFICATIONS.EMAIL_NOTIFICATION.DETAIL.TOTAL_SENT_SUCCESS_DATA' | translate: {
+                        sentSuccess: notificationDetail.summary?.sent,
+                        totalEmails: notificationDetail.summary?.total} }}</span>
+                </div>
+            </div>
+            <mat-divider fxFlex="0 1 100%"></mat-divider>
+            <div fxFlex.gt-sm="50%" fxLayout="column" class="download_recipients">
+                <div fxFlex="100%" fxLayout="column" fxLayoutAlign="center start">
+                    <button mat-stroked-button color="tertiary" class="ob-button small" (click)="exportRecipients()"
+                        [disabled]="(isExportLoading$ | async)">
+                        <mat-icon>file_download</mat-icon>
+                        {{'NOTIFICATIONS.EMAIL_NOTIFICATION.DETAIL.DOWNLOAD_RECIPIENTS' | translate}}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </mat-expansion-panel>
+</mat-accordion>
+<div class="spinner-container" *ngIf="isLoading$ | async">
+    <mat-spinner></mat-spinner>
+</div>

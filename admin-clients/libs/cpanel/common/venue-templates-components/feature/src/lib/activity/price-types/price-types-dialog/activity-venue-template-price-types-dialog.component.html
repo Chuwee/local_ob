@@ -1,0 +1,46 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">
+            {{ ($priceTypesMode() === priceTypesDataMode.edition ?
+                'VENUE_TPLS.EDIT_TICKET_TYPE' : 'VENUE_TPLS.ADD_TICKET_TYPE') | translate
+            }}
+        </h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <form [formGroup]="form" fxLayout="column" fxLayoutGap="16px">
+            <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                <input matInput aria-label="name" [placeholder]="'FORMS.LABELS.NAME' | translate"
+                    formControlName="name">
+                <mat-error [ob-form-errors]="form" field="name"></mat-error>
+            </mat-form-field>
+            <div fxLayout="row" fxLayoutAlign="start center">
+                <mat-form-field fxFlex="50%" appearance="outline" class="ob-form-field">
+                    <mat-label>{{'FORMS.LABELS.CODE' | translate}}</mat-label>
+                    <input matInput aria-label="name" [placeholder]="'FORMS.LABELS.CODE' | translate"
+                        formControlName="code">
+                    <mat-error [ob-form-errors]="form" field="code"></mat-error>
+                </mat-form-field>
+            </div>
+        </form>
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button"
+            (click)="$priceTypesMode() === priceTypesDataMode.edition ? editPriceType() : newPriceType()"
+            [disabled]="form.pristine || form.invalid || $loading()">
+            {{ ($priceTypesMode() === priceTypesDataMode.edition ? 'FORMS.ACTIONS.SAVE' : 'FORMS.ACTIONS.ADD') | translate}}
+        </button>
+    </div>
+</div>
+
+@if ($loading()) {
+    <div class="spinner-container">
+        <mat-spinner></mat-spinner>
+    </div>
+}

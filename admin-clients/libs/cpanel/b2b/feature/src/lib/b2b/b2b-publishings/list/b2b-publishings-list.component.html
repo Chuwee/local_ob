@@ -1,0 +1,108 @@
+<div class="list-container" fxFlex="0 1 100%" fxLayout="column">
+    <div fxFlex="0 0 42px" class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">
+                {{'TITLES.B2B_PUBLISHINGS' | translate}}
+            </h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+            <div class="filter-container" fxFlex="none">
+                <button mat-stroked-button color="tertiary" class="ob-button medium only-icon"
+                    [matMenuTriggerFor]="ticketsListMenu">
+                    <mat-icon>more_horiz</mat-icon>
+                </button>
+                <mat-menu #ticketsListMenu="matMenu">
+                    <button mat-menu-item [disabled]="(metadata$ | async)?.total === 0" (click)="exportB2bSeatsList()">
+                        {{'ACTIONS.EXPORT.BTN' | translate}}
+                    </button>
+                </mat-menu>
+            </div>
+        </div>
+    </div>
+    <div fxFlex="0 0 44px" class="heading-container" fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxFlex="50%" fxLayoutGap="20px" fxLayoutAlign="start center">
+            <div class="filter-container" fxFlex="none">
+                <app-popover appFilter>
+                    <app-b2b-publishings-list-filter #filterContent
+                        [canSelectEntity$]="canReadMultipleEntities$"></app-b2b-publishings-list-filter>
+                </app-popover>
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            <p *ngIf="metadata$ | async as metadata" class="page-summary"
+                [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: metadata">
+            </p>
+            <app-paginator [length]="(metadata$ | async)?.total" [pageSize]="pageSize"></app-paginator>
+        </div>
+    </div>
+    <div class="heading-container heading-divider">
+        <mat-divider></mat-divider>
+    </div>
+    <div class="heading-container">
+        <app-chips appFilter></app-chips>
+    </div>
+    <div class="spinner-container" *ngIf="loadingData$ | async">
+        <mat-spinner></mat-spinner>
+    </div>
+    <mat-table class="ob-table" [dataSource]="b2bSeats$ | async" [trackBy]="trackByFn"
+        matSort [matSortActive]="initSortCol" [matSortDirection]="initSortDir" matSortDisableClear
+        [class.not-touchable]="(isHandsetOrTablet$ | async) !== true"
+        [attr.aria-label]="'TITLES.B2B_CLIENTS' | translate">
+        <ng-container matColumnDef="seat">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'B2B_SEATS.SEAT' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.seat?.sector_name + (row.seat?.row_name ? (' - ' + ('B2B_PUBLISHINGS.SEAT_ROW' |
+                translate) + ' ' + row.seat?.row_name) : '') +
+                (row.seat?.seat_name ? (' - ' + ('B2B_PUBLISHINGS.SEAT_NAME' | translate) + ' ' + row.seat?.seat_name) : '')}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="session.name">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'B2B_SEATS.SESSION' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.session?.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="event.name">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'B2B_SEATS.EVENT' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.event?.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="channel.name">
+            <mat-header-cell mat-sort-header *matHeaderCellDef class="head-cell">{{'B2B_SEATS.CHANNEL' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.channel?.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="date">
+            <mat-header-cell mat-sort-header *matHeaderCellDef class="head-cell">{{'B2B_SEATS.PUBLISHED_DATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.date | dateTime : dateTimeFormats.shortDateTime}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'B2B_SEATS.STATUS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{('ENUMS.B2B_SEAT_TYPE_OPTS.' + row.type) | translate}}, {{(('ENUMS.SEAT_STATUS_OPTS.' +
+                row.seat.status) | translate) | lowercase}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="publisher.client_name">
+            <mat-header-cell mat-sort-header *matHeaderCellDef class="head-cell">{{'B2B_SEATS.PUBLISHER' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.publisher?.client_name}}</mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;" class="interactive-row"
+            [routerLink]="[row.id]"></mat-row>
+    </mat-table>
+    <ng-container
+        *ngIf="(metadata$ | async)?.total === 0 && (loadingData$ | async) === false">
+        <app-empty-state *ngIf="!hasSearchFilterApplied; else listEmpty" fxFlex="100%"
+            [title]="'B2B_SEATS.EMPTY_B2B_SEATS_LIST_TITLE' | translate"
+            [description]="'B2B_SEATS.EMPTY_B2B_SEATS_LIST_DESCRIPTION' | translate">
+        </app-empty-state>
+        <ng-template #listEmpty>
+            <div class="context-notification-container" fxFlex="0 50 100%" fxLayout="row" fxLayoutAlign="center start">
+                <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px"
+                    fxFlex="80%" fxLayoutAlign="center start">
+                    <p>{{'LIST.EMPTY' | translate}}</p>
+                </app-context-notification>
+            </div>
+        </ng-template>
+    </ng-container>
+</div>

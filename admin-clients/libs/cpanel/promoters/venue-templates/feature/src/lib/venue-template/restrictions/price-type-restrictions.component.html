@@ -1,0 +1,16 @@
+<app-actions-table [title]="'EVENTS.TIERS.TABLE_PRICE_ZONE' | translate"
+    [data]="priceTypes$" [actions]="actions" [columns]="columns" (actionClick)="actionClicked($event)">
+    <ng-container matColumnDef="badge">
+        <mat-header-cell *matHeaderCellDef class="head-cell" />
+        <mat-cell *matCellDef="let row;" fxLayoutAlign="end">
+            <div class="badge" [fxShow]="row.hasRestrictions">
+                {{'VENUE_TPLS.PRICE_TYPES.HAS_RESTRICTIONS' | translate}}
+            </div>
+        </mat-cell>
+    </ng-container>
+</app-actions-table>
+@if(isLoadingOrSaving$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

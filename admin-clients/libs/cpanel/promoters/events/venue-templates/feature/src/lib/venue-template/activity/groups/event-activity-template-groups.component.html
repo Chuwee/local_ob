@@ -1,0 +1,18 @@
+<app-form-container fxFlex="0 1 100%" [disabled]="!form.dirty || (reqInProgress$ | async)" (cancel)="cancelChanges()"
+    (save)="save()">
+    <div fxLayout="column">
+        <!-- TEMPLATE PRINCIPAL INFO -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'VENUE_TPLS.GROUPS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-activity-venue-template-groups [form]="form" [venueTemplate]="venueTemplate$ | async" />
+        </mat-expansion-panel>
+    </div>
+    <app-archived-event-mgr slot="actions-bar" [disabled]="form.dirty || (reqInProgress$ | async)" />
+</app-form-container>
+@if(reqInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

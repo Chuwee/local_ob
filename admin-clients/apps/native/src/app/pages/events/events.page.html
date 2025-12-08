@@ -1,0 +1,83 @@
+<ion-header class="ob-layout__header">
+    <ion-toolbar>
+        <div class="events-page__header">
+            <h1 class="events-page__header-username"> {{'TABS.EVENTS' |translate}}</h1>
+            <div class="events-page__header-circle-monogram" (click)="goToProfile()">
+                <div>{{$initials()}}</div>
+            </div>
+        </div>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="ob-layout__content">
+    <div class="events-page__search-bar" slot="fixed">
+        <ion-searchbar class="ob-search-bar events-page__header-search-bar"
+            placeholder="{{ 'EVENTS.FILTER_INPUT_PLACEHOLDER' | translate }}" autocapitalize="none" [value]="inputValue"
+            (ionChange)="onSearch($event)" (ionInput)="onClear()" searchIcon="./assets/media/icons/lens.svg" />         
+        <ion-button fill="clear" class="btn-filter" (click)="goToFilters()">
+            <ion-icon slot="icon-only" src="./assets/media/icons/filter_list.svg" />
+        </ion-button>
+        <ion-button fill="clear" class="btn-calendar" (click)="goToCalendar()">
+            <ion-icon slot="icon-only" src="./assets/media/icons/calendar.svg" />
+        </ion-button>
+    </div>
+    <div class="events-page__search-content">
+        @if($listOfFilterBubbles() && $listOfFilterBubbles().length > 0){
+            <div class="events-page__filters">
+                <ion-text class="events-page__filters-filter-label">{{ "EVENTS.FILTERS" | translate }}</ion-text>
+                    @for(filterBubble of $listOfFilterBubbles(); track $index){
+                        <ion-col>
+                            <ion-chip [outline]="true">
+                                <ion-label>{{filterBubble.label }} </ion-label>
+                                <ion-icon (click)="removeBubbleFilter(filterBubble.name)" name="close" />
+                            </ion-chip>
+                        </ion-col>
+                    }
+            </div>
+        }
+        <div class="events-page__result-block">
+            <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+                <ion-refresher-content />
+            </ion-refresher>
+            @if(!$isLoading() && $totalResultsCounter() === 0){
+                <static-view [viewContent]="{ title: 'NO-RESULTS-TITLE', description: 'NO-RESULTS-DESCRIPTION' }"/>
+            }@else {
+                @if(!$isLoading() || ionInfinite){
+                    <ion-text class="events-page__result-block-info">
+                        <span>
+                            {{ "EVENTS.TOTAL-RESULTS" | translate : { number: $totalResultsCounter() } }}
+                        </span>
+                    </ion-text>
+                } 
+                @if(!$isLoading() || ionInfinite){
+                    <ion-list class="events-page__event-list">
+                        @for(event of $events(); track $index){
+                            <ion-item>
+                                <event-card class="events-page__event-card" [event]="event" (tap)="goToEventDetail($event)" />
+                            </ion-item>
+                        } 
+                    </ion-list>
+                }@else {
+                    <ion-list class="events-page__event-list">
+                        <ion-item>
+                            <skeleton-card class="events-page__event-card" />
+                        </ion-item>
+                    </ion-list>           
+                }
+
+                <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+                    <ion-infinite-scroll-content />
+                </ion-infinite-scroll>
+
+            }
+       
+        </div>
+    </div>
+</ion-content>
+
+<modal [isOpen]="calendarModalIsOpen" (openModal)="calendarSelector.checkContent()" (closeModal)="closeToCalendar()">
+    @if(calendarModalIsOpen){
+        <calendar-selector #calendarSelector [selectedTime]="filterCalendar"
+        (selectDate)="updateFiltersCalendar($event)" />
+    }
+</modal>

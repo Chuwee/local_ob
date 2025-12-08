@@ -1,0 +1,72 @@
+<div mat-dialog-title>
+    <div class="flex flex-row items-center">
+        <h2 class="secondary title basis-full">{{'CHANNELS.REVIEWS.DIALOG_CONFIG.TITLE' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="dialogRef.close()">
+            <mat-icon fontIcon="close" />
+        </button>
+    </div>
+</div>
+<app-wizard-bar [steps]="[step1, step2]" />
+<div mat-dialog-content>
+    <div class="grid gap-6" [formGroup]="createForm">
+        @switch ($currentStep()) {
+            @case (step1) {
+                <ob-review-config-events [channelId]="data.channelId" [initSelection]="$selectedEvents()"
+                    [shouldDisableEvent]="shouldDisableEvent" (selectedChange)="setEvents($event)" />
+                @if (!!$selectedEvents()?.length) {
+                    <mat-radio-group class="grid gap-2" formControlName="scope">
+                        <mat-radio-button value="EVENT">
+                            {{'CHANNELS.REVIEWS.DIALOG_CONFIG.SCOPE.EVENT' | translate}}
+                        </mat-radio-button>
+                        <div class="flex items-center gap-2">
+                            <mat-radio-button value="SESSION" [disabled]="$selectedEvents().length > 1"
+                                [matTooltip]="'CHANNELS.REVIEWS.DIALOG_CONFIG.SCOPE.SESSION_TOOLTIP' | translate"
+                                [matTooltipDisabled]="$selectedEvents().length <= 1">
+                                {{'CHANNELS.REVIEWS.DIALOG_CONFIG.SCOPE.SESSION' | translate}}
+                            </mat-radio-button>
+                            <mat-icon class="ob-help-icon" fontIcon="help_outline"
+                                [matTooltip]='"CHANNELS.REVIEWS.DIALOG_CONFIG.SCOPE.SESSION_HELP" | translate' />
+                        </div>
+                    </mat-radio-group>
+                }
+                @if($showSessionsTable()){
+                    <ob-review-config-sessions [channelId]="data.channelId" [eventId]="$selectedEvents()[0]?.event?.id"
+                        [initSelection]="$selectedSessions()" (selectedChange)="setSessions($event)" class="nested-content" />
+                }
+            } @case (step2) {
+                <ob-review-config-elements-template [scope]="$scope()" [sessions]="$sessionsElements()" [events]="$eventsElements()" />
+                <ob-review-config-criteria-control [formControl]="createForm.get('criteria')" />
+                @if($showSessionsTable()){
+                    <div class="flex items-center gap-2">
+                        <mat-icon class="ob-icon small info" fontIcon="info" />
+                        <span>{{'CHANNELS.REVIEWS.DIALOG_CONFIG.SESSIONS_INFO' | translate}}</span>
+                    </div>
+                }
+            }
+        }
+    </div>
+</div>
+<div mat-dialog-actions>
+    <div class="flex-1 flex justify-end">
+        <button mat-button type="button" class="ob-button" (click)="dialogRef.close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-stroked-button color="secondary" type=" button" class="ob-button" [disabled]="$currentStep() === step1"
+            (click)="previous()">
+            <div class="flex justify-between items-center gap-3">
+                <mat-icon fontIcon="arrow_back" />
+                {{'FORMS.ACTIONS.PREVIOUS' | translate}}
+            </div>
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" [disabled]="$disabledNextStep()" (click)="next()">
+            <div class="flex justify-between items-center gap-3">
+                @if($currentStep() === step1){
+                    {{'FORMS.ACTIONS.NEXT' | translate}}
+                    <mat-icon fontIcon="arrow_forward" />
+                } @else {
+                    {{'FORMS.ACTIONS.CREATE' | translate}}
+                }
+            </div>
+        </button>
+    </div>
+</div>

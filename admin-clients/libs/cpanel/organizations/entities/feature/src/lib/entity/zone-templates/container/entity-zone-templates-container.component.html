@@ -1,0 +1,30 @@
+<div fxFlex="0 0 100%" fxLayout="column" fxLayoutAlign="stretch stretch">
+    <mat-drawer-container fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="start stretch">
+        <mat-drawer #drawer mode="side" opened fxFlex="0 0 {{sidebarWidth$ | async}}">
+            <app-entity-zone-templates-list />
+        </mat-drawer>
+        <mat-drawer-content fxFlex="0 1 100%" fxLayout="column" class="entity-zone-templates-container">
+            <div class="ob-sidebar-toggle" (click)="drawer.toggle();" [ngClass]="{'collapsed': !drawer.opened}">
+                <span class="arrow"></span>
+            </div>
+            @if ((zoneTemplates$ | async)?.length) {
+                <router-outlet />
+            }
+            @if ((zoneTemplates$ | async)?.length === 0) {
+                <app-empty-state fxFlex="1 1 100%"
+                    [title]="'ENTITY.ZONE_TEMPLATES.EMPTY_LIST_MESSAGE' | translate"
+                    [description]="'ENTITY.ZONE_TEMPLATES.CREATE_MESSAGE' | translate">
+                    @if (canWrite$ | async) {
+                        <button mat-flat-button class="ob-button" color="primary" (click)="addZoneTemplate()">
+                            <mat-icon>add</mat-icon>
+                            {{'ENTITY.ZONE_TEMPLATES.ADD_TEMPLATE' | translate}}
+                        </button>
+                    }
+                </app-empty-state>
+            }
+            @if (isLoading$ | async) {
+                <div class="spinner-container"><mat-spinner /></div>
+            }
+        </mat-drawer-content>
+    </mat-drawer-container>
+</div>

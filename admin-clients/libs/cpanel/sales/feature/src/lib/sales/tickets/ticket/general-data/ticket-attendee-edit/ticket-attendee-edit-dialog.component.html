@@ -1,0 +1,47 @@
+<div class="dialog-msg-container">
+    <form (ngSubmit)="submit()" [formGroup]="form">
+        <div mat-dialog-title>
+            <div class="flex flex-row justify-between items-center">
+                <h2 class="secondary title">{{'TICKET.ATTENDEE.EDIT.TITLE' | translate}}</h2>
+                <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </div>
+        </div>
+        @if (attendant$ | async; as attendant) {
+            <div mat-dialog-content class="flex flex-col">
+                @if (attendant.size) {
+                    <div class="flex flex-wrap flex-[0_0_100%]">
+                        @for (attendantField of attendant | keyvalue; track $index) {
+                            <mat-form-field appearance="outline"
+                                class="ob-form-field field-with-label attendant-field sm:flex-[1_1_calc(50%-25px)] flex-[1_1_100%]">
+                                <mat-label> {{'ATTENDANT_FIELD.' + attendantField.key | translate}}</mat-label>
+                                <input matInput [placeholder]="'ATTENDANT_FIELD.' + attendantField.key | translate"
+                                    [formControlName]="attendantField.key">
+                            </mat-form-field>
+                        }
+                    </div>
+                } @else {
+                    <span>{{'TICKET.ATTENDEE.EDIT.NO_EDITABLE_FIELDS' | translate}}</span>
+                }
+            </div>
+        } @else {
+            <div mat-dialog-content class="loading-attendant flex flex-col">
+                <div class="spinner-container">
+                    <mat-spinner />
+                </div>
+            </div>
+        }
+        <div mat-dialog-actions>
+            <div class="flex flex-auto justify-end">
+                <button type="button" mat-button class="ob-button" (click)="close()">
+                    {{'FORMS.ACTIONS.CANCEL' | translate}}
+                </button>
+                <button [disabled]="!form.valid || !(attendant$ | async)?.size" mat-flat-button color="primary"
+                    type="submit" class="ob-button">
+                    {{'TICKET.ATTENDEE.EDIT.SUBMIT' | translate}}
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

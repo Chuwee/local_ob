@@ -1,0 +1,80 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="100%" class="secondary title">{{'TITLES.NEW_PRODUCER' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column">
+        <form [formGroup]="form" fxLayout="column" fxLayoutAlign="start stretch">
+            <!-- Entity -->
+            <mat-form-field appearance="outline" class="ob-form-field" *ngIf="canSelectEntity$ | async">
+                <mat-label>{{'PRODUCER.ENTITY' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="entity">
+                    <mat-option>
+                        <app-select-search #entitySelectSearch [options$]="entities$"
+                            [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" requireSelection="true">
+                        </app-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let entity of entitySelectSearch.getFilteredOptions$() | async" [value]="entity">
+                        <div appEllipsify [matTooltip]="entity.name">
+                            {{entity.name}}
+                        </div>
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="form.hasError('required', 'entity')">
+                    {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                </mat-error>
+            </mat-form-field>
+            <!-- Name -->
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'PRODUCER.NAME' | translate}}</mat-label>
+                <input matInput aria-label="name" [placeholder]="'PRODUCER.NAME' | translate" formControlName="name">
+                <mat-error *ngIf="form.hasError('required','name')">
+                    {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                </mat-error>
+                <mat-error *ngIf="form.hasError('maxlength','name')">
+                    {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value: restrictions.producerNameLength})}}
+                </mat-error>
+            </mat-form-field>
+            <!-- TAX ID / NIF -->
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'PRODUCER.TAX_ID' | translate}}</mat-label>
+                <input matInput aria-label="tax_id" formControlName="tax_id">
+                <mat-error *ngIf="form.hasError('required', 'tax_id')">
+                    {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                </mat-error>
+                <mat-error *ngIf="form.hasError('maxlength', 'tax_id')">
+                    {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value: restrictions.producerTaxIdMaxLength})}}
+                </mat-error>
+                <mat-error *ngIf="form.hasError('pattern', 'tax_id')">
+                    {{'FORMS.ERRORS.INVALID_CHARACTERS' | translate}}
+                </mat-error>
+            </mat-form-field>
+            <!-- Business Name / Social Reason -->
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'PRODUCER.SOCIAL_REASON' | translate}}</mat-label>
+                <input matInput aria-label="social_reason" formControlName="social_reason">
+                <mat-error *ngIf="form.hasError('required', 'social_reason')">
+                    {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                </mat-error>
+                <mat-error *ngIf="form.hasError('maxlength', 'social_reason')">
+                    {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value:
+                    restrictions.producerSocialReasonMaxLength})}}
+                </mat-error>
+            </mat-form-field>
+        </form>
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()" [disabled]="producerSaving$ | async">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createProducer()"
+            [disabled]="(!form.dirty) || (producerSaving$ | async)">
+            {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>
+<div class="spinner-container" *ngIf="producerSaving$ | async">
+    <mat-spinner></mat-spinner>
+</div>

@@ -1,0 +1,56 @@
+@if ((requestAccepted$ | async) === true && (isLoading$ | async) === false) {
+    <app-language-bar [languages]="languageList$ | async" [selected]="language$ | async"
+        (changed)="changeLanguage($event)" class="sticky" />
+    <app-form-container hideActionBar class="no-top-padding">
+        <div class="details-container">
+            @if (shouldShowLinks) {
+                <ng-container>
+                    <div class="actions-bar" fxLayoutAlign="start center">
+                        <div fxLayout="row" fxLayoutAlign="start center">
+                            <span class="copy-label">{{'SEASON_TICKET.CHANNEL.CHANNEL.CONTENT.SEASON_TICKET_LINK_LABEL' |
+                            translate}}</span>
+                            <span class="copy-link">{{seasonTicketChannelSessionLink?.link}}</span>
+                            <app-copy-text [copyText]="seasonTicketChannelSessionLink?.link"
+                                [copyOk]="'SEASON_TICKET.CHANNEL.CHANNEL.CONTENT.LINK_COPY_OK' | translate"
+                                [copyKo]="'SEASON_TICKET.CHANNEL.CHANNEL.CONTENT.LINK_COPY_KO' | translate"
+                                [copyTooltip]="'SEASON_TICKET.CHANNEL.CHANNEL.CONTENT.COPY_LINK' | translate" />
+                        </div>
+                        <div class="go-link">
+                            <a mat-button aria-label="Go to link" class="ob-button medium" target="_blank"
+                                href="{{seasonTicketChannelSessionLink?.link}}" [disabled]="!shouldEnableLink"
+                                [matTooltip]="'SEASON_TICKET.CHANNEL.CHANNEL.CONTENT.SEASON_TICKET_NOT_ENABLED' | translate"
+                                [matTooltipDisabled]="shouldEnableLink">
+                                <span>{{'SEASON_TICKET.CHANNEL.CHANNEL.CONTENT.GO_TO_LINK' | translate}}</span>
+                                <mat-icon>launch</mat-icon>
+                            </a>
+                        </div>
+                    </div>
+                </ng-container>
+            }
+            <mat-accordion [multi]="true" [togglePosition]="'before'">
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>
+                            {{'SEASON_TICKET.CHANNEL.CHANNEL.CONTENT.TICKETS' | translate}}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div fxLayout="row" fxLayoutAlign="start center">
+                        <span>{{'SEASON_TICKET.CHANNEL.CHANNEL.CONTENT.TICKETS_DESCRIPTION' | translate}}</span>
+                        <div class="go-link">
+                            <button mat-button class="ob-button medium" (click)="openTicketPreview()">
+                                <mat-icon>visibility</mat-icon>
+                                {{'ACTIONS.SEE_TICKET.BTN' | translate}}
+                            </button>
+                        </div>
+                    </div>
+                </mat-expansion-panel>
+            </mat-accordion>
+        </div>
+    </app-form-container>
+}
+@if ((requestAccepted$ | async) === false && (isLoading$ | async) === false) {
+    <app-empty-state [title]="'SEASON_TICKET.CHANNEL.CHANNEL.CONTENT.REQUEST_NOT_ACCEPTED' | translate" />
+}
+@if ((isLoading$ | async) || (ticketLoading$ | async)) {
+    <div class="spinner-container"><mat-spinner /></div>
+}

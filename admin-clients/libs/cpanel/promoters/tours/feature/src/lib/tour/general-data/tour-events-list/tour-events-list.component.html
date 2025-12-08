@@ -1,0 +1,44 @@
+<div fxLayout="column" class="tour-events-table">
+    <mat-table class="ob-table not-touchable" [dataSource]="tourEvents$ | async" [attr.aria-label]="'TOUR.EVENTS.TITLE' | translate">
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'TOUR.EVENTS.TITLES.NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.name}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef class="footer-cell">
+                {{'FORMS.LABELS.TOTAL' | translate}}
+            </mat-footer-cell>
+        </ng-container>
+        <ng-container matColumnDef="startDate">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'TOUR.EVENTS.TITLES.START_DATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.start_date | dateTime: dateTimeFormats.shortDate}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'TOUR.EVENTS.TITLES.STATUS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{'TOUR.EVENTS.EVENT_' + row.status | translate}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container>
+        <ng-container matColumnDef="archived">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'TOUR.EVENTS.TITLES.ARCHIVED' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{(row.archived ? 'TOUR.EVENTS.ARCHIVED' : 'TOUR.EVENTS.NOT_ARCHIVED') | translate}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container>
+        <ng-container matColumnDef="capacity">
+            <mat-header-cell *matHeaderCellDef class="head-cell right">{{'TOUR.EVENTS.TITLES.CAPACITY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="right">{{row.capacity}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef class="right">{{totalCapacity$ | async}}</mat-footer-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="columns; sticky: true" class="dense-row"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: columns;" class="dense-row"></mat-row>
+        <mat-footer-row *matFooterRowDef="columns; sticky: true" class="dense-row"></mat-footer-row>
+    </mat-table>
+</div>

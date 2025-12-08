@@ -1,0 +1,190 @@
+<ion-header class="ob-layout__header">
+    @if(!$isLoading()){
+        <ion-toolbar>
+            <back-button [breadcrumbs]=" true" [viewTitle]="session?.name ?? ''" />
+            @if(!$isError() && !$isLoading()){
+                <div class="session-detail-page__header-info">
+                    <div class="session-detail-page__header-info-dates-session">
+                        <ion-text>
+                            {{session?.start_date | dateTime: dateTimeFormats.shortDateTime}}
+                        </ion-text>
+                        @if(session?.start_date){
+                            <ion-text>{{"|"}}</ion-text>
+                        }
+                        <ion-text>
+                            {{session?.start_date | dateTime: dateTimeFormats.shortDateTime}}
+                        </ion-text>
+                    </div>
+                </div>
+            }
+        </ion-toolbar>
+    }@else {
+        <ion-toolbar>
+            <back-button [breadcrumbs]=" true" viewTitle="" />
+            <div class="session-detail-page__header-info">
+                <ion-skeleton-text class="skeleton__header-info" [animated]="true" />
+                <ion-skeleton-text class="skeleton__header-info" [animated]="true" />
+            </div>
+        </ion-toolbar>
+    }
+
+</ion-header>
+
+<ion-content class="ob-layout__content">
+    @if($isError()){
+        <static-view [viewContent]="{ title: 'ERROR-TITLE', description: 'ERROR-DESCRIPTION'}" (tap)="reTry()"/>
+    }@else {
+        @if(!$isLoading()){
+            <div>
+                <ion-accordion-group mode="md" class="ob-accordion-group">
+                    <ion-accordion class="ob-accordion session-detail-page__accordion">
+                        <ion-item id="session-status" class="ob-accordion__title session-detail-page__accordion-title" slot="header"
+                            (click)="toggleActivatedClass($event)">
+                            <span>{{"SESSION_DETAIL.STATUS_BLOCK.TITLE" | translate}}</span>
+                        </ion-item>                   
+                        <div class="ob-accordion__content session-detail-page__accordion-content" slot="content">
+                            <div class="session-detail-page__accordion-text-block">
+                                <ob-select [filterOptions]="statusOptions" [value]="session?.status || null" [isMultiple]="false" [label]=""
+                                    (valueChange)="changeStatus($event)" />
+                            </div>
+                        </div>
+                    </ion-accordion>
+                    <ion-accordion class="ob-accordion session-detail-page__accordion">
+                        <ion-item id="session-dates" class="ob-accordion__title session-detail-page__accordion-title" slot="header"
+                            (click)="toggleActivatedClass($event)">
+                            <span>{{"SESSION_DETAIL.DATES.TITLE" | translate}}</span>
+                        </ion-item>
+                        <div class="ob-accordion__content session-detail-page__accordion-content" slot="content">
+                            <div class="session-detail-page__accordion-text-block">
+                                <ion-list>
+                                    <ion-item class="session-detail-page__accordion-list-item">
+                                        <div class="session-detail-page__accordion-list-item-text-container">
+                                            <ion-label class="session-detail-page__accordion-list-item-text">
+                                                {{"SESSION_DETAIL.DATES.CHANNELS" | translate}}
+                                            </ion-label>
+                                            <span class="session-detail-page__accordion-list-item-text">
+                                                {{session?.settings.release.date | dateTime: dateTimeFormats.shortDateTime}}
+                                            </span>
+                                        </div>
+                                        <div class="session-detail-page__accordion-list-item-toggle-container">
+                                            <ion-toggle class="ob-toggle" [checked]="session?.settings.release.enable"
+                                                (ionChange)="changeStatusSession('release')" />
+                                        </div>
+                                    </ion-item>
+                                    @if(session?.settings.booking.enable){
+                                        <ion-item class="session-detail-page__accordion-list-item">
+                                            <div class="session-detail-page__accordion-list-item-text-container">
+                                                <ion-label class="session-detail-page__accordion-list-item-text">
+                                                    {{"SESSION_DETAIL.DATES.BOOKING" | translate}}
+                                                </ion-label>
+                                                <span class="session-detail-page__accordion-list-item-text">
+                                                    <b>{{"SESSION_DETAIL.DATES.INIT" | translate}} :</b>
+                                                    {{session?.settings.booking.start_date | dateTime: dateTimeFormats.shortDateTime}}
+                                                </span>
+                                                <span class="session-detail-page__accordion-list-item-text">
+                                                    <b>{{"SESSION_DETAIL.DATES.END" | translate}}:</b>
+                                                    {{session?.settings.booking.end_date | dateTime: dateTimeFormats.shortDateTime}}
+                                                </span>
+                                            </div>
+                                            <div class="session-detail-page__accordion-list-item-toggle-container">
+                                                <ion-toggle class="ob-toggle" [checked]="session?.settings.booking.enable"
+                                                    (ionChange)="changeStatusSession('booking')" />
+                                            </div>
+                                        </ion-item>
+                                    }
+
+                                    <ion-item class="session-detail-page__accordion-list-item">
+                                        <div class="session-detail-page__accordion-list-item-text-container">
+                                            <ion-label class="session-detail-page__accordion-list-item-text">
+                                                {{"SESSION_DETAIL.DATES.ACTIVE_SALE" | translate}}
+                                            </ion-label>
+                                            <span class="session-detail-page__accordion-list-item-text">
+                                                <b>{{"SESSION_DETAIL.DATES.INIT" | translate}}:</b>
+                                                {{session?.settings.sale.start_date | dateTime: dateTimeFormats.shortDateTime}}
+                                            </span>
+                                            <span class="session-detail-page__accordion-list-item-text">
+                                                <b>{{"SESSION_DETAIL.DATES.END" | translate}} :</b>
+                                                {{session?.settings.sale.end_date | dateTime: dateTimeFormats.shortDateTime}}
+                                            </span>
+                                        </div>
+                                        <div class="session-detail-page__accordion-list-item-toggle-container">
+                                            <ion-toggle class="ob-toggle" [checked]="session?.settings.sale.enable"
+                                                (ionChange)="changeStatusSession('sale')" />
+                                        </div>
+                                    </ion-item>
+                                </ion-list>
+                            </div>
+                        </div>
+                    </ion-accordion>
+                    <ion-accordion class="ob-accordion session-detail-page__accordion">
+                        <ion-item id="session-search" class="ob-accordion__title session-detail-page__accordion-title" slot="header"
+                            (click)="toggleActivatedClass($event)">
+                            <span>{{"SESSION_DETAIL.SEARCH_CODE.TITLE" | translate}}</span>
+                        </ion-item>
+                        <div class="ob-accordion__content session-detail-page__accordion-content" slot="content">
+                            <div class="session-detail-page__accordion-text-block">
+                                <ion-searchbar class="ob-search-bar session-detail-page__header-search-bar"
+                                    placeholder="{{'SESSION_DETAIL.SEARCH_CODE.FILTER_INPUT_PLACEHOLDER' | translate}}"
+                                    (keyup.enter)="onEnter()" (ionInput)="onClear()" [(ngModel)]="inputValue"
+                                    searchIcon="./assets/media/icons/lens.svg" />
+                                <ion-button data-override-styles="" expand="full" class="ob-btn primary size--medium" (click)="onEnter()">
+                                    {{ "SESSION_DETAIL.SEARCH_CODE.SEARCH" | translate }}
+                                </ion-button>
+                                <div class="session-detail-page__result">
+                                    @if(!$isLoading() && $totalResultsCounter() === 0){
+                                        <static-view [viewContent]="{
+                                            title: 'NO-RESULTS-TITLE', description: 'NO-RESULTS-DESCRIPTION', isError: false}"/>
+                                    }@else {
+                                        <ion-text class="session-detail-page__result-block-title">
+                                            {{ "EVENTS.EVENTS_LIST_TITLE_SEARCH" | translate }}
+                                        </ion-text>
+                                        @if(!$isLoading()){
+                                            <ion-text class="session-detail-page__result-block-info">
+                                                <span>
+                                                    {{"EVENT_DETAIL.SESSION.TOTAL-RESULTS" | translate : {number: $totalResultsCounter()} }}
+                                                </span>
+                                            </ion-text>
+                                        }
+                                        <ion-list class="session-detail-page__ticket-list">
+                                            @for(ticket of filters.searchedResults; track $index){
+                                                <ion-item>
+                                                    <ticket-access-control-card class="session-detail-page__ticket-card" [ticket]="ticket"
+                                                        (tap)="gotToDetailTicket(ticket)" />
+                                                </ion-item>
+                                            } 
+                                        </ion-list>
+                                        <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+                                            <ion-infinite-scroll-content />
+                                        </ion-infinite-scroll>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </ion-accordion>
+                    <ion-accordion class="ob-accordion session-detail-page__accordion">
+                        <ion-item id="session-occupation" class="ob-accordion__title session-detail-page__accordion-title" slot="header"
+                            (click)="toggleActivatedClass($event)">
+                            <span>{{"SESSION_DETAIL.CHECK_OCCUPATION.TITLE" | translate}}</span>
+                        </ion-item>
+                        <div class="ob-accordion__content session-detail-page__accordion-content" slot="content">
+                            <div class="session-detail-page__accordion-text-block">
+                                <ion-label>{{"SESSION_DETAIL.CHECK_OCCUPATION.PRICE_ZONE" | translate}}</ion-label>
+                                <ob-select [filterOptions]="pricesOptions" [isMultiple]="false" [label]=""
+                                    (valueChange)="selectPriceType($event)" />
+                                <detail-price-zone [priceAvailability]="getPriceAvailable" />
+                            </div>
+                        </div>
+                    </ion-accordion>
+                </ion-accordion-group>
+            </div>
+        }@else {
+            <ion-accordion-group mode="ios" class="ob-accordion-group session-detail-page__accordion-group">
+                <ion-accordion class="ob-accordion session-detail-page__accordion">
+                    <ion-item class="ob-accordion__title session-detail-page__accordion-title" slot="header">
+                        <ion-skeleton-text class="skeleton__accordion" [animated]="true" />
+                    </ion-item>
+                </ion-accordion>
+            </ion-accordion-group>
+        }
+    }
+</ion-content>

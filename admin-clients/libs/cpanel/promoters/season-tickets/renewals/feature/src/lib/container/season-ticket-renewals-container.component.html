@@ -1,0 +1,60 @@
+<div fxFlex="100%" fxLayout="column" *ngIf="seasonTicket$ | async as seasonTicket">
+    <div class="spinner-container" *ngIf="isLoading$ | async">
+        <mat-spinner />
+    </div>
+    <div *ngIf="seasonTicket.settings.operative.allow_renewal; else renewalDisabled"
+        fxFlex="grow" fxLayoutAlign="center" class="season-ticket-renewals">
+        <div class="ob-overlay-wrapper" fxLayoutAlign="center center"
+            *ngIf="(isGenerationStatusInProgress$ | async) ||
+            (isImporting$ | async) ||
+            ((isNoneRenewalsCandidatesCompatible$ | async) && !isNoneRenewalsCandidatesCompatibleUnderstood)">
+            <div class="ob-overlay-pane">
+                <app-context-notification class="ob-context-notification-info" contextType="info"
+                    *ngIf="(isGenerationStatusInProgress$ | async)" fxFlex.gt-sm="600px" fxFlex="80%">
+                    <p>{{'SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate}}</p>
+                    <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                        [attr.aria-label]="('SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate)" />
+                </app-context-notification>
+                <app-context-notification class="ob-context-notification-info" contextType="info"
+                    *ngIf="(isImporting$ | async)" fxFlex.gt-sm="600px" fxFlex="80%">
+                    <p>{{'SEASON_TICKET.RENEWALS.IMPORTING_MESSAGE_INFO' | translate}}</p>
+                    <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                        [attr.aria-label]="('SEASON_TICKET.RENEWALS.IMPORTING_MESSAGE_INFO' | translate)" />
+                </app-context-notification>
+                <app-context-notification class="ob-context-notification-info" contextType="info"
+                    *ngIf="(isNoneRenewalsCandidatesCompatible$ | async)" fxFlex.gt-sm="600px" fxFlex="80%">
+                    <p>{{'SEASON_TICKET.RENEWALS.NONE_CANDIDATES_COMPATIBLE' | translate}}</p>
+                    <div foot fxFlex="100%" fxLayoutAlign="end">
+                        <button type="button" mat-stroked-button class="ob-button medium"
+                            [attr.aria-label]="'FORMS.ACTIONS.OK' | translate"
+                            (click)="isNoneRenewalsCandidatesCompatibleUnderstood = true">
+                            {{'FORMS.ACTIONS.OK' | translate}}
+                        </button>
+                    </div>
+                </app-context-notification>
+            </div>
+        </div>
+        <app-season-ticket-renewals-list [fxShow]="(isListShown$ | async)" fxFlex="100%"
+            ($updateSubstatusLoading)="$updateSubstatusLoading.set($event)" />
+        <app-empty-state [fxShow]="(isLoading$ | async) === false && (isListShown$ | async) === false" fxFlex="100%"
+            [description]="'SEASON_TICKET.RENEWALS.IMPORT_MESSAGE' | translate">
+            <button *ngIf="canLoggedUserWrite$ | async" mat-flat-button class="ob-button" color="primary"
+                (click)="openNewSeasonTicketRenewalDialog()"
+                [disabled]="(isLoading$ | async) || (isImporting$ | async) || (isNoneRenewalsCandidatesCompatible$ | async)
+                || (isGenerationStatusReady$ | async) === false">
+                <mat-icon>swap_vert</mat-icon>
+                {{'SEASON_TICKET.RENEWALS.IMPORT' | translate}}
+            </button>
+        </app-empty-state>
+    </div>
+    <ng-template #renewalDisabled>
+        <app-empty-state [fxShow]="(isLoading$ | async) === false" fxFlex="100%"
+            [title]="'SEASON_TICKET.RENEWALS.DISABLED.TITLE' | translate"
+            [description]="'SEASON_TICKET.RENEWALS.DISABLED.BODY' | translate">
+            <button mat-flat-button color="primary" type="button" class="ob-button"
+                [routerLink]="['/season-tickets', seasonTicket.id, 'general-data', 'renewals-config']">
+                {{'SEASON_TICKET.RENEWALS.REDIRECT' | translate}}
+            </button>
+        </app-empty-state>
+    </ng-template>
+</div>

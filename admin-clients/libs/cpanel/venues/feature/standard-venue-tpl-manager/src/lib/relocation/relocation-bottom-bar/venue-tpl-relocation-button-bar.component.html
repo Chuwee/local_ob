@@ -1,0 +1,32 @@
+<div class="bottom-actions-bar no-shadow flex items-center">
+    <div class="bottom-action-content flex justify-between flex-grow items-center">
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-2">
+                <mat-icon>info</mat-icon>
+                <span>{{'VENUE_TPLS.FORMS.INFOS.RELOCATION_MODE' | translate}}</span>
+            </div>
+            <button type="button" mat-stroked-button class="ob-button" (click)="cancelRelocation()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+        </div>
+        <div class="flex items-center">
+            <button type="button" mat-stroked-button class="ob-button"
+                [disabled]="!$relocationStatus()?.activeStep!" (click)="setActiveStep(0)">
+                <mat-icon>arrow_back</mat-icon>
+                {{'FORMS.ACTIONS.PREVIOUS' | translate}}
+            </button>
+            @if ($relocationStatus()?.activeStep === 0) {
+                <button type="button" mat-button class="ob-button"
+                    [disabled]="!$relocationStatus()?.originSeatsSelected" (click)="setActiveStep(1)">
+                    <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+                    {{'FORMS.ACTIONS.NEXT' | translate}}
+                </button>
+            } @else {
+                <button type="button" mat-button class="ob-button"
+                    [disabled]="!$relocationStatus()?.canStartRelocation" (click)="startRelocation()">
+                    {{'FORMS.ACTIONS.RELOCATION' | translate}}
+                </button>
+            }
+        </div>
+    </div>
+</div>

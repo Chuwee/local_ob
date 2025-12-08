@@ -1,0 +1,23 @@
+<mat-list cdkDropList class="ob-list" role="list" (cdkDropListDropped)="onListDrop($event)" fxLayout="column" fxLayoutGap="5px">
+    <mat-list-item *ngFor="let elem of (listElems$ | async); let i = index" cdkDrag cdkDragBoundary=".ob-list"
+        role="listitem" (click)="openAddContentDialog.emit(isCustomElement(elem?.group))" class="card-item with-icon">
+        <div fxLayout="row" fxLayoutAlign="space-between center" fxFlex="100%">
+            <div fxLayout="row" fxLayoutAlign="start center">
+                <mat-icon class="drag-icon">drag_indicator</mat-icon>
+                <div *ngIf="!isCustomElement(elem?.group) else customContentItem">
+                    <p class="card-title">{{'TICKET_PASSBOOK.FIELDS.' + elem.key | uppercase | translate}}</p>
+                    <p class="card-text">{{'TICKET_PASSBOOK.' + elem.group | uppercase | translate}}</p>
+                </div>
+            </div>
+            <div class="delete-action" fxLayout="row" fxLayoutAlign="end center">
+                <button type="button" mat-icon-button class="ob-button xsmall" (click)="removeElem(i)">
+                    <mat-icon class="delete-icon">delete</mat-icon>
+                </button>
+            </div>
+        </div>
+    </mat-list-item>
+</mat-list>
+
+<ng-template #customContentItem>
+    <p class="card-title">{{'TICKET_PASSBOOK.CUSTOM_CONTENT_TITLE' | translate}}</p>
+</ng-template>

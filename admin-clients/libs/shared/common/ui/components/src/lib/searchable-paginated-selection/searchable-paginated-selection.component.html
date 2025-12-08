@@ -1,0 +1,55 @@
+@if ({data: (data$ | async), metadata: (metadata$ | async)}; as list) {
+    <div fxLayout="column" class="paginated-selection-list-container" fxLayoutAlign="center">
+        <div fxLayout="row" fxLayoutAlign="space-between start" [class.main-page-filters]="mainPage"
+            [class.boxed-filters]="useBoxedOptions">
+            <div fxFlex fxLayout="column" [class.filters]="!mainPage">
+                <div fxFlex fxLayoutAlign="start center">
+                    <div fxFlex fxLayoutAlign="start center" fxLayoutGap="8px">
+                        <ng-content select="[slot='filter']" />
+                        @if (!hideSearch) {
+                            <app-search-input fxFlex="0 1 600px" class="search-input"
+                                [disabled]="searchDisabled" [placeholder]="placeholder" (valueChanged)="searchChanged.emit($event)" />
+                        }
+                        <ng-content select="[slot='right-filter']" />
+                    </div>
+                    @if (paginatorPosition === 'above') {
+                        <div class="paginator">
+                            <span class="page-summary" [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: {
+                                startItem: getPaginatorStartItem(list.metadata),
+                                endItem: getPaginatorEndItem(list.metadata),
+                                total: list.metadata?.total || 0
+                            }"></span>
+                            <mat-paginator hidePageSize [pageIndex]="list.metadata?.offset / list.metadata?.limit"
+                                [pageSize]="list.metadata?.limit || pageSize" [length]="list.metadata?.total"
+                                (page)="canPageChange($event)" />
+                        </div>
+                    }
+                </div>
+                <div>
+                    <ng-content select="[slot='chips']" />
+                </div>
+            </div>
+        </div>
+        <div>
+            <ng-content select="[slot='aggData']" />
+        </div>
+        @if (list.data) {
+            <div class="paginated-selection-list">
+                <ng-container [ngTemplateOutlet]="selectionTemplateRef"
+                    [ngTemplateOutletContext]="{pageForm, data: list.data, selectionChanged}" />
+                @if (paginatorPosition === 'below') {
+                    <div class="paginator bottom" [class.filters]="!mainPage">
+                        <mat-paginator hidePageSize class="with-range-label transparent" [class.main-page-paginator]="mainPage"
+                            [pageIndex]="list.metadata?.offset / list.metadata?.limit" [pageSize]="list.metadata?.limit || pageSize"
+                            [length]="list.metadata?.total" (page)="canPageChange($event)" />
+                    </div>
+                }
+                @if (loading$ | async) {
+                    <div class="spinner-container">
+                        <mat-spinner />
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}

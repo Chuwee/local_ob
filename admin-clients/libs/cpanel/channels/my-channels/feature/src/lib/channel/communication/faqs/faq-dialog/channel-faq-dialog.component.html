@@ -1,0 +1,90 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxLayout="row">
+        @if(isNewFaq) {
+            <h2 fxFlex="100%" class="secondary title">{{'CHANNELS.FAQS.NEW_TITLE' | translate}}</h2>
+        }
+        @else if(!isNewFaq) {
+            <h2 fxFlex="100%" class="secondary title">{{'CHANNELS.FAQS.EDIT_TITLE' | translate}}</h2>
+        }
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    @if(!!!(isInProgress$ | async)) {
+        <form mat-dialog-content [formGroup]="form" fxLayout="column">
+            <p>{{'CHANNELS.FAQS.DESCRIPTION' | translate}}</p>
+            <app-tabs-menu type="language" formGroupName="contents" overrideClasses="no-left-padding">
+                @for (lang of languages$ | async; track $index) {
+                    <ng-container>
+                        <ng-template appTab [ctrl]="form.controls.contents.get(lang)" lazyLoad [label]="('LANGUAGES.' + lang) | translate">
+                            <div class="faq-container" fxLayout="column" fxLayoutGap="24px" [formGroupName]="lang"
+                                fxLayoutAlign="start stretch">
+                                <div fxFlex="100%" fxLayout="column">
+                                    <span class="field-label">
+                                        {{'CHANNELS.FAQS.CONTENT_TITLE' | translate}}
+                                    </span>
+                                    <mat-form-field appearance="outline" class="ob-form-field">
+                                        <input matInput aria-label="title"
+                                            [placeholder]="'CHANNELS.FAQS.TEXTAREA_TITLE.PLACEHOLDER' | translate"
+                                            formControlName="title">
+                                        <mat-hint class="price-zone-title"
+                                            fxFlex="1 0 100%">{{'CHANNELS.FAQS.TEXTAREA_TITLE.MAX' | translate}}</mat-hint>
+                                    </mat-form-field>
+                                </div>
+                                <div fxFlex="100%" fxLayout="column">
+                                    <span class="field-label">
+                                        {{'CHANNELS.FAQS.CONTENT' | translate}}
+                                    </span>
+                                    <mat-form-field appearance="outline" class="ob-form-field no-padding">
+                                        <app-rich-text-area aria-label="content"
+                                            [placeholder]="'CHANNELS.FAQS.TEXTAREA_CONTENT.PLACEHOLDER' | translate"
+                                            formControlName="content" />
+                                        <mat-error [ob-form-errors]="form" [field]="['contents', lang, 'content']" />
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </ng-container>
+                }
+            </app-tabs-menu>
+            @if (categories.length > 1) {
+                <p>{{'CHANNELS.FAQS.CATEGORY_DESCRIPTION' | translate}}</p>
+                <div fxLayout="column">
+                    <mat-checkbox
+                        [checked]="$all().selected"
+                        [indeterminate]="$partiallySelected()"
+                        (change)="update($event.checked)">
+                        {{'CHANNELS.FAQS.CATEGORY_OPTS.ALL' | translate}}
+                    </mat-checkbox>
+                    <div [formGroup]="form.get('categories')" fxLayout="column">
+                        @for (category of $all().categories; track category; let i = $index) {
+                            <mat-checkbox [checked]="category.selected" (change)="update($event.checked, i)" class="inline checkbox-option"
+                                [formControlName]="category.name">
+                                {{'CHANNELS.FAQS.CATEGORY_OPTS.'+ category.name | translate}}
+                            </mat-checkbox>
+                        }
+                        @if(form.get('categories').touched) {
+                            <mat-error fxFlex="100%" [ob-form-errors]="form" field="categories" />
+                        }
+                    </div>
+                </div>
+            }
+        </form>
+    } @else {
+        <div fxLayout="column">
+            <div fxFlex="0 0 300px" fxLayoutAlign="center center">
+                <mat-spinner />
+            </div>
+        </div>
+    }
+
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button"
+            [disabled]="form.disabled || (isInProgress$ | async)" (click)="save()">
+            {{ (isNewFaq ? 'FORMS.ACTIONS.CREATE' : 'FORMS.ACTIONS.UPDATE') | translate }}
+        </button>
+    </div>
+</div>

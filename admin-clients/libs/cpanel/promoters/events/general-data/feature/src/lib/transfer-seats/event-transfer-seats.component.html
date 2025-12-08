@@ -1,0 +1,260 @@
+@if ($event()) {
+    <app-form-container (save)="save()" (cancel)="cancel()" layout="menu" [disabled]="!form.dirty">
+        <div slot="outside" class="status-notifications-container">
+            <div class="status-bar">
+                <mat-slide-toggle class="ob-slide-toggle" color="primary"
+                    [formControl]="form.controls.enabled">
+                    {{ 'EVENTS.TRANSFER_SEATS.ENABLED'| translate }}
+                </mat-slide-toggle>
+            </div>
+        </div>
+        <div class="flex flex-col gap-4">
+            <p>{{ 'EVENTS.TRANSFER_SEATS.DESCRIPTION' | translate }}</p>
+            <mat-accordion [multi]="true" [togglePosition]="'before'" [formGroup]="form">
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'EVENTS.TRANSFER_SEATS.MAX_TRANSFERS_RECOVERS_DELAY' | translate}}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="flex flex-col">
+                        <div class="flex flex-col gap-4 section-block">
+                            <div class="flex flex-col">
+                                <div class="flex flex-wrap items-center">
+                                    <mat-checkbox formControlName="enable_transfer_delay" color="primary">
+                                        {{'EVENTS.TRANSFER_SEATS.TRANSFER_DELAY_ENABLED' | translate}}
+                                    </mat-checkbox>
+                                </div>
+                                @if (form.controls.enable_transfer_delay.value) {
+                                    <mat-radio-group class="flex flex-col gap-4 transfer-delay" formControlName="transfer_delay_type">
+                                        <mat-radio-button class="ob-radio-button align" [value]="'FROM'">
+                                            <div class="flex flex-row items-baseline" [formGroup]="form.controls.transfer_delay">
+                                                <label>{{'EVENTS.TRANSFER_SEATS.MIN_TRANSFER_DELAY_PREFIX' | translate}}</label>
+                                                <mat-form-field class="ob-form-field inline-field value-field transfer-delay-input"
+                                                    appearance="outline">
+                                                    <input matInput type="number" formControlName="from" min="1" step="1">
+                                                </mat-form-field>
+                                                <label>{{'EVENTS.TRANSFER_SEATS.MIN_TRANSFER_DELAY_SUFFIX' | translate}}</label>
+                                            </div>
+                                        </mat-radio-button>
+                                        <mat-radio-button class="ob-radio-button align" [value]="'TO'">
+                                            <div class="flex flex-row items-baseline" [formGroup]="form.controls.transfer_delay">
+                                                <label>{{'EVENTS.TRANSFER_SEATS.MAX_TRANSFER_DELAY_PREFIX' | translate}}</label>
+                                                <mat-form-field class="ob-form-field inline-field value-field transfer-delay-input"
+                                                    appearance="outline">
+                                                    <input matInput type="number" formControlName="to" min="1" step="1">
+                                                </mat-form-field>
+                                                <label>{{'EVENTS.TRANSFER_SEATS.MAX_TRANSFER_DELAY_SUFFIX' | translate}}</label>
+                                            </div>
+                                        </mat-radio-button>
+                                        <mat-radio-button class="ob-radio-button align" [value]="'RANGE'">
+                                            <div class="flex flex-row items-baseline"
+                                                [formGroup]="form.controls.transfer_delay.controls.range">
+                                                <label>{{'EVENTS.TRANSFER_SEATS.MIN_TRANSFER_DELAY_PREFIX' | translate}}</label>
+                                                <mat-form-field class="ob-form-field inline-field value-field transfer-delay-input"
+                                                    appearance="outline">
+                                                    <input matInput type="number" formControlName="min_delay_time" min="1" step="1">
+                                                </mat-form-field>
+                                                <label>{{'EVENTS.TRANSFER_SEATS.TRANSFER_DELAY_RANGE_PREFIX' | translate}}</label>
+                                                <mat-form-field class="ob-form-field inline-field value-field transfer-delay-input"
+                                                    appearance="outline">
+                                                    <input matInput type="number" formControlName="max_delay_time" min="1" step="1">
+                                                </mat-form-field>
+                                                <label>{{'EVENTS.TRANSFER_SEATS.TRANSFER_DELAY_RANGE_SUFFIX' | translate }}</label>
+                                            </div>
+                                        </mat-radio-button>
+                                    </mat-radio-group>
+                                    <mat-error class="transfer-delay-range-error"
+                                        [ob-form-errors]="form.controls.transfer_delay" [field]="['range']" />
+                                }
+                            </div>
+                            <div class="flex flex-1 items-baseline gap-1">
+                                <mat-checkbox formControlName="enable_recover_delay" color="primary" />
+                                <div class="flex sm:flex-1 flex-wrap items-baseline">
+                                    <label>{{'EVENTS.TRANSFER_SEATS.MAX_RECOVER_DELAY' | translate}}</label>
+                                    <mat-form-field class="ob-form-field inline-field value-field basis-24"
+                                        appearance="outline">
+                                        <input matInput type="number" formControlName="recovery_ticket_max_delay_time" min="1" step="1">
+                                    </mat-form-field>
+                                    <label>{{'EVENTS.TRANSFER_SEATS.PREV_HOURS' | translate }}</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <mat-divider />
+
+                        <div class="flex flex-col gap-4 section-block">
+                            <div class="flex flex-col">
+                                <mat-checkbox formControlName="enable_multiple_transfers" color="primary">
+                                    <b>{{'EVENTS.TRANSFER_SEATS.MULTIPLE_TRANSFERS_ENABLED' | translate}}</b>
+                                </mat-checkbox>
+                                <div class="multiple-transfers-description">
+                                    <span>{{'EVENTS.TRANSFER_SEATS.MULTIPLE_TRANSFERS_ENABLED_DESCRIPTION' | translate}}</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap items-center">
+                                <mat-checkbox formControlName="enable_max_ticket_transfers" color="primary">
+                                    <div class="flex items-center gap-1">
+                                        <span>{{'EVENTS.TRANSFER_SEATS.MAX_LIMIT_TRANSFERS_CHECK' | translate}}</span>
+                                        <mat-icon class="ob-help-icon" fontIcon="help_outline"
+                                            [matTooltip]='"EVENTS.TRANSFER_SEATS.MAX_LIMIT_TRANSFERS_CHECK_TOOLTIP" | translate' />
+                                    </div>
+                                </mat-checkbox>
+                                <mat-form-field class="ob-form-field inline-field value-field basis-24" appearance="outline">
+                                    <input matInput type="number" inputmode="numeric" placeholder="0"
+                                        formControlName="max_ticket_transfers" min="1" step="1">
+                                    <mat-error class="under_error" [ob-form-errors]="form.controls.max_ticket_transfers" />
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        @if ($showFriendsSettings()) {
+                            <mat-divider />
+                            <div class="flex align-center section-block">
+                                <mat-checkbox formControlName="enable_friends_family" color="primary">
+                                    {{'EVENTS.TRANSFER_SEATS.LIMIT_FRIENDS_FAMILY' | translate}}
+                                </mat-checkbox>
+                            </div>
+                        }
+                    </div>
+                </mat-expansion-panel>
+
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'EVENTS.TRANSFER_SEATS.SESSIONS.TITLE' | translate}}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="flex flex-col">
+                        <div class="flex flex-col event-sessions-container">
+                            <h3 class="section-title">{{'EVENTS.TRANSFER_SEATS.SESSIONS.SELECTION_TITLE' | translate}}</h3>
+                            <p>{{'EVENTS.TRANSFER_SEATS.SESSIONS.SELECTION_DESCRIPTION' | translate}}</p>
+                            <mat-radio-group [formControl]="form.controls.sessions.controls.select_all">
+                                <mat-radio-button [value]="true" class="ob-radio-button vertical-list">
+                                    <div>{{'EVENTS.TRANSFER_SEATS.SESSIONS.SELECTION_ALL' | translate}}</div>
+                                </mat-radio-button>
+                                <mat-radio-button [value]="false" class="ob-radio-button vertical-list">
+                                    <div>{{'EVENTS.TRANSFER_SEATS.SESSIONS.SELECTION_RESTRICTED' | translate}}</div>
+                                </mat-radio-button>
+                                @if (form.value.sessions.select_all === false) {
+                                    <div class="sessions-selection nested-content">
+                                        @let selectedSessions = form.value.sessions.selection?.length || 0;
+                                        <app-searchable-paginated-selection [placeholder]="'FORMS.SEARCH.SESSIONS' | translate"
+                                            [class.field-error]="form.controls.sessions.controls.selection.hasError('atLeastOneRequired')
+                                                && form.controls.sessions.controls.selection.touched"
+                                            [form]="form.controls.sessions.controls.selection"
+                                            [pageSize]="pageSize" [data$]="sessionsList$" [metadata$]="sessionsMetadata$"
+                                            [loading$]="areSessionsLoading$" (loadData)="filterChangeHandler($event)">
+                                            <div slot="filter" class="badge-container">
+                                                {{selectedSessions}} / {{$sessionsMetadata()?.total || 0}}
+                                    </div>
+                                    <!--  TODO: Commented till back model changed -->
+                                    <!-- <button slot="filter" type="button" mat-icon-button class="show-selected-only-button ob-button"
+                                                color="tertiary" fxFlex="none" [class.active]="sessionsSelectedOnly$ | async"
+                                                [matTooltip]="'EVENTS.PROMOTIONS.SHOW_SELECTED_TOOLTIP' | translate"
+                                                (click)="showSelectedOnlyClick.emit()">
+                                                <mat-icon>visibility</mat-icon>
+                                            </button> -->
+                                    <div slot="filter" class="filter-container" fxFlex="none">
+                                        <app-sessions-selector-filter (filterChange)="filterChangeHandler($event)" />
+                                    </div>
+                                    <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data"
+                                        let-selectionChanged="selectionChanged">
+                                        <app-selection-list [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged"
+                                            class="small-rows">
+                                            <div slot="subheader" class="list-header">
+                                                <div class="flex justify-between items-center">
+                                                    <div>
+                                                        <mat-checkbox color="primary" [disabled]="(sessionsSelectedOnly$ | async)"
+                                                            [checked]="selectedSessions === ($sessionsMetadata()?.total || 0) || (sessionsSelectedOnly$ | async)"
+                                                            [indeterminate]="selectedSessions > 0 && selectedSessions < ($sessionsMetadata()?.total || 0)"
+                                                            (change)="selectAll($event)" />
+                                                        <span>{{'FORMS.LABELS.SESSIONS' | translate}}</span>
+                                                    </div>
+                                                    <div class="flex-[0_1_200px]">
+                                                        <span>{{'FORMS.LABELS.DATE' | translate}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <ng-template #groupHeaderTemplate let-group>
+                                                @if (group.value.length && group.key !== 'unknown') {
+                                                    <div class="group-header">
+                                                        {{(group.key === 'sessions' ?
+                                                                'EVENTS.SESSIONS.TITLE' : 'EVENTS.SESSION_PACKS') | translate | uppercase}}
+                                                    </div>
+                                                }
+                                            </ng-template>
+                                            <ng-template #optionTemplate let-row>
+                                                <div class="flex justify-between items-center">
+                                                    <div>
+                                                        @if(row.smartbooking) {
+                                                            <b>{{ 'FORMS.LABELS.SMART_BOOKING_TYPE' | translate }} | </b>
+                                                        }
+                                                        <span>{{row.name}}</span>
+                                                    </div>
+                                                    <div class="flex-[0_1_200px]">
+                                                        <span>
+                                                            {{row.start | dateTime : dateTimeFormats.shortDateTimeWithWeek}}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </ng-template>
+                                        </app-selection-list>
+                                    </ng-template>
+                                    </app-searchable-paginated-selection>
+                        </div>
+                    }
+                    </mat-radio-group>
+                    </div>
+        </div>
+        </mat-expansion-panel>
+        <!-- commented till back ready -->
+        <!-- @if ($showLoyaltyPointsSettings()) {
+                    <mat-expansion-panel [expanded]="true">
+                        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                            <mat-panel-title>{{'EVENTS.TRANSFER_SEATS.ASSIGN_POINTS_SESSION.TITLE' | translate}}
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <div class="flex flex-col section-block" [formGroup]="loyaltyForm">
+                            <p>{{'EVENTS.TRANSFER_SEATS.ASSIGN_POINTS_SESSION.DESCRIPTION' | translate}}</p>
+                            <app-search-table [dataSource]="loyaltyPointsSessions$"
+                                [metadata]="loyaltyPointsSessionsMetadata$"
+                                [columns]="columns" [pageSize]="pageSize"
+                                (changed)="form.value.sessions.select_all ? loadEventSessions($event) : loyaltyPointsTableChanged($event)"
+                                [placeholder]="'EVENTS.TRANSFER_SEATS.ASSIGN_POINTS_SESSION.SEARCH_PLACEHOLDER' | translate"
+                                emptyListTitle="EVENT.TRANSFER_SEAT.ASSIGN_POINTS_SESSION.EMPTY_LIST_TITLE"
+                                emptyListDescription="EVENT.TRANSFER_SEAT.ASSIGN_POINTS_SESSION.EMPTY_LIST_DESCRIPTION"
+                                [searchOnInteraction]="false">
+                                <ng-container matColumnDef="session">
+                                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                                        {{'FORMS.LABELS.SESSION' | translate}}
+                                    </mat-header-cell>
+                                    <mat-cell *matCellDef="let row">{{row.name}}</mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="date">
+                                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                                        {{'FORMS.LABELS.DATE' | translate}}
+                                    </mat-header-cell>
+                                    <mat-cell
+                                        *matCellDef="let row">{{row.start | localDateTime}}</mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="points">
+                                    <mat-header-cell *matHeaderCellDef class="head-cell input-column right">
+                                        {{'FORMS.LABELS.LOYALTY_POINTS' | translate}}
+                                    </mat-header-cell>
+                                    <mat-cell *matCellDef="let row" [class.editable-cell]="true" class="right">
+                                        <mat-form-field class="ob-form-field flex basis-24" appearance="outline">
+                                            <input matInput type="number" inputmode="numeric" placeholder="0" class="number-input"
+                                                [formControlName]="row.id" min="0"
+                                                [readonly]="false">
+                                        </mat-form-field>
+                                    </mat-cell>
+                                </ng-container>
+                            </app-search-table>
+                        </div>
+                    </mat-expansion-panel>
+                } -->
+        </mat-accordion>
+        </div>
+
+    </app-form-container>
+    }

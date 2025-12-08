@@ -1,0 +1,23 @@
+<div fxLayout="row" fxLayoutAlign="start stretch" class="snackbar-content" [ngClass]="typeClass">
+    <div fxFlex="32px" fxLayoutAlign="start start" class="left-side">
+        <mat-icon class="ob-icon xsmall">{{typeEnum[typeClass]}}</mat-icon>
+    </div>
+    <div fxFlex fxLayoutAlign="space-between center" class="main">
+        <p class="msg-content">{{data.msgKey | translate: data.msgParams}}</p>
+        @if (data.customBtn; as btn) {
+            <button mat-icon-button type="button" class="ob-button large"
+                [attr.aria-label]="'ACTIONS.RELOAD' | translate" [matTooltip]="(btn.tooltip ? btn.tooltip : null) | translate"
+                matTooltipShowDelay="300" (click)="btn.action()">
+                <mat-icon>{{btn.icon}}</mat-icon>
+            </button>
+        }
+    </div>
+    @if (!data.hideCloseBtn; as showCloseBtn) {
+        <div fxFlex="32px" fxLayoutAlign="center start">
+            <button mat-icon-button aria-label="close" class="ob-button close-btn"
+                [ngClass]="data.customBtn && showCloseBtn ? 'large' : 'xsmall'" (click)="close()">
+                <mat-icon>clear</mat-icon>
+            </button>
+        </div>
+    }
+</div>

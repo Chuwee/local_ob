@@ -1,0 +1,92 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'TITLES.NEW_ENTITY_CONFIG' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <form [formGroup]="form" fxLayout="column" fxLayoutAlign="start stretch">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{($isEntityConfig() ? 'FORMS.LABELS.ENTITY' :
+                 'INVOICING.OPERATORS_CONFIGURATION.TITLES.OPERATOR') | translate}}</mat-label>
+                <app-select-server-search [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="operatorId"
+                    [options$]="entities$" (loadOptions)="loadEntities($event)" [moreOptionsAvailable$]="moreAvailableEntities$">
+                </app-select-server-search>
+            </mat-form-field>
+
+            <ng-container formGroupName="config">
+                @if (!$isEntityConfig()) {
+                    <div fxLayout="column" fxLayoutGap="16px" class="radio-group-container">
+                        <mat-label>{{'INVOICING.OPERATORS_CONFIGURATION.FORMS.LABELS.OPERATORS_TYPE' | translate}}</mat-label>
+                        <mat-radio-group formControlName="type" fxLayoutGap="16px" fxLayout="column">
+                            <mat-radio-button class="ob-radio-button" [value]="invoicingOperatorType.event">
+                                <div>
+                                    {{'INVOICING.OPERATORS_CONFIGURATION.TITLES.EVENT' | translate}}
+                                </div>
+                            </mat-radio-button>
+                            <mat-radio-button class="ob-radio-button" [value]="invoicingOperatorType.channel">
+                                <div>
+                                    {{'INVOICING.OPERATORS_CONFIGURATION.TITLES.CHANNEL' | translate}}
+                                </div>
+                            </mat-radio-button>
+                            @if (form.controls['config'].get('type').invalid && form.controls['config'].get('type').touched) {
+                                <mat-error [ob-form-errors]="form.controls['config']" field="type" class="radio-error"></mat-error>
+                            }
+                        </mat-radio-group>
+                    </div>
+                }
+                <div fxLayout="row wrap" fxLayoutGap="20px">
+                    <mat-form-field fxFlex="0 1 calc(50% - 10px)" appearance="outline" class="ob-form-field">
+                        <mat-label>{{'INVOICING.OPERATORS_CONFIGURATION.TITLES.FIXED' | translate}}</mat-label>
+                        <input matInput aria-label="fixed" placeholder="0.00" formControlName="fixed"
+                            type="number" step=".01">
+                        <mat-error [ob-form-errors]="form.controls['config']" field="fixed"></mat-error>
+                    </mat-form-field>
+                    <mat-form-field fxFlex="0 1 calc(50% - 10px)" appearance="outline" class="ob-form-field">
+                        <mat-label>{{'INVOICING.OPERATORS_CONFIGURATION.TITLES.VARIABLE' | translate}}</mat-label>
+                        <input matInput aria-label="variable" placeholder="0.00" formControlName="variable"
+                            type="number" step=".01">
+                        <mat-error [ob-form-errors]="form.controls['config']" field="variable"></mat-error>
+                    </mat-form-field>
+                </div>
+                <div fxLayout="row wrap" fxLayoutGap="20px">
+                    <mat-form-field fxFlex="0 1 calc(50% - 10px)" appearance="outline" class="ob-form-field">
+                        <mat-label>{{'INVOICING.OPERATORS_CONFIGURATION.TITLES.MIN' | translate}}</mat-label>
+                        <input matInput aria-label="min" placeholder="0.00" formControlName="min"
+                            type="number" step=".01">
+                        <mat-error [ob-form-errors]="form.controls['config']" field="min"></mat-error>
+                    </mat-form-field>
+                    <mat-form-field fxFlex="0 1 calc(50% - 10px)" appearance="outline" class="ob-form-field">
+                        <mat-label>{{'INVOICING.OPERATORS_CONFIGURATION.TITLES.MAX' | translate}}</mat-label>
+                        <input matInput aria-label="max" placeholder="0.00" formControlName="max"
+                            type="number" step=".01">
+                        <mat-error [ob-form-errors]="form.controls['config']" field="max"></mat-error>
+                    </mat-form-field>
+                </div>
+                <div fxLayout="row wrap" fxLayoutGap="20px">
+                    <mat-form-field fxFlex="0 1 calc(50% - 10px)" appearance="outline" class="ob-form-field">
+                        <mat-label>{{'INVOICING.OPERATORS_CONFIGURATION.TITLES.INVITATION' | translate}}</mat-label>
+                        <input matInput aria-label="invitation" placeholder="0.00" formControlName="invitation"
+                            type="number" step=".01">
+                        <mat-error [ob-form-errors]="form.controls['config']" field="invitation"></mat-error>
+                    </mat-form-field>
+                    <mat-form-field fxFlex="0 1 calc(50% - 10px)" appearance="outline" class="ob-form-field">
+                        <mat-label>{{'INVOICING.OPERATORS_CONFIGURATION.TITLES.REFUND' | translate}}</mat-label>
+                        <input matInput aria-label="refund" placeholder="0.00" formControlName="refund"
+                            type="number" step=".01">
+                        <mat-error [ob-form-errors]="form.controls['config']" field="refund"></mat-error>
+                    </mat-form-field>
+                </div>
+            </ng-container>
+        </form>
+    </div>
+    <div mat-dialog-actions fxFlex="auto" fxLayout="row no wrap" fxLayoutAlign="end">
+        <button mat-button type="button" class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createConfig()">
+            {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>

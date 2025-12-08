@@ -1,0 +1,133 @@
+@let order = $order();
+@let ticketsBasePrice = $ticketsBasePrice();
+@let productsBasePrice = $productsBasePrice();
+@let voucherPrice = $voucherPrice();
+@let ccy = order.price?.currency;
+@let isSeatReallocation = order.type === orderTypes.seatReallocation;
+@let primaryChannelCharges = order.price?.charges?.channel;
+@let primaryPromoterCharges = order.price?.charges?.promoter;
+@let reallocationCharges = order.price?.charges?.reallocation;
+@let secondaryPromoterCharges = order.price?.charges?.secondary_market_promoter;
+@let ticketReallocationCharges = order.price?.charges?.ticket_reallocation;
+@let secondaryChannelCharges = order.price?.charges?.secondary_market_channel;
+@let deliveryPrice = order.price?.delivery || 0;
+
+<h2 class="order-summary-section-title">
+    {{(order.type === orderTypes.booking ? 'ORDER.PRICE_DATA.TITLE_BOOKING' : 'ORDER.PRICE_DATA.TITLE') | translate}}
+</h2>
+
+<div class="order-summary-price-container flex flex-col gap-2">
+    <app-order-price-row class="emphasized-price"
+        [value]="ticketsBasePrice" [ccy]="ccy"
+        [label]="'ORDER.PRICE_DATA.BASE' | translate" />
+
+    @if (order.products_count > 0) {
+        <app-order-price-row
+            [value]="productsBasePrice" [ccy]="ccy"
+            [label]="'ORDER.PRICE_DATA.PRODUCTS_BASE' | translate" />
+    }
+    @if (order.price?.sales?.automatic; as automatic) {
+        <app-order-price-row
+            [value]="automatic" [ccy]="ccy" prefix="subtraction"
+            [label]="'ORDER.PRICE_DATA.PROMOTION.AUTOMATIC' | translate" />
+    }
+    @if (order.price?.sales?.promotion; as promotion) {
+        <app-order-price-row
+            [value]="promotion" [ccy]="ccy" prefix="subtraction"
+            [label]="'ORDER.PRICE_DATA.PROMOTION.MANUAL' | translate" />
+    }
+    @if (order.price?.sales?.discount; as discount) {
+        <app-order-price-row
+            [value]="discount" [ccy]="ccy" prefix="subtraction"
+            [label]="'ORDER.PRICE_DATA.PROMOTION.DISCOUNT' | translate" />
+    }
+    @if (order.price?.sales?.order_automatic; as saleOrderAuto) {
+        <app-order-price-row
+            [value]="saleOrderAuto" [ccy]="ccy" prefix="subtraction"
+            [label]="'ORDER.PRICE_DATA.PROMOTION.ORDER_AUTOMATIC' | translate" />
+    }
+    @if (order.price?.sales?.order_collective; as saleOrderCollective) {
+        <app-order-price-row
+            [value]="saleOrderCollective" [ccy]="ccy" prefix="subtraction"
+            [label]="'ORDER.PRICE_DATA.PROMOTION.ORDER_COLLECTIVE' | translate" />
+    }
+    @if (primaryChannelCharges !== undefined) {
+        <app-order-price-row
+            [value]="primaryChannelCharges" [ccy]="ccy" prefix="addition"
+            [label]="'ORDER.PRICE_DATA.SURCHARGE.CHANNEL' | translate" />
+    }
+    @if (primaryPromoterCharges !== undefined) {
+        <app-order-price-row
+            [value]="primaryPromoterCharges" [ccy]="ccy" prefix="addition"
+            [label]="'ORDER.PRICE_DATA.SURCHARGE.PROMOTER' | translate" />
+    }
+    @if (reallocationCharges !== undefined) {
+        <app-order-price-row
+            [value]="reallocationCharges" [ccy]="ccy" prefix="addition"
+            [label]="'ORDER.PRICE_DATA.SURCHARGE.REALLOCATION' | translate" />
+    }
+    @if (secondaryPromoterCharges !== undefined) {
+        <app-order-price-row
+            [value]="secondaryPromoterCharges" [ccy]="ccy" prefix="addition"
+            [label]="'ORDER.PRICE_DATA.SURCHARGE.SECONDARY_MARKET_PROMOTER' | translate" />
+    }
+    @if (ticketReallocationCharges !== undefined) {
+        <app-order-price-row
+            [value]="ticketReallocationCharges" [ccy]="ccy" prefix="addition"
+            [label]="'ORDER.PRICE_DATA.SURCHARGE.TICKET_REALLOCATION' | translate" />
+    }
+    @if (secondaryChannelCharges !== undefined) {
+        <app-order-price-row
+            [value]="secondaryChannelCharges" [ccy]="ccy" prefix="addition"
+            [label]="'ORDER.PRICE_DATA.SURCHARGE.SECONDARY_MARKET_CHANNEL' | translate" />
+    }
+    @if (order.price?.b2b?.conditions; as conditions) {
+        <app-order-price-row
+            [value]="conditions" [ccy]="ccy" prefix="subtraction"
+            [label]="'ORDER.PRICE_DATA.B2B.CONDITION' | translate" />
+    }
+    @if (order.price?.insurance; as insurance) {
+        <app-order-price-row
+            [value]="insurance" [ccy]="ccy" prefix="addition"
+            [label]="'ORDER.PRICE_DATA.INSURANCE' | translate" />
+    }
+    @if (order.price?.donation; as donation) {
+        <app-order-price-row
+            [value]="donation" [ccy]="ccy" prefix="addition"
+            [label]="'ORDER.PRICE_DATA.DONATION' | translate" />
+    }
+    <app-order-price-row
+        [value]="deliveryPrice" [ccy]="ccy" prefix="addition"
+        label="{{'ORDER.PRICE_DATA.DELIVERY' | translate}}: {{('ENUMS.DELIVERY_OPTS.' + order.delivery) | translate}}" />
+    @if(order.price?.gateway; as gatewaySurcharge) {
+        <app-order-price-row
+            [value]="gatewaySurcharge" [ccy]="ccy" prefix="addition"
+            label="{{'ORDER.PRICE_DATA.GATEWAY' | translate}}: {{$order().payment_data?.[0].gateway}}" />
+    }
+</div>
+
+<mat-divider class="order-summary-divider"></mat-divider>
+
+<app-order-price-row class="final-price-row flex flex-col"
+    [value]="order.price?.final" [ccy]="ccy"
+    [label]="'FORMS.LABELS.TOTAL' | translate" />
+
+@if($isTaxes()){
+    <app-order-taxes-info
+        [totalTaxes]="$totalTaxes() | absoluteAmount"
+        [ccy]="order.price?.currency"
+        [itemsTaxes]="$itemsTaxesTotal()"
+        [productsTaxes]="$productsTaxesTotal()" />
+}
+
+@if (isSeatReallocation && order.price?.reallocation_refund) {
+    <app-order-price-row class="badge-price-row flex flex-col"
+        [value]="order.price?.reallocation_refund | absoluteAmount" [ccy]="ccy"
+        [label]="'ORDER.PRICE_DATA.REALLOCATION' | translate" />
+}
+
+@if (order.payment_detail?.voucher?.group?.type === voucherType.seasonTicket && !!voucherPrice) {
+    <app-order-price-row class="badge-price-row flex flex-col"
+        [value]="voucherPrice?.value | absoluteAmount" [ccy]="ccy"
+        [label]="'ORDER.PRICE_DATA.VOUCHER' | translate" />
+}

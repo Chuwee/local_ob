@@ -1,0 +1,69 @@
+<div *ngIf="ocupationTable$ | async as ocupationTable">
+    <p class="table-title">{{'EVENTS.SESSION.OCUPATION.TIERS_OCUPATION' | translate}}</p>
+    <table mat-table class="ob-table" [dataSource]="ocupationTable" multiTemplateDataRows>
+        <ng-container [matColumnDef]="tableHead[0]">
+            <th mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'EVENTS.OCUPATION.TABLE_PRICE_ZONE' | translate}}
+            </th>
+            <td mat-cell *matCellDef="let row;" fxLayout="row" fxLayoutAlign="start center" class="td_name">
+                <button mat-icon-button aria-label="Tier settings" *ngIf="row.node.length > 0"
+                    class="ob-button medium only-icon" [class.tier-margin]="row.level === 2" (click)="toggleTier(row)">
+                    <mat-icon>
+                        {{ !openedRows.has(row.id) ? 'keyboard_arrow_right' : 'keyboard_arrow_down'
+                        }}
+                    </mat-icon>
+                </button>
+                <span class="name" fxLayoutAlign="start center" *ngIf="row.level === 1">
+                    <div fxLayout="column">
+                        <span fxLayoutAlign="start center">{{row.price_type.name}}</span>
+                        <span class="aforo" fxLayoutAlign="start center">
+                            {{'EVENTS.TIERS.TABLE_CAPACITY' | translate}}:
+                            {{row.price_type.capacity}}
+                        </span>
+                    </div>
+                </span>
+                <span class="name" fxLayoutAlign="start center" *ngIf="row.level === 2">
+                    <div [class.active]="row.tier.active"></div>
+                    {{row.tier.name}}
+                </span>
+                <span class="name quota-margin" fxLayoutAlign="start center" *ngIf="row.level === 3">
+                    {{row.quota.name}}
+                </span>
+            </td>
+        </ng-container>
+        <ng-container [matColumnDef]="tableHead[1]">
+            <th mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'EVENTS.OCUPATION.TABLE_STOCK_LIMIT' | translate}}
+            </th>
+            <td mat-cell *matCellDef="let row;">
+                <span *ngIf="row.level === 2">{{row.tier.limit}}</span>
+                <span *ngIf="row.level === 3" [class.tier-limit]="!row.quota.limit">
+                    {{row.quota.limit ? row.quota.limit : row.tier.limit}}
+                </span>
+            </td>
+        </ng-container>
+        <ng-container [matColumnDef]="tableHead[2]">
+            <th mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'EVENTS.OCUPATION.TABLE_SOLD' | translate}}
+            </th>
+            <td mat-cell *matCellDef="let row;">
+                <span *ngIf="row.level === 1">{{sumAllKey(row, 'sold')}}</span>
+                <span *ngIf="row.level === 2">{{sumAllKey(row, 'sold')}}</span>
+                <span *ngIf="row.level === 3">{{row.sold}}</span>
+            </td>
+        </ng-container>
+        <ng-container [matColumnDef]="tableHead[3]">
+            <th mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'EVENTS.OCUPATION.TABLE_REFUND' | translate}}
+            </th>
+            <td mat-cell *matCellDef="let row;">
+                <span *ngIf="row.level === 1">{{sumAllKey(row, 'refunded')}}</span>
+                <span *ngIf="row.level === 2">{{sumAllKey(row, 'refunded')}}</span>
+                <span *ngIf="row.level === 3">{{row.refunded}}</span>
+            </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="tableHead" class="dense-row"></tr>
+        <tr mat-row *matRowDef="let row; columns: tableHead;" class="dense-row hoverable-row">
+        </tr>
+    </table>
+</div>

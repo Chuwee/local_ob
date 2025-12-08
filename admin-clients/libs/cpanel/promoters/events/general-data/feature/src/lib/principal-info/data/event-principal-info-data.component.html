@@ -1,0 +1,32 @@
+<div id="principalInfo" fxLayout="row wrap" fxLayoutGap="0" fxLayoutGap.gt-sm="40px">
+    <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="calc(50%-40px)" fxLayout="column"
+         *ngIf="operatorMode$ | async">
+        <span class="field-label">{{'EVENTS.ENTITY' | translate}}</span>
+        <span>{{event.entity.name}}</span>
+    </div>
+    <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" fxFlex.gt-sm="calc(50%-40px)" appearance="outline">
+        <mat-label>{{'EVENTS.NAME' | translate}}</mat-label>
+        <input matInput aria-label="name" [placeholder]="'EVENTS.NAME' | translate" [formControl]="dataForm.controls.name">
+        <mat-error [ob-form-errors]="dataForm.controls.name"></mat-error>
+    </mat-form-field>
+    <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="calc(50%-40px)" fxLayout="column">
+        <span class="field-label">{{'EVENTS.PRODUCER' | translate}}</span>
+        <span>{{event.producer.name}}</span>
+    </div>
+    <mat-form-field fxFlex="100%" fxFlex.gt-sm="calc(50%-40px)" appearance="outline" class="ob-form-field field-with-label">
+        <mat-label>{{'EVENTS.REFERENCE' | translate}}</mat-label>
+        <input matInput aria-label="reference" [placeholder]="'EVENTS.REFERENCE' | translate"
+            [formControl]="dataForm.controls.reference">
+        <mat-error [ob-form-errors]="dataForm.controls.reference"></mat-error>
+    </mat-form-field>
+    <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(50%-40px)" appearance="outline"
+        class="ob-form-field field-with-label"
+        [matTooltip]="eventStatusCtrl.disabled ? ('EVENTS.ARCHIVED_STATUS_TOOLTIP' | translate) : ''">
+        <mat-label>{{'EVENTS.STATUS' | translate}}</mat-label>
+        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" [formControl]="eventStatusCtrl">
+            <mat-option *ngFor="let status of eventStatus | keyvalue" [value]="status.value">
+                {{('EVENTS.STATUS_OPTS.' + status.value) | translate}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</div>

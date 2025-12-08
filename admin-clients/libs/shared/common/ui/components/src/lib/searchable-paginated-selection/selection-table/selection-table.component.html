@@ -1,0 +1,37 @@
+<mat-table id="optionsTable" class="ob-table" [ngClass]="overrideClasses" [dataSource]="data" [trackBy]="trackBy()">
+    <!-- Active checkbox column -->
+    <ng-container matColumnDef="active">
+        <mat-header-cell *matHeaderCellDef class="head-cell active" fxFlex="42px" [class.checkbox-margin]="margin">
+            <ng-container *ngTemplateOutlet="selectAllTemplateRef;"></ng-container>
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row; let i = index;" class="icon-cell active" fxFlex="42px" [class.checkbox-margin]="margin">
+            <mat-checkbox color="primary" (click)="$event.stopPropagation()" (change)="changeSelection(row, i)"
+                [checked]="isSelected(row) || selectionDisabled" [disabled]="selectionDisabled"
+                *ngIf="canEditSelection && !columnsDisabled?.includes(i)">
+            </mat-checkbox>
+        </mat-cell>
+    </ng-container>
+    <ng-content></ng-content>
+    <mat-header-row *matHeaderRowDef="columns" class="dense-row" [class.main-row-height]="mainPage"></mat-header-row>
+    <ng-container *ngIf="linkedRows else noLinkedRows">
+        <mat-row *matRowDef="let row; columns: columns; index as j" [routerLink]="row[linkParamKey]" class="dense-row interactive-row">
+        </mat-row>
+    </ng-container>
+    <ng-template #noLinkedRows>
+        <mat-row *matRowDef="let row; columns: columns; index as j" (click)="changeSelection(row, j, row)"
+            class="dense-row interactive-row" [class.main-row-height]="mainPage"
+            [class.ob-row-selected]="!selectionDisabled && isSelected(row)"
+            [class.ob-row-alert]="row.modified">
+        </mat-row>
+    </ng-template>
+</mat-table>
+
+<ng-container *ngIf="isEmptyStructure(data)">
+    <ng-container *ngIf="noResultsTemplateRef else defaultNoResults" [ngTemplateOutlet]="noResultsTemplateRef">
+    </ng-container>
+    <ng-template #defaultNoResults>
+        <div class="context-message-container">
+            <p class="title">{{'FORMS.SELECT.NO_RESULTS' | translate}}</p>
+        </div>
+    </ng-template>
+</ng-container>

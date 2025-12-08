@@ -1,0 +1,86 @@
+<div fxLayout="column">
+    <div class="table-actions-container" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="10px">
+        <div *ngIf="subscriptionListBuyersMetadata$ | async as buyersMetadata" class="page-summary"
+            [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: buyersMetadata">
+        </div>
+        <app-paginator [length]="(subscriptionListBuyersMetadata$ | async)?.total" [pageSize]="buyersPageSize">
+        </app-paginator>
+        <div class="filter-container" fxFlex="none">
+            <button mat-stroked-button color="tertiary" class="ob-button small only-icon"
+                [matMenuTriggerFor]="buyersListMenu">
+                <mat-icon>more_horiz</mat-icon>
+            </button>
+            <mat-menu #buyersListMenu="matMenu">
+                <button mat-menu-item [disabled]="!(subscriptionListBuyers$ | async)?.length"
+                    (click)="exportBuyers()">
+                    {{'ACTIONS.EXPORT.BTN' | translate}}
+                </button>
+            </mat-menu>
+        </div>
+    </div>
+    <mat-table class="ob-table" [dataSource]="subscriptionListBuyers$ | async" matSortDisableClear matSort
+        [matSortDirection]="initSortDir" [matSortActive]="initSortCol">
+        <ng-container matColumnDef="email">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'BUYERS.EMAIL' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span appEllipsify [matTooltip]="row.email" matTooltipClass="ob-tooltip-nowrap">{{row.email}}</span>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'BUYERS.NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span appEllipsify [matTooltip]="row.name">{{row.name}}</span>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="surname">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'BUYERS.SURNAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span appEllipsify [matTooltip]="row.surname">{{row.surname}}</span>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="gender">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'BUYERS.GENDER' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                {{ row.gender ? ('BUYERS.GENDER_OPS.' + row.gender | translate) : ''}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="date.create">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'BUYERS.CREATED_DATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.date.create | localDateTime :
+                dateTimeFormats.shortDateWithWeek}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="identityCard.type">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'BUYERS.DOCUMENT_TYPE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.identityCard?.type}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="identityCard.id">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'BUYERS.DOCUMENT_ID' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.identityCard?.id}}</mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns" class="dense-row"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;" class="dense-row">
+        </mat-row>
+    </mat-table>
+    <div class="context-notification-container" fxFlex="0 50 100%" fxLayout="row" fxLayoutAlign="center start"
+        *ngIf="(subscriptionListBuyersMetadata$ | async)?.total === 0">
+        <app-context-notification class="ob-context-notification" contextType="info"
+            fxFlex.gt-sm="600px" fxFlex="80%"
+            fxLayoutAlign="center start">
+            <p>{{'LIST.EMPTY' | translate}}</p>
+        </app-context-notification>
+    </div>
+</div>

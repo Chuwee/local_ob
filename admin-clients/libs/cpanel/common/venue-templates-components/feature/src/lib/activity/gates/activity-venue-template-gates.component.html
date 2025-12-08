@@ -1,0 +1,47 @@
+<div fxFlex="100%" class="template-form-section" fxLayout="column" [formGroup]="gatesForm">
+    <div class="gates-container">
+        <mat-form-field appearance="outline" class="ob-form-field field-with-label inline-field" fxFlex="auto">
+            <mat-label>{{'VENUE_TPLS.NEW_GATE' | translate}}</mat-label>
+            <input aria-label="new gate" matInput id="new-gate-input"
+                formControlName="newGate" (keyup.enter)="addNewGate()">
+            <mat-error [ob-form-errors]="gatesForm" field="newGate" />
+        </mat-form-field>
+        <div class="new-gate-action" fxFlex="none">
+            <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                [disabled]="!newGateControl.dirty || newGateControl.invalid || !newGateControl.value"
+                (click)="addNewGate()">
+                <mat-icon>add</mat-icon>
+                {{'FORMS.ACTIONS.ADD' | translate}}
+            </button>
+        </div>
+    </div>
+    @if(gates$ | async; as gates) {
+        <mat-list class="ob-list" formGroupName="gates"
+            [class.disabled]="form().dirty" role="list">
+            @for (gate of gates; track gate.id) {
+                <mat-list-item class="editable-item" role="listitem"
+                    [formGroupName]="$index">
+                    <mat-button-toggle aria-label="Set default gate"
+                        class="ob-icon-button-toggle-simple yellow-icon-appearance ob-button medium only-icon"
+                        [checked]="gate.default" [disabled]="gate.default" (click)="setDefaultGate(gate)">
+                        <mat-icon [ngClass]="gate.default ? 'selected' : 'not-selected'"
+                            matTooltip="{{'VENUE_TPLS.DEFAULT_GATE' | translate}}" [matTooltipDisabled]="!gate.default">
+                            {{gate.default ? 'star' : 'star_border'}}
+                        </mat-icon>
+                    </mat-button-toggle>
+                    <div fxFlex class="write-value">
+                        <input #gateInput aria-label="rename price type" #ticketTypeInput id="ticket-type-input{{$index}}" type="text"
+                            formControlName="name" class="gate"
+                            (blur)="checkValidity($index, gateInput)">
+                    </div>
+                    <div class="delete-action" [fxHide]="gate.default || form().dirty">
+                        <button type="button" mat-icon-button aria-label="Delete gate" class="ob-button medium"
+                            (click)="deleteGate(gate)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+                </mat-list-item>
+            }
+        </mat-list>
+    }
+</div>

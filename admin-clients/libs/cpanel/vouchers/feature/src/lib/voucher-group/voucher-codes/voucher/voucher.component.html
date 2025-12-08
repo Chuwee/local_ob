@@ -1,0 +1,197 @@
+<div fxFlex="1 1 100%" fxLayout="column" *ngIf="voucherGroup$ | async as group">
+    <div class="status-notifications-container">
+        <div fxLayoutAlign="center center">
+            <div fxFlex="0 1 1232px" fxLayoutAlign="end center">
+                <span class="ob-label">
+                    {{'VOUCHER_GROUP.STATUS' | translate}}:
+                </span>
+                <span class="ob-status-badge" [ngClass]="group.status?.toLowerCase()">
+                    {{('VOUCHER_GROUP.STATUS_OPTS.' + group.status) | translate}}
+                </span>
+            </div>
+        </div>
+    </div>
+    <app-form-container *ngIf="voucher$ | async as voucher" (cancel)="cancel()" (save)="save()"
+        [disabled]="!form.dirty" layout="main">
+        <div *ngIf="group.type === groupType.manual || group.type === groupType.refund" class="actions-bar">
+            <div fxFlex="0 1 1305px" fxLayout="row">
+                <button mat-button type="button" class="ob-button small" (click)="openSendEmailDialog()"
+                    [attr.aria-label]="'ACTIONS.SEND_EMAIL.BTN' | translate"
+                    [matTooltip]="'ACTIONS.SEND_EMAIL.BTN' | translate">
+                    <mat-icon>redo</mat-icon>
+                    {{'ACTIONS.SEND_EMAIL.BTN' | translate}}
+                </button>
+            </div>
+        </div>
+        <mat-accordion multi [togglePosition]="'before'">
+            <!-- VOUCHER OPERATIVE -->
+            <mat-expansion-panel expanded>
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'VOUCHER.OPERATIVE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div fxLayout="column" fxFlex="60%" fxFlex.lt-md="100%" fxLayoutGap="24px">
+                    <!-- VOUCHER STATUS -->
+                    <div fxLayout="column" fxLayoutGap="8px">
+                        <mat-slide-toggle class="ob-slide-toggle" [formControl]="statusCtrl"
+                            (change)="saveVoucherStatus($event.checked)">
+                            {{(statusCtrl.value ? 'VOUCHER.DEACTIVATE' : 'VOUCHER.ACTIVATE') | translate}}
+                        </mat-slide-toggle>
+                        <mat-divider></mat-divider>
+                    </div>
+                    <!-- VOUCHER BALANCE -->
+                    <div *ngIf="group.type !== groupType.external" fxLayout="column">
+                        <div fxLayoutAlign="space-between center">
+                            <div class="header-summary-detail purple-detail" fxLayout="column" fxLayoutAlign="start start">
+                                <span>{{'FORMS.LABELS.BALANCE' | translate}}</span>
+                                <span>{{voucher.balance | localCurrency:(currency$ | async):'narrow'}}</span>
+                            </div>
+                            <button type="button" mat-stroked-button class="ob-button medium" color="tertiary" (click)="updateBalance()">
+                                <mat-icon>edit</mat-icon>
+                                {{'VOUCHER.UPDATE_BALANCE' | translate }}
+                            </button>
+                        </div>
+                        <mat-divider></mat-divider>
+                    </div>
+                    <!-- VOUCHER ENTITY -->
+                    <div *ngIf="group.entity">
+                        <p class="mat-subtitle-2">{{'FORMS.LABELS.ENTITY' | translate}}</p>
+                        <p>{{group.entity.name}}</p>
+                    </div>
+                    <div fxLayoutGap="24px">
+                        <!-- VOUCHER PIN -->
+                        <mat-form-field *ngIf="group.validation_method === voucherValidationMethod.codeAndPin" id="pin"
+                            fxFlex="calc(50% - 24px)" appearance="outline" class="ob-form-field inline-field">
+                            <mat-label>{{'FORMS.LABELS.PIN' | translate}}</mat-label>
+                            <input [formControl]="form.controls.pin" matInput [placeholder]="'FORMS.LABELS.PIN' | translate">
+                            <mat-error [ob-form-errors]="form" field="pin"></mat-error>
+                        </mat-form-field>
+                        <!-- EMAIL -->
+                        <mat-form-field id="email" fxFlex="50%" appearance="outline" class="ob-form-field inline-field">
+                            <mat-label>{{'FORMS.LABELS.EMAIL' | translate}}</mat-label>
+                            <input [formControl]="form.controls.email" matInput [placeholder]="'FORMS.LABELS.EMAIL' | translate">
+                            <mat-error [ob-form-errors]="form" field="email"></mat-error>
+                        </mat-form-field>
+                    </div>
+                    <!-- EXPIRATION DATE -->
+                    <div fxLayout="column">
+                        <p class="mat-subtitle-2">{{'FORMS.LABELS.EXPIRATION_DATE' | translate}}</p>
+                        <div fxFlex="0 0 40px" fxLayoutAlign="start center" fxLayoutGap="20px">
+                            <mat-checkbox #expirationEnabler color="primary"
+                                [formControl]="form.controls.expiration.controls.expirationEnabled">
+                                {{'GIFT_CARD.EXPIRATION.ACTIVATE' | translate}}
+                            </mat-checkbox>
+                            <mat-form-field *ngIf="expirationEnabler.checked" appearance="outline" class="ob-form-field inline-field">
+                                <input matInput [matDatepicker]="expirationDate" [placeholder]="dateFormat"
+                                    [formControl]="form.controls.expiration.controls.expirationDate" (focus)="expirationDate.open()">
+                                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                                    (click)="$event.stopPropagation(); expirationDate.open();">
+                                    <mat-icon>event</mat-icon>
+                                </button>
+                                <mat-datepicker #expirationDate></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <!-- LIMIT CHECK -->
+                    <div fxLayout="column">
+                        <p class="mat-subtitle-2">{{'VOUCHER.LIMITS_DESC' | translate}}</p>
+                        <div fxFlex="0 0 32px" fxLayoutAlign="start center" fxLayoutGap="20px">
+                            <mat-checkbox #limitEnabler color="primary" [formControl]="form.controls.usage">
+                                {{'VOUCHER.USAGE_MAX' | translate}}
+                            </mat-checkbox>
+                            <mat-form-field fxFlex="120px" *ngIf="limitEnabler.checked" appearance="outline"
+                                class="ob-form-field inline-field">
+                                <input matInput type="number" min="1" [formControl]="form.controls.limit" placeholder="1">
+                                <mat-error class="voucher-usage-error" [ob-form-errors]="form.controls.limit">
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+            <!-- VOUCHER MOVEMENTS -->
+            <mat-expansion-panel expanded>
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'VOUCHER.MOVEMENTS' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div fxLayout="column">
+                    <div class="paginator" fxFlex fxLayoutAlign="end center" fxLayoutGap="8px">
+                        <span *ngIf="transactions$ | async" class="page-summary" [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: {
+                                    startItem: getPaginatorStartItem(transactionsPage$ | async),
+                                    endItem: getPaginatorEndItem(transactionsPage$ | async, (transactions$ | async)?.length),
+                                    total: (transactions$ | async)?.length
+                                }">
+                        </span>
+                        <mat-paginator [pageSize]="transactionsPageSize" [pageIndex]="transactionsPage$ | async" hidePageSize
+                            (page)="pageFilter($event)" [length]="(transactions$ | async)?.length">
+                        </mat-paginator>
+                    </div>
+                    <!-- VOUCHER MOVEMENTS -->
+                    <mat-table class="ob-table" [dataSource]="pagedTransactions$" [attr.aria-label]="'VOUCHER.MOVEMENTS' | translate"
+                        [class.not-touchable]="(isHandsetOrTablet$ | async) !== true">
+                        <!-- Code Column -->
+                        <ng-container matColumnDef="datetime">
+                            <mat-header-cell *matHeaderCellDef class="head-cell">
+                                {{'FORMS.LABELS.DATE' | translate}}
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row">
+                                {{row.date | dateTime : dateTimeFormats.shortDateTime}}
+                            </mat-cell>
+                        </ng-container>
+                        <!-- Amount Column -->
+                        <ng-container matColumnDef="amount">
+                            <mat-header-cell *matHeaderCellDef class="head-cell">
+                                {{'FORMS.LABELS.AMOUNT' | translate}}
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row">
+                                {{row.amount >= 0 ? '+' : ''}}{{row.amount | localCurrency:(currency$ | async):'narrow'}}
+                            </mat-cell>
+                        </ng-container>
+                        <!-- Balance Column -->
+                        <ng-container matColumnDef="balance">
+                            <mat-header-cell *matHeaderCellDef class="head-cell">
+                                {{'FORMS.LABELS.BALANCE' | translate}}
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row">
+                                {{row.balance | localCurrency:(currency$ | async):'narrow'}}
+                            </mat-cell>
+                        </ng-container>
+                        <!-- Transaction Type Column -->
+                        <ng-container matColumnDef="type">
+                            <mat-header-cell *matHeaderCellDef class="head-cell">
+                                {{'FORMS.LABELS.TYPE' | translate}}
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row">
+                                <span>
+                                    {{'VOUCHER.TRANSACTION_TYPE.' + row.type | translate}}</span>
+                            </mat-cell>
+                        </ng-container>
+                        <!-- Operation Code Column -->
+                        <ng-container matColumnDef="code">
+                            <mat-header-cell *matHeaderCellDef class="head-cell">
+                                {{'FORMS.LABELS.CODE' | translate}}
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row">
+                                {{group.type !== groupType.external || row.type === transactionType.creation ? (row.code || '-') : '-'}}
+                            </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="externalId">
+                            <mat-header-cell *matHeaderCellDef class="head-cell">
+                                {{'FORMS.LABELS.EXTERNAL_ID' | translate}}
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row">
+                                {{group.type === groupType.external && row.type === transactionType.redeem ? row.code : ''}}
+                            </mat-cell>
+                        </ng-container>
+                        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+                        <mat-row *matRowDef="let row; columns: displayedColumns;" class="dense-row"
+                            [class.interactive-row]="isLinkableTransaction(row)" [routerLink]="getOrderLink(row)">
+                        </mat-row>
+                    </mat-table>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </app-form-container>
+</div>
+<div class="spinner-container" *ngIf="reqInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

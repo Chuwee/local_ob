@@ -1,0 +1,22 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu"
+    [disabled]="!form.dirty || (isLoadingOrSaving$ | async)">
+    <span class="description">{{'CHANNELS.WHATSAPP_COMMUNICATION.DESCRIPTION' | translate}}</span>
+    <mat-checkbox [formControl]="form.controls.use_entity_config" color="primary" class="app-checkbox-wrap-label use-entity-config-check">
+        {{'CHANNELS.WHATSAPP_COMMUNICATION.USE_ENTITY_SETTINGS' | translate}}
+    </mat-checkbox>
+    <mat-radio-group [formControl]="form.controls.whatsapp_template" class="templates-container" fxLayout="column">
+        <mat-radio-button fxFlexLayout="column" *ngFor="let whatsappTemplate of (whatsappTemplates$ | async)"
+            class="ob-radio-button" [value]="whatsappTemplate.id">
+            <div class="template-name">{{whatsappTemplate.name}}</div>
+            <div fxLayout="row">
+                <p fxFlex="0 1 405px" class="template-preview">{{whatsappTemplate.preview}}</p>
+            </div>
+        </mat-radio-button>
+    </mat-radio-group>
+</app-form-container>
+
+@if (isLoadingOrSaving$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

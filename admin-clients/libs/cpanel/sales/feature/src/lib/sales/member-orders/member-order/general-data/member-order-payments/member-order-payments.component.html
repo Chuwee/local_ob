@@ -1,0 +1,59 @@
+<div fxLayout="row wrap" class="payments-container">
+    <mat-table class="ob-table order-detail-table" [dataSource]="payments">
+        <ng-container matColumnDef="date">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'FORMS.LABELS.DATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                {{row.date | dateTime : dateTimeFormats.shortDateTime}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef>
+                {{'FORMS.LABELS.TOTAL' | translate}}
+            </mat-footer-cell>
+        </ng-container>
+        <ng-container matColumnDef="method">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'FORMS.LABELS.PAYMENT_METHOD' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row; let i = index">
+                <span>{{'ORDER.PAYMENT.TYPE.' + row.type | translate}}
+                    <ng-container *ngIf="row.type === (paymentType.creditCard || paymentType.other) && row.gateway">
+                        ({{row.gateway}})
+                    </ng-container>
+                </span>
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef>
+            </mat-footer-cell>
+        </ng-container>
+        <ng-container matColumnDef="description">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'FORMS.LABELS.DESCRIPTION' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <ng-container *ngIf="row.reference">
+                    {{'ORDER.PAYMENT.REFERENCE' | translate: {numReference: row.reference} }}
+                </ng-container>
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef>
+            </mat-footer-cell>
+        </ng-container>
+        <ng-container matColumnDef="price">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'FORMS.LABELS.PRICE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                {{row.value | localCurrency: currency}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef>
+                {{paymentsTotalAmount | localCurrency: currency}}
+            </mat-footer-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="paymentsColumns" class="dense-row">
+        </mat-header-row>
+        <mat-row *matRowDef="let row; columns: paymentsColumns;" class="dense-row"
+            (click)="$event.preventDefault();">
+        </mat-row>
+        <mat-footer-row *matFooterRowDef="paymentsColumns" class="dense-row">
+        </mat-footer-row>
+    </mat-table>
+</div>

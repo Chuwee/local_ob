@@ -1,0 +1,272 @@
+@let mappingsMetadata = mappingsMetadata$ | async;
+@let hasWritePermissions = hasWritePermissions$ | async;
+
+<div class="list-container" fxFlex="0 1 100%" fxLayout="column">
+    <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">
+                {{'TITLES.MAPPINGS.MAPPINGS_LIST_TITLE' | translate}}
+            </h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+            <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                [disabled]="!hasWritePermissions"
+                [attr.aria-label]="'MAPPINGS.NEW_BTN' | translate" (click)="openNewMappingDialog()">
+                <mat-icon>add</mat-icon>
+                {{'MAPPINGS.NEW_BTN' | translate}}
+            </button>
+            <button mat-icon-button class="ob-button medium" aria-label="refresh" (click)="refresh()">
+                <mat-icon>autorenew</mat-icon>
+            </button>
+            <button mat-stroked-button color="tertiary" class="ob-button medium only-icon" [matMenuTriggerFor]="ordersListMenu">
+                <mat-icon>more_horiz</mat-icon>
+            </button>
+            <mat-menu #ordersListMenu="matMenu">
+                <button mat-menu-item [disabled]="isExportLoading$ | async" (click)="openExportMappingslistDialog()">
+                    {{'MAPPINGS.OPEN_EXPORT_MAPPINGS_LIST_DIALOG' | translate}}
+                </button>
+                @if (hasWritePermissions) {
+                    <button mat-menu-item (click)="openBulkCleanListingsDialog()">
+                        {{'MAPPINGS.BULK_CLEAN_BTN' | translate}}
+                    </button>
+                    <button mat-menu-item (click)="openBulkCreateMappingsDialog()">
+                        {{'MAPPINGS.ACTIONS.BULK_CREATE_DIALOG' | translate}}
+                    </button>
+                }
+            </mat-menu>
+        </div>
+    </div>
+
+    <div class="heading-container" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="8px">
+        <div fxFlex="85%" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+            <div class="badge-counter-container">
+                {{(selectedMappings().length)}} / {{(mappingsMetadata)?.total}}
+            </div>
+            <button type="button" class="ob-button only-icon" mat-icon-button color="tertiary"
+                [class.active]="!!(selectedOnly$ | async)"
+                [disabled]="selectedMappings().length === 0"
+                [matTooltip]="'MATCHINGS.ACTIONS.SHOW_SELECTED_TOOLTIP' | translate"
+                (click)="clickShowSelected()">
+                <mat-icon>visibility</mat-icon>
+            </button>
+
+            <div class="" fxLayout="row" fxLayoutGap="8px">
+                <button type="button" mat-flat-button class="ob-button" color="primary"
+                    [disabled]="selectedStatus() === mappingStatus.active || selectedMappings().length === 0"
+                    (click)="updateBulkStatus(mappingStatus.active)">
+                    {{'MAPPINGS.STATUS_OPTS.ACTIVE' | translate}}
+                </button>
+                <button type="button" mat-flat-button class="ob-button" color="primary"
+                    [disabled]="selectedStatus() === mappingStatus.disable || selectedMappings().length === 0"
+                    (click)="updateBulkStatus(mappingStatus.disable)">
+                    {{'MAPPINGS.STATUS_OPTS.DISABLE' | translate}}
+                </button>
+
+            </div>
+            <div class="filter-container" fxFlex="none">
+                <app-popover-date-range-picker-filter [matTooltip]="'MAPPINGS.CREATED' | translate">
+                </app-popover-date-range-picker-filter>
+            </div>
+            <div class="filter-container" fxFlex="none" data-test="filterBtn">
+                <app-popover appFilter>
+                    <app-mappings-list-filter #filterContent>
+                    </app-mappings-list-filter>
+                </app-popover>
+            </div>
+            <div class="search-field" fxFlex>
+                <app-search-input [placeholder]="'FORMS.SEARCH.MAPPINGS_LIST' | translate"></app-search-input>
+            </div>
+        </div>
+
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            @if (mappingsMetadata) {
+                <p class="page-summary"
+                    [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: mappingsMetadata">
+                </p>
+            }
+            <app-paginator [length]="(mappingsMetadata)?.total" [pageSize]="mappingsPageSize"></app-paginator>
+        </div>
+    </div>
+    <div class="heading-container">
+        <app-chips appFilter></app-chips>
+    </div>
+    @if (loadingData$ | async) {
+        <div class="spinner-container">
+            <mat-spinner></mat-spinner>
+        </div>
+    }
+    <mat-table class="ob-table" [dataSource]="mappings$ | async" matSort [matSortActive]="initSortCol"
+        [matSortDirection]="initSortDir" matSortDisableClear [attr.aria-label]="'TITLES.MAPPINGS.MAPPINGS_LIST_TITLE' | translate"
+        [class.not-touchable]="(isHandsetOrTablet$ | async) !== true">
+        <ng-container matColumnDef="favorite">
+            <mat-header-cell *matHeaderCellDef class="favorite-cell head-cell" fxFlex="0 0 60px"></mat-header-cell>
+            <mat-cell *matCellDef="let row" class="favorite-cell" fxFlex="0 0 60px" fxLayoutAlign="end center">
+                <mat-checkbox color="primary" (click)="$event.stopPropagation()" (change)="changeSelection(row)"
+                    [checked]="isSelected(row)" [disabled]="selectedMappings().length > 0 && row.status !== selectedStatus()">
+                </mat-checkbox>
+                <app-default-icon (click)="$event.stopPropagation()" [tplName]="row.name" [enabled]="hasWritePermissions"
+                    [checked]="row.favorite" [tplId]="row.code" onlyIcon="true" [updateDefault]="updateFavorite"
+                    [literals]="favoriteMappingLiterals">
+                </app-default-icon>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="shi_id">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'MAPPINGS.ID' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="badge-container">
+                <span class="badge" appEllipsify [matTooltip]="row.shi_id" matTooltipClass="ob-tooltip-nowrap">
+                    {{row.shi_id}}
+                </span>
+                @if (row.shi_id) {
+                    <app-copy-text [copyText]="row.shi_id" class="copy-button"></app-copy-text>
+                }
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="created">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'MAPPINGS.CREATED' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.created | dateTime : dateTimeFormats.shortDateTime}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'MAPPINGS.NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span appEllipsify [matTooltip]="row.name" matTooltipClass="ob-tooltip-nowrap">
+                    {{row.name}}
+                </span>
+                @if (row.name) {
+                    <app-copy-text [copyText]="row.name" class="copy-button"></app-copy-text>
+                }
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="taxonomies">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'MAPPINGS.TAXONOMIES' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                {{row.taxonomies ? getTaxonomies(row) : '-'}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="category">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'MAPPINGS.CATEGORY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{'MAPPINGS.CATEGORY_OPTS.' + row.category | translate}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="date">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'MAPPINGS.EVENT_DATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                {{row.date ? (row.date | dateTime : dateTimeFormats.shortDateTime) : '-'}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="updated">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell with-divider">
+                {{'MAPPINGS.UPDATED' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef=" let row" class="with-divider">
+                {{row.updated | dateTime : dateTimeFormats.shortDateTime}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="country_code">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'MAPPINGS.COUNTRY_CODE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.country_code ?? '-'}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="supplier">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'MAPPINGS.SUPPLIER' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.supplier}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="supplier_id">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'MAPPINGS.SUPPLIER_ID' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span appEllipsify [matTooltip]="row.supplier_id" matTooltipClass="ob-tooltip-nowrap">
+                    {{row.supplier_id}}
+                </span>
+                @if (row.supplier_id) {
+                    <app-copy-text [copyText]="row.supplier_id" class="copy-button"></app-copy-text>
+                }
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="related_listings">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'MAPPINGS.RELATED_LISTINGS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <mat-icon [matTooltip]="'MAPPINGS.FORMS.INFOS.RELATED_LISTINGS' | translate" class="related-listings-icon"
+                    (click)="goToRelatedListings(row.supplier_id)">list</mat-icon>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'MAPPINGS.STATUS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" [class]="(hasWritePermissions) ? 'editable-cell' : 'status-cell'">
+                @if (hasWritePermissions) {
+                    <app-status-select fxFlex="100" [element]="row" statusType="MAPPINGS" [statusList]="mappingStatus"
+                        [updateStatus]="updateStatus" (click)="$event.stopPropagation()" [hiddenStatusList]="[mappingStatus.inactive]">
+                        <ng-template #optionTemplate let-row>
+                            {{'MAPPINGS.STATUS_OPTS.' + row | translate}}
+                        </ng-template>
+                    </app-status-select>
+                } @else {
+                    <span [ngClass]="['status-dot', row.status.toLowerCase()]"></span>
+                    <span>{{'MAPPINGS.STATUS_OPTS.' + row.status | translate}}</span>
+                }
+            </mat-cell>
+        </ng-container>
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="two-actions-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="two-actions-cell" [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                <div class="action-buttons" (click)="$event.stopPropagation()">
+                    @if ((hasWritePermissions) && row.status === mappingStatus.active) {
+                        <button mat-icon-button aria-label="Clean listings" class="ob-button medium"
+                            (click)="openCleanListingsDialog(row)">
+                            <mat-icon>switch_access_shortcut</mat-icon>
+                        </button>
+                    }
+                    @if (hasWritePermissions) {
+                        <button mat-icon-button aria-label="Delete mapping" class="ob-button medium"
+                            (click)="openDeleteMappingDialog(row)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    }
+                </div>
+            </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+    @if ((mappingsMetadata)?.total === 0) {
+        <div class="context-notification-container" fxFlex="0 50 100%" fxLayout="row"
+            fxLayoutAlign="center start">
+            <app-context-notification
+                class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px" fxFlex="80%" fxLayoutAlign="center start">
+                @if (emptyListWithWordAndFilters$ | async) {
+                    <div fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="20px">
+                        <p>{{'LIST.EMPTY_LIST_WITH_KEYWORD' | translate}}</p>
+                        <button mat-stroked-button color="primary" type="button" class="ob-button medium"
+                            [attr.aria-label]="'LIST.REMOVE_FILTERS' | translate"
+                            (click)="removeFilters()">
+                            {{'LIST.REMOVE_FILTERS_BTN' | translate}}
+                        </button>
+                    </div>
+                } @else {
+                    <p>{{'LIST.EMPTY' | translate}}</p>
+                }
+            </app-context-notification>
+        </div>
+    }
+</div>

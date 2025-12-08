@@ -1,0 +1,228 @@
+<app-form-container [disabled]="!form.dirty || (reqInProgress$ | async)" (cancel)="cancel()" (save)="saveConditions()" layout="main">
+    <div fxLayoutAlign="start center" fxLayoutGap="8px" class="edit-event-conditions-container">
+        <button type="button" mat-stroked-button class="edit-event-conditions-button ob-button" color="tertiary"
+            (click)="editB2bConditions()">
+            <mat-icon>edit</mat-icon>
+            {{'PROFESSIONAL_SELLING.EDIT_' + context + '_B2B_CONDITIONS' | translate}}
+        </button>
+        <mat-icon class="ob-help-icon"
+            [matTooltip]="'PROFESSIONAL_SELLING.EDIT_' + context + '_B2B_CONDITIONS_INFO' | translate">
+            help_outline
+        </mat-icon>
+    </div>
+    <mat-divider class="ob-divider" />
+    <div class="clients-conditions-container list-container">
+        <app-searchable-paginated-selection [placeholder]="'FORMS.SEARCH.CLIENTS' | translate"
+            (loadData)="filterChangeHandler($event)" [form]="selectedRowsCtrl" [pageSize]="pageSize" [data$]="conditionsClientList$"
+            [metadata$]="metadata$" [loading$]="reqInProgress$">
+            <div slot="filter" class="badge-container" [class.empty]="(totalClients$ | async) === 0">
+                {{numSelectedClients}} / {{totalClients$ | async}}
+            </div>
+            <button slot="filter" type="button" mat-flat-button class="show-selected-only-button ob-button" color="tertiary"
+                [class.active]="!!(showSelectedOnly$ | async)" [disabled]="numSelectedClients === 0"
+                [matTooltip]="'PROFESSIONAL_SELLING.SHOW_SELECTED_CLIENTS_TOOLTIP' | translate" (click)="clickShowSelected()">
+                <mat-icon>visibility</mat-icon>
+                {{'PROFESSIONAL_SELLING.SHOW_SELECTED_CLIENTS' | translate}}
+            </button>
+            <button slot="filter" type="button" mat-stroked-button class="edit-clients-conditions-button ob-button" color="tertiary"
+                [disabled]="numSelectedClients === 0" (click)="editMultipleClientConditions()">
+                <mat-icon>edit</mat-icon>
+                {{'PROFESSIONAL_SELLING.EDIT_B2B_CLIENTS_CONDITIONS' | translate}}
+            </button>
+            <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data" let-selectionChanged="selectionChanged">
+                <app-selection-table [data]="data" *ngIf="totalColumns$ | async as finalColumns" [columns]="finalColumns"
+                    [pageForm]="pageForm" overrideClasses="dense-table"
+                    [selectionChanged]="selectionChanged"
+                    [class.some-selected]="numSelectedClients > 0">
+                    <ng-template #selectAllTemplate>
+                        <mat-checkbox color="primary"
+                            [disabled]="(showSelectedOnly$ | async) || (totalClients$ | async) === 0"
+                            [checked]="numSelectedClients > 0 && numSelectedClients === (totalClients$ | async) || (showSelectedOnly$ | async)"
+                            [indeterminate]="numSelectedClients > 0 && numSelectedClients < (totalClients$ | async) && (showSelectedOnly$ | async) === false"
+                            (change)="selectAll($event)" />
+                    </ng-template>
+                    <ng-container matColumnDef="b2bClient">
+                        <mat-header-cell *matHeaderCellDef class="head-cell b2b-client">
+                            <span appEllipsify [matTooltip]="'PROFESSIONAL_SELLING.CLIENTS' | translate"
+                                matTooltipClass="ob-tooltip-nowrap">
+                                {{'PROFESSIONAL_SELLING.CLIENTS' | translate}}
+                            </span>
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="b2b-client">
+                            <span appEllipsify [matTooltip]="row.name">{{row.name}}</span>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="canBuy">
+                        <mat-header-cell *matHeaderCellDef class="head-cell checkbox-column can-buy">
+                            <span appEllipsify [matTooltip]="'PROFESSIONAL_SELLING.CONDITIONS.CAN_BUY' | translate"
+                                matTooltipClass="ob-tooltip-nowrap">
+                                {{'PROFESSIONAL_SELLING.CONDITIONS.CAN_BUY' | translate}}
+                            </span>
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="checkbox-column can-buy">
+                            <mat-checkbox color="primary" disableRipple [formControl]="clientsFormGroup.get([row.id, 'canBuy'])"
+                                (change)="markRowAsModified(row)" (click)="$event.stopPropagation()" />
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="canBook">
+                        <mat-header-cell *matHeaderCellDef class="head-cell checkbox-column can-book">
+                            <span appEllipsify [matTooltip]="'PROFESSIONAL_SELLING.CONDITIONS.CAN_BOOK' | translate"
+                                matTooltipClass="ob-tooltip-nowrap">
+                                {{'PROFESSIONAL_SELLING.CONDITIONS.CAN_BOOK' | translate}}
+                            </span>
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="checkbox-column can-book">
+                            <mat-checkbox color="primary" disableRipple [formControl]="clientsFormGroup.get([row.id, 'canBook'])"
+                                (change)="markRowAsModified(row)" (click)="$event.stopPropagation()" />
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container *ngIf="finalColumns.includes('canPublish')" matColumnDef="canPublish">
+                        <mat-header-cell *matHeaderCellDef class="head-cell checkbox-column can-publish">
+                            <span appEllipsify [matTooltip]="'PROFESSIONAL_SELLING.CONDITIONS.CAN_PUBLISH' | translate"
+                                matTooltipClass="ob-tooltip-nowrap">
+                                {{'PROFESSIONAL_SELLING.CONDITIONS.CAN_PUBLISH' | translate}}
+                            </span>
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="checkbox-column can-publish">
+                            <mat-checkbox color="primary" disableRipple [formControl]="clientsFormGroup.get([row.id, 'canPublish'])"
+                                (change)="markRowAsModified(row)" (click)="$event.stopPropagation()" />
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container *ngIf="finalColumns.includes('canInvite')" matColumnDef="canInvite">
+                        <mat-header-cell *matHeaderCellDef class="head-cell checkbox-column can-invite">
+                            <span appEllipsify [matTooltip]="'PROFESSIONAL_SELLING.CONDITIONS.CAN_INVITE' | translate"
+                                matTooltipClass="ob-tooltip-nowrap">
+                                {{'PROFESSIONAL_SELLING.CONDITIONS.CAN_INVITE_TABLE' | translate}}
+                            </span>
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="checkbox-column can-invite">
+                            <mat-checkbox color="primary" disableRipple [formControl]="clientsFormGroup.get([row.id, 'canInvite'])"
+                                (change)="markRowAsModified(row)" (click)="$event.stopPropagation()" />
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="maxSeats">
+                        <mat-header-cell *matHeaderCellDef class="head-cell max-seats">
+                            <span appEllipsify [matTooltip]="'PROFESSIONAL_SELLING.CONDITIONS.MAX_SEATS' | translate"
+                                matTooltipClass="ob-tooltip-nowrap">
+                                {{'PROFESSIONAL_SELLING.CONDITIONS.MAX_SEATS' | translate}}
+                            </span>
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="editable-cell max-seats">
+                            <mat-form-field appearance="outline" class="ob-form-field">
+                                <input matInput type="number" [placeholder]="0" [formControl]="clientsFormGroup.get([row.id, 'maxSeats'])"
+                                    (change)="markRowAsModified(row)" (click)="$event.stopPropagation()">
+                            </mat-form-field>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="bookingExpirationDays">
+                        <mat-header-cell *matHeaderCellDef class="head-cell bookingExpirationDays">
+                            <span appEllipsify [matTooltip]="'PROFESSIONAL_SELLING.CONDITIONS.BOOKING_EXPIRATION_DAYS' | translate"
+                                matTooltipClass="ob-tooltip-nowrap">
+                                {{'PROFESSIONAL_SELLING.CONDITIONS.BOOKING_EXPIRATION_DAYS' | translate}}
+                            </span>
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="editable-cell bookingExpirationDays">
+                            <mat-form-field appearance="outline" class="ob-form-field">
+                                <app-expiration-days-selector [placeholder]="'0'"
+                                    [formControl]="clientsFormGroup.get([row.id, 'bookingExpirationDays'])"
+                                    (valueChanged)="markRowAsModified(row)" (click)="$event.stopPropagation()"
+                                    [translationKeys]="translationKeys" />
+                            </mat-form-field>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="clientDiscount">
+                        <mat-header-cell *matHeaderCellDef class="head-cell clientDiscount">
+                            <span appEllipsify [matTooltip]="'PROFESSIONAL_SELLING.CONDITIONS.CLIENT_DISCOUNT' | translate"
+                                matTooltipClass="ob-tooltip-nowrap">
+                                {{'PROFESSIONAL_SELLING.CONDITIONS.CLIENT_DISCOUNT' | translate}}
+                            </span>
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="editable-cell clientDiscount">
+                            <mat-form-field appearance="outline" class="ob-form-field">
+                                <input matInput [placeholder]="0" [formControl]="clientsFormGroup.get([row.id, 'clientDiscount'])"
+                                    (change)="markRowAsModified(row)" (click)="$event.stopPropagation()">
+                            </mat-form-field>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="clientComission">
+                        <mat-header-cell *matHeaderCellDef class="head-cell clientComission">
+                            <span appEllipsify [matTooltip]="'PROFESSIONAL_SELLING.CONDITIONS.CLIENT_COMISSION' | translate"
+                                matTooltipClass="ob-tooltip-nowrap">
+                                {{'PROFESSIONAL_SELLING.CONDITIONS.CLIENT_COMISSION' | translate}}
+                            </span>
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="editable-cell clientComission">
+                            <mat-form-field appearance="outline" class="ob-form-field">
+                                <app-percentage-input [formControl]="clientsFormGroup.get([row.id, 'clientComission'])"
+                                    [placeholder]="(0 | localNumber : '1.2-2')" (change)="markRowAsModified(row)"
+                                    (click)="$event.stopPropagation()" />
+                            </mat-form-field>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="paymentMethods">
+                        <mat-header-cell *matHeaderCellDef class="head-cell paymentMethods">
+                            <span appEllipsify [matTooltip]="'PROFESSIONAL_SELLING.CONDITIONS.PAYMENT_METHODS' | translate"
+                                matTooltipClass="ob-tooltip-nowrap">
+                                {{'PROFESSIONAL_SELLING.CONDITIONS.PAYMENT_METHODS' | translate}}
+                            </span>
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="editable-cell paymentMethods">
+                            <mat-form-field appearance="outline" class="ob-form-field">
+                                <mat-select multiple [formControl]="clientsFormGroup.get([row.id, 'paymentMethods'])"
+                                    (selectionChange)="markRowAsModified(row)" (click)="$event.stopPropagation()">
+                                    @for (type of paymentMethodTypes; track type) {
+                                        <mat-option [value]="type">
+                                            {{'PROFESSIONAL_SELLING.CONDITIONS.PAYMENT_METHOD_TYPES.' + type | translate}}
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="condHierarchicalLevel">
+                        <mat-header-cell *matHeaderCellDef class="head-cell condHierarchicalLevel">
+                            <span appEllipsify [matTooltip]="'PROFESSIONAL_SELLING.CONDITIONS.COND_HIERARCHICAL_LEVEL' | translate"
+                                matTooltipClass="ob-tooltip-nowrap">
+                                {{'PROFESSIONAL_SELLING.CONDITIONS.COND_HIERARCHICAL_LEVEL' | translate}}
+                            </span>
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="condHierarchicalLevel">
+                            <span appEllipsify
+                                [matTooltip]="'PROFESSIONAL_SELLING.CONDITIONS.COND_HIERARCHICAL_LEVEL_TYPE.' +
+                                (row.modified ? 'CLIENT_B2B_EVENT' : row.condHierarchicalLevel) | translate"
+                                matTooltipClass="ob-tooltip-nowrap">
+                                {{'PROFESSIONAL_SELLING.CONDITIONS.COND_HIERARCHICAL_LEVEL_TYPE.' +
+                                (row.modified ? 'CLIENT_B2B_EVENT' : row.condHierarchicalLevel) | translate}}
+                            </span>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="actions">
+                        <mat-header-cell *matHeaderCellDef class="actions-cell head-cell"
+                            [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true" />
+                        <mat-cell *matCellDef="let row; let i = index" class="actions-cell"
+                            [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                            <div class="action-buttons" (click)="$event.stopPropagation()">
+                                <button mat-icon-button *ngIf="row.condHierarchicalLevel === 'CLIENT_B2B_EVENT' && !row.modified"
+                                    [attr.aria-label]="'PROFESSIONAL_SELLING.CONDITIONS.RESET_CONDITIONS' | translate"
+                                    [matTooltip]="'PROFESSIONAL_SELLING.CONDITIONS.RESET_CONDITIONS' | translate"
+                                    class="ob-button medium" (click)="restoreClientConditions(row)">
+                                    <mat-icon>undo</mat-icon>
+                                </button>
+                            </div>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-template #noResultsTemplate>
+                        <div class="context-message-container">
+                            <div fxFlex="100%" fxLayout="row" fxLayoutAlign="center">
+                                <div fxFlex="100%" fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="15px">
+                                    <p class="title">{{'PROFESSIONAL_SELLING.CONDITIONS.EMPTY_LIST_TITLE' | translate}}</p>
+                                    <p class="body">{{'PROFESSIONAL_SELLING.CONDITIONS.EMPTY_LIST_MSG' | translate}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </app-selection-table>
+            </ng-template>
+        </app-searchable-paginated-selection>
+    </div>
+</app-form-container>

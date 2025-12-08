@@ -1,0 +1,79 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="(inProgress$ | async) || !form.dirty"
+    [formGroup]="form" *ngIf="period$ | async as period">
+    <p *ngIf="!isBuySeatPeriod(period)" class="section-description">
+        {{('CHANNELS.MEMBER_EXTERNAL.STEPS.DESCRIPTION.' + period) | translate}}
+    </p>
+    <div fxLayout="column" fxLayoutGap="24px" [formGroupName]="period" class="period-list">
+        <div *ngIf="isNewMemberPeriod(period)">
+            <mat-form-field fxFlex="100%" fxFlex.gt-sm="50%"
+                class="ob-form-field field-with-label inline-field-bottom" appearance="outline">
+                <mat-label>{{'CHANNELS.MEMBER_EXTERNAL.FLOW.TITLE' | translate}}</mat-label>
+                <mat-select formControlName="new_member_flow"
+                    [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                    <mat-option *ngFor="let flow of newMemberFlowOptions" [value]="flow">
+                        {{('CHANNELS.MEMBER_EXTERNAL.FLOW.' + flow) | translate}}
+                    </mat-option>
+                </mat-select>
+                <mat-error [ob-form-errors]="form" field="NEW_MEMBER.new_member_flow" />
+            </mat-form-field>
+        </div>
+        <div *ngIf="isBuySeatPeriod(period)">
+            <p class="mat-subtitle-2">{{'CHANNELS.MEMBER_EXTERNAL.BUY_SEAT_FLOW.TITLE' | translate}}</p>
+            <p class="mat-body-2">{{'CHANNELS.MEMBER_EXTERNAL.BUY_SEAT_FLOW.DESCRIPTION' | translate}}</p>
+            <mat-radio-group fxLayout="row wrap" fxLayoutAlign="start start" formControlName="buy_seat_flow">
+                <mat-radio-button *ngFor="let flow of buySeatFlow" fxFlex="0 0 100%"
+                    class="ob-radio-button vertical-list" [value]="flow">
+                    <div class="option-title">
+                        {{('CHANNELS.MEMBER_EXTERNAL.BUY_SEAT_FLOW.' + flow + '.TITLE') | translate}}
+                    </div>
+                    <div>
+                        {{('CHANNELS.MEMBER_EXTERNAL.BUY_SEAT_FLOW.' + flow + '.BODY') | translate}}
+                    </div>
+                </mat-radio-button>
+            </mat-radio-group>
+        </div>
+        <div fxLayout="row wrap" fxLayoutGap="40px">
+            <div *ngIf="isBuySeatPeriod(period)" fxFlex="0 0 100%">
+                <p class="mat-subtitle-2">
+                    {{('CHANNELS.MEMBER_EXTERNAL.STEPS.' + period + '_STEPS.TITLE') | translate}}
+                </p>
+                <p class="mat-body-2">
+                    {{('CHANNELS.MEMBER_EXTERNAL.STEPS.' + period + '_STEPS.DESCRIPTION') | translate}}
+                </p>
+            </div>
+            <div *ngIf="isBuySeatPeriod(period)" fxFlex="0 0 25%" fxLayout="column">
+                <mat-button-toggle-group vertical class="ob-outline-button-group" [formControl]="selectedBuySeatFlowType">
+                    <mat-button-toggle *ngFor="let option of configBuySeatFlowOptions" [value]="option">
+                        {{('CHANNELS.MEMBER_EXTERNAL.BUY_SEAT_FLOW.' + option + '.TITLE') | translate}}
+                    </mat-button-toggle>
+                </mat-button-toggle-group>
+            </div>
+            <div fxLayout="column" fxLayoutGap="16px">
+                <div *ngFor="let step of steps[period + newMemberFlow(period) + getSelectedBuySeatFlowType(period)];
+                        let index = index" fxLayout="row" class="period" [ngClass]="{child: step.child}">
+                    <div fxLayout="row">
+                        <ng-container *ngIf="step.deactivable">
+                            <mat-checkbox *ngIf="!step.child else stepChild" color="primary"
+                                (change)="toggleStep(period, step.id, $event)"
+                                [checked]="!form.get([period, 'ignored_steps'])?.value?.includes(step.id)" />
+                            <ng-template #stepChild>
+                                <mat-checkbox *ngIf="step.child && form.get([period, step.controlName]) as ctrl" color="primary"
+                                    [checked]="step.invert ? !ctrl.value : ctrl.value"
+                                    (change)="ctrl.setValue(!ctrl.value); ctrl.markAsDirty();" />
+                            </ng-template>
+                        </ng-container>
+                        <ng-container *ngIf="step.number">
+                            {{'CHANNELS.MEMBER_EXTERNAL.STEPS.LABEL' | translate}} {{step.number}}:&nbsp;
+                        </ng-container>
+                        <span class="name">{{('CHANNELS.MEMBER_EXTERNAL.STEPS.' + step.id) | translate}}</span>
+                        <app-help-button *ngIf="step.info"
+                            [message]="('CHANNELS.MEMBER_EXTERNAL.STEPS_HELP.' + step.id) | translate" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</app-form-container>
+<div class="spinner-container" *ngIf="inProgress$ | async">
+    <mat-spinner />
+</div>

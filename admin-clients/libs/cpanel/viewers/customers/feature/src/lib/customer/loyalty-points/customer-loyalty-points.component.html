@@ -1,0 +1,62 @@
+<app-form-container layout="main" hideActionBar>
+    <div class="list-container">
+        <div class="customer-loyalty-points-header">
+            <div class="customer-loyalty-points-info">
+                <span class="total-count">
+                    {{'CUSTOMER.LOYALTY_POINTS_HISTORY.TOTAL_COUNT' | translate: {totalCount: $customerTotalPoints()} }}
+                </span>
+            </div>
+            <button mat-stroked-button color="primary" type="button" class="ob-button medium"
+                (click)="openEditPointsDialog()">
+                <mat-icon>edit</mat-icon>
+                {{ 'CUSTOMER.LOYALTY_POINTS_HISTORY.EDIT_POINTS_BUTTON' | translate }}
+            </button>
+        </div>
+
+        <app-search-table [dataSource]="customerLoyaltyPoints$" [metadata]="customerLoyaltyPointsMetadata$"
+            [columns]="columns" [pageSize]="pageSize" (changed)="loadLoyaltyPointsHistory($event)" [searchOnInteraction]="false"
+            [placeholder]="'CUSTOMER.LOYALTY_POINTS_HISTORY.SEARCH_PLACEHOLDER' | translate"
+            emptyListTitle="CUSTOMER.LOYALTY_POINTS_HISTORY.EMPTY_LIST_TITLE"
+            emptyListDescription="CUSTOMER.LOYALTY_POINTS_HISTORY.EMPTY_LIST_DESCRIPTION">
+            <ng-container matColumnDef="date">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'FORMS.LABELS.DATE' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    {{row.date | dateTime : dateTimeFormats.shortDateTime}}
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="type">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'FORMS.LABELS.ACTION' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    {{ 'CUSTOMER.LOYALTY_POINTS.TYPE_' + row.type | translate }}
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="description">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'FORMS.LABELS.DESCRIPTION' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    {{row.description}}
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="points">
+                <mat-header-cell *matHeaderCellDef class="head-cell right">
+                    {{'FORMS.LABELS.LOYALTY_POINTS' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row" class="status-cell right"
+                    [ngClass]="row.points >= 0 ? 'positive' : 'negative'">
+                    {{row.points >= 0 ? '+' : ''}}{{row.points}}
+                </mat-cell>
+            </ng-container>
+        </app-search-table>
+    </div>
+</app-form-container>
+
+@if ($isLoading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

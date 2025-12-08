@@ -1,0 +1,238 @@
+<div class="matching-details">
+    <form id="formMatchingData" *ngIf="!!!(isLoading$ | async)">
+        <div class="matching_data" fxLayout="row wrap" fxLayoutGap.gt-xs="24px" fxLayoutAlign="flex-start" *ngIf="matching.supplier_event"
+            appCustomScroll [ngClass]="{'add-margin' : matching.status === matchingStatus.candidate && (hasWritePermissions$ | async)}">
+            <div class="badge-container">
+                <span class="badge"
+                    [ngClass]="{
+                        'candidate': matching.status === matchingStatus.candidate,
+                        'matched' : matching.status === matchingStatus.matched,
+                        'not_related' : matching.status === matchingStatus.notRelated
+                    }">
+                    {{'MATCHINGS.STATUS_OPTS.' + matching.status | translate}}
+                </span>
+            </div>
+            <div class="timeline">
+                <div class="related-element">
+                    <div class="related-card">
+                        <div class="row">
+                            <span class="element_title">
+                                {{'MATCHINGS.MATCHING_DETAILS.GENERAL_INFO' | translate}}
+                            </span>
+                        </div>
+                        <div class="card-info" fxLayout="row wrap" fxLayoutGap.gt-xs="24px" fxLayoutAlign="flex-start">
+                            <div class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.SUPPLIER_ID' | translate}}</span>
+                                <span>{{matching.supplier_event.id }}</span>
+                            </div>
+                            <div *ngIf="matching.shi_event" class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.SHI_ID' | translate}}</span>
+                                <span>{{matching.shi_event?.id}}</span>
+                            </div>
+                            <div class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.EVENT_DATE' | translate}}</span>
+                                <span>{{matching.supplier_event.date | dateTime: dateTimeFormats.shortDateTime}}</span>
+                            </div>
+                            <div *ngIf="matching.shi_event" class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.SHI_EVENT_DATE' | translate}}</span>
+                                <span>
+                                    {{matching.shi_event?.date ? (matching.shi_event?.date | dateTime: dateTimeFormats.shortDateTime) :
+                                    '-'}}
+                                </span>
+                            </div>
+                            <div class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.EVENT_NAME' | translate}}</span>
+                                <span>{{matching.supplier_event.name}}</span>
+                            </div>
+                            <div *ngIf="matching.shi_event" class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.SHI_EVENT_NAME' | translate}}</span>
+                                <span>{{matching.shi_event?.name}}</span>
+                            </div>
+                            <div class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.COUNTRY' | translate}}</span>
+                                <span>{{matching.supplier_event.venue?.country_code}}</span>
+                            </div>
+                            <div *ngIf="matching.shi_event" class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.SHI_COUNTRY' | translate}}</span>
+                                <span>{{matching.shi_event?.venue?.country_code ?? '-'}}</span>
+                            </div>
+                            <div class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.TAXONOMY' | translate}}</span>
+                                {{suplTaxonomiesList}}
+                            </div>
+                            <div *ngIf="matching.shi_event" class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.SHI_TAXONOMY' | translate}}</span>
+                                {{shiTaxonomiesList}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="timeline">
+                <div class="related-element">
+                    <div class="related-card">
+                        <div class="row">
+                            <span class="element_title">
+                                {{'MATCHINGS.MATCHING_DETAILS.LOCATION_INFO' | translate}}
+                            </span>
+                        </div>
+                        <div class="card-info" fxLayout="row wrap" fxLayoutGap.gt-xs="24px" fxLayoutAlign="flex-start">
+                            <div class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.VENUE_ID' | translate}}</span>
+                                <span>{{matching.supplier_event.venue?.id}}</span>
+                            </div>
+                            <div *ngIf="matching.shi_event" class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.SHI_VENUE_ID' | translate}}</span>
+                                <span>{{matching.shi_event?.venue?.id ?? '-'}}</span>
+                            </div>
+                            <div class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.VENUE_NAME' | translate}}</span>
+                                <span>{{matching.supplier_event.venue?.name}}</span>
+                            </div>
+                            <div *ngIf="matching.shi_event" class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.SHI_VENUE_NAME' | translate}}</span>
+                                <span>{{matching.shi_event?.venue?.name ?? '-'}}</span>
+                            </div>
+                            <div class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.VENUE_STATE' | translate}}</span>
+                                <span>{{matching.supplier_event.venue?.state ?? '-'}}</span>
+                            </div>
+                            <div *ngIf="matching.shi_event" class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.SHI_VENUE_STATE' | translate}}</span>
+                                <span>{{matching.shi_event?.venue?.state ?? '-'}}</span>
+                            </div>
+                            <div class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.VENUE_CITY' | translate}}</span>
+                                <span>{{matching.supplier_event.venue?.city ?? '-'}}</span>
+                            </div>
+                            <div *ngIf="matching.shi_event" class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.SHI_VENUE_CITY' | translate}}</span>
+                                <span>{{matching.shi_event?.venue?.city ?? '-'}}</span>
+                            </div>
+                            <div class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.VENUE_POSTAL_CODE' | translate}}</span>
+                                <span>{{matching.supplier_event.venue?.postal_code ?? '-'}}</span>
+                            </div>
+                            <div *ngIf="matching.shi_event" class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.SHI_VENUE_POSTAL_CODE' | translate}}</span>
+                                <span>{{matching.shi_event?.venue?.postal_code ?? '-'}}</span>
+                            </div>
+                            <div class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.VENUE_LONGITUDE' | translate}}</span>
+                                <span>{{matching.supplier_event.venue?.longitude ?? '-'}}</span>
+                            </div>
+                            <div *ngIf="matching.shi_event" class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.SHI_VENUE_LONGITUDE' | translate}}</span>
+                                <span>{{matching.shi_event?.venue?.longitude ?? '-'}}</span>
+                            </div>
+                            <div class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.VENUE_LATITUDE' | translate}}</span>
+                                <span>{{matching.supplier_event.venue?.latitude ?? '-'}}</span>
+                            </div>
+                            <div *ngIf="matching.shi_event" class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.SHI_VENUE_LATITUDE' | translate}}</span>
+                                <span>{{matching.shi_event?.venue?.latitude ?? '-'}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="timeline">
+                <div class="related-element">
+                    <div class="related-card">
+                        <div class="row">
+                            <span class="element_title">
+                                {{'MATCHINGS.MATCHING_DETAILS.CATALOG_INFO' | translate}}
+                            </span>
+                        </div>
+                        <div class="card-info" fxLayout="row wrap" fxLayoutGap.gt-xs="24px" fxLayoutAlign="flex-start">
+                            <div class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.LISTINGS' | translate}}</span>
+                                <span>{{matching.supplier_event.availability?.listings ?? '-'}}</span>
+                            </div>
+                            <div *ngIf="matching.shi_event" class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.SHI_LISTINGS' | translate}}</span>
+                                <span>{{matching.shi_event?.availability?.listings ?? '-'}}</span>
+                            </div>
+                            <div class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.TICKETS' | translate}}</span>
+                                <span>{{matching.supplier_event.availability?.tickets ?? '-'}}</span>
+                            </div>
+                            <div *ngIf="matching.shi_event" class="details-non-editable-field ob-form-field"
+                                fxFlex="{{matching.status === matchingStatus.notRelated ? '0 1 100%' : '0 1 calc(50% - 24px)'}}"
+                                fxLayout="column">
+                                <span class="field-label">{{'MATCHINGS.MATCHING_DETAILS.SHI_TICKETS' | translate}}</span>
+                                <span>{{matching.shi_event?.availability?.tickets ?? '-'}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action_button" fxFlex="0 1 650px" fxLayoutAlign="end center"
+            *ngIf="matching.status === matchingStatus.candidate && (hasWritePermissions$ | async)">
+            <button mat-flat-button color="primary" type="button" class="ob-button medium add-button"
+                [attr.aria-label]="'MATCHINGS.MATCHING_DETAILS.MAP_BUTTON' | translate" (click)="openCreateMappingDialog(matching.id)">
+                {{'MATCHINGS.MATCHING_DETAILS.MAP_BUTTON' | translate}}
+            </button>
+        </div>
+    </form>
+    <div class="spinner-container" *ngIf="isLoading$ | async">
+        <mat-spinner></mat-spinner>
+    </div>
+</div>

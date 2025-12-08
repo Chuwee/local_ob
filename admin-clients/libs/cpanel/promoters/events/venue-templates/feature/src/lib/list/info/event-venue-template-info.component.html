@@ -1,0 +1,31 @@
+<div class="extra-info flex">
+    <div class="template-id flex-1">
+        <div class="label primary" appEllipsify>{{'VENUE_TPLS.ID' | translate}}</div>
+        <div class="value">{{$template()?.id || '-'}}</div>
+    </div>
+    <mat-divider vertical />
+    <div class="price-zones flex-1">
+        <div class="label primary" appEllipsify>{{'RESULTS.PRICEZONES' | translate}}</div>
+        <div class="value">{{($info()?.priceTypes | localNumber) || '-'}}</div>
+    </div>
+</div>
+@if ($info()?.external_data; as external_data) {
+    <div class="external-info flex flex-col flex-1">
+        <mat-divider class="ob-divider flex-1" />
+        <div class="flex basis-[36px]">
+            @if($isAvet()) {
+                <h3 class="section-title">{{'VENUE_TPLS.DETAILS_TITLE_AVET' | translate | uppercase}}</h3>
+            } @else if($isSGA()) {
+                <h3 class="section-title">{{'EVENTS.VENUE_TPLS.DETAILS_TITLE_SGA' | translate | uppercase}}</h3>
+            }
+        </div>
+        <div class="item-details flex flex-col gap-[14px]">
+            @for (item of external_data | keyvalue ; track item.key) {
+                <div class="flex flex-col">
+                    <span class="label primary">{{'VENUE_TPLS.' + item.key | uppercase | translate}}</span>
+                    <span class="value">{{item.value}}</span>
+                </div>
+            }
+        </div>
+    </div>
+}

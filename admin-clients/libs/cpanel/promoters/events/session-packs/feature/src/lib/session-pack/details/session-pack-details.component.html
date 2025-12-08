@@ -1,0 +1,90 @@
+<div fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="start stretch" *ngIf="session$ | async">
+    <div *ngIf="isSessionGenerationInProgress$ | async" class="ob-overlay-wrapper" fxLayoutAlign="center start">
+        <div class="ob-overlay-pane">
+            <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px"
+                fxFlex="80%">
+                <p>{{'EVENTS.SESSION_GENERATION_STATUS_IN_PROGRESS' | translate}}</p>
+                <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                    [attr.aria-label]="('EVENTS.SESSION_GENERATION_STATUS_IN_PROGRESS' | translate)" />
+            </app-context-notification>
+        </div>
+    </div>
+    <app-nav-tabs-menu type="horizontalSubtab" [elements]="[
+        {
+            label: 'EVENTS.PLANNING',
+            id: 'tab_event_session-packs_planning',
+            param: 'planning',
+            disabled: isSessionGenerationError$ | async
+        },
+        {
+            label: 'EVENTS.CAPACITY',
+            id: 'tab_event_session-packs_capacity',
+            param: 'capacity',
+            disabled: (isSessionGenerationError$ | async) || (archived$ | async),
+            tooltip: {
+                text: 'EVENTS.ARCHIVED_DISABLED_SECTION_INFO',
+                disabled: (archived$ | async) === false
+            }
+        },
+        {
+            label: 'EVENTS.PRESALES',
+            id: 'tab_event_session-packs_presales',
+            param: 'presales',
+            disabled: isSessionGenerationError$ | async
+        },
+        {
+            label: 'EVENTS.OCUPATION.TITLE',
+            id: 'tab_event_session-packs_seat-status',
+            param: 'seat-status',
+            disabled: (isSessionGenerationError$ | async) || (archived$ | async),
+            tooltip: {
+                text: 'EVENTS.ARCHIVED_DISABLED_SECTION_INFO',
+                disabled: (archived$ | async) === false
+            }
+        },
+        {
+            label: 'EVENTS.COMMUNICATION.TITLE',
+            id: 'tab_event_session-packs_communication',
+            param: 'communication',
+            disabled: isSessionGenerationError$ | async
+        },
+        {
+            label: 'EVENTS.DYNAMIC_PRICES.TITLE',
+            id: 'tab_event_sessions_dynamic-prices',
+            param: 'dynamic-prices',
+            show: isLowEnv
+        },
+        {
+            label: 'EVENTS.ACCESS_CONTROL',
+            id: 'tab_event_session-packs_access-control',
+            param: 'access-control',
+            disabled: isSessionGenerationError$ | async
+        },
+        {
+            label: 'EVENTS.OTHER_SETTINGS',
+            id: 'tab_event_session-packs_other-settings',
+            param: 'other-settings',
+            disabled: isSessionGenerationError$ | async
+        },
+        {
+            label: 'EVENTS.REFUNDS',
+            id: 'tab_event_session-packs_refunds',
+            param: 'refunds',
+            disabled: !(session$ | async)?.settings?.session_pack?.allow_partial_refund
+        },
+        {
+            label: 'EVENTS.SESSION.CONF_CODES',
+            id: 'tab_event_session-packs_code-configuration',
+            param: 'code-configuration',
+            disabled: isSessionGenerationError$ | async,
+            show: enableSessionCodeConfiguration$ | async
+        },
+        {
+            label: 'EVENTS.SESSION.AUTOMATIC_SALES.TITLE',
+            id: 'tab_event_sessions_automatic_sales',
+            param: 'automatic-sales',
+            show: enableAutomaticSales$ | async
+        }
+    ]" />
+    <router-outlet />
+</div>

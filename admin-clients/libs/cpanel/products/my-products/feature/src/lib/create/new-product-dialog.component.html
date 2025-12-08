@@ -1,0 +1,116 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'TITLES.NEW_PRODUCT' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <form [formGroup]="form" fxLayout="column" fxLayoutAlign="start stretch">
+            @if (canSelectEntity$ | async) {
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-label>{{'PRODUCT.ENTITY' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate" formControlName="entity">
+                        <mat-option>
+                            <app-select-search #entitySelectSearch [options$]="entities$"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" requireSelection="true" />
+                        </mat-option>
+                        @for (entity of entitySelectSearch.getFilteredOptions$() | async; track entity) {
+                            <mat-option [value]="entity">
+                                {{entity.name}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form" field="entity" />
+                </mat-form-field>
+            }
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'PRODUCT.PRODUCER' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="producer">
+                    <mat-option>
+                        <app-select-search #producerSelectSearch [options$]="producers$"
+                            [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" requireSelection="true" />
+                    </mat-option>
+                    @for (producer of producerSelectSearch.getFilteredOptions$() | async; track producer) {
+                        <mat-option [value]="producer">
+                            {{producer.name}}
+                        </mat-option>
+                    }
+                </mat-select>
+                <mat-error [ob-form-errors]="form" field="producer" />
+            </mat-form-field>
+            @if ((currencies$ | async)?.length > 1) {
+
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-label>{{'FORMS.LABELS.CURRENCY' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="currency">
+                        <mat-option>
+                            <app-select-search #currencySelectSearch [options$]="currencies$ | localCurrenciesFullTranslation$"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="description"
+                                requireSelection="true" />
+                        </mat-option>
+                        @for (currency of currencySelectSearch.getFilteredOptions$() | async; track currency) {
+                            <mat-option [value]="currency">
+                                {{currency.description}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form.get('currency')" field="currency" />
+                </mat-form-field>
+
+            }
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'PRODUCT.NAME' | translate}}</mat-label>
+                <input matInput aria-label="name" [placeholder]="'PRODUCT.NAME' | translate" formControlName="name">
+                <mat-error [ob-form-errors]="form" field="name" />
+            </mat-form-field>
+            <div fxFlex="100%" fxLayout="column">
+                <span class="ob-label">{{'PRODUCT.TYPE' | translate}} *</span>
+                <mat-radio-group formControlName="product_type" fxFlex="100%" fxLayout="column">
+                    <mat-radio-button [value]="productTypes.simple" class="ob-radio-button vertical-list">
+                        <div class="option-title">{{'PRODUCT.TYPE_OPTS.SIMPLE' | translate}}</div>
+                        <div>{{'PRODUCT.TYPE_DESCRIPTION.SIMPLE' | translate}}</div>
+                    </mat-radio-button>
+                    <mat-radio-button [value]="productTypes.variant" class="ob-radio-button vertical-list">
+                        <div class="option-title">{{'PRODUCT.TYPE_OPTS.VARIANT' | translate}}</div>
+                        <div>{{'PRODUCT.TYPE_DESCRIPTION.VARIANT' | translate}}</div>
+                    </mat-radio-button>
+                </mat-radio-group>
+            </div>
+            <mat-divider class="ob-divider" />
+            <div fxFlex="100%" fxLayout="column">
+                <span class="ob-label">{{'PRODUCT.STOCK_TYPE.LABEL' | translate}} *</span>
+                <mat-radio-group formControlName="stock_type" fxFlex="100%" fxLayout="column">
+                    <mat-radio-button [value]="stockTypes.unbounded" class="ob-radio-button vertical-list">
+                        <div class="option-title">{{'PRODUCT.STOCK_TYPE_UNBOUNDED' | translate}}</div>
+                        <div class="option-body">{{'PRODUCT.STOCK_TYPE_UNBOUNDED_DESCRIPTION' | translate}}</div>
+                    </mat-radio-button>
+                    <mat-radio-button [value]="stockTypes.bounded" class="ob-radio-button vertical-list">
+                        <div class="option-title">{{'PRODUCT.STOCK_TYPE_BOUNDED_AND_SHARE' | translate}}</div>
+                        <div class="option-body">{{'PRODUCT.STOCK_TYPE_BOUNDED_AND_SHARE_DESCRIPTION' | translate}}</div>
+                    </mat-radio-button>
+                    <mat-radio-button [value]="stockTypes.session_bounded" class="ob-radio-button vertical-list"
+                        [disabled]="form.controls.product_type.value !== productTypes.simple"
+                        [matTooltipDisabled]="form.controls.product_type.value === productTypes.simple"
+                        [matTooltip]="'PRODUCT.STOCK_TYPE_BOUNDED_AND_INDEPENDENT_TOOLTIP' | translate">
+                        <div class="option-title">{{'PRODUCT.STOCK_TYPE_BOUNDED_AND_INDEPENDENT' | translate}}</div>
+                        <div class="option-body">{{'PRODUCT.STOCK_TYPE_BOUNDED_AND_INDEPENDENT_DESCRIPTION' | translate}}</div>
+                    </mat-radio-button>
+                </mat-radio-group>
+            </div>
+        </form>
+    </div>
+    <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createProduct()">
+            {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

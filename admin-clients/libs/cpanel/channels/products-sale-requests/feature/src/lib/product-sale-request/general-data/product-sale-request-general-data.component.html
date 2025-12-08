@@ -1,0 +1,34 @@
+<div class="flex basis-full">
+    <div class="subtabs-container basis-[200px] shrink-0">
+        <mat-button-toggle-group vertical [value]="deepPath$ | async" class="ob-subtab" appLastPathGuardListener
+            [currValue]="(deepPath$ | async)">
+            <mat-button-toggle id="subtab_product_sale_request_general-data_principal-info"
+                routerLink="principal-info" value="principal-info">
+                {{'PRODUCTS_SALE_REQUESTS.TITLES.PRINCIPAL_INFO' | translate}}
+            </mat-button-toggle>
+            <!-- TO DO: uncomment when backend done
+            <mat-button-toggle id="subtab_product_sale_request_general-data_promotions" routerLink="promotions" value="promotions">
+                {{'PRODUCTS_SALE_REQUESTS.TITLES.PROMOTIONS' | translate}}
+            </mat-button-toggle> -->
+        </mat-button-toggle-group>
+    </div>
+    <div class="flex basis-full flex-col">
+        @if (saleRequest$ | async; as saleRequest) {
+            <div class="flex justify-center items-center">
+                <div class="sale-request-status-bar flex flex-row grow shrink-0 justify-end items-center gap-2">
+                    <span class="ob-label">
+                        {{'PRODUCTS_SALE_REQUESTS.FORMS.LABELS.STATUS' | translate}}:
+                    </span>
+                    <app-status-select class="basis-[160px] shrink-0 grow-0" [element]="saleRequest" statusType="SALES_REQUESTS"
+                        [statusList]="productSaleRequestsStatus" [updateStatus]="updateStatus" [hiddenStatusList]="['PENDING']">
+                        <ng-template #optionTemplate let-row>
+                            {{'PRODUCTS_SALE_REQUESTS.FORMS.STATUS_OPTS.' + row | translate}}
+                        </ng-template>
+                    </app-status-select>
+                </div>
+            </div>
+            <mat-divider />
+            <router-outlet />
+        }
+    </div>
+</div>

@@ -1,0 +1,40 @@
+<div class="list-container" fxFlex="100%" fxLayout="column">
+    <div class="heading-container without-overflow-hidden" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div fxLayout="row wrap">
+            <h1 class="secondary mat-headline-3">{{'BI.SUBSCRIPTIONS.TITLES.SUBSCRIPTIONS_LIST' | translate}}</h1>
+        </div>
+        <div class="actions-container" [fxFlex]="(isHandset$ | async) ? '100%' : 'auto'"
+            fxLayout="row wrap" fxLayoutAlign="end">
+            <div class="filter-container" [fxFlex]="(isHandset$ | async) ? '100%' : 'none'" fxLayoutGap="10px"
+                [fxLayout]="(isHandset$ | async) ? 'column' : 'row'">
+                @if (canImpersonate$ | async) {
+                    <app-bi-impersonation fxFlex="100%" />
+                }
+                <div>
+                    <button mat-stroked-button color="primary" type="button" fxFlex="100%"
+                        class="ob-button medium add-button" [attr.aria-label]="'BI.SUBSCRIPTIONS.ACTIONS.EDIT_SUBSCRIPTIONS' | translate"
+                        [disabled]="isLoading$ | async" (click)="editSubscriptions()">
+                        <mat-icon>open_in_new</mat-icon>
+                        {{'BI.SUBSCRIPTIONS.ACTIONS.EDIT_SUBSCRIPTIONS' | translate}}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @if (isLoading$ | async) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+    @if (subscriptions$ | async; as subscriptions) {
+        <app-empty-state [fxShow]="subscriptions.length === 0" fxFlex="100%" class="list-content"
+            [title]="'BI.SUBSCRIPTIONS.EMPTY_LIST_MESSAGE' | translate" />
+        @if (isHandset$ | async) {
+            <app-bi-subscriptions-list-cards [subscriptions]="subscriptions" (deleteEmitter)="deleteSubscription($event)"
+                (sendSubscriptionEmitter)="sendSubscription($event)" />
+        } @else {
+            <app-bi-subscriptions-list-table [subscriptions]="subscriptions" (deleteEmitter)="deleteSubscription($event)"
+                (sendSubscriptionEmitter)="sendSubscription($event)" />
+        }
+    }
+</div>

@@ -1,0 +1,74 @@
+<form [formGroup]="filtersForm" fxFlex="0 1 590px" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="start stretch">
+    <ng-container *ngIf="(canSelectEntity$ | async)">
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label" fxFlex="60px">
+                {{'FORMS.LABELS.ENTITY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="0 1 100%">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select formControlName="entity" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate">
+                        <mat-option>
+                            <app-select-search #entitites [options$]="entities$" searchField="name" />
+                        </mat-option>
+                        @for (entity of entitites.getFilteredOptions$() | async; track entity?.id) {
+                            <mat-option [value]="entity">
+                                {{entity ? entity.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-divider [inset]="true" />
+    </ng-container>
+    <div fxLayout="row wrap" fxLayoutGap="16px grid" class="filter-block filters-group">
+        <div fxFlex="0 1 50%" fxFlex.lt-sm="0 1 100%">
+            <div class="ob-label" fxFlex="60px">{{'FORMS.LABELS.VENUE' | translate}}</div>
+            <div fxFlex="0 1 100%" class="filter-block-input">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select formControlName="venue" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option>
+                            <app-select-search #venues [options$]="venues$" searchField="name" />
+                        </mat-option>
+                        @for (venue of venues.getFilteredOptions$() | async; track venue?.id) {
+                            <mat-option [value]="venue">
+                                <div appEllipsify [matTooltip]="venue ? venue.name : ('FORMS.SELECT.ALL_ELEMENTS_MALE' | translate)">
+                                    {{venue ? venue.name : ('FORMS.SELECT.ALL_ELEMENTS_MALE' | translate)}}
+                                </div>
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div fxFlex="0 1 50%" fxFlex.lt-sm="0 1 100%">
+            <div class="ob-label" fxFlex="60px">{{'FORMS.LABELS.CITY' | translate}}</div>
+            <div fxFlex="0 1 100%" class="filter-block-input">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select formControlName="city" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate">
+                        <mat-option>
+                            <app-select-search #citySelectSearch [options$]="cities$" searchField="name" />
+                        </mat-option>
+                        @for (city of citySelectSearch.getFilteredOptions$() | async; track city?.name) {
+                            <mat-option [value]="city">
+                                {{city ? city.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div fxFlex="0 1 50%" fxFlex.lt-sm="0 1 100%">
+            <div class="ob-label" fxFlex="60px">{{'VENUE_TPLS.GRAPHIC' | translate}}</div>
+            <div fxFlex="0 1 100%" class="filter-block-input">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select formControlName="graphic" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate">
+                        <mat-option>{{'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate}}</mat-option>
+                        <mat-option [value]="true">{{'FORMS.LABELS.YES' | translate}}</mat-option>
+                        <mat-option [value]="false">{{'FORMS.LABELS.NO' | translate}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,45 @@
+<app-form-container [disabled]="!form.dirty" (cancel)="cancel()" (save)="savePrices()" layout="menu">
+    <div class="flex flex-col gap-10">
+        <app-tabs-menu type="navigation">
+            <ng-template appTab [label]="'EVENTS.PRICEZONE.TITLE_CONFIGURATION_TABLE' | translate">
+                <div class="list-container flex flex-col">
+                    <app-event-price-types-rates-group-filters #filters />
+                    <app-event-price-types-rates-group-list [selectedRate]="filters.selectedRate | async" />
+                </div>
+            </ng-template>
+            <ng-template appTab lazyLoad [label]="'EVENTS.PRICEZONE.TITLE_DESCRIPTION_TRANSLATE_TABLE' | translate">
+                <div class="list-container flex flex-col">
+                    @if ($isSga() !== true) {
+                        <div class="flex">
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label flex basis-full sm:basis-1/3">
+                                <mat-label>{{'EVENTS.PRICE_TYPES.VENUE_TEMPLATE' | translate}}</mat-label>
+                                <mat-select [formControl]="venueCtrl" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate"
+                                    [compareWith]="compareWith">
+                                    <mat-option>
+                                        <app-select-search #venueTplSelectSearch [options$]="venueTpls$" searchField="name"
+                                            requireSelection="true" />
+                                    </mat-option>
+                                    @for (venue of venueTplSelectSearch.getFilteredOptions$() | async; track venue.id) {
+                                        <mat-option [value]="venue">
+                                            <div appEllipsify
+                                                [matTooltip]="venue ? venue.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)">
+                                                {{venue ? venue.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                                            </div>
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    }
+                    <app-price-type-translations class="flex basis-1/2" [form]="form" [languages$]="languages$"
+                        [venueTplId]="venueCtrl.value?.id" />
+                </div>
+            </ng-template>
+        </app-tabs-menu>
+    </div>
+</app-form-container>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

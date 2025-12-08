@@ -1,0 +1,51 @@
+<div *ngIf="useBoxedOptions else listedOptions" fxFlex="100%" fxLayout="row wrap">
+    <mat-selection-list fxFlex="100%" gdColumns="1fr" gdColumns.gt-sm="1fr 1fr"
+        class="ob-grid-select-list" [class.no-padding]="noPadding" [compareWith]="compareWith" [multiple]="multiple"
+        (selectionChange)="changeSelection($event)" [formControl]="pageForm">
+        <mat-list-option *ngFor="let item of data" color="primary" [value]="item" checkboxPosition="before"
+            [disabled]="selectionDisabled || disabledOptionPredicate(item)" [attr.aria-selected]="item.selected">
+            <ng-container *ngTemplateOutlet="optionTemplateRef; context: {$implicit: item}" />
+        </mat-list-option>
+    </mat-selection-list>
+    <ng-container *ngIf="isEmptyStructure(data)">
+        <ng-container *ngIf="noResultsTemplateRef else defaultNoResults" [ngTemplateOutlet]="noResultsTemplateRef" />
+        <ng-template #defaultNoResults>
+            <div class="context-notification-container" fxFlex="100%" fxLayout="row" fxLayoutAlign="center start">
+                <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px" fxFlex="80%"
+                    fxLayoutAlign="center start">
+                    <span>{{'LIST.EMPTY' | translate}}</span>
+                </app-context-notification>
+            </div>
+        </ng-template>
+    </ng-container>
+</div>
+<ng-template #listedOptions>
+    <mat-selection-list fxFlex="100%" [compareWith]="compareWith" (selectionChange)="changeSelection($event)" class="ob-list"
+        [class.small-rows]="useSmallRows" [formControl]="pageForm" [multiple]="multiple">
+        <ng-content select="[slot='subheader']" />
+        <div *ngIf="isArray(data)">
+            <mat-list-option *ngFor="let row of data" color="primary" [value]="row" checkboxPosition="before" [selected]="selectionDisabled"
+                [disabled]="selectionDisabled || disabledOptionPredicate(row)" [matTooltip]="disabledTooltip"
+                [matTooltipDisabled]="!(selectionDisabled || disabledOptionPredicate(row))">
+                <ng-container *ngTemplateOutlet="optionTemplateRef; context: {$implicit: row}" />
+            </mat-list-option>
+        </div>
+        <ng-container *ngIf="!isArray(data)">
+            <ng-container *ngFor="let group of data | keyvalue">
+                <ng-container *ngTemplateOutlet="groupHeaderTemplateRef; context: {$implicit: group}" />
+                <mat-list-option *ngFor="let row of group.value" color="primary" [value]="row" checkboxPosition="before"
+                    [disabled]="selectionDisabled || disabledOptionPredicate(row)">
+                    <ng-container *ngTemplateOutlet="optionTemplateRef; context: {$implicit: row}" />
+                </mat-list-option>
+            </ng-container>
+        </ng-container>
+        <ng-container *ngIf="isEmptyStructure(data)">
+            <ng-container *ngIf="noResultsTemplateRef else defaultNoResults" [ngTemplateOutlet]="noResultsTemplateRef" />
+            <ng-template #defaultNoResults>
+                <div class="context-message-container">
+                    <p class="title">{{'FORMS.SELECT.NO_RESULTS' | translate}}</p>
+                </div>
+            </ng-template>
+        </ng-container>
+    </mat-selection-list>
+</ng-template>

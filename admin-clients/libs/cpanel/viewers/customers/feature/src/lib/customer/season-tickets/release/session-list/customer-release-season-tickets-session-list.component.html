@@ -1,0 +1,126 @@
+<div fxLayout="column" fxFlex="0 1 100%" class="list-container">
+    <div class="list-container" fxFlex="0 1 100%" fxLayout="column">
+        <div fxLayout="row" fxFlex="0 1 50px" fxLayoutAlign="flex-end center">
+            <mat-paginator hidePageSize fxFlex="0 0 auto" class="with-range-label transparent" />
+        </div>
+        <div fxFlex="auto" class="table-container" fxLayout="column">
+            <mat-table class="ob-table" [dataSource]="seasonTicketSessions$ | async" matSort [matSortActive]="initSortCol"
+                [matSortDirection]="initSortDir" matSortDisableClear
+                [attr.aria-label]="'CUSTOMER.TRANSFER.SEASON_TICKETS.SESSION_LIST.TABLE' | translate"
+                [class.not-touchable]="(isHandsetOrTablet$ | async) !== true">
+                <ng-container matColumnDef="session_name">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header="session_name"
+                        class="head-cell width130 right">{{'CUSTOMER.RELEASE.SEASON_TICKETS.SESSION_LIST.SESSION_NAME' | translate}}
+                    </mat-header-cell>
+                    <mat-cell class="width130 right" *matCellDef="let row">{{row.session_name}}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="session_starting_date">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header="session_starting_date"
+                        class="head-cell width130 right">{{'CUSTOMER.RELEASE.SEASON_TICKETS.SESSION_LIST.SESSION_DATE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell class="width130 right" *matCellDef="let row">
+                        {{row.session_starting_date | dateTime : dateTimeFormats.shortDate}}
+                        {{row.session_starting_date | dateTime : dateTimeFormats.shortTime}}
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="session_purchase_date">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header="session_purchase_date"
+                        class="head-cell width130 right">{{'CUSTOMER.RELEASE.SEASON_TICKETS.SESSION_LIST.PURCHASE_DATE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell class="width130 right" *matCellDef="let row">
+                        @if(row.releaseSession?.status && (row.releaseSession?.status === seasonTicketReleaseStatus.released
+                        || row.releaseSession?.status === seasonTicketReleaseStatus.sold)) {
+                            {{row.releaseSession?.purchase_date | dateTime : dateTimeFormats.shortDate}}
+                            {{row.releaseSession?.purchase_date | dateTime : dateTimeFormats.shortTime}}
+                        }
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="session_purchase_price">
+                    <mat-header-cell *matHeaderCellDef
+                        class="head-cell width130 right">{{'CUSTOMER.TRANSFER.SEASON_TICKETS.SESSION_LIST.PURCHASE_PRICE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell class="width130 right" *matCellDef="let row">
+                        @if(row.releaseSession?.status && (row.releaseSession?.status === seasonTicketReleaseStatus.released
+                        || row.releaseSession?.status === seasonTicketReleaseStatus.sold)) {
+                            {{row.releaseSession?.price | localCurrency: (currency$ | async) }}
+                        }
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="session_release_percentage">
+                    <mat-header-cell *matHeaderCellDef class="head-cell width130 right">
+                        {{'CUSTOMER.RELEASE.SEASON_TICKETS.SESSION_LIST.RELEASE_PERCENTAGE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell class="width130 right" *matCellDef="let row">
+                        @if(row.releaseSession?.status && (row.releaseSession?.status === seasonTicketReleaseStatus.released
+                        || row.releaseSession?.status === seasonTicketReleaseStatus.sold) && row.releaseSession?.percentage) {
+                            {{row.releaseSession?.percentage | localNumber : '1.2-2'}} %
+                        }
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="session_release_earnings">
+                    <mat-header-cell *matHeaderCellDef
+                        class="head-cell width130 right">{{'CUSTOMER.RELEASE.SEASON_TICKETS.SESSION_LIST.RELEASE_EARNINGS' | translate}}
+                    </mat-header-cell>
+                    <mat-cell class="width130 right" *matCellDef="let row">
+                        @if(row.releaseSession?.status && (row.releaseSession?.status === seasonTicketReleaseStatus.released
+                        || row.releaseSession?.status === seasonTicketReleaseStatus.sold)) {
+                            {{row.releaseSession?.earnings | localCurrency: (currency$ | async) }}
+                        }
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="session_released_by">
+                    <mat-header-cell *matHeaderCellDef
+                        class="head-cell width130 right">{{'CUSTOMER.RELEASE.SEASON_TICKETS.SESSION_LIST.RELEASE_BY.HEADER' | translate}}
+                    </mat-header-cell>
+                    <mat-cell class="width130 right" *matCellDef="let row">
+                        {{row.releaseSession.request_user?.type ?
+                        ('CUSTOMER.RELEASE.SEASON_TICKETS.SESSION_LIST.RELEASED_BY.TYPE_OPTS.'
+                        + row.releaseSession.request_user?.type | translate) : ''}}
+                    </mat-cell>
+                </ng-container>
+                <ng-container stickyEnd matColumnDef="session_status">
+                    <mat-header-cell *matHeaderCellDef
+                        class="head-cell width130 left status-column">{{'CUSTOMER.RELEASE.SEASON_TICKETS.SESSION_LIST.STATUS' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row" class="status-cell width130 left status-column">
+                        @if (row.releaseSession?.status && row.releaseSession?.status !== seasonTicketReleaseStatus.notReleased) {
+                            <span [ngClass]="['status-dot', row.releaseSession?.status.toLowerCase()]"></span>
+                            <span appEllipsify [matTooltip]="'CUSTOMER.STATUS_OPTS.' + row.releaseSession?.status | translate">
+                                {{'CUSTOMER.STATUS_OPTS.' + row.releaseSession?.status | translate}}
+                            </span>
+                        }
+                    </mat-cell>
+                </ng-container>
+                <ng-container stickyEnd matColumnDef="session_release_actions">
+                    <mat-header-cell *matHeaderCellDef
+                        class="button-actions-cell head-cell width130 left" />
+                    <mat-cell *matCellDef="let row" class="button-actions-cell width130 left">
+                        @if (row.releaseSession?.showRelease && $isSeasonTicketStatusReady()) {
+                            <button mat-stroked-button color="primary" class="ob-button medium" type="button"
+                                    (click)="openReleaseDialog(row)">
+                                {{'CUSTOMER.RELEASE.SEASON_TICKETS.SESSION_LIST.RELEASE_BUTTON' | translate}}
+                            </button>
+                        }
+                        @if (row.releaseSession?.showRecover && $isSeasonTicketStatusReady()) {
+                            <button mat-stroked-button color="tertiary" class="ob-button medium" type="button"
+                                    (click)="openRecoverDialog(row)">
+                                {{'CUSTOMER.REOEASE.SEASON_TICKETS.SESSION_LIST.RECOVER_BUTTON' | translate}}
+                            </button>
+                        }
+                    </mat-cell>
+                </ng-container>
+                <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" />
+                <mat-row *matRowDef="let row; columns: displayedColumns;" class="hoverable-row" />
+            </mat-table>
+            @if ((isLoading$ | async) === false && !(seasonTicketSessions$ | async)?.length) {
+                <app-empty-state-tiny fxFlex [title]="'CUSTOMER.RELEASE.SEASON_TICKETS.SESSION_LIST.EMPTY_LIST_TITLE' | translate"
+                    [description]="'CUSTOMER.RELEASE.SEASON_TICKETS.SESSION_LIST.EMPTY_LIST_MESSAGE' | translate" />
+            }
+        </div>
+    </div>
+</div>
+@if (isLoading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,130 @@
+<div [formGroup]="$form()">
+    <div class="section-block">
+        <div [class.in-season-ticket]="$isSeasonTicket()"
+            class="price-description">{{'SECONDARY_MARKET.PRICE_DESCRIPTION' | translate }}</div>
+        @if(!$isSeasonTicket()){
+            <p class="section-description legal-warning">
+                <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                <span>{{'SECONDARY_MARKET.PRICE_LEGAL_WARNING' | translate }}</span>
+            </p>
+        }
+        <mat-radio-group formControlName="type" class="price-type-selector">
+            <mat-radio-button class="ob-radio-button" value="ORIGINAL_PRICE">
+                <div class="price-type-item">
+                    <span class="ob-label">{{'SECONDARY_MARKET.BASE_PRICE' | translate}}</span>
+                    <span>{{'SECONDARY_MARKET.BASE_PRICE_DESCRIPTION' | translate }}</span>
+                </div>
+            </mat-radio-button>
+            <mat-radio-button #option class="ob-radio-button" value="PRICE_WITH_RESTRICTIONS" formGroupName="restrictions">
+                <div class="price-type-item">
+                    <span class="ob-label">{{'SECONDARY_MARKET.PRICE_WITH_RESTRICTIONS' | translate}}</span>
+                    <span>{{'SECONDARY_MARKET.PRICE_WITH_RESTRICTIONS_DESCRIPTION' | translate }}</span>
+                </div>
+            </mat-radio-button>
+            <div *ngIf="option.checked" class="price-restrictions" [class.in-season-ticket]="$isSeasonTicket()">
+                <div>
+                    <span class="ob-label">
+                        {{'SECONDARY_MARKET.PRICE_RESTRICTION_MIN' | translate}}
+                    </span>
+                    <div class="restriction-row" [formGroup]="minModifierForm">
+                        <mat-form-field appearance="outline" class="ob-form-field modifier-form inline-field">
+                            <mat-select formControlName="modifier" #minModifierInput
+                                [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                <mat-option [value]="priceRestrictionModifier.lessThan">
+                                    {{'SECONDARY_MARKET.PRICE_RESTRICTION_OPTS.LESS_THAN_BASE' | translate}}
+                                </mat-option>
+                                <mat-option [value]="priceRestrictionModifier.moreThan">
+                                    {{'SECONDARY_MARKET.PRICE_RESTRICTION_OPTS.MORE_THAN_BASE' | translate}}
+                                </mat-option>
+                                <mat-option [value]="priceRestrictionModifier.sameAs">
+                                    {{'SECONDARY_MARKET.PRICE_RESTRICTION_OPTS.SAME_AS_BASE' | translate}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div [class.hidden]="!showMinModifierValue()">
+                            <mat-form-field appearance="outline"
+                                subscriptSizing="dynamic"
+                                class="ob-form-field percentage-field">
+                                <app-percentage-input formControlName="modifierValue" #minInput
+                                    placeholder="{{100 | localNumber : '1.2-2'}}" />
+                            </mat-form-field>
+                        </div>
+                        <span>
+                            {{showMinModifierValue() ?
+                                    ('SECONDARY_MARKET.DISTINCT_FROM_BASE_PRICE' | translate) :
+                                    ('SECONDARY_MARKET.SAME_AS_BASE_PRICE' | translate)}} </span>
+                    </div>
+                    <mat-error *ngIf="minModifierForm.hasError('minGreaterThanMax')">
+                        {{'SECONDARY_MARKET.MIN_GREATER_THAN_MAX_ERROR' | translate}}
+                    </mat-error>
+                </div>
+                <div>
+                    <span class="ob-label">
+                        {{'SECONDARY_MARKET.PRICE_RESTRICTION_MAX' | translate}}
+                    </span>
+                    <div class="restriction-row" [formGroup]="maxModifierForm">
+                        <mat-form-field appearance="outline" class="ob-form-field modifier-form inline-field">
+                            <mat-select formControlName="modifier" #maxModifierInput
+                                [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                <mat-option [value]="priceRestrictionModifier.lessThan">
+                                    {{'SECONDARY_MARKET.PRICE_RESTRICTION_OPTS.LESS_THAN_BASE' | translate}}
+                                </mat-option>
+                                <mat-option [value]="priceRestrictionModifier.moreThan">
+                                    {{'SECONDARY_MARKET.PRICE_RESTRICTION_OPTS.MORE_THAN_BASE' | translate}}
+                                </mat-option>
+                                <mat-option [value]="priceRestrictionModifier.sameAs">
+                                    {{'SECONDARY_MARKET.PRICE_RESTRICTION_OPTS.SAME_AS_BASE' | translate}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div [class.hidden]="!showMaxModifierValue()">
+                            <mat-form-field appearance="outline"
+                                subscriptSizing="dynamic"
+                                class="ob-form-field percentage-field">
+                                <app-percentage-input formControlName="modifierValue" #maxInput
+                                    placeholder="{{100 | localNumber : '1.2-2'}}" />
+                            </mat-form-field>
+                        </div>
+                        <span>
+                            {{showMaxModifierValue() ?
+                                    ('SECONDARY_MARKET.DISTINCT_FROM_BASE_PRICE' | translate) :
+                                    ('SECONDARY_MARKET.SAME_AS_BASE_PRICE' | translate)}}
+                        </span>
+                    </div>
+                    <mat-error
+                        *ngIf="maxModifierForm.hasError('minGreaterThanMax')">
+                        {{'SECONDARY_MARKET.MAX_LOWER_THAN_MIN_ERROR' | translate}}
+                    </mat-error>
+                </div>
+                <mat-divider class="no-margin" />
+                <div>
+                    <div class="example-help-text">
+                        <span class="ob-label">{{'SECONDARY_MARKET.PRICE_CALCULATION_TITLE' | translate}}</span>
+                    </div>
+                    <div>
+                        <span class="example-help-text"
+                            [innerHTML]="'SECONDARY_MARKET.PRICE_CALCULATION_FIRST_PART' | translate:
+                                calculatePriceRange(simulationInput.value, minModifierInput,
+                                minInput.value, maxModifierInput, maxInput.value)"></span>
+                        <mat-form-field appearance="outline"
+                            subscriptSizing="dynamic"
+                            class="ob-form-field wrapped-field simulator-input">
+                            @let errorMessage = simulationCtrl | obErrorMessage$ | async;
+                            @if (errorMessage) {
+                                <mat-icon matIconPrefix [obErrorIcon]="errorMessage">
+                                    error_outline
+                                </mat-icon>
+                            }
+                            <app-currency-input #simulationInput [formControl]="simulationCtrl"
+                                [currencyFormat]="'narrow'" />
+                        </mat-form-field>
+                        <span class="example-help-text"
+                            [innerHTML]="'SECONDARY_MARKET.PRICE_CALCULATION_SECOND_PART' | translate:
+                                calculatePriceRange(simulationInput.value, minModifierInput,
+                                minInput.value, maxModifierInput, maxInput.value)"></span>
+                    </div>
+                </div>
+            </div>
+        </mat-radio-group>
+    </div>
+</div>

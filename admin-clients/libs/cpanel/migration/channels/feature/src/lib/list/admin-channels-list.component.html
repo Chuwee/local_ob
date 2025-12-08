@@ -1,0 +1,183 @@
+<div class="list-container" fxFlex="100%" fxLayout="column">
+    <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">{{'TITLES.CHANNELS' | translate}}</h1>
+        </div>
+    </div>
+    <div class="heading-container" fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxFlex="70%" fxLayoutGap="20px" fxLayoutAlign="start center">
+            <div class="filter-container" fxFlex="none">
+                <app-popover appFilter>
+                    <app-admin-channels-list-filter #filterContent [canSelectEntity$]="canReadMultipleEntities$" />
+                </app-popover>
+            </div>
+            <div class="search-field" fxFlex="100%">
+                <app-search-input [placeholder]="'FORMS.SEARCH.CHANNEL_LIST' | translate" />
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            @if (channelsMetadata$ | async; as channelsMetadata) {
+                <p class="page-summary"
+                    [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: channelsMetadata">
+                </p>
+            }
+            <app-paginator [length]="(channelsMetadata$ | async)?.total" [pageSize]="channelsPageSize" />
+        </div>
+    </div>
+    <div class="heading-container heading-divider">
+        <mat-divider />
+    </div>
+    <div class="heading-container">
+        <app-chips appFilter />
+    </div>
+    @if (channelsLoading$ | async) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+    <mat-table class="ob-table" [dataSource]="channels$ | async" matSort [matSortActive]="initSortCol"
+        [matSortDirection]="initSortDir" matSortDisableClear [attr.aria-label]="'TITLES.MY_CHANNELS' | translate"
+        [ngClass]="{'not-touchable': (isHandsetOrTablet$ | async) !== true}">
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'CHANNELS.NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="entity_name">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'CHANNELS.ENTITY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.entity?.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'CHANNELS.TYPE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{'CHANNELS.TYPE_OPTS.' + row.type | translate}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'CHANNELS.STATUS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{'CHANNELS.STATUS_OPTS.' + row.status | translate}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="whitelabel_type">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'CHANNELS.WHITELABEL_TYPE.TITLE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="editable-cell">
+                <div class="sale-request-status" fxFlex="1 1 100%" fxLayout="row" fxLayoutAlign="start center"
+                    fxLayoutGap="20px">
+                    <mat-form-field appearance="outline" class="ob-form-field ob-form-field-outline inline-field thin-select-field"
+                        fxFlex="0 1 180px" (click)="$event.stopPropagation()">
+                        <mat-select [value]="row.whitelabel_settings.whitelabelType"
+                            (selectionChange)="updateWhitelabelType(row, $event.value)">
+                            <mat-select-trigger>
+                                {{'CHANNELS.WHITELABEL_TYPE.' + row.whitelabel_settings?.whitelabelType?.toUpperCase() | translate}}
+                            </mat-select-trigger>
+                            @for (whitelabelType of whitelabelTypeOptions; track whitelabelType) {
+                                <mat-option [value]="whitelabelType">
+                                    {{'CHANNELS.WHITELABEL_TYPE.' + whitelabelType?.toUpperCase() | translate}}
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="v4_config_enabled">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'CHANNELS.V4_CONFIG_STATUS.TITLE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="editable-cell">
+                <div class="sale-request-status" fxFlex="1 1 100%" fxLayout="row" fxLayoutAlign="start center"
+                    fxLayoutGap="20px">
+                    <mat-form-field appearance="outline" class="ob-form-field ob-form-field-outline inline-field thin-select-field"
+                        fxFlex="0 1 180px" (click)="$event.stopPropagation()">
+                        @let v4ConfigEnabled = row.whitelabel_settings.v4_config_enabled;
+                        <mat-select [disabled]="row.whitelabel_settings.v4_enabled || v4ConfigEnabled"
+                            [value]="v4ConfigEnabled ? 'ENABLED' : 'DISABLED'"
+                            (selectionChange)="updateV4(row, $event.value)">
+                            <mat-select-trigger>
+                                <span [ngClass]="['status-dot', v4ConfigEnabled ? 'active' : 'blocked']"></span>
+                                {{'CHANNELS.V4_CONFIG_STATUS.' + (v4ConfigEnabled ? 'ENABLED' : 'DISABLED') |
+                            translate}}
+                        </mat-select-trigger>
+                        @for (status of generalStatusOptions; track status) {
+
+                            <mat-option [value]="status">
+                                {{'CHANNELS.V4_CONFIG_STATUS.' + status | translate}}
+                            </mat-option>
+
+                        }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="v4_enabled">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'CHANNELS.V4_STATUS.TITLE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="editable-cell">
+                <div class="sale-request-status" fxFlex="1 1 100%" fxLayout="row" fxLayoutAlign="start center"
+                    fxLayoutGap="20px">
+                    <mat-form-field appearance="outline" class="ob-form-field ob-form-field-outline inline-field thin-select-field"
+                        fxFlex="0 1 180px" (click)="$event.stopPropagation()">
+                        @let v4Enabled = row.whitelabel_settings.v4_enabled;
+                        <mat-select [value]="v4Enabled ? 'MIGRATED' : 'NOT_MIGRATED'"
+                            (selectionChange)="updateV4(row, $event.value)">
+                            <mat-select-trigger>
+                                <span [ngClass]="['status-dot', v4Enabled ? 'active' : 'blocked']"></span>
+                                {{'CHANNELS.V4_STATUS.' + (v4Enabled ? 'MIGRATED' : 'NOT_MIGRATED') | translate}}
+                        </mat-select-trigger>
+                        @for (status of v4StatusOptions; track status) {
+
+                            <mat-option [value]="status" [disabled]="v4Enabled && status === 'MIGRATED_STRIPE'">
+                                {{'CHANNELS.V4_STATUS.' + status | translate}}
+                            </mat-option>
+
+                        }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="v2_receipt_template_enabled">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'CHANNELS.V2_RECEIPT_TEMPLATE_STATUS.TITLE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="editable-cell">
+                <div class="sale-request-status" fxFlex="1 1 100%" fxLayout="row" fxLayoutAlign="start center"
+                    fxLayoutGap="20px">
+                    <mat-form-field appearance="outline" class="ob-form-field ob-form-field-outline inline-field thin-select-field"
+                        fxFlex="0 1 180px" (click)="$event.stopPropagation()">
+                        <mat-select [value]="row.whitelabel_settings.v2_receipt_template_enabled ? 'ENABLED' : 'DISABLED'"
+                            [disabled]="!row.whitelabel_settings.v4_enabled"
+                            (selectionChange)="migrateReceipt(row, $event.value === 'ENABLED')">
+                            <mat-select-trigger>
+                                <span [ngClass]="['status-dot', row.whitelabel_settings.v2_receipt_template_enabled ?
+                                'active' : 'blocked']"></span>
+                                {{'CHANNELS.V2_RECEIPT_TEMPLATE_STATUS.' + (row.whitelabel_settings.v2_receipt_template_enabled ?
+                                'ENABLED' : 'DISABLED') | translate}}
+                            </mat-select-trigger>
+                            @for (status of generalStatusOptions; track status) {
+
+                                <mat-option [value]="status">
+                                    {{'CHANNELS.V2_RECEIPT_TEMPLATE_STATUS.' + status | translate}}
+                                </mat-option>
+
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="columns; sticky: true" />
+        <mat-row *matRowDef="let row; columns: columns;" [routerLink]="['/channels', row.id]" class="interactive-row" />
+    </mat-table>
+    @if ((channelsMetadata$ | async)?.total === 0) {
+        <div class="context-notification-container" fxFlex="0 50 100%" fxLayout="row" fxLayoutAlign="center start">
+            <app-context-notification class="ob-context-notification" contextType="info"
+                fxFlex.gt-sm="600px" fxFlex="80%"
+                fxLayoutAlign="center start">
+                <p>{{'LIST.EMPTY' | translate}}</p>
+            </app-context-notification>
+        </div>
+    }
+</div>

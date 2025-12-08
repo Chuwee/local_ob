@@ -1,0 +1,20 @@
+<form id="templates" class="templates-form" [formGroup]="templatesForm" fxLayout="column">
+    <div class="templates-row" fxFlex="100%" fxLayout="row" fxLayoutAlign="start center">
+        <mat-form-field appearance="outline" class="ob-form-field inline-field field-with-label" fxFlex="200px">
+            <mat-label class="template-label">{{'EVENTS.COMMUNICATION.TEMPLATE_PDF' | translate}}</mat-label>
+            <mat-icon matPrefix class="ob-icon small" svgIcon="ticket-pdf" />
+            <mat-select [placeholder]="(templatesPdf.length === 0 ?
+                'EVENTS.COMMUNICATION.EMPTY_TEMPLATE_LIST' : 'FORMS.SELECT.PLACE_HOLDER') | translate" formControlName="singlePdfTemplate">
+                @for (template of templatesPdf; track template.id) {
+                    <mat-option [value]="template.id" fxLayout="row" fxLayoutGap="8px">
+                        <span fxFlex appEllipsify [matTooltip]="template.name">{{template.name}}</span>
+                        <!-- TODO: Not ready in backend yet -->
+                        <!-- @if(template.default) {
+                            <mat-icon svgIcon="star-icon" class="no-margin mat-icon-no-color star" />
+                        } -->
+                    </mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+    </div>
+</form>

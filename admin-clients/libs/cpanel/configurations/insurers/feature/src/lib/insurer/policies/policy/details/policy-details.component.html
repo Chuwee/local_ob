@@ -1,0 +1,39 @@
+@let policy = $policy();
+@if (policy) {
+    <div class="main-content flex flex-1 basis-full flex-col">
+            <app-nav-tabs-menu type="horizontalSubtab" [elements]="[
+                {
+                    label: 'INSURERS.TITLES.GENERAL_DATA',
+                    param: 'general-data'
+                },
+                {
+                    label: 'INSURERS.POLICIES.TITLES.PRICES',
+                    param: 'prices'
+                },
+                {
+                    label: 'INSURERS.POLICIES.TITLES.TERMS_AND_CONDITIONS',
+                    param: 'terms-conditions',
+                }
+            ]" /> 
+            <div slot="top-content" class="status-notifications-container flex flex-row justify-between items-center">
+                <div [class.disabled]="statusCtrl.disabled"
+                    [matTooltip]="'INSURERS.POLICIES..DISABLED_ACTIVATION_DESC' | translate"
+                    [matTooltipDisabled]="statusCtrl.enabled">
+                    <mat-slide-toggle class="ob-slide-toggle ob-label"
+                        [formControl]="statusCtrl"
+                        (change)="handleStatusChange($event.checked)"> 
+                        {{'INSURERS.POLICIES.CHANGE_STATUS' | translate}}
+                    </mat-slide-toggle>
+                </div>
+                <div class="promotion-status items-center">
+                    <span class="promotion-status-label ob-label">
+                        {{'INSURERS.POLICIES.STATUS' | translate}}:
+                    </span>
+                    <span class="ob-status-badge" [ngClass]="policy.active ? 'active' : 'inactive'">
+                        {{('CHANNELS.PROMOTIONS.STATUS_OPTS.' + (policy.active ? 'ACTIVE' : 'INACTIVE')) | translate}}
+                    </span>
+                </div>
+            </div>
+            <router-outlet  (activate)="childComponentChange($event)"/>            
+    </div>
+}

@@ -1,0 +1,105 @@
+@if (channelFormsArray$ | async; as channelForms) {
+    <ng-container [formGroup]="form">
+        @if (channelForms.length > 1) {
+
+            <app-tabs-menu type="navigation">
+                @for (channelForm of channelForms; track channelForm.key) {
+
+                    <ng-template appTab [label]="'FORMS.' + channelForm.key + '.NAME' | prefix | uppercase | translate">
+                        <ng-container [ngTemplateOutlet]="channelFormTemplate"
+                            [ngTemplateOutletContext]="{channelForm: channelForm, form: form}" />
+                    </ng-template>
+
+                }
+            </app-tabs-menu>
+
+        } @else {
+
+            <div fxLayout="column">
+                <ng-container [ngTemplateOutlet]="channelFormTemplate"
+                    [ngTemplateOutletContext]="{channelForm: channelForms[0], form: form}" />
+            </div>
+
+        }
+
+    </ng-container>
+}
+<ng-template #channelFormTemplate let-channelForm="channelForm" let-form="form">
+    <p>{{'FORMS.' + channelForm.key + '.DESCRIPTION' | uppercase | prefix | translate}}</p>
+    <mat-table class="ob-table channel-form-table" [dataSource]="channelForm.value"
+        [formGroup]="form.get(channelForm.key)">
+        <!-- Visible checkbox column -->
+        <ng-container matColumnDef="visible">
+            <mat-header-cell *matHeaderCellDef class="head-cell visible checkbox-column" fxFlex="42px"
+                fxLayoutAlign="center center" />
+            <mat-cell *matCellDef="let row; index as i" [formArrayName]="i" class="icon-cell visible checkbox-column"
+                fxFlex="42px" fxLayoutAlign="center center">
+                <mat-checkbox color="primary" formControlName="visible" />
+            </mat-cell>
+        </ng-container>
+        <!-- Field name column -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef class="head-cell name">
+                {{ 'FORM_FIELDS_HEADER' | prefix | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="name">
+                {{ 'FORM_FIELDS.' + row.key?.toUpperCase() | prefix | translate }}
+            </mat-cell>
+        </ng-container>
+        <!-- Purchase-required checkbox column -->
+        <ng-container matColumnDef="required">
+            <mat-header-cell *matHeaderCellDef class="head-cell purchase-required checkbox-column"
+                fxLayoutAlign="center center">
+                {{'REQUIRED' | prefix | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row; index as i" [formArrayName]="i"
+                class="icon-cell purchase-required checkbox-column" fxLayoutAlign="center center">
+                <mat-checkbox color="primary" formControlName="mandatory" />
+            </mat-cell>
+        </ng-container>
+        <!-- uneditable checkbox column -->
+        <ng-container matColumnDef="uneditable">
+            <mat-header-cell *matHeaderCellDef class="head-cell uneditable checkbox-column"
+                fxLayoutAlign="center center">
+                {{'UNEDITABLE' | prefix | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row; index as i" [formArrayName]="i"
+                class="icon-cell uneditable checkbox-column" fxLayoutAlign="center center">
+                <mat-checkbox color="primary" formControlName="uneditable" />
+            </mat-cell>
+        </ng-container>
+        <!-- Rules-badge column -->
+        <ng-container matColumnDef="rules-badge">
+            <mat-header-cell *matHeaderCellDef class="head-cell rules-badge" fxLayoutAlign="start center">
+                {{'VALIDATIONS.HEADER' | prefix | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row; index as i" class="rules-badge" fxLayoutAlign="start center">
+                <div class="badge" [fxShow]="form.get([channelForm.key, i, 'rules']).value?.length">
+                    {{'FORM_FIELD_HAS_VALIDATIONS' | prefix | translate}}
+                </div>
+            </mat-cell>
+        </ng-container>
+        <!-- Rules-editor buttons column -->
+        <ng-container matColumnDef="rules-editor">
+            <mat-header-cell *matHeaderCellDef class="actions-cell head-cell" fxFlex="0 0 50px" />
+            <mat-cell *matCellDef="let row; index as i" class="actions-cell" fxFlex="0 0 50px" fxLayoutAlign="end">
+                @if (row.available_rules?.length) {
+                    <div (click)="$event.stopPropagation()">
+                        <button mat-icon-button [matMenuTriggerFor]="actionsListMenu" #menuTrigger="matMenuTrigger"
+                            class="ob-button medium">
+                            <mat-icon>more_horiz</mat-icon>
+                        </button>
+                        <mat-menu #actionsListMenu="matMenu" xPosition="before" (close)="menuTrigger">
+                            <button mat-menu-item [attr.aria-label]="'VALIDATIONS_EDITION' | prefix | translate"
+                                (click)="openRulesEditorDialog(channelForm.key, row)">
+                                {{'VALIDATIONS_EDITION' | prefix | translate}}
+                            </button>
+                        </mat-menu>
+                    </div>
+                }
+            </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="channelFormsColumns[channelForm.key];sticky: true" class="dense-row" />
+        <mat-row *matRowDef="let row; columns: channelFormsColumns[channelForm.key]" class="dense-row hoverable-row" />
+    </mat-table>
+</ng-template>

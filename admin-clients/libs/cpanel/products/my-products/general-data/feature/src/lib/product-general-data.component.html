@@ -1,0 +1,44 @@
+<div class="flex basis-full">
+    <div class="subtabs-container basis-[200px] shrink-0">
+        <mat-button-toggle-group vertical [value]="deepPath$ | async" class="ob-subtab" appLastPathGuardListener
+            [currValue]="(deepPath$ | async)">
+            <mat-button-toggle id="subtab_product_general-data_principal-info" routerLink="principal-info" value="principal-info">
+                {{'PRODUCT.PRINCIPAL_INFO.TITLE' | translate}}
+            </mat-button-toggle>
+            <mat-button-toggle id="subtab_product_general-data_configuration" routerLink="configuration" value="configuration">
+                {{'PRODUCT.CONFIGURATION.TITLE' | translate}}
+            </mat-button-toggle>
+        </mat-button-toggle-group>
+    </div>
+    @if (product$ | async; as product) {
+        <div class="flex basis-full flex-col">
+            @if (productHasVariants$ | async) {
+                <div class="product-status-bar flex justify-between items-center">
+                    <div class="flex-row">
+                        <span class="ob-label">
+                            {{'PRODUCT.TYPE' | translate}}:
+                        </span>
+                        <span>
+                            {{'PRODUCT.TYPE_OPTS.' + product.product_type | translate | uppercase}}
+                        </span>
+                    </div>
+                    <div class="flex flex-row justify-end items-center gap-2">
+                        <span class="ob-label">
+                            {{'PRODUCT.STATUS' | translate}}:
+                        </span>
+                        <app-status-select [element]="product" statusType="PRODUCT" class="basis-[160px] shrink-0 grow-0"
+                            [statusList]="productStatusList" [updateStatus]="updateStatus">
+                            <ng-template #optionTemplate let-row>
+                                {{'PRODUCT.STATUS_OPTS.' + row | translate}}
+                            </ng-template>
+                        </app-status-select>
+                    </div>
+                </div>
+            }
+            @if (productHasVariants$ | async) {
+                <mat-divider />
+            }
+            <router-outlet />
+        </div>
+    }
+</div>

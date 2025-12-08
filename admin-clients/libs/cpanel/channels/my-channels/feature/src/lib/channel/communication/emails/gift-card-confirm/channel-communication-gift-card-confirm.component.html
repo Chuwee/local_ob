@@ -1,0 +1,33 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" class="overflow-y-auto"
+    [formGroup]="form" [disabled]="!form.dirty || (reqInProgress$ | async)">
+    <app-language-bar [languages]="languageList$ | async" [selected]="selectedLanguage$ | async" slot="outside"
+        [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)" />
+
+    <p class="mat-body-2 section-description">
+        {{ 'CHANNELS.EMAILS_COMMUNICATION.GIFT_CARD_CONFIRM.DESCRIPTION' | translate }}
+    </p>
+    <div class="flex">
+        <mat-form-field appearance="outline" class="ob-form-field field-with-label basis-1/2">
+            <mat-label>{{'CHANNELS.EMAILS_COMMUNICATION.GIFT_CARD_CONFIRM.SUBJECT' | translate}}</mat-label>
+            <input matInput aria-label="subject"
+                [placeholder]="'CHANNELS.EMAILS_COMMUNICATION.GIFT_CARD_CONFIRM.SUBJECT' | translate"
+                formControlName="subject" />
+        </mat-form-field>
+    </div>
+    <mat-form-field appearance="outline" class="ob-form-field no-padding field-with-label">
+        <mat-label>{{'CHANNELS.EMAILS_COMMUNICATION.GIFT_CARD_CONFIRM.HEADER' | translate}}</mat-label>
+        <app-rich-text-area [autoresize]="{min: 300, max: 500}" formControlName="header"
+            [autocompleterItems]="placeholdersMap['header']" class="vertical-stretch" />
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="ob-form-field no-padding field-with-label">
+        <mat-label>{{'CHANNELS.EMAILS_COMMUNICATION.GIFT_CARD_CONFIRM.FOOTER' | translate}}</mat-label>
+        <app-rich-text-area [autoresize]="{min: 300, max: 800}" formControlName="footer"
+            [autocompleterItems]="placeholdersMap['footer']" class="vertical-stretch" />
+    </mat-form-field>
+</app-form-container>
+
+@if (reqInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

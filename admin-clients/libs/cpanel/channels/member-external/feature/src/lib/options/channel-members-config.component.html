@@ -1,0 +1,252 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="(inProgress$ | async) || !form.dirty"
+    [formGroup]="form">
+    <mat-accordion [multi]="true" [togglePosition]="'before'">
+
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.MEMBERS_CONFIG.GENERAL_OPTIONS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex flex-col">
+                <mat-checkbox color="primary" formControlName="change_pin">
+                    {{'CHANNELS.MEMBERS_CONFIG.SHOW_CHANGE_PIN' | translate }}
+                </mat-checkbox>
+                <mat-checkbox color="primary" formControlName="remember_pin">
+                    {{'CHANNELS.MEMBERS_CONFIG.SHOW_REMEMBER_PIN' | translate }}
+                </mat-checkbox>
+                <mat-checkbox color="primary" formControlName="user_area">
+                    {{'CHANNELS.MEMBERS_CONFIG.SHOW_USER_AREA' | translate }}
+                </mat-checkbox>
+                <div class="flex flex-row">
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label buy-url flex-[0_1_500px]">
+                        <mat-label>{{'CHANNELS.MEMBERS_CONFIG.BUY_URL' | translate}}</mat-label>
+                        <input matInput type="text" formControlName="buy_url" spellcheck="false" placeholder="https://" />
+                    </mat-form-field>
+                </div>
+            </div>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.MEMBERS_CONFIG.MEMBER_OPTIONS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex flex-col">
+                <p>{{'CHANNELS.MEMBERS_CONFIG.MEMBER_OPTIONS_DESCRIPTION' | translate }}</p>
+                <mat-slide-toggle class="ob-slide-toggle" color="primary" formControlName="member_enabled">
+                    {{'CHANNELS.MEMBERS_CONFIG.ENABLE_MEMBERS' | translate }}
+                </mat-slide-toggle>
+            </div>
+            <mat-divider class="ob-divider" />
+            <div class="section-block flex flex-col">
+                <h3 class="section-title">{{'CHANNELS.MEMBERS_CONFIG.ADD_MEMBERS' | translate }}</h3>
+                <p>{{'CHANNELS.MEMBERS_CONFIG.OPEN_ADD_MEMBER_MODAL_DESCRIPTION' | translate }}</p>
+                <mat-checkbox color="primary" formControlName="open_additional_members">
+                    {{'CHANNELS.MEMBERS_CONFIG.OPEN_ADD_MEMBER_MODAL' | translate }}
+                </mat-checkbox>
+                <p>{{'CHANNELS.MEMBERS_CONFIG.MAX_ADDITIONAL_MEMBERS_DESCRIPTION' | translate }}</p>
+                <div class="flex flex-row justify-start items-center">
+                    {{'CHANNELS.MEMBERS_CONFIG.MAX_ADDITIONAL_MEMBERS' | translate}}
+                    <mat-form-field appearance="outline" class="ob-form-field inline-field value-field flex basis-[80px]">
+                        <input matInput type="number" formControlName="max_additional_members" placeholder="0">
+                    </mat-form-field>
+                    <mat-error [ob-form-errors]="form" field="max_additional_members" />
+                </div>
+            </div>
+            <mat-divider class="ob-form-divider" />
+            <div class="section-block flex flex-col" formGroupName="member_operation_periods">
+                <h3 class="section-title">{{'CHANNELS.MEMBERS_CONFIG.AVET_OPTIONS' | translate }}</h3>
+                <table mat-table #table [dataSource]="periods" class="ob-table member-operation-periods-table">
+                    <ng-container matColumnDef="period">
+                        <th mat-header-cell *matHeaderCellDef class="head-cell">
+                            {{'CHANNELS.SURCHARGES.MEMBERS.ORDER_TYPE' | translate}}
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                            {{'MEMBER_ORDER.TYPE_OPTS.' + row | translate}}
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="payment_mode">
+                        <th mat-header-cell *matHeaderCellDef class="head-cell">
+                            {{'CHANNELS.MEMBERS_CONFIG.ID_PAYMENT' | translate}}
+                        </th>
+                        <td mat-cell *matCellDef="let row" class="editable-cell" [formGroupName]="row">
+                            <div class="write-value">
+                                <mat-form-field appearance="outline" class="ob-form-field">
+                                    <input matInput type="number" formControlName="payment_mode" placeholder="0">
+                                </mat-form-field>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="emission_reason">
+                        <th mat-header-cell *matHeaderCellDef class="head-cell">
+                            {{'CHANNELS.MEMBERS_CONFIG.ID_EMISION' | translate}}
+                        </th>
+                        <td mat-cell *matCellDef="let row" class="editable-cell" [formGroupName]="row">
+                            <div class="write-value">
+                                <mat-form-field appearance="outline" class="ob-form-field">
+                                    <input matInput class="table-input" type="number" formControlName="emission_reason" placeholder="0">
+                                </mat-form-field>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <!-- eslint-disable-next-line @angular-eslint/template/prefer-self-closing-tags -->
+                    <tr mat-header-row *matHeaderRowDef="['period', 'payment_mode','emission_reason']"></tr>
+                    <!-- eslint-disable-next-line @angular-eslint/template/prefer-self-closing-tags -->
+                    <tr mat-row *matRowDef="let row; columns: ['period', 'payment_mode', 'emission_reason'];" class="hoverable-row"></tr>
+                </table>
+            </div>
+            <mat-divider class="ob-form-divider" />
+            <div class="flex flex-col">
+                <h3 class="section-title">{{'CHANNELS.MEMBERS_CONFIG.PASSBOOK' | translate }}</h3>
+                <mat-checkbox color="primary" formControlName="force_regenerate_passbook" class="app-checkbox-wrap-label">
+                    {{'CHANNELS.MEMBERS_CONFIG.FORCE_REGENERATE_PASSBOOK' | translate }}
+                </mat-checkbox>
+                <app-date-time-picker class="date-form-field passbook-expiration"
+                    [label]="'CHANNELS.MEMBERS_CONFIG.EXPIRATION_DATE_PASSBOOK' | translate" formControlName="expiration_date_passbook" />
+                <div class="flex flex-row">
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label flex-[0_1_500px]">
+                        <mat-label>{{'CHANNELS.MEMBERS_CONFIG.PASSBOOK_PERMISSIONS' | translate}}</mat-label>
+                        <mat-select formControlName="download_passbook_permissions" multiple
+                            [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                            @for (permission of membersPermisions$ | async; track $index) {
+                                <mat-option [value]="permission.id">
+                                    {{ permission.name | translate }}
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <mat-divider class="ob-form-divider" />
+            <div class="flex flex-col">
+                <h3 class="section-title">{{'CHANNELS.MEMBERS_CONFIG.MEMBERS_PERMISSIONS' | translate }}</h3>
+                <div class="flex flex-row">
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label flex-[0_1_500px]">
+                        <mat-label>{{'CHANNELS.MEMBERS_CONFIG.BUY_SEAT_PERMISSIONS_LABEL' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                            formControlName="buy_seat_permission">
+                            @for (permission of membersPermisions$ | async; track $index) {
+                                <mat-option [value]="permission.id">
+                                    {{permission.name | translate}}
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="flex flex-row">
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label flex-[0_1_500px]">
+                        <mat-label>{{'CHANNELS.MEMBERS_CONFIG.NEW_MEMBER_PERMISSIONS_LABEL' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                            formControlName="new_member_permission">
+                            @for (permission of membersPermisions$ | async; track $index) {
+                                <mat-option [value]="permission.id">
+                                    {{permission.name | translate}}
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <mat-divider class="ob-form-divider" />
+            <div class="section-block flex flex-col" formGroupName="member_operation_periods">
+                <h3 class="section-title">{{'CHANNELS.MEMBERS_CONFIG.ORPHAN_SEATS' | translate }}</h3>
+                <p>{{'CHANNELS.MEMBERS_CONFIG.ORPHAN_SEATS_DESCRIPTION' | translate }}</p>
+                @for (period of orphanSeatsPeriods; track $index) {
+                    <ng-container [formGroupName]="period">
+                        <mat-slide-toggle class="ob-slide-toggle" color="primary" formControlName="orphan_seats_enabled">
+                            {{'CHANNELS.MEMBERS_CONFIG.ORPHAN_SEATS_' + period | translate }}
+                        </mat-slide-toggle>
+                    </ng-container>
+                }
+            </div>
+            <mat-divider class="ob-form-divider" />
+            <div class="section-block flex flex-col">
+                <h3 class="section-title">{{'CHANNELS.MEMBERS_CONFIG.TUTOR_TITLE' | translate }}</h3>
+                <div class="flex flex-row items-center">
+                    <mat-checkbox class="no-margin-bottom" color="primary" formControlName="allow_tutor_form">
+                        {{'CHANNELS.MEMBERS_CONFIG.ALLOW_TUTOR_FORM_LABEL' | translate }}
+                    </mat-checkbox>
+                    <mat-form-field appearance="outline" class="ob-form-field inline-field value-field flex-[0_0_80px]">
+                        <input matInput type="number" formControlName="tutee_max_age" placeholder="0">
+                    </mat-form-field>
+                    <span>{{'CHANNELS.MEMBERS_CONFIG.TUTEE_MAX_AGE_LABEL' | translate }}</span>
+                </div>
+            </div>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.MEMBERS_CONFIG.EMAIL_OPTIONS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex flex-col">
+                <mat-checkbox color="primary" formControlName="show_previous_seat">
+                    {{'CHANNELS.MEMBERS_CONFIG.SHOW_PREVIOUS_SEAT_EMAIL' | translate }}
+                </mat-checkbox>
+                <mat-checkbox color="primary" formControlName="show_subscription_mode">
+                    {{'CHANNELS.MEMBERS_CONFIG.SHOW_SUBSCRIPTION_MODE_EMAIL' | translate }}
+                </mat-checkbox>
+                <mat-checkbox color="primary" formControlName="show_role">
+                    {{'CHANNELS.MEMBERS_CONFIG.SHOW_ROLE_EMAIL' | translate }}
+                </mat-checkbox>
+                <div class="flex flex-row basis-[24px] justify-start items-center">
+                    <mat-checkbox class="no-margin-bottom flex-row" color="primary" formControlName="signup_email">
+                        <mat-label>{{'CHANNELS.MEMBERS_CONFIG.SEND_SIGNUP_EMAIL' | translate }}</mat-label>
+                    </mat-checkbox>
+                    <app-help-button [message]="'CHANNELS.MEMBERS_CONFIG.SEND_SIGNUP_EMAIL_HELP' | translate" />
+                </div>
+            </div>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.MEMBERS_CONFIG.PRICES.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div>
+                <p>{{'CHANNELS.MEMBERS_CONFIG.PRICES.UPDATE_BATCH_PRICES_DESCRIPTION' | translate}}</p>
+                <button type="button" mat-stroked-button color="tertiary" class="ob-button small" (click)="updateMembersBatchPrices()"
+                    [disabled]="disableUpdateBatchPricesButton$ | async">
+                    <mat-icon>refresh</mat-icon>
+                    {{'CHANNELS.MEMBERS_CONFIG.PRICES.UPDATE_BATCH_PRICES' | translate}}
+                </button>
+            </div>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.MEMBERS_CONFIG.CARD_IMAGE.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div formGroupName="members_card_image">
+                <p>{{'CHANNELS.MEMBERS_CONFIG.CARD_IMAGE.DESCRIPTION' | translate}}</p>
+                <mat-radio-group formControlName="type" class="flex flex-col">
+                    <div class="radio-option flex flex-col">
+                        <mat-radio-button class="ob-radio-button vertical-list radio-option" [value]="'HORIZONTAL'">
+                            {{'CHANNELS.MEMBERS_CONFIG.CARD_IMAGE.HORIZONTAL_TYPE' | translate}}
+                        </mat-radio-button>
+                        @if (form.controls.members_card_image.controls.type?.value === 'HORIZONTAL') {
+                            <div class="nested-content flex shrink grow">
+                                <app-image-uploader [imageRestrictions]="horizontalRestrictions" [style.max-width]="'250px'"
+                                    formControlName="image" />
+                            </div>
+                        }
+                    </div>
+                    <div class="radio-option flex flex-col">
+                        <mat-radio-button class="ob-radio-button vertical-list" [value]="'VERTICAL'">
+                            {{'CHANNELS.MEMBERS_CONFIG.CARD_IMAGE.VERTICAL_TYPE' | translate}}
+                        </mat-radio-button>
+                        @if (form.controls.members_card_image.controls.type?.value === 'VERTICAL') {
+                            <div class="nested-content flex shrink grow">
+                                <app-image-uploader [imageRestrictions]="verticalRestrictions" [style.max-width]="'158px'"
+                                    formControlName="image" />
+                            </div>
+                        }
+                    </div>
+                </mat-radio-group>
+            </div>
+        </mat-expansion-panel>
+
+    </mat-accordion>
+</app-form-container>
+
+@if (inProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

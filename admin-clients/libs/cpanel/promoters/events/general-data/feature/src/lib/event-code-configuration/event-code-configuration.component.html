@@ -1,0 +1,52 @@
+<app-form-container layout="menu" (cancel)="refresh()" (save)="save()" [disabled]="!form.dirty || (isLoadingOrSaving$ | async)">
+    <form [formGroup]="form" class="code-configuration-container" [class.form-disabled]="(componentBlocked$ | async) === true"
+        [matTooltip]="'EVENTS.CONF_CODES_TOOLTIP' | translate" [matTooltipDisabled]="(componentBlocked$ | async) === false">
+        <div class="code-conf-status-container">
+            <mat-slide-toggle class="ob-slide-toggle" formControlName="toggleControl">
+                {{'EVENTS.CONF_CODES_STATUS' | translate}}
+            </mat-slide-toggle>
+        </div>
+        <p class="description">{{'EVENTS.CONF_CODES_DESCRIPTION' | translate}}</p>
+        <div fxLayout="row wrap">
+            <div fxFlex="0 0 240px">
+                <mat-form-field fxFlex="240px" appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'EVENTS.FAIR_CODE' | translate}}</mat-label>
+                    <mat-select formControlName="fairCode" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                        <mat-option>
+                            <app-select-search #fairCodeSelectSearch [options$]="fairCodeOptions$" searchField="name">
+                            </app-select-search>
+                        </mat-option>
+                        <mat-option *ngFor="let code of fairCodeSelectSearch.getFilteredOptions$() | async" [value]="code">
+                            <div>
+                                {{code}}
+                            </div>
+                        </mat-option>
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form" field="fairCode"></mat-error>
+                </mat-form-field>
+            </div>
+            <div fxFlex="0 0 240px">
+                <mat-form-field fxFlex="240px" appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'EVENTS.FAIR_EDITION' | translate}}</mat-label>
+                    <mat-select formControlName="fairEdition" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                        <mat-option>
+                            <app-select-search #fairEditionSelectSearch [options$]="fairEditionOptions$" searchField="name">
+                            </app-select-search>
+                        </mat-option>
+                        <mat-option *ngFor="let code of fairEditionSelectSearch.getFilteredOptions$() | async" [value]="code">
+                            <div>
+                                {{code}}
+                            </div>
+                        </mat-option>
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form" field="fairEdition"></mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+    </form>
+
+    <app-archived-event-mgr slot="actions-bar" [disabled]="form.dirty || (isLoadingOrSaving$ | async)"></app-archived-event-mgr>
+</app-form-container>
+<div *ngIf="isLoadingOrSaving$ | async" class="spinner-container">
+    <mat-spinner></mat-spinner>
+</div>

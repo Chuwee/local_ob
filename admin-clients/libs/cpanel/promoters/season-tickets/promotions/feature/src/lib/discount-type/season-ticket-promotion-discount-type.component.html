@@ -1,0 +1,48 @@
+<app-form-container [disabled]="!(form?.dirty) || (reqInProgress$ | async)" (cancel)="cancel()" (save)="save()">
+    <form [formGroup]="form" fxLayout="column">
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'SEASON_TICKET.PROMOTIONS.DISCOUNT_TYPE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="column" class="promotion-form-section">
+                <p class="mat-subtitle-2">{{'SEASON_TICKET.PROMOTIONS.DISCOUNT_TYPE_DESCRIPTION' | translate}}</p>
+                <!-- PROMOTION DISCOUNT TYPE -->
+                <div fxFlex fxLayout="row">
+                    <mat-radio-group fxFlex="300px" fxLayout="column" formControlName="type" class="release-date-mode">
+                        <div fxLayout="row" fxLayoutAlign="center space-between" fxFlex="100%" fxLayoutGap="15px">
+                            <mat-radio-button fxFlex="100%" class="ob-radio-button inline" [value]="discountTypes.fixed">
+                                <div>{{'SEASON_TICKET.PROMOTIONS.DISCOUNT_TYPE_OPTS.FIXED' | translate}}</div>
+                            </mat-radio-button>
+                            <mat-form-field fxFlex="120px" appearance="outline" class="ob-form-field">
+                                <app-currency-input formControlName="fixValue"
+                                    [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                                    [placeholder]="0 | localCurrency:(currency$ | async):'narrow'" />
+                            </mat-form-field>
+                        </div>
+                        <div fxLayout="row" fxLayoutAlign="center space-between" fxFlex="100%" fxLayoutGap="15px">
+                            <mat-radio-button fxFlex="100%" class="ob-radio-button inline" [value]="discountTypes.percentage">
+                                <div>{{'SEASON_TICKET.PROMOTIONS.DISCOUNT_TYPE_OPTS.PERCENTUAL' | translate}}</div>
+                            </mat-radio-button>
+                            <mat-form-field fxFlex="120px" appearance="outline" class="ob-form-field">
+                                <app-percentage-input formControlName="percentualValue"
+                                    placeholder="{{0 | localNumber : '1.2-2'}}" />
+                            </mat-form-field>
+                        </div>
+                        <mat-radio-button *ngIf="(promotion$ | async)?.type !== promotionTypes.basic"
+                            class="ob-radio-button inline" [value]="discountTypes.basePrice">
+                            <div>{{'SEASON_TICKET.PROMOTIONS.DISCOUNT_TYPE_OPTS.BASE_PRICE' | translate}}</div>
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </div>
+                <div *ngIf="form.get('type').value === discountTypes.basePrice" fxFlex>
+                    <app-range-table fxFlex="100%" fxFlex.gt-md="500px" [form]="form" [data]="(ranges$ | async)"
+                        class="nested-content" onlyFixed="true" type="generic" [currency]="currency$ | async"
+                        [currencyFormat]="'narrow'" />
+                </div>
+            </div>
+        </mat-expansion-panel>
+    </form>
+</app-form-container>
+<div class="spinner-container" *ngIf="reqInProgress$ | async">
+    <mat-spinner />
+</div>

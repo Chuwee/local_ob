@@ -1,0 +1,32 @@
+<app-form-container [disabled]="!form.dirty || (loading$ | async)" (cancel)="cancel()" (save)="save()">
+    <form [formGroup]="form">
+        <div fxLayout="column" class="pack-form-section" formGroupName="pack_period">
+            <p class="mat-subtitle-2" fxLayoutAlign="start center">
+                {{'CHANNELS.PACKS.PACK_PERIOD' | translate}}
+            </p>
+            <mat-radio-group formControlName="type" fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="center">
+                <mat-radio-button class="ob-radio-button" [value]="'AUTOMATIC'">
+                    <div class="option-title">{{'CHANNELS.PACKS.PACK_PERIOD_AUTOMATIC' | translate}}</div>
+                    <div>{{'CHANNELS.PACKS.PACK_PERIOD_AUTOMATIC_DESC' | translate}}</div>
+                </mat-radio-button>
+                <mat-radio-button class="ob-radio-button" [value]="'CUSTOM'">
+                    <div class="option-title">{{'CHANNELS.PACKS.PACK_PERIOD_CUSTOM' | translate}}</div>
+                    <div>{{'CHANNELS.PACKS.PACK_PERIOD_CUSTOM_DESC' | translate}}</div>
+                </mat-radio-button>
+            </mat-radio-group>
+            @if($packPeriodType() === 'CUSTOM') {
+                <div fxLayout="row" fxLayoutGap="48px" class="dates-selection nested-content">
+                    <app-date-time-picker fxFlex="100%" class="date-form-field" [label]="'DATES.START_DATE' | translate"
+                        formControlName="start_date" />
+                    <app-date-time-picker fxFlex="100%" class="date-form-field" [label]="'DATES.END_DATE' | translate"
+                        formControlName="end_date" />
+                </div>
+            }
+        </div>
+    </form>
+</app-form-container>
+@if(loading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,32 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" class="no-padding"
+    [disabled]="!form.dirty || (isLoadingOrSaving$ | async)">
+    <app-language-bar [languages]="languages$ | async" [selected]="selectedLanguage$ | async" slot="outside"
+        [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)" />
+    <div fxFlex="grow" fxLayout="column">
+        <!-- shame hack :( -->
+        <div fxFlex="0 0 24px" class="spacer">
+            <div class="details-container" fxFlex="0 1 880px"></div>
+            <mat-divider vertical="true" fxFlexAlign="stretch" />
+            <div fxFlex="0 0 200px"></div>
+        </div>
+        @if (((channel$ | async) | isMembersChannel) === false) {
+            <app-channel-ticket-content-pdf #pdfContent [form]="form" [language$]="selectedLanguage$"
+                class="ticket-content-block" />
+        }
+        @let passbook = passbook$ | async;
+        @if (passbook?.visible) {
+            <app-channel-ticket-content-passbook #passbookContent [form]="form" [language$]="selectedLanguage$"
+                [isEnabled]="passbook.enabled" class="ticket-content-block" />
+        }
+        @if (((channel$ | async) | isBoxOffice)) {
+            <app-channel-ticket-content-printer #printerContent [form]="form" [language$]="selectedLanguage$"
+                class="ticket-content-block" />
+        }
+    </div>
+</app-form-container>
+
+@if (isLoadingOrSaving$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

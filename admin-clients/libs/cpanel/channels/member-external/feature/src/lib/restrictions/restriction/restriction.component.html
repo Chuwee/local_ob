@@ -1,0 +1,100 @@
+<form [formGroup]="form" class="form-box">
+
+    <div class="restriction-status" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+        <span class="detail-description"
+            [innerHTML]="('MEMBER_EXTERNAL.RESTRICTIONS.' + restriction.restriction_type + '_DESCRIPTION') | translate">
+        </span>
+        <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="16px">
+            <mat-slide-toggle #toggle class="ob-slide-toggle" color="primary" formControlName="activated"
+                (change)="activate($event.checked)"
+                [matTooltip]="'MEMBER_EXTERNAL.RESTRICTIONS.ACTIVATION_DISABLED' | translate"
+                [matTooltipDisabled]="!toggle.disabled">
+                {{'MEMBER_EXTERNAL.RESTRICTIONS.ACTIVATE' | translate }}
+            </mat-slide-toggle>
+            <button mat-stroked-button color="tertiary" class="ob-button medium"
+                (click)="edit()" [disabled]="restriction.editing">
+                {{'MEMBER_EXTERNAL.RESTRICTIONS.EDIT' | translate}}
+            </button>
+        </div>
+    </div>
+
+    <div class="restriction-sectors" fxLayout="row wrap" fxLayoutAlign="space-between center" fxLayoutGap="8px">
+        <mat-label fxFlex="0 1 170px">{{'MEMBER_EXTERNAL.RESTRICTIONS.SECTORS' | translate}}</mat-label>
+        <mat-form-field fxFlex="1 0 75%" class="ob-form-field inline-field" appearance="outline">
+            <mat-select #select multiple aria-label="sectors"
+                formControlName="venue_template_sectors"
+                [placeholder]="'MEMBER_EXTERNAL.RESTRICTIONS.SECTORS_PLACEHOLDER' | translate">
+                <mat-option>
+                    <app-select-search #search searchField="name"
+                        [requireSelection]="true" [options$]="sectors$"
+                        [placeholderLabel]="'FORMS.SEARCH.NAME' | translate">
+                    </app-select-search>
+                </mat-option>
+                <div class="mat-option" (click)="selectAll(select)">
+                    <span class="mat-option-text">
+                        {{ (allSelected(select) ? 'FORMS.ACTIONS.SELECT_ALL' : 'FORMS.ACTIONS.UNSELECT_ALL') | translate }}
+                    </span>
+                </div>
+                <mat-option *ngFor="let sector of search.getFilteredOptions$() | async" [value]="sector?.id">
+                    {{sector?.name}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+
+    <app-members-restriction-fields
+        class="restriction-fields"
+        [form]="form"
+        [restriction]="restriction">
+    </app-members-restriction-fields>
+
+    <div class="restriction-periods" fxLayout="row wrap" fxLayoutAlign="space-between center" fxLayoutGap="8px">
+        <mat-label fxFlex="0 1 170px">{{'MEMBER_EXTERNAL.RESTRICTIONS.PERIODS' | translate}}</mat-label>
+        <mat-form-field fxFlex="1 0 75%" class="ob-form-field inline-field" appearance="outline">
+            <mat-select multiple aria-label="periods"
+                formControlName="member_periods"
+                [placeholder]="'MEMBER_EXTERNAL.RESTRICTIONS.PERIODS_PLACEHOLDER' | translate">
+                <mat-option *ngFor="let period of periods" [value]="period">
+                    {{ 'MEMBER_ORDER.TYPE_OPTS.' + period | translate }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+
+    <mat-divider class="ob-divider"></mat-divider>
+
+    <p *ngIf="missingTranslations()" fxLayoutAlign=" center">
+        <mat-icon class="ob-icon small warning">warning</mat-icon>
+        {{'MEMBER_EXTERNAL.RESTRICTIONS.TRANSLATIONS_WARNING' | translate}}
+    </p>
+
+    <span class="mat-subtitle-2">{{'MEMBER_EXTERNAL.RESTRICTIONS.TRANSLATIONS' | translate}}</span>
+    <div fxLayout="row" fxLayoutAlign=" center">
+        <span>{{'MEMBER_EXTERNAL.RESTRICTIONS.TRANSLATIONS_INFO' | translate}}</span>
+        <button mat-icon-button color="tertiary" class="ob-button small"
+            (click)="translate()" [disabled]="!restriction.editing">
+            <mat-icon>mode_edit</mat-icon>
+        </button>
+    </div>
+
+</form>
+
+<div fxLayoutAlign="start center" fxLayoutGap="8px"
+    *ngIf="restriction.editing && ((form.valueChanges | async) || true)">
+    <div fxFlex="1 1 auto" fxLayoutAlign=" center" class="editing-mode-message">
+        <mat-icon class="ob-icon small info with-text">info</mat-icon>
+        {{'MEMBER_EXTERNAL.RESTRICTIONS.EDITING_MODE' | translate}}
+    </div>
+    <button type="button" mat-button class="ob-button medium"
+        (click)="cancel()">
+        {{'FORMS.ACTIONS.CANCEL' | translate}}
+    </button>
+    <button type="button" mat-flat-button class="ob-button medium" color="primary"
+        (click)="save()" [disabled]="!form.dirty">
+        {{'FORMS.ACTIONS.UPDATE' | translate}}
+    </button>
+</div>
+
+<div class="spinner-container" *ngIf="(loading$ | async)?.[restriction.sid] === true">
+    <mat-spinner></mat-spinner>
+</div>

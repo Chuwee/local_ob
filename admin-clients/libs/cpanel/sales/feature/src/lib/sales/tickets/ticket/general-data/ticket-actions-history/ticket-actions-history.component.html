@@ -1,0 +1,103 @@
+<div fxLayout="row wrap">
+    <div fxFlex="100%" *ngIf="(actions$ | async)?.length <= actionsHistoryPageSize">
+        <p class="ticket-table-count mat-subtitle-2" fxFlex="100%" fxLayoutAlign="start center">
+            {{'TICKET.ACTIONS_HISTORY.' + (type ? type : 'ALL') + '.TOTAL_NUMBER' | translate: { total: total } }}&nbsp;
+            <mat-icon fxFlexAlign="center" class="ob-help-icon"
+                [matTooltip]="'TICKET.ACTIONS_HISTORY.' +  (type ? type : 'ALL') + '.INFO' | translate">
+                help_outline
+            </mat-icon>
+        </p>
+    </div>
+    <div class="filter-container" fxLayoutGap="20px" *ngIf="(actions$ | async)?.length > actionsHistoryPageSize" fxFlex="100%">
+        <div class="paginator" fxFlex fxLayoutAlign="end center" fxLayoutGap="10px">
+            <p *ngIf="actions$ | async as actions" class="page-summary" [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: {
+                        startItem: getPaginatorStartItem(actionsPage$ | async),
+                        endItem: getPaginatorEndItem(actionsPage$ | async, actions?.length),
+                        total: actions?.length
+                    }">
+            </p>
+            <mat-paginator [pageSize]="actionsHistoryPageSize" [pageIndex]="actions$ | async" hidePageSize (page)="pageFilter($event)"
+                [length]="(actions$ | async)?.length" />
+        </div>
+    </div>
+    <div class="table-container" fxFlex="100%">
+        <mat-table class="ob-table ticket-detail-table" [dataSource]="pagedActions$ | async">
+            <ng-container matColumnDef="date">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'FORMS.LABELS.DATE' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    {{row.date | dateTime : dateTimeFormats.shortDateTime}}
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="channel">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'FORMS.LABELS.CHANNEL' | translate}}
+                </mat-header-cell>
+                <mat-cell appEllipsify matTooltipClass="ob-tooltip-nowrap" [matTooltip]="row.channel?.name" *matCellDef="let row">
+                    {{row.channel?.name}}
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="user">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'FORMS.LABELS.USER' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    <ng-container *ngIf="!row.additional_data?.external_user_id else additionalUser">
+                        <span appEllipsify matTooltipClass="ob-tooltip-nowrap" [matTooltip]="row.user?.username">
+                            {{row.user?.username}}
+                        </span>
+                    </ng-container>
+                    <ng-template #additionalUser>
+                        <span appEllipsify matTooltipClass="ob-tooltip-nowrap" [matTooltip]="additionalUserInfo(row.additional_data)">
+                            {{additionalUserInfo(row.additional_data)}}
+                        </span>
+                    </ng-template>
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="resend_email">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'FORMS.LABELS.RESEND_EMAIL' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    <span appEllipsify matTooltipClass="ob-tooltip-nowrap" [matTooltip]="row.additional_data?.resend_email">
+                        {{row.additional_data?.resend_email}}
+                    </span>
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="resend_whatsapp">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'FORMS.LABELS.RESEND_WHATSAPP' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    <span appEllipsify matTooltipClass="ob-tooltip-nowrap" [matTooltip]="row.additional_data?.resend_whatsapp">
+                        {{row.additional_data?.resend_whatsapp}}
+                    </span>
+                </mat-cell>
+            </ng-container>
+            <!-- Only for all-actions table -->
+            <ng-container matColumnDef="ticket_action">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'FORMS.LABELS.TICKET_ACTION' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    <ng-container *ngIf="row.type">
+                        {{'TICKET.ACTIONS_HISTORY.ACTION.' + row.type | translate}}
+                    </ng-container>
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="ticket_format">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'FORMS.LABELS.TICKET_FORMAT' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    <ng-container *ngIf="row.ticket_format">
+                        {{'TICKET.ACTIONS_HISTORY.FORMAT.' + row.ticket_format | translate}}
+                    </ng-container>
+                </mat-cell>
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="printsColumns | async;  sticky: true" class="dense-row" />
+            <mat-row *matRowDef="let row; columns: (printsColumns | async);" class="dense-row" />
+        </mat-table>
+    </div>
+</div>

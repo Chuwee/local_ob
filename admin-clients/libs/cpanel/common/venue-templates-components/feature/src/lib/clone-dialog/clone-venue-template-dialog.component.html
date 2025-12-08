@@ -1,0 +1,77 @@
+<div class="dialog-msg-container flex flex-col">
+  <div mat-dialog-title>
+    <div class="flex flex-auto justify-between items-center">
+        <h2 class="secondary title">{{'TITLES.CLONE_VENUE_TEMPLATE' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+          <mat-icon>close</mat-icon>
+        </button>
+    </div>
+  </div>
+  <div mat-dialog-content class="flex flex-col">
+    <form [formGroup]="form" class="flex flex-col">
+      @if (operatorMode$ | async) {
+        <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+          <mat-label>{{'FORMS.LABELS.ENTITY' | translate}}</mat-label>
+          <mat-select [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate" formControlName="entity">
+            <mat-option>
+              <app-select-search #entitySelectSearch [options$]="entities$" requireSelection="true"
+                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" />
+              </mat-option>
+              @for (entity of entitySelectSearch.getFilteredOptions$() | async; track entity) {
+                <mat-option [value]="entity.id">
+                  {{entity.name}}
+                </mat-option>
+              }
+            </mat-select>
+            <mat-error [ob-form-errors]="form" field="entity" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+            <mat-label>{{'FORMS.LABELS.VENUE' | translate}}</mat-label>
+            <app-select-server-search formControlName="venue"
+              [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" [options$]="venues$"
+              [moreOptionsAvailable$]="moreVenuesAvailable$"
+              (loadOptions)="loadVenues($event.q, $event.nextPage)" />
+              <mat-error [ob-form-errors]="form" field="venue" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.SPACE' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="space">
+                  <mat-option>
+                    <app-select-search #spaceSelectSearch [options$]="spaces$" requireSelection="true"
+                      [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" />
+                    </mat-option>
+                    @for (space of spaceSelectSearch.getFilteredOptions$() | async; track space) {
+                      <mat-option [value]="space.id">
+                        {{space.name}}
+                      </mat-option>
+                    }
+                </mat-select>
+                <mat-error [ob-form-errors]="form" field="space" />
+            </mat-form-field>
+        }
+        <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+          <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+          <input matInput aria-label="name" required [placeholder]="'FORMS.LABELS.NAME' | translate"
+            formControlName="name">
+            <mat-error [ob-form-errors]="form" field="name" />
+        </mat-form-field>
+    </form>
+  </div>
+  <div mat-dialog-actions>
+    <div class="flex flex-auto justify-end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+          {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="cloneVenueTemplate()">
+          {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+  </div>
+  @if (loading$ | async) {
+    <div class="spinner-container">
+      <mat-spinner />
+    </div>
+  }
+</div>

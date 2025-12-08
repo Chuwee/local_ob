@@ -1,0 +1,48 @@
+<div>
+    <p class="mat-subtitle-2">{{'CHANNELS.GIFT_CARD.TITLE' | translate}}</p>
+    <p>{{'CHANNELS.GIFT_CARD.INFO' | translate}}</p>
+</div>
+
+<!--    TODO(MULTICURRENCY): delete ngIf else when the multicurrency functionality is finished-->
+@if (isMultiCurrency$ | async) {
+    @if ((channelCurrencies$ | async)?.length > 1) {
+        <app-tabs-menu type="navigation" (changeEmitter)="currencySelectedTabBS.next($event.key)">
+            @for (currency of channelCurrencies$ | async;  let isFirst = $first; track currency.id) {
+                <ng-template appTab [label]="currency.code | localCurrencyPartialTranslation" [key]="currency.code">
+                    <app-channel-gift-card-enable-currency [form]="form" [currencyCode]="currency.code" [errorCtrl]="errorCtrl"
+                        [putChannelVouchersCtrl]="putChannelVouchersCtrl" [currencySelectedTab$]="currencySelectedTabBS" [isFirst]="isFirst"
+                        (loadingEmitter)="loadingEmitter.next($event)" [class.field-error]="form.hasError('required', 'selected')" />
+                </ng-template>
+            }
+        </app-tabs-menu>
+    } @else if ((channelCurrencies$ | async)?.length === 1) {
+        <app-channel-gift-card-enable-currency [form]="form" [currencyCode]="(channelCurrencies$ | async)[0].code" [errorCtrl]="errorCtrl"
+            [putChannelVouchersCtrl]="putChannelVouchersCtrl" [currencySelectedTab$]="currencySelectedTabBS" [isFirst]="true"
+            (loadingEmitter)="loadingEmitter.next($event)" [class.field-error]="form.hasError('required', 'selected')" />
+    }
+} @else {
+    <div fxLayout="row wrap" fxLayoutGap="40px">
+        <mat-form-field class="ob-form-field inline-field" hidden-outline
+            [matTooltip]="'CHANNELS.GIFT_CARD.DISABLED_TOOLTIP' | translate" [matTooltipDisabled]="giftCardEnableCtrl.enabled"
+            matTooltipPosition="right">
+            <input fxHide matInput>
+            <mat-checkbox data-test="gift-card-enable" [formControl]="giftCardEnableCtrl" color="primary">
+                {{'CHANNELS.GIFT_CARD.ACTIVATE' | translate}}
+            </mat-checkbox>
+        </mat-form-field>
+        <mat-form-field fxFlex="grow" fxFlex.gt-sm="0 1 600px" appearance="outline" class="ob-form-field field-with-label">
+            <mat-label>{{'CHANNELS.GIFT_CARD.CONFIGURATION' | translate}}</mat-label>
+            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" data-test="gift-card-group"
+                [formControl]="giftCardGroupCtrl">
+                @for (group of voucherGroupsList$ | async; track group.id) {
+                    <mat-option [value]="group.id">
+                        <div appEllipsify [matTooltip]="group.name">
+                            {{group.name}}
+                        </div>
+                    </mat-option>
+                }
+            </mat-select>
+            <mat-error [ob-form-errors]="giftCardGroupCtrl" />
+        </mat-form-field>
+    </div>
+}

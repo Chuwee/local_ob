@@ -1,0 +1,180 @@
+@if (channel$ | async; as channel) {
+    <div fxFill fxLayout="column">
+        <div fxFlex="none" fxLayout="row wrap" class="actions-container">
+            <div fxFlex="0 1 calc(((100% - 1310px)/2)+1250px)" fxLayoutAlign="end">
+                <button mat-stroked-button type="button" class="ob-button small import-button"
+                    (click)="openImportContentsDialog()">
+                    <mat-icon>import_export</mat-icon>
+                    {{'CHANNELS.IMPORT_CONTENTS.BTN_LABEL' | translate}}
+                </button>
+            </div>
+        </div>
+        <div fxFlex fxLayout="row">
+            <div fxFlex="0 0 200px" fxLayout="column" class="subtabs-container">
+                <mat-button-toggle-group vertical [value]="deepPath$ | async" class="ob-subtab" fxFlex="1 0 100%"
+                    appLastPathGuardListener [currValue]="(deepPath$ | async)">
+                    @if ((channel | isWebChannel) || (channel | isMembersChannel)) {
+                        @let route = (channel | isV3$ | async) ?'portal-literals' : 'literals';
+                        <!-- { fix indentation } -->
+                        <mat-button-toggle [routerLink]="route" [value]="route">
+                            {{'CHANNELS.LITERALS.TITLE' | translate}}
+                        </mat-button-toggle>
+                        @if ((channel | isV3$ | async) && (channel | isWebV4$ | async)) {
+                            <mat-button-toggle routerLink="literals" value="literals">
+                                {{'CHANNELS.LITERALS.TITLE' | translate}}
+                                <span class="ob-badge info">
+                                    {{'INFORMATION_BADGE.NEW_FEATURE' | translate}}
+                                </span>
+                            </mat-button-toggle>
+                        }
+                    }
+
+                    @if (channel.type === channelTypes.boxOffice) {
+                        <mat-expansion-panel [expanded]="true" class="mat-elevation-z0">
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                <mat-panel-title>{{'CHANNELS.LITERALS.TITLE' | translate}}</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <mat-button-toggle routerLink="literals/email-receipt" value="literals/email-receipt">
+                                {{'CHANNELS.LITERALS.RECEIPT_EMAIL' | translate}}
+                            </mat-button-toggle>
+                            <mat-button-toggle routerLink="literals/receipt" value="literals/receipt">
+                                {{'CHANNELS.LITERALS.RECEIPT' | translate}}
+                            </mat-button-toggle>
+                            <mat-button-toggle routerLink="literals/booking" value="literals/booking">
+                                {{'CHANNELS.LITERALS.BOOKING' | translate}}
+                            </mat-button-toggle>
+                            <mat-button-toggle routerLink="literals/cashbox" value="literals/cashbox">
+                                {{'CHANNELS.LITERALS.CASHBOX' | translate}}
+                            </mat-button-toggle>
+                        </mat-expansion-panel>
+                    }
+                    @if (channel | isWebChannel) {
+                        <mat-expansion-panel [expanded]="true" class="mat-elevation-z0">
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                <mat-panel-title>{{'CHANNELS.CHANNEL_COMMUNICATION.TITLE' | translate}}</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <mat-button-toggle routerLink="channel-contents/general" value="channel-contents/general">
+                                {{'CHANNELS.CHANNEL_COMMUNICATION.GENERAL' | translate}}
+                            </mat-button-toggle>
+                            <mat-button-toggle routerLink="channel-contents/legal-texts" value="channel-contents/legal-texts">
+                                {{'CHANNELS.CHANNEL_COMMUNICATION.LEGAL_TEXTS' | translate}}
+                            </mat-button-toggle>
+                            @if (channel | isV3$ | async) {
+                                <mat-button-toggle routerLink="channel-contents/error-texts" value="channel-contents/error-texts">
+                                    {{'CHANNELS.CHANNEL_COMMUNICATION.ERROR_TEXTS' | translate}}
+                                </mat-button-toggle>
+                            }
+                            <mat-button-toggle routerLink="channel-contents/delivery-methods"
+                                value="channel-contents/delivery-methods">
+                                {{'CHANNELS.CHANNEL_COMMUNICATION.DELIVERY_METHODS' | translate}}
+                            </mat-button-toggle>
+                            <mat-button-toggle routerLink="channel-contents/purchase-process"
+                                value="channel-contents/purchase-process">
+                                {{'CHANNELS.CHANNEL_COMMUNICATION.PURCHASE_PROCESS' | translate}}
+                            </mat-button-toggle>
+                        </mat-expansion-panel>
+                    }
+                    @if ((channel | isBoxOffice) || (channel | isMembersChannel)) {
+                        <mat-expansion-panel [expanded]="true" class="mat-elevation-z0">
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                <mat-panel-title>{{'CHANNELS.CHANNEL_COMMUNICATION.TITLE' | translate}}</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <mat-button-toggle routerLink="channel-contents/legal-texts" value="channel-contents/legal-texts">
+                                {{'CHANNELS.CHANNEL_COMMUNICATION.LEGAL_TEXTS' | translate}}
+                            </mat-button-toggle>
+                        </mat-expansion-panel>
+                    }
+
+                    @if ((channel | isWebChannel) || (channel | isMembersChannel)) {
+                        <mat-button-toggle routerLink="faqs" value="faqs">
+                            {{'CHANNELS.FAQS.TITLE' | translate}}
+                        </mat-button-toggle>
+                    }
+
+                    @if ((channel | isMembersChannel) === false) {
+                        <mat-expansion-panel [expanded]="true" class="mat-elevation-z0">
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                <mat-panel-title>{{'CHANNELS.EMAILS_COMMUNICATION.TITLE' | translate}}</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <mat-button-toggle routerLink="email-contents/images" value="email-contents/images">
+                                {{'CHANNELS.EMAILS_COMMUNICATION.IMAGES.TITLE' | translate}}
+                            </mat-button-toggle>
+                            <mat-button-toggle routerLink="email-contents/purchase-confirm"
+                                value="email-contents/purchase-confirm">
+                                {{'CHANNELS.EMAILS_COMMUNICATION.PURCHASE_CONFIRM.TITLE' | translate}}
+                            </mat-button-toggle>
+                            <mat-button-toggle routerLink="email-contents/booking-confirm"
+                                value="email-contents/booking-confirm">
+                                {{'CHANNELS.EMAILS_COMMUNICATION.BOOKING_CONFIRM.TITLE' | translate}}
+                            </mat-button-toggle>
+                            @if (webOrWebBoxoffice.includes(channel.type)) {
+                                <mat-button-toggle routerLink="email-contents/gift-card-confirm"
+                                    value="email-contents/gift-card-confirm">
+                                    {{'CHANNELS.EMAILS_COMMUNICATION.GIFT_CARD_CONFIRM.TITLE' | translate}}
+                                </mat-button-toggle>
+                            }
+                            <mat-button-toggle routerLink="email-contents/tickets-email" value="email-contents/tickets-email">
+                                {{'CHANNELS.EMAILS_COMMUNICATION.TICKETS.TITLE' | translate}}
+                            </mat-button-toggle>
+                            <mat-button-toggle routerLink="email-contents/voucher-refund-email"
+                                value="email-contents/voucher-refund-email">
+                                {{'CHANNELS.EMAILS_COMMUNICATION.VOUCHER_REFUND_EMAIL.TITLE' | translate}}
+                            </mat-button-toggle>
+                            <!-- TODO remove this comment when the reviews email is fully implemented -->
+                            <!-- @if (channel.type === channelTypes.web) {
+                                <mat-button-toggle routerLink="email-contents/reviews-email"
+                                    value="email-contents/reviews-email">
+                                    {{'CHANNELS.EMAILS_COMMUNICATION.REVIEWS_EMAIL.TITLE' | translate}}
+                                </mat-button-toggle>
+                            } -->
+                        </mat-expansion-panel>
+                    }
+
+                    @if((isNewReceiptEnabled$ | async) && $showSecondaryMarket() && channel.type === channelTypes.web ){
+                        <mat-expansion-panel [expanded]="true" class="mat-elevation-z0">
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                <mat-panel-title>
+                                    {{'CHANNELS.SECONDARY_MARKET_COMMUNICATION.TITLE' | translate}}
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+
+                            <mat-button-toggle routerLink="email-contents/published-ticket"
+                                value="email-contents/published-ticket">
+                                {{'CHANNELS.EMAILS_COMMUNICATION.PUBLISHED_TICKET.TITLE' | translate}}
+                            </mat-button-toggle>
+                            <mat-button-toggle routerLink="email-contents/sold-ticket"
+                                value="email-contents/sold-ticket">
+                                {{'CHANNELS.EMAILS_COMMUNICATION.SOLD_TICKET.TITLE' | translate}}
+                            </mat-button-toggle>
+                        </mat-expansion-panel>
+                    }
+                    @if (showWhatsapp$ | async) {
+                        <mat-button-toggle routerLink="whatsapp-contents" value="whatsapp-contents">
+                            {{'CHANNELS.WHATSAPP_COMMUNICATION.TITLE' | translate}}
+                        </mat-button-toggle>
+                    }
+                    <mat-button-toggle routerLink="ticket-contents" value="ticket-contents">
+                        {{'CHANNELS.TICKETS_COMMUNICATION.TITLE' | translate}}
+                    </mat-button-toggle>
+
+                    @if (channel.type === channelTypes.web) {
+                        <mat-expansion-panel [expanded]="true"
+                            class="mat-elevation-z0">
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                <mat-panel-title>{{'CHANNELS.PORTAL.TITLE' | translate}}</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <mat-button-toggle routerLink="portal-contents/reallocation-confirm"
+                                value="portal-contents/reallocation-confirm">
+                                {{'CHANNELS.EMAILS_COMMUNICATION.REALLOCATION_CONFIRM.TITLE' | translate}}
+                            </mat-button-toggle>
+                        </mat-expansion-panel>
+                    }
+
+                </mat-button-toggle-group>
+            </div>
+            <div fxFlex fxLayout="column" class="communication-container">
+                <router-outlet />
+            </div>
+        </div>
+    </div>
+}

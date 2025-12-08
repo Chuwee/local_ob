@@ -1,0 +1,63 @@
+@let ticket = $ticket();
+<!-- {fix indentations} -->
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="flex flex-col details-non-editable-field">
+        <span class="field-label">{{'FORMS.LABELS.CODE' | translate}}</span>
+        <span>{{ticket.order.code}}</span>
+    </div>
+    <div class="flex flex-col details-non-editable-field">
+        <span class="field-label">{{'FORMS.LABELS.TYPE' | translate}}</span>
+        <span>{{('ENUMS.TYPE_OPTS.' + $orderType()) | translate}}</span>
+    </div>
+    <div class="flex flex-col details-non-editable-field">
+        <span class="field-label">{{'FORMS.LABELS.DATE' | translate}}</span>
+        <span>{{ticket.order.date | localDateTime : dateTimeFormats.shortDateTime}}</span>
+    </div>
+    <div class="flex flex-col details-non-editable-field">
+        <span class="field-label">{{'FORMS.LABELS.CHANNEL' | translate}}</span>
+        <span>{{ticket.channel.name}}</span>
+    </div>
+    <div class="flex flex-col details-non-editable-field">
+        <span class="field-label">{{'FORMS.LABELS.ENTITY' | translate}}</span>
+        <span>{{ticket.channel.entity.name}}</span>
+    </div>
+    @if (ticket.order.booking_expires) {
+        <div class="flex flex-col details-non-editable-field">
+            <span class="field-label">{{'FORMS.LABELS.BOOKING_EXPIRES' | translate}}</span>
+            <span>{{ticket.order.booking_expires | localDateTime : dateTimeFormats.shortDateTime}}</span>
+        </div>
+    }
+    @if (ticket.previous_order) {
+        <div class="flex flex-col details-non-editable-field">
+            <span class="field-label">{{'FORMS.LABELS.PREVIOUS_ORDER.CODE' | translate}}</span>
+            <span>{{ticket.previous_order.code}}</span>
+        </div>
+        <div class="flex flex-col details-non-editable-field">
+            <span class="field-label">{{'FORMS.LABELS.PREVIOUS_ORDER.TYPE' | translate}}</span>
+            <span>{{('ENUMS.TYPE_OPTS.' + $previousOrderType()) | translate}}</span>
+        </div>
+        @if (ticket.previous_order.date) {
+            <div class="flex flex-col details-non-editable-field">
+                <span class="field-label">{{'FORMS.LABELS.PREVIOUS_ORDER.DATE' | translate}}</span>
+                <span>{{ticket.previous_order.date | localDateTime : dateTimeFormats.shortDateTime}}</span>
+            </div>
+        }
+    }
+    @if (ticket.next_order) {
+        <div class="flex flex-col details-non-editable-field">
+            <span class="field-label">{{'FORMS.LABELS.NEXT_ORDER.CODE' | translate}}</span>
+            <span>{{ticket.next_order.code}}</span>
+        </div>
+        <div class="flex flex-col details-non-editable-field">
+            <span class="field-label">{{'FORMS.LABELS.NEXT_ORDER.TYPE' | translate}}</span>
+            <span>{{('ENUMS.TYPE_OPTS.' + $nextOrderType()) | translate}}</span>
+        </div>
+        @if (ticket.next_order.date) {
+            <div class="flex flex-col details-non-editable-field">
+                <span class="field-label">{{'FORMS.LABELS.NEXT_ORDER.DATE' | translate}}</span>
+                <span>{{ticket.next_order.date | localDateTime : dateTimeFormats.shortDateTime}}</span>
+            </div>
+        }
+    }
+</div>

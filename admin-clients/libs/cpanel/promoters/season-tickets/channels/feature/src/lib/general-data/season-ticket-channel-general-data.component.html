@@ -1,0 +1,265 @@
+@if (seasonTicketChannel$ | async; as seasonTicketChannel) {
+    <div class="status-notifications-container flex justify-center">
+        <div class="channel-status flex justify-end items-center basis-full">
+            <span class="channel-status-label ob-label">
+                {{'EVENTS.CHANNEL.CHANNEL_STATUS' | translate}}:
+            </span>
+            <span class="ob-status-badge"
+                [ngClass]="getReleaseStatusIndicator(seasonTicketChannel.status.request, seasonTicketChannel.status.release)"
+                [matTooltip]="'EVENTS.CHANNEL.RELEASE_STATUS.' + seasonTicketChannel.status.release | translate">
+                {{'EVENTS.CHANNEL.RELEASE_STATE' | translate}}
+            </span>
+            <span [matTooltip]="'EVENTS.CHANNEL.SALE_STATUS.' + seasonTicketChannel.status.sale | translate"
+                class="ob-status-badge"
+                [ngClass]="getSaleStatusIndicator(seasonTicketChannel.status.request, seasonTicketChannel.status.sale)">
+                {{'EVENTS.CHANNEL.SALE_STATE' | translate}}
+            </span>
+        </div>
+    </div>
+    <app-form-container (save)="save()"
+        (cancel)="cancel()" [disabled]="!(form?.dirty)" sidebar>
+        <form [formGroup]="form" class="flex flex-col">
+            <!-- OPERATIVE -->
+            <mat-accordion multi togglePosition="before" class="season-tickets-channel-form-container">
+                <mat-expansion-panel expanded togglePosition="before" formGroupName="operativeForm">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'SEASON_TICKET.CHANNEL_OPERATIVE' | translate}}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="flex flex-col">
+                        <div class="flex flex-col basis-full expansion-sub-header">
+                            <mat-slide-toggle class="ob-slide-toggle" formControlName="use_season_ticket_dates">
+                                {{'SEASON_TICKET.CHANNEL_USE_OPERATIVE_ST' | translate}}
+                            </mat-slide-toggle>
+                        </div>
+                        <div class="flex flex-col expansion-body">
+                            <!-- RELEASE DATE-->
+                            <div class="flex flex-wrap section-block" id="releaseDate" formGroupName="release">
+                                <div class="flex flex-col basis-full season-tickets-channel-form-feature-activation">
+                                    <div class="flex basis-[28px]">
+                                        <mat-slide-toggle class="ob-slide-toggle" formControlName="enabled"
+                                            (change)="checkPublishChange($event.checked)">
+                                            {{'SEASON_TICKET.CHANNEL_RELEASE' | translate}}
+                                        </mat-slide-toggle>
+                                    </div>
+                                    <mat-divider />
+                                </div>
+                                <p class="basis-full field-with-label">
+                                    {{'SEASON_TICKET.CHANNEL_RELEASE_INFO' | translate}}
+                                </p>
+                                @if (!getUseSeasonTicketValue) {
+                                    <div class="flex flex-col basis-full md:basis-1/2">
+                                        <app-date-time-picker class="basis-full season-tickets-channel-form-field"
+                                            [label]="'DATES.DATE' | translate" formControlName="date" />
+                                    </div>
+                                } @else {
+                                    <div [formGroup]="seasonTicketDatesForm" class="flex flex-col basis-full md:basis-1/2">
+                                        <app-date-time-picker class="basis-full season-tickets-channel-form-field"
+                                            [label]="'DATES.DATE' | translate" formControlName="st_release_date" />
+                                    </div>
+                                }
+                            </div>
+                            <!-- SALE DATE -->
+                            <div class="flex flex-wrap section-block" id="saleDate" formGroupName="sale">
+                                <div class="flex flex-col basis-full season-tickets-channel-form-feature-activation">
+                                    <div class="flex basis-[28px]">
+                                        <mat-slide-toggle class="ob-slide-toggle" formControlName="enabled">
+                                            {{'SEASON_TICKET.CHANNEL_SALE' | translate}}
+                                        </mat-slide-toggle>
+                                    </div>
+                                    <mat-divider />
+                                </div>
+                                <p class="basis-full field-with-label">
+                                    {{'SEASON_TICKET.CHANNEL_SALE_INFO' | translate}}
+                                </p>
+                                <!-- START SALE DATE -->
+                                @if (!getUseSeasonTicketValue) {
+                                    <div class="flex flex-col basis-full md:basis-1/2">
+                                        <app-date-time-picker class="basis-full season-tickets-channel-form-field"
+                                            [label]="'DATES.START_DATE' | translate" formControlName="start_date" />
+                                    </div>
+                                } @else {
+                                    <div [formGroup]="seasonTicketDatesForm" class="flex flex-col basis-full md:basis-1/2">
+                                        <app-date-time-picker class="basis-full season-tickets-channel-form-field"
+                                            [label]="'DATES.START_DATE' | translate" formControlName="st_sale_start_date" />
+                                    </div>
+                                }
+                                <!-- END SALE DATE -->
+                                @if (!getUseSeasonTicketValue) {
+                                    <div class="flex flex-col basis-full md:basis-1/2">
+                                        <app-date-time-picker class="basis-full season-tickets-channel-form-field"
+                                            [label]="'DATES.END_DATE' | translate" formControlName="end_date" />
+                                    </div>
+                                } @else {
+                                    <div [formGroup]="seasonTicketDatesForm" class="flex flex-col basis-full md:basis-1/2">
+                                        <app-date-time-picker class="basis-full season-tickets-channel-form-field"
+                                            [label]="'DATES.END_DATE' | translate" formControlName="st_sale_end_date" />
+                                    </div>
+                                }
+                            </div>
+                            <!-- BOOKING DATE -->
+                            @if($allowBooking()){
+                                <div class="flex flex-row flex-wrap section-block" id="bookingDate" formGroupName="booking">
+                                    <div class="flex flex-col basis-full season-tickets-channel-form-feature-activation">
+                                        <div class="flex flex-row basis-[28px]">
+                                            <mat-slide-toggle class="ob-slide-toggle" formControlName="enabled">
+                                                {{'SEASON_TICKET.CHANNEL_BOOKING' | translate}}
+                                            </mat-slide-toggle>
+                                        </div>
+                                        <mat-divider />
+                                    </div>
+                                    <p class="basis-full field-with-label">
+                                        {{'SEASON_TICKET.CHANNEL_BOOKING_INFO' | translate}}
+                                    </p>
+                                    <!-- START BOOKING DATE -->
+                                    @if(!getUseSeasonTicketValue){
+                                        <div class="flex flex-col basis-full md:basis-1/2">
+                                            <app-date-time-picker class="basis-full season-tickets-channel-form-field"
+                                                [label]="'DATES.START_DATE' | translate" formControlName="start_date" />
+                                        </div>
+                                    } @else{
+                                        <div [formGroup]="seasonTicketDatesForm" class="flex flex-col basis-full md:basis-1/2">
+                                            <app-date-time-picker class="basis-full season-tickets-channel-form-field"
+                                                [label]="'DATES.START_DATE' | translate" formControlName="st_booking_start_date" />
+                                        </div>
+                                    }
+                                    <!-- END BOOKING DATE -->
+                                    @if(!getUseSeasonTicketValue){
+                                        <div class="flex flex-col basis-full md:basis-1/2">
+                                            <app-date-time-picker class="basis-full season-tickets-channel-form-field"
+                                                [label]="'DATES.END_DATE' | translate" formControlName="end_date" />
+                                        </div>
+                                    } @else {
+                                        <div [formGroup]="seasonTicketDatesForm" class="flex flex-col basis-full md:basis-1/2">
+                                            <app-date-time-picker class="basis-full season-tickets-channel-form-field"
+                                                [label]="'DATES.START_DATE' | translate" formControlName="st_booking_end_date" />
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            @if($allowSecondaryMarketSale()){
+                                <!-- SECONDARY MARKET SALE DATE -->
+                                <div class="flex flex-row flex-wrap section-block" id="saleDate" formGroupName="secondary_market_sale">
+                                    <div class="flex flex-col basis-full season-tickets-channel-form-feature-activation">
+                                        <div class="flex flex-row basis-[28px]">
+                                            <mat-slide-toggle class="ob-slide-toggle" formControlName="enabled">
+                                                {{'SEASON_TICKET.CHANNEL_SECONDARY_MARKET_SALE' | translate}}
+                                            </mat-slide-toggle>
+                                        </div>
+                                        <mat-divider />
+                                    </div>
+                                    <p class="basis-full field-with-label">
+                                        {{'SEASON_TICKET.CHANNEL_SECONDARY_MARKET_SALE_INFO' | translate}}
+                                    </p>
+                                    <!-- START SECONDARY MARKET SALE DATE -->
+                                    @if (!getUseSeasonTicketValue) {
+                                        <div class="flex flex-col basis-full md:basis-1/2">
+                                            <app-date-time-picker class="basis-full season-tickets-channel-form-field"
+                                                [label]="'DATES.START_DATE' | translate" formControlName="start_date" />
+                                        </div>
+                                    } @else {
+                                        <div [formGroup]="seasonTicketDatesForm" class="flex flex-col basis-full md:basis-1/2">
+                                            <app-date-time-picker class="basis-full season-tickets-channel-form-field"
+                                                [label]="'DATES.START_DATE' | translate"
+                                                formControlName="st_secondary_market_sale_start_date" />
+                                        </div>
+                                    }
+                                    <!-- END SECONDARY MARKET SALE DATE -->
+                                    @if (!getUseSeasonTicketValue) {
+                                        <div class="flex flex-col basis-full md:basis-1/2">
+                                            <app-date-time-picker class="basis-full season-tickets-channel-form-field"
+                                                [label]="'DATES.END_DATE' | translate" formControlName="end_date" />
+                                        </div>
+                                    } @else {
+                                        <div [formGroup]="seasonTicketDatesForm" class="flex flex-col basis-full md:basis-1/2">
+                                            <app-date-time-picker class="basis-full season-tickets-channel-form-field"
+                                                [label]="'DATES.END_DATE' | translate"
+                                                formControlName="st_secondary_market_sale_end_date" />
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </mat-expansion-panel>
+                <!-- SALE GROUPS -->
+                <mat-expansion-panel expanded togglePosition="before" formGroupName="quotaForm" id="quotas">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'SEASON_TICKET.CHANNEL_SALE_GROUP' | translate}}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="flex flex-col section-block expansion-body">
+                        <div class="flex flex-row flex-wrap">
+                            <p class="basis-full field-with-label">
+                                {{'SEASON_TICKET.CHANNEL_SALE_GROUP_INFO' | translate}}:
+                            </p>
+                        </div>
+                        <!-- ALL SALE GROUPS SELECTION RADIO -->
+                        <div class="flex flex-row flex-wrap quotas-radio-group">
+                            <mat-radio-group class="flex flex-col basis-full" formControlName="use_all_quotas">
+                                <mat-radio-button [value]="true" class="quota-radio-button">
+                                    <mat-label>{{'SEASON_TICKET.CHANNEL_SALE_GROUP_ALL' | translate}}
+                                    </mat-label>
+                                </mat-radio-button>
+                                <mat-radio-button [value]="false" class="quota-radio-button">
+                                    <mat-label>
+                                        {{'SEASON_TICKET.CHANNEL_SALE_GROUP_SELECT_SALE_GROUP' | translate}}
+                                    </mat-label>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                            <!-- INDIVIDUAL SALE GROUP SELECTION CHECKBOXES -->
+                            <div class="flex flex-col flex-auto single-quota-selection nested-content">
+                                @if (form.hasError('quotas', 'quotaForm')) {
+                                    <mat-error>
+                                        {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                                    </mat-error>
+                                }
+                                @if (!form.value.quotaForm.use_all_quotas) {
+                                    <div class="flex flex-col basis-full" formGroupName="quotas"
+                                        [ngClass]="form.hasError('quotas', 'quotaForm') ? 'quotas quotas-error' : 'quotas'">
+                                        @for (quota of seasonTicketChannel.quotas; track quota) {
+                                            <mat-checkbox color="primary" class="flex items-center quota-checkbox"
+                                                formControlName="{{quota.id}}">
+                                                {{ quota.description + ' - ' + quota.template_name }}
+                                            </mat-checkbox>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </mat-expansion-panel>
+            </mat-accordion>
+        </form>
+        <!-- CHANNEL INFO -->
+        <mat-divider vertical="true" />
+        <div slot="sidebar" class="channel-sidebar-container">
+            <div class="channel-img-container">
+                @if (seasonTicketChannel.channel.entity.logo) {
+                    <img class="channel-image basis-full"
+                        [src]="seasonTicketChannel.channel.entity.logo" alt="channel logo" />
+                }
+                @if (!seasonTicketChannel.channel.entity.logo) {
+                    <div class="flex justify-center">
+                        <mat-icon class="material-icons flex content-center">
+                            image
+                        </mat-icon>
+                    </div>
+                }
+            </div>
+            <h4 class="sidebar-title">{{seasonTicketChannel.channel.name}}</h4>
+            <button mat-flat-button color="primary" type="button" class="ob-button"
+                (click)="requestChannel(seasonTicketChannel)"
+                [disabled]="seasonTicketChannel.status.request !== 'PENDING_REQUEST'">
+                {{'FORMS.ACTIONS.REQUEST' | translate}}
+            </button>
+            <div class="flex flex-col channel-sidebar-container-data">
+                <span class="channel-sidebar-label">{{'CHANNELS.ENTITY' | translate}}</span>
+                <span>{{seasonTicketChannel.channel.entity.name}}</span>
+
+                <span class="channel-sidebar-label">{{'CHANNELS.ID' | translate}}</span>
+                <span>{{seasonTicketChannel.channel.id}}</span>
+            </div>
+        </div>
+    </app-form-container>
+}

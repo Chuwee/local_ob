@@ -1,0 +1,114 @@
+<div class="details-container" fxLayout="column" fxFlex="0 1 880px">
+    <div fxFlex="0 1 100%" fxLayout="column">
+        <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+            <mat-expansion-panel [expanded]="true" (expandedChange)="expanded = $event">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{'EVENTS.COMMUNICATION.PASSBOOK.SECTION_TITLE' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <form id="passbookContent" [formGroup]="contentForm" fxLayout="column" *ngIf="placeholders$ | async as placeholders">
+                    <div class="section-block" fxLayout="column">
+                        <h3 class="section-title">
+                            {{'EVENTS.COMMUNICATION.PASSBOOK.PRINCIPAL_IMAGE' | translate}}
+                        </h3>
+                        <p class="section-description">
+                            {{'EVENTS.COMMUNICATION.PASSBOOK.PRINCIPAL_IMAGE_INFO' | translate }}
+                        </p>
+                        <div fxFlex="100%" fxLayout="row">
+                            <div fxFlex="326px" fxLayout="column" class="image-uploader">
+                                <app-image-uploader [imageRestrictions]="imageRestrictions['passbookBannerMain']"
+                                    [placeholder]="placeholders.images?.[imageType.strip]"
+                                    [formControlName]="imageType.strip" [disabled]="contentForm.disabled">
+                                </app-image-uploader>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-block" fxLayout="column">
+                        <h3 class="section-title">
+                            {{'EVENTS.COMMUNICATION.PASSBOOK.TEMPLATE_CONTENT' | translate}}
+                        </h3>
+                        <p class="section-description">
+                            {{'EVENTS.COMMUNICATION.PASSBOOK.TEMPLATE_CONTENT_INFO' | translate }}
+                        </p>
+                        <div class="context-notification-container" *ngIf="(isPassbookFieldInactive$() | async)"
+                            fxFlex="100%" fxLayout="row" fxLayoutAlign="start">
+                            <app-context-notification class="ob-context-notification" contextType="info"
+                                fxFlex.gt-sm="600px" fxFlex="80%" fxLayoutAlign="start">
+                                <p>{{'EVENTS.COMMUNICATION.PASSBOOK.EMPTY_LIST' | translate}}</p>
+                            </app-context-notification>
+                        </div>
+                        <div fxFlex="100%" fxLayout="row" [fxHide]="(isPassbookFieldInactive$(textType.title) | async)">
+                            <div fxFlex="436px" fxFlex.lt-lg="100%" fxLayout="column">
+                                <span class="field-label">
+                                    {{'EVENTS.COMMUNICATION.TEXT.TITLE.LABEL' | translate}}
+                                </span>
+                                <mat-form-field appearance="outline" class="ob-form-field">
+                                    <input matInput aria-label="Additional Data"
+                                        [placeholder]="placeholders.texts?.[textType.title] || 'EVENTS.COMMUNICATION.TEXT.TITLE.PLACEHOLDER' | translate"
+                                        [formControlName]="textType.title">
+                                    <mat-error [ob-form-errors]="contentForm" [field]="textType.title">
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div fxFlex="100%" fxLayout="row" [fxHide]="(isPassbookFieldInactive$(textType.additionalData1) | async)">
+                            <div fxFlex="436px" fxFlex.lt-lg="100%" fxLayout="column">
+                                <span class="field-label">
+                                    {{'EVENTS.COMMUNICATION.OTHER_DATA_1.LABEL' | translate}}
+                                </span>
+                                <mat-form-field appearance="outline" class="ob-form-field">
+                                    <input matInput aria-label="Additional Data"
+                                        [placeholder]="placeholders.texts?.[textType.additionalData1] || 'EVENTS.COMMUNICATION.OTHER_DATA_1.PLACEHOLDER' | translate"
+                                        [formControlName]="textType.additionalData1">
+                                    <mat-error [ob-form-errors]="contentForm" [field]="textType.additionalData1">
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div fxFlex="100%" fxLayout="row" [fxHide]="(isPassbookFieldInactive$(textType.additionalData2) | async)">
+                            <div fxFlex="436px" fxFlex.lt-lg="100%" fxLayout="column">
+                                <span class="field-label">
+                                    {{'EVENTS.COMMUNICATION.OTHER_DATA_2.LABEL' | translate}}
+                                </span>
+                                <mat-form-field appearance="outline" class="ob-form-field">
+                                    <input matInput aria-label="Additional Data"
+                                        [placeholder]="placeholders.texts?.[textType.additionalData2] || 'EVENTS.COMMUNICATION.OTHER_DATA_2.PLACEHOLDER' | translate"
+                                        [formControlName]="textType.additionalData2">
+                                    <mat-error [ob-form-errors]="contentForm" [field]="textType.additionalData2">
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div fxFlex="100%" fxLayout="row" [fxHide]="(isPassbookFieldInactive$(textType.additionalData3) | async)">
+                            <div fxFlex="436px" fxFlex.lt-lg="100%" fxLayout="column">
+                                <span class="field-label">
+                                    {{'EVENTS.COMMUNICATION.OTHER_DATA_3.LABEL' | translate}}
+                                </span>
+                                <mat-form-field appearance="outline" class="ob-form-field">
+                                    <input matInput aria-label="Additional Data"
+                                        [placeholder]="placeholders.texts?.[textType.additionalData3] || 'EVENTS.COMMUNICATION.OTHER_DATA_3.PLACEHOLDER' | translate"
+                                        [formControlName]="textType.additionalData3">
+                                    <mat-error [ob-form-errors]="contentForm" [field]="textType.additionalData3">
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+</div>
+<mat-divider vertical="true" fxFlexAlign="stretch"></mat-divider>
+<div fxFlex="0 0 200px">
+    <div class="ticket-template-legend legend-passbook" [fxHide]="!expanded" fxLayout="column"
+        fxLayoutAlign="start start">
+        <img src="assets/ticket-template/passbook-ticket-template-event.svg"
+            [alt]="'EVENTS.COMMUNICATION.PASSBOOK' | translate">
+        <div class="legend-title">{{'EVENTS.TEMPLATE' | translate}}</div>
+        <div class="legend-value">{{(ticketPassbook$ | async)?.name || '-'}}</div>
+        <div class="legend-title">{{'EVENTS.PASSBOOK.INFO_PLANTILLA' | translate}}</div>
+        <div class="legend-value">{{'EVENTS.PASSBOOK.INFO_PLANTILLA_TEXT' | translate}}</div>
+    </div>
+</div>

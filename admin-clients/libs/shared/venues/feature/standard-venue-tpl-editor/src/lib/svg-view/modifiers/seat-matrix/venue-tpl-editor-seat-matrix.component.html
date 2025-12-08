@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" #svg *ngIf="viewBox$ | async as viewBox" class="seat-matrix-svg" [attr.viewBox]="viewBox">
+    <rect class="background-overlay" [attr.width]="viewBox[2]" [attr.height]="viewBox[3]"></rect>
+    <g #placerGroup *ngIf="viewConf$ | async as viewConf"
+        [attr.transform]="'translate(' + viewConf.pos.x + ',' + viewConf.pos.y + ') rotate(' + viewConf.angle + ')'">
+        <g #contentGroup [attr.transform]="'translate(' + viewConf.rect.offsetX + ',' + viewConf.rect.offsetY + ')'">
+            <rect [attr.width]="viewConf.rect.width" [attr.height]="viewConf.rect.height" class="seats-rect"></rect>
+            <g #seatsGroup [attr.transform]="'translate(' + viewConf.padding + ',' + viewConf.padding + ')'">
+                <ng-container *ngFor="let row of viewConf.rows; index as rowIndex">
+                    <text *ngIf="!!viewConf.leftLabelsWidth" [attr.font-size]="viewConf.labelFontSize"
+                        [class]="viewConf.interactiveRowLabels ? interactiveClass : ''"
+                        [attr.fill]="viewConf.interactiveRowLabels ? '#333333' : '#888888'"
+                        letter-spacing="0" font-family="Arial" space="preserve">
+                        <!-- Text has proportional paddings, the multiplication by .8 sets the text in the middle of the row (approx) -->
+                        <tspan [attr.x]="0"
+                            [attr.y]="viewConf.seatsSize * 0.8 + rowIndex * viewConf.seatsSize + rowIndex * viewConf.rowsDistance">
+                            {{row.name}}
+                        </tspan>
+                    </text>
+                    <ng-container *ngFor="let seat of row.seats; index as seatIndex">
+                        <circle [id]="seat.id || ''" [attr.r]="viewConf.seatsSize / 2" [class]="interactiveClass"
+                            [attr.cx]="viewConf.leftLabelsWidth + viewConf.seatsSize / 2 + seatIndex * viewConf.seatsSize
+                            + seatIndex * viewConf.seatsDistance"
+                            [attr.cy]="viewConf.seatsSize / 2 + rowIndex * viewConf.seatsSize + rowIndex * viewConf.rowsDistance">
+                        </circle>
+                        <text fill="#D0D8D0" letter-spacing="0" style="line-height: 0" font-family="Arial"
+                            [attr.font-size]="viewConf.labelFontSize * 0.7"
+                            [attr.x]="viewConf.leftLabelsWidth + viewConf.seatsSize * getSeatLabelOffset(seat.name.length)
+                            + seatIndex * viewConf.seatsSize + seatIndex * viewConf.seatsDistance"
+                            [attr.y]="viewConf.seatsSize * .75 + rowIndex * viewConf.seatsSize + rowIndex * viewConf.rowsDistance">
+                            <!-- Text has proportional paddings... -->
+                            <tspan>{{seat.name}}</tspan>
+                        </text>
+                    </ng-container>
+                    <text *ngIf="!!viewConf.rightLabelsWidth" [attr.font-size]="viewConf.labelFontSize"
+                        [class]="viewConf.interactiveRowLabels ? interactiveClass : ''"
+                        [attr.fill]="viewConf.interactiveRowLabels ? '#333333' : '#888888'"
+                        letter-spacing="0" font-family="Arial" space="preserve">
+                        <!-- Text has proportional paddings... -->
+                        <tspan [attr.x]="viewConf.leftLabelsWidth + viewConf.labelDistance + row.seats.length * viewConf.seatsSize
+                        + (row.seats.length - 1) * viewConf.seatsDistance"
+                            [attr.y]="viewConf.seatsSize * 0.8 + rowIndex * viewConf.seatsSize + rowIndex * viewConf.rowsDistance">
+                            {{row.name}}
+                        </tspan>
+                    </text>
+                </ng-container>
+            </g>
+            <rect [attr.width]="viewConf.rect.width" [attr.height]="viewConf.rect.height" class="control-rect"
+                (mousedown)="shapeDrag.dragInit($event, 'move')"></rect>
+            <g [attr.transform]="'rotate(180), scale(' + viewConf.invScale + ')'"
+                appEditorRotateControl (rotate)="shapeDrag.dragInit($event, 'rotate')">
+            </g>
+            <!-- TOP RIGHT CONTROLS -->
+            <g [attr.transform]="'translate(' + viewConf.rect.width + ',0), rotate(270), scale(' + viewConf.invScale + ')'"
+                appEditorRotateControl (rotate)="shapeDrag.dragInit($event, 'rotate')">
+            </g>
+            <!-- BOTTOM RIGHT CONTROLS -->
+            <g [attr.transform]="'translate(' + viewConf.rect.width + ',' + viewConf.rect.height + '), scale(' + viewConf.invScale + ')'"
+                appEditorRotateControl (rotate)="shapeDrag.dragInit($event, 'rotate')">
+            </g>
+            <!-- BOTTOM LEFT CONTROLS -->
+            <g [attr.transform]="'translate(0,' + viewConf.rect.height + '), rotate(90), scale(' + viewConf.invScale + ')'"
+                appEditorRotateControl (rotate)="shapeDrag.dragInit($event, 'rotate')">
+            </g>
+        </g>
+    </g>
+    <rect *ngIf="(shapeDrag.controlData$ | async)?.currentAction"
+        [attr.width]="viewBox[2]" [attr.height]="viewBox[3]" class="interactive-overlay"
+        (mousemove)="shapeDrag.dragMove($event)" (mouseup)="shapeDrag.dragEnd()" (mouseenter)="shapeDrag.dragCheck($event)">
+    </rect>
+</svg>

@@ -1,0 +1,54 @@
+<div class="flex justify-between">
+    <h3 appEllipsify class="section-title flex basis-1/2">
+        {{'VENUE_TPLS.ELEMENT_INFO.FEATURES_LIST.TITLE' | translate}}
+    </h3>
+    <div class="flex gap-2 justify-center items-baseline">
+        <mat-checkbox color="primary" [formControl]="enabledForm">
+            {{ 'VENUE_TPLS.ELEMENT_INFO.ENABLE_IN_PORTAL' | translate }}
+        </mat-checkbox>
+        <mat-divider vertical="true" class="self-stretch" />
+        <span class="ob-link" (click)="deleteContentComponent()">
+            {{ 'VENUE_TPLS.ELEMENT_INFO.DELETE_CONTENT' | translate }}
+        </span>
+    </div>
+</div>
+<p>{{ 'VENUE_TPLS.ELEMENT_INFO.FEATURES_LIST.INFO_LABEL' | translate }}</p>
+<app-tabs-menu [formGroup]="langFormGroup" type="language" overrideClasses="no-left-padding" #textsTabs>
+    @for (lang of languages; track lang) {
+        <ng-template appTab [ctrl]="langFormGroup.get(lang)" lazyLoad [label]="('LANGUAGES.' + lang) | translate">
+            <div fxLayout="column" fxLayoutAlign="start" fxLayoutGap="8px" class="links-container">
+                @for (cont of langFormGroup.controls?.[lang].controls; track $index;) {
+                    <ng-container [formArrayName]="lang">
+                        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px" [formGroupName]="$index">
+                            <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field inline-field-bottom"
+                                subscriptSizing="dynamic">
+                                <input matInput formControlName="text"
+                                    placeholder="{{ 'VENUE_TPLS.ELEMENT_INFO.FEATURES_LIST.FEATURE_PLACEHOLDER' | translate }}">
+                                <mat-icon (click)="openLinkModal($index, lang)" matSuffix fxFlexAlign="center" class="ob-icon xsmall action"
+                                    [matTooltip]="'VENUE_TPLS.ELEMENT_INFO.FEATURES_LIST.FEATURE_LINK_TOOLTIP' | translate">
+                                    add_link
+                                </mat-icon>
+                            </mat-form-field>
+                            @if ($index > 0) {
+                                <button mat-icon-button type="button" class="ob-button small"
+                                    (click)="deleteLink($index)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            }
+                        </div>
+                    </ng-container>
+                }
+            </div>
+            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px"
+                [class.disabled]="isNewLinkBtnDisabled()" class="add-link-btn">
+                <button mat-icon-button type="button" [disabled]="isNewLinkBtnDisabled()"
+                    class="ob-button mat-stroked-button xsmall" (click)="createNewLink()">
+                    <mat-icon>add</mat-icon>
+                </button>
+                <span (click)="!isNewLinkBtnDisabled() && createNewLink()">
+                    {{'VENUE_TPLS.ELEMENT_INFO.FEATURES_LIST.ADD_LINK' | translate}}
+                </span>
+            </div>
+        </ng-template>
+    }
+</app-tabs-menu>

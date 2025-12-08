@@ -1,0 +1,136 @@
+<div fxLayout="column" fxFlex="1 1 100%" fxLayoutGap="16px">
+    <form [formGroup]="form" class="form-box">
+        <div fxLayout="column" fxLayoutGap="16px" class="gray-card-content">
+            <div fxFlex="1 1 100%" fxLayoutGap="8px" fxLayoutAlign="space-between center" class="details-description">
+                @if (item.session_data.price_type) {
+                    <span> {{ 'CHANNELS.PACKS.SESSION.DESCRIPTION_PRICE_ZONE' | translate }} </span>
+                } @else {
+                    <span> {{ 'CHANNELS.PACKS.SESSION.DESCRIPTION' | translate }} </span>
+                }
+                <button mat-stroked-button color="tertiary" class="ob-button medium"
+                    (click)="edit()" [disabled]="item.editing">
+                    {{'MEMBER_EXTERNAL.RESTRICTIONS.EDIT' | translate}}
+                </button>
+            </div>
+            <div class="card-info" fxLayout="column" fxLayoutGap="24px">
+                <div fxLayout="column" fxLayoutGap="8px">
+                    <span class="details-title">
+                        {{ 'CHANNELS.PACKS.SESSION.DATE_TITLE' | translate }}
+                    </span>
+                    <span>{{item.session_data?.dates?.start | dateTime : dateTimeFormats.shortDateTime}}</span>
+                </div>
+                <div fxLayout="row" fxLayoutGap="24px">
+                    <div fxLayout="column" fxLayoutGap="8px" fxFlex="1 1 20%">
+                        <span class="details-title">
+                            {{ 'CHANNELS.PACKS.SESSION.TEMPLATE_TITLE' | translate }}
+                        </span>
+                        <span>{{item.session_data?.venue_template.venue.name}}</span>
+                    </div>
+                    @if (item.session_data.price_type) {
+                        <div fxLayout="column" fxFlex="1 1 100%">
+                            <span class="details-title">
+                                {{ 'CHANNELS.PACKS.SESSION.PRICES_TITLE' | translate }}
+                            </span>
+                            <mat-form-field appearance="outline" class="ob-form-field">
+                                <mat-select formControlName="price_type">
+                                    @if((priceTypes$ | async); as priceTypes;){
+                                        @for (type of priceTypes; track type) {
+                                            <mat-option [value]="type.id">{{type.name}}</mat-option>
+                                        }
+                                    } @else {
+                                        <mat-option [value]="item.session_data.price_type.id">
+                                            {{item.session_data.price_type?.name}}
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    }
+                </div>
+                @if (item.session_data.price_type_mapping) {
+                    <div class="flex flex-col gap-2">
+                        <span class="details-title">
+                            {{ 'FORMS.LABELS.PRICE_TYPES' | translate }}
+                        </span>
+                        <div class="table-prices-container">
+                            <table mat-table class="ob-table table-prices" [dataSource]="item.session_data.price_type_mapping">
+                                <ng-container matColumnDef="sourcePriceType">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="additional-headers-th-row border-right default-padding first-column">
+                                        {{ 'CHANNELS.PACKS.FORMS.LABELS.PRICES_SOURCE' | translate | uppercase }}
+                                    </th>
+                                    <td mat-cell *matCellDef="let row">
+                                        {{ row.source_price_type.name }}
+                                    </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="targetPriceType">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="additional-headers-th-row border-right default-padding second-column">
+                                        {{ 'CHANNELS.PACKS.FORMS.LABELS.PRICES_TARGET' | translate | uppercase }}
+                                    </th>
+                                    <td mat-cell *matCellDef="let row" class="default-padding">
+                                        {{ row.target_price_type[0]?.name ?? '-' }}
+                                    </td>
+                                </ng-container>
+
+                                <tr mat-header-row *matHeaderRowDef="['sourcePriceType', 'targetPriceType']; sticky: true"
+                                    class="additional-headers-tr-row dense-row"></tr>
+                                <tr mat-row *matRowDef="let row; columns: ['sourcePriceType', 'targetPriceType'];"></tr>
+                            </table>
+                        </div>
+                    </div>
+                }
+
+                <div class="flex flex-row gap-[24px]">
+                    <div fxLayout="column" fxLayoutGap="8px" fxFlex="1 1 40%">
+                        <span class="details-title">{{'CHANNELS.PACKS.FORMS.INFOS.DISPLAY_PACK_DETAIL' | translate}}</span>
+                        <mat-checkbox color="primary" formControlName="display_item_in_channels">
+                            <mat-label>{{'CHANNELS.PACKS.FORMS.LABELS.DISPLAY_PACK_DETAIL' | translate}}</mat-label>
+                        </mat-checkbox>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-[8px]">
+                    <mat-label class="details-title flex items-center">
+                        {{'CHANNELS.PACKS.FORMS.LABELS.INFORMATIVE_PRICE' | translate}}
+                        <app-help-button [message]="'CHANNELS.PACKS.ELEMENTS.INFORMATIVE_PRICE_INFO' | translate" />
+                    </mat-label>
+                    <mat-checkbox color="primary" formControlName="informative_price_check">
+                        <mat-label>{{'CHANNELS.PACKS.FORMS.LABELS.DEFINE_INFORMATIVE_PRICE' | translate}}</mat-label>
+                    </mat-checkbox>
+                    @if(this.form.controls.informative_price_check.value) {
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label radio-content">
+                            <mat-label>{{'CHANNELS.PACKS.FORMS.LABELS.NEW_INFORMATIVE_PRICE' | translate}}</mat-label>
+                            <app-currency-input formControlName="informative_price"
+                                [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                                [placeholder]="0 | localCurrency: (currency$ | async) :'narrow'" />
+                        </mat-form-field>
+                    }
+                </div>
+            </div>
+        </div>
+    </form>
+    @if(item.editing){
+        <div fxLayoutAlign="end center" fxLayoutGap="8px">
+            @if(!this.$pack().has_sales) {
+                <div class="flex flex-1 items-center editing-mode-message">
+                    <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                    {{'MEMBER_EXTERNAL.RESTRICTIONS.EDITING_MODE' | translate}}
+                </div>
+            } @else {
+                <div class="flex flex-1 items-center editing-mode-message">
+                    <mat-icon class="ob-icon small warning with-text">warning</mat-icon>
+                    {{'CHANNELS.PACKS.ELEMENTS.EDITING_WITH_SALES' | translate}}
+                </div>
+            }
+            <button type="button" mat-button class="ob-button medium"
+                (click)="cancel()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button type="button" mat-flat-button class="ob-button medium" color="primary"
+                (click)="save()" [disabled]="!form.dirty">
+                {{'FORMS.ACTIONS.UPDATE' | translate}}
+            </button>
+        </div>
+    }
+</div>

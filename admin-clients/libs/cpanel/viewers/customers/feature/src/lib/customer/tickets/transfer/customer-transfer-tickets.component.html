@@ -1,0 +1,163 @@
+
+<app-form-container layout="main" [hideActionBar]="true">
+    <!-- TODO: Add condition to check if is transfer in cascade allowed in entity -->
+    @if (!$onlyTransferredToCustomer() || $isMultipleTransfersEnabled()) {
+        <p class="rates-info flex items-start justify-start">
+            <mat-icon class="ob-icon small info with-text">info</mat-icon>
+            <span>{{ 'CUSTOMER.TRANSFER.RATES_INFO' | translate }}</span>
+        </p>
+    }
+    <!-- LIST -->
+     <div class="flex flex-col">
+        <div class="flex flex-col flex-auto">
+            <div class="flex justify-end">
+                <div class="flex-auto">
+                    <mat-paginator hidePageSize class="with-range-label transparent" />
+                </div>
+            </div>
+            @let selectedSessionItems = $dataSource();
+            <div class="list-container">
+                <mat-table class="ob-table" [dataSource]="selectedSessionItems" matSort [matSortActive]="initSortCol"
+                    [matSortDirection]="initSortDir" matSortDisableClear
+                    [attr.aria-label]="'CUSTOMER.TRANSFER.TICKETS.SESSION_LIST.TABLE' | translate">
+                    <ng-container matColumnDef="allocation">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header="session_name"
+                            class="head-cell allocation width200 default-padding">
+                            {{'CUSTOMER.TRANSFER.TICKETS.SESSION_LIST.ALLOCATION' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row" class="allocation width200">
+                            <div class="flex flex-col">
+                                <span><b>{{row.ticket.allocation.sector?.name}}</b></span>
+                                <span>
+                                    @if (row.ticket?.allocation.type === 'NUMBERED') {
+                                        {{ 'FORMS.LABELS.ROW' | translate }}:
+                                        <b>{{row.ticket.allocation.row?.name}}</b> -
+                                    } @else {
+                                        {{ 'FORMS.LABELS.ZONE' | translate }}:
+                                        <b>{{row.ticket.allocation.not_numbered_area?.name}}</b> -
+                                    }
+                                    {{ 'FORMS.LABELS.SEAT' | translate }}:
+                                    <b>{{row.ticket.allocation.seat?.name}}</b>
+                                </span>
+                            </div>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="rate">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header="rate" class="head-cell width100">
+                            {{'CUSTOMER.TRANSFER.TICKETS.SESSION_LIST.RATE' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row" class="width100">
+                            {{row.ticket.rate.name}}
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="transferred_to">
+                        <mat-header-cell *matHeaderCellDef
+                            class="head-cell width100">{{'CUSTOMER.TRANSFER.TICKETS.SESSION_LIST.TRANSFERRED_TO' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row" class="width100">
+                            {{row.transfer?.receiver?.name}} {{row.transfer?.receiver?.surname}}
+                         </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="transfer_date">
+                        <mat-header-cell *matHeaderCellDef class="head-cell width100">
+                            {{'CUSTOMER.TRANSFER.TICKETS.SESSION_LIST.TRANSFER_DATE' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row" class="width100">
+                            {{row.transfer?.receiver?.date | dateTime : dateTimeFormats.shortDate}}
+                            {{row.transfer?.receiver?.date | dateTime : dateTimeFormats.shortTime}}
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="transferred_by">
+                        <mat-header-cell *matHeaderCellDef
+                            class="head-cell width100">{{'CUSTOMER.TRANSFER.TICKETS.SESSION_LIST.TRANSFERRED_BY' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row" class="width100">
+                            @if (row.transfer?.status === 'TRANSFERRED') {
+                                {{ row.buyer_data?.name }} {{ row.buyer_data?.surname }}
+                            }
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container [stickyEnd]="$onlyTransferredToCustomer() && $isMultipleTransfersEnabled()" 
+                        matColumnDef="transferred_count">
+                        <mat-header-cell *matHeaderCellDef class="head-cell width100 with-max"
+                            [class.fixed-cols-divider]="$onlyTransferredToCustomer() && $isMultipleTransfersEnabled()">
+                            {{'CUSTOMER.TRANSFER.TICKETS.SESSION_LIST.TRANSFERRED_COUNT' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row" class="width100 with-max" 
+                            [class.fixed-cols-divider]="$onlyTransferredToCustomer() && $isMultipleTransfersEnabled()">
+                            {{ row.transfer?.count || 0 }}
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container stickyEnd matColumnDef="session_status">
+                        <mat-header-cell *matHeaderCellDef class="head-cell width100">
+                            {{'CUSTOMER.TRANSFER.TICKETS.SESSION_LIST.STATUS' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row" class="status-cell width100">
+                            @if (row.transfer?.status === 'TRANSFERRED') {
+                                <span class="status-dot" [class.transferred]="row.transfer?.status === 'TRANSFERRED'"></span>
+                                <span [matTooltip]="'CUSTOMER.TRANSFER.TICKETS.STATUS_OPTS.' + row.transfer?.status | translate"
+                                    appEllipsify>
+                                    {{'CUSTOMER.TRANSFER.TICKETS.STATUS_OPTS.' + row.transfer?.status | translate}}
+                                </span>
+                            }
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container stickyEnd matColumnDef="actions">
+                        <mat-header-cell *matHeaderCellDef 
+                            [class.fixed-cols-divider]="$onlyTransferredToCustomer() && !$isMultipleTransfersEnabled()"
+                            class="button-actions-cell head-cell width100" />
+                        <mat-cell *matCellDef="let row" class="button-actions-cell width100"
+                            [class.fixed-cols-divider]="$onlyTransferredToCustomer() && !$isMultipleTransfersEnabled()">
+                            @if ((row.transfer?.status !== 'TRANSFERRED' && !!row.action?.transfer || $onlyTransferredToCustomer() && $isMultipleTransfersEnabled()) 
+                            && $isEventStatusReady()) {
+                                <button mat-stroked-button color="primary" class="ob-button small" (click)="openTransferDialog(row)">
+                                    {{'CUSTOMER.TRANSFER.TICKETS.SESSION_LIST.TRANSFER_BUTTON' | translate}}
+                                </button>
+                            }
+                            @if (row.transfer?.status === 'TRANSFERRED' && !!row.action?.transfer_recover && $isEventStatusReady() 
+                                && row?.transfer?.receiver?.customer_id !== $currentCustomer()?.id) {
+                                <button mat-stroked-button color="tertiary" class="ob-button small" (click)="openRecoverDialog(row)">
+                                    {{'CUSTOMER.TRANSFER.TICKETS.SESSION_LIST.RECOVER_BUTTON' | translate}}
+                                </button>
+                            }
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container [stickyEnd]="!$onlyTransferredToCustomer() && !$isMultipleTransfersEnabled()" 
+                        matColumnDef="transfer_actions">
+                        <mat-header-cell *matHeaderCellDef
+                            class="menu-button-actions-cell head-cell width50" />
+                        <mat-cell *matCellDef="let row" class="menu-button-actions-cell width50 justify-end">
+                            <button mat-icon-button color="tertiary" class="ob-button medium only-icon"
+                                    [matMenuTriggerFor]="ticketsMenu">
+                                <mat-icon>more_horiz</mat-icon>
+                            </button>
+                            <mat-menu #ticketsMenu="matMenu">
+                                @if (row.transfer?.status === 'TRANSFERRED' && $isEventStatusReady()) {
+                                    <button mat-menu-item (click)="openResendEmailDialog(row)" [disabled]="!row.transfer?.receiver?.email">
+                                        {{'CUSTOMER.TRANSFER.TICKETS.SESSION_LIST.RESEND' | translate}}
+                                    </button>
+                                }
+                                <a mat-menu-item class="ob-button" target="_blank" 
+                                    [routerLink]="['/transactions', row.order?.code, 'tickets', row.id ]">
+                                    <span>{{ "CUSTOMER.TRANSFER.TICKETS.SESSION_LIST.SEE_TICKET" | translate }}</span>
+                                </a>
+                            </mat-menu>
+                        </mat-cell>
+                    </ng-container>
+                    <mat-header-row *matHeaderRowDef="$displayedColumns(); sticky: true" />
+                    <mat-row *matRowDef="let row; columns: $displayedColumns();" class="dense-row" />
+                </mat-table>
+            </div>
+            @if (!selectedSessionItems.data.length) {
+                <app-empty-state-tiny class="flex-[1_1_1e-09px]" 
+                    [title]="'CUSTOMER.TRANSFER.TICKETS.SESSION_LIST.EMPTY_LIST_TITLE' | translate"
+                    [description]="'CUSTOMER.TRANSFER.TICKETS.SESSION_LIST.EMPTY_LIST_MESSAGE' | translate" />
+            }
+        </div>
+     </div>
+    @if ($isLoading()) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+</app-form-container>

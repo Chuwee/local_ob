@@ -1,0 +1,22 @@
+<div class="flex flex-col justify-start items-stretch" [formGroup]="$form()">
+    <mat-form-field appearance="outline" class="ob-form-field">
+        <mat-label>{{'SEASON_TICKET.VENUE_TEMPLATES' | translate}}</mat-label>
+        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="template">
+            @for (template of (inventoryProviderTemplates$ | async); track template.id) {
+                <mat-option [value]="template">
+                    {{template.name}}
+                </mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="ob-form-field">
+        <mat-label>{{'SEASON_TICKET.SELECT_EXTERNAL_EVENT' | translate}}</mat-label>
+        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="event">
+            @for (event of externalProviderEvents$(); track event.id) {
+                <mat-option [value]="event">
+                    {{event.name}}
+                </mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+</div>

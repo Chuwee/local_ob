@@ -1,0 +1,25 @@
+@let listData = $sortedListData() || [];
+    @if(listData.length) {
+    <div class="flex flex-col gap-2">
+        <span>{{ listDescription() | translate }}</span>
+        <div class="flex justify-end">
+            <button mat-button type="button" class="ob-button medium translate-button"
+                [attr.aria-label]="'EVENTS.TRANSLATE_RATES_BTN' | translate" (click)="openTranslateDialog()"
+                [disabled]="!listData?.length">
+                <mat-icon>translate</mat-icon>
+                {{'EVENTS.TRANSLATE_RATES_BTN' | translate}}
+            </button>
+        </div>
+    </div>
+    <mat-list cdkDropList [cdkDropListData]="listData" class="ob-list" role="list"
+        (cdkDropListDropped)="onListDrop($event)">
+        @for(item of listData; track item.id) {
+            <mat-list-item cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".ob-list" cdkDragHandle role="listitem">
+                <mat-icon class="drag-icon">
+                    drag_indicator
+                </mat-icon>
+                <span class="item-name">{{item.name}}</span>
+            </mat-list-item>
+        }
+    </mat-list>
+}

@@ -1,0 +1,66 @@
+<div fxFlex="0 1 100%" fxLayout="column">
+    <app-form-container layout="main" hideActionBar class="no-top-padding" [formGroup]="form">
+        <div class="form-details-area">
+            <div class="content-wrapper taxes-list-container">
+
+                <div fxLayoutAlign="end">
+                    <button mat-stroked-button class="ob-button new-tax-button" color="primary" (click)="openNewTaxDialog()">
+                        <mat-icon>add</mat-icon>
+                        {{'OPERATOR.ADD_TAX_BTN' | translate}}
+                    </button>
+                </div>
+
+                <mat-table *ngIf="taxGroups$ | async" class="ob-table dense-table" [dataSource]="taxGroups$">
+
+                    <ng-container matColumnDef="default">
+                        <mat-header-cell *matHeaderCellDef class="head-cell without-gap default-column">
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row" class="default-column without-gap">
+                            <mat-button-toggle
+                                class="ob-icon-button-toggle-simple yellow-icon-appearance ob-button only-icon fake-icon-button"
+                                aria-label="Set default tax" [checked]="row.controls.default.value" [disabled]="row.controls.default.value"
+                                (click)="$event.preventDefault(); changeDefaultTax(row.value.id);">
+                                <mat-icon [ngClass]="row.controls.default.value ? 'selected' : 'not-selected'"
+                                    matTooltip="{{'OPERATOR.DEFAULT_TAX' | translate}}" [matTooltipDisabled]="!row.value.default">
+                                    {{ row.controls.default.value ? 'star' : 'star_border' }}
+                                </mat-icon>
+                            </mat-button-toggle>
+                        </mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="name">
+                        <mat-header-cell *matHeaderCellDef class="head-cell">
+                            {{'FORMS.LABELS.NAME' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row; index as i" class="editable-cell" [formGroup]="row">
+                            <div fxFlex class="write-value">
+                                <mat-form-field fxFlex="0 1 160px" appearance="outline" class="ob-form-field">
+                                    <input id="tax-input-{{i}}" matInput type="text" formControlName="name">
+                                    <mat-error [ob-form-errors]="row" field="name"></mat-error>
+                                </mat-form-field>
+                            </div>
+                        </mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="value">
+                        <mat-header-cell *matHeaderCellDef class="head-cell">
+                            {{'FORMS.LABELS.VALUE' | translate}} (%)
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            <span class="tax-value">
+                                {{ row.value.value }} %
+                            </span>
+                        </mat-cell>
+                    </ng-container>
+
+                    <mat-header-row *matHeaderRowDef="['default', 'name', 'value']" class="dense-row"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: ['default', 'name', 'value'];" class="dense-row hoverable-row"></mat-row>
+
+                </mat-table>
+            </div>
+        </div>
+    </app-form-container>
+</div>
+<div class="spinner-container" *ngIf="reqInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

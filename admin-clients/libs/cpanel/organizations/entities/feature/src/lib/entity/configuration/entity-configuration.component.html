@@ -1,0 +1,33 @@
+<div class="flex basis-full">
+    <div class="subtabs-container basis-[200px] shrink-0">
+        <mat-button-toggle-group vertical [value]="deepPath$ | async" class="ob-subtab"
+            appLastPathGuardListener [currValue]="(deepPath$ | async)">
+            @if($isSuperOperator()){
+                <mat-button-toggle routerLink="domain-settings" value="domain-settings" data-test="domain-settings">
+                    {{'ENTITY.TITLES.SUBDOMAIN' | translate}}
+                </mat-button-toggle>
+            } @else {
+                <mat-button-toggle routerLink="third-integrations" value="third-integrations" data-test="third-integrations">
+                    {{'ENTITY.ADVANCED_CONFIG.INTEGRATIONS' | translate}}
+                </mat-button-toggle>
+                <mat-button-toggle routerLink="fever-integrations" value="fever-integrations" data-test="fever-integrations">
+                    {{'ENTITY.TITLES.FEVER_INTEGRATIONS' | translate}}
+                </mat-button-toggle>
+                <mat-button-toggle routerLink="security" value="security" data-test="security">
+                    {{'ENTITY.GENERAL_DATA.SECURITY' | translate}}
+                </mat-button-toggle>
+                @if(showWebhooks$ | async){
+                    <mat-button-toggle routerLink="webhooks" value="webhooks" data-test="webhooks">
+                        {{'ENTITY.GENERAL_DATA.WEBHOOKS' | translate}}
+                    </mat-button-toggle>
+                }
+                <mat-button-toggle routerLink="other-options" value="other-options" data-test="other-options">
+                    {{'ENTITY.TITLES.OTHER_OPTIONS' | translate}}
+                </mat-button-toggle>
+            }
+        </mat-button-toggle-group>
+    </div>
+    <div class="flex flex-col flex-auto">
+        <router-outlet />
+    </div>
+</div>

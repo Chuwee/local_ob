@@ -1,0 +1,54 @@
+<div id="time-picker" class="time-picker" fullscreen="true">
+     <div class="time-picker__separators">
+        <div class="time-picker__separator" style="right: -30px;"><span>:</span></div>
+        <div class="time-picker__separator" style="right: -8px; "><span>-</span></div>
+        <div class="time-picker__separator" style="right: 14px; "><span>:</span></div>
+        <div class="time-picker__separator"></div>
+    </div> 
+
+    <ion-picker>
+        <div class="picker-columns">
+            <ion-picker-column   [value]="pickerColumns[0].selectedIndex" (ionChange)="onIonChange($event,0)">
+                <ion-picker-column-option  *ngFor="let hourFrom of pickerColumns[0].options" [value]="hourFrom.value" >
+                 {{hourFrom.text}}
+                </ion-picker-column-option>         
+              </ion-picker-column>
+            <ion-picker-column    [value]="pickerColumns[1].selectedIndex" (ionChange)="onIonChange($event,1)">
+                <ion-picker-column-option  *ngFor="let minFrom of pickerColumns[1].options" [value]="minFrom.value" >
+                    {{minFrom.text}}
+                </ion-picker-column-option>          
+              </ion-picker-column>
+
+              <ion-picker-column   [value]="pickerColumns[2].selectedIndex" (ionChange)="onIonChange($event,2)">
+                <ion-picker-column-option  *ngFor="let hourTo of pickerColumns[2].options" [value]="hourTo.value" >
+                 {{hourTo.text}}
+                </ion-picker-column-option>         
+              </ion-picker-column>
+            <ion-picker-column    [value]="pickerColumns[3].selectedIndex" (ionChange)="onIonChange($event,3)">
+                <ion-picker-column-option  *ngFor="let minTo of pickerColumns[3].options" [value]="minTo.value" >
+                    {{minTo.text}}
+                </ion-picker-column-option>           
+              </ion-picker-column>
+        </div>
+    </ion-picker>
+
+    <div class="time-picker__date-info">
+        <div class="date-info">
+            <span class="date-info__title">{{ "CALENDAR-SELECTOR.FROM" | translate }}:</span>
+            <p class="date-info__date">
+                <span class="date-info__date--bold">{{ stringDateFrom }}</span>
+                {{ stringTimeFrom }}
+            </p>
+        </div>
+        <div class="date-info">
+            <span class="date-info__title">{{ "CALENDAR-SELECTOR.TO" | translate }}:</span>
+            <p class="date-info__date">
+                <span class="date-info__date--bold">{{ stringDateTo }}</span>
+                {{ stringTimeTo }}
+            </p>
+        </div>
+    </div>
+    <ion-button data-override-styles="" class="ob-btn primary size--medium" (click)="save()">
+        {{ "CALENDAR-SELECTOR.APPLY-BTN" | translate }}
+    </ion-button>
+</div>

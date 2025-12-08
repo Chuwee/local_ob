@@ -1,0 +1,27 @@
+<div fxLayout="row" fxLayoutAlign="flex-start center" fxLayoutGap="28px">
+    <div class="file-status">
+        <div class="file-status-thumb">
+            <img src="assets/file-status/file-status.svg" height="64px" alt="file status">
+        </div>
+        <div class="file-status-icon">
+            <mat-icon [ngClass]="getIconClassName()">
+                {{getIconName()}}
+            </mat-icon>
+        </div>
+    </div>
+    <div fxLayout="column" fxFlex="100%" fxLayoutGap="8px" class="file-details">
+        <span appEllipsify>{{getProgressLabel()}}</span>
+        <mat-progress-bar class="ob-progress-bar"
+            [ngClass]="getProgressBarClassName()"
+            [mode]="getProgressMode()"
+            [value]="getProgressValue()"/>
+        <span class="file-size">{{size ?? 0}}B</span>
+    </div>
+    @if (isCancelable) {
+        <button mat-icon-button type="button" [disabled]="state === 'loading' || disabled"
+            class="ob-button medium" (click)="cancelFileHandler()">
+            <mat-icon>delete</mat-icon>
+        </button>
+    }
+</div>
+

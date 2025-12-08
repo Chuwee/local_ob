@@ -1,0 +1,33 @@
+<div class="code-selector" [formGroup]="form">
+    @if($formConnection()){
+        <div fxFlex="50%" slot="outside" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+            <mat-label><b>{{'ENTITY.EXTERNAL.CONNECTION.LABEL' | translate}}</b></mat-label>
+            <mat-form-field fxFlex="150px" appearance="outline" class="ob-form-field ob-form-field-outline inline-field thin-select-field">
+                <mat-select [formControl]="$formConnection()" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                    @for(connection of  connections; track connection){
+                        <mat-option [value]="connection">
+                            {{'ENTITY.EXTERNAL.CONNECTION.' + connection | translate}}
+                        </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+    }
+    <div fxFlex="auto" slot="outside" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="end center">
+        <mat-label><b>{{'ENTITY.EXTERNAL.CLUB_CODE.LABEL' | translate}}</b></mat-label>
+        <mat-form-field fxFlex="150px" appearance="outline" class="ob-form-field ob-form-field-outline inline-field thin-select-field">
+            <mat-select formControlName="control" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                @for(code of codes; track code){
+                    <mat-option [value]="code">
+                        {{code}}
+                    </mat-option>
+                }
+                @if(this.form.get('control').value){
+                    <mat-option [value]="null">
+                        {{'ENTITY.EXTERNAL.CLUB_CODE.UNLINK' | translate}}
+                    </mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+    </div>
+</div>

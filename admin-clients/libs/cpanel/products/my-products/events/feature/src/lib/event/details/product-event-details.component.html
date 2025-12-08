@@ -1,0 +1,60 @@
+<div class="main-content flex-1 flex flex-col">
+    @if ((deliveryType$ | async) === 'SESSION') {
+        <app-nav-tabs-menu type="horizontalSubtab" [elements]="[
+            {
+                label: 'PRODUCT.EVENTS.DETAIL.SESSIONS.TITLE',
+                id: 'tab_product_general-data',
+                param: 'sessions',
+            },
+            {
+                label: 'PRODUCT.EVENTS.DETAIL.STOCK_AND_PRICES.TITLE',
+                id: 'tab_product_event_stock',
+                param: 'stock',
+                show: ($product().product_type === 'SIMPLE' && $product().stock_type === 'SESSION_BOUNDED')
+            },
+            {
+                label: 'PRODUCT.EVENTS.DETAIL.PRICES.TITLE',
+                id: 'tab_product_event_prices',
+                param: 'prices',
+                show: ($product().product_type === 'SIMPLE')
+            },
+            {
+                label: 'PRODUCT.EVENTS.DETAIL.DELIVERY.TITLE',
+                id: 'tab_product_taxes',
+                param: 'delivery-points'
+            }
+        ]" />
+    }
+    @if (isInProgress$ | async) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+    @let productEvent = (selectedProductEvent$ | async);
+    <!-- {} -->
+    <div class="status-notifications-container">
+        <div class="flex justify-center items-center" [formGroup]="form">
+            <div class="flex flex-1 flex-row justify-between items-center">
+                <div class="flex flex-row">
+                    @if (canWrite$ | async) {
+                        <mat-slide-toggle class="ob-slide-toggle" color="primary" formControlName="status"
+                            (change)="updateProductEventStatus($event)"
+                            [matTooltip]="'PRODUCT.EVENTS.DETAIL.STATUS_SWITCH.DISABLED_TOOLTIP' | translate"
+                            [matTooltipDisabled]="canSetEventStatus$ | async">
+                            {{'PRODUCT.EVENTS.DETAIL.STATUS_SWITCH.LABEL' | translate }}
+                        </mat-slide-toggle>
+                    }
+                </div>
+                <div class="flex flex-row justify-end items-center gap-2">
+                    <span class="ob-label">
+                        {{'PRODUCT.EVENTS.DETAIL.STATUS_BAR_LABEL' | translate}}:
+                    </span>
+                    <span>
+                        {{ 'EVENTS.STATUS_OPTS.' + productEvent?.event?.status | translate }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <router-outlet />
+</div>

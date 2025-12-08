@@ -1,0 +1,97 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="(loadingOrSaving$ | async) || !form.dirty"
+    *ngIf="(configuration$ | async) else loading">
+    <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'SALE_REQUEST.CONFIGURATION.CATEGORIES.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div id="categoryInfo" fxLayout="row wrap" [formGroup]="categoriesDataForm">
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%" fxLayout="column">
+                    <span class="field-label">{{'SALE_REQUEST.CONFIGURATION.EVENT_CATEGORY' | translate}}</span>
+                    <span *ngIf="saleRequest.event.category?.custom && saleRequest.event.category?.parent">
+                        {{saleRequest.event.category?.parent.description}} -
+                        {{saleRequest.event.category?.custom.description}}
+                    </span>
+                    <span *ngIf="saleRequest.event.category?.custom && !saleRequest.event.category?.parent">
+                        <span>{{saleRequest.event.category?.custom.description}}</span>
+                    </span>
+                    <span *ngIf="!saleRequest.event.category?.custom">{{saleRequest.event.category?.description}}</span>
+                </div>
+                <mat-form-field fxFlex="100%" fxFlex.gt-sm="50%" appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'SALE_REQUEST.CONFIGURATION.CHANNEL_CATEGORY' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="categoryId">
+                        <mat-option>
+                            <app-select-search #entityCategoriesSelectSearch [options$]="entityCategories$"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="description"
+                                requireSelection="true">
+                            </app-select-search>
+                        </mat-option>
+                        <mat-option *ngFor="let category of entityCategoriesSelectSearch.getFilteredOptions$() | async"
+                            [value]="category.id">
+                            <div appEllipsify [matTooltip]="category.description">
+                                {{category.description}}
+                            </div>
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel [expanded]="true" *ngIf="isWebType">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'SALE_REQUEST.CONFIGURATION.REFUNDS.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div id="refundInfo" fxLayout="row wrap" class="configuration-form-section" [formGroup]="refundForm">
+                <div fxFlex="100%" fxLayout="column" class="configuration-form-refund">
+                    <div fxFlex="28px" fxLayout="row">
+                        <mat-slide-toggle class="ob-slide-toggle" formControlName="allowedRefund">
+                            {{'SALE_REQUEST.CONFIGURATION.REFUNDS.TOGGLE' | translate}}
+                        </mat-slide-toggle>
+                    </div>
+                    <mat-divider fxFlex="100%"></mat-divider>
+                </div>
+                <p fxFlex="100%" class="field-with-label">
+                    {{'SALE_REQUEST.CONFIGURATION.REFUNDS.DESCRIPTION' | translate}}
+                </p>
+            </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'SALE_REQUEST.CUSTOMER_RELATIONSHIP' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="row wrap" fxLayoutAlign="stretch">
+                <div fxLayout="column">
+                    <p fxLayout="row" class="description">
+                        {{'SALE_REQUEST.SUBSCRIPTIONS_LIST_DESCRIPTION' | translate}}
+                    </p>
+                </div>
+            </div>
+            <form id="customerRelationshipData" [formGroup]="customerRelationshipDataForm" fxLayout="row wrap"
+                fxLayoutAlign="space-between">
+                <mat-form-field fxFlex="100%" fxFlex.gt-sm="50%" appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'SALE_REQUEST.SUBSCRIPTIONS_LIST' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="subscriptionListId">
+                        <mat-option [value]="null">
+                            <div appEllipsify [matTooltip]="('FORMS.SELECT.PLACE_HOLDER' | translate)">
+                                {{'FORMS.SELECT.PLACE_HOLDER' | translate}}
+                            </div>
+                        </mat-option>
+                        <mat-option *ngFor="let subscriptions of entitySubscriptionLists$ | async" [value]="subscriptions.id">
+                            <div appEllipsify [matTooltip]="subscriptions.name">
+                                {{subscriptions.name}}
+                            </div>
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </form>
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+
+<ng-template #loading>
+    <div fxFlex="0 1 1080px" fxLayout="column">
+        <div fxFlex="0 0 300px" fxLayoutAlign="center center">
+            <mat-spinner></mat-spinner>
+        </div>
+    </div>
+</ng-template>

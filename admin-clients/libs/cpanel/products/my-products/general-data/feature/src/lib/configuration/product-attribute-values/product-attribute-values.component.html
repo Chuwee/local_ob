@@ -1,0 +1,26 @@
+<div mat-dialog-content fxLayout="column" class="with-wizard-bar">
+    @switch ($action()) {
+        @case ('CREATE') {
+            <p>{{'PRODUCT.VARIANTS.FORMS.INFOS.CREATE_VALUES_INFO' | translate}}</p>
+        }
+        @case ('EDIT') {
+            <p>{{'PRODUCT.VARIANTS.FORMS.INFOS.EDIT_VALUES_INFO' | translate}}</p>
+            <p fxFlex fxLayoutAlign="start start">
+                <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                <span>{{'PRODUCT.VARIANTS.FORMS.INFOS.PRODUCT_WITH_SALES_INFO_TITLE' | translate}}</span>
+            </p>
+        }
+    }
+    @for(attribute of $productAttributes(); track attribute.attribute_id; let last = $last) {
+        <app-product-attribute-values-list [productId]="$productId()" [attribute]="attribute" [maxSelection]="$maxSelection()"
+            [maxVariantsReached]="$maxVariantsReached()"
+            [disableValueCreation]="$disableAttributeValueCreation()?.get(attribute.attribute_id)"
+            [action]="$action()"
+            (currentValuesList)="updateValues($event, attribute.attribute_id)"
+            (someActionDone)="someActionDone.emit()">
+        </app-product-attribute-values-list>
+        @if (!last) {
+            <mat-divider class="ob-form-divider fields-divider"></mat-divider>
+        }
+    }
+</div>

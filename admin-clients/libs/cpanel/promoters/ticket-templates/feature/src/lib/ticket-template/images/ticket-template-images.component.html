@@ -1,0 +1,171 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="main" [disabled]="!form.dirty || (isInProgress$ | async)" sidebar>
+    <app-language-bar [languages]="languageList$ | async" [selected]="language$ | async" slot="outside"
+        [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)">
+    </app-language-bar>
+    <div fxFlex="grow" fxLayoutAlign="center">
+        <div fxLayout="column" fxFlex="0 1 900px" class="details-container overflow">
+            <form [formGroup]="form" class="details-form-container">
+                <div fxLayout="column" *ngIf="ticketTemplate?.design.format === format.printer" class="section-block">
+                    <div class="section-block" fxLayout="column">
+                        <h3 class="section-title">{{'TICKET_TEMPLATE.IMAGES.PRINTER.MAIN_TITLE' | translate}}</h3>
+                        <p class="section-description">
+                            {{'TICKET_TEMPLATE.IMAGES.PRINTER.MAIN_SUBTITLE' | translate }}
+                        </p>
+                        <div fxFlex="100" fxLayout="row wrap" fxLayoutGap="28px">
+                            <div fxFlex="none" fxLayout="row">
+                                <div fxFlex="47px">
+                                    <span class="ob-round-badge badge-printer">1</span>
+                                </div>
+                                <div fxFlex="100" fxLayout="column" class="image-uploader">
+                                    <span class="field-label">{{'TICKET_TEMPLATE.IMAGES.PRINTER.MAIN' | translate}}</span>
+                                    <app-image-uploader [imageRestrictions]="printerImageRestrictions.MAIN"
+                                        formControlName="MAIN">
+                                    </app-image-uploader>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-block" fxLayout="column">
+                        <h3 class="section-title">{{'TICKET_TEMPLATE.IMAGES.PRINTER.BANNERS_TITLE' | translate}}</h3>
+                        <p class="section-description">
+                            {{'TICKET_TEMPLATE.IMAGES.PRINTER.BANNERS_SUBTITLE' | translate }}
+                        </p>
+                        <div fxFlex="100%" fxLayout="row wrap" fxLayoutGap="28px">
+                            <div fxFlex="none" fxLayout="row">
+                                <div fxFlex="47px">
+                                    <span class="ob-round-badge badge-printer">2</span>
+                                </div>
+                                <div fxFlex="326px" fxLayout="column" class="image-uploader">
+                                    <span class="field-label">{{'TICKET_TEMPLATE.IMAGES.PRINTER.BANNER_MAIN' | translate}}</span>
+                                    <app-image-uploader [imageRestrictions]="printerImageRestrictions.BANNER_MAIN"
+                                        formControlName="BANNER_MAIN">
+                                    </app-image-uploader>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div fxLayout="column" *ngIf="ticketTemplate?.design.format === format.pdf" class="section-block">
+                    <div class="section-block" fxLayout="column">
+                        <h3 class="section-title">{{'TICKET_TEMPLATE.IMAGES.PDF.MAIN_TITLE' | translate}}</h3>
+                        <p class="section-description">
+                            {{'TICKET_TEMPLATE.IMAGES.PDF.MAIN_SUBTITLE' | translate }}
+                        </p>
+                        <div fxFlex="100%" fxLayout="row">
+                            <div fxFlex="47px">
+                                <span class="ob-round-badge badge-pdf">1</span>
+                            </div>
+                            <div fxFlex fxLayout="column" class="image-uploader">
+                                <span class="field-label">{{'TICKET_TEMPLATE.IMAGES.PDF.HEADER' | translate}}</span>
+                                <app-image-uploader [imageRestrictions]="pdfImageRestrictions.HEADER"
+                                    formControlName="HEADER">
+                                </app-image-uploader>
+                            </div>
+                        </div>
+                        <div fxFlex="100%" fxLayout="row wrap" fxLayoutGap="10%">
+                            <div fxFlex="35%" fxLayout="row">
+                                <div fxFlex="47px">
+                                    <span class="ob-round-badge badge-pdf">2</span>
+                                </div>
+                                <div fxFlex fxLayout="column" class="image-uploader">
+                                    <span class="field-label">{{'TICKET_TEMPLATE.IMAGES.PDF.BODY' | translate}}</span>
+                                    <app-image-uploader [imageRestrictions]="pdfImageRestrictions.BODY"
+                                        formControlName="BODY">
+                                    </app-image-uploader>
+                                </div>
+                            </div>
+                            <div fxFlex="55%" fxLayout="row">
+                                <div fxFlex="47px">
+                                    <span class="ob-round-badge badge-pdf">3</span>
+                                </div>
+                                <div fxFlex fxLayout="column" class="image-uploader">
+                                    <span class="field-label">{{'TICKET_TEMPLATE.IMAGES.PDF.EVENT_LOGO' | translate}}</span>
+                                    <app-image-uploader [imageRestrictions]="pdfImageRestrictions.EVENT_LOGO"
+                                        formControlName="EVENT_LOGO">
+                                    </app-image-uploader>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-block" fxLayout="column">
+                        <h3 class="section-title">{{'TICKET_TEMPLATE.IMAGES.PDF.BANNERS_TITLE' | translate}}</h3>
+                        <p class="section-description">
+                            {{'TICKET_TEMPLATE.IMAGES.PDF.BANNERS_SUBTITLE' | translate }}
+                        </p>
+                        <div fxFlex="100%" fxLayout="row wrap" fxLayoutGap="10%">
+                            <div fxFlex="50%" fxLayout="row">
+                                <div fxFlex="47px">
+                                    <span class="ob-round-badge badge-pdf">4</span>
+                                </div>
+                                <div fxFlex fxLayout="column" class="image-uploader">
+                                    <span class="field-label">{{'TICKET_TEMPLATE.IMAGES.PDF.BANNER_MAIN' | translate}}</span>
+                                    <app-image-uploader [imageRestrictions]="pdfImageRestrictions.BANNER_MAIN"
+                                        formControlName="BANNER_MAIN">
+                                    </app-image-uploader>
+                                </div>
+                            </div>
+                            <div fxFlex="40%" fxLayout="column" fxLayoutGap="10%">
+                                <div fxFlex fxLayout="row" fxLayoutGap="0">
+                                    <div fxFlex="47px">
+                                        <span class="ob-round-badge badge-pdf">5</span>
+                                    </div>
+                                    <div fxFlex fxLayout="column">
+                                        <span class="field-label">{{'TICKET_TEMPLATE.IMAGES.PDF.BANNER_SECONDARY' | translate}}</span>
+                                        <app-image-uploader [imageRestrictions]="pdfImageRestrictions.BANNER_SECONDARY"
+                                            formControlName="BANNER_SECONDARY">
+                                        </app-image-uploader>
+                                    </div>
+                                </div>
+                                <div fxFlex fxLayout="row">
+                                    <div fxFlex="47px">
+                                        <span class="ob-round-badge badge-pdf">6</span>
+                                    </div>
+                                    <div fxFlex fxLayout="column" class="image-uploader">
+                                        <span class="field-label">{{'TICKET_TEMPLATE.IMAGES.PDF.BANNER_CHANNEL_LOGO' | translate}}</span>
+                                        <app-image-uploader [imageRestrictions]="pdfImageRestrictions.BANNER_CHANNEL_LOGO"
+                                            formControlName="BANNER_CHANNEL_LOGO">
+                                        </app-image-uploader>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div slot="sidebar">
+        <div *ngIf="ticketTemplate?.design.format === format.printer" class="ticket-template-legend legend-printer"
+            fxLayout="column" fxLayoutAlign="start start">
+            <img src="assets/ticket-template/printer-ticket-template-images.svg" [alt]="'EVENTS.TEMPLATE' | translate">
+            <div class="legend-title">{{'EVENTS.TEMPLATE' | translate}}</div>
+            <div class="legend-value">{{ticketTemplate?.name || '-'}}</div>
+            <div class="legend-title">{{'TICKET_TEMPLATE.PRINTER' | translate}}</div>
+            <div class="legend-value">{{ticketTemplate?.design.printer || '-'}}</div>
+            <div class="legend-title">{{'TICKET_TEMPLATE.PAPER_TYPE' | translate}}</div>
+            <div class="legend-value">{{ticketTemplate?.design.paper_type || '-'}}</div>
+            <div class="legend-title">{{'TICKET_TEMPLATE.DESIGN' | translate}}</div>
+            <div class="legend-value">{{ticketTemplate?.design.name || '-'}}</div>
+        </div>
+        <div *ngIf="ticketTemplate?.design.format === format.pdf" class="ticket-template-legend legend-pdf"
+            fxLayout="column" fxLayoutAlign="start start">
+            <img src="assets/ticket-template/pdf-ticket-template-images.svg" [alt]="'EVENTS.TEMPLATE' | translate">
+            <button mat-flat-button class="ob-button xsmall ticket-template-preview" (click)="openTicketPreview()">
+                <mat-icon>visibility</mat-icon>
+                {{'ACTIONS.SEE_TICKET.BTN' | translate}}
+            </button>
+            <div class="legend-title">{{'EVENTS.TEMPLATE' | translate}}</div>
+            <div class="legend-value">{{ticketTemplate?.name || '-'}}</div>
+            <div class="legend-title">{{'TICKET_TEMPLATE.PRINTER' | translate}}</div>
+            <div class="legend-value">{{ticketTemplate?.design.printer || '-'}}</div>
+            <div class="legend-title">{{'TICKET_TEMPLATE.PAPER_TYPE' | translate}}</div>
+            <div class="legend-value">{{ticketTemplate?.design.paper_type || '-'}}</div>
+            <div class="legend-title">{{'TICKET_TEMPLATE.DESIGN' | translate}}</div>
+            <div class="legend-value">{{ticketTemplate?.design.name || '-'}}</div>
+        </div>
+    </div>
+</app-form-container>
+
+<div class="spinner-container" *ngIf="isInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

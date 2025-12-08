@@ -1,0 +1,61 @@
+<div id="categoriesData" fxLayout="row wrap" fxLayoutGap="0" fxLayoutGap.gt-sm="40px">
+    <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(50%-40px)" appearance="outline" class="ob-form-field field-with-label">
+        <mat-label>{{ 'PRODUCT.CATEGORY' | translate }}</mat-label>
+        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+            [formControl]="categoriesDataForm.controls.categoryId" aria-label="category id">
+            <mat-option>
+                <app-select-search #categoriesSelection [options$]="categories$"
+                    [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                    searchField="description" requireSelection="true" />
+            </mat-option>
+            @for (category of categoriesSelection.getFilteredOptions$() | async; track category.id) {
+                <mat-option [value]="category.id">
+                    <div appEllipsify [matTooltip]="category.description">
+                        {{ category.description }}
+                    </div>
+                </mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+    @if ((entityCategories$ | async)?.length) {
+        <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(50%-40px)" appearance="outline" class="ob-form-field field-with-label">
+            <mat-label>{{ 'PRODUCT.CUSTOM_CATEGORY' | translate }}</mat-label>
+            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                [formControl]="categoriesDataForm.controls.customCategoryId" aria-label="custom category id">
+                <mat-option>
+                    <app-select-search #ecategoriesSelection [options$]="entityCategories$"
+                        [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                        searchField="description" requireSelection="true" />
+                </mat-option>
+                @for (eCategory of ecategoriesSelection.getFilteredOptions$() | async; track eCategory.id) {
+                    <mat-option [value]="eCategory.id">
+                        <div appEllipsify [matTooltip]="eCategory.description">
+                            {{ eCategory.description }}
+                        </div>
+                    </mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+    }
+    @if ((toursBS$ | async)?.length) {
+        <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(50%-40px)" appearance="outline" class="ob-form-field field-with-label">
+            <mat-label>{{ 'SEASON_TICKET.TOUR' | translate }}</mat-label>
+            <mat-select [formControl]="categoriesDataForm.controls.tour" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                <mat-option>
+                    <app-select-search #toursSelection [options$]="toursBS$"
+                        [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                        searchField="name" requireSelection="true" />
+                </mat-option>
+                @for (tour of toursSelection.getFilteredOptions$() | async; track tour.id) {
+                    <mat-option [value]="tour.id">
+                        <div appEllipsify [matTooltip]="tour.name">
+                            {{ tour.name }}
+                        </div>
+                    </mat-option>
+                }
+            </mat-select>
+            <app-help-button matSuffix [message]="'SEASON_TICKET.TOUR_HELP_DESCRIPTION' | translate" />
+        </mat-form-field>
+    }
+
+</div>

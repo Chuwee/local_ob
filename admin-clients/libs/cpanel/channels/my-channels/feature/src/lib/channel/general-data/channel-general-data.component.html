@@ -1,0 +1,86 @@
+<app-form-container (save)="save()" (cancel)="reset()" layout="main"
+    [disabled]="!form.dirty || (isInProgress$ | async)">
+    <div class="actions-bar flex flex-col">
+        <div class="flex justify-end grow-0 basis-full">
+            <mat-checkbox class="flex justify-end" color="primary" [formControl]="form.controls.isPublic">
+                {{'CHANNELS.MAKE_PUBLIC' | translate}}
+            </mat-checkbox>
+        </div>
+    </div>
+    <mat-accordion [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.CHANNEL_DATA' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-form-channel-data [form]="form" [channel]="$channel()" [putChannelCtrl]="putChannelCtrl" />
+        </mat-expansion-panel>
+        @if ((isMultiCurrency$ | async) || $isSuperOperator()) {
+            <mat-expansion-panel [expanded]="true" id="formCurrency">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'CHANNELS.CURRENCY' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                @if (($channel() | isBoxOffice)) {
+                    <app-channel-single-currency-selector [description]="( 'CHANNELS.CURRENCY_DESCRIPTION_SINGLE' ) | translate"
+                        [channel]="$channel()" [putChannelCtrl]="putChannelCtrl" [form]="form" />
+                } @else if($currencySelectorData()) {
+                    <app-channel-multiple-currency-selector [description]="( 'CHANNELS.CURRENCY_DESCRIPTION' ) | translate"
+                        [data]="$currencySelectorData()" [putChannelCtrl]="putChannelCtrl" [formGroup]="form" />
+                }
+            </mat-expansion-panel>
+        }
+        @if ($channel() | isWebV4$ | async) {
+            @defer {
+                <mat-expansion-panel [expanded]="true" id="formCurrencies">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'CHANNELS.CURRENCY_EXCHANGE.TITLE' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <app-channel-exchange-selector [data]="$channel()" [putChannelCtrl]="putChannelCtrl" [formGroup]="form" />
+                </mat-expansion-panel>
+            }
+        }
+        <mat-expansion-panel [expanded]="true" id="formLanguages">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.LANGUAGES' | translate}} *</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-channel-language-selector [form]="form" [languageSelectorData]="$languageSelectorData()"
+                [putChannelCtrl]="putChannelCtrl"
+                [enableDefaultSelection]="($channel() | isWebChannel) || ($channel() | isMembersChannel)" />
+        </mat-expansion-panel>
+        @if ($channel() | isWebChannel) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'CHANNELS.SELL_TYPE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="flex flex-wrap">
+                    <p class="section-description">{{( 'CHANNELS.MULTIEVENT_DESCRIPTION' ) | translate }}</p>
+                </div>
+                <div class="flex flex-wrap">
+                    <mat-checkbox class="flex justify-start grow-0 basis-1/2" color="primary" [formControl]="form.controls.multiEvent">
+                        {{( 'CHANNELS.MULTIEVENT' ) | translate }}
+                    </mat-checkbox>
+                </div>
+            </mat-expansion-panel>
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'CHANNELS.CONTACT' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-form-contact-data [form]="form" [channel]="$channel()" [putChannelCtrl]="putChannelCtrl" />
+            </mat-expansion-panel>
+            @if ($entity().settings.allow_destination_channels === true && $isOperator()
+                && $entity().settings.allow_fever_zone === true) {
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>Destination Channel</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <app-destination-channel-form [form]="form" [channel]="$channel()" [putChannelCtrl]="putChannelCtrl" />
+                </mat-expansion-panel>
+            }
+        }
+    </mat-accordion>
+</app-form-container>
+
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,38 @@
+<app-form-container (cancel)="cancel()" (save)="save()" [disabled]="!form.dirty || (isInProgress$ | async)">
+    <app-language-bar [languages]="languageList$ | async" [selected]="selectedLanguage$ | async" slot="outside"
+        [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)" />
+    <form [formGroup]="form">
+        <h3 class="section-title">
+            {{'ENTITY.ZONE_TEMPLATE.EMAIL.HEADER_TITLE' | translate }}
+        </h3>
+        <p class="section-description">
+            {{ 'ENTITY.ZONE_TEMPLATE.EMAIL.DESCRIPTION' | translate }}
+        </p>
+        <p class="flex flex-row items-center">
+            <mat-icon class="ob-icon small neutral with-text">info</mat-icon>
+            <span>{{'ENTITY.ZONE_TEMPLATE.EMAIL.INFO' | translate}}</span>
+        </p>
+        <div class="flex flex-col custom-module">
+            <span class="field-label">{{'ENTITY.ZONE_TEMPLATE.EMAIL.CUSTOM_MODULE' | translate}}</span>
+            <span class="section-description">
+                {{ 'ENTITY.ZONE_TEMPLATE.EMAIL.CUSTOM_MODULE_DESCRIPTION' | translate }}
+            </span>
+            <mat-form-field appearance="outline" class="ob-form-field no-padding field-with-label flex flex-[1_1_100%]">
+                <app-rich-text-area [autoresize]="{min: 100, max: 200}" formControlName="customModule"
+                    [autocompleterItems]="placeholdersMap['customModule']" class="vertical-stretch" />
+            </mat-form-field>
+            @if (hasSmartBooking$ | async) {
+                <mat-form-field appearance="outline" class="ob-form-field no-padding field-with-label flex flex-[1_1_100%]">
+                    <mat-label>{{'ENTITY.ZONE_TEMPLATE.EMAIL.SMART_BOOKING_CUSTOM_MODULE' | translate}}</mat-label>
+                    <app-rich-text-area [autoresize]="{min: 100, max: 200}" formControlName="smartBookingCustomModule"
+                        [autocompleterItems]="placeholdersMap['smartBookingCustomModule']" class="vertical-stretch" />
+                </mat-form-field>
+            }
+        </div>
+    </form>
+</app-form-container>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

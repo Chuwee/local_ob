@@ -1,0 +1,39 @@
+@if (deliveryPoint$ | async; as deliveryPoint) {
+    <div class="details-container" [formGroup]="form" fxFlex="0 1 100%" fxLayout="column">
+        <div class="heading-container only-title" fxLayoutAlign="start center">
+            <app-go-back defaultPath="/delivery-points" />
+            <h1 class="secondary mat-headline-3">{{ deliveryPoint.name }}</h1>
+        </div>
+        <div class="main-content" fxFlex="100%" fxLayout="column">
+            <div fxFlex="0 0" fxLayout="column">
+                <div class="status-notifications-container">
+                    <div fxLayoutAlign="center center">
+                        <div fxFlex="0 1 1232px" fxLayoutAlign="space-between center">
+                            <div fxFlex="250px" fxLayout="center">
+                                <mat-slide-toggle class="ob-slide-toggle" color="primary" formControlName="status"
+                                    (change)="updateStatus()">
+                                    {{ 'DELIVERY_POINT.STATUS_SWITCH.' + deliveryPoint.status | translate }}
+                                </mat-slide-toggle>
+                            </div>
+                            <div fxFlex="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+                                <span class="ob-label">
+                                    {{'DELIVERY_POINT.STATUS_BAR' | translate}}:
+                                </span>
+                                <span [class]="'ob-status-badge ' + (deliveryPoint.status | lowercase )">
+                                    {{ 'DELIVERY_POINT.STATUS_OPTS.' + deliveryPoint.status | translate }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <mat-divider />
+                <router-outlet (activate)="handleChildRouteComponentInstanceChange($event)" />
+                @if (isLoadingOrSaving$ | async) {
+                    <div class="spinner-container">
+                        <mat-spinner />
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}

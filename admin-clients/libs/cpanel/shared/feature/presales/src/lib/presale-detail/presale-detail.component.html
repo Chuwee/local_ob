@@ -1,0 +1,207 @@
+<form [formGroup]="form" class="form-box flex flex-col gap-8">
+    <!-- ACTIVE -->
+    <div class="flex flex-row justify-between">
+        <div class="flex flex-col gap-2">
+            <span class="body-1">{{'PRESALES.VALIDATOR_TYPE' | prefix | translate}} </span>
+            @if (presaleDetail?.validator_type === validatorTypes.collective) {
+                <div class="flex items-center gap-2">
+                    <span>{{$presale().validator.name + ' - ' + (('PRESALES.VALIDATOR_TYPE_OPTS.' +
+                        $presale().validator.validation_method) | prefix | translate)}}
+                    </span>
+                    <a aria-label="Go to collective" class="ob-link flex items-center gap-1 event-link" target="_blank"
+                        [routerLink]="[
+                            '/collectives',
+                            $presale().validator.id
+                        ]">
+                        <span>{{'ACTIONS.GO_TO_COLLECTIVE' | translate}} </span>
+                        <mat-icon iconPositionEnd class="ob-icon xsmall">launch</mat-icon>
+                    </a>
+                </div>
+            } @else {
+                <span>{{'PRESALES.VALIDATOR_CUSTOMER_LABEL' | prefix | translate}}</span>
+            }
+        </div>
+        <mat-slide-toggle #toggle formControlName="active" class="ob-slide-toggle flex content-center" color="primary"
+            (change)="activate($event.checked)" [matTooltip]="'PRESALES.ACTIVATION_DISABLED' | prefix | translate"
+            [disabled]="form.dirty || form.invalid"
+            [matTooltipDisabled]="!toggle.disabled">
+            {{'PRESALES.ACTIVATE' | prefix | translate }}
+        </mat-slide-toggle>
+    </div>
+    <mat-divider />
+    <!-- PRESALE -->
+    <div id="presale" formGroupName="presales" class="flex flex-col gap-8">
+        <!-- DATES -->
+        <div class="flex flex-col gap-2">
+            <span class="body-1">{{'PRESALES.DATES_TITLE' | prefix | translate}}</span>
+            <span class="field-with-label">{{'PRESALES.DATES_DESCRIPTION' | prefix | translate}}</span>
+            <mat-radio-group formControlName="dates" class="flex flex-col gap-3">
+                <mat-radio-button [value]="validationTypes.all" class="ob-radio-button">
+                    {{'PRESALES.DATES_OPT.ALL' | prefix | translate}}
+                </mat-radio-button>
+                <mat-radio-button [value]="validationTypes.dateRange" class="ob-radio-button">
+                    {{'PRESALES.DATES_OPT.SELECT' | prefix | translate}}
+                </mat-radio-button>
+            </mat-radio-group>
+            @if (form.get('presales.dates').value === validationTypes.dateRange) {
+                <div class="flex flex-row gap-6 presale-dates">
+                    <!-- START PRESALE DATE -->
+                    <div class="flex flex-col flex-[0_1_320px]">
+                        <app-date-time-picker class="flex-[1_1_100%]" [label]="'DATES.START_DATE' | translate"
+                            formControlName="start_date" />
+                    </div>
+                    <!-- END PRESALE DATE -->
+                    <div class="flex flex-col flex-[0_1_320px]">
+                        <app-date-time-picker class="flex-[1_1_100%]" [label]="'DATES.END_DATE' | translate"
+                            formControlName="end_date" />
+                    </div>
+                </div>
+            }
+        </div>
+        <!-- PRESALE CHANNEL LIST -->
+        <div class="flex-[1_1_100%] presales-channels-list-container">
+            <span class="mat-subtitle-2"> {{ 'PRESALES.CHANNELS.TITLE' | prefix | translate }} </span>
+            <div class="presales-channels-list" [class.field-error]="channelsControl.hasError('required') && channelsControl.touched">
+                <app-searchable-paginated-selection class="ob-large-list transparent-bg" #selection
+                    [placeholder]="'FORMS.SEARCH_CHANNEL_FIELD' | translate" [pageSize]="pageSize" [data$]="channelsList$"
+                    [form]="channelsControl" (loadData)="loadPagedChannels($event)" [metadata$]="channelsListMetadata$">
+                    <div slot="filter" class="badge-container" [class.empty]="!(channelsListMetadata$ | async)?.total">
+                        {{channelsControl?.value?.length}} / {{(totalChannels$ | async) || 0}}
+                    </div>
+                    <button slot="filter" type="button" mat-icon-button class="show-selected-only-button ob-button" color="tertiary"
+                        [class.active]="$selectedOnly()" [disabled]="channelsControl?.value?.length === 0"
+                        [matTooltip]="'PRESALES.CHANNELS.SHOW_SELECTED_TOOLTIP' | prefix | translate"
+                        (click)="changeSelectedOnly()">
+                        <mat-icon>visibility</mat-icon>
+                    </button>
+                    <ng-template #selectionTemplate let-data="data" let-pageForm="pageForm" let-selectionChanged="selectionChanged">
+                        <app-selection-list [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged"
+                            class="small-rows">
+                            <ng-template #optionTemplate let-row>
+                                <div class="flex justify-between">
+                                    <span>{{row.name}}</span>
+                                    <span>{{row.enabled}}</span>
+                                </div>
+                            </ng-template>
+                        </app-selection-list>
+                    </ng-template>
+                </app-searchable-paginated-selection>
+            </div>
+            @if (channelsControl.hasError('required') && channelsControl.touched) {
+                <span class="error-description">
+                    {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                </span>
+            }
+        </div>
+
+        <!-- PRESALE LIMITS AVET EVENT -->
+        @if ($isAvetEvent()) {
+            <div>
+                <mat-divider class="ob-form-divider" />
+                <div class="flex flex-col gap-4">
+                    <span class="body-1">{{'PRESALES.MEMBERS.TITLE' | prefix | translate}}</span>
+                    <div class="flex flex-row">
+                        <div class="basis-1/2">
+                            <span class="non-editable-field-label">{{'PRESALES.MEMBER_TICKETS_LIMIT' | prefix | translate}}</span>
+                            <span>{{presaleDetail.member_tickets_limit ?? 0}}</span>
+                        </div>
+                        <div class="basis-1/2">
+                            <span class="non-editable-field-label">{{'PRESALES.GENERAL_TICKETS_LIMIT' | prefix | translate}}</span>
+                            <span>{{presaleDetail.general_tickets_limit ?? 0}}</span>
+                        </div>
+                    </div>
+                    @if($isSmartBooking()) {
+                        <mat-checkbox color="primary" formControlName="multiple_purchase">
+                            {{'PRESALES.MEMBERS.ALLOW_MULTIPLE_PURCHASE' | translate }}
+                        </mat-checkbox>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (presaleDetail?.validator_type === validatorTypes.customers) {
+            <div class="flex flex-col gap-2">
+                <!-- CUSTOMER TYPES -->
+                @if ($customerTypes()?.length) {
+                    <div class="flex flex-col gap-2">
+                        <span class="body-1">{{'PRESALES.CUSTOMER_TYPES.TITLE' | prefix | translate}}</span>
+                        <div class="flex flex-row justify-start customer-types-warning">
+                            <mat-icon class="ob-icon small warning with-text">warning</mat-icon>
+                            {{'PRESALES.CUSTOMER_TYPES.DESCRIPTION' | prefix | translate}}
+                        </div>
+                        <div class="flex flex-row">
+                            <mat-form-field appearance="outline" class="ob-form-field flex-[0_1_385px]">
+                                <mat-select multiple [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                    formControlName="customer_types">
+                                    @for( customerType of $customerTypes(); track customerType?.id ) {
+                                        <mat-option [value]="customerType.id">{{customerType.name}}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+
+                    </div>
+                }
+                <div class="flex flex-col gap-8">
+                    <!-- PRESALE LIMITS NO AVET EVENT -->
+                    @if (!$isAvetEvent()) {
+                        <div class="flex flex-col gap-2">
+                            <span class="body-1">{{'PRESALES.CUSTOMER_TICKETS_LIMIT.TITLE' | prefix | translate}}</span>
+                            <mat-checkbox formControlName="member_tickets_limit_enabled">
+                                {{'PRESALES.CUSTOMER_TICKETS_LIMIT.DESCRIPTION' | prefix | translate}}
+                            </mat-checkbox>
+                            @if (form.value.presales.member_tickets_limit_enabled) {
+                                <div class="flex flex-row">
+                                    <mat-form-field appearance="outline" class="ob-form-field tickets-limit-field flex-[0_1_96px]">
+                                        <input matInput formControlName="member_tickets_limit" aria-label="member tickets limit"
+                                            type="number" inputmode="numeric" min="1" step="1" placeholder="1">
+                                    </mat-form-field>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    @if ($showLoyaltyPointsSettings()) {
+                        <div class="flex flex-col gap-2">
+                            <span class="body-1">{{'PRESALES.CUSTOMER_LOYALTY_POINTS.TITLE' | prefix | translate}}</span>
+                            <mat-checkbox formControlName="loyalty_points_enabled">
+                                {{'PRESALES.CUSTOMER_LOYALTY_POINTS.DESCRIPTION' | prefix | translate}}
+                            </mat-checkbox>
+                            @if (form.value.presales.loyalty_points_enabled) {
+                                <div class="flex flex-row">
+                                    <mat-form-field appearance="outline" class="ob-form-field tickets-limit-field flex-[0_1_96px]">
+                                        <input matInput formControlName="loyalty_points_amount"
+                                            type="number" inputmode="numeric" min="1" step="1" placeholder="1">
+                                    </mat-form-field>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</form>
+
+@if (form.dirty && ((form.valueChanges | async) || true)) {
+    <div class="flex justify-start items-center gap-2">
+        <div class="flex flex-1 items-center editing-mode-message">
+            <mat-icon class="ob-icon small info with-text">info</mat-icon>
+            {{'PRESALES.EDITING_MODE' | prefix | translate}}
+        </div>
+        <button type="button" mat-button class="ob-button medium"
+            (click)="cancel()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button type="button" mat-flat-button class="ob-button medium" color="primary" (click)="save()" [disabled]="!form.dirty">
+            {{'FORMS.ACTIONS.UPDATE' | translate}}
+        </button>
+    </div>
+}
+
+
+@if ((loading$ | async)?.[$presale().id] === true) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

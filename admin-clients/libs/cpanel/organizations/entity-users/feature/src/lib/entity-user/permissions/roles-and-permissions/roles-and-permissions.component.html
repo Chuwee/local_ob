@@ -1,0 +1,188 @@
+<app-form-container [layout]="(isSysAdmin$ | async) ? 'menu' : 'main'" [formGroup]="form" (cancel)="cancel()" (save)="save()"
+    [disabled]="!form.dirty || (isInProgress$ | async)" class="overflow-y-auto">
+    @if (canEditUserStatus$ | async) {
+        <div slot="outside">
+            <!-- User status -->
+            <div class="user-status" fxLayout="row" fxLayoutAlign="center">
+                <div fxFlex="0 1 1280px" fxLayoutAlign="end center" fxLayoutGap="10px">
+                    <div class="ob-label">
+                        {{'USER.STATUS' | translate}}
+                    </div>
+                    <div class="user-status-select" fxFlex="220px">
+                        <mat-form-field fxFlex appearance="outline"
+                            class="ob-form-field ob-form-field-outline inline-field thin-select-field">
+                            <mat-select formControlName="userStatus">
+                                <mat-select-trigger>
+                                    <span
+                                        [ngClass]="['status-dot', form.get('userStatus').value?.toLowerCase() || '']">
+                                    </span>
+                                    <span>{{'USER.STATUS_OPTS.' + form.get('userStatus').value | translate}}</span>
+                                </mat-select-trigger>
+                                @for (status of userStatusList; track status) {
+                                    <mat-option [value]="status">
+                                        <span>{{'USER.STATUS_OPTS.' + status | translate}}</span>
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <mat-divider />
+        </div>
+    }
+    @if ({availableRoles : availableUserRoles$ | async}; as model) {
+        <div class="user-roles-container" fxLayout="row">
+            <!-- User roles -->
+            <div class="roles-list-container" fxLayout="column">
+                <div class="user-roles-header roles-list-header">
+                    <h3 class="section-title">{{'USER.USER_ROLES_TITLE' | translate | uppercase}}</h3>
+                </div>
+                @if (model.availableRoles) {
+                    <mat-button-toggle-group vertical [formControl]="selectedRole"
+                        class="ob-outline-button-group">
+                        @for (availableRole of model.availableRoles; track availableRole) {
+                            <mat-button-toggle [value]="availableRole">
+                                <mat-checkbox [formControl]="form.get(['rolesGroup', availableRole.code])" color="primary" />
+                                <span class="role-label"
+                                    [class.disabled]="form.get(['rolesGroup', availableRole.code]).disabled">{{'USER.ROLES.' +
+                        availableRole.code | translate}}</span>
+                            </mat-button-toggle>
+                        }
+                    </mat-button-toggle-group>
+                }
+            </div>
+            <!-- User role description -->
+            <div fxFlex class="role-description-container">
+                @if (selectedRole.value; as selectedRole) {
+                    <div fxLayout="column">
+                        <div class="user-roles-header">
+                            <h3 class="section-title">{{'USER.ROLE_DESCRIPTION_TITLE' | translate | uppercase}}</h3>
+                        </div>
+                        <div fxLayout="column">
+                            <!-- Description -->
+                            <div>
+                                @if (((selectedRole | isBiUser) && (isBiInheritUser$ | async))) {
+                                    <p>
+                                        {{'USER.ROLE_DESCRIPTIONS.BI_INHERIT' | translate}}
+                                    </p>
+                                } @else {
+                                    <p>{{'USER.ROLE_DESCRIPTIONS.' + selectedRole.code | translate}}</p>
+                                }
+                            </div>
+                            <!-- Permissions list -->
+                            @if (!(selectedRole | isBiUser) && selectedRole.code !== feverReportingRole) {
+                                <div>
+                                    <span>{{'USER.PERMISSION_DESCRIPTIONS_TITLE' | translate}}</span>
+                                    <ul>
+                                        @for (
+                                            roleDefaultPermission
+                                            of rolesDefaultPermissions[selectedRole?.code || model.availableRoles[0]?.code];
+                                            track roleDefaultPermission
+                                        ) {
+                                            <li>
+                                                {{'USER.PERMISSION_DESCRIPTIONS.' + roleDefaultPermission | translate}}
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                            <!-- Modules list -->
+                            @if (
+                                selectedRole?.code !== entityUserRoles.CNL_TAQ &&
+                                !(selectedRole | isBiUser) && selectedRole.code !== feverReportingRole
+                            ) {
+                                <div>
+                                    <span>{{'USER.MODULES_AVAILABLE_TITLE' | translate}}</span>
+                                    <ul>
+                                        @for (
+                                            module of modulesAvailable[selectedRole?.code || model.availableRoles[0]?.code]; track module
+                                        ) {
+                                            <li>
+                                                {{'USER.MODULES_AVAILABLE.' + module | translate}}
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                            <!-- Type permissions list (must select one) -->
+                            @if (!((selectedRole | isBiUser) && (isBiInheritUser$ | async)) && selectedRole.code !== feverReportingRole) {
+                                <div>
+                                    @if (selectedRole | isBiUser) {
+                                        <div>
+                                            <span>{{'USER.TYPES_AVAILABLE_TITLE' | translate}}</span>
+                                            <ul>
+                                                @for (type of biTypes; track type) {
+                                                    <li>
+                                                        {{'USER.ADDITIONAL_PERMISSIONS.' + type + '.DESCRIPTION' | translate}}
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    }
+                                    <div fxLayout="column" fxLayoutGap="30px">
+                                        <!-- Additional permissions -->
+                                        @if (selectedRole?.permissions; as permissions) {
+                                            <div fxLayout="column" fxLayoutGap="15px">
+                                                <span>
+                                                    {{((selectedRole | isBiUser)
+                                                        ? 'USER.TYPE_PERMISSIONS.TITLE' : 'USER.ADDITIONAL_PERMISSIONS_TITLE') | translate}}
+                                                </span>
+                                                <div class="additional-permissions-container" fxLayout="column" fxLayoutGap="10px">
+                                                    @if ((selectedRole | isBiUser)) {
+                                                        <mat-radio-group
+                                                            [formControl]="form.get(['permissionsGroup', 'biPermissionControl'])"
+                                                            fxLayout="column"
+                                                            fxLayoutGap="10px">
+                                                            @for (permission of biTypes; track permission) {
+                                                                <mat-radio-button class="inline" [value]="permission">
+                                                                    {{'USER.ADDITIONAL_PERMISSIONS.' + permission + '.TITLE' | translate}}
+                                                                </mat-radio-button>
+                                                            }
+                                                        </mat-radio-group>
+                                                    } @else {
+                                                        @for (permission of permissions; track permission) {
+                                                            <mat-checkbox color="primary"
+                                                                [formControl]="form.get(['permissionsGroup', permission])">
+                                                                {{'USER.ADDITIONAL_PERMISSIONS.' + permission | translate}}
+                                                            </mat-checkbox>
+                                                        }
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            <!-- Producer -->
+                            @if (selectedRole | isProducerUser) {
+                                <div>
+                                    <div fxLayout="column" fxLayoutGap="16px">
+                                        <div>
+                                            {{'USER.ROLE_PRD_ANS.SELECT_PRODUCER' | translate}}
+                                        </div>
+                                        <div fxLayout="row">
+                                            <mat-form-field appearance="outline" fxFlex="368px" class="ob-form-field field-with-label">
+                                                <mat-label> {{'USER.ROLE_PRD_ANS.PRODUCER' | translate}}
+                                                </mat-label>
+                                                <app-select-server-search [multiple]="false"
+                                                    [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="producer"
+                                                    [options$]="producers$" [moreOptionsAvailable$]="moreProducersAvailable$"
+                                                    (loadOptions)="loadProducers($event.q, $event.nextPage)" />
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</app-form-container>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,91 @@
+<app-form-container layout="main" [disabled]="(reqInProgress$ | async) || !form.dirty" (cancel)="cancel()" (save)="save()">
+    @if (collective$ | async; as collective) {
+        <form [formGroup]="form">
+            <!-- COLLECTIVE GENERAL INFO -->
+            <mat-expansion-panel expanded togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'COLLECTIVE.GENERAL_INFO' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div fxLayout="row wrap" fxLayoutGap="50px">
+                    <!-- COLLECTIVE ENTITY -->
+                    @if (collective.external_validator?.external_validator_name) {
+                        <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 50px)" fxLayout="column">
+                            <span class="field-label">{{'FORMS.LABELS.EXTERNAL_VALIDATOR_NAME' | translate}}</span>
+                            <span>{{collective.external_validator.external_validator_name}}</span>
+                        </div>
+                    }
+                    <ng-container formGroupName="generalData">
+                        <!-- COLLECTIVE NAME -->
+                        <mat-form-field id="name" fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 50px)" appearance="outline"
+                            class="ob-form-field field-with-label">
+                            <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                            <input formControlName="name" matInput [placeholder]="'FORMS.LABELS.NAME' | translate">
+                            <mat-error [ob-form-errors]="form.controls.generalData.controls.name" />
+                        </mat-form-field>
+                        <!-- COLLECTIVE TYPE -->
+                        <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 50px)" fxLayout="column">
+                            <span class="field-label">{{'FORMS.LABELS.COLLECTIVE_TYPE' | translate}}</span>
+                            <span>{{('COLLECTIVE.TYPE_OPTS.' + collective.type) | translate}}</span>
+                        </div>
+                        <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 50px)" fxLayout="column">
+                            <span class="field-label">{{'FORMS.LABELS.COLLECTIVE_VALIDATION_METHOD' | translate}}</span>
+                            <span>{{('COLLECTIVE.VALIDATION_METHOD_OPTS.' + collective.validation_method) | translate}}</span>
+                        </div>
+                        <!-- COLLECTIVE DESCRIPTION -->
+                        <mat-form-field id="description" fxFlex="100%" fxFlex.gt-sm="60%" appearance="outline"
+                            class="ob-form-field field-with-label">
+                            <mat-label>{{'FORMS.LABELS.DESCRIPTION' | translate}}</mat-label>
+                            <textarea matInput formControlName="description" rows="4"></textarea>
+                            <mat-error [ob-form-errors]="form.controls.generalData.controls.description" />
+                        </mat-form-field>
+                    </ng-container>
+
+                    <!-- COLLECTIVE EXTERNAL VALIDATOR -->
+                    @if (collective.external_validator && (isNotOperatorUser$ | async)) {
+                        <ng-container formGroupName="externalValidator">
+                            <mat-form-field id="user" fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 50px)" appearance="outline"
+                                class="ob-form-field field-with-label">
+                                <mat-label>{{'FORMS.LABELS.EXTERNAL_VALIDATOR_USER' | translate}}</mat-label>
+                                <input formControlName="user" matInput [placeholder]="'FORMS.LABELS.EXTERNAL_VALIDATOR_USER' | translate">
+                                <mat-error [ob-form-errors]="form.controls.externalValidator.controls.user" />
+                            </mat-form-field>
+
+                            <mat-form-field id="password" fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 50px)" appearance="outline"
+                                class="ob-form-field field-with-label">
+                                <mat-label>{{'FORMS.LABELS.EXTERNAL_VALIDATOR_PASSWORD' | translate}}</mat-label>
+                                <input formControlName="password" matInput
+                                    [placeholder]="'FORMS.LABELS.EXTERNAL_VALIDATOR_PASSWORD' | translate">
+                                <mat-error [ob-form-errors]="form.controls.externalValidator.controls.password" />
+                            </mat-form-field>
+                        </ng-container>
+                    }
+
+                    <!-- SHOW USAGES LIMIT -->
+                    @if (collective.type === collectiveType.internal && collective.entity && userEntityId === collective.entity.id
+                    && collective.validation_method !== collectiveValidationMethod.giftTicket) {
+                        <div fxLayout="column" fxFlex="100%" formGroupName="generalData">
+                            <p class="mat-subtitle-2">{{'COLLECTIVE.SHOW_USAGES.TITLE' | translate}}</p>
+                            <mat-checkbox color="primary" formControlName="showUsages">
+                                {{'COLLECTIVE.SHOW_USAGES.LABEL' | translate}}
+                            </mat-checkbox>
+                        </div>
+                    }
+                </div>
+            </mat-expansion-panel>
+            <!-- COLLECTIVE ENTITY -->
+            @if (showCollectiveEntity$ | async) {
+                <mat-expansion-panel expanded togglePosition="before">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'COLLECTIVE.ENTITY_ASSIGN' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <app-collective-entity [entitiesForm]="form.controls.entities" />
+                </mat-expansion-panel>
+            }
+        </form>
+    }
+</app-form-container>
+@if (reqInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

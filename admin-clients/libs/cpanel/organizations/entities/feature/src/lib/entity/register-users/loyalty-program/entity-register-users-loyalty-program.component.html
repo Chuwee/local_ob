@@ -1,0 +1,104 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="!form.dirty">
+    <div class="enable-loyalty-points-container flex justify-end items-center" slot="outside">
+        @if ($isLoyaltyEnabled()) {
+            <button type="button" mat-button class="ob-button medium" color="primary" disabled>
+                <mat-icon>check</mat-icon>
+                {{'ENTITY.LOYALTY_POINTS.DISABLE_BUTTON' | translate}}
+            </button>
+        } @else {
+            <div [matTooltip]="'ENTITY.LOYALTY_POINTS.ENABLE_TOOLTIP' | translate" [matTooltipDisabled]="$isLoyaltyButtonEnabled()">
+                <button type="button" mat-stroked-button class="ob-button medium" color="primary" [disabled]="!$isLoyaltyButtonEnabled()"
+                    (click)="enableLoyaltyPoints()">
+                    {{'ENTITY.LOYALTY_POINTS.ENABLE_BUTTON' | translate}}
+                </button>
+            </div>
+        }
+    </div>
+    <mat-accordion [multi]="true" [togglePosition]="'before'" [formGroup]="form">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'ENTITY.LOYALTY_POINTS.CURRENCY_POINTS_TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex">
+                <div class="flex flex-col gap-4 flex-[0_1_680px]" formArrayName="point_exchange">
+                    @for (point_exchange of pointExchange.controls; track point_exchange; let i = $index) {
+                        <div class="flex flex-row justify-start items-baseline gap-2" [formGroupName]="i">
+                            <span>1 {{'ENTITY.LOYALTY_POINTS.POINTS_LABEL' | translate}} =</span>
+                            <mat-form-field appearance="outline" class="ob-form-field flex-[0_1_96px]">
+                                <app-currency-input formControlName="value" placeholder="0,00" [currencyCode]="' '" />
+                            </mat-form-field>
+                            <span>
+                                {{ point_exchange.get('code').value | localCurrencyPartialTranslation }}
+                                {{ (currencies$ |async)[i]?.description ? ('(' + (currencies$ |async)[i]?.description + ')') : ''}}
+                            </span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </mat-expansion-panel>
+        <!-- TODO: uncomment when expiration works in back-->
+        <!--<mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'ENTITY.LOYALTY_POINTS.EXPIRATION_TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex">
+                <div class="flex flex-col gap-4 flex-[0_1_680px]" formGroupName="expiration">
+                    <div class="flex flex-col gap-2">
+                        <span>{{'ENTITY.LOYALTY_POINTS.EXPIRATION_ENABLE' | translate}}</span>
+                        <div class="flex align-center">
+                            <mat-icon class="ob-icon warning with-text">warning</mat-icon>
+                            <span>{{'ENTITY.LOYALTY_POINTS.EXPIRATION_WARNING' | translate}}</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <mat-radio-group class="flex flex-col gap-4" formControlName="enabled">
+                            <mat-radio-button class="ob-radio-button" [value]="false">
+                                {{'ENTITY.LOYALTY_POINTS.EXPIRATION_CHECK_DISABLED' | translate}}
+                            </mat-radio-button>
+                            <mat-radio-button class="ob-radio-button" [value]="true">
+                                {{'ENTITY.LOYALTY_POINTS.EXPIRATION_CHECK_ENABLED' | translate}}
+                            </mat-radio-button>
+                        </mat-radio-group>
+                        @if (form.controls.expiration.value.enabled) {
+                            <div class="flex flex-col gap-2 expiration-input-container">
+                                <div>
+                                    <mat-form-field appearance="outline" class="ob-form-field field-with-label flex-[0_1_210px]"
+                                        subscriptSizing="dynamic">
+                                        <mat-label>{{'ENTITY.LOYALTY_POINTS.EXPIRATION_INPUT_LABEL' | translate}}</mat-label>
+                                        <input matInput type="number" placeholder="0" formControlName="months"
+                                            aria-label="expiration.months">
+                                        <mat-error [ob-form-errors]="form" field="expiration.months" />
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </mat-expansion-panel>-->
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'ENTITY.LOYALTY_POINTS.RESET_TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex flex-col">
+                <p>{{'ENTITY.LOYALTY_POINTS.RESET_DESCRIPTION' | translate}}</p>
+                <div class="flex flex-row justify-start items-center gap-4">
+                    <button type="button" mat-stroked-button class="ob-button medium"
+                        (click)="resetLoyaltyPoints()" [disabled]="!$isLoyaltyEnabled() || $loading()">
+                        <mat-icon>autorenew</mat-icon>
+                        {{'ENTITY.LOYALTY_POINTS.RESET_BUTTON' | translate}}
+                    </button>
+                    @if ($lastLoyaltyPointsReset() !== null) {
+                        <span>{{'ENTITY.LOYALTY_POINTS.RESET_LAST_DATE' | translate: {
+                            lastResetDate: $lastLoyaltyPointsReset()} }}</span>
+                    }
+                </div>
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+@if($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,79 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'TITLES.NEW_DELIVERY_POINT' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small only-icon" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <form [formGroup]="form" fxLayout="column" fxLayoutAlign="start stretch">
+            @if (canSelectEntity$ | async) {
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-label>{{'DELIVERY_POINT.ENTITY' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate" formControlName="entity">
+                        <mat-option>
+                            <app-select-search #entitySelectSearch [options$]="entities$"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" requireSelection="true" />
+                        </mat-option>
+                        @for (entity of entitySelectSearch.getFilteredOptions$() | async; track entity) {
+                            <mat-option [value]="entity.id">
+                                {{entity.name}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form" field="entity" />
+                </mat-form-field>
+            }
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'DELIVERY_POINT.NAME' | translate}}</mat-label>
+                <input matInput aria-label="name" [placeholder]="'DELIVERY_POINT.NAME' | translate" formControlName="name">
+                <mat-error [ob-form-errors]="form" field="name" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'DELIVERY_POINT.COUNTRY' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate" formControlName="country">
+                    @for (country of countries$ | async; track country) {
+                        <mat-option [value]="country.code">
+                            {{country.name}}
+                        </mat-option>
+                    }
+                </mat-select>
+                <mat-error [ob-form-errors]="form" field="country" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'DELIVERY_POINT.COUNTRY_SUBDIVISION' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate" formControlName="country_subdivision">
+                    @for (region of regions$ | async; track region) {
+                        <mat-option [value]="region.code">
+                            {{region.name}}
+                        </mat-option>
+                    }
+                </mat-select>
+                <mat-error [ob-form-errors]="form" field="country_subdivision" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'DELIVERY_POINT.CITY' | translate}}</mat-label>
+                <input matInput aria-label="city" [placeholder]="'DELIVERY_POINT.CITY' | translate" formControlName="city">
+                <mat-error [ob-form-errors]="form" field="city" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'DELIVERY_POINT.ADDRESS' | translate}}</mat-label>
+                <input matInput aria-label="address" [placeholder]="'DELIVERY_POINT.ADDRESS' | translate" formControlName="address">
+                <mat-error [ob-form-errors]="form" field="address" />
+            </mat-form-field>
+        </form>
+    </div>
+    <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createDeliveryPoint()">
+            {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

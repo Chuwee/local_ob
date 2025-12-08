@@ -1,0 +1,28 @@
+<app-tabs-menu type="language" overrideClasses="no-left-padding" [formGroup]="form" #tabs>
+    <ng-container *ngFor="let lang of languages">
+        <ng-template appTab [ctrl]="form.get(lang)" lazyLoad [label]="('LANGUAGES.' + lang) | translate" #tab="appTab">
+            <div fxLayout="column" class="communication-container" [formGroupName]="lang" [class.active]="tab.isActive">
+                <ng-container *ngFor="let field of fields">
+                    <ng-container *ngIf="field.type === 'text'">
+                        <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field"
+                                [ngClass]="{'field-with-label': field.label}">
+                            <mat-label *ngIf="field.label">{{field.label | translate}}</mat-label>
+                            <input matInput [formControlName]="field.name" [attr.aria-label]="field.name"
+                                [placeholder]="(field.placeholder || field.label) | translate">
+                            <mat-error [ob-form-errors]="form" [field]="[lang, field.name]" />
+                        </mat-form-field>
+                    </ng-container>
+                    <ng-container *ngIf="field.type === 'html'">
+                        <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field no-padding"
+                                [ngClass]="{'field-with-label': field.label}">
+                            <mat-label *ngIf="field.label">{{field.label | translate}}</mat-label>
+                            <app-rich-text-area [autoresize]="{min: 200, max: 200}" [attr.aria-label]="field.name"
+                                [placeholder]="(field.placeholder || field.label) | translate" [formControlName]="field.name" />
+                            <mat-error [ob-form-errors]="form" [field]="[lang, field.name]" />
+                        </mat-form-field>
+                    </ng-container>
+                </ng-container>
+            </div>
+        </ng-template>
+    </ng-container>
+</app-tabs-menu>

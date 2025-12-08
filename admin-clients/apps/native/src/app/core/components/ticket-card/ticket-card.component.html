@@ -1,0 +1,39 @@
+<ion-card data-override-styles class="ob-native-card ticket-card" (click)="goToTicketDetail()">
+    <ion-card-content class="ticket-card__content">
+        <div class="ticket-card__color-bar" [ngClass]="getCssClass"></div>
+        <ion-text class="ticket-card__code">
+            <span>
+                {{"TICKETS.TICKET-CODE" | translate : {code: formattedCode} }}
+            </span>
+        </ion-text>
+        <ion-text class="ticket-card__title"><span>{{ ticket.ticket.allocation.event.name }}</span></ion-text>
+        <div class="ticket-card__session">
+            <ion-text class="ticket-card__session-title">
+                <span> {{ "TICKETS.TICKET-SESSION" | translate : {session: ticket.ticket.allocation.session.name} }} </span>
+            </ion-text>
+            <ion-text><span>|</span></ion-text>
+            <ion-text class="ticket-card__session-date">
+                <span> {{ ticket.ticket.allocation.session.date.start| dateTime : "DD/MM/yyyy HH:mm" }} </span>
+            </ion-text>
+        </div>
+        <div class="ticket-card__purchase-date-and-channel">
+            <div>
+                <ion-text class="ticket-card__purchase-date-and-channel--label">
+                    <span> {{ "TICKETS.TICKET-PURCHASE-DATE" | translate }}</span>
+                </ion-text>
+                <ion-text class="ticket-card__purchase-date-and-channel--value">
+                    <span>{{ ticket.order.date | dateTime : this.dateTimeFormats.shortDateTime }}</span>
+                </ion-text>
+            </div>
+            <div>
+                <ion-text class="ticket-card__purchase-date-and-channel--label">
+                    <span>{{ "TICKETS.TICKET-CHANNEL" | translate }}</span>
+                </ion-text>
+
+                <ion-text class="ticket-card__purchase-date-and-channel--value">
+                    <span>{{ ticket.channel.name }}</span>
+                </ion-text>
+            </div>
+        </div>
+    </ion-card-content>
+</ion-card>

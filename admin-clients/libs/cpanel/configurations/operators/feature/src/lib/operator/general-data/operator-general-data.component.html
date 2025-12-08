@@ -1,0 +1,239 @@
+<div fxFlex="0 1 100%" fxLayout="column">
+    <app-form-container layout="main" class="no-top-padding"
+        [formGroup]="form" (cancel)="cancel()" (save)="save()" [disabled]="!form.dirty && !$walletsChanged()">
+        @if (operator$ | async; as operator) {
+            <div class="form-details-area" fxFlex="grow" fxLayoutAlign="center">
+                <div class="details-container content-wrapper" fxLayout="column" fxFlex="0 1 1280px">
+                    <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+                        <!-- GENERAL DATA -->
+                        <mat-expansion-panel [expanded]="true">
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                <mat-panel-title>{{'OPERATOR.OPERATOR_DATA' | translate}}</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <form id="operator-general-data" fxLayout="row wrap">
+                                <div fxFlex="100%" fxLayout="row wrap" fxLayoutGap.gt-sm="40px" fxLayoutGap="0">
+                                    <!-- Name -->
+                                    <div fxFlex="100%" fxFlex.gt-sm="100%" fxFlex.gt-md="0 0 calc(33.3% - 40px)">
+                                        <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 0 50%" fxFlex.gt-md="100%"
+                                            appearance="outline" class="ob-form-field field-with-label">
+                                            <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                                            <input matInput aria-label="name" [placeholder]="'USER.NAME' | translate"
+                                                [formControl]="form.controls.generalData.controls.name">
+                                            <mat-error [ob-form-errors]="form.controls.generalData.controls.name" />
+                                        </mat-form-field>
+                                    </div>
+                                    <div fxFlex="100%" fxLayout="column" fxLayout.gt-sm="row" fxFlex.gt-md="0 0 calc(66.6% - 40px)"
+                                        fxLayoutGap="20px" fxLayoutGap.gt-sm="40px">
+                                        <!-- Short Name (readonly) -->
+                                        <div class="details-non-editable-field ob-form-field" fxFlex="100%"
+                                            fxFlex.gt-sm="0 0 50%" fxLayout="column">
+                                            <span class="field-label">{{'FORMS.LABELS.SHORT_NAME' | translate}}</span>
+                                            <span>{{operator.short_name}}</span>
+                                        </div>
+                                        <!-- User (readonly) -->
+                                        <div class="details-non-editable-field ob-form-field" fxFlex="100%"
+                                            fxFlex.gt-sm="0 0 50%" fxFlex.gt-md="0 1 calc(33.3% - 40px)" fxLayout="column">
+                                            <span class="field-label">{{'FORMS.LABELS.USER' | translate}}</span>
+                                            <span>{{'all@' + operator.short_name.toLowerCase() + '.com'}}</span>
+                                        </div>
+                                    </div>
+                                    <div fxFlex="100%" fxLayout="column" fxLayout.gt-sm="row" fxFlex.gt-md="1 0 calc(66.6% - 40px)"
+                                        fxLayoutGap="0" fxLayoutGap.gt-sm="40px">
+                                        <!-- Language -->
+                                        <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 0 50%" fxFlex.gt-md="0 0 calc(33.3% - 30px)"
+                                            fxLayoutGap.gt-sm="40px" appearance="outline" class="ob-form-field field-with-label"
+                                            data-test="language">
+                                            <mat-label>{{'FORMS.LABELS.LANGUAGE' | translate}}</mat-label>
+                                            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                                [formControl]="form.controls.generalData.controls.language" aria-label="language">
+                                                @for (language of languages$ | async; track language.code) {
+                                                    <mat-option [value]="language.code">
+                                                        {{language ? (('LANGUAGES.' + language.code) | translate) : ''}}
+                                                    </mat-option>
+                                                }
+                                            </mat-select>
+                                        </mat-form-field>
+                                        <!-- Timezone -->
+                                        <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 0 50%" fxFlex.gt-md="0 0 calc(33.3% - 30px)"
+                                            fxLayoutGap.gt-sm="40px"
+                                            appearance="outline" class="ob-form-field field-with-label">
+                                            <mat-label>{{'FORMS.LABELS.TIMEZONE' | translate}}</mat-label>
+                                            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                                [formControl]="form.controls.generalData.controls.timezone" aria-label="timezone">
+                                                @for (timezone of timezones$ | async; track timezone.olson_id) {
+                                                    <mat-option
+                                                        [value]="timezone.olson_id">
+                                                        {{timezone.name}}
+                                                    </mat-option>
+                                                }
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                    <!-- Shard (readonly) -->
+                                    <div fxFlex="100%">
+                                        <div class="details-non-editable-field ob-form-field" fxFlex="100%"
+                                            fxFlex.gt-sm="0 1 calc(50% - 40px)"
+                                            fxFlex.gt-md="0 1 calc(33.3% - 40px)" fxLayout="column">
+                                            <span class="field-label">{{'FORMS.LABELS.SHARD' | translate}}</span>
+                                            <span>{{operator.shard}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </mat-expansion-panel>
+                        <mat-expansion-panel [expanded]="true">
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                <mat-panel-title>{{'OPERATOR.MULTICURRENCY.TITLE' | translate}}</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            @if (isMultiCurrency$ | async) {
+                                <app-operator-multi-currency [form]="form" [putCurrenciesBS]="putCurrenciesBS" />
+                            }
+                            <!--TODO: when all operators are multiCurrency, delete currency control-->
+                            <!-- Currencies -->
+                            @if ((isMultiCurrency$ | async) === false) {
+                                <mat-form-field fxFlex="100%"
+                                    fxFlex.gt-sm="0 1 calc(50% - 40px)" fxFlex.gt-md="0 1 calc(33.3% - 40px)" appearance="outline"
+                                    class="ob-form-field field-with-label">
+                                    <mat-label>{{'FORMS.LABELS.CURRENCY' | translate}}</mat-label>
+                                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                        [formControl]="form.controls.generalData.controls.currency" aria-label="currency">
+                                        @for (currency of currencies$ | async; track currency.code) {
+                                            <mat-option [value]="currency.code">
+                                                {{currency ? (('CURRENCIES.' + currency.code) | translate) : ''}}
+                                            </mat-option>
+                                        }
+                                    </mat-select>
+                                </mat-form-field>
+                            }
+                        </mat-expansion-panel>
+                        <!-- CONFIGURATION -->
+                        <mat-expansion-panel [expanded]="true">
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                <mat-panel-title>{{'OPERATOR.CONFIGURATION.TITLE' | translate}}</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <form id="configuration" fxLayout="column">
+                                <div fxFlex="100%" fxLayout="row">
+                                    <!-- Gateways -->
+                                    <mat-form-field fxFlex="0 1 350px" appearance="outline" class="ob-form-field field-with-label">
+                                        <mat-label>{{'FORMS.LABELS.GATEWAYS' | translate}}*</mat-label>
+
+                                        <mat-select #field [multiple]="true" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                            [formControl]="form.controls.configuration.controls.gateways">
+                                            <mat-option>
+                                                <app-select-search #search searchField="name"
+                                                    [requireSelection]="true" [options$]="gateways$"
+                                                    [placeholderLabel]="'FORMS.SEARCH.NAME' | translate" />
+                                            </mat-option>
+                                            @for (option of search.getFilteredOptions$() | async; track option.sid) {
+                                                <mat-option [value]="option.sid" (click)="onGatewaySelectionChange(option.sid)">
+                                                    {{option.name}}
+                                                </mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                                <h3 class="section-title">{{'CONFIGURACIÓN DE WALLETS' | translate | uppercase}}</h3>
+                                @if (form.controls.configuration.controls.wallets.length > 0) {
+                                    <div class="wallet-asociation-headers" fxFlex="100%" fxLayout="row">
+                                        <span fxFlex="0 1 380px">{{'OPERATOR.FORMS.LABELS.WALLET' | translate}}</span>
+                                        <span fxFlex="0 1 350px">{{'OPERATOR.FORMS.LABELS.GATEWAY_FOR_WALLETS' | translate}}</span>
+                                    </div>
+                                }
+                                <div fxFlex="100%" fxLayout="column" fxLayoutGap="16px">
+                                    @for (walletGroup of
+                                        form.controls.configuration.controls.wallets.controls; track walletGroup.value.wallet
+                                    ) {
+                                        <div fxLayout="row" [formGroup]="walletGroup">
+                                            <mat-form-field fxFlex="0 1 350px" appearance="outline" class="ob-form-field inline-field">
+                                                <mat-select #field [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                                    [formControl]="walletGroup.controls.wallet">
+                                                    <mat-option>
+                                                        <app-select-search #searchWallet searchField="name"
+                                                            [requireSelection]="true" [options$]="walletGateways$"
+                                                            [placeholderLabel]="'FORMS.SEARCH.NAME' | translate" />
+                                                    </mat-option>
+                                                    @for (option of (searchWallet.getFilteredOptions$() | async); track option.sid) {
+                                                        <mat-option
+                                                            [disabled]="$walletsConfigured().includes(option.sid) &&
+                                                                (option.sid !== walletGroup.value.wallet)"
+                                                            [value]="option.sid">
+                                                            {{option.name}}
+                                                        </mat-option>
+                                                    }
+                                                </mat-select>
+                                            </mat-form-field>
+                                            <mat-divider fxFlex="30px" fxFlexAlign="center" />
+                                            <mat-form-field fxFlex="0 1 350px" appearance="outline" class="ob-form-field inline-field">
+                                                <mat-select #field [multiple]="true" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                                    [formControl]="walletGroup.controls.gateways">
+                                                    <mat-option>
+                                                        <app-select-search #searchGateways searchField="name"
+                                                            [requireSelection]="true" [options$]="availableGatewaysForWallets$"
+                                                            [placeholderLabel]="'FORMS.SEARCH.NAME' | translate" />
+                                                    </mat-option>
+                                                    @for (option of searchGateways.getFilteredOptions$() | async; track option.sid) {
+                                                        <mat-option
+                                                            [value]="option.sid">
+                                                            {{option.name}}
+                                                        </mat-option>
+                                                    }
+                                                </mat-select>
+                                            </mat-form-field>
+                                            <button fxFlex="0 0 33px" fxFlexAlign="center"
+                                                mat-icon-button class="ob-button small"
+                                                (click)="removeWallet(walletGroup)">
+                                                <mat-icon>delete</mat-icon>
+                                            </button>
+                                        </div>
+                                    }
+                                    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px" class="add-link-btn">
+                                        <button mat-icon-button type="button"
+                                            class="ob-button mat-stroked-button xsmall" (click)="addNewWalletAssociation()">
+                                            <mat-icon>add</mat-icon>
+                                        </button>
+                                        <span (click)="addNewWalletAssociation()">
+                                            {{'OPERATOR.ASOCIATION_LIST.ADD_ASOCIATION' | translate}}
+                                        </span>
+                                    </div>
+                                </div>
+                            </form>
+                        </mat-expansion-panel>
+                        <!-- BANKING BENEFITS -->
+                        <mat-expansion-panel expanded>
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                <mat-panel-title>{{'OPERATOR.TITLES.BANKING_BENEFITS' | translate}}</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <form id="banking-benefits">
+                                <div class="flex flex-wrap">
+                                    <mat-checkbox class="flex justify-start" color="primary"
+                                        [formControl]="form.controls.allowGatewayBenefits">
+                                        {{( 'OPERATOR.FORMS.LABELS.BANKING_BENEFITS.ALLOW' ) | translate }}
+                                    </mat-checkbox>
+                                </div>
+                            </form>
+                        </mat-expansion-panel>
+                        <!-- FEVERZONE -->
+                        <mat-expansion-panel expanded>
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                <mat-panel-title>{{'OPERATOR.FEVER_ZONE.TITLE' | translate}}</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <form id="feverzone">
+                                <div class="flex flex-wrap">
+                                    <mat-checkbox class="flex justify-start" color="primary"
+                                        [formControl]="form.controls.allowFeverZone">
+                                        {{( 'OPERATOR.FEVER_ZONE.ALLOW.LABEL' ) | translate }}
+                                    </mat-checkbox>
+                                </div>
+                            </form>
+                        </mat-expansion-panel>
+                    </mat-accordion>
+                </div>
+            </div>
+        }
+    </app-form-container>
+</div>
+@if (reqInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

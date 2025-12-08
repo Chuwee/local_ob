@@ -1,0 +1,58 @@
+<mat-table class="ob-table order-detail-table" [dataSource]="items">
+    <!-- CARD COLUMN -->
+    <ng-container matColumnDef="card">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{'VOUCHER_ORDER.CARD_DATA.NAME' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+            {{row.group.name}}
+        </mat-cell>
+    </ng-container>
+    <!-- CODE COLUMN -->
+    <ng-container matColumnDef="code">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{'VOUCHER_ORDER.CARD_DATA.CODE' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+            {{row.code}}
+        </mat-cell>
+    </ng-container>
+    <!-- EXPIRATION COLUMN -->
+    <ng-container matColumnDef="expiration">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{'VOUCHER_ORDER.CARD_DATA.EXPIRATION' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+            {{row.expiration_date ? (row.expiration_date | localDateTime: dateTimeFormats.shortDateTime)
+            : ('VOUCHER_ORDER.CARD.EXPIRATION.UNLIMITED' | translate)}}
+        </mat-cell>
+    </ng-container>
+    <!-- PRICE COLUMN -->
+    <ng-container matColumnDef="price">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{'VOUCHER_ORDER.CARD_DATA.PRICE' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+            {{row.price.final | localCurrency: row.price.currency}}
+        </mat-cell>
+    </ng-container>
+    <!-- STATUS COLUMN -->
+    <ng-container matColumnDef="status">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{'VOUCHER_ORDER.CARD_DATA.STATUS' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+            <span [matTooltip]="'VOUCHER_ORDER.CARD_DATA.STATUS_OPTS.' + row.delivery_status| translate" appEllipsify>
+                {{'VOUCHER_ORDER.CARD_DATA.STATUS_OPTS.' + row.delivery_status | translate}}
+            </span>
+        </mat-cell>
+    </ng-container>
+    <!-- ROW DEFINITIONS -->
+    <mat-header-row *matHeaderRowDef="cardColumns; sticky: true">
+    </mat-header-row>
+    <mat-row *matRowDef="let row; columns: cardColumns;"
+        class="interactive-row"
+        [fxShow]="!row.hidden"
+        (click)="$event.preventDefault();goToVoucherGroup(row)">
+    </mat-row>
+</mat-table>

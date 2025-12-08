@@ -1,0 +1,82 @@
+<div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-8">
+        <div>
+            {{ 'ORDER.RELOCATIONS.FORMS.INFOS.PROMOTER_DESCRIPTION' | translate }}
+        </div>
+        <div role="listitem" class="flex flex-col gap-2">
+            <div class="checklist-title">
+                {{ 'ORDER.RELOCATIONS.FORMS.INFOS.PROMOTER_CHECKLIST_QUESTION' | translate }}
+            </div>
+            <li class="flex gap-2">
+                <mat-icon class="check-icon" aria-hidden="true">check</mat-icon>
+                {{ 'ORDER.RELOCATIONS.FORMS.INFOS.PROMOTER_CHECKLIST_1' | translate }}
+            </li>
+            <li class="flex gap-2">
+                <mat-icon class="check-icon" aria-hidden="true">check</mat-icon>
+                {{ 'ORDER.RELOCATIONS.FORMS.INFOS.PROMOTER_CHECKLIST_2' | translate }}
+            </li>
+            <li class="flex gap-2">
+                <mat-icon class="check-icon" aria-hidden="true">check</mat-icon>
+                {{ 'ORDER.RELOCATIONS.FORMS.INFOS.PROMOTER_CHECKLIST_3' | translate }}
+            </li>
+        </div>
+    </div>
+    <div class="link-box flex flex-col gap-4">
+        <div class="flex gap-2 items-center">
+            <h3 class="block section-title">
+                {{ 'ORDER.RELOCATIONS.FORMS.LABELS.PROMOTER_LINK' | translate | uppercase }}
+            </h3>
+            <mat-icon class="ob-help-icon"
+                [matTooltip]="'ORDER.RELOCATIONS.FORMS.INFOS.PROMOTER_LINK' | translate">
+                help_outline
+            </mat-icon>
+        </div>
+        <div class="flex flex-wrap">
+            @let events = $events(); <!-- {} -->
+            @if (events.length > 1) {
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label basis-full">
+                    <mat-label>{{ 'ORDER.RELOCATIONS.FORMS.LABELS.SELECT_EVENT' | translate }}</mat-label>
+                    <mat-select [formControl]="eventCtrl">
+                        @for (event of events; track event.id) {
+                            <mat-option [value]="event.id">
+                                {{ event.name }}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            }
+            <button mat-stroked-button class="ob-button small" color="tertiary"
+                (click)="openPromoterLinkInNewTab()">
+                <mat-icon>open_in_new</mat-icon>
+                {{'ORDER.RELOCATIONS.ACTIONS.START_CHANGE' | translate}}
+            </button>
+        </div>
+    </div>
+    <div class="flex flex-col gap-4 basis-full">
+        <mat-accordion togglePosition="before">
+            <mat-expansion-panel class="ob-dialog-panel tiny">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        {{'ORDER.RELOCATIONS.TITLES.REALLOCATION_CHARGES' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="flex flex-col gap-4">
+                    <div>
+                        <span class="helper-title">{{'ORDER.RELOCATIONS.FORMS.INFOS.CHARGES_1' | translate}}</span>
+                        <div>{{'ORDER.RELOCATIONS.FORMS.INFOS.CHARGES_DESCRIPTION_1' | translate}}</div>
+                    </div>
+
+                    <div>
+                        <span class="helper-title">{{'ORDER.RELOCATIONS.FORMS.INFOS.CHARGES_2' | translate}}</span>
+                        <div>{{'ORDER.RELOCATIONS.FORMS.INFOS.CHARGES_DESCRIPTION_2' | translate}}</div>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+</div>
+@if ($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

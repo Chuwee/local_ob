@@ -1,0 +1,287 @@
+<app-form-container layout="menu" [formGroup]="form" [disabled]="!form.dirty || (loading$ | async)" (cancel)="refresh()" (save)="save()">
+    <div slot="outside" class="relocation-status-container flex">
+        <div class="relocation-status-content flex flex-shrink basis-full items-center justify-between">
+            <mat-slide-toggle class="ob-slide-toggle" appEllipsify [formControl]="enabledControl">
+                {{'EVENTS.RELOCATIONS.FORMS.LABELS.ENABLE_CONFIG' | translate}}
+            </mat-slide-toggle>
+            @if (enabledControl.value) {
+                <div class="flex gap-1 shrink-1">
+                    <mat-icon class="ob-icon xsmall info">info</mat-icon>
+                    <span class="shrink-1" appEllipsify>{{'EVENTS.RELOCATIONS.FORMS.INFOS.ENABLE_CONFIG_HELP' | translate}}</span>
+                </div>
+            }
+        </div>
+    </div>
+    <p>{{'EVENTS.RELOCATIONS.FORMS.INFOS.MAIN_INFO' | translate}}</p>
+    <mat-accordion [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.RELOCATIONS.TITLES.LIMITS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex flex-col gap-8">
+                <div class="flex flex-col gap-2.5">
+                    <span class="ob-label">{{'EVENTS.RELOCATIONS.FORMS.LABELS.AVAILABILITY' | translate}}</span>
+                    <div class="flex items-center gap-2">
+                        <mat-checkbox class="shrink-0" [formControl]="limitsExpiryGroup.controls.enabled" color="primary">
+                            {{'EVENTS.RELOCATIONS.FORMS.LABELS.AVAILABILITY_PREFIX' | translate}}
+                        </mat-checkbox>
+                        <div class="flex gap-2 items-center basis-full">
+                            <mat-form-field appearance="outline" class="ob-form-field inline-field basis-[96px]">
+                                <input matInput aria-label="availability limit amount" type="number" min="1"
+                                    [formControl]="limitsExpiryTimeGroup.controls.timeOffsetLimitAmount">
+                                <mat-error [ob-form-errors]="limitsExpiryTimeGroup.controls.timeOffsetLimitAmount" />
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" class="ob-form-field inline-field basis-[120px]">
+                                <mat-select [formControl]="limitsExpiryTimeGroup.controls.timeOffsetLimitUnit"
+                                    [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                    @for (unit of limitationTimeUnits; track $index) {
+                                        <mat-option [value]="unit">
+                                            {{getTimeUnitKey(
+                                                unit,
+                                                limitsExpiryTimeGroup.controls.timeOffsetLimitAmount.value
+                                            ) | translate | lowercase }}
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                                <mat-error [ob-form-errors]="limitsExpiryTimeGroup.controls.timeOffsetLimitUnit" />
+                            </mat-form-field>
+                            <span [class.disabled]="limitsExpiryTimeGroup.controls.timeOffsetLimitAmount.disabled">
+                                {{'EVENTS.RELOCATIONS.FORMS.LABELS.AVAILABILITY_SUFFIX' | translate}}
+                            </span>
+                        </div>
+                    </div>
+                    @if (limitsExpiryGroup.controls.enabled.touched && limitsExpiryGroup.controls.enabled.invalid) {
+                        <mat-error [ob-form-errors]="limitsExpiryGroup.controls.enabled" />
+                    }
+                </div>
+                <div class="flex flex-col gap-4">
+                    <span class="ob-label">{{'EVENTS.RELOCATIONS.FORMS.LABELS.CHANGE_SEAT_TYPE' | translate}}</span>
+                    <mat-radio-group class="shrink-0 flex flex-col gap-4" [formControl]="limitationSectionForm.controls.type">
+                        <mat-radio-button class="ob-radio-button radio-option" [value]="changeSeatType.all">
+                            {{'EVENTS.RELOCATIONS.FORMS.LABELS.CHANGE_SEAT_TYPE_ALL' | translate}}
+                        </mat-radio-button>
+                        <mat-radio-button class="ob-radio-button" [value]="changeSeatType.partial">
+                            {{'EVENTS.RELOCATIONS.FORMS.LABELS.CHANGE_SEAT_TYPE_PARTIAL' | translate}}
+                        </mat-radio-button>
+                        @if (limitationSectionForm.controls.type.touched && limitationSectionForm.controls.type.invalid) {
+                            <mat-error [ob-form-errors]="limitationSectionForm.controls.type" />
+                        }
+                    </mat-radio-group>
+                </div>
+            </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.RELOCATIONS.TITLES.TICKETS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <div class="flex flex-col gap-8">
+                <p class="panel-description">{{'EVENTS.RELOCATIONS.FORMS.INFOS.TICKETS' | translate}}</p>
+                <div class="flex flex-col gap-4">
+                    <span class="section-subtitle">{{'EVENTS.RELOCATIONS.TITLES.ALLOWED_SESSIONS' | translate}}</span>
+                    <mat-radio-group class="shrink-0 flex flex-col gap-4" [formControl]="ticketsSectionForm.controls.allowedSessions">
+                        <mat-radio-button class="ob-radio-button radio-option" [value]="changeSeatAllowedSessions.same">
+                            <div class="ob-label">
+                                {{'EVENTS.RELOCATIONS.FORMS.LABELS.ALLOWED_SESSIONS.TYPE_SAME_TITLE' | translate}}
+                            </div>
+                            {{'EVENTS.RELOCATIONS.FORMS.LABELS.ALLOWED_SESSIONS.TYPE_SAME_DESCRIPTION' | translate}}
+                        </mat-radio-button>
+                        <div class="flex flex-col gap-2">
+                            <mat-radio-button class="ob-radio-button" [value]="changeSeatAllowedSessions.different">
+                                <div class="ob-label">
+                                    {{'EVENTS.RELOCATIONS.FORMS.LABELS.ALLOWED_SESSIONS.TYPE_DIFFERENT_TITLE' | translate}}
+                                </div>
+                                {{'EVENTS.RELOCATIONS.FORMS.LABELS.ALLOWED_SESSIONS.TYPE_DIFFERENT_DESCRIPTION' | translate}}
+                            </mat-radio-button>
+                            @if (ticketsSectionForm.controls.sameDateOnly.enabled) {
+                                <mat-checkbox class="shrink-0 indented-children"
+                                    [formControl]="ticketsSectionForm.controls.sameDateOnly" color="primary">
+                                    {{'EVENTS.RELOCATIONS.FORMS.LABELS.ALLOWED_SESSIONS.SAME_DATE_ONLY' | translate}}
+                                </mat-checkbox>
+                            }
+                        </div>
+                        <mat-radio-button class="ob-radio-button" [value]="changeSeatAllowedSessions.any">
+                            <div class="ob-label">
+                                {{'EVENTS.RELOCATIONS.FORMS.LABELS.ALLOWED_SESSIONS.TYPE_ANY_TITLE' | translate}}
+                            </div>
+                            {{'EVENTS.RELOCATIONS.FORMS.LABELS.ALLOWED_SESSIONS.TYPE_ANY_DESCRIPTION' | translate}}
+                        </mat-radio-button>
+                        @if (ticketsSectionForm.controls.allowedSessions.touched && ticketsSectionForm.controls.allowedSessions.invalid) {
+                            <mat-error [ob-form-errors]="ticketsSectionForm.controls.allowedSessions" />
+                        }
+                    </mat-radio-group>
+                </div>
+                <!-- <div class="flex flex-col gap-4">
+                    <span class="section-subtitle">{{'EVENTS.RELOCATIONS.TITLES.PRICE' | translate}}</span>
+                    <mat-radio-group class="shrink-0 flex flex-col gap-4" [formControl]="ticketsPriceGroup.controls.type">
+                        <mat-radio-button class="ob-radio-button radio-option" [value]="changeSeatTicketsType.greaterOrEqual">
+                            <div class="ob-label">
+                                {{'EVENTS.RELOCATIONS.FORMS.LABELS.PRICE.TYPE_GREATER_OR_EQUAL_TITLE' | translate}}
+                            </div>
+                            {{'EVENTS.RELOCATIONS.FORMS.LABELS.PRICE.TYPE_GREATER_OR_EQUAL_DESCRIPTION' | translate}}
+                        </mat-radio-button>
+                        <mat-radio-button class="ob-radio-button" [value]="changeSeatTicketsType.any">
+                            <div class="ob-label">
+                                {{'EVENTS.RELOCATIONS.FORMS.LABELS.PRICE.TYPE_ANY_TITLE' | translate}}
+                            </div>
+                            {{'EVENTS.RELOCATIONS.FORMS.LABELS.PRICE.TYPE_ANY_DESCRIPTION' | translate}}
+                        </mat-radio-button>
+                        @if (ticketsRefundGroup.controls.type.enabled) {
+                            <div class="indented-children flex flex-col gap-4">
+                                <span>{{'EVENTS.RELOCATIONS.FORMS.INFOS.LESS_PRICE' | translate}}</span>
+                                <mat-radio-group class="shrink-0 flex flex-col gap-4"
+                                    [formControl]="ticketsRefundGroup.controls.type">
+                                    <mat-radio-button class="ob-radio-button radio-option" [value]="changeSeatRefundType.voucher">
+                                        <div class="flex gap-2 shrink-1">
+                                            {{'EVENTS.RELOCATIONS.FORMS.LABELS.PRICE.TYPE_VOUCHER' | translate}}
+                                            <mat-icon class="ob-help-icon ob-icon xsmall"
+                                                [matTooltip]="'EVENTS.RELOCATIONS.FORMS.INFOS.TYPE_VOUCHER_HELP' | translate"
+                                                fontIcon="help_outline" />
+                                        </div>
+                                    </mat-radio-button>
+                                    @if (ticketsRefundVoucherExpiryGroup.controls.enabled.enabled) {
+                                        <div class="flex items-center gap-2 indented-children">
+                                            <mat-checkbox class="shrink-0" [formControl]="ticketsRefundVoucherExpiryGroup.controls.enabled"
+                                                color="primary">
+                                                {{'EVENTS.RELOCATIONS.FORMS.LABELS.VOUCHER_EXPIRY_PREFIX' | translate}}
+                                            </mat-checkbox>
+                                            <div class="flex gap-2 items-center basis-full">
+                                                <mat-form-field appearance="outline" class="ob-form-field inline-field flex-[0_0_96px]">
+                                                    <input matInput aria-label="availability limit amount" type="number" min="1"
+                                                        [formControl]="ticketsRefundVoucherExpiryTimeGroup.controls.timeOffsetLimitAmount">
+                                                    <mat-error [ob-form-errors]="
+                                                            ticketsRefundVoucherExpiryTimeGroup.controls.timeOffsetLimitAmount
+                                                        " />
+                                                </mat-form-field>
+                                                <mat-form-field appearance="outline" class="ob-form-field inline-field flex-[0_0_120px]">
+                                                    <mat-select
+                                                        [formControl]="ticketsRefundVoucherExpiryTimeGroup.controls.timeOffsetLimitUnit"
+                                                        [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                                        @for (unit of voucherTimeUnits; track $index) {
+                                                            <mat-option [value]="unit">
+                                                                {{
+                                                                    getTimeUnitKey(unit,
+                                                                        ticketsRefundVoucherExpiryTimeGroup
+                                                                            .controls.timeOffsetLimitAmount.value
+                                                                    ) | translate | lowercase
+                                                                }}
+                                                            </mat-option>
+                                                        }
+                                                    </mat-select>
+                                                    <mat-error [ob-form-errors]="
+                                                            ticketsRefundVoucherExpiryTimeGroup.controls.timeOffsetLimitUnit
+                                                        " />
+                                                </mat-form-field>
+                                                <span [class.disabled]="
+                                                        ticketsRefundVoucherExpiryTimeGroup.controls.timeOffsetLimitAmount.disabled
+                                                    ">
+                                                    {{'EVENTS.RELOCATIONS.FORMS.LABELS.VOUCHER_EXPIRY_SUFFIX' | translate}}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        @if (
+                                            ticketsRefundVoucherExpiryGroup.controls.enabled.touched &&
+                                            ticketsRefundVoucherExpiryGroup.controls.enabled.invalid
+                                        ) {
+                                            <mat-error [ob-form-errors]="ticketsRefundVoucherExpiryGroup.controls.enabled" />
+                                        }
+                                    }
+                                    <mat-radio-button class="ob-radio-button" [value]="changeSeatRefundType.none">
+                                        {{'EVENTS.RELOCATIONS.FORMS.LABELS.PRICE.TYPE_NONE' | translate}}
+                                    </mat-radio-button>
+                                    @if (
+                                        ticketsRefundGroup.controls.type.touched &&
+                                        ticketsRefundGroup.controls.type.invalid
+                                    ) {
+                                        <mat-error [ob-form-errors]="ticketsRefundGroup.controls.type" />
+                                    }
+                                </mat-radio-group>
+                            </div>
+                        }
+                        @if (
+                            ticketsPriceGroup.controls.type.touched &&
+                            ticketsPriceGroup.controls.type.invalid
+                        ) {
+                            <mat-error [ob-form-errors]="ticketsPriceGroup.controls.type" />
+                        }
+                    </mat-radio-group>
+                </div>
+                <div class="flex flex-col gap-4">
+                    <span class="section-subtitle">{{'EVENTS.RELOCATIONS.TITLES.QUANTITY_TICKETS' | translate}}</span>
+                    <mat-radio-group class="shrink-0 flex flex-col gap-4" [formControl]="ticketsSectionForm.controls.quantityTickets">
+                        <mat-radio-button class="ob-radio-button radio-option" [value]="changeSeatTicketsType.greaterOrEqual">
+                            <div class="ob-label">
+                                {{'EVENTS.RELOCATIONS.FORMS.LABELS.QUANTITY_TICKETS.TYPE_GREATER_OR_EQUAL_TITLE' | translate}}
+                            </div>
+                            {{'EVENTS.RELOCATIONS.FORMS.LABELS.QUANTITY_TICKETS.TYPE_GREATER_OR_EQUAL_DESCRIPTION' | translate}}
+                        </mat-radio-button>
+                        <mat-radio-button class="ob-radio-button" [value]="changeSeatTicketsType.any">
+                            <div class="ob-label">
+                                {{'EVENTS.RELOCATIONS.FORMS.LABELS.QUANTITY_TICKETS.TYPE_ANY_TITLE' | translate}}
+                            </div>
+                            {{'EVENTS.RELOCATIONS.FORMS.LABELS.QUANTITY_TICKETS.TYPE_ANY_DESCRIPTION' | translate}}
+                        </mat-radio-button>
+                        @if (ticketsSectionForm.controls.quantityTickets.touched && ticketsSectionForm.controls.quantityTickets.invalid) {
+                            <mat-error [ob-form-errors]="ticketsSectionForm.controls.quantityTickets" />
+                        }
+                    </mat-radio-group>
+                </div> -->
+            </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.RELOCATIONS.TITLES.CHARGES' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex items-center gap-2">
+                <p class="panel-description">{{'EVENTS.RELOCATIONS.FORMS.INFOS.CHARGES_LINK_INFO' | translate}}</p>
+                <a class="ob-link icon linkout" (click)="navigateToCharges()">
+                    {{'EVENTS.RELOCATIONS.ACTIONS.NAV_TO_CHARGES' | translate}}
+                </a>
+            </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.RELOCATIONS.TITLES.CHANNELS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex flex-col gap-4">
+                <p class="panel-description">{{'EVENTS.RELOCATIONS.FORMS.INFOS.CHANNELS' | translate}}</p>
+
+                <div class="flex flex-col">
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                        <mat-label>{{'FORMS.LABELS.CHANNEL' | translate}}</mat-label>
+                        <mat-select [formControl]="channelsSectionForm.controls.id"
+                            [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                            @for (channel of $channels(); track channel.id) {
+                                <mat-option [value]="channel.id">
+                                    {{channel.name}}
+                                </mat-option>
+                            }
+                        </mat-select>
+                        <mat-error [ob-form-errors]="channelsSectionForm.controls.id" />
+                    </mat-form-field>
+                    @if (channelsSectionForm.controls.id.value !== null) {
+                        <mat-checkbox class="shrink-0" [formControl]="channelsSectionForm.controls.redirectObPortal"
+                            color="primary">
+                            <div class="multiline-checkbox-label ob-label">
+                                {{'EVENTS.RELOCATIONS.FORMS.LABELS.REDIRECT_OB_PORTAL_TITLE' | translate}}
+                            </div>
+                            {{'EVENTS.RELOCATIONS.FORMS.LABELS.REDIRECT_OB_PORTAL_DESCRIPTION' | translate}}
+
+                        </mat-checkbox>
+                        @if (
+                            channelsSectionForm.controls.redirectObPortal.touched &&
+                            channelsSectionForm.controls.redirectObPortal.invalid
+                        ) {
+                            <mat-error [ob-form-errors]="channelsSectionForm.controls.redirectObPortal" />
+                        }
+                    }
+                </div>
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+@if (loading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

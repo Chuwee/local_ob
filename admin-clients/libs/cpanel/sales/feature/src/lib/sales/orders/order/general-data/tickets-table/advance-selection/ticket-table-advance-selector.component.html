@@ -1,0 +1,29 @@
+<mat-icon class="trigger-icon"
+    [satPopoverAnchor]="popover"
+    (click)="popover.toggle()"
+    [class.active]="popover.isOpen()">
+    {{popover?.isOpen() ? 'expand_less' : 'expand_more'}}
+</mat-icon>
+<sat-popover #popover hasBackdrop yAlign="below" xAlign="start" (opened)="open()" (closed)="popover.close()">
+    <mat-card class="ob-card small-paddings">
+        <mat-card-content [formGroup]="form" class="form-container">
+            <p class="selector-description">{{'ORDER.TICKETS_DATA.ADVANCE_SELECTOR.DESCRIPTION' | translate }}</p>
+            <div fxLayout="column" fxLayoutGap="10px">
+                <mat-checkbox *ngFor="let item of items"
+                    class="app-checkbox-wrap-label"
+                    [formControlName]="item.id" color="primary">
+                    {{item.name}}
+                    <span class="date">
+                        {{item.date | localDateTime : dateTimeFormats.shortDateTimeWithWeek}}
+                    </span>
+                </mat-checkbox>
+            </div>
+        </mat-card-content>
+        <mat-card-actions fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="15px">
+            <button (click)="apply() && popover.close()"
+                mat-flat-button color="primary" class="ob-button small">
+                {{'FORMS.APPLY_FILTER_BTN' | translate}}
+            </button>
+        </mat-card-actions>
+    </mat-card>
+</sat-popover>

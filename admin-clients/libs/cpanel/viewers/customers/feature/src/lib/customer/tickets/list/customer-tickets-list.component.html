@@ -1,0 +1,50 @@
+<div class="flex left-bar-container">
+    <div class="flex flex-1 flex-col justify-between left-bar">
+        <div class="flex flex-col left-sidebar-title">
+            <div class="flex items-center">
+                <h2 class="title">{{'CUSTOMER.EVENTS.TITLE' | translate}}</h2>
+            </div>
+            <div class="flex-1">
+                <p class="results-count" [innerHTML]="('RESULTS.TOTAL' | translate) + ': ' + $eventsProducts()?.size"></p>
+            </div>
+        </div>
+        <div class="flex flex-1 flex-col list-container">
+            <mat-accordion displayMode="flat" class="ob-accordion-list tiny" fxFlex fxLayout="column">
+                <mat-selection-list class="ob-lateral-select-list" appLastPathGuardListener
+                    [currValue]="'name hardcoded'" [multiple]="false">
+                    @for (eventGroup of $eventsProducts() | keyvalue; track eventGroup.key) {
+                        <mat-expansion-panel #groupPanel
+                            class="session-group-item exclude-body-padding mat-elevation-z0 exclude-header-padding"
+                            [expanded]="$event()?.id === eventGroup.key">
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*" class="session-group-header"
+                                [class.selected]="$event()?.id === eventGroup.key">
+                                <mat-panel-title>
+                                    <span class="group-title" appEllipsify [matTooltip]="eventGroup.value[0]?.name">
+                                        {{eventGroup.value?.name}}
+                                    </span>
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+                             @for(sessionItem of (eventGroup.value.sessions | keyvalue); track sessionItem.key) {
+                                 <mat-list-option
+                                     #option [disabled]="option.disabled"
+                                     [selected]="lastSessionId === sessionItem.key"
+                                     [value]="sessionItem.key"
+                                     [id]="'st-products-list-option-' + sessionItem.key"
+                                     (selectedChange)="selectionChangeHandler(sessionItem.value.items[0])">
+                                     <span class="list-item-title">
+                                         {{ sessionItem.value.name }}
+                                     </span>
+                                 </mat-list-option>
+                             }
+                        </mat-expansion-panel>
+                    }
+                </mat-selection-list>
+            </mat-accordion>
+        </div>
+    </div>
+</div>
+@if ($isLoading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

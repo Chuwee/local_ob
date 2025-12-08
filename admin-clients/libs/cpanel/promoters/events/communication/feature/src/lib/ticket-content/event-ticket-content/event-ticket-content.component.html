@@ -1,0 +1,35 @@
+<app-form-container layout="menu" class="no-padding" (cancel)="cancel()" (save)="save()" [disabled]="!form.dirty">
+    <app-event-ticket-templates #templatesComponent slot="outside" [form]="form" [language$]="selectedLanguage$"
+        [ticketType]="ticketType" [passbookEnabled]="passbookEnabled$ | async"
+        [seasonPackEnabled]="seasonPackEnabled$ | async">
+    </app-event-ticket-templates>
+    <app-language-bar slot="outside" [languages]="languages$ | async" [selected]="selectedLanguage$ | async"
+        [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)">
+    </app-language-bar>
+    <!-- shame hack :( -->
+    <div fxFlex="0 0 24px" class="spacer">
+        <div class="details-container" fxFlex="0 1 880px"></div>
+        <mat-divider vertical="true" fxFlexAlign="stretch"></mat-divider>
+        <div fxFlex="0 0 200px"></div>
+    </div>
+    <app-event-ticket-content-pdf #pdfContent [form]="form" [language$]="selectedLanguage$" [ticketType]="ticketType">
+    </app-event-ticket-content-pdf>
+    <app-event-ticket-content-printer #printerContent [form]="form" [language$]="selectedLanguage$"
+        [ticketType]="ticketType">
+    </app-event-ticket-content-printer>
+    <ng-container *ngIf="passbookEnabled$ | async">
+        <app-event-ticket-content-passbook #passbookContent [form]="form" [language$]="selectedLanguage$"
+            [ticketType]="ticketType" id="section_event_communication_ticket-content_passbook">
+        </app-event-ticket-content-passbook>
+    </ng-container>
+    <div fxFlex="grow" class="bottom-content">
+        <div fxFlex="0 1 880px"></div>
+        <mat-divider vertical="true" fxFlexAlign="stretch"></mat-divider>
+        <div fxFlex="0 0 200px"></div>
+    </div>
+    <app-archived-event-mgr slot="actions-bar" [disabled]="form.dirty || (isLoadingOrSaving$ | async)">
+    </app-archived-event-mgr>
+</app-form-container>
+<div class="spinner-container" *ngIf="isLoadingOrSaving$ | async">
+    <mat-spinner></mat-spinner>
+</div>

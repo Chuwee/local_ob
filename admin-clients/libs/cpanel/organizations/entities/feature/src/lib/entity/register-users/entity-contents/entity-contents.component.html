@@ -1,0 +1,17 @@
+<app-form-container [formGroup]="form" (cancel)="cancel()" (save)="save()" layout="menu" class="no-padding overflow-y-auto"
+    [disabled]="!form.dirty || ($isInProgress())">
+    <app-literals-table
+        [languages$]="languageList$" [literals$]="literals$" [formGroup]="form" name="literals"
+        [selectedLanguage]="selectedLanguage.getValue()" (changedLanguage)="loadTextContents($event)"
+        [allowHtmlEditor]="$isUserOprMgr()">
+        <p class="description-container">
+            {{'ENTITY.CONTENTS.DESCRIPTION' | translate}}
+        </p>
+    </app-literals-table>
+</app-form-container>
+
+@if($isInProgress()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

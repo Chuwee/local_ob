@@ -1,0 +1,91 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="main" class="no-top-padding"
+    [disabled]="!form.dirty || (isInProgress$ | async)">
+    <div class="ticket-template-general-data flex flex-col gap-6">
+
+        <app-default-icon [tplId]="ticketTemplate?.id" showWarning="true" [tplName]="ticketTemplate?.name"
+            [checked]="ticketTemplate?.default" [updateDefault]="updateDefault" [enabled]="ticketTemplate && !ticketTemplate.default"
+            [literals]="defaultTicketTemplateLiterals">
+            <ng-container slot="label">
+                {{'TICKET_TEMPLATE.DEFAULT_TEMPLATE' | translate}}
+            </ng-container>
+            <ng-container slot="helper">
+                <app-help-button [message]="'TICKET_TEMPLATE.DEFAULT_TEMPLATE_DESCRIPTION' | translate" />
+            </ng-container>
+        </app-default-icon>
+
+        <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'TICKET_TEMPLATE.GENERAL_DATA' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <form id="principalInfo" [formGroup]="form">
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label" subscriptSizing="dynamic">
+                        <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                        <input matInput aria-label="name" [placeholder]="'EVENTS.NAME' | translate" formControlName="name">
+                        <mat-error [ob-form-errors]="form" field="name" />
+                    </mat-form-field>
+                </form>
+            </mat-expansion-panel>
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'TICKET_TEMPLATE.DESIGN' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <form id="design" [formGroup]="form" class="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-6">
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic"
+                        class="ob-form-field field-with-label col-span-2 md:col-span-1">
+                        <mat-label>{{'TICKET_TEMPLATE.DESIGN' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="design"
+                            [compareWith]="compareObjectsById">
+                            <mat-option>
+                                <app-select-search #designSelectSearch [options$]="designs$"
+                                    [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name"
+                                    requireSelection="true" />
+                            </mat-option>
+                            <mat-option *ngFor="let design of designSelectSearch.getFilteredOptions$() | async" [value]="design">
+                                <div appEllipsify [matTooltip]="design.name">
+                                    {{design.name}}
+                                </div>
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="form.hasError('required', 'design')">
+                            {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                        </mat-error>
+                    </mat-form-field>
+                    <div class="flex flex-col">
+                        <span class="field-label">{{'TICKET_TEMPLATE.FORMAT' | translate}}</span>
+                        <span>{{form.value?.design?.format}}</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="field-label">{{'TICKET_TEMPLATE.PRINTER' | translate}}</span>
+                        <span>{{form.value?.design?.printer}}</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="field-label">{{'TICKET_TEMPLATE.PAPER_TYPE' | translate}}</span>
+                        <span>{{form.value?.design?.paper_type}}</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="field-label">{{'TICKET_TEMPLATE.ORIENTATION' | translate}}</span>
+                        <span>{{form.value?.design?.orientation}}</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="field-label">{{'TICKET_TEMPLATE.DESCRIPTION' | translate}}</span>
+                        <span>{{form.value?.design?.description ? form.value?.design.description : '-'}}</span>
+                    </div>
+                </form>
+            </mat-expansion-panel>
+            <mat-expansion-panel [expanded]="true" id="formLanguages">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'TICKET_TEMPLATE.LANGUAGES' | translate}} *</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-language-selector #languageSelector [hidden]="!languageSelectorData" [enableDefaultSelection]="true"
+                    [description]="( 'TICKET_TEMPLATE.LANGUAGES_DESCRIPTION' ) | translate" [data]="languageSelectorData" />
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+</app-form-container>
+
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

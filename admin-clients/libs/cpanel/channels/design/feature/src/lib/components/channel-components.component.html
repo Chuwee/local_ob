@@ -1,0 +1,373 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu"
+    [disabled]="(inProgress$ | async) || (!form.dirty && !showRelatedChannel.dirty)" [formGroup]="form">
+    <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+        @if (isHeaderTextsEnabled && (channel | isV3$ | async)) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'CHANNELS.HEADER_TEXTS.TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <p class="section-description">{{'CHANNELS.HEADER_TEXTS.DESCRIPTION' | translate}}</p>
+                <div formGroupName="headerTexts" class="header-texts-section flex flex-col gap-5">
+                    <mat-checkbox formControlName="purchaseOptionsAndClientInfo" color="primary">
+                        {{'CHANNELS.HEADER_TEXTS.PURCHASE_OPTIONS_AND_CLIENT_INFO' | translate}}
+                    </mat-checkbox>
+                    <mat-checkbox formControlName="paymentGateway" color="primary">
+                        {{'CHANNELS.HEADER_TEXTS.PAYMENT_GATEWAY' | translate}}
+                    </mat-checkbox>
+                </div>
+            </mat-expansion-panel>
+        }
+        @if (isLayoutEnabled && (channel | isWebV4$ | async) === false) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'CHANNELS.VENUE_LAYOUT.TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <p class="section-description">{{'CHANNELS.VENUE_LAYOUT.DESCRIPTION' | translate}}</p>
+                <div class="header-texts-section flex flex-col">
+                    <mat-radio-group formControlName="venueLayout" class="flex flex-col gap-5">
+                        <mat-radio-button class="ob-radio-button flex-[0_1_calc(33%-10px)] md:basis-full"
+                            [value]="venueContentLayouts.autoDetect">
+                            <div class="option-title">{{'CHANNELS.VENUE_LAYOUT.AUTODETECT' | translate}}</div>
+                            <div>{{'CHANNELS.VENUE_LAYOUT.AUTODETECT_DESC' | translate}}</div>
+                        </mat-radio-button>
+                        <mat-radio-button class="ob-radio-button flex-[0_1_calc(33%-10px)] md:basis-full"
+                            [value]="venueContentLayouts.desktop">
+                            <div class="option-title">{{'CHANNELS.VENUE_LAYOUT.DESKTOP' | translate}}</div>
+                            <div>{{'CHANNELS.VENUE_LAYOUT.DESKTOP_DESC' | translate}}</div>
+                        </mat-radio-button>
+                        <mat-radio-button class="ob-radio-button flex-[0_1_calc(33%-10px)] md:basis-full"
+                            [value]="venueContentLayouts.mobile">
+                            <div class="option-title">{{'CHANNELS.VENUE_LAYOUT.MOBILE' | translate}}</div>
+                            <div>{{'CHANNELS.VENUE_LAYOUT.MOBILE_DESC' | translate}}</div>
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </div>
+            </mat-expansion-panel>
+        }
+        @if (isInteractiveVenueEnabled && channel | isWebChannel) {
+            <mat-expansion-panel [expanded]="true" formGroupName="interactiveVenue">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'CHANNELS.INTERACTIVE_VENUE.TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-checkbox color="primary" formControlName="enabled">
+                    {{'CHANNELS.INTERACTIVE_VENUE.DESCRIPTION' | translate}}
+                </mat-checkbox>
+                @if (form.value.interactiveVenue?.enabled) {
+                    <div class="interactive-venue-section flex flex-col flex-wrap">
+                        <div class="flex">
+                            @if(allowedInteractiveVenues?.length === 1) {
+                                <mat-form-field [style.display]="'none'">
+                                    <input matInput>
+                                </mat-form-field>
+                                <div class="flex flex-col gap-2">
+                                    <span class="ob-label">{{ 'CHANNELS.INTERACTIVE_VENUE.LABEL' | translate }}</span>
+                                    <p>{{ 'CHANNELS.INTERACTIVE_VENUE.'+ allowedInteractiveVenues[0] | translate }}</p>
+                                </div>
+                            } @else {
+                                <mat-form-field appearance="outline" class="ob-form-field flex-[0_0_446px]">
+                                    <mat-label>
+                                        {{'CHANNELS.INTERACTIVE_VENUE.LABEL' | translate}}
+                                    </mat-label>
+                                    <mat-select multiple formControlName="venueTypes"
+                                        [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                        @for (interactiveVenue of allowedInteractiveVenues; track interactiveVenue) {
+                                            <mat-option
+                                                [value]="interactiveVenue">
+                                                {{ 'CHANNELS.INTERACTIVE_VENUE.'+ interactiveVenue | translate }}
+                                            </mat-option>
+                                        }
+                                    </mat-select>
+                                    <mat-error [ob-form-errors]="form" field="interactiveVenue.venueTypes" />
+                                </mat-form-field>
+                            }
+                        </div>
+                        <div formGroupName="venueOptions" class="flex flex-col">
+                            <p>{{ 'CHANNELS.INTERACTIVE_VENUE.OPTIONS_DESCRIPTION' | translate }}</p>
+                            <div class="flex items-center justify-start gap-5">
+                                <img src="assets/interactive-venue/ico-recinto.svg"
+                                    [alt]="'CHANNELS.INTERACTIVE_VENUE.VENUE_3D' | translate">
+                                <div class="flex">
+                                    <mat-checkbox formControlName="venueViewEnabled" color="primary">
+                                        {{'CHANNELS.INTERACTIVE_VENUE.VENUE_ENABLED' | translate}}
+                                    </mat-checkbox>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-start gap-5">
+                                <img src="assets/interactive-venue/ico-sector.svg"
+                                    [alt]="'CHANNELS.INTERACTIVE_VENUE.VENUE_SECTOR_VIEW' | translate">
+                                <mat-checkbox formControlName="venueSectorViewEnabled" color="primary">
+                                    {{'CHANNELS.INTERACTIVE_VENUE.VENUE_SECTOR_VIEW_ENABLED' | translate}}
+                                </mat-checkbox>
+                            </div>
+                            <div class="flex items-center justify-start gap-5">
+                                <img src="assets/interactive-venue/ico-butaca.svg"
+                                    [alt]="'CHANNELS.INTERACTIVE_VENUE.VENUE_SEAT_VIEW' | translate">
+                                <mat-checkbox formControlName="venueSeatViewEnabled" color="primary">
+                                    {{'CHANNELS.INTERACTIVE_VENUE.VENUE_SEAT_VIEW_ENABLED' | translate}}
+                                </mat-checkbox>
+                            </div>
+                            @if (form.controls.interactiveVenue.controls.venueOptions.touched && form.controls.interactiveVenue.controls.venueOptions.errors?.['required']) {
+                                <mat-error>{{ 'CHANNELS.INTERACTIVE_VENUE.ONE_REQUIRED_ERROR' | translate }}</mat-error>
+                            }
+                        </div>
+                    </div>
+                }
+            </mat-expansion-panel>
+        }
+        @if (channel.type === channelType.webB2B) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'CHANNELS.PRICE_ZONE_CATEGORIZATION.TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="flex flex-col gap-5 header-texts-section">
+                    <mat-checkbox formControlName="allowPriceTypeTagFilter" color="primary">
+                        {{'CHANNELS.PRICE_ZONE_CATEGORIZATION.ENABLE' | translate}}
+                    </mat-checkbox>
+                </div>
+            </mat-expansion-panel>
+        }
+        @if (channel | isV3$ | async) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'CHANNELS.SESSIONS_LAYOUT.TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <p class="section-description">{{'CHANNELS.SESSIONS_LAYOUT.DESCRIPTION' | translate}}</p>
+                <div formGroupName="sessionsLayout" class="header-texts-section">
+                    <mat-radio-group #sessionsLayout="matRadioGroup" formControlName="type" class="flex flex-col gap-5">
+                        <div class="flex flex-col">
+                            <mat-radio-button class="inline" [value]="sessionsLayouts.list">
+                                {{'CHANNELS.SESSIONS_LAYOUT.LIST' | translate}}
+                            </mat-radio-button>
+                            @if (sessionsLayout.value === sessionsLayouts.list) {
+                                <div class="nested-content flex items-center justify-start basis-[45px] shrink-0 grow-0">
+                                    <p class="sessions-list-max-text">{{'CHANNELS.SESSIONS_LAYOUT.LIST_MAX' | translate}}</p>
+                                    <mat-form-field appearance="outline"
+                                        class="ob-form-field inline-field value-field basis-[80px] grow-0 shrink-0">
+                                        <input matInput type="number" formControlName="listMax" placeholder="0">
+                                    </mat-form-field>
+                                    @if (form.get('sessionsLayout.listMax').touched) {
+                                        <mat-error [ob-form-errors]="form"
+                                            field="sessionsLayout.listMax" />
+                                    }
+                                </div>
+                            }
+                        </div>
+                        <div>
+                            <mat-radio-button class="inline" [value]="sessionsLayouts.calendar">
+                                {{'CHANNELS.SESSIONS_LAYOUT.CALENDAR' | translate}}
+                            </mat-radio-button>
+                        </div>
+                    </mat-radio-group>
+                </div>
+            </mat-expansion-panel>
+        }
+
+        <!--PRICE VISUALIZATION-->
+        @if((channel | isWebV4$ | async) || channel.type === channelType.webB2B){
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'CHANNELS.TAXES.TITLES' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div formGroupName="taxDisplay" class="header-texts-section flex flex-col gap-4">
+                    <div class="flex flex-1 items-center">
+                        <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                        {{'CHANNELS.TAXES.INFO' | translate}}
+                    </div>
+                    <mat-radio-group #taxDisplay="matRadioGroup" formControlName="type" class="flex flex-col gap-4">
+                        <div class="flex flex-col gap-0">
+                            <mat-radio-button class="inline" [value]="taxesDisplay.included">
+                                <span class="ob-label">{{'CHANNELS.TAXES.FORMS.LABELS.INCLUDED' | translate}}</span>
+                            </mat-radio-button>
+                            <span class="nested-content">
+                                {{'CHANNELS.TAXES.FORMS.INFOS.INCLUDED' | translate}}
+                            </span>
+                        </div>
+                        @if (form.controls.taxDisplay.controls.type.value === taxesDisplay.included) {
+                            <div class="flex flex-col gap-4 included-container radio-content">
+                                <mat-checkbox formControlName="info" color="primary">
+                                    {{'CHANNELS.TAXES.FORMS.LABELS.INCLUDED_INFO' | translate}}
+                                </mat-checkbox>
+                                <!-- GG SECTION -->
+                                <span class="ob-label">
+                                    {{'CHANNELS.TAXES.FORMS.PRICES.TITLE' | translate}}
+                                </span>
+                                <mat-radio-group formControlName="prices" class="flex flex-col gap-4">
+                                    <div class="flex flex-col">
+                                        <mat-radio-button class="inline" [value]="pricesDisplay.base">
+                                            <span class="ob-label">{{'CHANNELS.TAXES.FORMS.PRICES.BASE' | translate}}</span>
+                                        </mat-radio-button>
+                                        <span class="nested-content">
+                                            {{'CHANNELS.TAXES.FORMS.PRICES.BASE_INFO' | translate}}
+                                        </span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <mat-radio-button [value]="pricesDisplay.final">
+                                            <span class="ob-label">{{'CHANNELS.TAXES.FORMS.PRICES.FINAL' | translate}}</span>
+                                        </mat-radio-button>
+                                        <span class="nested-content">
+                                            {{'CHANNELS.TAXES.FORMS.PRICES.FINAL_INFO' | translate}}
+                                        </span>
+                                    </div>
+                                </mat-radio-group>
+                            </div>
+                        }
+                        <div class="flex flex-col gap-0">
+                            <mat-radio-button class="inline" [value]="taxesDisplay.onTop">
+                                <span class="ob-label">{{'CHANNELS.TAXES.FORMS.LABELS.ON_TOP' | translate}}</span>
+                            </mat-radio-button>
+                            <span class="nested-content">
+                                {{ 'CHANNELS.TAXES.FORMS.INFOS.ON_TOP' | translate }}
+                            </span>
+                        </div>
+                    </mat-radio-group>
+                </div>
+            </mat-expansion-panel>
+        }
+
+        <!--OHTER CONFIGURATIONS-->
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.OTHER_SETTINGS.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="other-settings-section flex flex-col gap-4">
+                <div formGroupName="otherSettings" class="flex flex-col gap-5">
+                    @if (!(channel | isExternalWhitelabelType) && (channel | isV3$ | async)) {
+                        <mat-checkbox formControlName="includeTaxesSeparately" color="primary">
+                            {{'CHANNELS.OTHER_SETTINGS.INCLUDE_TAXES_SEPARATELY' | translate}}
+                        </mat-checkbox>
+                    }
+                    <mat-checkbox formControlName="persistPromoValidationCodes" color="primary">
+                        {{'CHANNELS.OTHER_SETTINGS.PERSIST_PROMO_VALIDATION_CODES' | translate}}
+                    </mat-checkbox>
+                </div>
+                @if (channel | isWebV4$ | async) {
+                    <mat-checkbox formControlName="allowKeepBuying" color="primary">
+                        <div class="keep-buying-label">
+                            {{'CHANNELS.OTHER_SETTINGS.ALLOW_KEEP_BUYING' | translate}}
+                        </div>
+                        <app-help-button class="keep-buying-help" small
+                            [message]="'CHANNELS.OTHER_SETTINGS.ALLOW_KEEP_BUYING_INFO' | translate" />
+                    </mat-checkbox>
+                }
+            </div>
+        </mat-expansion-panel>
+
+
+        <!--LINKS-->
+        @if (!(channel | isExternalWhitelabelType)) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'CHANNELS.REDIRECTION_POLICIES.TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <p class="section-description">{{'CHANNELS.REDIRECTION_POLICIES.DESCRIPTION' | translate}}</p>
+                <div formGroupName="redirectionPolicies" class="header-texts-section">
+                    @for (redirectionPolicyType of redirectionPolicyTypesValues; track redirectionPolicyType) {
+                        <div class="url-section-option"
+                            [class.with-margin]="form.get(['redirectionPolicies', redirectionPolicyType, 'mode']).value !== redirectionPolicyModes.goToUrl"
+                            [formGroupName]="redirectionPolicyType">
+                            <p class="url-section-option-title">
+                                {{'CHANNELS.REDIRECTION_POLICIES.'+ redirectionPolicyType | translate}}
+                            </p>
+                            <mat-radio-group class="flex flex-col" formControlName="mode">
+                                <div class="flex flex-col gap-4">
+                                    <mat-radio-button [value]="redirectionPolicyModes.origin">
+                                        @if (redirectionPolicyType !== 'NEED_HELP_BUTTON' && redirectionPolicyType !== 'COOKIES_BUTTON'
+                        && redirectionPolicyType !== 'PRIVACY_POLICY_BUTTON' && redirectionPolicyType !== 'ACCESSIBILITY_POLICY_BUTTON') {
+                                            <div>
+                                                {{'CHANNELS.REDIRECTION_POLICIES.GO_TO_CATALOG' | translate}}
+                                            </div>
+                                        } @else {
+                                            <div>
+                                                {{'CHANNELS.REDIRECTION_POLICIES.OPEN_MODAL' | translate}}
+                                            </div>
+                                        }
+                                    </mat-radio-button>
+                                    <mat-radio-button [value]="redirectionPolicyModes.goToUrl">
+                                        <div>{{'CHANNELS.REDIRECTION_POLICIES.GO_TO_URL' | translate}}</div>
+                                    </mat-radio-button>
+                                    @if (form.get(['redirectionPolicies', redirectionPolicyType, 'mode']).value === redirectionPolicyModes.goToUrl && (channel | isWebV4$ | async) && (languages$ | async).length > 1) {
+                                        <div class="nested-content flex flex-col">
+                                            <p>{{'CHANNELS.REDIRECTION_POLICIES.GO_TO_URL_DESCRIPTION' | translate}}</p>
+                                            <app-tabs-menu type="language" overrideClasses="no-left-padding"
+                                                [formGroup]="form.get(['redirectionPolicies', redirectionPolicyType, 'value'])">
+                                                @for (lang of languages$ | async; track lang) {
+                                                    <ng-template
+                                                        [ctrl]="form.get(['redirectionPolicies', redirectionPolicyType, 'value', lang])"
+                                                        appTab [label]="('LANGUAGES.' + lang) | translate">
+                                                        <div class="flex flex-wrap gap-2 justify-start items-center">
+                                                            <p class="url-label">{{'CHANNELS.URL' | translate | uppercase}}</p>
+                                                            <mat-form-field appearance="outline"
+                                                                class="ob-form-field value-field flex-[0_0_60%]">
+                                                                <input matInput formControlName="{{lang}}"
+                                                                    [placeholder]="'CHANNELS.REDIRECTION_POLICIES.URL_PLACEHOLDER' | translate">
+                                                            </mat-form-field>
+                                                        </div>
+                                                    </ng-template>
+                                                }
+                                            </app-tabs-menu>
+                                        </div>
+                                    }
+                                    @if (form.get(['redirectionPolicies', redirectionPolicyType, 'mode']).value === redirectionPolicyModes.goToUrl
+                        && (!!!(channel | isWebV4$ | async) || (languages$ | async).length === 1)) {
+                                        <div>
+                                            <div class="nested-content flex flex-wrap gap-2 justify-start items-center"
+                                                [formGroup]="form.get(['redirectionPolicies', redirectionPolicyType, 'value'])">
+                                                <p class="url-label">{{'CHANNELS.URL' | translate | uppercase}}</p>
+                                                <mat-form-field appearance="outline" class="ob-form-field value-field flex-[0_0_60%]">
+                                                    <input matInput formControlName="{{(defaultLang$ | async)}}"
+                                                        [placeholder]="'CHANNELS.REDIRECTION_POLICIES.URL_PLACEHOLDER' | translate">
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                    }
+                </div>
+            </mat-expansion-panel>
+            @if(channel?.type === 'WEB') {
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'CHANNELS.RELATED_CHANNEL.TITLE' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <p class="section-description">{{'CHANNELS.RELATED_CHANNEL.DESCRIPTION' | translate}}</p>
+                    <div class="header-texts-section flex flex-col gap-5">
+                        <mat-checkbox [formControl]="showRelatedChannel" color="primary" [value]="true">
+                            {{'CHANNELS.RELATED_CHANNEL.ACTIVATE' | translate}}
+                        </mat-checkbox>
+                        @if($showRelatedChannel()) {
+                            <div class="flex flex-row">
+                                <mat-form-field appearance="outline" class="ob-form-field related-channel-field flex-[0_0_297px]">
+                                    <mat-label>
+                                        {{'CHANNELS.RELATED_CHANNEL.SELECT' | translate}}
+                                    </mat-label>
+                                    <mat-select formControlName="relatedChannel"
+                                        [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                        <mat-option>
+                                            <app-select-search #channelsSelectSearch [options$]="channels$"
+                                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                                searchField="name" requireSelection="true" />
+                                        </mat-option>
+                                        @for (channel of channelsSelectSearch.getFilteredOptions$() | async; track channel) {
+                                            <mat-option
+                                                [value]="channel.id">
+                                                {{channel.name}}
+                                            </mat-option>
+                                        }
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        }
+                    </div>
+                </mat-expansion-panel>
+            }
+        }
+
+    </mat-accordion>
+</app-form-container>
+@if (inProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

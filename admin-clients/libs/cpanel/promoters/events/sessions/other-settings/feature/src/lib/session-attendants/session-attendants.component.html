@@ -1,0 +1,69 @@
+<div fxFlex="100%" fxLayout="column" [formGroup]="comForm">
+    <div fxLayout="row wrap">
+        <div fxFlex="100%" fxLayout="column">
+            <div fxFlex="28px" fxLayout="row">
+                <mat-slide-toggle class="ob-slide-toggle" formControlName="inheritAttendantsFromEvent">
+                    {{'EVENTS.SESSION.ATTENDANTS_CONFIG.EVENT_CONFIG' | translate}}
+                </mat-slide-toggle>
+            </div>
+            <mat-divider fxFlex="100%" />
+        </div>
+        <div fxLayout="row wrap" class="attendants-tickets" *ngIf="!comForm.value.inheritAttendantsFromEvent">
+            <ng-container formGroupName="attendantsTickets">
+                <mat-checkbox fxFlex="100%" formControlName="status" color="primary">
+                    {{'EVENTS.SESSION.ATTENDANTS_CONFIG.STATUS' | translate}}
+                </mat-checkbox>
+                <div fxFlex="100%" fxLayout="row wrap" class="channels-scope" formGroupName="channelsScope">
+                    <mat-radio-group fxFlex="100%" fxLayout="column" formControlName="type">
+                        <mat-radio-button class="ob-radio-button vertical-list" [value]="attendantsChannelsScopeType.all">
+                            {{'FORMS.OPTIONS.ALL_ELEMENTS_MALE' | translate}}
+                        </mat-radio-button>
+                        <mat-radio-button class="ob-radio-button vertical-list" [value]="attendantsChannelsScopeType.list">
+                            {{'FORMS.OPTIONS.SELECT_SOME' | translate}}
+                        </mat-radio-button>
+                    </mat-radio-group>
+                    <div fxFlex="100%" fxLayout="column" class="channels-list-container nested-content"
+                        [class.clip]="comForm.value.attendantsTickets?.channelsScope?.type === attendantsChannelsScopeType.all"
+                        [@expandSelection]="comForm.value.attendantsTickets?.channelsScope?.type === attendantsChannelsScopeType.list ?
+                                'expanded' : 'collapsed'">
+                        <div class="channels-list">
+                            <app-searchable-paginated-selection class="ob-medium-list"
+                                [class.field-error]="channelsControl.hasError('required') && channelsControl.touched"
+                                [placeholder]="'FORMS.SEARCH.SESSIONS' | translate" [form]="channelsControl"
+                                [pageSize]="pageSize" [data$]="channelList$" [metadata$]="metadata$" [loading$]="isLoading$"
+                                (loadData)="filterChangeHandler($event)">
+                                <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data"
+                                    let-selectionChanged="selectionChanged">
+                                    <app-selection-list [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged"
+                                        class="small-rows">
+                                        <ng-template #optionTemplate let-row>
+                                            <div fxLayoutAlign="space-between">
+                                                <span>{{row.name}}</span>
+                                            </div>
+                                        </ng-template>
+                                    </app-selection-list>
+                                </ng-template>
+                            </app-searchable-paginated-selection>
+                            <div class="channels-error-description">
+                                <span *ngIf="channelsControl.hasError('required') && channelsControl.touched">
+                                    {{'EVENTS.ATTENDANTS_CHANNELS.SELECT_SOME' | translate}}
+                                </span>
+                            </div>
+                        </div>
+                        <mat-checkbox formControlName="addNewEventChannelRelationships" color="primary">
+                            {{'EVENTS.SESSION.ATTENDANTS_CONFIG.ADD_NEW_CHANNELS' | translate}}
+                        </mat-checkbox>
+                    </div>
+                </div>
+                <ng-container *ngIf="isAvetSocket$ | async">
+                    <mat-checkbox fxFlex="100%" formControlName="autofill" color="primary" class="autofill-checkbox">
+                        {{'EVENTS.SESSION.ATTENDANTS_CONFIG.AUTOFILL' | translate}}
+                    </mat-checkbox>
+                    <mat-checkbox fxFlex="100%" formControlName="editAutofill" color="primary" class="autofill-checkbox">
+                        {{'EVENTS.SESSION.ATTENDANTS_CONFIG.EDIT_AUTOFILL' | translate}}
+                    </mat-checkbox>
+                </ng-container>
+            </ng-container>
+        </div>
+    </div>
+</div>

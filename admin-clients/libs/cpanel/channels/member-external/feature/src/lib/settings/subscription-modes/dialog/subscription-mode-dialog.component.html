@@ -1,0 +1,59 @@
+<div class="dialog-msg-container" fxLayout="column" fxFlex="100%">
+
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">
+            {{ (isCreation ?
+            'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.NEW_TITLE' :
+            'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.EDIT_TITLE'
+            ) | translate}}
+        </h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <form [formGroup]="form" mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+
+        <app-wizard-bar #stepper
+            [enableNavigation]="!isCreation"
+            (stepClick)="stepper.setActiveStep($event)"
+            [steps]="[
+                'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.SETTINGS',
+                'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.COMMUNICATION'
+            ]" />
+
+        <div fxLayout="column" class="settings" *ngIf="stepper.$active() === 0">
+            <p>{{'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.SETTINGS_DESCRIPTION' | translate}}</p>
+            <app-subscription-mode-general-settings formGroupName="settings" />
+        </div>
+
+        <div fxLayout="column" class="communication" *ngIf="stepper.$active() === 1">
+            <p>{{'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.COMMUNICATION_DESCRIPTION' | translate}}</p>
+            <app-communication-fields
+                [form]="form.get('translations')"
+                [fields]="fields"
+                [languages]="languages" />
+        </div>
+
+    </form>
+
+    <div mat-dialog-actions fxFlex="auto" fxLayout="row no wrap" fxLayoutAlign="end">
+        <button mat-button type="button" class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button [disabled]="loading$ | async" (click)="save()" *ngIf="({active: stepper.$active()}) as step"
+            mat-flat-button color="primary" type="button" class="ob-button">
+            <span *ngIf="isCreation">
+                {{ (step.active === 0 ? 'FORMS.ACTIONS.CREATE' : 'FORMS.ACTIONS.SAVE' ) | translate }}
+            </span>
+            <span *ngIf="!isCreation">
+                {{ (step.active === 0 ? 'FORMS.ACTIONS.NEXT' : 'FORMS.ACTIONS.SAVE' ) | translate }}
+            </span>
+        </button>
+    </div>
+
+</div>
+
+<div class="spinner-container" *ngIf="loading$ | async">
+    <mat-spinner />
+</div>

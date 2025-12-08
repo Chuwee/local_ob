@@ -1,0 +1,90 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="100%" class="secondary title">{{'TITLES.NEW_CHANNEL' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column">
+        <form [formGroup]="newChannelForm" fxLayout="column" fxLayoutAlign="start stretch">
+            <mat-form-field *ngIf="operatorMode$ | async" appearance="outline" class="ob-form-field">
+                <mat-label>{{'CHANNELS.ENTITY' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="entity">
+                    <mat-option>
+                        <app-select-search #entitySelectSearch [options$]="entities$"
+                            [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" requireSelection="true">
+                        </app-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let entity of entitySelectSearch.getFilteredOptions$() | async" [value]="entity">
+                        {{entity.name}}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="newChannelForm.hasError('required', 'entity')">
+                    {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'CHANNELS.NAME' | translate}}</mat-label>
+                <input matInput aria-label="name" [placeholder]="'CHANNELS.NAME' | translate" formControlName="name">
+                <mat-error *ngIf="newChannelForm.hasError('required', 'name')">
+                    {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                </mat-error>
+                <mat-error *ngIf="newChannelForm.hasError('maxlength', 'name')">
+                    {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value: maxChannelNameLength})}}
+                </mat-error>
+                <mat-error *ngIf="newChannelForm.hasError('pattern', 'name')">
+                    {{'FORMS.ERRORS.INVALID_CHARACTERS' | translate}}
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'CHANNELS.TYPE' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="type">
+                    <mat-option *ngFor="let type of channelTypes$ | async" [value]="type">
+                        {{ 'CHANNELS.TYPE_OPTS.' + type | translate}}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="newChannelForm.hasError('required', 'type')">
+                    {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field" *ngIf="!newChannelForm.get('url').disabled">
+                <mat-label>{{'CHANNELS.URL' | translate}}</mat-label>
+                <input matInput aria-label="url" formControlName="url">
+                <mat-error *ngIf="newChannelForm.hasError('required', 'url')">
+                    {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                </mat-error>
+                <mat-error *ngIf="newChannelForm.hasError('maxlength', 'url')">
+                    {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value: maxChannelUrlLength})}}
+                </mat-error>
+                <mat-error *ngIf="newChannelForm.hasError('pattern', 'url')">
+                    {{'FORMS.ERRORS.INVALID_CHARACTERS' | translate}}
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field" *ngIf="!newChannelForm.get('collective').disabled">
+                <mat-label>{{'CHANNELS.COLLECTIVE' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="collective">
+                    <mat-option *ngFor="let collective of collectives$ | async" [value]="collective">
+                        <div appEllipsify [matTooltip]="collective.name">
+                            {{collective.name}}
+                        </div>
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="newChannelForm.hasError('required', 'collective')">
+                    {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                </mat-error>
+            </mat-form-field>
+        </form>
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()" [disabled]="inProgress$ | async">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createChannel()"
+            [disabled]="(!newChannelForm.dirty) || (inProgress$ | async)">
+            {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>
+<div class="spinner-container" *ngIf="inProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

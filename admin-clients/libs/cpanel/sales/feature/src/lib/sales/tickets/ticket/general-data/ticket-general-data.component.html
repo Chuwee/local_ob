@@ -1,0 +1,141 @@
+<div class="ticket-general-data-container" fxLayout="column" fxFlex="100%" *ngIf="ticketDetail$ | async as ticketDetail">
+    <div class="actions-bar" fxLayout="column">
+        <div fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="center">
+            <div fxFlex="0 1 1175px" fxLayout="row" fxLayoutGap="8px">
+                <div fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="25px">
+                    <div fxFlex="0 1 100%" fxLayoutAlign="start center">
+                        <button *ngIf="ticketDetail.action?.print" mat-button type="button" class="ob-button small"
+                            [attr.aria-label]="'ACTIONS.SEE_TICKET.BTN' | translate"
+                            (click)="showTicket(ticketDetail.order.code, ticketDetail.id)">
+                            <mat-icon>remove_red_eye</mat-icon>
+                            {{'ACTIONS.SEE_TICKET.BTN' | translate}}
+                        </button>
+                        <button *ngIf="ticketDetail.action?.print" mat-button type="button" class="ob-button small"
+                            [attr.aria-label]="'ACTIONS.SEE_ALL_TICKETS.BTN' | translate" (click)="showTickets(ticketDetail)">
+                            <mat-icon>confirmation_number</mat-icon>
+                            {{'ACTIONS.SEE_ALL_TICKETS.BTN' | translate}}
+                        </button>
+                    </div>
+                    <div fxFlex="0 0 auto" fxLayoutAlign="end center" class="skip-generation-container"
+                        *ngIf="isSkipGeneration$ | async">
+                        <span class="ob-label skip-generation-label">
+                            {{'TICKET_DELIVERY.DISABLED.TITLE' | translate}}
+                        </span>
+                        <mat-icon fxFlexAlign="center" class="ob-help-icon" [matTooltip]="'TICKET_DELIVERY.DISABLED.INFO' | translate">
+                            help_outline
+                        </mat-icon>
+                    </div>
+                    <mat-form-field *ngIf="stateHistory$ | async as stateHistory" fxFlex="50%" fxFlex.gt-sm="30%" appearance="outline"
+                        class="ob-form-field inline-field thin-select-field">
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" [value]="stateHistory[0]">
+                            <mat-option *ngFor="let state of stateHistory" [value]="state">
+                                {{'TICKET.STATE_OPTS.' + state.state | translate}} {{state.date | dateTime:
+                                dateTimeFormats.shortDateTime}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+    </div>
+    <app-form-container [hideActionBar]="true" layout="main" class="no-top-padding">
+        <div fxLayout="column">
+            <div class="main-content" fxLayout="row wrap" fxLayoutAlign="space-between start">
+                <div fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="stretch">
+                    <div fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="center stretch">
+                        <mat-accordion class="details-form-container" fxFlex="0 1 845px" [multi]="true" togglePosition="before">
+                            @if (ticketDetail.pack) {
+                                <div fxLayout="row" fxLayoutAlign="start center" class="pack-info">
+                                    <mat-icon class="ob-icon xsmall info with-text">info</mat-icon>
+                                    <span>
+                                        {{
+                                      ticketDetail.pack.main_item
+                                        ? ('TICKET.PACK.MAIN_INFO' | translate)
+                                        : ('TICKET.PACK.INFO' | translate)
+                                    }}
+                                    </span>
+                                </div>
+                            }
+                            <mat-expansion-panel [expanded]="true">
+                                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                    <mat-panel-title>{{'TICKET.TICKET_DATA' | translate}}</mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <app-ticket-data [ticket]="ticketDetail" class="ticket-panel-content" />
+                            </mat-expansion-panel>
+                            <mat-expansion-panel [expanded]="true">
+                                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                    <mat-panel-title>{{'TICKET.ORDER_DATA' | translate}}</mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <app-ticket-order-data [ticket]="ticketDetail" class="ticket-panel-content" />
+                            </mat-expansion-panel>
+                            <mat-expansion-panel [expanded]="true">
+                                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                    <mat-panel-title>{{'TICKET.BUYER_DATA' | translate}}</mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <app-ticket-buyer-data [ticket]="ticketDetail" class="ticket-panel-content" />
+                            </mat-expansion-panel>
+                            <mat-expansion-panel [expanded]="true" *ngIf="ticketDetail.action.edit_attendant || ticketDetail.attendant">
+                                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                    <mat-panel-title>{{'TICKET.ATTENDEE.TITLE' | translate}}</mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <app-ticket-attendee-history class="ticket-panel-content" />
+                            </mat-expansion-panel>
+                            <mat-expansion-panel [expanded]="true" *ngIf="(actionHistoryPrints$ | async)?.length">
+                                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                    <mat-panel-title>{{'TICKET.ACTIONS_HISTORY.PRINT.TITLE' | translate}}</mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <app-ticket-actions-history class="ticket-panel-content"
+                                    [total]="ticketDetail.ticket.total_prints"
+                                    [actions$]="actionHistoryPrints$"
+                                    [type]="actionsHistoryType.print" />
+                            </mat-expansion-panel>
+                            <mat-expansion-panel [expanded]="true" *ngIf="(actionHistorySent$ | async)?.length">
+                                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                    <mat-panel-title>{{'TICKET.ACTIONS_HISTORY.RESENDS.TITLE' | translate}}</mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <app-ticket-actions-history class="ticket-panel-content"
+                                    [total]="(actionHistorySent$ | async)?.length"
+                                    [actions$]="actionHistorySent$"
+                                    [type]="actionsHistoryType.sent" />
+                            </mat-expansion-panel>
+                            <mat-expansion-panel [expanded]="true" *ngIf="ticketDetail.ticket.validations">
+                                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                    <mat-panel-title>{{'TICKET.VALIDATIONS.TITLE' | translate}}</mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <app-ticket-validation [ticketDetail]="ticketDetail" class="ticket-panel-content" />
+                            </mat-expansion-panel>
+                            <mat-expansion-panel [expanded]="true" *ngIf="(isOperatorUser$ | async) && (actionHistory$ | async)?.length">
+                                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                    <mat-panel-title>{{'TICKET.ACTIONS_HISTORY.ALL.TITLE' | translate}}</mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <app-ticket-actions-history class="ticket-panel-content"
+                                    [total]="ticketDetail.actions_history.length"
+                                    [actions$]="actionHistory$" />
+                            </mat-expansion-panel>
+                            @let secondaryMarketSessionsSold = secondaryMarketSessionsSold$ | async;
+                            @if(secondaryMarketSessionsSold?.length){
+                                <mat-expansion-panel [expanded]="true">
+                                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                        <mat-panel-title>{{'TICKET.SESSIONS_SOLD_AT_SECONDARY_MARKET.TITLE' | translate}}</mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <app-secondary-market-sold-sessions class="ticket-panel-content"
+                                        [total]="secondaryMarketSessionsSold.length"
+                                        [sessions$]="secondaryMarketSessionsSold$" />
+                                </mat-expansion-panel>
+                            }
+
+                        </mat-accordion>
+                        <mat-divider vertical="true" fxFlexAlign="stretch" />
+                        <div class="ob-summary sidebar-container" fxFlex="0 1 340px" fxLayout="column">
+                            <app-ticket-price *ngIf="ticketDetail.price" [ticket]="ticketDetail" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </app-form-container>
+</div>
+
+<div class="spinner-container" *ngIf="loading$ | async">
+    <mat-spinner />
+</div>

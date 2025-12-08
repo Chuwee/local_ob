@@ -1,0 +1,29 @@
+<div *ngIf="!hideTicketContents" fxFlex="0 1 100%" fxLayout="column">
+    <mat-checkbox class="use-ticket-contents-check"
+        [checked]="hideTicketContents" (change)="saveUseTicketTemplates(!hideTicketContents)">
+        {{'EVENTS.COMMUNICATION.USE_TICKET_CONTENT' | translate}}
+    </mat-checkbox>
+    <app-event-ticket-content fxFlex="grow" [ticketType]="ticketType"></app-event-ticket-content>
+</div>
+<div fxFlex="0 1 100%" *ngIf="hideTicketContents" class="use-ticket-contents">
+    <div fxFlex="0 1 980px" fxLayoutAlign="center start">
+        <div fxFlex="0 1 410px" fxLayout="column" fxLayoutAlign="start center">
+            <div class="use-ticket-contents-image" fxLayoutAlign="center center">
+                <img src="assets/ticket-template/template-reused.svg"
+                    [alt]="'EVENTS.COMMUNICATION.USE_TICKET_CONTENT' | translate"/>
+            </div>
+            <div class="use-ticket-contents-text">
+                {{'EVENTS.COMMUNICATION.INVITATIONS.MAIN_INFO' | translate}}
+            </div>
+            <div class="use-ticket-contents-text use-ticket-contents-text-sub">
+                {{'EVENTS.COMMUNICATION.INVITATIONS.DEACTIVATE_INFO' | translate}}
+            </div>
+            <button mat-stroked-button color="tertiary" class="ob-button" (click)="saveUseTicketTemplates(false)">
+                {{'EVENTS.COMMUNICATION.INVITATIONS.DEACTIVATE_BTN' | translate}}
+            </button>
+        </div>
+    </div>
+</div>
+<div class="spinner-container" *ngIf="isLoadingOrSaving$ | async">
+    <mat-spinner></mat-spinner>
+</div>

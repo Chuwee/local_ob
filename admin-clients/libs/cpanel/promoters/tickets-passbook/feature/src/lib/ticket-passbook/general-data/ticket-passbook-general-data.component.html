@@ -1,0 +1,50 @@
+<app-form-container sidebar (cancel)="cancel()" (save)="openDefaultModal()" [disabled]="!form.dirty" class="no-padding">
+    <div class="ticket-passbook-general-data-container flex flex-col gap-6">
+        @if (isOrderTemplate$ | async) {
+            <app-default-icon [tplId]="{code: ticketPassbook?.code, entityId: ticketPassbook?.entity_id}" showWarning="true"
+                [tplName]="ticketPassbook?.name" [checked]="ticketPassbook?.default_passbook" [updateDefault]="updateDefault"
+                [enabled]="ticketPassbook && !ticketPassbook.default_passbook" [literals]="defaultPassbookLiterals">
+                <ng-container slot="label">{{'TICKET_PASSBOOK.DEFAULT_TEMPLATE' | translate}}</ng-container>
+                <ng-container slot="helper">
+                    <app-help-button [message]="'TICKET_PASSBOOK.DEFAULT_TEMPLATE_DESCRIPTION' | translate" />
+                </ng-container>
+            </app-default-icon>
+        }
+
+        <mat-accordion multi togglePosition="before">
+            <mat-expansion-panel expanded>
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'TICKET_PASSBOOK.TICKET_PASSBOOK_DATA' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <form id="principalInfo" [formGroup]="formPrincipalInfo" class="flex flex-col gap-4">
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label" subscriptSizing="dynamic">
+                        <mat-label>{{'EVENTS.NAME' | translate}}</mat-label>
+                        <input matInput aria-label="name" [placeholder]="'EVENTS.NAME' | translate" formControlName="name">
+                        <mat-error [ob-form-errors]="formPrincipalInfo" field="name" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label" subscriptSizing="dynamic">
+                        <mat-label>{{'FORMS.LABELS.DESCRIPTION' | translate }}</mat-label>
+                        <textarea matInput rows="3" [placeholder]="'FORMS.LABELS.DESCRIPTION' | translate"
+                            formControlName="description"></textarea>
+                        <mat-error [ob-form-errors]="formPrincipalInfo" field="description" />
+                    </mat-form-field>
+                </form>
+            </mat-expansion-panel>
+            <mat-expansion-panel expanded id="formLanguages">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'TICKET_PASSBOOK.LANGUAGES' | translate}} *</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-language-selector #languageSelector [description]="( 'TICKET_PASSBOOK.LANGUAGES_DESCRIPTION' ) | translate"
+                    [data]="languageSelectorData" [enableDefaultSelection]="true" />
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+    <app-ticket-passbook-download slot="sidebar" />
+</app-form-container>
+
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,30 @@
+<mat-select #select class="ob-select-server-search" [placeholder]="placeholder || (defaultPlaceholder | translate)"
+    [compareWith]="compareById" [required]="required" [disabled]="disabled" [multiple]="multiple"
+    [panelClass]="'ob-select-server-search-panel elements-shown-' + $elementsToShow()" (openedChange)="openHandler($event)">
+    <mat-option>
+        <ngx-mat-select-search
+            [formControl]="searchControl" [disableInitialFocus]="false"
+            [placeholderLabel]="'FORMS.SEARCH.IN_LIST' | translate"
+            [noEntriesFoundLabel]="'FORMS.SELECT.NO_RESULTS' | translate" />
+    </mat-option>
+    <cdk-virtual-scroll-viewport class="virtual-scroll" [itemSize]="ITEM_SIZE" [style.height.px]="$scrollHeight()"
+        [minBufferPx]="ITEM_SIZE * bufferItemsAmount" [maxBufferPx]="ITEM_SIZE * bufferItemsAmount">
+        <mat-option [class.no-visible]="required && item === UNSELECT_ELEMENT"
+            *cdkVirtualFor="let item of internalOptionsBS | async; trackBy: trackBy" [value]="item"
+            [class.select-all]="item === UNSELECT_ELEMENT && multiple" [class.options-loader]="item === LOADER_ELEMENT">
+            @if (item !== LOADER_ELEMENT) {
+                @if (item !== UNSELECT_ELEMENT && optionTemplateRef) {
+                    <ng-template *ngTemplateOutlet="optionTemplateRef; context: {$implicit: item}" />
+                } @else {
+                    {{item !== UNSELECT_ELEMENT ? item?.name : unselectLabel || placeholder || (defaultPlaceholder | translate)}}
+                }
+            } @else {
+                <mat-progress-spinner
+                    (appIntersectionListener)="loadMore($event)"
+                    mode="indeterminate"
+                    class="loading-spinner"
+                    diameter="32" />
+            }
+        </mat-option>
+    </cdk-virtual-scroll-viewport>
+</mat-select>

@@ -1,0 +1,48 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="100%" class="secondary title">{{'PROFESSIONAL_SELLING.EDIT_EVENT_CONDITIONS' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="row wrap">
+        @if (selectedClients?.length) {
+            <div fxFlex="0 1 100%" fxLayoutAlign="center" class="restore-initial-conditions-btn-container">
+                <button type="button" mat-stroked-button class="ob-button" color="tertiary"
+                    [disabled]="!hasCustomConditions || (inProgress$ | async)"
+                    (click)="restoreInitialConditions()">
+                    <mat-icon>undo</mat-icon>
+                    {{'PROFESSIONAL_SELLING.RESTORE_INITIAL_B2B_CONDITIONS' | translate}}
+                </button>
+            </div>
+            <mat-divider fxFlex="0 1 100%" class="ob-grid-divider" />
+        }
+        <app-b2b-conditions-form [form]="form" [getConditions$]="getConditions$" [currencies]="currencies" />
+        @if (!selectedClients?.length) {
+            <mat-divider fxFlex="0 1 100%" class="ob-grid-divider" />
+            <div fxFlex="0 1 100%" fxLayoutAlign="center" class="delete-event-conditions-btn-container">
+                <button type="button" mat-stroked-button class="ob-button" color="primary"
+                    [disabled]="(noEventConditionsFound$ | async) || (inProgress$ | async)"
+                    (click)="deleteConditions()">
+                    <mat-icon>delete</mat-icon>
+                    {{'PROFESSIONAL_SELLING.DELETE_EVENT_B2B_CONDITIONS' | translate}}
+                </button>
+            </div>
+        }
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()" [disabled]="(inProgress$ | async)">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="saveConditions()"
+            [disabled]="(!form.dirty) || (inProgress$ | async)">
+            {{'FORMS.ACTIONS.SAVE' | translate}}
+        </button>
+    </div>
+</div>
+
+@if (inProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

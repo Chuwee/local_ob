@@ -1,0 +1,53 @@
+<div fxLayout="row wrap">
+    <div fxFlex="100%" *ngIf="actions?.length <= actionsHistoryPageSize">
+        <p class="ticket-table-count mat-subtitle-2" fxFlex="100%" fxLayoutAlign="start center">
+            {{'TICKET.ACTIONS_HISTORY.ALL.TOTAL_NUMBER' | translate: { total: actions?.length } }}&nbsp;
+            <mat-icon fxFlexAlign="center" class="ob-help-icon"
+                [matTooltip]="'TICKET.ACTIONS_HISTORY.ALL.INFO' | translate">
+                help_outline
+            </mat-icon>
+        </p>
+    </div>
+    <div class="filter-container" fxLayoutGap="20px" *ngIf="actions?.length > actionsHistoryPageSize" fxFlex="100%">
+        <div class="paginator" fxFlex fxLayoutAlign="end center" fxLayoutGap="10px">
+            <p *ngIf="actions" class="page-summary" [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: {
+                        startItem: getPaginatorStartItem(actionsPage$ | async),
+                        endItem: getPaginatorEndItem(actionsPage$ | async, actions?.length),
+                        total: actions?.length
+                    }">
+            </p>
+            <mat-paginator [pageSize]="actionsHistoryPageSize" [pageIndex]="actions" hidePageSize (page)="pageFilter($event)"
+                [length]="actions?.length"></mat-paginator>
+        </div>
+    </div>
+    <div class="table-container" fxFlex="100%">
+        <mat-table class="ob-table ticket-detail-table" [dataSource]="pagedActions$ | async">
+            <ng-container matColumnDef="date">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'FORMS.LABELS.DATE' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    {{row.date | dateTime : dateTimeFormats.shortDateTime}}
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="type">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'FORMS.LABELS.TYPE' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    {{('ENUMS.B2B_SEAT_TYPE_OPTS.' + row.type) | translate}}
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="publisher">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'FORMS.LABELS.USER' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    {{row.publisher?.username}}
+                </mat-cell>
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="printsColumns;  sticky: true" class="dense-row"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: printsColumns;" class="dense-row"></mat-row>
+        </mat-table>
+    </div>
+</div>

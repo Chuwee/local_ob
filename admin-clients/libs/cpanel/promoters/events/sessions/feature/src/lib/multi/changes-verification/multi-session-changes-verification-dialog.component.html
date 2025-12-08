@@ -1,0 +1,100 @@
+<div class="create-single-session-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'TITLES.MULTISESSION_CHANGES' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch" class="dialog-grid-form">
+        <div *ngIf="(filteredResult$ | async) === undefined || (isActionInProgress$ | async)"
+            fxLayoutAlign="center start">
+            <app-context-notification class="ob-context-notification" contextType="info" fxFlex="100%">
+                <p>
+                    {{((isActionExecuted$ | async) ?
+                    'EVENTS.SESSION.UPDATE_ACTION_IN_PROGRESS' :
+                    'EVENTS.SESSION.UPDATE_VALIDATION_IN_PROGRESS') | translate}}
+                </p>
+                <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar">
+                </mat-progress-bar>
+            </app-context-notification>
+        </div>
+        <div *ngIf="(isActionInProgress$ | async) === false">
+            <div fxLayoutAlign="start center" *ngIf="(totals$ | async)?.errors" class="total-errors-msg">
+                <mat-icon class="total-errors-icon">
+                    warning
+                </mat-icon>
+                {{((isActionExecuted$ | async) ?
+                'EVENTS.SESSION.INCOMPATIBLE_SESSIONS_RESULT_MSG' :
+                'EVENTS.SESSION.INCOMPATIBLE_SESSIONS_MSG') | translate : {
+                totalErrors: (totals$ | async)?.errors,
+                totalSessions: (totals$ | async)?.sessions
+                } }}
+            </div>
+            <div fxLayoutAlign="start center" *ngIf="(isActionExecuted$ | async) && (totals$ | async)?.errors === 0"
+                class="no-errors-msg">
+                <mat-icon class="no-errors-icon">
+                    check_circle
+                </mat-icon>
+                {{'EVENTS.SESSION.ALL_SESSIONS_SAVED_MSG' | translate : {
+                totalSessions: (totals$ | async)?.sessions
+                } }}
+            </div>
+            <div class="results-container">
+                <div class="results-filter">
+                    <mat-radio-group [formControl]="resultsFilter">
+                        <mat-radio-button class="ob-radio-button" [value]="bulkResultsFilter.noCompatibles">
+                            <div>{{'EVENTS.SESSION.NO_COMPATIBLES' | translate}}</div>
+                        </mat-radio-button>
+                        <mat-radio-button class="ob-radio-button" [value]="bulkResultsFilter.compatibles">
+                            <div>{{'EVENTS.SESSION.COMPATIBLES' | translate}}</div>
+                        </mat-radio-button>
+                        <mat-radio-button class="ob-radio-button" [value]="bulkResultsFilter.all">
+                            <div>{{'EVENTS.SESSION.ALL' | translate}} ({{(totals$ | async)?.sessions}})</div>
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </div>
+                <table mat-table class="ob-table" [dataSource]="filteredResult$ | async">
+                    <ng-container matColumnDef="status">
+                        <th mat-header-cell *matHeaderCellDef class="head-cell"></th>
+                        <td mat-cell *matCellDef="let row">
+                            <mat-icon *ngIf="row.status === sessionBulkStatus.error" class="error-icon"
+                                [matTooltip]="('EVENTS.SESSION.ERRORS.' + row.errorKey) | translate"
+                                matTooltipClass="ob-tooltip-error">
+                                error_outline
+                            </mat-icon>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="name">
+                        <th mat-header-cell *matHeaderCellDef class="head-cell">
+                            {{'EVENTS.SESSION.NAME' | translate}}
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                            {{row.name}}
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="date">
+                        <th mat-header-cell *matHeaderCellDef class="head-cell">
+                            {{'EVENTS.SESSION.DATE_TIME' | translate}}
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                            {{row.date | dateTime : dateTimeFormats.shortDateTime}}
+                        </td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="tableColumns" class="dense-row"></tr>
+                    <tr mat-row *matRowDef="let row; columns: tableColumns;" class="dense-row hoverable-row"
+                        [class.error-row]="row.status === sessionBulkStatus.error"></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button *ngIf="(isActionExecuted$ | async) === false" type="button" mat-button class="ob-button"
+            (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="updateOrClose()"
+            [disabled]="isActionInProgress$ | async">
+            {{((isActionExecuted$ | async) ? 'FORMS.ACTIONS.AGREED' : 'FORMS.ACTIONS.UPDATE_COMPATIBLES') | translate}}
+        </button>
+    </div>
+</div>

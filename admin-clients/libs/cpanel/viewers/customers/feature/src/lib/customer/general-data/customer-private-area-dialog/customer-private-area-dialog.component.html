@@ -1,0 +1,42 @@
+<div>
+    <div mat-dialog-title>
+        <div class="flex flex-row justify-between">
+            <h2 class="secondary title">
+                {{'CUSTOMER.PRIVATE_AREA.DIALOG_TITLE' | translate}}
+            </h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon fontIcon="close" />
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content>
+        <form [formGroup]="form" class="flex flex-col justify-start items-stretch">
+            <p>{{'CUSTOMER.PRIVATE_AREA.DIALOG_INFO' | translate}}</p>
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.CHANNEL' | translate}}</mat-label>
+                <mat-select formControlName="channel" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                    @for (channel of $channels(); track channel.id) {
+                        <mat-option [value]="channel">{{channel.name}}</mat-option>
+                    }
+                </mat-select>
+                <mat-error [ob-form-errors]="form" field="channel" />
+            </mat-form-field>
+        </form>
+    </div>
+    <div mat-dialog-actions>
+        <div class="flex flex-row flex-nowrap justify-end basis-full">
+            <button mat-button type="button" class="ob-button" (click)="close()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button mat-flat-button color="primary" type="button" class="ob-button"
+                    [disabled]="!form.valid" (click)="access()">
+                {{'FORMS.ACTIONS.ACCESS' | translate}}
+            </button>
+        </div>
+    </div>
+</div>
+@if ($isLoading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

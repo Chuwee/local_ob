@@ -1,0 +1,116 @@
+<app-form-container [disabled]="!(form?.dirty)" (cancel)="cancelChanges()" (save)="save()">
+    <div [formGroup]="form" class="flex flex-col gap-4">
+        <mat-radio-group [formControl]="form.controls.isEnabled">
+            <mat-radio-button [value]="false" class="ob-radio-button vertical-list">
+                {{'EVENTS.SESSION.DYNAMIC_PRICES.FORMS.LABELS.DISABLE_EVENT_PRICES' | translate}}
+                <a class="ob-link" [routerLink]="['/events', this.$session().event.id, 'prices', 'price-types']">
+                    {{'EVENTS.SESSION.DYNAMIC_PRICES.ACTIONS.GO_TO_EVENT_PRICES' | translate}}
+                </a>
+            </mat-radio-button>
+            <mat-radio-button [value]="true" class="ob-radio-button vertical-list">
+                {{'EVENTS.SESSION.DYNAMIC_PRICES.FORMS.LABELS.ENABLE_DYNAMIC_PRICES' | translate}}
+            </mat-radio-button>
+        </mat-radio-group>
+        @if (form.controls.isEnabled.value || dataSource$()) {
+            <div class="details-non-editable-field flex flex-col">
+                <span class="field-label">{{'EVENTS.SESSION.DYNAMIC_PRICES.LABELS.VENUE_TEMPLATE' | translate}}</span>
+                <span>
+                    {{this.$session().venue_template.name}}
+                </span>
+            </div>
+            @if ($isLoading()) {
+                <div class="spinner-container">
+                    <mat-spinner />
+                </div>
+            }
+            <mat-table class="ob-table" [dataSource]="dataSource$()">
+                <ng-container [matColumnDef]="columns[0]">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'EVENTS.SESSION.DYNAMIC_PRICES.TABLE.LABELS.PRICE_ZONE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row;">
+                        {{row.price_zone_name}}
+                    </mat-cell>
+                </ng-container>
+                <ng-container [matColumnDef]="columns[1]">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'EVENTS.SESSION.DYNAMIC_PRICES.TABLE.LABELS.TIER_NAME' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row;">
+                        @if (!row.dynamic_prices?.length) {
+                            -
+                        } @else {
+                            {{row.dynamic_prices[0].name}}
+                        }
+                    </mat-cell>
+                </ng-container>
+                <ng-container [matColumnDef]="columns[2]">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'EVENTS.SESSION.DYNAMIC_PRICES.TABLE.LABELS.CONDITION_TYPE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row;">
+                        <div class="flex flex-col gap-2">
+                            @if (!row.dynamic_prices?.length) {
+                                <div class="ob-status-badge tag capitalized flex flex-row items-center">
+                                    <mat-icon class="ob-icon xsmall with-text">indeterminate_check_box</mat-icon>
+                                    <div>{{'EVENTS.SESSION.DYNAMIC_PRICES.TABLE.TAGS.NONE' | translate}}</div>
+                                </div>
+                            }
+                            @else {
+                                @if (row.dynamic_prices[0].condition_types.includes('DATE')) {
+                                    <div class="ob-status-badge tag capitalized flex flex-row items-center">
+                                        <mat-icon class="ob-icon xsmall with-text">calendar_today</mat-icon>
+                                        <div>{{'EVENTS.SESSION.DYNAMIC_PRICES.TABLE.TAGS.DATE' | translate}}</div>
+                                    </div>
+                                }
+                                @if (row.dynamic_prices[0].condition_types.includes('CAPACITY')) {
+                                    <div class="ob-status-badge tag capitalized flex flex-row items-center">
+                                        <mat-icon class="ob-icon xsmall with-text">event_seat</mat-icon>
+                                        <div>{{'EVENTS.SESSION.DYNAMIC_PRICES.TABLE.TAGS.CAPACITY' | translate}}</div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </mat-cell>
+                </ng-container>
+                <ng-container [matColumnDef]="columns[3]">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'EVENTS.SESSION.DYNAMIC_PRICES.TABLE.LABELS.TIER_END' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row;" class="right">
+                        @if (!row.dynamic_prices?.length) {
+                            -
+                        } @else {
+                            <div class="flex flex-col gap-2">
+                                @if (row.dynamic_prices[0].condition_types.includes('DATE')) {
+                                    <div>
+                                        {{row.dynamic_prices[0].valid_date | localDateTime: dateTimeFormats.shortDateTime}}
+                                    </div>
+                                }
+                                @if (row.dynamic_prices[0].condition_types.includes('CAPACITY')) {
+                                    <div>
+                                        {{row.dynamic_prices[0].capacity}}
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </mat-cell>
+                </ng-container>
+                <ng-container [matColumnDef]="columns[4]">
+                    <mat-header-cell *matHeaderCellDef class="head-cell price-column">
+                        {{'EVENTS.SESSION.DYNAMIC_PRICES.TABLE.LABELS.PRICE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row;" class="right price-column">
+                        {{ row.dynamic_prices[0]?.dynamic_rates_price | sessionDynamicPricesRangePipe: $currency()}}
+                    </mat-cell>
+                </ng-container>
+                <mat-header-row *matHeaderRowDef="columns;" class="dense-row" />
+                <mat-row *matRowDef="let row; columns: columns;" class="dense-row interactive-row"
+                    (click)="openSidebarWithZone(row)"
+                    [matTooltipPositionAtOrigin]="true"
+                    [matTooltip]="!row.dynamic_prices?.length ?
+                    ('EVENTS.SESSION.DYNAMIC_PRICES.TABLE.TOOLTIP.NO_TIER' | translate) : ''" />
+            </mat-table>
+        }
+    </div>
+</app-form-container>

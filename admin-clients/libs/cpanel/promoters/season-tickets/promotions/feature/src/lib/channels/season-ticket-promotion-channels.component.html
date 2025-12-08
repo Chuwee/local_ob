@@ -1,0 +1,49 @@
+<div fxLayout="column" class="promotion-channels-container">
+    <p class="mat-subtitle-2">{{'SEASON_TICKET.PROMOTIONS.CHANNELS_DESCRIPTION' | translate}} *</p>
+    <mat-radio-group [formControl]="channelsForm.get('type')" fxLayout="column">
+        <mat-radio-button class="ob-radio-button vertical-list" [value]="promotionChannelsScope.all">
+            {{'SEASON_TICKET.PROMOTIONS.CHANNELS_OPTS.ALL' | translate}}
+        </mat-radio-button>
+        <mat-radio-button class="ob-radio-button vertical-list" [value]="promotionChannelsScope.restricted">
+            {{'SEASON_TICKET.PROMOTIONS.CHANNELS_OPTS.SELECT' | translate}}
+        </mat-radio-button>
+    </mat-radio-group>
+    <div class="channels-list-container nested-content" fxLayout="column" fxLayoutAlign="start start">
+        <div [fxShow]="channelsForm.get('type').value === promotionChannelsScope.restricted" class="channel-list"
+            [class.field-error]="channelsForm.get('selected').invalid && channelsForm.get('selected').touched">
+            <app-searchable-paginated-selection class="ob-medium-list" [placeholder]="'FORMS.SEARCH.SESSIONS' | translate"
+                [pageSize]="pageSize" [data$]="channelsListData$" [metadata$]="metadata$" [loading$]="isLoading$"
+                [form]="channelsForm?.get('selected')" (loadData)="filterChangeHandler($event)">
+                <div slot="filter">
+                    <mat-form-field fxFlex="200px" appearance="outline" class="ob-form-field field-with-label inline-field">
+                        <mat-label>{{'CHANNELS.TYPE' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate"
+                            (selectionChange)="filterChannels($event.value)">
+                            <mat-option>
+                                {{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}
+                            </mat-option>
+                            <mat-option *ngFor="let type of channelType | keyvalue" [value]="type.value">
+                                {{type.value && 'CHANNELS.TYPE_OPTS.' + type.value | translate}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data"
+                    let-selectionChanged="selectionChanged">
+                    <app-selection-list [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged"
+                        class="small-rows">
+                        <ng-template #optionTemplate let-row>
+                            <div fxLayoutAlign="space-between">
+                                <span>{{row.name}}</span>
+                            </div>
+                        </ng-template>
+                    </app-selection-list>
+                </ng-template>
+            </app-searchable-paginated-selection>
+        </div>
+        <span *ngIf="channelsForm.hasError('required', 'selected') && channelsForm.get('selected').touched"
+            class="error-description">
+            {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+        </span>
+    </div>
+</div>

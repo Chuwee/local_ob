@@ -1,0 +1,61 @@
+<div class="flex flex-col" [formGroup]="$form()">
+    <div class="flex flex-col">
+        <mat-checkbox color="primary" class="inline" formControlName="enabled">
+            <b>{{'PROMOTIONS.BY_RATE_TICKETS_GROUPS.ENABLE' | translate}}</b>
+        </mat-checkbox>
+        <div class="promotions-by-rate-tickets-groups-description">
+            <div class="flex flex-col gap-2">
+                <p>{{'PROMOTIONS.BY_RATE_TICKETS_GROUPS.DESCRIPTION' | translate}}</p>
+                @if(this.$form()?.value.enabled) {
+                    <div class="flex flex-col gap-4" formArrayName="rate_ticket_groups">
+                        <!-- RATE TICKETS GROUP LIST -->
+                        @for(rate of rateTicketsGroups.controls; track rate; let first = $first; let i = $index) {
+                            <div class="flex flex-1 flex-row items-center" [formGroupName]="i">
+                                <!-- TICKETS NUMBER -->
+                                <mat-form-field appearance="outline"
+                                    class="ob-form-field field-with-label inline-field flex-[0_0_150px]">
+                                    <mat-label class="ob-form-field field-with-label">
+                                        {{'PROMOTIONS.BY_RATE_TICKETS_GROUPS.TICKETS_NUMBER' | translate}}
+                                    </mat-label>
+                                    <input matInput type="number" min="0" formControlName="limit" placeholder="0">
+                                </mat-form-field>
+                                <mat-divider class="ob-divider" />
+                                <!-- RATES -->
+                                <mat-form-field appearance="outline" class="ob-form-field field-with-label inline-field flex-[0_0_300px]">
+                                    <mat-label class="ob-form-field field-with-label">
+                                        {{'PROMOTIONS.BY_RATE_TICKETS_GROUPS.RATE' | translate}}
+                                    </mat-label>
+                                    <mat-select formControlName="rate" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                        @for(rate of $availableRates(); track rate.id) {
+                                            <mat-option [disabled]="rate.disabled" [value]="rate.id">
+                                                {{rate.name}}
+                                            </mat-option>
+                                        }
+                                    </mat-select>
+                                </mat-form-field>
+                                <button mat-icon-button class="ob-button small"
+                                    [disabled]="first && rateTicketsGroups.at(0).invalid"
+                                    (click)="deleteRateTicketsGroup(i)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </div>
+                        }
+                        @let lastRateTicketGroup = rateTicketsGroups.at(rateTicketsGroups.length - 1);
+                        @if($allowAddRateTicketsGroup()) {
+                            <div class="add-group flex flex-row items-center" [class.disabled]="lastRateTicketGroup?.invalid"
+                                (click)="(lastRateTicketGroup?.valid) && addRateTicketsGroup()">
+                                <button mat-icon-button type="button" [disabled]="lastRateTicketGroup?.invalid"
+                                    class="ob-button mat-stroked-button xsmall">
+                                    <mat-icon>add</mat-icon>
+                                </button>
+                                <span>
+                                    {{'PROMOTIONS.BY_RATE_TICKETS_GROUPS.ADD' | translate}}
+                                </span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

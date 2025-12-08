@@ -1,0 +1,83 @@
+<app-form-container layout="menu" *ngIf="(subscriptionModes$ | async) !== null" hideActionBar>
+
+    <p class="body-1 description">
+        {{'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.DESCRIPTION' | translate}}
+    </p>
+
+    <div class="sub-modes-list" fxLayout="column">
+        <div fxFlex="none" fxLayoutAlign="end">
+            <button mat-stroked-button color="primary" class="ob-button medium add-button"
+                [attr.aria-label]="'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.NEW' | translate"
+                (click)="open()">
+                <mat-icon>add</mat-icon>
+                {{'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.NEW' | translate}}
+            </button>
+        </div>
+
+        <mat-table class="ob-table" [dataSource]="subscriptionModes$">
+
+            <ng-container matColumnDef="sid">
+                <mat-header-cell *matHeaderCellDef class="head-cell sid">
+                    {{ 'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.ID' | translate }}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row" class="sid">
+                    {{ row.sid }}
+                </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+                <mat-header-cell *matHeaderCellDef class="head-cell name">
+                    {{ 'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.NAME' | translate }}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row" class="name">
+                    {{ row.name }}
+                </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="active">
+                <mat-header-cell *matHeaderCellDef class="head-cell active">
+                    {{ 'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.ENABLED' | translate }}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row; let i = index;" class="active" (click)="$event.stopPropagation()">
+                    <mat-slide-toggle class="ob-slide-toggle"
+                        (change)="toggle(row, $event.checked)" [checked]="row.active">
+                    </mat-slide-toggle>
+                </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+                <mat-header-cell *matHeaderCellDef class="head-cell actions"></mat-header-cell>
+                <mat-cell *matCellDef="let row" class="actions-buttons" (click)="$event.stopPropagation()">
+                    <button mat-icon-button [matTooltip]="'FORMS.ACTIONS.MODIFY' | translate"
+                        aria-label="Edit subscription mode" class="ob-button medium" (click)="open(row)">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button [matTooltip]="'FORMS.ACTIONS.DELETE' | translate"
+                        aria-label="Delete subscription mode" class="ob-button medium" (click)="delete(row)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="columns" class="dense-row"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: columns;" class="dense-row"></mat-row>
+        </mat-table>
+    </div>
+
+</app-form-container>
+
+<ng-container *ngIf="loading$ | async">
+    <div class="spinner-container">
+        <mat-spinner></mat-spinner>
+    </div>
+</ng-container>
+
+<ng-container *ngIf="error$ | async">
+    <div fxFlex="0 1 1080px" fxLayout="column">
+        <div fxFlex="0 0 300px" fxLayoutAlign="center center">
+            <app-context-notification class="ob-context-notification" contextType="warn">
+                {{'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.ERROR' | translate}}
+            </app-context-notification>
+        </div>
+    </div>
+</ng-container>

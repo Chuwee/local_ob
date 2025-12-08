@@ -1,0 +1,26 @@
+{
+  "name": "shared-ui-components-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/shared-ui-components-e2e/src",
+  "projectType": "application",
+  "tags": [],
+  "implicitDependencies": ["shared-common-ui-components"],
+  "targets": {
+    "e2e": {
+      "executor": "@nx/cypress:cypress",
+      "options": {
+        "cypressConfig": "apps/shared-ui-components-e2e/cypress.config.ts",
+        "devServerTarget": "shared-common-ui-components:storybook",
+        "testingType": "e2e"
+      },
+      "configurations": {
+        "ci": {
+          "devServerTarget": "shared-common-ui-components:static-storybook:ci"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

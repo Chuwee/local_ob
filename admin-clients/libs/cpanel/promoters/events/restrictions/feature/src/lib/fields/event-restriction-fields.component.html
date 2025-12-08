@@ -1,0 +1,47 @@
+<ng-container *ngFor="let field of fields$ | async" [formGroup]="form.get('fields')">
+    <mat-label [attr.name]="field.id">{{field.label | translate}}</mat-label>
+    <ng-container [ngSwitch]="field.type">
+
+        <ng-container *ngSwitchCase="'multiselect'">
+            <mat-form-field [attr.name]="field.id" appearance="outline" class="ob-form-field inline-field">
+                <mat-select #select multiple [formControlName]="field.id" [attr.aria-label]="field.id"
+                    [placeholder]="(field.placeholder || 'FORMS.SELECT.PLACE_HOLDER') | translate">
+                    <mat-option>
+                        <app-select-search #search searchField="name" [requireSelection]="true" [options$]="field.source$"
+                            [placeholderLabel]="'FORMS.SEARCH.NAME' | translate">
+                        </app-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let option of search.getFilteredOptions$() | async" [value]="option.id">
+                        {{option.namedOption || option.name}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'select'">
+            <mat-form-field [attr.name]="field.id" appearance="outline" class="ob-form-field inline-field">
+                <mat-select #select [formControlName]="field.id" [attr.aria-label]="field.id"
+                    [placeholder]="(field.placeholder || 'FORMS.SELECT.PLACE_HOLDER') | translate">
+                    <mat-option *ngFor="let option of field.source$ | async" [value]="option.id">
+                        {{option.namedOption || option.name}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'text'">
+            <mat-form-field [attr.name]="field.id" appearance="outline" class="ob-form-field inline-field">
+                <input matInput [formControlName]="field.id" [attr.aria-label]="field.id"
+                    [placeholder]="(field.placeholder || 'FORMS.SELECT.PLACE_HOLDER') | translate">
+            </mat-form-field>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'number'">
+            <mat-form-field [attr.name]="field.id" appearance="outline" class="ob-form-field inline-field">
+                <input matInput [formControlName]="field.id" [attr.aria-label]="field.id"
+                    [placeholder]="(field.placeholder || 'FORMS.SELECT.PLACE_HOLDER') | translate">
+            </mat-form-field>
+        </ng-container>
+
+    </ng-container>
+</ng-container>

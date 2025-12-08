@@ -1,0 +1,378 @@
+@use '@angular/material' as mat;
+@mixin button-toggle-group-override($palettes, $colors, $typography) {
+    $primary: map-get($palettes, primary);
+    $ob-white: map-get($colors, ob-white);
+    $ob-grey: map-get($colors, ob-grey);
+    $ob-grey-light-10: map-get($colors, ob-grey-light-10);
+    $ob-grey-light-20: map-get($colors, ob-grey-light-20);
+    $ob-black: map-get($colors, ob-black);
+    $ob-bg-1: map-get($colors, ob-bg-1);
+    $ob-bg-2: map-get($colors, ob-bg-2);
+    $warn-color: mat.m2-get-color-from-palette(map-get($palettes, warn));
+
+    .mat-button-toggle-group {
+        --mat-standard-button-toggle-label-text-font: Nunito Sans;
+        --mat-standard-button-toggle-label-text-size: 14px;
+        &.ob-subtab {
+            padding: 40px 0 20px;
+            margin: 0;
+            z-index: 9999;
+            background-color: $ob-white;
+            border-radius: 0;
+            border: none;
+            border-right: solid 1px $ob-grey-light-20;
+            overflow: initial;
+            gap: 10px;
+            .mat-button-toggle {
+                @include mat.m2-typography-level($typography, body-1);
+                color: $ob-grey;
+                height: 40px;
+                min-height: 40px;
+                border-top: none;
+                background-color: #00000000;
+                &.mat-button-toggle-disabled {
+                    opacity: 0.5;
+                }
+                &.mat-button-toggle-checked {
+                    color: $ob-black;
+                    background-color: unset;
+                    .mat-button-toggle-button {
+                        border-right: solid 5px
+                            mat.m2-get-color-from-palette($primary);
+                        background-color: mat.m2-get-color-from-palette(
+                            $primary,
+                            100
+                        );
+                    }
+                }
+                .mat-button-toggle-button {
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    border-right: solid 5px #00000000;
+                }
+                .mat-button-toggle-label-content {
+                    line-height: 1.2;
+                    left: 0;
+                    text-align: left;
+                    padding-left: 16px;
+                    padding-bottom: 5px;
+                    padding-top: 5px;
+                    white-space: normal;
+                    width: 100%;
+                }
+                .mat-button-toggle-focus-overlay {
+                    background-color: #00000000;
+                    border: unset;
+                }
+                &:not(.mat-button-toggle-disabled):hover {
+                    color: $ob-black;
+                    background-color: mat.m2-get-color-from-palette($primary, 50);
+                }
+            }
+            &.mat-button-toggle-group-appearance-standard.mat-button-toggle-vertical
+                .mat-button-toggle
+                + .mat-button-toggle {
+                border-left: none;
+                border-top: none;
+            }
+            // Level 5 inside 4A menu
+            .mat-expansion-panel {
+                // material override:
+                &:not(.mat-expanded)
+                    .mat-expansion-panel-header:hover:not(
+                        [aria-disabled="true"]
+                    ) {
+                    background: none;
+                }
+                .mat-expansion-panel-header {
+                    @include mat.m2-typography-level($typography, body-1);
+                    height: 40px;
+                    padding: 0 16px 0;
+                    .mat-expansion-indicator::after {
+                        margin-bottom: 5px;
+                    }
+                }
+                .mat-expansion-panel-header-title:not(:active) {
+                    color: $ob-grey;
+                }
+                .mat-expansion-panel-body {
+                    padding: 0;
+                    .mat-button-toggle {
+                        @include mat.m2-typography-level($typography, caption);
+                        display: block;
+                        height: unset;
+                        min-height: unset;
+                        margin: 0;
+                        .mat-button-toggle-label-content {
+                            padding-left: 24px;
+                        }
+                    }
+                }
+            }
+        }
+        &.ob-flat-button-group {
+            &.mat-button-toggle-group-appearance-standard {
+                border: unset;
+                border-radius: 0;
+                .mat-button-toggle-appearance-standard.mat-button-toggle {
+                    border-color: $ob-grey-light-10;
+                    border-width: thin;
+                    border-top-style: solid;
+                    border-bottom-style: solid;
+                    color: $ob-grey;
+                    .mat-button-toggle-label-content > * {
+                        vertical-align: text-top;
+                    }
+                    &:hover:not(.mat-button-toggle-checked) {
+                        color: $ob-black;
+                    }
+                    &.mat-button-toggle-checked {
+                        color: $ob-white;
+                        background-color: mat.m2-get-color-from-palette(
+                            $primary,
+                            darker
+                        );
+                        border-color: mat.m2-get-color-from-palette(
+                            $primary,
+                            darker
+                        );
+                    }
+                    &:first-child {
+                        border-top-left-radius: 2px;
+                        border-bottom-left-radius: 2px;
+                        border-left-style: solid;
+                    }
+                    &:last-child {
+                        border-top-right-radius: 2px;
+                        border-bottom-right-radius: 2px;
+                        border-right-style: solid;
+                    }
+                }
+                &.small {
+                    .mat-button-toggle-appearance-standard
+                        .mat-button-toggle-label-content {
+                        line-height: 28px;
+                        .mat-icon {
+                            width: 21px;
+                            height: 21px;
+                            font-size: 21px;
+                        }
+                    }
+                }
+                &.medium {
+                    .mat-button-toggle-appearance-standard
+                        .mat-button-toggle-label-content {
+                        line-height: 34px;
+                        .mat-icon {
+                            width: 21px;
+                            height: 21px;
+                            font-size: 21px;
+                        }
+                    }
+                }
+            }
+        }
+        &.ob-popover-button-group {
+            &.mat-button-toggle-group-appearance-standard {
+                border-color: $ob-grey-light-20;
+                border-width: thin;
+                border-top-style: solid;
+                border-bottom-style: solid;
+
+                &.active {
+                    border-color: $ob-black;
+                }
+
+                .mat-button-toggle-appearance-standard.mat-button-toggle {
+                    background-color: $ob-bg-1;
+                    padding-left: 10px;
+                    padding-right: 10px;
+
+                    &.mat-button-toggle-checked {
+                        color: unset;
+                        background-color: unset;
+                    }
+                    .mat-button-toggle-label-content > * {
+                        vertical-align: middle;
+                    }
+                    &.text-button:not(.text-button-range) {
+                        @include mat.m2-typography-level($typography, button);
+                    }
+                    &.text-button-range {
+                        background-color: $ob-white;
+                        .empty-date {
+                            color: $ob-grey-light-20;
+                        }
+                    }
+                    &.icon-button {
+                        color: $ob-white;
+                        background-color: mat.m2-get-color-from-palette($primary);
+                    }
+                    &.only-icon {
+                        padding-left: 0;
+                        padding-right: 0;
+                    }
+                    &:hover:not(&.mat-button-toggle-disabled):not(
+                            .icon-button
+                        ) {
+                        background-color: map-get($colors, ob-bg-3);
+                        stroke-opacity: 90%;
+                    }
+                    &.mat-button-toggle-disabled {
+                        opacity: 50%;
+                        color: rgba(0, 0, 0, 0.26);
+                    }
+                }
+                &.small {
+                    .mat-button-toggle-appearance-standard {
+                        .mat-button-toggle-label-content {
+                            line-height: 28px;
+
+                            .mat-icon {
+                                width: 21px;
+                                height: 21px;
+                                font-size: 21px;
+                            }
+                        }
+                    }
+                }
+                &.medium {
+                    .mat-button-toggle-appearance-standard {
+                        .mat-button-toggle-label-content {
+                            line-height: 34px;
+                            .mat-icon {
+                                width: 21px;
+                                height: 21px;
+                                font-size: 21px;
+                            }
+                        }
+                    }
+                }
+                .ob-form-field.mat-mdc-form-field & {
+                    border: none;
+                    border-radius: 0;
+                    .mat-button-toggle-appearance-standard.mat-button-toggle {
+                        padding: 0;
+                        border-left: none;
+                        //TODO: only works with mouse, not with keyboard
+                        &:hover:not(&.mat-button-toggle-disabled) {
+                            .mat-button-toggle-focus-overlay {
+                                background-color: unset;
+                            }
+                            &:not(.icon-button) {
+                                background-color: $ob-white;
+                            }
+                        }
+                        &:not(.icon-button) {
+                            .mat-button-toggle-button {
+                                text-align: left;
+                            }
+                        }
+                    }
+                    &.medium {
+                        .mat-button-toggle-appearance-standard {
+                            .mat-button-toggle-label-content {
+                                line-height: 16px;
+                                .mat-icon {
+                                    width: 16px;
+                                    height: 16px;
+                                    font-size: 16px;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        &.ob-round-button-group {
+            @include mat.m2-typography-level($typography, caption);
+            border: 0;
+            .mat-button-toggle-appearance-standard {
+                border: solid 1px rgba(0, 0, 0, 0.12);
+                border-radius: 100%;
+                transition: border 200ms ease-out;
+                &:not(:last-child) {
+                    margin-right: 10px;
+                }
+                &.mat-button-toggle-checked {
+                    color: $ob-white;
+                    background-color: mat.m2-get-color-from-palette($primary);
+                }
+                &:not(.mat-button-toggle-disabled):hover {
+                    border: solid 1px $ob-black;
+                    .mat-button-toggle-focus-overlay {
+                        opacity: 0;
+                    }
+                }
+                .mat-button-toggle-label-content {
+                    width: 28px;
+                    line-height: 28px;
+                    padding: 0;
+                }
+                .mat-button-toggle-ripple {
+                    border-radius: 100%;
+                }
+            }
+        }
+        &.ob-outline-button-group {
+            &.mat-button-toggle-group-appearance-standard {
+                border: 0;
+                border-radius: 0;
+                &.mat-button-toggle-vertical .mat-button-toggle {
+                    &.mat-button-toggle-checked {
+                        background-color: unset;
+                        color: mat.m2-get-color-from-palette($primary, darker);
+                        .mat-button-toggle-button {
+                            border: 1px
+                                mat.m2-get-color-from-palette($primary, darker)
+                                solid;
+                        }
+                        .mat-button-toggle-label-content {
+                            font-weight: bold;
+                        }
+                    }
+                    + .mat-button-toggle {
+                        border: 0;
+                        border-radius: 0;
+                    }
+                    .mat-button-toggle-button {
+                        border: 1px solid transparent;
+                        border-radius: 2px;
+                    }
+                    mat-checkbox {
+                        margin-right: 10px;
+                        vertical-align: initial;
+                        .mat-checkbox-layout {
+                            padding-top: 8px;
+                        }
+                    }
+                }
+                .mat-button-toggle-appearance-standard
+                    .mat-button-toggle-label-content {
+                    line-height: 34px;
+                    text-align: left;
+                    padding-right: 30px;
+                }
+            }
+        }
+    }
+
+    div:has(> .subtabs-container) {
+        padding-left: calc(50% - 640px);
+    }
+
+    .subtabs-container {
+        position: relative;
+        .mat-button-toggle-group {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            box-sizing: border-box;
+            mat-expansion-panel {
+                min-height: fit-content;
+            }
+        }
+    }
+}

@@ -1,0 +1,67 @@
+<div>
+    <div class="session-tab__filters" slot="fixed">
+        <div class="session-tab__filters-actions">
+            <ion-button fill="clear" class="btn-filter" (click)="goToSessionFilters()">
+                <ion-icon slot="icon-only" src="./assets/media/icons/filter_list.svg" />
+            </ion-button>
+            <ion-button fill="clear" class="btn-calendar" (click)="goToCalendar()">
+                <ion-icon slot="icon-only" src="./assets/media/icons/calendar.svg" />
+            </ion-button>
+        </div>
+        @if(listOfFilterBubbles.length){
+            <div class="session-tab__filters-bubbles">
+                <ion-text class="session-tab__filters-filter-label">{{ "SALES.FILTERS" | translate }}</ion-text>
+                @for(filterBubble of listOfFilterBubbles; track $index){
+                    <ion-col>
+                        <ion-chip [outline]="true">
+                            <ion-label>{{filterBubble.label }} </ion-label>
+                            <ion-icon (click)="removeBubbleFilter(filterBubble.name)" name="close" />
+                        </ion-chip>
+                    </ion-col>
+                }
+            </div>
+        }
+
+    </div>
+    <div class="session-tab__result-block">
+        <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+            <ion-refresher-content />
+        </ion-refresher>
+        @if(!$isLoading() && $totalSessionEvents() === 0){
+            <static-view [viewContent]="{ title: 'NO-RESULTS-TITLE', description: 'NO-RESULTS-DESCRIPTION', isError: false}"/>
+        }@else {
+            <ion-text class="session-tab__result-block-block-title">
+                {{ "EVENTS.EVENTS_LIST_TITLE_SEARCH" | translate }}
+            </ion-text>
+            @if(!$isLoading()){
+                <ion-text class="session-tab__result-block-block-info">
+                    <span>{{ "EVENT_DETAIL.SESSION.TOTAL-RESULTS" | translate : {number: $totalSessionEvents()} }}</span>
+                </ion-text>
+            }
+            @if(!$isLoading() || ionInfinite){
+                <ion-list class="session-tab__ticket-list">
+                    @for(session of foundSessions; track $index){
+                        <ion-item>
+                            <session-card class="session-tab__ticket-card" [session]="session" (tap)="goToSessionDetail(session)" />
+                        </ion-item>
+                    }
+                </ion-list>
+            }@else {
+                <ion-list class="session-tab__ticket-list">
+                    <ion-item>
+                        <skeleton-card class="session-tab__ticket-card" />
+                    </ion-item>
+                </ion-list>
+            }
+            <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+                <ion-infinite-scroll-content />
+            </ion-infinite-scroll>
+        }
+    </div>
+</div>
+
+<modal [isOpen]="calendarModalIsOpen" (closeModal)="closeToCalendar()">
+    @if(calendarModalIsOpen){
+        <calendar-selector [selectedTime]="filterSessionCalendar" (selectDate)="updateFiltersCalendar($event)" />
+    }
+</modal>

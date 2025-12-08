@@ -1,0 +1,30 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title>
+        <div class="flex justify-between">
+            <div class="flex flex-col gap-1">
+                <h2 class="primary title">{{ 'EVENTS.CHANNEL.SQUARE_SESSION_IMAGES.MODAL_TITLE' | translate }}</h2>
+                <span class="mat-body-2">{{ session.name }} - {{ session.start_date | date: 'dd/MM/yyyy' }}</span>
+            </div>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content>
+        <p class="body-1">{{ 'EVENTS.CHANNEL.SQUARE_SESSION_IMAGES.MODAL_DESCRIPTION' | translate }}</p>
+        <app-event-channel-image-uploader [formGroup]="form" />
+    </div>
+    <div mat-dialog-actions align="end">
+        <button mat-button type="button" class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="save()" [disabled]="!form.dirty">
+            {{'FORMS.ACTIONS.UPDATE' | translate}}
+        </button>
+    </div>
+</div>
+@if ($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,102 @@
+@let order = $order();
+@if (order.buyer_data.profile_data?.attributes?.length) {
+    <div class="order-details-profile-attributes">
+        <button mat-stroked-button color="primary" class="ob-button small"
+            (click)="openProfileAttributesDialog(order.buyer_data.profile_data?.attributes)"
+            [attr.aria-label]="'ORDER.BUYER_DATA.PROFILE_ATTRIBUTES.VIEW_BTN' | translate"
+            [matTooltip]="'ORDER.BUYER_DATA.PROFILE_ATTRIBUTES.VIEW_BTN' | translate">
+            <mat-icon>remove_red_eye</mat-icon>
+            {{'ORDER.BUYER_DATA.PROFILE_ATTRIBUTES.VIEW_BTN' | translate}}
+        </button>
+    </div>
+}
+<div class="fields">
+    <div class="field">
+        <span class="ob-label">{{'FORMS.LABELS.CLIENT_TYPE' | translate}}</span>
+        <span>{{'ENUMS.CLIENT_TYPE_OPTS.' + order.client_type | translate}}</span>
+    </div>
+    @if (order.buyer_data.name) {
+        <div class="field">
+            <span class="ob-label">{{'FORMS.LABELS.NAME' | translate}}</span>
+            <span>{{order.buyer_data.name}}</span>
+        </div>
+    }
+    @if (order.buyer_data.surname) {
+        <div class="field">
+            <span class="ob-label">{{'FORMS.LABELS.SURNAME' | translate}}</span>
+            <span>{{order.buyer_data.surname}}</span>
+        </div>
+    }
+    <div class="field">
+        <span class="ob-label">{{'FORMS.LABELS.EMAIL' | translate}}</span>
+        <span appEllipsify [matTooltip]="order.buyer_data.email">{{order.buyer_data.email}}</span>
+    </div>
+    @if (order.buyer_data.phone) {
+        <div class="field">
+            <span class="ob-label">{{'FORMS.LABELS.PHONE' | translate}}</span>
+            <span>{{order.buyer_data.phone}}</span>
+        </div>
+    }
+    @if (order.buyer_data.international_phone) {
+        <div class="field">
+            <span class="ob-label">{{'FORMS.LABELS.INTERNATIONAL_PHONE' | translate}}</span>
+            <span>{{(order.buyer_data.international_phone.prefix ? ('+' + order.buyer_data.international_phone.prefix + ' ') : '')
+            + order.buyer_data.international_phone.number }}</span>
+        </div>
+    }
+    @if (order.buyer_data.country) {
+        <div class="field">
+            <span class="ob-label">{{'FORMS.LABELS.COUNTRY' | translate}}</span>
+            <span>{{'COUNTRIES.' + order.buyer_data.country | translate }}</span>
+        </div>
+    }
+    @if (order.buyer_data.country_subdivision) {
+        <div class="field">
+            <span class="ob-label">{{'FORMS.LABELS.COUNTRY_SUBDIVISION' | translate}}</span>
+            <span>{{'REGIONS.' + order.buyer_data.country_subdivision | translate }}</span>
+        </div>
+    }
+    @if (order.buyer_data.zip_code) {
+        <div class="field">
+            <span class="ob-label">{{'FORMS.LABELS.ZIPCODE' | translate}}</span>
+            <span>{{order.buyer_data.zip_code}}</span>
+        </div>
+    }
+    @if (order.buyer_data.city) {
+        <div class="field">
+            <span class="ob-label">{{'FORMS.LABELS.CITY' | translate}}</span>
+            <span>{{order.buyer_data.city}}</span>
+        </div>
+    }
+    @if (order.buyer_data.address) {
+        <div class="field">
+            <span class="ob-label">{{'FORMS.LABELS.ADDRESS' | translate}}</span>
+            <span>{{order.buyer_data.address}}</span>
+        </div>
+    }
+    @if (order.buyer_data.language) {
+        <div class="field">
+            <span class="ob-label">{{'FORMS.LABELS.LANGUAGE' | translate}}</span>
+            <span>{{'LANGUAGES.' + order.buyer_data.language | translate }}</span>
+        </div>
+    }
+    @if (order.buyer_data.gender) {
+        <div class="field">
+            <span class="ob-label">{{'FORMS.LABELS.GENDER' | translate}}</span>
+            <span>{{'ENUMS.GENDER_OPTS.' + order.buyer_data.gender | translate}}</span>
+        </div>
+    }
+    @if (order.buyer_data.id_number) {
+        <div class="field">
+            <span class="ob-label">{{'FORMS.LABELS.ID_NUMBER' | translate}}</span>
+            <span>{{order.buyer_data.id_number}}</span>
+        </div>
+    }
+</div>
+@if (order.buyer_data.user_id) {
+    <a aria-label="Go to customer" class="ob-link flex items-center gap-1"
+       [routerLink]="['/customers', order.buyer_data.user_id]">
+        <span>{{ 'ORDER.BUYER_DATA.GO_TO_CUSTOMER' | translate }}</span>
+        <mat-icon class="ob-icon xsmall" iconPositionEnd>launch</mat-icon>
+    </a>
+}

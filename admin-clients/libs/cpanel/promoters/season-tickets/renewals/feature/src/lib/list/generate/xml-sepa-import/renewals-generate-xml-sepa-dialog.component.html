@@ -1,0 +1,36 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title>
+        <div class="flex justify-between items-center">
+            <h2 class="secondary title">
+                {{'SEASON_TICKETS.RENEWALS.DIALOG.GENERATE_XML_SEPA_RENEWALS_TITLE' | translate}}
+            </h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content [formGroup]="form">
+        <p class="generate-renewals-sepa-info"
+            [innerHTML]="'SEASON_TICKETS.RENEWALS.DIALOG.GENERATE_XML_SEPA_RENEWALS_CONTENT' | translate"></p>
+        <mat-form-field appearance="outline" class="ob-form-field field-with-label" subscriptSizing="dynamic">
+            <mat-label>{{'FORMS.LABELS.CHANNEL' | translate}}</mat-label>
+            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="channelId">
+                @for (channel of $channelsList(); track channel.id) {
+                    <mat-option [value]="channel.id">
+                        {{channel.name}}
+                    </mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div mat-dialog-actions>
+        <div class="flex flex-auto justify-end">
+            <button type="button" mat-button class="ob-button" (click)="close()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button mat-flat-button color="primary" type="button" class="ob-button" (click)="generate()" [disabled]="!form.valid">
+                {{ 'FORMS.ACTIONS.GENERATE' | translate}}
+            </button>
+        </div>
+    </div>
+</div>

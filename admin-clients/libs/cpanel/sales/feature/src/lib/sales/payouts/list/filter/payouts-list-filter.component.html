@@ -1,0 +1,69 @@
+<form class="flex flex-col gap-4" [formGroup]="filtersForm">
+    <div class="flex flex-col gap-6">
+        <div class="flex flex-row filter-block">
+            <div class="ob-label flex basis-[120px]">
+                {{'FORMS.LABELS.CHANNEL' | translate}}
+            </div>
+            <div class="filter-block-input flex basis-[540px] sm:flex-shrink-0">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <app-select-server-search [multiple]="true" formControlName="channel"
+                        [unselectLabel]="'FORMS.ACTIONS.UNSELECT_ALL' | translate"
+                        [options$]="channels$" [moreOptionsAvailable$]="moreChannelsAvailable$"
+                        (loadOptions)="loadChannels($event.q, $event.nextPage)" />
+                </mat-form-field>
+            </div>
+        </div>
+        @if ($canFilterByEvents()){
+            <div class="filter-block flex flex-row">
+                <div class="ob-label flex basis-[120px]">
+                    {{'FORMS.LABELS.EVENT' | translate}}
+                </div>
+                <div class="filter-block-input flex basis-[540px] sm:flex-shrink-0">
+                    <mat-form-field appearance="outline" class="ob-form-field">
+                        <app-select-server-search [multiple]="true" formControlName="event"
+                            [unselectLabel]="'FORMS.ACTIONS.UNSELECT_ALL' | translate"
+                            [options$]="events$" [moreOptionsAvailable$]="moreEventsAvailable$"
+                            (loadOptions)="loadEvents($event.q, $event.nextPage)" />
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="filter-block flex flex-row">
+                <div class="ob-label flex basis-[120px]">
+                    {{'FORMS.LABELS.SESSION' | translate}}
+                </div>
+                <div class="filter-block-input flex basis-[540px] sm:flex-shrink-0">
+                    <mat-form-field appearance="outline" class="ob-form-field">
+                        <app-select-server-search [multiple]="true" [unselectLabel]="'FORMS.ACTIONS.UNSELECT_ALL' | translate"
+                            formControlName="session" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate"
+                            [options$]="sessions$" [moreOptionsAvailable$]="moreSessionsAvailable$"
+                            (loadOptions)="loadSessions($event.q, $event.nextPage)">
+                            <ng-template #optionTemplate let-row>
+                                {{row.start_date | dateTime : dateTimeFormats.shortDateTime}} - {{row.name}}
+                            </ng-template>
+                        </app-select-server-search>
+                    </mat-form-field>
+                </div>
+            </div>
+        }
+        <mat-divider />
+        <div class="filter-block flex flex-row">
+            <div class="ob-label flex basis-[120px]">
+                {{'FORMS.LABELS.PAYOUT_TYPE' | translate}}
+            </div>
+            <div class="filter-block-input flex basis-[540px] sm:flex-shrink-0">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select formControlName="payout_type" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option [value]="null">
+                            {{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}
+                        </mat-option>
+                        @for (payoutType of payoutTypes; track payoutType) {
+                            <mat-option [value]="payoutType.id">
+                                {{payoutType.name | translate}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+</form>

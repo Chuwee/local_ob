@@ -1,0 +1,52 @@
+<app-form-container [disabled]="!(form?.dirty) || (reqInProgress$ | async)" (cancel)="cancel()" (save)="save()">
+    <form [formGroup]="form" fxLayout="column">
+        <!-- PROMOTION PRICE TYPES -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'SEASON_TICKET.PROMOTIONS.PRICE_ZONES' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div [class.atomic-saving-error]="errors.savePromotionPriceTypes">
+                <app-season-ticket-promotion-price-types [seasonTicket]="seasonTicket" [promotionId]="promotionId"
+                    [priceTypesForm]="form.get('priceTypes')" />
+                @if(errors.savePromotionPriceTypes) {
+                    <span class="error-description">
+                        {{'SEASON_TICKET.PROMOTIONS.ATOMIC_SAVING_ERROR' | translate}}
+                    </span>
+                }
+            </div>
+        </mat-expansion-panel>
+        <!-- PROMOTION RATES -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'SEASON_TICKET.PROMOTIONS.RATES' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div [class.atomic-saving-error]="errors.savePromotionRates">
+                @if ($arePromotionRatesGroupsEnabled()) {
+                    <div class="flex flex-col gap-4">
+                        <div class="flex flex-col gap-2">
+                            <span class="mat-subtitle-2">{{'SEASON_TICKET.PROMOTIONS.RATES_DESCRIPTION' | translate}}</span>
+                            <span>{{$assignedRatesNames()}}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                            {{'SEASON_TICKET.PROMOTIONS.RATES_INFO_DESCRIPTION' | translate}}
+                        </div>
+                    </div>
+                } @else {
+                    <app-season-ticket-promotion-rates [seasonTicketId]="seasonTicketId" [promotionId]="promotionId"
+                        [ratesForm]="form.get('rates')" />
+                    @if (errors.savePromotionRates) {
+                        <span class="error-description">
+                            {{'SEASON_TICKET.PROMOTIONS.ATOMIC_SAVING_ERROR' | translate}}
+                        </span>
+                    }
+                }
+            </div>
+        </mat-expansion-panel>
+    </form>
+</app-form-container>
+@if(reqInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

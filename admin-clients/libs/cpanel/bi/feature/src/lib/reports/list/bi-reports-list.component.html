@@ -1,0 +1,41 @@
+<div class="list-container" fxFlex="0 1 100%" fxLayout="column">
+    <div class="heading-container without-overflow-hidden" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div fxLayout="row wrap">
+            <h1 class="secondary mat-headline-3">{{'BI.REPORTS.TITLES.REPORTS_LIST' | translate}}</h1>
+        </div>
+        @if (canImpersonate$ | async) {
+            <div class="actions-container" [fxFlex]="(isHandset$ | async) ? '100%' : 'auto'"
+                fxLayout="row wrap" fxLayoutAlign="end">
+                <div class="filter-container" [fxFlex]="(isHandset$ | async) ? '100%' : 'none'">
+                    <app-bi-impersonation fxFlex="100%" />
+                </div>
+            </div>
+        }
+    </div>
+    <div class="heading-container without-overflow-hidden" fxLayout="row" fxLayoutAlign="space-between center">
+        <div [fxFlex]="(isHandset$ | async) ? '100%' : '50%'" fxLayoutAlign="start center">
+            <app-bi-reports-list-search-input fxFlex="100%">
+            </app-bi-reports-list-search-input>
+        </div>
+    </div>
+    <app-form-container hideActionBar layout="main" class="overflow-y-auto list-content">
+        <div fxLayout="row wrap">
+            @if (notReportsSearch$ | async) {
+                @if ((recentReports$ | async)?.length > 0) {
+                    <app-bi-reports-list-recents [recentReports]="recentReports$ | async" fxFlex="100%" class="section-block" />
+                }
+                @if (reports$ | async) {
+                    <app-bi-reports-list-tabs [reports]="reports$ | async" fxFlex="100%"
+                        class="section-block" />
+                }
+            } @else {
+                <app-bi-reports-list-search-results fxFlex="100%" class="section-block" />
+            }
+        </div>
+    </app-form-container>
+</div>
+@if (isLoading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

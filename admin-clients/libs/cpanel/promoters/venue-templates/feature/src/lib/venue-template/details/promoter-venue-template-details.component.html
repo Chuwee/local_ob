@@ -1,0 +1,24 @@
+@if (venueTemplate$ | async; as venueTemplate) {
+    <div class="details-container" fxFlex="0 1 100%" fxLayout="column">
+        <div class="heading-container" fxLayoutAlign="start center">
+            <app-go-back defaultPath="/promoter-venue-templates" />
+            <h1 class="secondary mat-headline-3">{{ venueTemplate.name }}</h1>
+        </div>
+        @if (standardTemplateTypes.includes(venueTemplate.type)) {
+            <div class="top-actions">
+                <app-nav-tabs-menu type="tabMenu" [elements]="[
+            {
+                label: 'EVENTS.CAPACITY',
+                param: 'standard'
+            },
+            {
+                label: 'EVENTS.ELEMENTS_INFO.TITLE',
+                param: 'elements-info',
+                disabled: !!!(isOperator$ | async) && (!!!(isEventOrVenueManager$ | async) && !!!(isV4$ | async))
+            }
+        ]" />
+            </div>
+        }
+        <router-outlet />
+    </div>
+}

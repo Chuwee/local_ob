@@ -1,0 +1,20 @@
+<div class="status-notifications-container flex justify-center">
+    <div class="status-bar flex justify-between items-center basis-full">
+        <mat-slide-toggle (change)="handleStatusChange($event.checked)" class="ob-slide-toggle" color="primary"
+            [formControl]="config.form.controls.enabled">
+            {{ 'SECONDARY_MARKET.ENABLED'| translate }}
+        </mat-slide-toggle>
+        <div fxLayoutAlign="center center" fxLayoutGap="4px">
+            <button mat-stroked-button (click)="resetConfig()" [disabled]="resetButtonDisabled$ | async" color="primary" type="button"
+                class="ob-button medium">
+                {{'SECONDARY_MARKET.RESET_TO_EVENT_CONFIG.BUTTON' | translate}}
+            </button>
+            <app-help-button [message]="'SECONDARY_MARKET.RESET_TO_EVENT_CONFIG.TOOLTIP' | translate" />
+        </div>
+    </div>
+</div>
+<app-form-container (cancel)="cancel()" (save)="save()" layout="main" [disabled]="!config.form.dirty || (loading$ | async)">
+    <ob-secondary-market-configuration #config />
+    <div *ngIf="loading$ | async" class="spinner-container">
+        <mat-spinner />
+    </div>

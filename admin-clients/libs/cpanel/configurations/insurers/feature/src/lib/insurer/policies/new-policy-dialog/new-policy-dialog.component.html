@@ -1,0 +1,45 @@
+<div class="dialog-msg-container flex flex-col basis-full">
+    <div mat-dialog-title>
+        <div class="flex flex-row items-center">
+            <h2 class="secondary title basis-full">{{'TITLES.NEW_POLICY' | translate}}</h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+        
+    </div>
+    <div mat-dialog-content class="flex flex-col justify-start items-stretch">
+        <form [formGroup]="form" class="flex flex-col justify-start items-stretch">      
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                <input matInput aria-label="name" [placeholder]="'FORMS.LABELS.NAME' | translate" formControlName="name">
+                <mat-error [ob-form-errors]="form" field="name" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'INSURERS.FORMS.LABELS.POLICY.NUMBER' | translate}}</mat-label>
+                <input matInput aria-label="number" [placeholder]="'INSURERS.FORMS.LABELS.POLICY.NUMBER' | translate" formControlName="number">
+                <mat-error [ob-form-errors]="form" field="number" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'INSURERS.FORMS.LABELS.POLICY.TAX' | translate}}</mat-label>
+                <app-percentage-input formControlName="taxes" />
+            </mat-form-field>
+        </form>
+    </div>
+    <div mat-dialog-actions>
+        <div class="flex-1 flex justify-end">
+            <button mat-button type="button" class="ob-button" (click)="close()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createPolicy()">
+                {{'FORMS.ACTIONS.CREATE' | translate}}
+            </button>
+        </div>
+    </div>
+</div>
+@if($reqInProgress()){
+    <div class="spinner-container">
+        <mat-progress-spinner />
+    </div>
+}
+

@@ -1,0 +1,91 @@
+@if (venueTemplates$ | async; as venueTpls) {
+    @let event = event$ | async;
+    @let isAvetEvent = event | isAvetEvent;
+    @let isSgaEvent = event | isSgaEvent;
+<!-- { correct indentation } -->
+    <div class="left-bar-container flex flex-col">
+        <div class="left-bar flex flex-col justify-between">
+            <div class="left-sidebar-title flex flex-col gap-[2px]">
+                <div class="flex flex-row items-center">
+                    <h2 class="title">{{'TITLES.TEMPLATES' | translate}}</h2>
+                    @if(!isAvetEvent && !isSgaEvent) {
+                        <button mat-icon-button
+                            [attr.aria-label]="'EVENTS.NEW_TPL_BTN' | translate"
+                            type="button" [matTooltip]="'EVENTS.NEW_TPL_BTN' | translate" (click)="openNewVenueTemplateDialog()"
+                            class="ob-button mat-stroked-button xsmall">
+                            <mat-icon>add</mat-icon>
+                        </button>
+                    }
+                </div>
+                <span class="results-count">{{'RESULTS.TOTAL' | translate}}: {{venueTpls.length}}</span>
+            </div>
+            <div class="left-sidebar-header flex justify-end items-center basis-[36px]">
+                @if($standardTemplate()) {
+                    <button mat-icon-button aria-label="Edit template" class="ob-button small"
+                        [disabled]="!venueTpls.length"
+                        (click)="openEditTemplateDialog()"
+                        [matTooltip]="'EVENTS.EDIT_TPL_BTN' | translate">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                }
+                @if(!isAvetEvent && !isSgaEvent) {
+                    <button mat-icon-button aria-label="Clone template"
+                        class="ob-button small" (click)="openCloneTemplateDialog()"
+                        [disabled]="!venueTpls.length"
+                        [matTooltip]="'EVENTS.CLONE_TPL_BTN' | translate">
+                        <mat-icon>content_copy</mat-icon>
+                    </button>
+                    <button mat-icon-button aria-label="Delete template"
+                        class="ob-button small" (click)="openDeleteTemplateDialog()"
+                        [disabled]="!venueTpls.length"
+                        [matTooltip]="'EVENTS.DELETE_TPL_BTN' | translate">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                }
+            </div>
+            <mat-accordion displayMode="flat" class="ob-accordion-list"
+                appLastPathGuardListener (navigationReverted)="undoLastNavigation()">
+                @for(template of venueTpls; track template.id) {
+                    <mat-expansion-panel class="mat-elevation-z0"
+                        [class.error-status]="template.status === venueTplStatus.error"
+                        [disabled]="(selectedVenueTpl$ | async)?.id === template.id"
+                        [expanded]="(selectedVenueTpl$ | async)?.id === template.id"
+                        (opened)="selectVenueTemplate(template)">
+                        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                            <mat-panel-title class="flex-1">
+                                <div class="template-main-info flex flex-col justify-center">
+                                    <span class="template-name" appEllipsify [matTooltip]="template.name">
+                                        {{template.name}}
+                                    </span>
+                                    <span class="venue-name" appEllipsify [matTooltip]="template.venue.name">
+                                        {{template.venue.name}}
+                                    </span>
+                                </div>
+                                <div class="status-container">
+                                    @if (template.isActiveFromInProgress) {
+                                        <mat-icon class="icon-active"> check </mat-icon>
+                                    }
+                                    @if (template.status === venueTplStatus.error) {
+                                        <mat-icon class="icon-error"> error_outline </mat-icon>
+                                    }
+                                    @if (template.status === venueTplStatus.inProgress) {
+                                        <mat-spinner class="icon-in-progress" diameter="25" />
+                                    }
+                                </div>
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+                        @if ($selectedVenueTplInfo(); as info) {
+                            <app-event-venue-template-info [info]="info" [template]="template" [event]="event$ | async" />
+                        }
+                    </mat-expansion-panel>
+                }
+            </mat-accordion>
+        </div>
+    </div>
+}
+
+@if ($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

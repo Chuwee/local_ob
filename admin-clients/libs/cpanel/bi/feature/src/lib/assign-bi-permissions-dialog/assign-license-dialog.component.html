@@ -1,0 +1,63 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{data.title | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <form [formGroup]="form" fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="0">
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.OPERATOR' | translate}}</mat-label>
+                <mat-select formControlName="operator" aria-label="operator"
+                    [placeholder]="'FORMS.LABELS.OPERATOR' | translate">
+                    <mat-option>
+                        <app-select-search #operatorsSearch [options$]="operators$" searchField="name" requireSelection="true"
+                            [placeholderLabel]="'FORMS.SEARCH.NAME' | translate">
+                        </app-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let operator of operatorsSearch.getFilteredOptions$() | async" [value]="operator.id">
+                        {{operator.name}}
+                    </mat-option>
+                </mat-select>
+                <mat-error [ob-form-errors]="form" field="operator"></mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.ENTITY' | translate}}</mat-label>
+                <mat-select formControlName="entity" aria-label="entity" [placeholder]="'FORMS.LABELS.ENTITY' | translate">
+                    <mat-option>
+                        <app-select-search #entitiesSearch [options$]="entities$" searchField="name" requireSelection="true"
+                            [placeholderLabel]="'FORMS.SEARCH.NAME' | translate">
+                        </app-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let entity of entitiesSearch.getFilteredOptions$() | async" [value]="entity.id">
+                        {{entity.name}}
+                    </mat-option>
+                </mat-select>
+                <mat-error [ob-form-errors]="form" field="entity"></mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.USER' | translate}}</mat-label>
+                <mat-select formControlName="user" aria-label="user" [placeholder]="'FORMS.LABELS.USER' | translate">
+                    <mat-option>
+                        <app-select-search #usersSearch [options$]="users$" searchField="email" requireSelection="true"
+                            [placeholderLabel]="'FORMS.SEARCH.NAME' | translate">
+                        </app-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let user of usersSearch.getFilteredOptions$() | async" [value]="user">
+                        {{user.email}} - {{user.name}} {{user.last_name}}
+                    </mat-option>
+                </mat-select>
+                <mat-error [ob-form-errors]="form" field="user"></mat-error>
+            </mat-form-field>
+        </form>
+    </div>
+    <div mat-dialog-actions fxFlex="auto" fxLayout="row no wrap" fxLayoutAlign="end">
+        <button mat-button type="button" class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="addUser()" [disabled]="!form.valid">
+            {{'FORMS.ACTIONS.ASSIGN' | translate}}
+        </button>
+    </div>
+</div>

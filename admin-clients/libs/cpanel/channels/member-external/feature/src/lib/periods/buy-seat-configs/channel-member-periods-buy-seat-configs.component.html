@@ -1,0 +1,88 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="(loading$ | async) || !form.dirty"
+    [formGroup]="form">
+    <mat-accordion [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'MEMBER_EXTERNAL.BUY_SEAT_CONFIGS.MEMBERSHIP_SECTION' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex flex-col">
+                <p class="mat-subtitle-2">{{'MEMBER_EXTERNAL.BUY_SEAT.CONFIGS.PERIODICITY_SUBTITLE' | translate }}</p>
+                <p>{{'MEMBER_EXTERNAL.BUY_SEAT.CONFIGS.PERIODICITY_DESCRIPTION' | translate }}</p>
+                <div>
+                    <mat-form-field class="ob-form-field field-with-label flex flex-[1_1_240px] fields-container" appearance="outline">
+                        <mat-label>{{'MEMBER_EXTERNAL.BUY_SEAT.CONFIGS.PERIODICITY_ID' | translate}}</mat-label>
+                        <mat-select formControlName="periodicity_id" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                            @for (periodicity of periodicities$ | async; track periodicity.id) {
+                                <mat-option [value]="periodicity.id">
+                                    {{ periodicity.id + ': ' + periodicity.name }}
+                                </mat-option>
+                            }
+                        </mat-select>
+                        <mat-error [ob-form-errors]="form" field="periodicity_id" />
+                    </mat-form-field>
+                </div>
+
+                <p class="mat-subtitle-2">{{'MEMBER_EXTERNAL.BUY_SEAT.CONFIGS.UNPAID_MEMBER_TERM_ALLOWED_SUBTITLE' | translate }}</p>
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-wrap justify-start align-center">
+                        <mat-checkbox color="primary" class="list-checkbox" formControlName="unpaid_term_allowed">
+                            {{'MEMBER_EXTERNAL.BUY_SEAT.CONFIGS.UNPAID_MEMBER_TERM_ALLOWED' | translate }}
+                        </mat-checkbox>
+                    </div>
+                    @if (form.controls.unpaid_term_allowed.value) {
+                        <div class="flex flex-wrap">
+                            <mat-form-field class="ob-form-field field-with-label term-select flex flex-[1_1_240px] fields-container"
+                                appearance="outline">
+                                <mat-label>{{'MEMBER_EXTERNAL.BUY_SEAT.CONFIGS.TERM_ID' | translate}}</mat-label>
+                                <mat-select formControlName="member_term_id" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                    @for (term of terms$ | async; track term.id) {
+                                        <mat-option [value]="term.id">{{ term.id + ': ' + term.name }}</mat-option>
+                                    }
+                                </mat-select>
+                                <mat-error [ob-form-errors]="form" field="member_term_id" />
+                            </mat-form-field>
+                            <div class="flex flex-[1_1_100%] justify-start content-start">
+                                <mat-icon class="context-icon info">info</mat-icon>
+                                <div class="flex flex-col gap-2">
+                                    <span>{{'MEMBER_EXTERNAL.BUY_SEAT.CONFIGS.UNPAID_MEMBER_TERM_INFO' | translate }}</span>
+                                    <a class="ob-link" routerLink="../advanced" target="_blank">
+                                        {{'MEMBER_EXTERNAL.GO_TO_ADVANCED_CONFIGS' | translate}}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'MEMBER_EXTERNAL.BUY_SEAT_CONFIGS.ALLOW_CROSS_PURCHASES.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-wrap justify-start align-center">
+                    <mat-checkbox color="primary" class="list-checkbox" formControlName="allow_cross_purchases">
+                        <span class="mat-subtitle-2">
+                            {{'MEMBER_EXTERNAL.BUY_SEAT.CONFIGS.ALLOW_CROSS_PURCHASES.CHECK' | translate }}
+                        </span>
+                        <p>{{'MEMBER_EXTERNAL.BUY_SEAT.CONFIGS.ALLOW_CROSS_PURCHASES.DESCRIPTION' | translate }}</p>
+                    </mat-checkbox>
+                </div>
+            </div>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'MEMBER_EXTERNAL.BUY_SEAT_CONFIGS.LIMIT_PORTAL_ACCESS_SECTION' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-channel-member-periods-dates-filter [form]="form.controls.dates_filter" [period]="memberPeriods.buy" />
+        </mat-expansion-panel>
+
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'MEMBER_EXTERNAL.BUY_SEAT_CONFIGS.AVATAR_SECTION' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-channel-member-periods-avatar-config [form]="form.controls.avatar" [period]="memberPeriods.buy" />
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>

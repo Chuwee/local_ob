@@ -1,0 +1,359 @@
+@if ((isRenewalsGenerationInProgress$ | async) || (isRenewalEditingInProgress$ | async) || (isRenewalsPurgeInProgress$ | async) || ($isRenewalGenerationInProgress())) {
+    <div class="ob-overlay-wrapper flex items-center justify-start" slot="overlay">
+        @if ((isRenewalsGenerationInProgress$ | async)) {
+            <div class="ob-overlay-pane pane-sticky">
+                <app-context-notification class="ob-context-notification" contextType="info">
+                    <p>{{'SEASON_TICKET.RENEWALS.LIST.IMPORTING_MESSAGE_INFO' | translate}}</p>
+                    <div class="flex flex-1 justify-end">
+                        <button mat-stroked-button type="button" class="ob-button medium refresh-button"
+                            [attr.aria-label]="'SEASON_TICKET.RENEWALS.LIST.REFRESH_LIST' | translate" (click)="refresh()">
+                            <mat-icon>autorenew</mat-icon>
+                            {{'SEASON_TICKET.RENEWALS.LIST.REFRESH_LIST' | translate}}
+                        </button>
+                    </div>
+                    <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                        [attr.aria-label]="('SEASON_TICKET.RENEWALS.LIST.IMPORTING_MESSAGE_INFO' | translate)" />
+                </app-context-notification>
+            </div>
+        }
+        @if ((isRenewalsPurgeInProgress$ | async)) {
+            <div class="ob-overlay-pane pane-sticky">
+                <app-context-notification class="ob-context-notification" contextType="info">
+                    <p>{{'SEASON_TICKET.RENEWALS.LIST.PURGING_MESSAGE_INFO' | translate}}</p>
+                    <div class="flex flex-1 justify-end">
+                        <button mat-stroked-button type="button" class="ob-button medium refresh-button"
+                            [attr.aria-label]="'SEASON_TICKET.RENEWALS.LIST.REFRESH_LIST' | translate"
+                            (click)="refresh()">
+                            <mat-icon>autorenew</mat-icon>
+                            {{'SEASON_TICKET.RENEWALS.LIST.REFRESH_LIST' | translate}}
+                        </button>
+                    </div>
+                    <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                        [attr.aria-label]="('SEASON_TICKET.RENEWALS.LIST.PURGING_MESSAGE_INFO' | translate)" />
+                </app-context-notification>
+            </div>
+        }
+        @if ((isRenewalEditingInProgress$ | async)) {
+            <div class="ob-overlay-pane pane-sticky">
+                <app-context-notification class="ob-context-notification" contextType="info">
+                    <p>{{'SEASON_TICKET.RENEWALS.LIST.EDITING_RENEWALS_MESSAGE_INFO' | translate}}</p>
+                    <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                        [attr.aria-label]="('SEASON_TICKET.RENEWALS.LIST.EDITING_RENEWALS_MESSAGE_INFO' | translate)" />
+                </app-context-notification>
+            </div>
+        }
+        @if ($isRenewalGenerationInProgress()) {
+            <div class="ob-overlay-pane pane-sticky">
+                <app-context-notification class="ob-context-notification" contextType="info">
+                    <p>{{'SEASON_TICKET.RENEWALS.LIST.GENERATE_RENEWALS_MESSAGE_INFO' | translate}}</p>
+                    <div class="flex flex-1 justify-end">
+                        <button mat-stroked-button type="button" class="ob-button medium refresh-button"
+                            [attr.aria-label]="'SEASON_TICKET.RENEWALS.LIST.REFRESH_LIST' | translate"
+                            (click)="refresh()">
+                            <mat-icon>autorenew</mat-icon>
+                            {{'SEASON_TICKET.RENEWALS.LIST.REFRESH_LIST' | translate}}
+                        </button>
+                    </div>
+                    <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                        [attr.aria-label]="('SEASON_TICKET.RENEWALS.LIST.GENERATE_RENEWALS_MESSAGE_INFO' | translate)" />
+                </app-context-notification>
+            </div>
+        }
+    </div>
+}
+<div class="list-container flex flex-col flex-shrink flex-grow basis-full">
+    <div class="actions-container flex flex-row justify-between">
+        <div class="sub-actions-container flex items-center justify-start flex-[0_1_40%]">
+            <button mat-stroked-button type="button" class="ob-button medium"
+                [disabled]="isEditDisabled || (isLoading$ | async) === true"
+                [attr.aria-label]="'SEASON_TICKET.RENEWALS.LIST.EDIT_SEAT' | translate"
+                (click)="editRenewalsHandler()">
+                <mat-icon>edit</mat-icon>
+                <span class="ob-text-ellipsis" [matTooltip]="'SEASON_TICKET.RENEWALS.LIST.EDIT_SEAT' | translate">
+                    {{'SEASON_TICKET.RENEWALS.LIST.EDIT_SEAT' | translate}}</span>
+            </button>
+            <button mat-stroked-button type="button" class="ob-button medium"
+                [disabled]="isDeleteDisabled || (isLoading$ | async) === true"
+                [attr.aria-label]="'SEASON_TICKET.RENEWALS.LIST.DELETE_SEAT' | translate"
+                (click)="deleteRenewalsHandler()">
+                <mat-icon>delete</mat-icon>
+                <span class="ob-text-ellipsis" [matTooltip]="'SEASON_TICKET.RENEWALS.LIST.DELETE_SEAT' | translate">
+                    {{'SEASON_TICKET.RENEWALS.LIST.DELETE_SEAT' | translate}}</span>
+            </button>
+            <div class="filter-container flex-none">
+                <button mat-stroked-button color="tertiary" class="ob-button medium only-icon" [matMenuTriggerFor]="ordersListMenu">
+                    <mat-icon>more_horiz</mat-icon>
+                </button>
+                <mat-menu #ordersListMenu="matMenu">
+                    @let isSeasonTicketSetUp = $isSeasonTicketSetUp();
+                    @let importTooltip = !isSeasonTicketSetUp
+                        ? 'SEASON_TICKETS.RENEWALS.LIST.SEASON_TICKET_NOT_SET_UP_TOOLTIP'
+                        : 'SEASON_TICKET.RENEWALS.LIST.IMPORT';
+                    <button mat-menu-item
+                        [disabled]="(isLoading$ | async) === true || !isSeasonTicketSetUp"
+                        [matTooltip]="importTooltip | translate"
+                        [attr.aria-label]="'SEASON_TICKET.RENEWALS.LIST.IMPORT' | translate"
+                        (click)="openNewSeasonTicketRenewalDialog()">
+                        {{'SEASON_TICKET.RENEWALS.LIST.IMPORT' | translate}}
+                    </button>
+                    <button mat-menu-item
+                        [disabled]="(isLoading$ | async) === true || (renewalsMetadata$ | async)?.total === 0"
+                        [matTooltip]="'SEASON_TICKET.RENEWALS.LIST.EXPORT' | translate"
+                        [attr.aria-label]="'SEASON_TICKET.RENEWALS.LIST.EXPORT' | translate"
+                        (click)="exportRenewals()">
+                        {{'ACTIONS.EXPORT.BTN' | translate}}
+                    </button>
+                    @let renewal = $seasonTicket().settings.operative.renewal;
+                    @let isSeasonTicketReady = $isSeasonTicketReady();
+                    @let generateRenewalsTooltip = !isSeasonTicketReady
+                        ? 'SEASON_TICKETS.RENEWALS.LIST.SEASON_TICKET_NOT_READY_TOOLTIP'
+                        : 'SEASON_TICKETS.RENEWALS.LIST.GENERATE_RENEWALS';
+                    @if (renewal?.automatic) {
+                        @if (renewal?.renewal_type === 'XML_SEPA') {
+                            <button mat-menu-item
+                                [disabled]="(isLoading$ | async) === true"
+                                [matTooltip]="'SEASON_TICKET.RENEWALS.LIST.EXPORT_XML_SEPA_BUTTON' | translate"
+                                [attr.aria-label]="'SEASON_TICKET.RENEWALS.LIST.EXPORT_XML_SEPA_BUTTON' | translate"
+                                (click)="openExportXMLSepaDialog()">
+                                {{'SEASON_TICKET.RENEWALS.LIST.EXPORT_XML_SEPA_BUTTON' | translate}}
+                            </button>
+                        }
+                        <!-- TODO: Implement disabled state when renewal_type is XML_SEPA and XML was previously downloaded -->
+                        @let isRenewalGenerationEnabled = true;
+                        <button mat-menu-item
+                            [disabled]="(isLoading$ | async) === true || (renewalsMetadata$ | async)?.total === 0
+                            || !isSeasonTicketReady || !isRenewalGenerationEnabled"
+                            [matTooltip]="generateRenewalsTooltip | translate"
+                            [attr.aria-label]="'SEASON_TICKETS.RENEWALS.LIST.GENERATE_RENEWALS' | translate"
+                            (click)="generateAutomaticRenewals()">
+                            {{'SEASON_TICKETS.RENEWALS.LIST.GENERATE_RENEWALS' | translate}}
+                    </button>
+                    }
+                </mat-menu>
+            </div>
+        </div>
+        <div class="sub-actions-container flex justify-end items-center flex-[0_1_60%]">
+            <div class="search-field flex flex-[1_1_0%]">
+                <app-search-input [placeholder]="'FORMS.SEARCH.SEASON_TICKET_RENEWALS_LIST' | translate" />
+            </div>
+            <div class="filter-container flex-none">
+                <app-popover appFilter>
+                    <app-season-ticket-renewals-list-filter #filterContent />
+                </app-popover>
+            </div>
+            <div class="flex flex-row justify-end items-center gap-2.5 flex-[0_1_180px]">
+                @if (renewalsMetadata$ | async; as metadata) {
+                    <span class="page-summary"
+                        [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: metadata">
+                    </span>
+                }
+                <app-paginator [length]="(renewalsMetadata$ | async)?.total" [pageSize]="pageSize" />
+            </div>
+        </div>
+    </div>
+    <app-season-ticket-renewals-list-summary />
+    <!-- Filter chips -->
+    <div class="filters-active-container">
+        <app-chips appFilter />
+    </div>
+    <div class="table-container flex flex-auto flex-col">
+        <!-- Table -->
+        <mat-table class="ob-table" [formGroup]="form"
+            [dataSource]="renewals$ | async" [class.with-data]="(renewalsMetadata$ | async)?.total !== 0" matSort
+            [matSortActive]="initSortCol" [matSortDirection]="initSortDir" matSortDisableClear
+            [attr.aria-label]="'SEASON_TICKET.RENEWALS.LIST.TABLE' | translate"
+            [class.not-touchable]="(isHandsetOrTablet$ | async) !== true">
+            <ng-container matColumnDef="selection">
+                <mat-header-cell *matHeaderCellDef
+                    class="default-padding head-cell with-status-border checkbox-column flex justify-center items-center flex-[0_1_50px]">
+                    <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
+                        [checked]="isAllSelected"
+                        [disabled]="(renewalsMetadata$ | async)?.total === 0" />
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row"
+                    class="default-padding with-status-border checkbox-column flex justify-center items-center flex-[0_1_50px]"
+                    [class.alert]="row.mapping_status === mappingStatus.notMapped"
+                    [class.success]="row.mapping_status === mappingStatus.mapped">
+                    <mat-checkbox [disabled]="!row.isSelectable" color="primary" [checked]="row.isSelected" />
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="mapping_status">
+                <mat-header-cell *matHeaderCellDef mat-sort-header
+                    class="head-cell without-gap flex justify-start items-center flex-[0_1_42px]" />
+                <mat-cell *matCellDef="let row" class="without-gap flex justify-start items-center flex-[0_1_42px]">
+                    @if (row.mapping_status === mappingStatus.mapped) {
+                        <mat-icon class="status-icon success">done</mat-icon>
+                    } @else {
+                        <mat-icon class="status-icon alert">warning</mat-icon>
+                    }
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="member_id">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'SEASON_TICKET.RENEWALS.LIST.MEMBER_PRODUCT_CLIENT_ID.TITLE' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row" class="flex flex-col justify-start items-start" matTooltipClass="ob-tooltip-nowrap"
+                    [matTooltip]="'SEASON_TICKET.RENEWALS.LIST.MEMBER_PRODUCT_CLIENT_ID.TOOLTIP' | translate :
+                    {member_id: row.member_id ?? '-', product_client_id: row.product_client_id?? '-' } ">
+                    <span appEllipsify class="status-cell">{{row.member_id ?? '-'}}</span>
+                    <span appEllipsify class="status-cell">{{row.product_client_id ?? '-'}}</span>
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="name">
+                <mat-header-cell *matHeaderCellDef mat-sort-header
+                    class="head-cell">{{'SEASON_TICKET.RENEWALS.LIST.MEMBER_DATA' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row" class="flex flex-col justify-start items-start">
+                    <span appEllipsify [matTooltip]="row.name + ' ' + row.surname" matTooltipClass="ob-tooltip-nowrap"
+                        class="status-cell">{{row.name}} {{row.surname}}</span>
+                    <span appEllipsify [matTooltip]="row.email" matTooltipClass="ob-tooltip-nowrap" class="status-cell">{{row.email}}</span>
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="entity">
+                <mat-header-cell *matHeaderCellDef
+                    class="head-cell">{{'SEASON_TICKET.RENEWALS.LIST.ENTITY' | translate}}
+                </mat-header-cell>
+                <mat-cell
+                    *matCellDef="let row">{{row.entity_name ?? '-'}}</mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="historic_seat">
+                <mat-header-cell *matHeaderCellDef class="head-cell">{{'SEASON_TICKET.RENEWALS.LIST.HISTORIC_SEAT' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row" class="flex flex-col justify-start items-start">
+                    <span appEllipsify [matTooltip]="row.historicLocation" matTooltipClass="ob-tooltip-nowrap"
+                        class="status-cell">{{row.historicLocation}}</span>
+                    <span appEllipsify [matTooltip]="row.historic_seat.price_zone" matTooltipClass="ob-tooltip-nowrap"
+                        class="status-cell">{{row.historic_seat.price_zone}}</span>
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="actual_seat">
+                <mat-header-cell *matHeaderCellDef class="head-cell">{{'SEASON_TICKET.RENEWALS.LIST.ACTUAL_SEAT' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row" [class.flex-col]="row.actual_seat" class="flex justify-start items-start"
+                    [matTooltip]="'SEASON_TICKET.RENEWALS.LIST.NOT_AVAILABLE_REASON' | translate"
+                    [matTooltipDisabled]="!!row.actual_seat">
+                    @if (row.actualLocation) {
+                        <span appEllipsify [matTooltip]="row.actualLocation" class="status-cell"
+                            matTooltipClass="ob-tooltip-nowrap">{{row.actualLocation}}</span>
+                        <span appEllipsify [matTooltip]="row.actual_seat.price_zone" matTooltipClass="ob-tooltip-nowrap"
+                            class="status-cell">{{row.actual_seat.price_zone}}</span>
+                    } @else {
+                        <span class="status-cell not-available">
+                            {{'SEASON_TICKET.RENEWALS.LIST.NOT_AVAILABLE' | translate}}
+                        </span>
+                    }
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="rate">
+                <mat-header-cell *matHeaderCellDef class="head-cell">{{'SEASON_TICKET.RENEWALS.LIST.RATE' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    {{row.actual_rate}}
+                    @if (!!row.historic_rate) {
+                        <mat-icon class="small tooltip-icon hidden-icon margin-left ob-help-icon" [matTooltip]="row.historic_rate">
+                            help_outline
+                        </mat-icon>
+                    }
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="balance">
+                <mat-header-cell *matHeaderCellDef class="head-cell right">
+                    {{'SEASON_TICKET.RENEWALS.LIST.BALANCE' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row" class="right">
+                    {{row.balance | localCurrency:(seasonTicketCurrencyCode$ | async)}}
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="type">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'SEASON_TICKET.RENEWALS.LIST.TYPE' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    {{(row.auto_renewal ? 'SEASON_TICKETS.RENEWALS.LIST.AUTOMATIC_TYPE'
+                    : 'SEASON_TICKET.RENEWALS.LIST.MANUAL_TYPE') | translate}}
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="renewal_status">
+                <mat-header-cell *matHeaderCellDef class="head-cell">{{'SEASON_TICKET.RENEWALS.LIST.RENEWAL_STATUS' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row" class="status-cell" [class]="row.renewal_substatus ? 'editable-cell' : 'status-cell'">
+                    @if (row.renewal_substatus) {
+                        <mat-form-field appearance="outline"
+                            class="ob-form-field ob-form-field-outline inline-field thin-select-field flex flex-[0_1_180px]">
+                            <mat-select [value]="row.renewal_substatus" (click)="$event.stopPropagation()" [formControlName]="row.id"
+                                (selectionChange)="updateRenewalStatus(row.id, row.user_id, $event.value)">
+                                <mat-select-trigger>
+                                    <span class="status-dot substatus"></span>
+                                    {{'SEASON_TICKET.RENEWALS.LIST.RENEWAL_STATUS_OPTS.' + row.renewal_substatus | translate}}
+                                </mat-select-trigger>
+                                @for (status of $automaticStatus(); track $index) {
+                                    <mat-option [value]="status">
+                                        {{'SEASON_TICKET.RENEWALS.LIST.RENEWAL_STATUS_OPTS.' + status | translate}}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    } @else if (row.renewal_status) {
+                        <span [class]="['status-dot', row.renewal_status.toLowerCase()]"></span>
+                        <span appEllipsify
+                            [matTooltip]="'SEASON_TICKET.RENEWALS.LIST.RENEWAL_STATUS_OPTS.' + row.renewal_status | translate">
+                            {{'SEASON_TICKET.RENEWALS.LIST.RENEWAL_STATUS_OPTS.' + row.renewal_status | translate}}</span>
+                        @if (row.renewal_status === renewalStatus.renewed) {
+                            <mat-icon class="small tooltip-icon hidden-icon margin-left ob-help-icon"
+                                [matTooltip]="'SEASON_TICKET.RENEWALS.LIST.RENEWED_INFO' | translate">
+                                help_outline
+                            </mat-icon>
+                        }
+                    }
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="actions">
+                <mat-header-cell *matHeaderCellDef="let row" class="actions-cell head-cell"
+                    [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true" />
+                <mat-cell *matCellDef="let row" class="actions-cell" [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                    @if (!row.renewal_substatus) {
+                        <div class="action-buttons" (click)="$event.stopPropagation()">
+                            <button mat-icon-button color="tertiary" class="ob-button medium" [matMenuTriggerFor]="moreActions">
+                                <mat-icon>more_horiz</mat-icon>
+                            </button>
+                            <mat-menu #moreActions="matMenu">
+                                @if (row.isSelectable) {
+                                    @if (row.renewal_status === renewalStatus.notRenewed) {
+                                        <button mat-menu-item [attr.aria-label]="'SEASON_TICKET.RENEWALS.LIST.EDIT_SEAT' | translate"
+                                            (click)="editRenewalHandler(row)">
+                                            {{'SEASON_TICKET.RENEWALS.LIST.EDIT_SEAT' | translate}}
+                                        </button>
+                                    }
+                                    @if (row.renewal_status !== renewalStatus.renewed) {
+                                        <button mat-menu-item [attr.aria-label]="'SEASON_TICKET.RENEWALS.LIST.DELETE_SEAT' | translate"
+                                            (click)="deleteRenewalHandler(row)">
+                                            {{'SEASON_TICKET.RENEWALS.LIST.DELETE_SEAT' | translate}}
+                                        </button>
+                                    }
+                                }
+                                @if (!row.isSelectable && row.renewal_status === renewalStatus.renewed && row.order_code) {
+                                    <button mat-menu-item [attr.aria-label]="'SEASON_TICKET.RENEWALS.LIST.SHOW_TRANSACTION' | translate"
+                                        (click)="showTransaction(row)">
+                                        {{'SEASON_TICKET.RENEWALS.LIST.SHOW_TRANSACTION' | translate}}
+                                    </button>
+                                }
+                            </mat-menu>
+                        </div>
+                    }
+                </mat-cell>
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" />
+            <mat-row *matRowDef="let row; columns: displayedColumns;" class="hoverable-row"
+                [class.ob-row-alert]="row.mapping_status === mappingStatus.notMapped && !row.isSelected"
+                [class.interactive-row]="row.renewal_status === renewalStatus.notRenewed && row.isSelectable"
+                [class.ob-row-selected]="row.isSelected" (click)="$event.stopPropagation(); toggleRow(row);" />
+        </mat-table>
+        @if ((renewalsMetadata$ | async)?.total === 0) {
+            <div class="context-notification-container flex flex-1 justify-center items-center">
+                <app-context-notification class="ob-context-notification flex justify-start items-center" contextType="info">
+                    <p>{{'LIST.EMPTY' | translate}}</p>
+                </app-context-notification>
+            </div>
+        }
+    </div>
+</div>

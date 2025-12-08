@@ -1,0 +1,68 @@
+<div class="left-bar-container">
+    <div fxFlex class="left-bar" fxLayout="column" fxLayoutAlign="justify">
+        <div class="left-sidebar-title" fxLayout="column">
+            <div fxLayout="row" fxLayoutAlign="justify center">
+                <h2 class="title">{{'CHANNELS.PACKS.TITLE' | translate}}</h2>
+                <button mat-icon-button [attr.aria-label]="'CHANNELS.PACKS.CREATE_BTN' | translate" type="button"
+                    [disabled]="isLoadingList$ | async"
+                    class="ob-button mat-stroked-button xsmall" (click)="openNewPackDialog()"
+                    [matTooltip]="'CHANNELS.PACKS.CREATE_BTN' | translate">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+            <span class="results-count">
+                {{('RESULTS.TOTAL' | translate) + ': ' + (totalPacks$ | async)}}
+            </span>
+        </div>
+        <div fxFlex="36px" class="left-sidebar-header" fxLayoutAlign="end center">
+            <!-- TODO: talk with backend, we cannot have two packs with the same name for now -->
+            <!-- <button mat-icon-button class="ob-button small" (click)="openEditPackDialog()"
+                [attr.aria-label]="'CHANNELS.PACKS.EDIT_BTN' | translate" [matTooltip]="'CHANNELS.PACKS.EDIT_BTN' | translate"
+                [disabled]="(isLoadingList$ | async) || (totalPacks$ | async) === 0">
+                <mat-icon>edit</mat-icon>
+            </button> -->
+            <button mat-icon-button [attr.aria-label]="'CHANNELS.PACKS.DELETE_BTN' | translate" class="ob-button small"
+                (click)="openDeletePackDialog()" [matTooltip]="'CHANNELS.PACKS.DELETE_BTN' | translate"
+                [disabled]="(isLoadingList$ | async) || (totalPacks$ | async) === 0">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </div>
+        <div fxLayout="column" fxFlex class="list-container">
+            <mat-selection-list (selectionChange)="selectionChangeHandler($event.options[0]?.value)"
+                class="ob-lateral-select-list" appLastPathGuardListener disableRipple [currValue]="(pack$ | async)?.id"
+                [multiple]="false">
+                <mat-list-option class="with-badge" #option *ngFor="let pack of (packsList$ | async)"
+                    [value]="pack.id" [id]="'pack-list-option-' + pack.id" [selected]="pack.id === selectedPackId"
+                    [disabled]="option.selected">
+                    <div fxLayoutAlign="space-between center">
+                        <div fxFlex="calc(100% - 48px)" fxLayout="column" fxLayoutAlign="center"
+                            class="pack-main-info">
+                            <span class="list-item-title" appEllipsify [matTooltip]="pack.name">
+                                {{pack.name}}
+                            </span>
+                            <span class="list-item-subtitle" appEllipsify [matTooltip]="pack.pack_period?.type === 'AUTOMATIC' ?
+                             ('CHANNELS.PACKS.AUTOMATIC_SALE_DATE' | translate)
+                            : ((pack.pack_period?.start_date  | localDateTime : dateTimeFormats.shortDateWithWeek) + ' - ' +
+                                (pack.pack_period?.end_date  | localDateTime : dateTimeFormats.shortDateWithWeek))">
+                                {{pack.pack_period?.type === 'AUTOMATIC' ? ('CHANNELS.PACKS.AUTOMATIC_SALE_DATE' | translate) : (
+                                (pack.pack_period?.start_date | localDateTime : dateTimeFormats.shortDateWithWeek) + ' - ' +
+                                (pack.pack_period?.end_date | localDateTime : dateTimeFormats.shortDateWithWeek))}}
+                            </span>
+                        </div>
+                        <div class="badge-container" fxLayout="column">
+                            <span class="small-badge ob-status-badge" [ngClass]="pack.active ? 'active' : 'inactive'"
+                                [matTooltip]="('CHANNELS.PACKS.TYPE_OPTS.'+ (pack.type === 'AUTOMATIC' ? 'AUTOMATIC' : 'MANUAL') | translate)">
+                                {{('CHANNELS.PACKS.TYPE_OPTS.'+ (pack.type === 'AUTOMATIC' ? 'AUTOMATIC' : 'MANUAL') | translate).substring(0, 1)}}
+                            </span>
+                        </div>
+                    </div>
+                </mat-list-option>
+            </mat-selection-list>
+        </div>
+    </div>
+    <div *ngIf="isLoadingList$ | async" class="loading-state-container" fxLayoutAlign="center center">
+        <div class="loading-state-background" fxLayout="row" fxLayoutAlign="center center">
+            <mat-spinner></mat-spinner>
+        </div>
+    </div>
+</div>

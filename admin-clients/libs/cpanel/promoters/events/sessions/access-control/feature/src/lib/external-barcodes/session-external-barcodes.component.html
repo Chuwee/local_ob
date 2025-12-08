@@ -1,0 +1,91 @@
+<div fxLayout.gt-sm="row" fxLayout="column" fxLayoutGap="50px" class="barcodes-actions">
+    <div fxFlex.gt-sm="50%" fxFlex="100%" fxLayout="column">
+        <div fxLayout="column">
+            <p class="mat-subtitle-2">{{'EVENTS.SESSION.EXTERNAL_BARCODES.IMPORT.TITLE' | translate}}</p>
+            <p class="mat-body-2">{{'EVENTS.SESSION.EXTERNAL_BARCODES.IMPORT.DESCRIPTION' | translate}}</p>
+        </div>
+        <div fxFlex="100%" fxLayout="column" fxLayoutAlign="end start" fxFlexOffset="5px">
+            <button mat-stroked-button color="tertiary" class="ob-button small" [disabled]="isExportOrImportLoading$ | async"
+                (click)="openImportBarcodesDialog()">
+                <mat-icon>file_upload</mat-icon>
+                {{'EVENTS.SESSION.EXTERNAL_BARCODES.IMPORT.BUTTON' | translate}}
+            </button>
+        </div>
+    </div>
+</div>
+<div [fxShow]="hasImportedBarcodes$ | async" class="total-container" fxLayout="column" fxLayoutGap="20px">
+    <mat-divider />
+    <div fxLayoutAlign="space-between center">
+        <span fxLayout="row" class="mat-subtitle-2 total-imported">
+            {{'EVENTS.SESSION.EXTERNAL_BARCODES.IMPORT.TOTAL' | translate : ({total: (totalImported$ | async) ?? '-'})}}
+        </span>
+        <button mat-stroked-button color="tertiary" class="ob-button small" (click)="openExportExternalBarcodesDialog()"
+            [disabled]="isExportOrImportLoading$ | async">
+            <mat-icon>file_download</mat-icon>
+            {{'EVENTS.SESSION.EXTERNAL_BARCODES.EXPORT.BUTTON' | translate}}
+        </button>
+    </div>
+    <app-search-table [dataSource]="barcodes$" [metadata]="metadata$" [columns]="columns" [pageSize]="pageSize"
+        (changed)="loadBarcodes($event)" [searchOnInteraction]="false"
+        [placeholder]="'EVENTS.SESSION.EXTERNAL_BARCODES.SEARCH_PLACEHOLDER' | translate">
+        <ng-container matColumnDef="barcode">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'FORMS.LABELS.BARCODE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.barcode ? (row.barcode | obfuscateString) : '-'}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="row">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'FORMS.LABELS.ROW' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.seat_data?.row?.name ? row.seat_data.row.name : '-'}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="seat">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'FORMS.LABELS.SEAT' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.seat_data?.seat?.name ? row.seat_data.seat.name : '-'}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="locator">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'FORMS.LABELS.LOCATOR' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.locator ? row.locator : '-'}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="access">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'FORMS.LABELS.ACCESS' | translate}}
+            </mat-header-cell>
+            <mat-cell [attr.title]="row?.seat_data?.access?.id"
+                *matCellDef="let row">{{row?.seat_data?.access?.name ? row.seat_data.access.name : '-'}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'FORMS.LABELS.STATUS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" fxLayoutAlign="start">
+                <div *ngIf="!!row.status else noValidations" fxLayout="row" fxLayoutAlign="start center">
+                    <span class="status-dot" [ngClass]="[barcodeValidated(row) ? 'active' : 'blocked']"></span>
+                    <span>
+                        {{('EVENTS.SESSION.EXTERNAL_BARCODES.STATUS_OPTS.'
+                        + (barcodeValidated(row) ? 'VALIDATED' : 'NOT_VALIDATED')) | translate}}
+                    </span>
+                </div>
+                <ng-template #noValidations>-</ng-template>
+            </mat-cell>
+        </ng-container>
+    </app-search-table>
+</div>
+<!-- Customer Import modal progress -->
+<div class="ob-overlay-wrapper" fxLayoutAlign="center center" *ngIf="isImportLoading$ | async">
+    <div class="ob-overlay-pane" fxLayoutAlign="center center">
+        <app-context-notification class="ob-context-notification-info" contextType="info" fxFlex.gt-sm="550px" fxFlex="80%">
+            <p>{{'EVENTS.SESSION.EXTERNAL_BARCODES.IMPORT_IN_PROGRESS_INFO' | translate}}</p>
+            <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                [attr.aria-label]="('EVENTS.SESSION.EXTERNAL_BARCODES.IMPORT_IN_PROGRESS_INFO' | translate)" />
+        </app-context-notification>
+    </div>
+</div>
+<div class="spinner-container" *ngIf="reqInProgress$ | async">
+    <mat-spinner />
+</div>

@@ -1,0 +1,33 @@
+@if ($template()) {
+    <app-form-container (cancel)="cancel()" (save)="save()" [disabled]="!form.dirty || (isLoadingOrSaving$ | async)">
+        <form [formGroup]="form">
+            <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'ENTITY.ZONE_TEMPLATES.GENERAL_INFO.TITLE' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="flex flex-row flex-wrap sm:gap-[40px]">
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label flex-[0_1_calc(50%-40px)]">
+                            <mat-label>{{'ENTITY.ZONE_TEMPLATE.NAME' | translate}}</mat-label>
+                            <input matInput aria-label="name" [placeholder]="'ENTITY.ZONE_TEMPLATE.NAME' | translate"
+                                [formControl]="form.controls.name">
+                            <mat-error [ob-form-errors]="form.controls.name" />
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label flex-[0_1_calc(50%-40px)]">
+                            <mat-label>{{'ENTITY.ZONE_TEMPLATE.CODE' | translate}}</mat-label>
+                            <input matInput aria-label="code" [placeholder]="'ENTITY.ZONE_TEMPLATE.CODE' | translate"
+                                [formControl]="form.controls.code">
+                            <mat-error [ob-form-errors]="form.controls.code" />
+                        </mat-form-field>
+                    </div>
+                </mat-expansion-panel>
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'ENTITY.ZONE_TEMPLATES.CHANNEL_COMMUNICATION.TITLE' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <app-communication-text-content [form]="form" [languages$]="languages$" [restrictions]="fieldRestrictions" />
+                </mat-expansion-panel>
+            </mat-accordion>
+        </form>
+    </app-form-container>
+}

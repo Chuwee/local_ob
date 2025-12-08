@@ -1,0 +1,99 @@
+@let metadata = packsSaleRequestsMetadata$ | async;
+@let isLoading = isLoading$ | async;
+<!--{}-->
+<div class="list-container flex flex-col basis-full">
+    <div class="heading-container flex flex-row flex-wrap justify-between items-start">
+        <div>
+            <h1 class="secondary mat-headline-3">{{'TITLES.PACKS_SALE_REQUESTS' | translate}}</h1>
+        </div>
+    </div>
+    <div class="heading-container flex flex-row justify-between items-center">
+        <div class="flex flex-row basis-[70%] gap-5 justify-start items-center">
+            <div class="filter-container flex-none">
+                <app-popover appFilter>
+                    <app-packs-sale-requests-list-filter #filterContent />
+                </app-popover>
+            </div>
+            <div class="search-field flex-auto basis-full">
+                <app-search-input [placeholder]="'PACKS_SALE_REQUESTS.FORMS.INFOS.SEARCH_BY' | translate" />
+            </div>
+        </div>
+        <div class="flex flex-row justify-start items-center gap-2.5">
+            @if (metadata) {
+                <p class="page-summary" [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: metadata">
+                </p>
+            }
+            <app-paginator [length]="metadata?.total" [pageSize]="pageSize" />
+        </div>
+    </div>
+    <div class="heading-container heading-divider">
+        <mat-divider />
+    </div>
+    <div class="heading-container">
+        <app-chips appFilter />
+    </div>
+    @if (isLoading) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+    <mat-table class="ob-table" [dataSource]="packsSaleRequests$ | async" [trackBy]="trackByFn"
+        matSort [matSortActive]="initSortCol" [matSortDirection]="initSortDir" matSortDisableClear
+        [attr.aria-label]="'TITLES.PACKS_SALE_REQUESTS' | translate"
+        [ngClass]="{'not-touchable': (isHandsetOrTablet$ | async) !== true}">
+        <ng-container matColumnDef="request_date">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'PACKS_SALE_REQUESTS.FORMS.LABELS.REQUEST_DATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.date | dateTime : dateTimeFormats.shortDateTime}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="pack_name">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'PACKS_SALE_REQUESTS.FORMS.LABELS.PACK' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.pack?.name}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="channel_name">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'PACKS_SALE_REQUESTS.FORMS.LABELS.CHANNEL' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.channel?.name}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="pack_entity_name">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'PACKS_SALE_REQUESTS.FORMS.LABELS.PACK_ENTITY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.pack?.entity?.name}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'PACKS_SALE_REQUESTS.FORMS.LABELS.STATUS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="editable-cell" (click)="$event.stopPropagation()">
+                <app-status-select class="flex basis-full" [element]="row" statusType="SALES_REQUESTS"
+                    [statusList]="packSaleRequestsStatus" [updateStatus]="updateStatus" [hiddenStatusList]="['PENDING']">
+                    <ng-template #optionTemplate let-row>
+                        {{'PACKS_SALE_REQUESTS.FORMS.STATUS_OPTS.' + row | translate}}
+                    </ng-template>
+                </app-status-select>
+            </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" />
+        <mat-row *matRowDef="let row; columns: displayedColumns;" class="interactive-row" />
+        <!-- [routerLink]="[row.id, 'general-data']" -->
+    </mat-table>
+    @if (metadata?.total === 0 && !isLoading && hasAppliedFilters) {
+        <div class="context-notification-container flex basis-full justify-center items-start">
+            <app-context-notification class="ob-context-notification flex-[0_0_80%] sm:flex-[0_0_600px] justify-center items-start"
+                contextType="info">
+                <p>{{'LIST.EMPTY' | translate}}</p>
+            </app-context-notification>
+        </div>
+    } @else if (metadata?.total === 0 && !isLoading && !hasAppliedFilters) {
+        <app-empty-state class="flex basis-full" [title]="'PACKS_SALE_REQUESTS.EMPTY_LIST_TITLE' | translate" />
+    }
+</div>

@@ -1,0 +1,60 @@
+<form [formGroup]="filtersForm" fxLayout="column" fxLayoutGap="24px">
+    <div fxLayout="row" class="filter-block">
+        <div class="ob-label" fxFlex="120px">
+            {{'LISTINGS.LISTINGS_LIST_FILTER.IMPORT_DATE' | translate}}
+        </div>
+        <div class="filter-block-input" fxFlex="180px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="startDate" [placeholder]="dateFormat" formControlName="startDateListing"
+                    (focus)="startDate.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                (click)="$event.stopPropagation(); startDate.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #startDate></mat-datepicker>
+            </mat-form-field>
+        </div>
+        <div fxFlex="20px">
+            <span fxFlex class="filter-block-dates-separator"></span>
+        </div>
+        <div class="filter-block-input" fxFlex="180px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="endDate" [placeholder]="dateFormat" formControlName="endDateListing"
+                    (focus)="endDate.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                (click)="$event.stopPropagation(); endDate.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #endDate></mat-datepicker>
+            </mat-form-field>
+        </div>
+    </div>
+    <div fxLayout="row" class="filter-block">
+        <div class="ob-label" fxFlex="120px">
+            {{'LISTINGS.LISTINGS_LIST_FILTER.STATUS' | translate}}
+        </div>
+        <div class="filter-block-input" fxFlex="540px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-select formControlName="status" multiple [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                    <mat-option *ngFor="let status of statusList" [value]="status">
+                        {{status?.name | translate}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+    <div fxLayout="row" class="filter-block">
+        <div class="ob-label" fxFlex="120px">
+            {{'LISTINGS.LISTINGS_LIST_FILTER.SUPPLIER' | translate}}
+        </div>
+        <div class="filter-block-input" fxFlex="540px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-select formControlName="supplier" multiple [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                    <mat-option *ngFor="let supplier of (suppliers$ | async)" [value]="supplier">
+                        {{supplier?.name | translate}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+</form>

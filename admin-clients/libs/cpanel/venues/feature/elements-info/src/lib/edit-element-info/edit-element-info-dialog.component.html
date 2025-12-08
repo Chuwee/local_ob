@@ -1,0 +1,150 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title fxLayout="row">
+        <div fxFlex="100%">
+            <h2 class="secondary title">{{'TITLES.EDIT_VENUE_TEMPLATE_ELEMENT_INFO' | translate}}</h2>
+            <span class="mat-body-2">
+                @if (currentAction === venueTemplateElementInfoAction.editSingle
+                    || currentAction === venueTemplateElementInfoAction.createSingle) {
+                    {{singleElementInfo.name}}
+                } @else {
+                    {{'VENUE_TPLS.ELEMENT_INFO.SUBTITLE_MULTIPLE' | translate}}
+                }
+            </span>
+        </div>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column">
+        <form [formGroup]="form" fxLayout="column" fxLayoutAlign="start stretch">
+            @if (currentAction === venueTemplateElementInfoAction.editSingle
+                || currentAction === venueTemplateElementInfoAction.createSingle) {
+                <div fxLayout="column" class="section-block">
+                    <p class="section-description">
+                        {{'VENUE_TPLS.ELEMENT_INFO.NAME.DESCRIPTION' | translate }}
+                    </p>
+                    <app-tabs-menu type="language" overrideClasses="no-left-padding" #namesTabs formGroupName="name">
+                        @for (lang of languages; track lang) {
+                            <ng-template appTab [ctrl]="form.get(['name', lang])" lazyLoad [label]="('LANGUAGES.' + lang) | translate">
+                                <mat-form-field fxFlex="70%" appearance="outline" class="ob-form-field field-with-label">
+                                    <mat-label>{{'VENUE_TPLS.ELEMENT_INFO.NAME.LABEL' | translate}}</mat-label>
+                                    <input matInput [formControlName]="lang"
+                                        [placeholder]="singleElementInfo.name || 'VENUE_TPLS.ELEMENT_INFO.NAME.LABEL' | translate">
+                                    <mat-error [ob-form-errors]="form" [field]="['name', lang]" />
+                                </mat-form-field>
+                            </ng-template>
+                        }
+                    </app-tabs-menu>
+                </div>
+            }
+            @if(entityZoneTemplates$ | async) {
+                <div fxLayout="column" class="section-block">
+                    <h3 class="section-title">
+                        {{ 'VENUE_TPLS.ELEMENT_INFO.TEMPLATE_ZONES.TITLE' | translate }}
+                        <app-badge [badge]="'INFORMATION_BADGE.BETA_FEATURE'" [badgeClass]="'blue'" />
+                    </h3>
+                    <p>{{ 'VENUE_TPLS.ELEMENT_INFO.TEMPLATE_ZONES.DESCRIPTION' | translate }}</p>
+                    <div class="flex items-baseline gap-4">
+                        <mat-form-field appearance="outline" class="ob-form-field ob-form-field-outline flex basis-1/2"
+                            [matTooltip]="'VENUE_TPLS.ELEMENT_INFO.TEMPLATE_ZONES.SELECTOR_DISABLED_DESCRIPTION' | translate"
+                            [matTooltipDisabled]="(entityZoneTemplates$ | async).length > 0" matTooltipPosition="right">
+                            <app-select-server-search [multiple]="true" [unselectLabel]="'FORMS.ACTIONS.UNSELECT_ALL' | translate"
+                                formControlName="templates_zones" [options$]="entityZoneTemplates$"
+                                [moreOptionsAvailable$]="moreTemplatesAvailable$"
+                                (loadOptions)="loadTemplates($event.q, $event.nextPage)" />
+                        </mat-form-field>
+                        <div class="flex items-baseline">
+                            <a aria-label="Go to link" class="ob-link flex" target="_blank"
+                                [routerLink]="entityId === $loggedUserEntityId()
+                                    ? ['/my-entity', 'zone-templates']
+                                    : ['/entities', entityId, 'zone-templates']">
+                                <span>{{'VENUE_TPLS.ELEMENT_INFO.GO_TO_ENTITY_TEMPLATE_ZONES' | translate}}</span>
+                                <mat-icon class="ob-icon xsmall" iconPositionEnd>launch</mat-icon>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+            @if (status) {
+                <div fxLayout="row wrap" class="section-block">
+                    <mat-slide-toggle class="ob-slide-toggle" formControlName="status">
+                        {{ 'VENUE_TPLS.ELEMENTS_INFO.STATUS_TOGGLE'| translate }}
+                    </mat-slide-toggle>
+                </div>
+            }
+            <ng-container>
+                @if (currentContentOptions.includes(venueTemplateElementInfoContents.badge)) {
+                    <div class="section-block">
+                        <mat-divider class="ob-form-divider" />
+                        <app-edit-element-info-badge (deleteContent)="deleteContent($event)" [formGroup]="defaultInfoGroup"
+                            [languages]="languages" [defaultInfo]="singleElementInfoDetail" />
+                    </div>
+                }
+                @if (currentContentOptions.includes(venueTemplateElementInfoContents.textInfo)) {
+                    <div class="section-block">
+                        <mat-divider class="ob-form-divider" />
+                        <app-edit-element-info-text (deleteContent)="deleteContent($event)" [formGroup]="defaultInfoGroup"
+                            [languages]="languages" [defaultInfo]="singleElementInfoDetail" />
+                    </div>
+                }
+                @if (currentContentOptions.includes(venueTemplateElementInfoContents.featuresList)) {
+                    <div class="section-block">
+                        <mat-divider class="ob-form-divider" />
+                        <app-edit-element-features-list (deleteContent)="deleteContent($event)" [formGroup]="defaultInfoGroup"
+                            [languages]="languages" [defaultInfo]="singleElementInfoDetail" />
+                    </div>
+                }
+                @if (currentContentOptions.includes(venueTemplateElementInfoContents.view3d)) {
+                    <div class="section-block">
+                        <mat-divider class="ob-form-divider" />
+                        <app-edit-element-info-3d-view (deleteContent)="deleteContent($event)" [form]="defaultInfoGroup"
+                            [singleCode]="singleElementInfo?.code"
+                            [currentAction]="currentAction" [defaultInfo]="singleElementInfoDetail" />
+                    </div>
+                }
+                @if (currentContentOptions.includes(venueTemplateElementInfoContents.highlightedImage)) {
+                    <div class="section-block">
+                        <mat-divider class="ob-form-divider" />
+                        <app-edit-element-info-highlighted-image (deleteContent)="deleteContent($event)" [formGroup]="defaultInfoGroup"
+                            [languages]="languages" [defaultInfo]="singleElementInfoDetail" />
+                    </div>
+                }
+                @if (currentContentOptions.includes(venueTemplateElementInfoContents.imageList)) {
+                    <div class="section-block">
+                        <mat-divider class="ob-form-divider" />
+                        <app-edit-element-info-images (deleteContent)="deleteContent($event)" [formGroup]="defaultInfoGroup"
+                            [languages]="languages" [defaultInfo]="singleElementInfoDetail" />
+                    </div>
+                }
+                @if (currentContentOptions.includes(venueTemplateElementInfoContents.restriction)) {
+                    <div class="section-block">
+                        <mat-divider class="ob-form-divider" />
+                        <app-edit-element-info-restriction (deleteContent)="deleteContent($event)" [formGroup]="defaultInfoGroup"
+                            [languages]="languages" [defaultInfo]="singleElementInfoDetail" />
+                    </div>
+                }
+            </ng-container>
+            <div fxLayoutAlign="center" class="section-block add-content-container">
+                <button mat-button type="button" class="ob-button small" color="tertiary" (click)="openContentOptionsModal()"
+                    [disabled]="(disableAddContentButton$ | async) || (isInProgress$ | async)">
+                    <mat-icon>add</mat-icon>
+                    {{'VENUE_TPLS.ELEMENT_INFO.ADD_CONTENT' | translate}}
+                </button>
+            </div>
+        </form>
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button mat-button type="button" class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="saveElementsInfo()"
+            [disabled]="(isInProgress$ | async) || form.disabled">
+            {{'FORMS.ACTIONS.SAVE' | translate}}
+        </button>
+    </div>
+</div>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

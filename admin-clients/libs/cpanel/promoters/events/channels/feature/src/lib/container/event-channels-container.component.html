@@ -1,0 +1,24 @@
+<div fxFlex="0 0 100%" fxLayout="column" fxLayoutAlign="stretch stretch">
+    <mat-drawer-container fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="start stretch">
+        <mat-drawer #drawer mode="side" opened fxFlex="0 0 {{sidebarWidth$ | async}}">
+            <app-event-channels-list></app-event-channels-list>
+        </mat-drawer>
+        <mat-drawer-content fxFlex="0 1 100%" fxLayout="column" class="channel-editor-container">
+            <div class="ob-sidebar-toggle" (click)="drawer.toggle();" [ngClass]="{'collapsed': !drawer.opened}">
+                <span class="arrow"></span>
+            </div>
+            <router-outlet *ngIf="(eventChannelListMetadata$ | async)?.total !== 0"></router-outlet>
+            <app-empty-state [fxShow]="(eventChannelListMetadata$ | async)?.total === 0" fxFlex="100%"
+                [title]="'EVENTS.CHANNEL.EMPTY_LIST_MESSAGE' | translate"
+                [description]="'EVENTS.CHANNEL.NEW_MESSAGE' | translate">
+                <button mat-flat-button class="ob-button" color="primary" (click)="newChannel()">
+                    <mat-icon>add</mat-icon>
+                    {{'EVENTS.CHANNEL.NEW' | translate}}
+                </button>
+            </app-empty-state>
+            <div class="spinner-container" *ngIf="(isLoading$ | async)">
+                <mat-spinner></mat-spinner>
+            </div>
+        </mat-drawer-content>
+    </mat-drawer-container>
+</div>

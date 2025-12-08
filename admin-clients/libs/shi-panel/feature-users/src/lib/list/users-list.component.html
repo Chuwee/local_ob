@@ -1,0 +1,122 @@
+<div class="list-container" fxFlex="0 1 100%" fxLayout="column">
+    <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">
+                {{'TITLES.USERS.USERS_LIST_TITLE' | translate}}
+            </h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+            <div class="filter-container" fxFlex="none" *ngIf="(isOwnerUser$ | async) || (isAdminUser$ | async)">
+                <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                    [attr.aria-label]="'USERS.NEW_USER_BTN' | translate" (click)="openNewUserDialog()"
+                    [disabled]="(hasWritePermissions$ | async) === false">
+                    <mat-icon>add</mat-icon>
+                    {{'USERS.NEW_USER_BTN' | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="heading-container" fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxFlex="80%" fxLayoutGap="20px" fxLayoutAlign="start center">
+            <div class="search-field" fxFlex="100%">
+                <app-search-input [placeholder]="'FORMS.SEARCH.USERS_LIST' | translate" />
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            <p *ngIf="usersMetadata$ | async as usersMetadata" class="page-summary"
+                [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: usersMetadata">
+            </p>
+            <app-paginator [length]="(usersMetadata$ | async)?.total" [pageSize]="usersPageSize" />
+        </div>
+    </div>
+    <div class="spinner-container" *ngIf="loadingData$ | async">
+        <mat-spinner />
+    </div>
+    <mat-table class="ob-table" [dataSource]="users$ | async" matSort [matSortActive]="initSortCol" [matSortDirection]="initSortDir"
+        matSortDisableClear [attr.aria-label]="'TITLES.USERS.USERS_LIST_TITLE' | translate"
+        [class.not-touchable]="(isHandsetOrTablet$ | async) !== true">
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'USERS.NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span appEllipsify [matTooltip]="row.name" matTooltipClass="ob-tooltip-nowrap">
+                    {{row.name}}
+                </span>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="surname">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'USERS.SURNAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span appEllipsify [matTooltip]="row.surname" matTooltipClass="ob-tooltip-nowrap">
+                    {{row.surname}}
+                </span>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="username">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'USERS.EMAIL' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span appEllipsify [matTooltip]="row.username" matTooltipClass="ob-tooltip-nowrap">
+                    {{row.username}}
+                </span>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="role">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell status-cell">
+                {{'USERS.ROLE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="badge-container status-cell">
+                <span>{{'USERS.ROLE_OPTS.' + row.role | translate}}</span>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'USER.STATUS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row"
+                [class]="canEditUser(row, isAdminUser$ | async, isOwnerUser$ | async) ? 'editable-cell' : 'status-cell'">
+                <ng-container
+                    *ngIf="canEditUser(row, isAdminUser$ | async, isOwnerUser$ | async) && (hasWritePermissions$ | async); else statusReadonly">
+                    <app-status-select fxFlex="100" [element]="row" statusType="USER" [statusList]="userStatus"
+                        [updateStatus]="updateStatus" (click)="$event.stopPropagation()">
+                        <ng-template #optionTemplate let-row>
+                            {{'USER.STATUS_OPTS.' + row | translate}}
+                        </ng-template>
+                    </app-status-select>
+                </ng-container>
+                <ng-template #statusReadonly>
+                    <span class="readonly" [ngClass]="['status-dot', row.status.toLowerCase()]"></span>
+                    <span>{{'USER.STATUS_OPTS.' + row.status | translate}}</span>
+                </ng-template>
+            </mat-cell>
+        </ng-container>
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="head-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true" />
+            <mat-cell *matCellDef="let row" [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                <div class="action-buttons" (click)="$event.stopPropagation()">
+                    <button mat-icon-button (click)="openDeleteUserDialog(row)" aria-label="Delete user" class="ob-button medium"
+                        *ngIf="canEditUser(row, isAdminUser$ | async, isOwnerUser$ | async) && (hasWritePermissions$ | async)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+            </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" />
+        <mat-row *matRowDef="let row; columns: displayedColumns;"
+            [class.interactive-row]="!(row.role === userRoles.owner && (isAdminUser$ | async))"
+            [routerLink]="getUserLink(row, isAdminUser$ | async, isOwnerUser$ | async)" />
+    </mat-table>
+    <div class="context-notification-container" fxFlex="0 50 100%" *ngIf="((usersMetadata$ | async)?.total === 0)"
+        fxLayout="row" fxLayoutAlign="center start">
+        <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px"
+            fxFlex="80%" fxLayoutAlign="center start">
+            <p>{{'LIST.EMPTY' | translate}}</p>
+        </app-context-notification>
+    </div>
+</div>

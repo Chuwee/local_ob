@@ -1,0 +1,94 @@
+<app-form-container layout="main" class="overflow-y-auto" (cancel)="cancel()" (save)="save()" [formGroup]="form"
+    [disabled]="!form.dirty">
+
+    <div class="product-event-sessions-container section-block flex flex-col">
+        <h3 class="section-title">{{'PRODUCT.EVENTS.DETAIL.SESSIONS.SELECTION_TITLE' | translate}} *</h3>
+        <p>{{'PRODUCT.EVENTS.DETAIL.SESSIONS.SELECTION_DESCRIPTION' | translate}}</p>
+        <mat-radio-group [formControl]="form.get('sessionsSelectAll')" class="flex-1">
+            <mat-radio-button [value]="true" class="ob-radio-button vertical-list">
+                <div>{{'PRODUCT.EVENTS.DETAIL.SESSIONS.SELECTION_ALL' | translate}}</div>
+            </mat-radio-button>
+            <mat-radio-button [value]="false" class="ob-radio-button vertical-list">
+                <div>{{'PRODUCT.EVENTS.DETAIL.SESSIONS.SELECTION_RESTRICTED' | translate}}</div>
+            </mat-radio-button>
+            @if (form.get('sessionsSelectAll').value === false) {
+                <ng-container [ngTemplateOutlet]="sessionsSelectionList" />
+            }
+        </mat-radio-group>
+    </div>
+
+    <ng-template #sessionsSelectionList>
+        <div class="sessions-selection nested-content">
+            <app-searchable-paginated-selection class="ob-medium-list"
+                [class.field-error]="form.get('sessions').hasError('atLeastOneRequired') && form.get('sessions').touched"
+                [placeholder]="'PRODUCT.EVENTS.DETAIL.SESSIONS.SELECTION_SEARCH_PLACEHOLDER' | translate"
+                [pageSize]="pageSize" [form]="form.get('sessions')"
+                [data$]="allEventSessionsData$" [metadata$]="allEventSessionsMetadata$"
+                (loadData)="reloadSessionsList($event)">
+                <div slot="filter" class="badge-container" [class.empty]="!(allEventSessionsMetadata$ | async)?.total">
+                    {{form.get('sessions').value?.length}} / {{(allEventSessionsMetadata$ | async)?.total || 0}}
+                </div>
+                <button slot="filter" mat-icon-button color="tertiary" class="ob-button only-icon"
+                    [class.active]="sessionsSelectedOnly$ | async"
+                    [disabled]="form.get('sessions').value?.length === 0"
+                    [matTooltip]="'PRODUCT.EVENTS.DETAIL.SESSIONS.SHOW_SELECTED_TOOLTIP' | translate"
+                    (click)="changeSessionsSelectedOnly()">
+                    <mat-icon>visibility</mat-icon>
+                </button>
+                <div slot="filter" class="filter-container flex-none">
+                    <app-sessions-selector-filter (filterChange)="filterChangeHandler($event)" />
+                </div>
+                <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data" let-selectionChanged="selectionChanged">
+                    @if (sessions$ | async) {
+                        <app-selection-list [selectionDisabled]="form.get('sessionsSelectAll').value === true"
+                            [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged" class="small-rows">
+                            <div slot="subheader" class="list-header">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <mat-checkbox color="primary" [disabled]="(sessionsSelectedOnly$ | async)"
+                                            [checked]="form.get('sessions').value.length > 0 &&
+                                            form.get('sessions').value.length === (allEventSessionsMetadata$ | async).total ||
+                                            (sessionsSelectedOnly$ | async)"
+                                            [indeterminate]="form.get('sessions').value.length > 0 &&
+                                            form.get('sessions').value.length < (allEventSessionsMetadata$ | async).total"
+                                            (change)="selectAll($event)" />
+                                        <span class="basis-full">{{'FORMS.LABELS.SESSIONS' | translate}}</span>
+                                    </div>
+                                    <div class="flex-[0_1_200px]">
+                                        <span>{{'FORMS.LABELS.DATE' | translate}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <ng-template #optionTemplate let-row>
+                                <div class="flex justify-between">
+                                    <div>
+                                        @if(row.smartbooking) {
+                                            <b>{{ 'FORMS.LABELS.SMART_BOOKING_TYPE' | translate }} | </b>
+                                        }
+                                        <span>
+                                            {{row.name}}
+                                        </span>
+                                    </div>
+                                    <div class="flex-[0_1_200px]">
+                                        <span>{{row.start | dateTime :
+                                        dateTimeFormats.shortDateTimeWithWeek}}</span>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </app-selection-list>
+                    }
+                </ng-template>
+            </app-searchable-paginated-selection>
+            @if (form.get('sessions').hasError('atLeastOneRequired') && form.get('sessions').touched) {
+                <mat-error>
+                    {{'PRODUCT.EVENTS.DETAIL.SESSIONS_SELECTOR.AT_LEAST_ONE_REQUIRED' | translate}}
+                </mat-error>
+            }
+        </div>
+    </ng-template>
+</app-form-container>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

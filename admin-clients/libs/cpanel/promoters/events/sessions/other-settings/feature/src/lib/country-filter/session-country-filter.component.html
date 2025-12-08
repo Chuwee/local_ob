@@ -1,0 +1,19 @@
+<div class="country-filter" [formGroup]="countryFilterFormGroup" fxFlex="100%" fxLayout="row wrap">
+    <mat-checkbox formControlName="enable" color="primary">
+        {{'EVENTS.SESSION.COUNTRY_FILTER.ENABLED' | translate}}
+    </mat-checkbox>
+    <div fxFlex="100%" class="country-selection-div"
+        [@expandSelection]="countryFilterFormGroup.get('enable').value ? 'expanded' : 'collapsed'">
+        <div fxFlex="100%" fxLayout="row wrap" class="edition-block country-scope">
+            <mat-selection-list fxFlex="100%" fxFlex.gt-md="80%" class="country-list" formControlName="countries">
+                <mat-list-option *ngFor="let country of (countries$ | async)" color="primary" checkboxPosition="before"
+                    [value]="country.code">
+                    {{country.name}}
+                </mat-list-option>
+            </mat-selection-list>
+            <mat-error *ngIf="countryFilterFormGroup.hasError('countryListEmpty')">
+                {{'EVENTS.SESSION.COUNTRY_FILTER.SELECT_SOME' | translate}}
+            </mat-error>
+        </div>
+    </div>
+</div>

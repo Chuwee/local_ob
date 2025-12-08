@@ -1,0 +1,85 @@
+<ng-container *ngIf="(templates$ | async) as templates">
+    <app-form-container *ngIf="templates?.length" layout="menu" class="no-padding" (cancel)="cancel()" (save)="save()"
+        [disabled]="!form.dirty || (isLoadingOrSaving$ | async)" [class.disabled-form]="!currentFormGroup">
+        <app-language-bar slot="outside" [languages]="languages$ | async" [selected]="selectedLanguage$ | async"
+            (changed)="changeLanguage($event)">
+        </app-language-bar>
+
+        <div class="zone-selection" fxFlex>
+            <mat-form-field *ngIf="templates.length > 1" appearance="outline" class="ob-form-field field-with-label venue-tpl-select"
+                fxFlex="0 1 320px">
+                <mat-label>{{'EVENTS.SELECT_EVENT_TEMPLATE' | translate}}</mat-label>
+                <mat-select [formControl]="venueTplCtrl" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                    <mat-option *ngFor="let venue of templates" [value]="venue">
+                        <div appEllipsify [matTooltip]="venue?.name">
+                            {{venue?.name}}
+                        </div>
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <div *ngIf="templates.length === 1" class="details-non-editable-field" fxFlex="0 1 320px" fxLayout="column">
+                <span class="field-label">{{'EVENTS.SELECT_EVENT_TEMPLATE' | translate}}</span>
+                <span>{{templates[0]?.name}}</span>
+            </div>
+            <p class="details-non-editable-field body-1 no-templates-message" *ngIf="!templates.length">
+                {{'EVENTS.NO_TEMPLATES' | translate}}
+            </p>
+            <mat-form-field fxFlex="0 1 320px" appearance="outline" *ngIf="templates.length"
+                class="ob-form-field field-with-label price-type-selector">
+                <mat-label>{{'VENUE_TPLS.PRICE_TYPE' | translate}}</mat-label>
+                <mat-select [formControl]="priceTypeCtrl" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                    <mat-option *ngFor="let priceType of (priceTypes$ | async)" [value]="priceType">
+                        <div appEllipsify [matTooltip]="priceType.name + ' ' +
+                            (priceType.edited ? ('('+('FORMS.LABELS.EDITED' | translate)+')'):'')">
+                            {{priceType.name}}
+                            <span class="edited-option">
+                                {{priceType.edited ? ('('+('FORMS.LABELS.EDITED' | translate)+')'):''}}
+                            </span>
+                        </div>
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <!-- shame hack :( -->
+        <div fxFlex="0 0 24px" class="spacer">
+            <div class="details-container" fxFlex="0 1 880px"></div>
+            <mat-divider vertical="true" fxFlexAlign="stretch"></mat-divider>
+            <div fxFlex="0 0 200px"></div>
+        </div>
+        <div fxFlex class="top-content">
+            <div class="details-container" fxFlex="0 1 880px">
+                <p class="section-description">{{'EVENTS.COMMUNICATION.TICKET.PRICE_TYPE_DESCRIPTION' | translate}}</p>
+            </div>
+            <mat-divider vertical="true" fxFlexAlign="stretch"></mat-divider>
+            <div fxFlex="0 0 200px"></div>
+        </div>
+        <app-price-type-ticket-content-pdf #pdfContent [texts$]="pdfTexts$" [images$]="pdfImages$" [form]="currentFormGroup"
+            [language$]="selectedLanguage$">
+        </app-price-type-ticket-content-pdf>
+        <app-price-type-ticket-content-printer #printerContent [texts$]="printerTexts$" [images$]="printerImages$" [form]="currentFormGroup"
+            [language$]="selectedLanguage$">
+        </app-price-type-ticket-content-printer>
+        <ng-container *ngIf="passbookEnabled$ | async">
+            <app-price-type-ticket-content-passbook #passbookContent [texts$]="passbookTexts$" [images$]="passbookImages$"
+                [form]="currentFormGroup" [language$]="selectedLanguage$">
+            </app-price-type-ticket-content-passbook>
+        </ng-container>
+        <div fxFlex="grow" class="bottom-content">
+            <div fxFlex="0 1 880px"></div>
+            <mat-divider vertical="true" fxFlexAlign="stretch"></mat-divider>
+            <div fxFlex="0 0 200px"></div>
+        </div>
+
+        <app-archived-event-mgr slot="actions-bar"></app-archived-event-mgr>
+
+    </app-form-container>
+
+    <div fxFlex="0 1 100%" *ngIf="!templates?.length" class="no-templates" fxLayoutAlign="center center">
+        <app-empty-state [description]="'EVENTS.NO_TEMPLATES' | translate"></app-empty-state>
+    </div>
+
+</ng-container>
+
+<div class="spinner-container" *ngIf="isLoadingOrSaving$ | async">
+    <mat-spinner></mat-spinner>
+</div>

@@ -1,0 +1,75 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'TITLES.NEW_COLLECTIVE_CODE' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch" class="dialog-grid-form">
+        <form [formGroup]="form" fxLayout="row wrap" fxLayoutAlign="start stretch">
+            <ng-container *ngIf="isUserPass || isUser else code">
+                <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.COLLECTIVE_CODE_USER' | translate}}</mat-label>
+                    <input matInput aria-label="user" formControlName="user"
+                        [placeholder]="'FORMS.LABELS.COLLECTIVE_CODE_USER' | translate">
+                    <mat-error [ob-form-errors]="form" field="user" />
+                </mat-form-field>
+                <mat-form-field *ngIf="isUserPass" fxFlex="100%" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.COLLECTIVE_CODE_KEY' | translate}}</mat-label>
+                    <input matInput aria-label="key" formControlName="key"
+                        [placeholder]="'FORMS.LABELS.COLLECTIVE_CODE_KEY' | translate">
+                    <mat-error [ob-form-errors]="form" field="key" />
+                </mat-form-field>
+            </ng-container>
+            <ng-template #code>
+                <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.COLLECTIVE_CODE' | translate}}</mat-label>
+                    <input matInput aria-label="code" formControlName="code"
+                        oninput="value = value.toUpperCase()"
+                        [placeholder]="'FORMS.LABELS.COLLECTIVE_CODE' | translate">
+                    <mat-error [ob-form-errors]="form" field="code" />
+                </mat-form-field>
+            </ng-template>
+
+            <div fxLayout="row wrap" class="dates-selection" fxLayoutGap="15px" formGroupName="validity_period">
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label" fxFlex="45%">
+                    <mat-label>{{'FORMS.LABELS.COLLECTIVE_CODE_VALIDITY_PERIOD_FROM' | translate}}</mat-label>
+                    <input matInput [matDatepicker]="validityPeriodFromDP" [placeholder]="dateFormat"
+                        formControlName="from" (focus)="validityPeriodFromDP.open()">
+                    <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                        (click)="$event.stopPropagation(); validityPeriodFromDP.open();">
+                        <mat-icon>event</mat-icon>
+                    </button>
+                    <mat-datepicker #validityPeriodFromDP />
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label" fxFlex="45%">
+                    <mat-label>{{'FORMS.LABELS.COLLECTIVE_CODE_VALIDITY_PERIOD_TO' | translate}}</mat-label>
+                    <input matInput [matDatepicker]="validityPeriodToDP" [placeholder]="dateFormat" formControlName="to"
+                        (focus)="validityPeriodToDP.open()">
+                    <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                        (click)="$event.stopPropagation(); validityPeriodToDP.open();">
+                        <mat-icon>event</mat-icon>
+                    </button>
+                    <mat-datepicker #validityPeriodToDP />
+                </mat-form-field>
+                <mat-error *ngIf="form.get('validity_period').invalid" [ob-form-errors]="form" field="validity_period" />
+            </div>
+
+            <mat-form-field fxFlex="50%" appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.COLLECTIVE_CODE_USAGE_LIMIT' | translate}}</mat-label>
+                <input matInput type="number" formControlName="usage_limit" placeholder="0">
+                <mat-error [ob-form-errors]="form" field="usage_limit" />
+            </mat-form-field>
+        </form>
+    </div>
+    <div mat-dialog-actions fxFlex="auto" fxLayout="row no wrap" fxLayoutAlign="end">
+        <button mat-button type="button" class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createCollectiveCode()"
+            [disabled]="isSaving$ | async">
+            {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>

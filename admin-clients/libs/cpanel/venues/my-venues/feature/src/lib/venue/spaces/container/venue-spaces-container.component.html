@@ -1,0 +1,21 @@
+<div fxFlex="0 0 100%" fxLayout="column" fxLayoutAlign="stretch stretch">
+    <mat-drawer-container fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="start stretch">
+        <mat-drawer #drawer mode="side" opened fxFlex="0 0 {{sidebarWidth$ | async}}">
+            <app-venue-spaces-list></app-venue-spaces-list>
+        </mat-drawer>
+        <mat-drawer-content fxFlex="0 1 100%" class="space-editor-container">
+            <div class="ob-sidebar-toggle" (click)="drawer.toggle();" [ngClass]="{'collapsed': !drawer.opened}">
+                <span class="arrow"></span>
+            </div>
+            <router-outlet *ngIf="(venueSpacesListMetadata$ | async)?.total !== 0"></router-outlet>
+            <app-empty-state [fxShow]="(venueSpacesListMetadata$ | async)?.total === 0"
+                [title]="'VENUE.SPACES.EMPTY_LIST_MESSAGE' | translate"
+                [description]="'VENUE.SPACES.CREATE_MESSAGE' | translate">
+                <button mat-flat-button class="ob-button" color="primary" (click)="newVenueSpace()">
+                    <mat-icon>add</mat-icon>
+                    {{'VENUE.SPACES.NEW_SPACE' | translate}}
+                </button>
+            </app-empty-state>
+        </mat-drawer-content>
+    </mat-drawer-container>
+</div>

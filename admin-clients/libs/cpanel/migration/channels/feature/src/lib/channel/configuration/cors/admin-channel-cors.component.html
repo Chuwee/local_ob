@@ -1,0 +1,65 @@
+@let originsTotal = $settings()?.allowed_origins?.length;
+<div class="cors-toggle-header">
+    <mat-slide-toggle class="ob-slide-toggle" [checked]="$settings()?.enabled" [disabled]="!(!!originsTotal)"
+        (change)="updateEnabled($event)">
+        {{ 'ADMIN_CHANNEL.CONFIGURATION.CORS.FORMS.LABELS.ENABLED' | translate }}
+    </mat-slide-toggle>
+</div>
+<mat-divider />
+<app-form-container layout="menu" hideActionBar>
+    @if(originsTotal){
+        <div class="flex flex-col gap-4">
+            <div class="flex flex-row items-center">
+                <mat-icon class="ob-icon small neutral with-text">info</mat-icon>
+                <span>{{ 'ADMIN_CHANNEL.CONFIGURATION.CORS.INFOS.LIMIT' | translate }}</span>
+            </div>
+            <div class="flex justify-end">
+                @let disabledCreateAction = originsTotal >= originsLimit;
+                <div [matTooltip]="'ADMIN_CHANNEL.CONFIGURATION.CORS.ACTIONS.LIMIT' | translate"
+                    [matTooltipDisabled]="!disabledCreateAction">
+                    <button mat-stroked-button color="primary" type="button" class="ob-button medium"
+                        [attr.aria-label]="'ADMIN_CHANNEL.CONFIGURATION.CORS.ACTIONS.CREATE' | translate"
+                        (click)="openCreateOrEditCorsDialog()"
+                        [disabled]="disabledCreateAction">
+                        <mat-icon fontIcon="add" />
+                        {{'ADMIN_CHANNEL.CONFIGURATION.CORS.ACTIONS.CREATE' | translate}}
+                    </button>
+                </div>
+            </div>
+            <mat-list class="ob-list" role="list">
+                @for(origin of $settings().allowed_origins; track $index){
+                    <mat-list-item class="editable-item" role="listitem">
+                        <h3 matListItemTitle>{{origin}}</h3>
+                        <div matListItemMeta class="flex flex-row actions-container">
+                            <button type="button" mat-icon-button aria-label="FORM.ACTIONS.EDIT" class="ob-button medium"
+                                (click)="openCreateOrEditCorsDialog($index)">
+                                <mat-icon class="ob-black" fontIcon=" edit" />
+                            </button>
+                            @if(originsTotal > 1){
+                                <button type="button" mat-icon-button aria-label="FORMS.ACTIONS.DELETE" class="ob-button medium"
+                                    (click)="openDeleteCorsDialog($index)">
+                                    <mat-icon class="ob-black" fontIcon="delete" />
+                                </button>
+                            }
+                        </div>
+                    </mat-list-item>
+                }
+            </mat-list>
+        </div>
+    } @else if (!$isInProgress()) {
+        <app-empty-state
+            [hideImage]=" true"
+            [title]="'ADMIN_CHANNEL.CONFIGURATION.CORS.ACTIONS.EMPTY' | translate"
+            [description]="'ADMIN_CHANNEL.CONFIGURATION.CORS.ACTIONS.EMPTY_DESCRIPTION' | translate">
+            <button mat-stroked-button class="ob-button" color="primary" (click)=" openCreateOrEditCorsDialog()">
+                <mat-icon fontIcon="add" />
+                {{'ADMIN_CHANNEL.CONFIGURATION.CORS.ACTIONS.CREATE' | translate}}
+            </button>
+        </app-empty-state>
+    }
+    @if($isInProgress()){
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+</app-form-container>

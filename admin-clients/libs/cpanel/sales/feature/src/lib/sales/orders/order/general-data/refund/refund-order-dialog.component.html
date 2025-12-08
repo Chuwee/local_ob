@@ -1,0 +1,210 @@
+<div class="dialog-msg-container refund-order-dialog">
+    <div mat-dialog-title class="flex flex-col">
+        <div class="flex justify-between items-center">
+            <h2 class="secondary title refund-order-dialog-title">
+                {{'TITLES.REFUND_TICKETS' | translate}}
+            </h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content fxLayout="column">
+        <div class="refund-order-dialog-subtitle">
+            {{'ACTIONS.REFUND.SUBTITLE' | translate: {selectedItems, totalItems} }}
+        </div>
+        <form [formGroup]="form" fxLayout="column">
+            <div class="context-notification-container ob-error" fxFlex="100%" fxLayout="row" fxLayoutAlign="center start">
+                @if (reimbursementKO) {
+                    <app-context-notification contextType="warn" fxFlex="100%">
+                        {{'ORDER.REIMBURSEMENT.KO' | translate}}
+                    </app-context-notification>
+                }
+            </div>
+            <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center" class="refund-order-dialog-advice">
+                <mat-icon class="ob-icon small neutral with-text">info</mat-icon>
+                <span>{{'ACTIONS.REFUND.ADVICE' | translate}}</span>
+            </div>
+            <div fxLayout="row" fxLayoutGap="30px">
+                <div class="refund-order-section" fxLayout="column" fxFlex="1 1 50%">
+                    <div class="mat-h4 refund-order-section-title">{{'ACTIONS.REFUND.TYPE.SELECT' | translate}}</div>
+                    <mat-divider />
+                    <div class="refund-order-section-content" fxLayout="row">
+                        <mat-radio-group (change)="updateType($event.value)" fxFlex="100%" fxLayout="column" fxLayoutGap="10px">
+                            <mat-radio-button class="ob-radio-card-button" [value]="refundType" [checked]="type === refundType">
+                                <div class="refund-order-option-text">
+                                    {{'ACTIONS.REFUND.TYPE.REFUND.NAME' | translate}}
+                                </div>
+                                <div>
+                                    {{'ACTIONS.REFUND.TYPE.REFUND.DESCRIPTION' | translate}}
+                                </div>
+                            </mat-radio-button>
+                            <mat-radio-button class="ob-radio-card-button" [value]="reimbursementType"
+                                [disabled]="!isAllowedReimbursement && !isAllowedExternalReimbursement"
+                                [checked]="type === reimbursementType">
+                                <div>{{ (isAllowedExternalReimbursement
+                                    ? 'ACTIONS.REFUND.TYPE.EXTERNAL_REIMBURSEMENT.NAME'
+                                    : 'ACTIONS.REFUND.TYPE.REIMBURSEMENT.NAME') | translate}}</div>
+                                <div>
+                                    {{ (isAllowedExternalReimbursement
+                                        ? 'ACTIONS.REFUND.TYPE.EXTERNAL_REIMBURSEMENT.DESCRIPTION'
+                                        : 'ACTIONS.REFUND.TYPE.REIMBURSEMENT.DESCRIPTION') | translate}}
+                                </div>
+                            </mat-radio-button>
+                            <mat-radio-button class="ob-radio-card-button" [value]="voucherType" [checked]="type === voucherType"
+                                [disabled]="!isAllowedVoucherReimbursement">
+                                <div>{{'ACTIONS.REFUND.TYPE.VOUCHER_REIMBURSEMENT.NAME' | translate}}</div>
+                                <div>
+                                    {{'ACTIONS.REFUND.TYPE.VOUCHER_REIMBURSEMENT.DESCRIPTION' | translate}}
+                                </div>
+                            </mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+                    <mat-divider />
+                    @for (payment of payments; track payment.type; let i = $index) {
+                        <div class="refund-order-section-content" fxLayout="row">
+                            <div class="refund-order-payment" fxFlex="100%" fxLayoutAlign="space-between center">
+                                {{('ORDER.PAYMENT.TYPE.' + payment.type) | translate}}
+                                @if (payment.reference) {
+                                    <span>
+                                        - {{'ORDER.PAYMENT.REFERENCE' | translate:{numReference: payment.reference} }}
+                                    </span>
+                                }
+                                @if (payments.length > 1 && form.get('payments')) {
+                                    <ng-container formArrayName="payments">
+                                        <ng-container [formGroupName]="i">
+                                            <mat-form-field appearance="outline" fxFlex="120px"
+                                                class="ob-form-field inline-field value-field">
+                                                <app-currency-input [formControlName]="payment.type"
+                                                    [placeholder]="0 | localCurrency : currency" />
+                                            </mat-form-field>
+                                        </ng-container>
+                                    </ng-container>
+                                }
+                            </div>
+                        </div>
+                        @if (payments.length > 1 && form.get('payments')) {
+                            <mat-error [ob-form-errors]="form" [field]="['payments', i, payment.type]" />
+                        }
+                    }
+                    @let sumDoesntMatch = form.getError('sumPaymentsDoesntMatch');
+                    @if (sumDoesntMatch) {
+                        <mat-error>
+                            {{'FORMS.ERRORS.SUM_PAYMENTS_DOESNT_MATCH' | translate : {value: sumDoesntMatch} }}
+                        </mat-error>
+                    }
+                </div>
+                <div class="refund-order-section" fxLayout="column" fxFlex="1 1 50%">
+                    <div class="mat-h4 refund-order-section-title">{{'ACTIONS.REFUND.AMOUNTS.SELECT' | translate}}</div>
+                    <mat-divider />
+                    <div class="refund-order-section-content" fxLayout="row">
+                        <div fxLayout="column" fxFlex="1 1 auto">{{'ORDER.TICKETS' | translate}}</div>
+                        <div fxLayout="column" fxFlex="0 0 auto">{{amount.tickets | localCurrency:currency}}</div>
+                        <div fxLayout="column" fxFlex="30px"></div>
+                    </div>
+                    <div class="refund-order-section-content" fxLayout="row">
+                        <div fxLayout="column" fxFlex="1 1 auto">{{'ORDER.PRODUCTS' | translate}}</div>
+                        <div fxLayout="column" fxFlex="0 0 auto">{{amount.products | localCurrency:currency}}</div>
+                        <div fxLayout="column" fxFlex="30px"></div>
+                    </div>
+                    <div class="refund-order-section-content" fxLayout="row">
+                        <div fxLayout="column" fxFlex="1 1 auto">{{'FORMS.LABELS.DISCOUNTS' | translate}}</div>
+                        <div fxLayout="column" fxFlex="0 0 auto">{{amount.discounts | localCurrency:currency}}</div>
+                        <div fxLayout="column" fxFlex="30px"></div>
+                    </div>
+                    <div class="refund-order-section-content" fxLayout="row">
+                        <div fxLayout="column" fxFlex="1 1 auto">{{'FORMS.LABELS.PROMOTIONS' | translate}}</div>
+                        <div fxLayout="column" fxFlex="0 0 auto">{{amount.promotions | localCurrency:currency}}</div>
+                        <div fxLayout="column" fxFlex="30px"></div>
+                    </div>
+                    <div class="refund-order-section-content" fxLayout="row">
+                        <div fxLayout="column" fxFlex="1 1 auto">{{'ORDER.PRICE_DATA.ORDER_SALES' | translate}}</div>
+                        <div fxLayout="column" fxFlex="0 0 auto">{{amount.orderSales | localCurrency:currency}}</div>
+                        <div fxLayout="column" fxFlex="30px"></div>
+                    </div>
+                    <mat-divider />
+                    <div class="refund-order-section-content mat-body-strong" fxLayout="row">
+                        <div fxLayout="column" fxFlex="1 1 auto">
+                            {{'ACTIONS.REFUND.AMOUNTS.TOTAL_TICKETS' | translate}}
+                        </div>
+                        <div fxLayout="column" fxFlex="0 0 auto">{{amount.totalTickets | localCurrency:currency}}</div>
+                        <div fxLayout="column" fxFlex="30px" fxLayoutAlign="center center">
+                            <input fxHide matInput>
+                            <mat-checkbox color="primary" disabled checked="true" />
+                        </div>
+                    </div>
+                    <div class="refund-order-section-content" fxLayout="row">
+                        <div fxLayout="column" fxFlex="1 1 auto">
+                            {{'FORMS.LABELS.ADMINISTRATION_FEES' | translate}}
+                        </div>
+                        <div fxLayout="column" fxFlex="0 0 auto">{{amount.fees | localCurrency:currency}}</div>
+                        <div fxLayout="column" fxFlex="30px" fxLayoutAlign="center center"
+                            [matTooltip]="'ORDER.PRICE_DATA.SURCHARGE_COSTS_NOT_REFUNDABLE' | translate"
+                            [matTooltipDisabled]="form.get('surcharges').enabled">
+                            <input fxHide matInput>
+                            <mat-checkbox formControlName="surcharges" color="primary" />
+                        </div>
+                    </div>
+                    <div class="refund-order-section-content" fxLayout="row">
+                        <div fxLayout="column" fxFlex="1 1 auto">{{'FORMS.LABELS.DELIVERY_COSTS' | translate}}</div>
+                        <div fxLayout="column" fxFlex="0 0 auto">{{amount.delivery | localCurrency:currency}}</div>
+                        <div fxLayout="column" fxFlex="30px" fxLayoutAlign="center center"
+                            [matTooltip]="'ORDER.PRICE_DATA.DELIVERY_COSTS_NOT_REFUNDABLE' | translate"
+                            [matTooltipDisabled]="form.get('delivery').enabled">
+                            <input fxHide matInput>
+                            <mat-checkbox formControlName="delivery" color="primary" />
+                        </div>
+                    </div>
+                    <div class="refund-order-section-content" fxLayout="row">
+                        <div fxLayout="column" fxFlex="1 1 auto">{{'FORMS.LABELS.PAYMENT_METHOD_COSTS' | translate}}</div>
+                        <div fxLayout="column" fxFlex="0 0 auto">{{amount.gateway | localCurrency:currency}}</div>
+                        <div fxLayout="column" fxFlex="30px" fxLayoutAlign="center center"
+                            [matTooltip]="'ORDER.PRICE_DATA.PAYMENT_METHOD_COSTS_NOT_REFUNDABLE' | translate"
+                            [matTooltipDisabled]="form.get('gateway').enabled">
+                            <input fxHide matInput>
+                            <mat-checkbox formControlName="gateway" color="primary" />
+                        </div>
+                    </div>
+                    <div class="refund-order-section-content" fxLayout="row">
+                        <div fxLayout="column" fxFlex="1 1 auto">{{'ORDER.PRICE_DATA.INSURANCE' | translate}}</div>
+                        <div fxLayout="column" fxFlex="0 0 auto">{{amount.insurance | localCurrency:currency}}</div>
+                        <div fxLayout="column" fxFlex="30px" fxLayoutAlign="center center"
+                            [matTooltip]="'ORDER.PRICE_DATA.INSURANCE_NOT_REFUNDABLE' | translate"
+                            [matTooltipDisabled]="form.get('insurance').enabled">
+                            <input fxHide matInput>
+                            <mat-checkbox formControlName="insurance" color="primary" />
+                        </div>
+                    </div>
+                    <mat-divider />
+                    <div class="refund-order-section-content refund-order-amount-total mat-body-strong" fxLayout="row">
+                        <div fxLayout="column" fxFlex="1 1 auto">
+                            <div>
+                                {{'ACTIONS.REFUND.AMOUNTS.AMOUNT_TO_RETURN' | translate}}
+                                <span class="refund-order-amount-total-max">
+                                    {{'ACTIONS.REFUND.AMOUNTS.MAX' | translate:{value: amount.max |
+                                    localCurrency:currency} }}
+                                </span>
+                            </div>
+                        </div>
+                        <div fxLayout="column" fxFlex="0 0 auto">{{amount.toRefund | localCurrency:currency}}</div>
+                        <div fxLayout="column" fxFlex="30px"></div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()" [disabled]="refunding$ | async">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="refund()"
+            [disabled]="(refunding$ | async) || reimbursementKO || form.invalid">
+            {{'ACTIONS.REFUND.CONFIRM' | translate}}
+        </button>
+    </div>
+</div>
+@if (refunding$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

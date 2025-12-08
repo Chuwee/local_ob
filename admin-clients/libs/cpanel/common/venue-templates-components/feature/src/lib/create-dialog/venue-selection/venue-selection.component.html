@@ -1,0 +1,97 @@
+<div [formGroup]="form()" class="flex flex-col">
+    <div class="venue-filter-container flex flex-row flex-wrap justify-start items-baseline">
+        @if(prefixedEntityId() === undefined) {
+            <mat-form-field appearance="outline" class="ob-form-field no-grid-spacing field-with-label entity-field">
+                <mat-label>{{'FORMS.LABELS.ENTITY' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="entity">
+                    <mat-option>
+                        <app-select-search #entitySelectSearch [options$]="entities$" searchField="name"
+                            requireSelection="true" [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" />
+                    </mat-option>
+                    @for (entity of entitySelectSearch.getFilteredOptions$() | async; track entity.id) {
+                        <mat-option [value]="entity">
+                            <div appEllipsify [matTooltip]="entity.name">
+                                {{entity.name}}
+                            </div>
+                        </mat-option>
+                    }
+                </mat-select>
+                @if (form().controls.entity.hasError('required')) {
+                    <mat-error>{{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}</mat-error>
+                }
+            </mat-form-field>
+        }
+        <mat-form-field appearance="outline" class="ob-form-field no-grid-spacing field-with-label">
+            <mat-label>{{'FORMS.LABELS.COUNTRY' | translate}}</mat-label>
+            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="country">
+                <mat-option [value]="null">{{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}</mat-option>
+                @for (country of countries$ | async; track country.code) {
+                    <mat-option [value]="country">
+                        <div appEllipsify [matTooltip]="country?.name">
+                            {{country?.name}}
+                        </div>
+                    </mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="ob-form-field no-grid-spacing field-with-label">
+            <mat-label>{{'FORMS.LABELS.CITY' | translate}}</mat-label>
+            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="city">
+                <mat-option [value]="null">{{'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate}}</mat-option>
+                @for (city of cities$ | async; track city.name) {
+                    <mat-option [value]="city">
+                        <div appEllipsify [matTooltip]="city.name">
+                            {{city.name}}
+                        </div>
+                    </mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+        <div class="venue-search-field flex-1">
+            <app-search-input [placeholder]="'FORMS.SEARCH.VENUES_LIST' | translate" (valueChanged)="changeKeyword($event)" />
+        </div>
+    </div>
+    @let venues = venues$ | async;
+    @if(venues?.length > 0) {
+        <div class="paginator-container flex justify-end items-center">
+            @if (venueListMetadata$ | async; as metadata) {
+                <mat-paginator hidePageSize class="venue-paginator with-range-label transparent no-padding"
+                    [pageIndex]="metadata?.offset / metadata?.limit" [pageSize]="metadata?.limit"
+                    [length]="metadata?.total" (page)="loadVenueList($event)" />
+            }
+        </div>
+        <div class="venues-list-container">
+            <mat-selection-list class="ob-grid-select-list" [multiple]="false" formControlName="selectedVenue">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    @for (venue of venues; track venue.id) {
+                        <mat-list-option color="primary" [value]="venue">
+                            <div class="grid grid-cols-5 items-center">
+                                <div class="main flex flex-col col-span-4">
+                                    <p class="card-title" appEllipsify [matTooltip]="venue.name">
+                                        {{venue.name}}
+                                    </p>
+                                    <p class="card-text">{{venue.city}}</p>
+                                    <p class="card-text">{{venue.entity?.name}}</p>
+                                </div>
+                                <div class="ob-summary-value right-side flex flex-col col-span-1">
+                                    <p class="label primary">{{'RESULTS.INVENTORY' | translate}}</p>
+                                    <p class="value grey">{{venue.capacity | localNumber}}</p>
+                                </div>
+                            </div>
+                        </mat-list-option>
+                    }
+                </div>
+            </mat-selection-list>
+        </div>
+    } @else if(venues?.length === 0 && !(loading$ | async)) {
+        <app-empty-state
+            [title]="'VENUES.EMPTY_LIST_TITLE' | translate"
+            [description]="'VENUES.EMPTY_LIST_MESSAGE' | translate" />
+    }
+</div>
+
+@if(loading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

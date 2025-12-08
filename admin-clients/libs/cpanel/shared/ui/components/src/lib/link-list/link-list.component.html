@@ -1,0 +1,90 @@
+@if ((links$ | async); as links) {
+    <div>
+        @if (links?.length)  {
+            <mat-expansion-panel [expanded]="expanded" [togglePosition]="'before'">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{$title() | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="flex-col">
+                    @if ((linksMetadata$ | async); as metadata) {
+                        @if(metadata?.total > pageSize) {
+                            <div class="session-paginator list-container flex flex-row justify-end items-center gap-3">
+                                <p class="page-summary" [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: metadata"></p>
+                                <mat-paginator [pageSize]="pageSize" [pageIndex]="metadata?.offset/metadata?.limit"
+                                    hidePageSize (page)="$loadMore.emit($event)" [length]="metadata?.total" />
+                            </div>
+                        }
+                    }
+                    <mat-list class="ob-list" role="list">
+                        @for (sessionLink of links; track sessionLink.link) {
+                            <mat-list-item role="listitem">
+                                <div class="flex flex-row justify-between items-center flex-grow w-full">
+                                    <div class="flex-col">
+                                        <span class="session-title" [class.disabled]="!sessionLink.enabled">
+                                            {{sessionLink.name}}
+                                            @if (sessionLink?.start_date) {
+                                                - {{sessionLink.start_date | dateTime : dateTimeFormats.shortDateTime}}
+                                            }
+                                        </span>
+                                        <div class="flex flex-row justify-start items-center">
+                                            <span class="copy-link">
+                                                {{ sessionLink.pending_generation ? ('EVENTS.CHANNEL.CHANNEL.CONTENT.SESSION.PENDING_GENERATION' | translate) : sessionLink.link}}
+                                            </span>
+                                            @if (!sessionLink.pending_generation) {
+                                                <app-copy-text [copyText]="sessionLink.link"
+                                                    [copyOk]="'EVENTS.CHANNEL.CHANNEL.CONTENT.LINK_COPY_OK' | translate"
+                                                    [copyKo]="'EVENTS.CHANNEL.CHANNEL.CONTENT.LINK_COPY_KO' | translate"
+                                                    [copyTooltip]="'EVENTS.CHANNEL.CHANNEL.CONTENT.COPY_LINK' | translate" />
+                                            }
+                                        </div>
+                                        @if (sessionLink?.virtual_queue) {
+                                            <div class="status justify-start">
+                                                <div class="queueit-container">
+                                                    <span [ngClass]="['status-dot', 'active']"></span>
+                                                    {{'EVENTS.CHANNEL.CHANNEL.CONTENT.SESSION_LINK_QUEUEIT_ACTIVE' | translate}}
+                                                </div>
+                                                @if (sessionLink.virtual_queue?.event && sessionLink.virtual_queue?.action_name) {
+                                                    <div class="flex-col justify-start">
+                                                        <div class="queueit-container flex flex-row justify-start w-full sm:w-1/2">
+                                                        <span class="ob-label label">
+                                                            {{'EVENTS.CHANNEL.CHANNEL.CONTENT.SESSION_LINK_QUEUEIT_ID' | translate}}
+                                                        </span>
+                                                            <span>{{sessionLink.virtual_queue?.event}}</span>
+                                                        </div>
+                                                        <div class="queueit-container flex flex-row justify-start w-full sm:w-1/2">
+                                                        <span class="ob-label label">
+                                                            {{'EVENTS.CHANNEL.CHANNEL.CONTENT.SESSION_LINK_QUEUEIT_NAME' | translate}}
+                                                        </span>
+                                                            <span>{{sessionLink.virtual_queue?.action_name}}</span>
+                                                        </div>
+                                                    </div>
+                                                } @else {
+                                                    <div class="queueit-container flex flex-row justify-start w-full sm:w-1/2">
+                                                        <span>{{'EVENTS.CHANNEL.CHANNEL.CONTENT.SESSION_LINK_QUEUEIT_NO_DATA' | translate}}</span>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="go-link">
+                                        <a mat-button aria-label="Go to link" class="ob-button medium" target="_blank"
+                                            href="{{sessionLink.link}}"
+                                            [matTooltip]="'EVENTS.CHANNEL.CHANNEL.CONTENT.SESSION_NOT_ENABLED' | translate"
+                                            [disabled]="!sessionLink.enabled || sessionLink.pending_generation"
+                                            [matTooltipDisabled]="sessionLink.enabled">
+                                            <span>{{'EVENTS.CHANNEL.CHANNEL.CONTENT.GO_TO_LINK' | translate}}</span>
+                                            <mat-icon iconPositionEnd>launch</mat-icon>
+                                        </a>
+                                    </div>
+                                </div>
+                            </mat-list-item>
+                        }
+                    </mat-list>
+                </div>
+            </mat-expansion-panel>
+        }
+    </div>
+
+}

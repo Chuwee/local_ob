@@ -1,0 +1,105 @@
+<app-form-container layout="main" class="overflow-y-auto" hideActionBar>
+    <div class="price-sessions-selection section-block">
+        <h3 class="section-title">{{'PRODUCT.EVENTS.DETAIL.SESSIONS_PRICE.TITLE' | translate}}</h3>
+        <p>{{ 'PRODUCT.EVENTS.DETAIL.SESSIONS_PRICE.DESCRIPTION' | translate }}</p>
+        <app-searchable-paginated-selection
+            [placeholder]="'FORMS.SEARCH_EVENT_FIELD' | translate"
+            [pageSize]="pageSize" [form]="sessionsCtrl"
+            [data$]="allConfigSessionsData$" [metadata$]="allConfigSessionsMetadata$"
+            (loadData)="reloadSessionsList($event)">
+            <!-- TODO: BACKEND MISSING -->
+            <!--<div slot="filter" class="badge-container" [class.empty]="!(allConfigSessionsMetadata$ | async)?.total">
+            {{sessionsCtrl.value?.length}} / {{(allConfigSessionsMetadata$ | async)?.total || 0}}
+        </div>
+        <button slot="filter" mat-icon-button color="tertiary" class="ob-button only-icon"
+            [class.active]="configSessionsSelectedOnly$ | async"
+            [disabled]="sessionsCtrl.value?.length === 0"
+            [matTooltip]="'PRODUCT.EVENTS.DETAIL.SESSIONS.SHOW_SELECTED_TOOLTIP' | translate"
+            (click)="changeSessionsSelectedOnly()">
+            <mat-icon>visibility</mat-icon>
+        </button>
+        @if (canWrite$ | async) {
+            <button slot="filter" [disabled]="!sessionsCtrl.value?.length" mat-icon-button
+                color="tertiary" class="ob-button only-icon" (click)="openSetSessionsConfigDialog()">
+                <mat-icon>edit</mat-icon>
+            </button>
+        } -->
+            <!-- TODO: Talk to backend and UX -->
+            <div slot="filter" class="filter-container" fxFlex="none">
+                <app-product-event-sessions-prices-filter (filterChange)="filterChangeHandler($event)" />
+            </div>
+            <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data" let-selectionChanged="selectionChanged">
+                <app-selection-list [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged" class="small-rows">
+                    <div slot="subheader" class="list-header">
+                        <div fxLayoutAlign="space-between" fxFlex="0 1 100%">
+                            <div fxLayout="row" fxLayoutAlign="start center" fxFlex="0 1 210px" appEllipsify>
+                                <mat-checkbox fxLayoutAlign="start end" color="primary"
+                                    [disabled]="(configSessionsSelectedOnly$ | async) || (allConfigSessionsMetadata$ | async)?.total === 0"
+                                    [checked]="sessionsCtrl.value?.length > 0 &&
+                                        sessionsCtrl.value?.length === (allConfigSessionsMetadata$ | async)?.total ||
+                                        (configSessionsSelectedOnly$ | async)"
+                                    [indeterminate]="sessionsCtrl.value?.length > 0 &&
+                                            sessionsCtrl.value?.length < (allConfigSessionsMetadata$ | async)?.total"
+                                    (change)="selectAll($event)" />
+                                <span>{{'FORMS.LABELS.SESSIONS' | translate}}</span>
+                            </div>
+                            <div fxFlex="0 1 200px" fxLayoutAlign="start center" appEllipsify>
+                                <span>{{'FORMS.LABELS.DATE' | translate}}</span>
+                            </div>
+                            <div fxFlex="0 1 150px" fxLayoutAlign="start center" appEllipsify>
+                                <span>{{'PRODUCT.EVENTS.DETAIL.PRICE' | translate}}</span>
+                            </div>
+                            <div fxFlex="0 1 150px" fxLayoutAlign="start center" appEllipsify>
+                                <span>{{'FORMS.LABELS.STATUS' | translate}}</span>
+                            </div>
+                            <div fxFlex="0 1 60px">
+                            </div>
+                        </div>
+                    </div>
+                    <ng-template #optionTemplate let-row>
+                        <div fxLayoutAlign="space-between center" class="session-option" fxFlex="0 1 100%">
+                            <div fxFlex="0 1 210px" appEllipsify>
+                                @if(row.smartbooking) {
+                                    <b>{{ 'FORMS.LABELS.SMART_BOOKING_TYPE' | translate }} | </b>
+                                }
+                                <span>
+                                    {{row.name}}
+                                </span>
+                            </div>
+                            <div fxFlex="0 1 200px">
+                                <span>{{row.start | dateTime : dateTimeFormats.shortDateTimeWithWeek}}</span>
+                            </div>
+                            <div fxFlex="0 1 150px">
+                                <span>{{ row.price }}</span>
+                            </div>
+                            <div fxFlex="0 1 150px">
+                                @if(row.use_custom_price) {
+                                    <span class="ob-status-badge neutral">
+                                        {{'PRODUCT.EVENTS.DETAIL.SESSIONS_CONFIG.EDITED' | translate}}
+                                    </span>
+                                }
+                            </div>
+                            <div fxFlex="0 1 60px" class="action-buttons float-actions-cell">
+                                @if (canWrite$ | async) {
+                                    <button slot="filter" mat-icon-button color="tertiary" class="ob-button only-icon single-edit"
+                                        (click)="openSetSessionsConfigDialog(row)">
+                                        <mat-icon>edit</mat-icon>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template #noResultsTemplate>
+                        <app-empty-state-tiny
+                            [title]="'PRODUCT.EVENTS.DETAIL.SESSIONS_CONFIG.NO_SESSIONS_TITLE' | translate" />
+                    </ng-template>
+                </app-selection-list>
+            </ng-template>
+        </app-searchable-paginated-selection>
+    </div>
+    @if (isInProgress$ | async) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+</app-form-container>

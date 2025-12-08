@@ -1,0 +1,41 @@
+<div fxFlex="0 0 100%" fxLayout="column" fxLayoutAlign="stretch stretch">
+    <div class="heading-container only-title" fxLayout="row wrap" fxLayoutAlign="space-between center">
+        <div>
+            <h1 class="secondary mat-headline-3">{{'TITLES.SUBSCRIPTION_LISTS' | translate}}</h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+            <div class="filter-container" fxFlex="none" *ngIf="canLoggedUserWrite$ | async">
+                <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                    [attr.aria-label]="'SUBSCRIPTION_LIST.NEW_BTN' | translate" (click)="openNewSubscriptionListDialog()">
+                    <mat-icon>add</mat-icon>
+                    {{'SUBSCRIPTION_LIST.NEW_BTN' | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+    <mat-drawer-container fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="stretch">
+        <mat-drawer #drawer mode="side" opened fxFlex="0 0 {{(smallDevice$ | async) ? '240px' : '290px'}}">
+            <app-subscription-lists-list></app-subscription-lists-list>
+        </mat-drawer>
+        <mat-drawer-content fxFlex="0 1 100%" class="subscription-list-editor-container">
+            <div class="ob-sidebar-toggle" (click)="drawer.toggle();" [ngClass]="{'collapsed': !drawer.opened}">
+                <span class="arrow"></span>
+            </div>
+            <div [fxShow]="(subscriptionLists$ | async)?.length > 0" fxFlex="100%" fxLayout="column">
+                <router-outlet></router-outlet>
+            </div>
+            <app-empty-state [fxShow]="(subscriptionLists$ | async)?.length === 0" fxFlex="100%"
+                [title]="'SUBSCRIPTION_LIST.EMPTY_LIST_MESSAGE' | translate"
+                [description]="'SUBSCRIPTION_LIST.CREATE_MESSAGE' | translate">
+                <button *ngIf="canLoggedUserWrite$ | async" mat-flat-button class="ob-button" color="primary"
+                    (click)="openNewSubscriptionListDialog()" [disabled]="isLoading$ | async">
+                    <mat-icon>add</mat-icon>
+                    {{'SUBSCRIPTION_LIST.NEW' | translate}}
+                </button>
+            </app-empty-state>
+            <div class="spinner-container" *ngIf="(isLoading$ | async)">
+                <mat-spinner></mat-spinner>
+            </div>
+        </mat-drawer-content>
+    </mat-drawer-container>
+</div>

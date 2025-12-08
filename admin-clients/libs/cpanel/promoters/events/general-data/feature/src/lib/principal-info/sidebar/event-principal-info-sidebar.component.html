@@ -1,0 +1,44 @@
+<div class="event-sidebar-container flex flex-col">
+    @if (eventImageUrl$ | async; as url) {
+        <img [src]="url" class="event-image" alt="" />
+    }
+    @let event = $event();
+    @if (event) {
+        @if (event.start_date) {
+            <span class="event-sidebar-label">{{'EVENTS.START_DATE' | translate}}</span>
+            <span>{{event.start_date | localDateTime : dateTimeFormats.longDate}}</span>
+        }
+        @if (event.end_date) {
+            <span class="event-sidebar-label">{{'EVENTS.END_DATE' | translate}}</span>
+            <span>{{event.end_date | localDateTime : dateTimeFormats.longDate}}</span>
+        }
+        <span class="event-sidebar-label">{{'EVENTS.SESSIONS.TITLE' | translate}}</span>
+        <span>{{((sessionsResume$ | async)?.total | localNumber) || '-'}}</span>
+        @if ($isAvet() !== true && $isSGA() !== true) {
+            <span class="event-sidebar-label">{{'EVENTS.CAPACITY' | translate}}</span>
+            <span>{{((sessionsResume$ | async)?.capacity | localNumber) || '-'}}</span>
+        }
+        <span class="event-sidebar-label">{{'EVENTS.ID' | translate}}</span>
+        <span>{{event.id}}</span>
+        @if (event.external_data) {
+            <mat-divider class="flex-1" />
+            <div class="left-sidebar-subheader flex basis-[36px]">
+                @if ($isSGA()) {
+                    <h3 class="section-title">{{'EVENTS.EVENTS.DETAILS_TITLE_SGA' | translate | uppercase}}</h3>
+                } @else if ($isAvet()) {
+                    <h3 class="section-title">{{'EVENTS.DETAILS_TITLE_AVET' | translate | uppercase}}</h3>
+                }
+            </div>
+            <div class="item-details flex flex-col gap-[14px]">
+                @for (external_data of event.external_data | keyvalue; track external_data.key) {
+                    <div>
+                        <div class="flex flex-col">
+                            <span class="event-sidebar-label">{{'EVENTS.' + external_data.key | uppercase | translate}}</span>
+                            <span>{{external_data.value}}</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>

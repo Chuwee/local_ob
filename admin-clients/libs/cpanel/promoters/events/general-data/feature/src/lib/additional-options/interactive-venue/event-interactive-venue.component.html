@@ -1,0 +1,59 @@
+<div [formGroup]="interactiveVenueFormGroup">
+    <mat-checkbox color="primary" formControlName="enabled">
+        {{'EVENTS.INTERACTIVE_VENUE.DESCRIPTION' | translate}}
+    </mat-checkbox>
+    @if (interactiveVenueFormGroup.value.enabled) {
+        <div class="edition-block flex flex-col flex-wrap">
+            <div class="flex">
+                @if ($interactiveVenues()?.length === 1) {
+                    <div class="flex flex-col gap-2">
+                        <span class="ob-label">{{ 'CHANNELS.INTERACTIVE_VENUE.LABEL' | translate }}</span>
+                        <p>{{ 'CHANNELS.INTERACTIVE_VENUE.'+ $interactiveVenues()[0] | translate }}</p>
+                    </div>
+                } @else {
+                    <mat-form-field  appearance="outline" class="ob-form-field flex-[0_0_446px]">
+                        <mat-label>
+                            {{'CHANNELS.INTERACTIVE_VENUE.LABEL' | translate}}
+                        </mat-label>
+                        <mat-select formControlName="venueType" 
+                            [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                            @for (interactiveVenue of $interactiveVenues(); track interactiveVenue) {
+                                <mat-option
+                                    [value]="interactiveVenue">
+                                    {{ 'CHANNELS.INTERACTIVE_VENUE.'+ interactiveVenue | translate }}
+                                </mat-option>
+                            }
+                        </mat-select>
+                        <mat-error [ob-form-errors]="interactiveVenueFormGroup" field="venueType" />
+                    </mat-form-field>
+                }
+            </div>
+            <div formGroupName="venueOptions" class="flex flex-col">
+                <p>{{ 'EVENTS.INTERACTIVE_VENUE.OPTIONS_DESCRIPTION' | translate }}</p>
+                <div class="flex items-center justify-start gap-5">
+                    <img src="assets/interactive-venue/ico-recinto.svg" [alt]="'EVENTS.INTERACTIVE_VENUE.VENUE_3D' | translate">
+                    <div class="flex">
+                        <mat-checkbox formControlName="venueViewEnabled" color="primary">
+                            {{'EVENTS.INTERACTIVE_VENUE.VENUE_ENABLED' | translate}}
+                        </mat-checkbox>
+                    </div>
+                </div>
+                <div class="flex flex-row justify-start items-center gap-5">
+                    <img src="assets/interactive-venue/ico-sector.svg" [alt]="'EVENTS.INTERACTIVE_VENUE.VENUE_SECTOR_VIEW' | translate">
+                    <mat-checkbox formControlName="venueSectorViewEnabled" color="primary">
+                        {{'EVENTS.INTERACTIVE_VENUE.VENUE_SECTOR_VIEW_ENABLED' | translate}}
+                    </mat-checkbox>
+                </div>
+                <div class="flex flex-row justify-start items-center gap-5">
+                    <img src="assets/interactive-venue/ico-butaca.svg" [alt]="'EVENTS.INTERACTIVE_VENUE.VENUE_SEAT_VIEW' | translate">
+                    <mat-checkbox formControlName="venueSeatViewEnabled" color="primary">
+                        {{'EVENTS.INTERACTIVE_VENUE.VENUE_SEAT_VIEW_ENABLED' | translate}}
+                    </mat-checkbox>
+                </div>
+                @if (interactiveVenueFormGroup.controls.venueOptions.touched && interactiveVenueFormGroup.controls.venueOptions.errors?.['required']) {
+                    <mat-error>{{ 'EVENTS.INTERACTIVE_VENUE.ONE_REQUIRED_ERROR' | translate }}</mat-error>
+                }
+            </div>
+        </div>
+    }
+</div>

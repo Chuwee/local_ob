@@ -1,0 +1,24 @@
+<div fxFlex="0 0 100%" fxLayout="column" fxLayoutAlign="stretch stretch">
+    <mat-drawer-container fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="stretch">
+        <mat-drawer #drawer mode="side" opened fxFlex="0 0 {{sidebarWidth$ | async}}">
+            <app-event-promotions-list></app-event-promotions-list>
+        </mat-drawer>
+        <mat-drawer-content fxFlex="0 1 100%" fxLayout="column" class="promotion-editor-container">
+            <div class="ob-sidebar-toggle" (click)="drawer.toggle();" [ngClass]="{'collapsed': !drawer.opened}">
+                <span class="arrow"></span>
+            </div>
+            <router-outlet *ngIf="(eventPromotionListMetadata$ | async)?.total !== 0"></router-outlet>
+            <app-empty-state [fxShow]="(eventPromotionListMetadata$ | async)?.total === 0" fxFlex="100%"
+                [title]="'EVENTS.PROMOTIONS.EMPTY_LIST_MESSAGE' | translate"
+                [description]="'EVENTS.PROMOTIONS.CREATE_MESSAGE' | translate">
+                <button mat-flat-button class="ob-button" color="primary" (click)="newPromotion()">
+                    <mat-icon>add</mat-icon>
+                    {{'EVENTS.PROMOTIONS.NEW' | translate}}
+                </button>
+            </app-empty-state>
+            <div class="spinner-container" *ngIf="(isLoadingPromotion$ | async)">
+                <mat-spinner></mat-spinner>
+            </div>
+        </mat-drawer-content>
+    </mat-drawer-container>
+</div>

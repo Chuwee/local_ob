@@ -1,0 +1,17 @@
+<mat-form-field fxFlex.gt-sm="0 1 40%" fxFlex="100%" appearance="outline" class="ob-form-field field-with-label no-margin-top">
+    <mat-select [compareWith]="compareWith" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" [formControl]="formControl" fxFlex="100%">
+        <mat-option>
+            <app-select-search #answersSelectSearch [options$]="answers$"
+                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" />
+        </mat-option>
+        @for (answer of answersSelectSearch.getFilteredOptions$() | async; track $index) {
+            <mat-option [value]="answer">
+                <div appEllipsify
+                     [matTooltip]="answer ? answer.name : ('FORMS.ACTIONS.DELETE_SELECTION' | translate)">
+                    {{answer ? answer.name : ('FORMS.ACTIONS.DELETE_SELECTION' | translate)}}
+                </div>
+            </mat-option>
+        }
+    </mat-select>
+    <mat-error [ob-form-errors]="formControl" />
+</mat-form-field>

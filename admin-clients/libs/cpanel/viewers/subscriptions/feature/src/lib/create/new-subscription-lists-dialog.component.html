@@ -1,0 +1,59 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="100%" class="secondary title">{{'TITLES.NEW_SUBSCRIPTION_LIST' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="dialogRef.close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column">
+        <form [formGroup]="newSubscriptionListForm" fxLayout="column" fxLayoutAlign="start stretch">
+            <mat-form-field *ngIf="newSubscriptionListForm.controls.entity.enabled" appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.ENTITY' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="entity">
+                    <mat-option>
+                        <app-select-search #entitySelectSearch [options$]="entities$"
+                            [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" requireSelection="true">
+                        </app-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let entity of entitySelectSearch.getFilteredOptions$() | async" [value]="entity">
+                        {{entity.name}}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="newSubscriptionListForm.hasError('required', 'entity')">
+                    {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                <input matInput aria-label="name" [placeholder]="'FORMS.LABELS.NAME' | translate" formControlName="name">
+                <mat-error *ngIf="newSubscriptionListForm.hasError('required', 'name')">
+                    {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                </mat-error>
+                <mat-error *ngIf="newSubscriptionListForm.hasError('maxlength', 'name')">
+                    {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({ value: maxSubscriptionListNameLength })}}
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.DESCRIPTION' | translate}}</mat-label>
+                <input matInput aria-label="description" [placeholder]="'FORMS.LABELS.DESCRIPTION' | translate"
+                    formControlName="description">
+                <mat-error *ngIf="newSubscriptionListForm.hasError('maxlength', 'description')">
+                    {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({ value: maxSubscriptionListDescriptionLength })}}
+                </mat-error>
+            </mat-form-field>
+        </form>
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="dialogRef.close()"
+            [disabled]="subscriptionListSaving$ | async">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createSubscriptionList()"
+            [disabled]="(!newSubscriptionListForm.dirty) || (subscriptionListSaving$ | async)">
+            {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>
+<div class="spinner-container" *ngIf="subscriptionListSaving$ | async">
+    <mat-spinner></mat-spinner>
+</div>

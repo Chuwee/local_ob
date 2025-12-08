@@ -1,0 +1,136 @@
+<mat-table class="ob-table order-detail-table" [dataSource]="$products()">
+    <!-- SELECTION COLUMN -->
+    <ng-container matColumnDef="selection">
+        <!-- SELECT HEADER -->
+        <mat-header-cell *matHeaderCellDef class="head-cell" [class.with-checkbox]="canRefundAnyProduct() && $isAllowedPartialRefund()">
+            @if(canRefundAnyProduct() && $isAllowedPartialRefund()) {
+                <mat-checkbox #superCheckbox color="primary"
+                    [checked]="areAllProductsSelected()"
+                    [indeterminate]="areSomeProductsSelected()"
+                    (change)="toggleAllProducts($event.checked)" />
+            }
+        </mat-header-cell>
+        <!-- SELECT CELL -->
+        <mat-cell *matCellDef="let row" (click)="$event.stopPropagation();"
+            [class.with-checkbox]="canRefundAnyProduct() && $isAllowedPartialRefund()">
+            @if(canRefundAnyProduct() && $isAllowedPartialRefund()) {
+                <mat-checkbox color="primary"
+                    [disabled]="!(row.action?.refund || row.action?.partial_refund)"
+                    [checked]="isProductSelected(row)"
+                    (change)="toggleProduct(row)" />
+            }
+        </mat-cell>
+    </ng-container>
+    <!-- PRODUCT COLUMN -->
+    <ng-container matColumnDef="product">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{'ORDER.PRODUCTS_DATA.NAME' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+            {{row.product.name}}
+        </mat-cell>
+    </ng-container>
+    <!-- VARIANT COLUMN -->
+    <ng-container matColumnDef="variant">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{'ORDER.PRODUCTS_DATA.VARIANT' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+            <span [matTooltip]="row.product.attribute1?.value?.name | variantText: row.product.attribute2?.value?.name" appEllipsify>
+                {{row.product.attribute1?.value?.name | variantText: row.product.attribute2?.value?.name | translate}}
+            </span>
+        </mat-cell>
+    </ng-container>
+    <!-- BARCODE COLUMN -->
+    <ng-container matColumnDef="barcode">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{'ORDER.TICKETS_DATA.BARCODE' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+            <span>{{(row.product.barcode | obfuscateString : undefined) || '-'}}
+            </span>
+        </mat-cell>
+    </ng-container>
+    <!-- PRICE COLUMN -->
+    <ng-container matColumnDef="price">
+        <mat-header-cell *matHeaderCellDef class="head-cell right">
+            {{'ORDER.TICKETS_DATA.PRICE' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row" class="right">
+            {{row.price?.final | localCurrency: row.price?.currency}}
+        </mat-cell>
+    </ng-container>
+    <!-- PRINTS COLUMN -->
+    <ng-container matColumnDef="print">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            <span [matTooltip]="'ORDER.PRODUCTS_DATA.PRINT' | translate" appEllipsify>
+                {{'ORDER.TICKETS_DATA.PRINT' | translate}}
+            </span>
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+            {{row.total_prints || '-'}}
+        </mat-cell>
+    </ng-container>
+    <!-- VALIDATION COLUMN -->
+    <ng-container matColumnDef="validation">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            <span [matTooltip]="'ORDER.PRODUCTS_DATA.VALIDATED' | translate" appEllipsify>
+                {{'ORDER.TICKETS_DATA.VALIDATED' | translate}}
+            </span>
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+            @if ($canHaveValidations() && !row.parentId) {
+                <mat-icon
+                    [class.mat-warn]="isProductNotValidated(row)">lens</mat-icon>
+            } @else {
+                -
+            }
+        </mat-cell>
+    </ng-container>
+    <!-- STATUS COLUMN -->
+    <ng-container matColumnDef="status">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{'ORDER.TICKETS_DATA.STATUS' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+            <span [matTooltip]="'ORDER.PRODUCTS_DATA.STATUS_OPTS.' + row.state | translate" appEllipsify>
+                {{'ORDER.TICKETS_DATA.STATUS_OPTS.' + row.state | translate}}
+            </span>
+        </mat-cell>
+    </ng-container>
+    <!-- ACTION ICONS COLUMN -->
+    <ng-container matColumnDef="icons">
+        <mat-header-cell *matHeaderCellDef class="head-cell" />
+        <mat-cell *matCellDef="let row" (click)="$event.stopPropagation();">
+            @if((row.next_order || row.previous_order) && !row.hideRelatedOrders){
+                <button mat-stroked-button color="tertiary" class="ob-button small only-icon"
+                    [class]="(menuTrigger.menuOpen) ? 'active' : ''" #menuTrigger="matMenuTrigger"
+                    [matTooltip]="'FORMS.ACTIONS.MORE' | translate" [matMenuTriggerFor]="actionsMenu">
+                    <mat-icon>more_horiz</mat-icon>
+                </button>
+            }
+            <mat-menu #actionsMenu="matMenu" xPosition="before">
+                @if(row.next_order && !row.hideRelatedOrders) {
+                    <button mat-menu-item (click)="goToOrder(row.next_order.code)">
+                        {{('ORDER.TICKETS_DATA.GO_TO_NEXT_ORDER_' + row.next_order.type | translate: { orderCode: row.next_order.code
+                        })}}
+                    </button>
+                }
+                @if (row.previous_order && !row.hideRelatedOrders) {
+                    <button mat-menu-item (click)="goToOrder(row.previous_order.code)">
+                        {{('ORDER.TICKETS_DATA.GO_TO_PREVIOUS_ORDER_' + row.previous_order.type | translate: { orderCode:
+                        row.previous_order.code })}}
+                    </button>
+                }
+            </mat-menu>
+        </mat-cell>
+    </ng-container>
+    <!-- ROW DEFINITIONS -->
+    <mat-header-row *matHeaderRowDef="productsColumns; sticky: true" class="dense-row" />
+    <mat-row *matRowDef="let row; columns: productsColumns;"
+        (click)="goToTicket($event, row)"
+        [class.interactive-row]="!row.parentId"
+        [fxShow]="!row.hidden"
+        [class.ob-row-selected]="isProductSelected(row)"
+        class="dense-row" />
+</mat-table>

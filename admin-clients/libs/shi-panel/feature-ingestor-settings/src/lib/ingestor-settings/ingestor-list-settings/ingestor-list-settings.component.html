@@ -1,0 +1,43 @@
+<app-form-container [formGroup]="form" (cancel)="cancel()" (save)="save()" layout="main"
+    [disabled]="(formChanged$ | async) === false" class="overflow-y-auto" [hideActionBar]="(hasWritePermissions$ | async) === false">
+    <form id="user-general-data" fxFlex fxLayoutGap="16px">
+        @if((selectedSupplierName$ | async) !== 'TIXSTOCK'){
+            <mat-accordion [togglePosition]="'before'">
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'INGESTOR_SETTINGS.TITLES.WHITELIST' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="settings-list-description">{{'INGESTOR_SETTINGS.FORMS.INFOS.WHITELIST' | translate}}</div>
+                    <app-ingestor-list-setting-container
+                        [listControl]="form.controls.general_admission"
+                        [title]="'INGESTOR_SETTINGS.TITLES.GENERAL_ADMISSION' | translate"
+                        [placeHolder]="'INGESTOR_SETTINGS.FORMS.INFOS.SEARCH_BY_KEYWORD' | translate"
+                        [elementTitle]="'INGESTOR_SETTINGS.FORMS.LABELS.KEYWORDS' | translate"
+                        [newElementTitle]="'INGESTOR_SETTINGS.ACTIONS.ADD_NEW_KEYWORD' | translate"
+                        [deleteTooltip]="'INGESTOR_SETTINGS.ACTIONS.DELETE_KEYWORD' | translate"
+                        (deleteElement)="deleteElement($event, 'general_admission')"
+                        (addElement)="addElement('general_admission', 'INGESTOR_SETTINGS.FORMS.LABELS.KEYWORD')">
+                    </app-ingestor-list-setting-container>
+                </mat-expansion-panel>
+            </mat-accordion>
+        }
+        <mat-accordion [togglePosition]="'before'">
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'INGESTOR_SETTINGS.TITLES.BLACKLIST' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="settings-list-description">{{'INGESTOR_SETTINGS.FORMS.INFOS.BLACKLIST' | translate}}</div>
+                <app-ingestor-list-setting-container
+                    [listControl]="form.controls.excluded_sections"
+                    [title]="'INGESTOR_SETTINGS.TITLES.EXCLUDED_SECTIONS' | translate"
+                    [placeHolder]="'INGESTOR_SETTINGS.FORMS.INFOS.SEARCH_BY_KEYWORD' | translate"
+                    [elementTitle]="'INGESTOR_SETTINGS.FORMS.LABELS.KEYWORDS' | translate"
+                    [newElementTitle]="'INGESTOR_SETTINGS.ACTIONS.ADD_NEW_KEYWORD' | translate"
+                    [deleteTooltip]="'INGESTOR_SETTINGS.ACTIONS.DELETE_KEYWORD' | translate"
+                    (deleteElement)="deleteElement($event, 'excluded_sections')"
+                    (addElement)="addElement('excluded_sections', 'INGESTOR_SETTINGS.FORMS.LABELS.KEYWORD')">
+                </app-ingestor-list-setting-container>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </form>
+</app-form-container>

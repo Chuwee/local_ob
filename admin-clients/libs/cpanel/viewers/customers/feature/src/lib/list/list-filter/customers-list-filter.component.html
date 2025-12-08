@@ -1,0 +1,51 @@
+<form [formGroup]="filtersForm" fxLayout="column" fxLayoutGap="24px" class="customer-filters-form">
+    <div fxLayout="row" fxLayoutAlign="space-between" class="filter-block">
+        <div>
+            <div class="ob-label" fxFlex="90px">
+                {{'CUSTOMER.STATUS' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field status-select">
+                    <mat-select formControlName="status" multiple
+                        [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        @for (status of statusList; track status) {
+                            <mat-option [value]="status">
+                                {{status && (status.name | translate)}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    <div fxLayout="row" class="filter-block">
+        <div class="ob-label" fxFlex="90px">
+            {{'CUSTOMER.SIGN_UP_DATE' | translate}}
+        </div>
+        <div class="filter-block-input" fxFlex="125px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="startDateDP" [placeholder]="dateFormat" formControlName="startDate"
+                    (focus)="startDateDP.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                    (click)="$event.stopPropagation(); startDateDP.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #startDateDP />
+            </mat-form-field>
+        </div>
+        <div fxFlex="20px">
+            <span fxFlex class="filter-block-dates-separator"></span>
+        </div>
+        <div class="filter-block-input" fxFlex="125px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="endDateDP" [placeholder]="dateFormat" formControlName="endDate"
+                    (focus)="endDateDP.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                    (click)="$event.stopPropagation(); endDateDP.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #endDateDP />
+            </mat-form-field>
+        </div>
+    </div>
+</form>

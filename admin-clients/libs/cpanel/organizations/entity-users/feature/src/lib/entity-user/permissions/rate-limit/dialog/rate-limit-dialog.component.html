@@ -1,0 +1,76 @@
+<div class="dialog-rate-limit-container">
+    <div mat-dialog-title>
+        <div class="flex flex-row justify-between">
+            <h2 class="secondary title">
+                {{ (dialogTypedCreate ? 'USER.RATE_LIMIT.ACTIONS.CREATE' :'FORMS.ACTIONS.EDIT' ) | translate }}
+            </h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon fontIcon="close" />
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content>
+        <form [formGroup]="form">
+            <div class="flex">
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label flex-[0_1_100%]" [hideRequiredMarker]="true">
+                    <mat-label class="ob-label">{{ 'USER.RATE_LIMIT.FORMS.PATTERN.LABEL' | translate }}</mat-label>
+                    <input matInput formControlName="pattern" aria-label="pattern"
+                        [placeholder]="'USER.RATE_LIMIT.FORMS.PATTERN.LABEL' | translate">
+                    <mat-error [ob-form-errors]="form" field="pattern" />
+                </mat-form-field>
+            </div>
+            <div class="flex flex-col gap-4">
+                <span class="ob-label">{{ 'USER.RATE_LIMIT.FORMS.QUOTAS.LABEL' | translate }}:</span>
+                <div formArrayName="quotas" class="flex flex-col gap-2">
+                    @let showDelete =  form.controls.quotas.controls.length > 1;
+                    @for(quota of form.controls.quotas.controls; track $index){
+                        <div [formGroupName]="$index" class="quota-form-group flex flex-row justify-between items-center">
+                            <mat-form-field appearance="outline" class="ob-form-field inline-field flex-[0_1_15%]">
+                                <input matInput type="number" formControlName="limit" aria-label="limit" placeholder="0">
+                            </mat-form-field>
+                            <span>{{ 'USER.RATE_LIMIT.FORMS.QUOTAS.TEXT' | translate }}</span>
+                            <mat-form-field appearance="outline" class="ob-form-field inline-field flex-[0_1_15%]">
+                                <input matInput type="number" formControlName="period" aria-label="period" placeholder="0">
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" class="ob-form-field inline-field flex-[0_1_25%]">
+                                <mat-select formControlName="time_unit" aria-label="time_unit"
+                                    [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                    @for(timeUnit of timeUnitOptions; track $index){
+                                        <mat-option [value]="timeUnit">
+                                            {{ 'USER.RATE_LIMIT.FORMS.TIME_UNIT.' + timeUnit | translate | titlecase }}
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                            <div class="flex flex-[0_1_10%] justify-center">
+                                @if(showDelete){
+                                    <button mat-icon-button type="button" class="ob-button small" (click)="removeQuota($index)">
+                                        <mat-icon fontIcon="delete" />
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="flex flex-row items-center gap-2">
+                    <button mat-icon-button type="button" class="ob-button mat-stroked-button small" (click)="addQuota()"
+                        [disabled]="!form.controls.quotas.valid">
+                        <mat-icon fontIcon="add" />
+                    </button>
+                    <span>{{ 'USER.RATE_LIMIT.FORMS.QUOTAS.ADD' | translate }}</span>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div mat-dialog-actions>
+        <div class="flex-1 flex flex-row justify-end">
+            <button type="button" mat-button class="ob-button" (click)="close()">
+                {{ 'FORMS.ACTIONS.CANCEL' | translate }}
+            </button>
+            <button mat-flat-button color="primary" type="button" class="ob-button" (click)="save()"
+                [disabled]="!form.valid || !form.dirty || $loading()">
+                {{ (dialogTypedCreate ? 'FORMS.ACTIONS.CREATE' : 'FORMS.ACTIONS.SAVE_CHANGES') | translate }}
+            </button>
+        </div>
+    </div>
+</div>

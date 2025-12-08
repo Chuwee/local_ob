@@ -1,0 +1,187 @@
+<form [formGroup]="filtersForm" fxLayout="column" fxLayoutGap="24px">
+    <div fxLayout="row" class="filter-block">
+        <div class="ob-label" fxFlex="120px">
+            {{'MAPPINGS.MAPPINGS_LIST_FILTER.EVENT_DATE' | translate}}
+        </div>
+        <div class="filter-block-input" fxFlex="200px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="startDateEvent" [placeholder]="dateFormat" formControlName="startDateEvent"
+                    (focus)="startDateEvent.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                    (click)="$event.stopPropagation(); startDateEvent.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #startDateEvent></mat-datepicker>
+            </mat-form-field>
+        </div>
+        <div fxFlex="20px">
+            <span fxFlex class="filter-block-dates-separator"></span>
+        </div>
+        <div class="filter-block-input" fxFlex="200px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="endDateEvent" [placeholder]="dateFormat" formControlName="endDateEvent"
+                    (focus)="endDateEvent.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                    (click)="$event.stopPropagation(); endDateEvent.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #endDateEvent></mat-datepicker>
+            </mat-form-field>
+        </div>
+    </div>
+    <div fxLayout="row" class="filter-block">
+        <div class="ob-label" fxFlex="120px">
+            {{'MAPPINGS.MAPPINGS_LIST_FILTER.UPDATE_DATE' | translate}}
+        </div>
+        <div class="filter-block-input" fxFlex="200px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="updateStartDate" [placeholder]="dateFormat" formControlName="startDateUpdate"
+                    (focus)="updateStartDate.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                    (click)="$event.stopPropagation(); updateStartDate.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #updateStartDate></mat-datepicker>
+            </mat-form-field>
+        </div>
+        <div fxFlex="20px">
+            <span fxFlex class="filter-block-dates-separator"></span>
+        </div>
+        <div class="filter-block-input" fxFlex="200px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="updateEndDate" [placeholder]="dateFormat" formControlName="endDateUpdate"
+                    (focus)="updateEndDate.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                    (click)="$event.stopPropagation(); updateEndDate.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #updateEndDate></mat-datepicker>
+            </mat-form-field>
+        </div>
+    </div>
+
+    <mat-divider [inset]="true"></mat-divider>
+
+    <div fxLayout="row" fxLayoutAlign="space-between" fxLayoutGap="50px" class="filter-block">
+        <div>
+            <div class="ob-label" fxFlex="120px">
+                {{'MAPPINGS.MAPPINGS_LIST_FILTER.STATUS' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select multiple formControlName="status" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option *ngFor="let status of statusList" [value]="status">
+                            {{status?.name | translate}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div>
+            <div class="ob-label" fxFlex="120px">
+                {{'MAPPINGS.MAPPINGS_LIST_FILTER.SUPPLIER' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select multiple formControlName="supplier" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option *ngFor="let supplier of (suppliers$ | async)" [value]="supplier">
+                            {{supplier?.name | translate}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+
+    <div fxLayout="row" fxLayoutAlign="space-between" fxLayoutGap="50px" class="filter-block">
+        <div>
+            <div class="ob-label" fxFlex="120px">
+                {{'MAPPINGS.MAPPINGS_LIST_FILTER.CATEGORY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select multiple formControlName="category" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option *ngFor="let category of categoriesList" [value]="category">
+                            {{category?.name | translate}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div>
+            <div class="ob-label" fxFlex="120px">
+                {{'MAPPINGS.MAPPINGS_LIST_FILTER.TAXONOMIES' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field fxFlex="100%" class="ob-form-field" appearance="outline">
+                    <mat-select multiple aria-label="taxonomies"
+                        [formControl]="this.filtersForm.controls.taxonomies"
+                        [placeholder]="'MAPPINGS.MAPPINGS_LIST_FILTER.TAXONOMIES' | translate">
+                        <mat-option>
+                            <app-select-search #searchTaxonomy searchField="name"
+                                [requireSelection]="true" [options$]="taxonomies$"
+                                [placeholderLabel]="'FORMS.SEARCH.TAXONOMIES' | translate">
+                            </app-select-search>
+                        </mat-option>
+                        <div *ngIf="(this.showTaxonomyClearSelection$ | async)" class="mat-option"
+                            (click)="deselectAllTaxonomies()">
+                            <span class="mat-option-text">
+                                {{ 'FORMS.ACTIONS.UNSELECT_ALL' | translate }}
+                            </span>
+                        </div>
+                        <mat-option *ngFor="let taxonomy of searchTaxonomy.getFilteredOptions$() | async" [value]="taxonomy">
+                            {{taxonomy?.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="space-between" fxLayoutGap="50px" class="filter-block">
+        <div>
+            <div class="ob-label" fxFlex="120px">
+                {{'MAPPINGS.MAPPINGS_LIST_FILTER.COUNTRY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field fxFlex="100%" class="ob-form-field" appearance="outline">
+                    <mat-select multiple aria-label="countries"
+                        [formControl]="this.filtersForm.controls.country_code"
+                        [placeholder]="'MAPPINGS.MAPPINGS_LIST_FILTER.COUNTRY' | translate">
+                        <mat-option>
+                            <app-select-search #search searchField="name"
+                                [requireSelection]="true" [options$]="countries$"
+                                [placeholderLabel]="'FORMS.SEARCH.COUNTRY_CODE' | translate">
+                            </app-select-search>
+                        </mat-option>
+                        <div *ngIf="(this.showClearSelection$ | async)" class="mat-option"
+                            (click)="deselectAll()">
+                            <span class="mat-option-text">
+                                {{ 'FORMS.ACTIONS.UNSELECT_ALL' | translate }}
+                            </span>
+                        </div>
+                        <mat-option *ngFor="let country of search.getFilteredOptions$() | async" [value]="country">
+                            {{country?.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div>
+            <div class="ob-label" fxFlex="120px">
+                {{'MAPPINGS.MAPPINGS_LIST_FILTER.FAVORITE' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select formControlName="favorite" [placeholder]="'FORMS.SELECT.FAVORITE' | translate">
+                        <mat-option [value]="'true'">
+                            {{'MAPPINGS.MAPPINGS_LIST_FILTER.FAVORITE_YES' | translate}}
+                        </mat-option>
+                        <mat-option [value]="'false'">
+                            {{'MAPPINGS.MAPPINGS_LIST_FILTER.FAVORITE_NO' | translate}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+</form>

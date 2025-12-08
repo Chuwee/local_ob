@@ -1,0 +1,63 @@
+<ion-header class="ob-layout__header">
+    <ion-toolbar>
+        <back-button  [viewTitle]="'PROFILE.TITLE' | translate"> </back-button>
+    </ion-toolbar>
+</ion-header>
+<ion-content class="ob-layout__content profile-config">
+    <static-view
+        [viewContent]="{
+            title: 'ERROR-TITLE',
+            description: 'ERROR-DESCRIPTION',
+            isError: true,
+        }"
+        (tap)="reTry()" *ngIf="isError$ | async; else content"></static-view>
+    <ng-template #content>
+        <div class="profile-config__info">
+            <div class="profile-config__circle-monogram" *ngIf="(isLoading$ | async) === false">
+                <div>{{ initials$ | async }}</div>
+            </div>
+            <div class="profile-config__info-data" *ngIf="(isLoading$ | async) === false; else skeleton">
+                <ion-text class="profile-config__username"><span>{{ username$ | async }}</span></ion-text>
+                <ion-text class="profile-config__mail"><span>{{ usermail$ | async }}</span></ion-text>
+            </div>
+            <ng-template #skeleton>
+                <div class="profile-config__info-data">
+                    <ion-text class="profile-config__username" *ngFor="let _ of [].constructor(2)">
+                        <ion-skeleton-text [animated]="true"></ion-skeleton-text>
+                    </ion-text>
+                </div>
+            </ng-template>
+        </div>
+        <div class="profile-config__options">
+            <!-- TODO: uncomment when we have the other langs -->
+            <!-- (click)="activateSelectingLang()" -->
+            <div class="profile-config__option">
+                <ion-text class="profile-config__option-name"><span>
+                        {{ "PROFILE.LANGUAGE" | translate }}
+                    </span></ion-text>
+                <ion-text class="profile-config__option-value"><span>{{ selectedLang }}</span></ion-text>
+                <!-- <ion-icon class="profile-config__option-arrow" name="chevron-forward-outline"></ion-icon> -->
+            </div>
+
+            <div class="profile-config__option" (click)="showAlert('deactivation')">
+                <ion-text class="profile-config__option-name">
+                    <span> {{ "PROFILE.DEACTIVATE-ACCOUNT" | translate }}</span>
+                </ion-text>
+                <ion-icon class="profile-config__option-arrow" name="chevron-forward-outline"></ion-icon>
+            </div>
+        </div>
+        <div class="profile-config__exit" (click)="showAlert('logout')">
+            <ion-icon class="profile-config__exit-icon" src="./assets/media/icons/logout.svg"></ion-icon>
+            <ion-text class="profile-config__exit-text"><span>{{ "PROFILE.LOGOUT" | translate }}</span></ion-text>
+        </div>
+    </ng-template>
+</ion-content>
+<ion-footer class="ob-layout__footer"> </ion-footer>
+<!-- <ion-modal [isOpen]="isSelectingLang" (ionModalDidDismiss)="deactivateSelectingLang($event)">
+    <ng-template>
+        <language-selector></language-selector>
+    </ng-template>
+</ion-modal> -->
+<ion-alert [isOpen]="alertOpen" header="{{ (selectedAlert ? selectedAlert.header : '') | translate }}"
+    [buttons]="selectedAlert ? selectedAlert.buttons : []" data-override-styles="" class="ob-alert alert-warning" backdropDismiss="false"
+    (ionAlertDidDismiss)="hideAlert()"></ion-alert>

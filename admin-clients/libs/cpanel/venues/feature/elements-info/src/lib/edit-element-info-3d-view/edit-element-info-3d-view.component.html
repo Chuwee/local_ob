@@ -1,0 +1,36 @@
+<div fxLayout="row" fxLayoutAlign="space-between">
+    <h3 class="section-title">
+        {{ 'VENUE_TPLS.ELEMENT_INFO.3DVIEW.TITLE' | translate }}
+        <span [matTooltip]="'INFORMATION_BADGE.BETA_FEATURE_TOOLTIP_INFO' | translate" class="ob-badge info">
+            {{'INFORMATION_BADGE.BETA_FEATURE' | translate}}
+        </span>
+    </h3>
+    <span class="ob-link" (click)="deleteContentComponent()">
+        {{ 'VENUE_TPLS.ELEMENT_INFO.DELETE_CONTENT' | translate }}
+    </span>
+</div>
+<div fxLayout="column" fxLayoutGap="16px" [formGroup]="info3dViewFormGroup">
+    <div fxLayout="row" fxLayoutAlign="start center">
+        <mat-icon class="ob-icon small info with-text">info</mat-icon>
+        <span class="mat-body-2">{{'VENUE_TPLS.ELEMENT_INFO.3DVIEW.BETA_MESSAGE' | translate}}</span>
+    </div>
+    <mat-checkbox color="primary" formControlName="enabled">
+        {{ 'VENUE_TPLS.ELEMENT_INFO.3DVIEW.ENABLE' | translate }}
+    </mat-checkbox>
+    @if (allowCodeConfiguration() && info3dViewFormGroup.controls.enabled.value) {
+        <div fxLayout="column">
+            <p>{{ 'VENUE_TPLS.ELEMENT_INFO.3DVIEW.DESCRIPTION' | translate }}</p>
+            <div fxLayout="row">
+                <div fxFlex="75%">
+                    <app-collection-input formControlName="codes" [placeholder]="'VENUE_TPLS.ELEMENT_INFO.3DVIEW.LABEL' | translate"
+                        [buttonLabel]="'FORMS.ACTIONS.ADD' | translate">
+                        <ng-template #elementsCollectionTemplate>
+                            <app-chips [chips$]="current3dViewCodesChips$" [isRemoveAllShown]="false" (removeEmitter)="removeChip($event)"
+                                class="ellipsified-chips without-max-height" />
+                        </ng-template>
+                    </app-collection-input>
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,92 @@
+@let productChannel = productChannel$ | async;
+@let statusKeySuffix = $productStatus() === 'INACTIVE' && productChannel.sale_request_status === 'ACCEPTED'
+    ? 'PRODUCT_INACTIVE'
+    : productChannel.sale_request_status;
+    <div class="status-notifications-container flex justify-center">
+        <div class="channel-status flex justify-end items-center basis-full">
+            <span class="channel-status-label ob-label">
+                {{'PRODUCT.CHANNELS.FORMS.LABELS.CHANNEL_STATUS' | translate}}:
+            </span>
+            <span class="ob-status-badge" [ngClass]="$saleStatusIndicator()"
+                [matTooltip]="'PRODUCT.CHANNELS.FORMS.INFOS.SALE_STATUS.' + statusKeySuffix | translate">
+                {{'PRODUCT.CHANNELS.FORMS.LABELS.CHANNEL_SALE_STATUS' | translate}}
+        </span>
+    </div>
+</div>
+<app-form-container (cancel)="cancel()" (save)="save()" [formGroup]="form" [disabled]="!form.dirty || form.invalid || (isLoading$ | async)"
+    [hideActionBar]="(isNotBoxOfficeChannel$ | async) === false" sidebar>
+    @if(productChannel) {
+        <div class="ob-form-field flex flex-col gap-4">
+            <mat-label class="ob-label">{{'PRODUCT.SALE_TYPE.LABEL' | translate }}</mat-label>
+            @if (isNotBoxOfficeChannel$ | async) {
+                <div> {{'PRODUCT.SALE_TYPE.DESCRIPTION' | translate }}</div>
+                <mat-radio-group formControlName="pack_only_enabled" class="flex-1">
+                    <mat-radio-button [value]="false" class="ob-radio-button vertical-list">
+                        <div>{{'PRODUCT.SALE_TYPE.VISIBLE_IN_FLOW' | translate}}</div>
+                    </mat-radio-button>
+                    @if (form.get('pack_only_enabled').value === false) {
+                        <div class="nested-content gap-4 flex flex-col">
+                            <mat-checkbox color="primary" formControlName="checkout_suggestion_enabled">
+                                <mat-label class="ob-label"> {{ 'PRODUCT.SALE_TYPE.INTEGRATED_LABEL' | translate }} </mat-label>
+                                <div> {{ 'PRODUCT.SALE_TYPE.INTEGRATED_DESCRIPTION' | translate }} </div>
+                            </mat-checkbox>
+                            <mat-checkbox color="primary" formControlName="standalone_enabled">
+                                <mat-label class="ob-label"> {{ 'PRODUCT.SALE_TYPE.DISCONNECTED_LABEL' | translate }} </mat-label>
+                                <div> {{ 'PRODUCT.SALE_TYPE.DISCONNECTED_DESCRIPTION' | translate }} </div>
+                            </mat-checkbox>
+                        </div>
+                    }
+                    <mat-radio-button [value]="true" class="ob-radio-button vertical-list">
+                        <div>{{'PRODUCT.SALE_TYPE.JUST_IN_PACK' | translate}}</div>
+                    </mat-radio-button>
+                </mat-radio-group>
+                <mat-error [ob-form-errors]="form" />
+            } @else {
+                <div> {{'PRODUCT.SALE_TYPE.BOX_OFFICE_DESCRIPTION' | translate }}</div>
+            }
+        </div>
+    }
+    <div slot="sidebar" class="channel-sidebar-container">
+        <div class="flex flex-col gap-4">
+            <div class="channel-img-container flex flex-col justify-center">
+                @if (productChannel.channel.entity.logo) {
+                    <img class="channel-image flex-1" alt="channel entity logo" [src]="productChannel.channel.entity.logo" />
+                } @else {
+                    <div class="flex flex-row justify-center items-center basis-[64px] grow-0 shrink">
+                        <mat-icon class="material-icons">
+                            image
+                        </mat-icon>
+                    </div>
+                }
+            </div>
+            <span class="sidebar-title">{{productChannel.channel.name}}</span>
+            @let requested = productChannel.sale_request_status !== 'PENDING_REQUEST';
+                <button mat-flat-button color="primary" type="button" class="ob-button" (click)="requestChannel(productChannel)"
+                    [disabled]="requested">
+                    @if (requested) {
+                <mat-icon>check</mat-icon>
+            }
+            {{ requested ? ('FORMS.ACTIONS.REQUESTED' | translate) : ('FORMS.ACTIONS.REQUEST' | translate)}}
+            </button>
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-col">
+                    <span class="channel-info-label">{{ 'PRODUCT.CHANNELS.FORMS.LABELS.ENTITY' | translate }}</span>
+                    <span>{{productChannel.channel.entity.name}}</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="channel-info-label">{{'CHANNELS.TYPE' | translate}}</span>
+                    <span>{{('CHANNELS.TYPE_OPTS.' + productChannel.channel.type) | translate}}</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="channel-info-label">{{ 'PRODUCT.CHANNELS.FORMS.LABELS.CHANNEL_ID' | translate }}</span>
+                    <span>{{productChannel.channel.id}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</app-form-container>
+@if (isLoading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

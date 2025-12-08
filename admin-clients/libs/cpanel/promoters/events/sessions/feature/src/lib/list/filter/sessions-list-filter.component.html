@@ -1,0 +1,149 @@
+<div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+    <mat-select fxFlex class="group-type-selector" [formControl]="groupTypeCtrl">
+        <mat-option *ngFor="let sessionGroupType of sessionGroupTypes" [value]="sessionGroupType">
+            {{'EVENTS.SESSIONS_GROUP_TYPES.' + sessionGroupType | translate}}
+        </mat-option>
+    </mat-select>
+    <button mat-stroked-button color="tertiary" class="ob-button small small-paddings" [class.active]="filterPopover.isOpen()"
+        [disabled]="disabled" [satPopoverAnchor]="filterPopover" [matBadge]="(appliedFiltersCounter$ | async) || ''"
+        (click)="filterPopover.toggle()">
+        {{'FORMS.OPEN_FILTER_BTN' | translate}}
+        <mat-icon iconPositionEnd>filter_list</mat-icon>
+    </button>
+</div>
+<sat-popover #filterPopover hasBackdrop yAlign="below" [autoFocus]="false" restoreFocus="false">
+    <mat-card class="ob-card">
+        <mat-card-content class="form-container">
+            <form [formGroup]="filtersForm" fxLayout="column" fxLayoutGap="24px">
+                <div fxLayout="row" class="filter-block">
+                    <div class="ob-label" fxFlex="0 1 90px">
+                        {{'EVENTS.TEMPLATE' | translate}}
+                    </div>
+                    <div class="filter-block-input" fxFlex="0 0 300px">
+                        <mat-form-field appearance="outline" class="ob-form-field venue-tpl-select">
+                            <mat-select formControlName="venueTplId" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate">
+                                <mat-option>
+                                    <app-select-search #venueTplSelectSearch [options$]="venueTpls$" searchField="name">
+                                    </app-select-search>
+                                </mat-option>
+                                <mat-option *ngFor="let venueTpl of venueTplSelectSearch.getFilteredOptions$() | async"
+                                    [value]="venueTpl?.id">
+                                    <div appEllipsify
+                                        [matTooltip]="venueTpl ? venueTpl.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)">
+                                        {{venueTpl ? venueTpl.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                                    </div>
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <mat-divider [inset]="true"></mat-divider>
+                <div fxLayout="row" class="filter-block">
+                    <div class="ob-label" fxFlex="0 1 90px">
+                        {{'EVENTS.STATUS' | translate}}
+                    </div>
+                    <div class="filter-block-input" fxFlex="0 0 300px">
+                        <mat-form-field appearance="outline" class="ob-form-field status-select">
+                            <mat-select formControlName="status" multiple [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                                <mat-option *ngFor="let status of statusList" [value]="status.id">
+                                    {{status && (status.name | translate)}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <mat-divider [inset]="true"></mat-divider>
+                <div fxLayout="row" class="filter-block">
+                    <div class="ob-label" fxFlex="0 1 90px">
+                        {{'EVENTS.DATE' | translate}}
+                    </div>
+                    <div class="filter-block-input" fxFlex="0 0 140px">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <input matInput [matDatepicker]="initStartDateDP" [placeholder]="dateFormat"
+                                [max]="filtersForm.get('finalStartDate')?.value" formControlName="initStartDate"
+                                (focus)="initStartDateDP.open()">
+                            <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                            (click)="$event.stopPropagation(); initStartDateDP.open();">
+                                <mat-icon>event</mat-icon>
+                            </button>
+                            <mat-datepicker #initStartDateDP [startAt]="getInitStartDateStartDay()"></mat-datepicker>
+                        </mat-form-field>
+                    </div>
+                    <div fxFlex="0 1 20px">
+                        <span fxFlex class="filter-block-dates-separator"></span>
+                    </div>
+                    <div class="filter-block-input" fxFlex="0 0 140px">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <input matInput [matDatepicker]="finalStartDateDP" [placeholder]="dateFormat"
+                                [min]="filtersForm.get('initStartDate')?.value" formControlName="finalStartDate"
+                                (focus)="finalStartDateDP.open()">
+                            <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                            (click)="$event.stopPropagation(); finalStartDateDP.open();">
+                                <mat-icon>event</mat-icon>
+                            </button>
+                            <mat-datepicker #finalStartDateDP [startAt]="getFinalStartDateStartDay()"></mat-datepicker>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <mat-divider [inset]="true"></mat-divider>
+                <div fxLayout="column" class="filter-block">
+                    <span class="field-label">{{'EVENTS.WEEKDAYS' | translate}}</span>
+                    <div>
+                        <mat-button-toggle-group class="ob-round-button-group weekdays-selector" multiple="true" formControlName="weekdays">
+                            <mat-button-toggle *ngFor="let day of weekdays" [value]="day.key">
+                                {{day.label}}
+                            </mat-button-toggle>
+                        </mat-button-toggle-group>
+                    </div>
+                </div>
+                <mat-divider [inset]="true"></mat-divider>
+                <div class="filter-block hour-ranges-filter" fxLayout="column">
+                    <span class="field-label">{{'EVENTS.HOURS' | translate}}</span>
+                    <div *ngFor="let hourRange of hourRanges.controls; index as i" class="hour-range" fxLayout="row"
+                        fxLayoutAlign="space-around" [formGroup]="hourRange">
+                        <div fxFlex fxLayout="row" fxLayoutGap="10px">
+                            <span class="timer-label">{{'FORMS.FROM' | translate}}</span>
+                            <app-time-picker formControlName="startTime">
+                            </app-time-picker>
+                        </div>
+                        <div fxFlex fxLayout="row" fxLayoutGap="10px">
+                            <span class="timer-label">{{'FORMS.TO' | translate}}</span>
+                            <app-time-picker formControlName="endTime">
+                            </app-time-picker>
+                        </div>
+                        <button mat-icon-button aria-label="Delete hour range" class="ob-button medium"
+                            (click)="deleteHourRange(i)" [matTooltip]="'EVENTS.DELETE_HOUR_RANGE_BTN' | translate">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+                    <div fxLayout="row" fxLayoutAlign="start center" class="add-hour-range"
+                        [class.disabled]="hourRanges.length === maxHourRanges">
+                        <button mat-icon-button aria-label="new hour range" type="button" [disabled]="hourRanges.length === maxHourRanges"
+                            class="ob-button mat-stroked-button xsmall" (click)="addHourRange()">
+                            <mat-icon>add</mat-icon>
+                        </button>
+                        <span (click)="addHourRange()">
+                            {{'EVENTS.ADD_HOUR_RANGE' | translate}}
+                        </span>
+                    </div>
+                </div>
+            </form>
+        </mat-card-content>
+        <mat-card-footer fxLayoutAlign="start center">
+            <div fxFlex="grow" class="left-actions">
+                <a class="ob-link" #removeLink (click)="onRemoveFiltersBtnClick()">
+                    {{'FORMS.REMOVE_FILTERS_BTN' | translate}}
+                </a>
+            </div>
+            <div fxFlex="none" class="right-actions">
+                <button mat-button class="ob-button small" (click)="onCloseBtnClick()">
+                    {{'FORMS.CLOSE_FILTER_BTN' | translate}}
+                </button>
+                <button mat-flat-button color="primary" class="ob-button small" [disabled]="filtersForm.invalid"
+                    (click)="onApplyBtnClick()">
+                    {{'FORMS.APPLY_FILTER_BTN' | translate}}
+                </button>
+            </div>
+        </mat-card-footer>
+    </mat-card>
+</sat-popover>

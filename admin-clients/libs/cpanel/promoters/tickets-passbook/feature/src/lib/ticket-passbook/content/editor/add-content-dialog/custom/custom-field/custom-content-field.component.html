@@ -1,0 +1,71 @@
+<div fxLayout="column" class="custom-content-item-container" [formGroup]="formGroup">
+    <div class="custom-content-item-container-header" fxLayoutAlign="space-between">
+        <h3 class="section-title">{{('TICKET_PASSBOOK.CUSTOM_CONTENT_TITLE' | translate | uppercase) + ' ' + contentNumber}}</h3>
+        <button matTooltip="{{'TICKET_PASSBOOK.DELETE_CUSTOM_CONTENT_TOOLTIP' | translate}}" mat-icon-button
+            aria-label="Delete custom content" class="ob-button medium delete-icon" (click)="deleteContent.emit()">
+            <mat-icon>delete</mat-icon>
+        </button>
+    </div>
+    <div fxLayout="row wrap" class="custom-content-item">
+        <div class="custom-content-item-field" fxLayout="column" formGroupName="title">
+            <div fxLayout="column">
+                <p class="custom-content-header-label">{{'TICKET_PASSBOOK.TITLE_FIELD' | translate}}</p>
+                <mat-radio-group class="custom-content-item-options" fxLayout="row" fxLayoutGap="35px" formControlName="type">
+                    <mat-radio-button [value]="ticketsPassbookCustomFieldTypes.label">
+                        <div>{{'TICKET_PASSBOOK.FIELD_TYPES.LABEL' | translate}}</div>
+                    </mat-radio-button>
+                    <mat-radio-button [value]="ticketsPassbookCustomFieldTypes.value">
+                        <div>{{'TICKET_PASSBOOK.FIELD_TYPES.VALUE' | translate}}</div>
+                    </mat-radio-button>
+                    <mat-radio-button [value]="ticketsPassbookCustomFieldTypes.empty">
+                        <div>{{'TICKET_PASSBOOK.FIELD_TYPES.EMPTY' | translate}}</div>
+                    </mat-radio-button>
+                </mat-radio-group>
+            </div>
+            <div fxLayout="row">
+                <mat-form-field fxFlex="400px" appearance="outline" class="ob-form-field">
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="value">
+                        <mat-option *ngFor="let item of (titleList$ | async)" [value]="item">
+                            <div appEllipsify [matTooltip]="item | customPlaceholderValue">
+                                {{item | customPlaceholderValue}}
+                            </div>
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="formGroup.hasError('required', 'title.value')">
+                        {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                    </mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="custom-content-item-field" fxLayout="column" formGroupName="description">
+            <div fxLayout="column">
+                <p class="custom-content-header-label">{{'TICKET_PASSBOOK.DESCRIPTION_FIELD' | translate}}</p>
+                <mat-radio-group class="custom-content-item-options" fxLayout="row" fxLayoutGap="35px" formControlName="type">
+                    <mat-radio-button [value]="ticketsPassbookCustomFieldTypes.label">
+                        <div>{{'TICKET_PASSBOOK.FIELD_TYPES.LABEL' | translate}}</div>
+                    </mat-radio-button>
+                    <mat-radio-button [value]="ticketsPassbookCustomFieldTypes.value">
+                        <div>{{'TICKET_PASSBOOK.FIELD_TYPES.VALUE' | translate}}</div>
+                    </mat-radio-button>
+                    <mat-radio-button [value]="ticketsPassbookCustomFieldTypes.empty">
+                        <div>{{'TICKET_PASSBOOK.FIELD_TYPES.EMPTY' | translate}}</div>
+                    </mat-radio-button>
+                </mat-radio-group>
+            </div>
+            <div fxLayout="row">
+                <mat-form-field fxFlex="400px" appearance="outline" class="ob-form-field">
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="value">
+                        <mat-option *ngFor="let item of (descriptionList$ | async)" [value]="item">
+                            <div appEllipsify [matTooltip]="item | customPlaceholderValue">
+                                {{item | customPlaceholderValue}}
+                            </div>
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="formGroup.hasError('required', 'description.value')">
+                        {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                    </mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+</div>

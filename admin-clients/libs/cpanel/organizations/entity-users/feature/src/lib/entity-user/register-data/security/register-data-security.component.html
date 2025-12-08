@@ -1,0 +1,110 @@
+<app-form-container layout="menu" hideActionBar>
+    <!-- User status -->
+    @if ($canEditUserStatus() && !$isMfaActivationAllowed()) {
+        <div slot="outside" class="flex flex-col user-status gap-2">
+            <div class="flex justify-end items-center">
+                <app-status-select class="basis-64" statusType="USER" label="USER.STATUS"
+                    [element]="$user()" [updateStatus]="updateStatus.bind(this)" [statusList]="userStatusList">
+                    <ng-template #optionTemplate let-row>
+                        {{'USER.STATUS_OPTS.' + row | translate}}
+                    </ng-template>
+                </app-status-select>
+            </div>
+            <mat-divider />
+        </div>
+    }
+    <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+        <!-- Reset password Panel -->
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'USERS.TITLES.PASSWORD' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <!-- Password -->
+            <div fxFlex="100%">
+                <button mat-stroked-button color="tertiary" class="ob-button small" type="button"
+                    [attr.aria-label]="'ACTIONS.SET_PASSWORD' | translate" (click)="openSetPasswordDialog()">
+                    <mat-icon svgIcon="new-password" />
+                    {{'ACTIONS.SET_PASSWORD' | translate}}
+                </button>
+            </div>
+        </mat-expansion-panel>
+
+        @if ($isMfaActivationAllowed()) {
+            <!-- Multi factor authentication panel -->
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'USERS.MFA.TITLES.MFA' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div fxLayout="column" fxLayoutGap="24px" class="mfa-panel-content">
+                    @if ($hasMfa(); as hasMfa) {
+                        <p fxLayout="row" fxLayoutAlign="start center">
+                            <mat-icon class="ob-icon info with-text">
+                                info
+                            </mat-icon>
+                            {{'USERS.MFA.FORMS.INFOS.MFA_DEACTIVATED' | translate}}
+                        </p>
+                        <button mat-stroked-button color="tertiary" class="ob-button small" aria-label="Activate authentication"
+                            (click)="openMfaDialog(hasMfa)" type="button">
+                            {{'USERS.MFA.ACTIONS.DEACTIVATE' | translate | uppercase}}
+                        </button>
+                    } @else {
+                        <ob-admonition
+                            icon="lightbulb"
+                            [title]="'FORMS.LABELS.ADVICE' | translate"
+                            [body]="'USERS.MFA.FORMS.INFOS.MFA_ADVICE' | translate" />
+                        <p>{{'USERS.MFA.FORMS.INFOS.ACTIVATE_HELP' | translate}}</p>
+                        <button mat-stroked-button color="tertiary" class="ob-button small" aria-label="Activate authentication"
+                            (click)="openMfaDialog()" type="button">
+                            {{'USERS.MFA.ACTIONS.ACTIVATE' | translate | uppercase}}
+                        </button>
+                    }
+                </div>
+
+            </mat-expansion-panel>
+        }
+
+        <!-- Client secret panel -->
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'USER.API_KEY.LABEL' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <!-- Api key -->
+            @if ($user(); as user) {
+                <div fxFlex="100%" class="details-non-editable-field ob-form-field" fxLayout="column">
+                    <span class="ob-label">{{'USER.API_KEY.LABEL' | translate}}</span>
+                    <div fxLayout="row wrap" fxLayoutAlign="start center" fxLayoutGap="8px">
+                        <div fxLayoutAlign="start center" fxLayoutGap="8px">
+                            <span>{{$userApiKey() || user.apikey}}</span>
+                            @if ($canCopyApiKey()) {
+                                <app-copy-text class="copy-key-button" [copyText]="user.apikey"
+                                    [copyOk]="'USER.API_KEY.KEY_COPY_OK' | translate" [copyKo]="'USER.API_KEY.KEY_COPY_KO' | translate"
+                                    [copyTooltip]="'USER.API_KEY.COPY_KEY' | translate" />
+                            }
+                        </div>
+                        @if ($isRefreshApiKeyAllowed()) {
+                            <div fxLayoutAlign="start center" fxLayoutGap="8px">
+                                <button mat-stroked-button color="tertiary" class="ob-button small" aria-label="refresh"
+                                    (click)="refreshApiKey()" type="button">
+                                    <mat-icon>autorenew</mat-icon>
+                                    {{'USER.API_KEY.REFRESH' | translate}}
+                                </button>
+                                <mat-icon class="ob-help-icon" fxFlexAlign="center"
+                                    [matTooltip]="'USER.API_KEY.REFRESH_HELP' | translate">
+                                    help_outline
+                                </mat-icon>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </mat-expansion-panel>
+
+    </mat-accordion>
+</app-form-container>
+@if ($isLoading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

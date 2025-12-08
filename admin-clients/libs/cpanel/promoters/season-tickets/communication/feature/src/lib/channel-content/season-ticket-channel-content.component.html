@@ -1,0 +1,149 @@
+<app-form-container layout="menu" [disabled]="(isLoadingOrSaving$ | async) || (isGenerationStatusError$ | async) || !form.dirty"
+    (cancel)="cancel()" (save)="save()">
+    <app-language-bar slot="outside" [languages]="languageList$ | async" [selected]="language$ | async"
+        [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)" />
+    <mat-accordion [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>
+                    {{'SEASON_TICKET.COMMUNICATION.CHANNEL.SEASON_TICKET_CONTENT' | translate}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <form id="seasonTicketChannelContent" [formGroup]="seasonTicketChannelContentForm" fxLayout="row wrap">
+                <div fxFlex="100%" fxLayout="row">
+                    <mat-form-field fxFlex="500px" fxFlex.lt-md="100%" appearance="outline"
+                        class="ob-form-field field-with-label">
+                        <mat-label>{{'SEASON_TICKET.COMMUNICATION.CHANNEL.TEXT.TITLE.LABEL' | translate}}</mat-label>
+                        <input matInput aria-label="title"
+                            [placeholder]="'SEASON_TICKET.COMMUNICATION.CHANNEL.TEXT.TITLE.PLACEHOLDER' | translate"
+                            formControlName="title">
+                        <mat-error [ob-form-errors]="seasonTicketChannelContentForm" field="title" />
+                    </mat-form-field>
+                </div>
+                <div fxFlex="100%" fxLayout="row">
+                    <mat-form-field fxFlex="500px" fxFlex.lt-md="100%" appearance="outline"
+                        class="ob-form-field field-with-label">
+                        <mat-label>{{'SEASON_TICKET.COMMUNICATION.CHANNEL.TEXT.SUBTITLE.LABEL' | translate}}</mat-label>
+                        <input matInput aria-label="subtitle"
+                            [placeholder]="'SEASON_TICKET.COMMUNICATION.CHANNEL.TEXT.SUBTITLE.PLACEHOLDER' | translate"
+                            formControlName="subtitle">
+                        <mat-error [ob-form-errors]="seasonTicketChannelContentForm" field="subtitle" />
+                    </mat-form-field>
+                </div>
+                <div fxFlex="100%" fxLayout="row">
+                    <div fxFlex="500px" fxFlex.lt-md="100%" fxLayout="column">
+                        <span class="field-label">
+                            {{'SEASON_TICKET.COMMUNICATION.CHANNEL.TEXT.DURATION_LANGUAGE.LABEL' | translate}}
+                        </span>
+                        <p class="field-description">
+                            {{'SEASON_TICKET.COMMUNICATION.CHANNEL.TEXT.DURATION_LANGUAGE.DESCRIPTION' | translate }}
+                        </p>
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <input matInput aria-label="durationLanguage"
+                                [placeholder]="'SEASON_TICKET.COMMUNICATION.CHANNEL.TEXT.DURATION_LANGUAGE.PLACEHOLDER' | translate"
+                                formControlName="durationLanguage">
+                            <mat-error [ob-form-errors]="seasonTicketChannelContentForm" field="durationLanguage" />
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div fxFlex="100%" fxLayout="row">
+                    <div fxFlex="685px" fxFlex.lt-lg="100%" fxLayout="column">
+                        <span class="field-label">
+                            {{'SEASON_TICKET.COMMUNICATION.CHANNEL.TEXT.SHORT_DESCRIPTION.LABEL' | translate}}
+                        </span>
+                        <p class="field-description">
+                            {{'SEASON_TICKET.COMMUNICATION.CHANNEL.TEXT.SHORT_DESCRIPTION.DESCRIPTION' | translate }}
+                        </p>
+                        <mat-form-field appearance="outline" class="ob-form-field no-padding">
+                            <app-rich-text-area aria-label="Short Description"
+                                [placeholder]="'SEASON_TICKET.COMMUNICATION.CHANNEL.TEXT.SHORT_DESCRIPTION.PLACEHOLDER' | translate"
+                                formControlName="shortDescription" />
+                            <mat-error [ob-form-errors]="seasonTicketChannelContentForm" field="shortDescription" />
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div fxFlex="100%" fxLayout="row">
+                    <mat-form-field fxFlex="685px" fxFlex.lt-lg="100%" appearance="outline"
+                        class="ob-form-field field-with-label no-padding">
+                        <mat-label>{{'SEASON_TICKET.COMMUNICATION.CHANNEL.TEXT..LONG_DESCRIPTION.LABEL' | translate}}
+                        </mat-label>
+                        <app-rich-text-area aria-label="Long Description"
+                            [placeholder]="'SEASON_TICKET.COMMUNICATION.CHANNEL.TEXT.LONG_DESCRIPTION.PLACEHOLDER' | translate"
+                            formControlName="longDescription" />
+                        <mat-error [ob-form-errors]="seasonTicketChannelContentForm" field="longDescription" />
+                    </mat-form-field>
+                </div>
+                <div fxFlex="100%" fxLayout="row">
+                    <div fxFlex="100%" fxLayout="column">
+                        <span class="field-label">
+                            {{'SEASON_TICKET.COMMUNICATION.CHANNEL.IMAGE.SLIDER.LABEL' | translate}}
+                        </span>
+                        <p class="field-description">
+                            {{'SEASON_TICKET.COMMUNICATION.CHANNEL.IMAGE.SLIDER.DESCRIPTION' | translate}}
+                        </p>
+                        <div fxLayout="row">
+                            <app-image-uploader hasAltText fxFlex="calc(50% + 20px)" formControlName="slider1"
+                                [imageRestrictions]="sliderRestrictions" hideLabelText />
+                            <div fxFlex="50%" fxLayout="row wrap">
+                                <app-image-uploader hasAltText fxFlex="50%" formControlName="slider2"
+                                    [imageRestrictions]="sliderRestrictions" hideLabelText />
+                                <app-image-uploader hasAltText fxFlex="50%" formControlName="slider3"
+                                    [imageRestrictions]="sliderRestrictions" hideLabelText />
+                                <app-image-uploader hasAltText fxFlex="50%" formControlName="slider4"
+                                    [imageRestrictions]="sliderRestrictions" hideLabelText />
+                                <app-image-uploader hasAltText fxFlex="50%" formControlName="slider5"
+                                    [imageRestrictions]="sliderRestrictions" hideLabelText />
+                            </div>
+                        </div>
+                        <span class="field-format">{{'UPLOAD_IMAGE.FORMAT' | translate: sliderRestrictions}}</span>
+                    </div>
+                </div>
+            </form>
+        </mat-expansion-panel>
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>
+                    {{'SEASON_TICKET.COMMUNICATION.CHANNEL.SEASON_TICKET_INVOICE_BANNER' | translate}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <form id="eventChannelInvoiceBanner" [formGroup]="seasonTicketChannelInvoiceBannerForm" fxLayout="row wrap">
+                <div fxFlex="100%" fxLayout="row">
+                    <div fxFlex="340px" fxLayout="column">
+                        <span class="field-label">
+                            {{'SEASON_TICKET.COMMUNICATION.CHANNEL.IMAGE.BANNER.LABEL' | translate}}
+                        </span>
+                        <p class="field-description">
+                            {{'SEASON_TICKET.COMMUNICATION.CHANNEL.IMAGE.BANNER.DESCRIPTION' | translate}}
+                        </p>
+                        <app-image-uploader [imageRestrictions]="bannerRestrictions"
+                            formControlName="invoiceBanner" />
+                    </div>
+                </div>
+            </form>
+        </mat-expansion-panel>
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>
+                    {{'SEASON_TICKET.COMMUNICATION.CHANNEL.SEASON_TICKET_PORTAL_SUBSCRIBERS' | translate}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <form id="channelCard" [formGroup]="seasonTicketChannelCardForm" fxLayout="row wrap">
+                <div fxFlex="100%" fxLayout="row">
+                    <div fxFlex="340px" fxLayout="column">
+                        <span class="field-label">
+                            {{'SEASON_TICKET.COMMUNICATION.CHANNEL.IMAGE.SUBSCRIBERS.LABEL' | translate}}
+                        </span>
+                        <p class="field-description">
+                            {{'SEASON_TICKET.COMMUNICATION.CHANNEL.IMAGE.SUBSCRIBERS.DESCRIPTION' | translate}}
+                        </p>
+                        <app-image-uploader hasAltText [imageRestrictions]="cardRestrictions" formControlName="card" />
+                    </div>
+                </div>
+            </form>
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+
+<div class="spinner-container" *ngIf="isLoadingOrSaving$ | async">
+    <mat-spinner />
+</div>

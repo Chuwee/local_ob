@@ -1,0 +1,65 @@
+<div class="details-container flex-col flex flex-grow">
+    <div class="heading-container flex flex-col">
+        <div class="flex flex-col w-full">
+            <h1 class="secondary mat-headline-3">
+                {{'TITLES.LITERALS' | translate}}
+            </h1>
+        </div>
+    </div>
+    <div class="main-content flex flex-col flex-grow">
+        <app-form-container [formGroup]="form" (cancel)="cancel()" (save)="save()" layout="main" class="overflow-y-auto"
+            [disabled]="!form.dirty || (isInProgress$ | async)">
+
+            <div class="section-block">
+                <p class="section-description">{{'LITERALS.EXTERNAL.DESCRIPTION' | translate}}</p>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div class="w-full lg:w-1/2">
+                    <mat-form-field class="w-full ob-form-field field-with-label" appearance="outline">
+                        <mat-label>{{'LITERALS.EXTERNAL.APPLICATION' | translate}}</mat-label>
+                        <mat-select formControlName="application" (selectionChange)="applicationChanged()"
+                            [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                            @for (application of applications | keyvalue; track application.key) {
+                                <mat-option [value]="application.value">
+                                    {{application.key}}
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="filter-container">
+                    <button mat-stroked-button color="tertiary" class="ob-button medium only-icon"
+                        [matMenuTriggerFor]="literalsListMenu">
+                        <mat-icon>more_horiz</mat-icon>
+                    </button>
+                    <mat-menu #literalsListMenu="matMenu">
+                        <button mat-menu-item (click)="importLiterals()">
+                            {{'LITERALS.EXTERNAL.UPLOAD_CSV_BTN' | translate}}
+                        </button>
+                    </mat-menu>
+                </div>
+            </div>
+
+            <app-literals-table [languages$]="languageList$" [literals$]="literals$" name="literals" [allowHtmlEditor]="true"
+                [selectedLanguage]="selectedLanguage.getValue()" (changedLanguage)="loadTextContents($event)">
+                @if(isLiteralCreationAllowed$ | async) {
+                    <div class="flex flex-row flex-wrap justify-end button-container">
+                        <button mat-stroked-button type="button" class="ob-button small import-button"
+                            (click)="openCreateLiteralDialog()" data-test="addLiteralBtn">
+                            <mat-icon>add</mat-icon>
+                            {{'LITERALS.EXTERNAL.ADD_KEY' | translate}}
+                        </button>
+                    </div>
+                }
+            </app-literals-table>
+
+        </app-form-container>
+
+        @if (isInProgress$ | async) {
+            <div class="spinner-container">
+                <mat-spinner />
+            </div>
+        }
+    </div>
+</div>

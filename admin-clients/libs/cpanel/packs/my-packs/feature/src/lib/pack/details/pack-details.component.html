@@ -1,0 +1,61 @@
+@if(pack$ | async;  as pack) {
+    <div class="details-container" fxFlex="0 1 100%" fxLayout="column">
+        <div class="heading-container flex flex-row items-center">
+            <app-go-back defaultPath="/packs" />
+            <h1 class="secondary mat-headline-3">
+                {{ pack.name }}
+            </h1>
+            <span class="ob-status-badge" [class]="pack.active ? 'active' : 'inactive'"
+                [matTooltip]="('CHANNELS.PACKS.STATUS_OPTS.'+ (pack.active ? 'ACTIVE' : 'INACTIVE') | translate)">
+                {{'CHANNELS.PACKS.STATUS_OPTS.'+ (pack.active ? 'ACTIVE' : 'INACTIVE') | translate}}
+            </span>
+        </div>
+        <div class="main-content" fxFlex="0 1 100%" fxLayout="column">
+            <div class="top-actions">
+                <app-nav-tabs-menu type="tabMenu" [elements]="[
+                    {
+                        label: 'PACK.GENERAL_DATA_TITLE',
+                        param: 'general-data'
+                    },
+                    {
+                        label: 'PACK.ELEMENTS_TITLE',
+                        param: 'elements'
+                    },
+                    {
+                        label: 'PACK.PROGRAMMING_TITLE',
+                        param: 'programming'
+                    },
+                    {
+                        label: 'PACK.PROMOTION_TITLE',
+                        param: 'promotion',
+                        show: pack.type === 'MANUAL'
+                    },
+                    {
+                        label: 'PACK.PRICES_TITLE',
+                        param: 'prices',
+                        show: pack.type === 'AUTOMATIC'
+                    },
+                    {
+                        label: 'PACK.DESIGN_TITLE',
+                        param: 'design'
+                    },
+                    {
+                        label: 'PACK.COMMUNICATION_TITLE',
+                        param: 'communication'
+                    },
+                    {
+                        label: 'PACK.CHANNELS_TITLE',
+                        param: 'channels'
+                    },
+                    {
+                        label: 'PACK.PROMOS_TITLE',
+                        param: 'promotions',
+                        badge: 'INFORMATION_BADGE.BETA_FEATURE',
+                        badgeClass: 'blue'
+                    }
+                ]" />
+            </div>
+            <router-outlet />
+        </div>
+    </div>
+}

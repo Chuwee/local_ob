@@ -1,0 +1,240 @@
+---
+description: >
+  Cursor rules for Angular 19 + Nx monorepo at OneBox. Enforce standalone components (no NgModules), OnPush change detection, external templates/styles (SCSS), and approved selector prefixes. Require individual Angular Material imports (never use deprecated shared modules). Mandate Tailwind CSS for all layout and flex styling (never use FlexLayoutModule or fx* directives). Follow Nx generator conventions and maintain strict code quality and architecture standards.
+alwaysApply: false
+---
+
+# Cursor Rules for Angular 19 + Nx Monorepo
+
+You are an AI assistant working with an Angular 19 + Nx monorepo at OneBox. Follow these strict rules:
+
+## 🏗️ Architecture Rules
+
+### Angular Standalone Components (MANDATORY)
+- ALWAYS create standalone components, NEVER use `standalone: false`
+- NEVER create NgModules for new code
+- When asked to create components, use this structure:
+```typescript
+@Component({
+  selector: 'prefix-name',
+  imports: [CommonModule, /* other imports */],
+  templateUrl: './name.component.html',
+  styleUrls: ['./name.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class NameComponent {}
+```
+
+### Nx Generators Compliance
+- Use these prefixes for selectors: `app`, `ob`, `cpanel`, `shipanel`
+- Always use OnPush change detection
+- Always use external template and style files (not inline)
+- Use SCSS for styling
+
+## 🎨 Angular Material Rules
+
+### Standalone Material Imports (REQUIRED)
+- NEVER import from `@admin-clients/shared/common/ui/ob-material`
+- ALWAYS use individual Angular Material imports:
+```typescript
+import { MatButton } from '@angular/material/button';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+```
+
+## 🎯 Layout & Styling Rules
+
+### Tailwind CSS (REQUIRED for Layouts)
+- NEVER use FlexLayoutModule or any `fx*` directives
+- REPLACE flex layouts with Tailwind classes:
+  - `fxLayout="row"` → `class="flex flex-row"`
+  - `fxLayoutGap="16px"` → `class="gap-4"`
+  - `fxLayoutAlign="start center"` → `class="justify-start items-center"`
+  - `fxFlex` → `class="flex-1"`
+
+### CSS Variables (REQUIRED)
+- NEVER use SCSS variables (`$variable`)
+- ALWAYS use CSS custom properties:
+```scss
+:host {
+  --primary-color: #1976d2;
+  --spacing: 8px;
+}
+```
+
+## 🔄 Reactivity Rules
+
+### Signals (PREFERRED)
+- USE signals for component state instead of properties:
+```typescript
+export class Component {
+  // GOOD
+  count = signal(0);
+  users = signal<User[]>([]);
+  
+  // COMPUTED
+  displayCount = computed(() => `Count: ${this.count()}`);
+  
+  // AVOID
+  private _count = 0;
+  users: User[] = [];
+}
+```
+
+### Control Flow Syntax (MANDATORY)
+- NEVER use `*ngIf`, `*ngFor`, `ngSwitch`
+- ALWAYS use new control flow:
+```html
+<!-- REQUIRED -->
+@if (condition()) {
+  <div>Content</div>
+} @else {
+  <div>Alternative</div>
+}
+
+@for (item of items(); track item.id) {
+  <div>{{ item.name }}</div>
+} @empty {
+  <div>No items</div>
+}
+
+@switch (status()) {
+  @case ('loading') { <div>Loading...</div> }
+  @case ('error') { <div>Error</div> }
+  @default { <div>Content</div> }
+}
+```
+
+## 🌐 Internationalization Rules
+
+### TranslatePipe (REQUIRED)
+- NEVER import `TranslateModule`
+- ALWAYS use `TranslatePipe` directly:
+```typescript
+import { TranslatePipe } from '@ngx-translate/core';
+
+@Component({
+  imports: [TranslatePipe],
+  template: `<h1>{{ 'key' | translate }}</h1>`
+})
+```
+
+## 📁 Component Organization Rules
+
+### File Size Limits
+- MAX 200 lines per component (template + component)
+- If larger, suggest breaking into smaller components
+- Extract complex logic into services
+
+### Smart/Dumb Pattern
+- Container components: handle state and business logic
+- Presentation components: pure display logic with @Input/@Output
+
+## ⚡ Performance Rules
+
+### Change Detection
+- ALWAYS use OnPush (already configured in nx.json)
+- Use signals to trigger change detection
+- Avoid heavy computations in templates
+
+### Bundle Optimization
+- Use lazy loading for routes
+- Import specific functions, not entire libraries
+- Tree-shake unused code
+
+## 🧪 Code Quality Rules
+
+### TypeScript
+- Use strict typing, avoid `any`
+- Prefer `readonly` for immutable data
+- Use proper interfaces and types
+
+### Forms
+- ALWAYS use reactive forms over template-driven
+- Use FormBuilder and validators properly
+
+## 🔧 Project Structure Awareness
+
+### Nx Workspace
+- This is a monorepo with apps: cpanel-client, native, shi-panel
+- Shared libraries are in `libs/` folder
+- Follow existing folder structure patterns
+
+### Component Naming
+- Use kebab-case for selectors
+- Follow the prefix rules: app-, ob-, cpanel-, shipanel-
+- Use descriptive component names
+
+## 🚨 Forbidden Patterns
+
+### NEVER DO THESE:
+```typescript
+// DON'T
+import { MaterialModule } from '@admin-clients/shared/common/ui/ob-material';
+import { FlexLayoutModule } from '@angular/flex-layout';
+import { TranslateModule } from '@ngx-translate/core';
+
+// DON'T
+@Component({
+  standalone: false, // NEVER
+  changeDetection: ChangeDetectionStrategy.Default // NEVER
+})
+
+// DON'T use structural directives
+*ngIf="condition"
+*ngFor="let item of items"
+
+// DON'T use fxLayout
+fxLayout="row"
+fxFlex="1"
+```
+
+## ✅ Migration Assistance
+
+When working with existing code:
+1. Suggest converting NgModules to standalone
+2. Replace FlexLayout with Tailwind
+3. Replace structural directives with control flow
+4. Replace MaterialModule with individual imports
+5. Replace SCSS variables with CSS custom properties
+
+## 📝 Code Generation Templates
+
+### Component Template:
+```typescript
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: '{prefix}-{name}',
+  imports: [CommonModule],
+  templateUrl: './{name}.component.html',
+  styleUrls: ['./{name}.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class {Name}Component {
+  // Use signals for state
+}
+```
+
+### Service Template:
+```typescript
+import { Injectable, signal } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class {Name}Service {
+  // Use signals for service state
+}
+```
+
+## 🎯 When Suggesting Code
+
+1. Always check if the suggestion follows these rules
+2. Proactively suggest improvements to existing patterns
+3. Explain WHY modern patterns are better
+4. Provide migration paths for legacy code
+5. Consider the Nx workspace structure
+
+Remember: We're using Angular 19's latest features for optimal performance and developer experience. Always prioritize standalone components, signals, control flow syntax, and Tailwind for layouts.

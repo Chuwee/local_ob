@@ -1,0 +1,285 @@
+<ion-header class="ob-layout__header promotion-detail__header">
+    @if(!$isLoading() || isUpdatingStatus){
+        <ion-toolbar>
+            <back-button [breadcrumbs]=" true" [viewTitle]="promotionName">
+                <ion-toggle #toggleBtn [checked]="$promotion()?.status === 'ACTIVE'" mode='ios'
+                    class="promotion-detail__header-toggle ob-toggle" color="primary" (ionChange)="updateStatus($event)"
+                    [slot]="'end'" />
+            </back-button>
+            <span class="promotion-detail__header-promotion-type">
+                {{"EVENT_DETAIL.PROMOTION_CARD.TYPE_OPTS." + $promotion()?.type | translate}}
+            </span>
+        </ion-toolbar>
+    }@else{
+        <ion-toolbar>
+            <back-button [breadcrumbs]="true" [viewTitle]="promotionName" />
+        </ion-toolbar>
+    }
+</ion-header>
+
+<ion-content class="ob-layout__content promotion-detail__content">
+    @if(isError){
+        <static-view
+        [viewContent]="{
+            title: 'ERROR-TITLE',
+            description: 'ERROR-DESCRIPTION',
+            isError: true,
+        }"
+        (tap)="reTry()" />
+    }@else {
+        @if(!$isLoading() || isUpdatingStatus){
+            <div>
+                <ion-accordion-group mode="ios" class="ob-accordion-group promotion-detail__accordion-group">
+                    <ion-accordion class="ob-accordion promotion-detail__accordion">
+                        <ion-item id="accordion-general-data" class="ob-accordion__title promotion-detail__accordion-title" slot="header"
+                            (click)="toggleActivatedClass($event)">
+                            <ion-label>{{"PROMOTION_DETAIL.ACCORDION_TITLES.GENERAL_DATA" | translate}}</ion-label>
+                        </ion-item>
+                        <div class="ob-accordion__content promotion-detail__accordion-content" slot="content">
+                            <div class="promotion-detail__accordion-text-block">
+                                <span class="promotion-detail__accordion-text--title">
+                                    {{"PROMOTION_DETAIL.ACCORDION_LANGUAGE" | translate}}
+                                </span>
+                                @if(promotionLang){
+                                    <span class="promotion-detail__accordion-text--value">
+                                        {{"LANG-SELECTOR." + promotionLang?.toUpperCase() | translate}}
+                                    </span>
+                                }
+                            </div>
+                            <div class="promotion-detail__accordion-text-block">
+                                <span class="promotion-detail__accordion-text--title">
+                                    {{"PROMOTION_DETAIL.ACCORDION_NAME" | translate}}
+                                </span>
+                                <span class="promotion-detail__accordion-text--value">
+                                    {{$promotion()?.name}}
+                                </span>
+                            </div>
+                            <div class="promotion-detail__accordion-text-block">
+                                <span class="promotion-detail__accordion-text--title">
+                                    {{"PROMOTION_DETAIL.ACCORDION_DESCRIPTION" | translate}}
+                                </span>
+                                <span class="promotion-detail__accordion-text--value">
+                                    {{promotionDescription ? promotionDescription : '-'}}
+                                </span>
+                            </div>
+                        </div>
+                    </ion-accordion>
+                    <ion-accordion class="ob-accordion promotion-detail__accordion">
+                        <ion-item id="accordion-limits-and-conditions" class="ob-accordion__title promotion-detail__accordion-title"
+                            slot="header" (click)="toggleActivatedClass($event)">
+                            <ion-label>{{"PROMOTION_DETAIL.ACCORDION_TITLES.LIMITS_AND_CONDITIONS" | translate}}</ion-label>
+                        </ion-item>
+                        <div class="ob-accordion__content promotion-detail__accordion-content" slot="content">
+                            @if($promotion()?.combinable === false){
+                                <div class="promotion-detail__accordion-text-block">
+                                    <span class="promotion-detail__accordion-text--title">
+                                        {{"PROMOTION_DETAIL.ACCORDION_CONDITIONS" | translate}}
+                                    </span>
+                                    <span class="promotion-detail__accordion-text--value">
+                                        {{"PROMOTION_DETAIL.ACCORDION_NOT_COMBINABLE" | translate}}
+                                    </span>
+                                </div>
+                            }
+                            <div class="promotion-detail__accordion-text-block">
+                                <span class="promotion-detail__accordion-text--title">
+                                    {{"PROMOTION_DETAIL.ACCORDION_VALIDATION_TIME" | translate}}
+                                </span>
+                                @if($promotion()?.validity_period?.type === 'PERIOD'){
+                                    <span class="promotion-detail__accordion-text--value">
+                                        {{$promotion()?.validity_period.start_date | dateTime: dateTimeFormats.shortDateTime }} -
+                                        {{$promotion()?.validity_period.end_date | dateTime: dateTimeFormats.shortDateTime }}
+                                    </span>
+                                }
+                                @if($promotion()?.validity_period?.type === 'EVENT'){
+                                    <span class="promotion-detail__accordion-text--value">
+                                        {{"PROMOTION_DETAIL.ACCORDION_PERIOD_EVENT" | translate }}
+                                    </span>
+                                }   
+                            </div>
+                            <div class="promotion-detail__accordion-divider"></div>
+                            <div class="promotion-detail__accordion-text-block">
+                                <span class="promotion-detail__accordion-text--title">
+                                    {{"PROMOTION_DETAIL.ACCORDION_CHANNELS" | translate}}
+                                </span>
+                                @if($promotionChannels()?.type === 'RESTRICTED'){
+                                    <span class="promotion-detail__accordion-text--value">
+                                    @if($promotionChannels().channels.length){
+                                        <div>
+                                            {{$promotionChannels().channels.length}}
+                                            @for (channel of $promotionChannels()?.channels; track $index) {
+                                                <span>
+                                                    {{channel.name}}
+                                                    {{$index === ($promotionChannels()?.channels.length -1) ? '' : ',&nbsp;' }}
+                                                </span>
+                                            }
+                                        </div>
+                                    }@else {
+                                        <ng-template>-</ng-template>
+                                    }
+                                    </span>
+                                }
+                                @if($promotionChannels()?.type === 'ALL'){
+                                    <span class="promotion-detail__accordion-text--value">
+                                        {{"PROMOTION_DETAIL.ACCORDION_ALL_CHANNELS" | translate}}
+                                    </span>
+                                }
+
+                            </div>
+                            <div class="promotion-detail__accordion-text-block">
+                                <span class="promotion-detail__accordion-text--title">
+                                    {{"PROMOTION_DETAIL.ACCORDION_EVENT_LIMITS" | translate}}
+                                </span>
+                                <span class="promotion-detail__accordion-text--value">
+                                    {{ $promotion()?.usage_limits.promotion_max.enabled ?
+                                    ("PROMOTION_DETAIL.ACCORDION_EVENT_TICKET_LIMIT" | translate: {
+                                    value: $promotion()?.usage_limits.promotion_max.limit }) : "-" }}
+                                </span>
+                            </div>
+                            <div class="promotion-detail__accordion-text-block">
+                                <span class="promotion-detail__accordion-text--title">
+                                    {{"PROMOTION_DETAIL.ACCORDION_SESSION_LIMITS" | translate}}
+                                </span>
+                                <span class="promotion-detail__accordion-text--value">
+                                    {{ $promotion()?.usage_limits.session_max.enabled ?
+                                    ("PROMOTION_DETAIL.ACCORDION_SESSION_TICKET_LIMIT" | translate: {
+                                    value: $promotion()?.usage_limits.session_max.limit }) : "-" }}
+                                </span>
+                            </div>
+                        </div>
+                    </ion-accordion>
+                    @if(($promotion()?.discount | json) !== ({} | json)){
+                        <ion-accordion class="ob-accordion promotion-detail__accordion">
+                            <ion-item id="accordion-discount-types" class="ob-accordion__title promotion-detail__accordion-title" 
+                                slot="header" (click)="toggleActivatedClass($event)">
+                                <ion-label>{{"PROMOTION_DETAIL.ACCORDION_TITLES.DISCOUNT_TYPES" | translate}}</ion-label>
+                            </ion-item>
+                            <div class="ob-accordion__content promotion-detail__accordion-content" slot="content">
+                                <div class="promotion-detail__accordion-text-block">
+                                    <span class="promotion-detail__accordion-text--title">
+                                        {{"PROMOTION_DETAIL.ACCORDION_DISCOUNT_TICKET" | translate}}
+                                    </span>
+
+                                    <div class="promotion-detail__accordion-text--value">
+                                        @switch($promotion()?.discount?.type){
+                                            @case(promotionDiscountTypes.percentage){
+                                                <div>
+                                                    {{("PROMOTION_DETAIL.DISCOUNT_TYPE_OPTS." +
+                                                     $promotion()?.discount.type| translate) + ": " + $promotion()?.discount.value + "%"}}
+                                                </div>
+                                            }
+                                            @case(promotionDiscountTypes.fixed){
+                                                <div>
+                                                    {{("PROMOTION_DETAIL.DISCOUNT_TYPE_OPTS." + 
+                                                    $promotion()?.discount.type| translate) + ": "+
+                                                    ($promotion()?.discount.value | localCurrency: $promotion()?.discount.currency_code)}}
+                                                </div>
+                                            }
+                                            @case(promotionDiscountTypes.basePrice){
+                                                <div>
+                                                    {{("PROMOTION_DETAIL.DISCOUNT_TYPE_OPTS."+
+                                                     $promotion()?.discount.type | translate)+": "}}
+                                                     @for( range of $promotion()?.discount.ranges; track $index){
+                                                        <div>
+                                                            <p>
+                                                                <span>
+                                                                    {{(range.from !== 0) ? (range.from
+                                                                     | localCurrency: $promotion()?.discount.currency_code)
+                                                                     : range.from + " - "}}
+                                                                </span>
+                                                                @if(range.to !== 0){
+                                                                    <span>
+                                                                        {{range.to | localCurrency: $promotion()?.discount.currency_code}}
+                                                                    </span>
+                                                                }
+                                                                @if(range.to === 0){
+                                                                    <ion-icon name="infinite-outline" />
+                                                                }                                 
+                                                                <span>
+                                                                    {{" = " + (range.value 
+                                                                    | localCurrency: $promotion()?.discount.currency_code) }}
+                                                                </span>
+                                                            </p>
+                                                        </div>
+                                                     }
+           
+                                                </div>
+                                            }
+                                            @case(promotionDiscountTypes.noDiscount){
+                                                <div>
+                                                    {{("PROMOTION_DETAIL.DISCOUNT_TYPE_OPTS."+ $promotion()?.discount.type | translate)}}
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </ion-accordion>
+                    }
+                    <ion-accordion class="ob-accordion promotion-detail__accordion">
+                        <ion-item id="accordion-assignment-zones" 
+                            class="ob-accordion__title promotion-detail__accordion-title"
+                            slot="header"(click)="toggleActivatedClass($event)">
+                            <ion-label>{{"PROMOTION_DETAIL.ACCORDION_TITLES.ASSIGNMENT_ZONES" | translate}}</ion-label>
+                        </ion-item>
+                        <div class="ob-accordion__content promotion-detail__accordion-content" slot="content">
+                            <div class="promotion-detail__accordion-text-block">
+                                <span class="promotion-detail__accordion-text--title">
+                                    {{"PROMOTION_DETAIL.ACCORDION_SESSIONS" | translate}}
+                                </span>
+                                @if($promotionSessions()?.type === 'RESTRICTED'){
+                                    <span class="promotion-detail__accordion-text--value">
+                                        {{getItemList($promotionSessions()?.sessions)}}
+                                    </span>
+                                }
+                                @if($promotionSessions()?.type === 'ALL'){
+                                    <span class="promotion-detail__accordion-text--value">
+                                        {{"PROMOTION_DETAIL.ACCORDION_ALL_SESSIONS" | translate}}
+                                    </span>
+                                }
+                            </div>
+                            <div class="promotion-detail__accordion-text-block">
+                                <span class="promotion-detail__accordion-text--title">
+                                    {{"PROMOTION_DETAIL.ACCORDION_PRICE_ZONES" | translate}}
+                                </span>
+                                @if($promotionPriceTypes()?.type === 'RESTRICTED'){
+                                    <span class="promotion-detail__accordion-text--value">
+                                        {{getItemList($promotionPriceTypes()?.price_types)}}
+                                    </span>
+                                }
+                                @if($promotionPriceTypes()?.type === 'ALL'){
+                                    <span class="promotion-detail__accordion-text--value">
+                                        {{"PROMOTION_DETAIL.ACCORDION_ALL_PRICES" | translate}}
+                                    </span>
+                                }
+                            </div>
+                            <div class="promotion-detail__accordion-text-block">
+                                <span class="promotion-detail__accordion-text--title">
+                                    {{"PROMOTION_DETAIL.ACCORDION_RATES" | translate}}
+                                </span>
+                                @if($promotionRates()?.type === 'RESTRICTED'){
+                                    <span class="promotion-detail__accordion-text--value">
+                                        {{getItemList($promotionRates()?.rates)}}
+                                    </span>
+                                }
+                                @if($promotionRates()?.type === 'ALL'){
+                                    <span class="promotion-detail__accordion-text--value">
+                                        {{"PROMOTION_DETAIL.ACCORDION_ALL_RATES" | translate}}
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </ion-accordion>
+    
+                </ion-accordion-group>
+            </div>
+        }@else {
+            <ion-accordion-group mode="ios" class="ob-accordion-group promotion-detail__accordion-group">
+                <ion-accordion class="ob-accordion promotion-detail__accordion">
+                    <ion-item class="ob-accordion__title promotion-detail__accordion-title" slot="header">
+                        <ion-skeleton-text class="skeleton__accordion" [animated]="true" />
+                    </ion-item>
+                </ion-accordion>
+            </ion-accordion-group>
+        }
+    }
+</ion-content>

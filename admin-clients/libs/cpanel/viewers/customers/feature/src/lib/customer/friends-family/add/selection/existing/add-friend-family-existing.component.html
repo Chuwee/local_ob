@@ -1,0 +1,46 @@
+<div class="customers-filter-container flex items-center gap-5">
+    <div class="search-field flex-[1_1_100%] basis-1/2">
+        <app-search-input [placeholder]="('CUSTOMER.MANAGED_CUSTOMERS.SEARCH' | translate)" />
+    </div>
+</div>
+<div class="customers-list-container flex flex-col">
+    @if ((isLoading$ | async) === false && $isContextNotificationShown()) {
+        <div class="context-notification-container">
+            <app-context-notification class="ob-context-notification" contextType="info" >
+                {{'LIST.EMPTY' | translate}}
+            </app-context-notification>
+        </div>
+    }
+
+    @if ((isLoading$ | async) === false && $isListShown()) {
+        <mat-selection-list [formControl]="$existingCustomerCtrl()" [multiple]="false" [compareWith]="compareWith"
+            class="ob-grid-select-list customers-select-list">
+            @for (customerToBeFriend of $customersToBeFriend(); track customerToBeFriend) {
+                <mat-list-option color="primary" [value]="customerToBeFriend" [disabled]="customerToBeFriend.disabled"
+                    [id]="'customer-list-option-' + customerToBeFriend.id">
+                    <div class="flex">
+                        <div class="main flex flex-col basis-4/5">
+                            <p class="card-title" appEllipsify
+                               [matTooltip]="customerToBeFriend.name + ' ' + customerToBeFriend.surname">
+                                {{customerToBeFriend.name}} {{customerToBeFriend.surname}}
+                            </p>
+                            <p class="card-text" appEllipsify
+                               [matTooltip]="customerToBeFriend.email">
+                                {{customerToBeFriend.email}}
+                            </p>
+                        </div>
+                        <div class="ob-summary-value right-side flex flex-col basis-1/5">
+                            <p class="label primary">{{'CUSTOMER.MEMBER_ID' | translate}}</p>
+                            <p class="value grey" appEllipsify
+                               [matTooltip]="customerToBeFriend.member_data?.id">
+                                {{customerToBeFriend.member_data?.id || '-'}}
+                            </p>
+                        </div>
+                    </div>
+                </mat-list-option>
+            }
+
+        </mat-selection-list>
+    }
+
+</div>

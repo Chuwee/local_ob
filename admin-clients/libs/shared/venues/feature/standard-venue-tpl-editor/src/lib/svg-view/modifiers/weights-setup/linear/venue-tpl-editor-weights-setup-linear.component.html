@@ -1,0 +1,51 @@
+<ng-container xmlns:svg="http://www.w3.org/2000/svg">
+    <svg:g *ngIf="viewBox$ | async as viewBox">
+        <svg:defs>
+            <!--GRADIENT-->
+            <svg:linearGradient id="linearGradient" gradientTransform="rotate(90)">
+                <svg:stop *ngFor="let color of keyColors, let index = index" [attr.stop-color]="color" [attr.offset]="0.25 * index">
+                </svg:stop>
+            </svg:linearGradient>
+            <!-- SEATS MASK -->
+            <svg:mask id="seatsMask">
+                <g [innerHTML]="seatsMask$ | async"></g>
+            </svg:mask>
+        </svg:defs>
+        <!-- SEATS COLORS USING GRADIENT AND MASK -->
+        <svg:g *ngIf="gradientCoords$ | async as coords" mask="url(#seatsMask)">
+            <svg:g [attr.transform]="'translate(' + coords.midPoint.x + ',' + coords.midPoint.y + '), rotate(' + coords.rotation + ')'">
+                <svg:rect [attr.fill]="firstKeyColor"
+                    [attr.x]="-coords.height" [attr.y]="-coords.height" [attr.width]="coords.width" [attr.height]="coords.height">
+                </svg:rect>
+                <svg:rect [attr.fill]="lastKeyColor"
+                    [attr.x]="-coords.height" [attr.width]="coords.width" [attr.height]="coords.height">
+                </svg:rect>
+                <svg:rect [attr.x]="-coords.height" [attr.y]="-coords.gradientHeight / 2"
+                    [attr.width]="coords.width" [attr.height]="coords.gradientHeight" fill="url(#linearGradient)">
+                </svg:rect>
+            </svg:g>
+        </svg:g>
+        <!-- SEATS STROKE -->
+        <g [innerHTML]="seatsStrokes$ | async"></g>
+        <!-- CONTROLS -->
+        <ng-container *ngIf="controlsData$ | async as cData">
+            <ng-container *ngIf="!cData.emitPreCommit else saverContainer">
+                <svg:polyline class="controls-line-shadow"
+                    [attr.points]="cData.point1.x + ',' + cData.point1.y + ' ' + cData.point2.x + ',' + cData.point2.y"></svg:polyline>
+                <svg:polyline class="controls-line"
+                    [attr.points]="cData.point1.x + ',' + cData.point1.y + ' ' + cData.point2.x + ',' + cData.point2.y"></svg:polyline>
+                <svg:g [attr.transform]="'translate(' + cData.point1.x + ',' + cData.point1.y + '), scale(' + (invScale$ | async) + ')'"
+                    appEditorPointControl (move)="moveInit('first')"></svg:g>
+                <svg:g [attr.transform]="'translate(' + cData.point2.x + ',' + cData.point2.y + '), scale(' + (invScale$ | async) + ')'"
+                    appEditorPointControl (move)="moveInit('second')"></svg:g>
+                <svg:rect *ngIf="cData.currentMovingPoint" class="interactive-overlay"
+                    [attr.width]="viewBox[2]" [attr.height]="viewBox[3]"
+                    (mousemove)="movePoint($event)" (mouseup)="moveEnd()" (mouseenter)="moveCheck($event)">
+                </svg:rect>
+            </ng-container>
+            <ng-template #saverContainer>
+                <ng-container *ngIf="saver$ | async"></ng-container><!-- saver template subscription triggers the pre commit process)-->
+            </ng-template>
+        </ng-container>
+    </svg:g>
+</ng-container>

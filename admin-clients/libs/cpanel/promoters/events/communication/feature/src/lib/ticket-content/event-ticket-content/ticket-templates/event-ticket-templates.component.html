@@ -1,0 +1,144 @@
+<form id="templates" class="templates-form" [formGroup]="templatesForm" fxLayout="column">
+    <div class="templates-row" fxFlex="100%" fxLayout="row" fxLayoutAlign="start center">
+        @if(allowGroups) {
+            <div class="templates-type" fxFlex="125px">
+                {{'EVENTS.COMMUNICATION.INDIVIDUAL.TITLE' | translate}}
+            </div>
+        }
+        <mat-form-field appearance="outline" class="ob-form-field inline-field field-with-label" fxFlex="200px">
+            <mat-label class="template-label">{{'EVENTS.COMMUNICATION.TEMPLATE_PDF' | translate}}</mat-label>
+            <mat-icon matPrefix class="ob-icon small" svgIcon="ticket-pdf" />
+            <mat-select hideSingleSelectionIndicator [placeholder]="(templatesPdf.length === 0 ?
+                'EVENTS.COMMUNICATION.EMPTY_TEMPLATE_LIST' : 'FORMS.SELECT.PLACE_HOLDER') | translate" formControlName="singlePdfTemplate">
+                @for (template of templatesPdf; track template.id) {
+                    <mat-option [value]="template.id" fxLayout="row" fxLayoutGap="8px">
+                        <span fxFlex appEllipsify class="ellipsify-no-wrap" [matTooltip]="template.name">{{template.name}}</span>
+                        @if(template.default) {
+                            <mat-icon svgIcon="star-icon" class="no-margin mat-icon-no-color star" />
+                        }
+                    </mat-option>
+                }
+
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="ob-form-field inline-field field-with-label" fxFlex="200px">
+            <mat-label class="template-label">{{'EVENTS.COMMUNICATION.TEMPLATE_TICKET' | translate}}</mat-label>
+            <mat-icon matPrefix class="ob-icon small" svgIcon="ticket-printer" />
+            <mat-select hideSingleSelectionIndicator [placeholder]="(templatesPrinter.length === 0 ?
+                'EVENTS.COMMUNICATION.EMPTY_TEMPLATE_LIST' : 'FORMS.SELECT.PLACE_HOLDER') | translate"
+                formControlName="singlePrinterTemplate">
+                @for (template of templatesPrinter; track template.id) {
+                    <mat-option [value]="template.id" fxLayout="row" fxLayoutGap="8px">
+                        <span fxFlex appEllipsify class="ellipsify-no-wrap" [matTooltip]="template.name">{{template.name}}</span>
+                        @if(template.default) {
+                            <mat-icon svgIcon="star-icon" class="no-margin mat-icon-no-color star" />
+                        }
+                    </mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+        @if(passbookEnabled) {
+            <ng-container>
+                <mat-form-field appearance="outline" class="ob-form-field inline-field  field-with-label" fxFlex="200px">
+                    <mat-label class="template-label">{{'EVENTS.COMMUNICATION.TEMPLATE_PASSBOOK' | translate}}</mat-label>
+                    <mat-icon matPrefix class="ob-icon small" svgIcon="ticket-passbook" />
+                    <mat-select hideSingleSelectionIndicator [placeholder]="(templatesPassbook.length === 0 ?
+                        'EVENTS.COMMUNICATION.EMPTY_TEMPLATE_LIST' : 'FORMS.SELECT.PLACE_HOLDER') | translate"
+                        formControlName="singlePassbookTemplate">
+                        @for (template of templatesPassbook; track template.code) {
+                            <mat-option [value]="template.code" fxLayout="row" fxLayoutGap="8px">
+                                <span fxFlex appEllipsify class="ellipsify-no-wrap"
+                                    [matTooltip]="template.name">{{template.name}}</span>
+                                @if(template.default_passbook) {
+                                    <mat-icon svgIcon="star-icon" class="no-margin mat-icon-no-color star" />
+                                }
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+                @if(seasonPackEnabled) {
+                    <mat-form-field appearance="outline" class="ob-form-field inline-field  field-with-label" fxFlex="200px">
+                        <mat-label class="template-label">{{'EVENTS.COMMUNICATION.TEMPLATE_PASSBOOK_SEASON_PACK' | translate}}
+                        </mat-label>
+                        <mat-icon matPrefix class="ob-icon small" svgIcon="ticket-passbook" />
+                        <mat-select hideSingleSelectionIndicator [placeholder]="(templatesPassbook.length === 0 ?
+                        'EVENTS.COMMUNICATION.EMPTY_TEMPLATE_LIST' : 'FORMS.SELECT.PLACE_HOLDER') | translate"
+                            formControlName="passbookSeasonPackTemplate">
+                            @for (template of templatesPassbook; track template.code) {
+                                <mat-option [value]="template.code" fxLayout="row" fxLayoutGap="8px">
+                                    <span fxFlex appEllipsify class="ellipsify-no-wrap"
+                                        [matTooltip]="template.name">{{template.name}}</span>
+                                    @if(template.default_passbook) {
+                                        <mat-icon svgIcon="star-icon" class="no-margin mat-icon-no-color star" />
+                                    }
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                }
+            </ng-container>
+        }
+
+    </div>
+    @if(allowGroups) {
+        <mat-divider />
+        <div class="templates-row" fxFlex="100%" fxLayout="row" fxLayoutAlign="start center">
+            <div class="templates-type" fxFlex="125px">
+                {{'EVENTS.COMMUNICATION.GROUP.TITLE' | translate}}
+            </div>
+            <mat-form-field appearance="outline" class="ob-form-field inline-field" fxFlex="200px">
+                <mat-label class="template-label">{{'EVENTS.COMMUNICATION.TEMPLATE_PDF' | translate}}</mat-label>
+                <mat-icon matPrefix class="ob-icon small" svgIcon="ticket-pdf" />
+                <mat-select hideSingleSelectionIndicator [placeholder]="(templatesPdf.length === 0 ?
+                    'EVENTS.COMMUNICATION.EMPTY_TEMPLATE_LIST' : 'FORMS.SELECT.PLACE_HOLDER') | translate"
+                    formControlName="groupPdfTemplate">
+                    @for (template of templatesPdf; track template.id) {
+                        <mat-option [value]="template.id" fxLayout="row" fxLayoutGap="8px">
+                            <span fxFlex appEllipsify class="ellipsify-no-wrap" [matTooltip]="template.name">{{template.name}}</span>
+                            @if(template.default) {
+                                <mat-icon svgIcon="star-icon" class="no-margin mat-icon-no-color star" />
+                            }
+                        </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field inline-field" fxFlex="200px">
+                <mat-label class="template-label">{{'EVENTS.COMMUNICATION.TEMPLATE_TICKET' | translate}}</mat-label>
+                <mat-icon matPrefix class="ob-icon small" svgIcon="ticket-printer" />
+                <mat-select hideSingleSelectionIndicator [placeholder]="(templatesPrinter.length === 0 ?
+                    'EVENTS.COMMUNICATION.EMPTY_TEMPLATE_LIST' : 'FORMS.SELECT.PLACE_HOLDER') | translate"
+                    formControlName="groupPrinterTemplate">
+                    @for (template of templatesPrinter; track template.id) {
+                        <mat-option [value]="template.id" fxLayout="row" fxLayoutGap="8px">
+                            <span fxFlex appEllipsify class="ellipsify-no-wrap" [matTooltip]="template.name">{{template.name}}</span>
+                            @if(template.default) {
+                                <mat-icon svgIcon="star-icon" class="no-margin mat-icon-no-color star" />
+                            }
+                        </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            @if(passbookEnabled) {
+                <ng-container>
+                    <mat-form-field appearance="outline" class="ob-form-field inline-field" fxFlex="200px">
+                        <mat-label class="template-label">{{'EVENTS.COMMUNICATION.TEMPLATE_PASSBOOK' | translate}}</mat-label>
+                        <mat-icon matPrefix class="ob-icon small" svgIcon="ticket-passbook" />
+                        <mat-select hideSingleSelectionIndicator [placeholder]="(templatesPassbook.length === 0 ?
+                            'EVENTS.COMMUNICATION.EMPTY_TEMPLATE_LIST' : 'FORMS.SELECT.PLACE_HOLDER') | translate"
+                            formControlName="groupPassbookTemplate">
+                            @for (template of templatesPassbook; track template.code) {
+                                <mat-option [value]="template.code" fxLayout="row" fxLayoutGap="8px">
+                                    <span fxFlex appEllipsify class="ellipsify-no-wrap"
+                                        [matTooltip]="template.name">{{template.name}}</span>
+                                    @if(template.default_passbook) {
+                                        <mat-icon svgIcon="star-icon" class="no-margin mat-icon-no-color star" />
+                                    }
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </ng-container>
+            }
+        </div>
+    }
+</form>

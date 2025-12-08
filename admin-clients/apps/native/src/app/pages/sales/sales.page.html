@@ -1,0 +1,162 @@
+<ion-header class="ob-layout__header">
+    <ion-toolbar>
+        <div class="sales-page__header">
+            <h1 class="sales-page__header-username">
+                {{'TABS.SALES' | translate}}
+            </h1>
+            <div class="sales-page__header-circle-monogram" (click)="goToProfile()">
+                <div>{{ $initials() }}</div>
+            </div>
+        </div>
+    </ion-toolbar>
+    <div class="sales-page__segment">
+        <ion-segment class="sales-page__segment-selector" [value]="segmentValue" (ionChange)="onSegmentValueChange($event)">
+            @if(isRoleTickets){
+                <ion-segment-button class="sales-page__segment-option" value="tickets">
+                    <ion-label class="sales-page__segment-label">{{ "TICKETS.TITLE" | translate }}</ion-label>
+                </ion-segment-button>
+            }
+            @if(isRoleTransactions){
+                <ion-segment-button  class="sales-page__segment-option" value="transactions">
+                    <ion-label class="sales-page__segment-label">{{ "TRANSACTIONS.TITLE" | translate }}</ion-label>
+                </ion-segment-button>
+            }
+        </ion-segment>
+    </div>
+</ion-header>
+
+<ion-content class="ob-layout__content">
+    @if(isRoleTickets || isRoleTransactions){
+        <div #content>
+            <div class="sales-page__search-bar" slot="fixed">
+                <ion-searchbar class="ob-search-bar qr" placeholder="{{'SALES.FILTER_INPUT_PLACEHOLDER' | translate}}"
+                    (ionChange)="onSearch($event)" (ionInput)="onClear()" searchIcon="./assets/media/icons/lens.svg" [value]="inputValue" />
+                <ion-button fill="clear" class="btn-filter" (click)="goToFilters()">
+                    <ion-icon slot="icon-only" src="./assets/media/icons/filter_list.svg" />
+                </ion-button>
+                <ion-button fill="clear" class="btn-calendar" (click)="goToCalendar()">
+                    <ion-icon slot="icon-only" src="./assets/media/icons/calendar.svg" />
+                </ion-button>
+            </div>
+            <div class="sales-page__content">
+                @if($isLoading() && !ionInfinite){
+                    <div class="sales-page__kpis">
+                        <div class="sales-page__kpi sales-page__kpi--skeleton">
+                            <span class="sales-page__kpi-amount"><ion-skeleton-text [animated]="true" /></span>
+                            <span class="sales-page__kpi-title"><ion-skeleton-text [animated]="true" /></span>
+                        </div>
+                    </div>
+                } @else {
+                        <div class="sales-page__kpis">
+                            @if(sales[this.segmentValue].appliedSearchFilters.currency_code){
+                                @for(kpi of sales[segmentValue].kpis; track $index ){
+                                    <div class="sales-page__kpi">
+                                        @if(kpi.name === 'products' || kpi.name === 'transactions'){
+                                            <span class="sales-page__kpi-amount">
+                                                {{kpi.amount}}
+                                            </span>
+                                        }
+                                        @if(kpi.name !== 'products' && kpi.name !== 'transactions'){
+                                            <span class="sales-page__kpi-amount">
+                                                {{kpi.amount | localCurrency: sales[this.segmentValue].appliedSearchFilters.currency_code}}
+                                            </span>
+                                        }
+                                        <span class="sales-page__kpi-title">
+                                            {{"SALES.KPI-" + kpi.name.toUpperCase() | translate}}</span>
+                                    </div>
+                                }
+                            } @else {
+                                @if(segmentValue === 'tickets'){
+                                    <div class="sales-page__kpi">
+                                        <span class="sales-page__kpi-amount">
+                                            {{this.sales.tickets.totalResultsCounter}}
+                                        </span>
+                                        <span class="sales-page__kpi-title">
+                                            {{"SALES.KPI-PRODUCTS" | translate}}</span>
+                                    </div>
+                                }
+                                @if(segmentValue === 'transactions'){
+                                    <div class="sales-page__kpi">
+                                        <span class="sales-page__kpi-amount">
+                                            {{this.sales.transactions.totalResultsCounter}}
+                                        </span>
+                                        <span class="sales-page__kpi-title">
+                                            {{"SALES.KPI-TRANSACTIONS" | translate}}</span>
+                                    </div>
+                                }
+                                
+                            }    
+                        </div>
+                } 
+    
+                <div class="sales-page__search-results">
+                    @if(listOfFilterBubbles?.length){
+                        <div class="sales-page__filters">
+                            <ion-text class="sales-page__filters-filter-label">{{ "SALES.FILTERS" | translate }}</ion-text>
+                            @for(filterBubble of listOfFilterBubbles; track $index){
+                                <ion-col>
+                                    <ion-chip [outline]="true">
+                                        <ion-label>{{filterBubble.label }} </ion-label>
+                                        <ion-icon (click)="removeBubbleFilter(filterBubble.name)" name="close" />
+                                    </ion-chip>
+                                </ion-col>
+                            }
+                        </div>
+                    }    
+                    <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+                        <ion-refresher-content />
+                    </ion-refresher>
+                    @if(!$isLoading() && sales[segmentValue].totalResultsCounter === 0){
+                        <static-view [viewContent]="{      title: 'NO-RESULTS-TITLE', description: 'NO-RESULTS-DESCRIPTION'}"/>
+                    } @else {
+                        @if(!$isLoading()){
+                            <ion-text class="sales-page__result-block-info">
+                                <span>
+                                    {{ "SALES.TOTAL-"+segmentValue.toUpperCase()+"-RESULTS" | translate: {number:
+                                    sales[segmentValue].totalResultsCounter} }}
+                                </span>
+                            </ion-text>
+                        }
+                        @if(!$isLoading() || ionInfinite){
+                            <ion-list class="sales-page__list">
+                                @for(item of sales[segmentValue].searchedResults; track $index){
+                                    <ion-item>
+                                        @if(segmentValue === 'tickets'){
+                                            <ticket-card class="sales-page__card" [ticket]="item"/>
+                                        }
+                                        @if(segmentValue === 'transactions'){
+                                            <transaction-card class="sales-page__card" [transaction]="item"/>
+                                        }
+                                    </ion-item>
+                                }
+                            </ion-list>
+                        } @else {
+                            <ion-list class="sales-page__list">
+                                <ion-item>
+                                    <skeleton-card class="sales-page__card" />
+                                </ion-item>
+                            </ion-list>
+                            <ion-list class="sales-page__ticket-list">
+                                <ion-item>
+                                    <skeleton-card class="sales-page__ticket-card" />
+                                </ion-item>
+                            </ion-list>    
+                        }
+                        <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+                            <ion-infinite-scroll-content />
+                        </ion-infinite-scroll>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</ion-content>
+
+<modal [isOpen]="calendarModalIsOpen" (openModal)="calendarSelector.checkContent()" (closeModal)="closeCalendar()">
+    @if(calendarModalIsOpen){
+        <calendar-selector #calendarSelector [selectedTime]="{
+            timeFrom: sales[segmentValue].appliedSearchFilters.purchase_date_from,
+            timeTo: sales[segmentValue].appliedSearchFilters.purchase_date_to
+        }" (selectDate)="updateFiltersCalendar($event)" />
+    }
+</modal>

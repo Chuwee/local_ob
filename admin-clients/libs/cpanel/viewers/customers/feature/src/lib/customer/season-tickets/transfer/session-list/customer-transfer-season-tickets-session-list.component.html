@@ -1,0 +1,126 @@
+<div fxLayout="column" fxFlex="0 1 100%" class="list-container">
+    <div class="list-container" fxFlex="0 1 100%" fxLayout="column">
+        <div fxLayout="row" fxFlex="0 1 50px" fxLayoutAlign="flex-end center">
+            <mat-paginator hidePageSize fxFlex="0 0 auto" class="with-range-label transparent" />
+        </div>
+        <div fxFlex="auto" class="table-container" fxLayout="column">
+            <mat-table fxFlex class="ob-table" [dataSource]="seasonTicketSessions$ | async" matSort [matSortActive]="initSortCol"
+                [matSortDirection]="initSortDir" matSortDisableClear
+                [attr.aria-label]="'CUSTOMER.TRANSFER.SEASON_TICKETS.SESSION_LIST.TABLE' | translate"
+                [class.not-touchable]="(isHandsetOrTablet$ | async) !== true">
+                <ng-container matColumnDef="session_name">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header="session_name"
+                        class="head-cell">{{'CUSTOMER.TRANSFER.SEASON_TICKETS.SESSION_LIST.SESSION_NAME' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{row.session_name}}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="session_starting_date">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header="session_starting_date" class="head-cell">
+                        {{'CUSTOMER.TRANSFER.SEASON_TICKETS.SESSION_LIST.SESSION_DATE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        {{row.session_starting_date | dateTime : dateTimeFormats.shortDate}}
+                        {{row.session_starting_date | dateTime : dateTimeFormats.shortTime}}
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="transferred_to">
+                    <mat-header-cell *matHeaderCellDef
+                        class="head-cell">{{'CUSTOMER.TRANSFER.SEASON_TICKETS.SESSION_LIST.TRANSFERRED_TO' | translate}}
+                    </mat-header-cell>
+                    <mat-cell
+                        *matCellDef="let row">{{row.transferSession.data?.name}} {{row.transferSession.data?.surname}} </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="delivery_method">
+                    <mat-header-cell *matHeaderCellDef
+                        class="head-cell">{{'CUSTOMER.TRANSFER.SEASON_TICKETS.SESSION_LIST.DELIVERY_METHOD.HEADER' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        {{row.transferSession.delivery_method ?
+                        ('CUSTOMER.TRANSFER.SEASON_TICKETS.SESSION_LIST.DELIVERY_METHOD.TYPE_OPTS.'
+                        + row.transferSession.delivery_method | translate) : ''}}
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="transfer_date">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'CUSTOMER.TRANSFER.SEASON_TICKETS.SESSION_LIST.TRANSFER_DATE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        {{row.transferSession.data?.date | dateTime : dateTimeFormats.shortDate}}
+                        {{row.transferSession.data?.date | dateTime : dateTimeFormats.shortTime}}
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="transferred_by">
+                    <mat-header-cell *matHeaderCellDef
+                        class="head-cell">{{'CUSTOMER.TRANSFER.SEASON_TICKETS.SESSION_LIST.TRANSFERRED_BY.HEADER' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        {{row.transferSession.request_user?.type ?
+                        ('CUSTOMER.TRANSFER.SEASON_TICKETS.SESSION_LIST.TRANSFERRED_BY.TYPE_OPTS.'
+                        + row.transferSession.request_user?.type | translate) : ''}}
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="session_status">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'CUSTOMER.TRANSFER.SEASON_TICKETS.SESSION_LIST.STATUS' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row" class="status-cell">
+                        @if (row.transferSession?.status && row.transferSession?.status !== seasonTicketTransferStatus.inSeason) {
+                            <span [ngClass]="['status-dot', row.transferSession?.status.toLowerCase()]"></span>
+                            <span appEllipsify [matTooltip]="'CUSTOMER.STATUS_OPTS.' + row.transferSession?.status | translate">
+                                {{'CUSTOMER.STATUS_OPTS.' + row.transferSession?.status | translate}}
+                            </span>
+                        }
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="actions">
+                    <mat-header-cell *matHeaderCellDef
+                        class="button-actions-cell head-cell" />
+                    <mat-cell *matCellDef="let row" class="button-actions-cell">
+                        @if (row.transferSession.showTransfer && $isSeasonTicketStatusReady()) {
+                            <button mat-stroked-button color="primary" class="ob-button medium" (click)="openTransferDialog(row)">
+                                {{'CUSTOMER.TRANSFER.SEASON_TICKETS.SESSION_LIST.TRANSFER_BUTTON' | translate}}
+                            </button>
+                        }
+                        @if (row.transferSession.showRecover && $isSeasonTicketStatusReady()) {
+                            <button mat-stroked-button color="tertiary" class="ob-button medium" (click)="openRecoverDialog(row)">
+                                {{'CUSTOMER.TRANSFER.SEASON_TICKETS.SESSION_LIST.RECOVER_BUTTON' | translate}}
+                            </button>
+                        }
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="transfer_actions">
+                    <mat-header-cell *matHeaderCellDef
+                        class="menu-button-actions-cell head-cell" />
+                    <mat-cell *matCellDef="let row" class="menu-button-actions-cell">
+                        @if (row.transferSession.status === seasonTicketTransferStatus.transferred && $isSeasonTicketStatusReady()) {
+                            <button mat-stroked-button color="tertiary" class="ob-button medium only-icon"
+                                    [matMenuTriggerFor]="ticketsMenu">
+                                <mat-icon>more_horiz</mat-icon>
+                            </button>
+                        }
+                        <mat-menu #ticketsMenu="matMenu">
+                            <button mat-menu-item (click)="openResendEmailDialog(row)" [disabled]="!row.transferSession.data?.email">
+                                {{'CUSTOMER.TRANSFER.SEASON_TICKETS.SESSION_LIST.RESEND' | translate}}
+                            </button>
+                            <button mat-menu-item (click)="downloadTickets(row)">
+                                {{'CUSTOMER.TRANSFER.SEASON_TICKETS.SESSION_LIST.DOWNLOAD' | translate}}
+                            </button>
+                        </mat-menu>
+                    </mat-cell>
+                </ng-container>
+                <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="dense-row" />
+                <mat-row *matRowDef="let row; columns: displayedColumns;" class="dense-row hoverable-row" />
+            </mat-table>
+            @if ((isLoading$ | async) === false && !(seasonTicketSessions$ | async)?.length) {
+                <app-empty-state-tiny fxFlex [title]="'CUSTOMER.TRANSFER.SEASON_TICKETS.SESSION_LIST.EMPTY_LIST_TITLE' | translate"
+                                      [description]="'CUSTOMER.TRANSFER.SEASON_TICKETS.SESSION_LIST.EMPTY_LIST_MESSAGE' | translate" />
+            }
+        </div>
+    </div>
+</div>
+@if (isLoading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}
+

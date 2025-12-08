@@ -1,0 +1,99 @@
+<div class="list-container" fxFlex="0 1 100%" fxLayout="column">
+    <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">
+                {{'TITLES.CURRENCIES.CURRENCIES_LIST_TITLE' | translate}}
+            </h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+            <div class="filter-container" fxFlex="none">
+                <button mat-icon-button class="ob-button medium" aria-label="refresh" (click)="refresh()">
+                    <mat-icon>autorenew</mat-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="spinner-container" *ngIf="loadingData$ | async">
+        <mat-spinner></mat-spinner>
+    </div>
+    <mat-table class="ob-table" [dataSource]="currencies$ | async" matSort [matSortActive]="initSortCol" [matSortDirection]="initSortDir"
+        matSortDisableClear [attr.aria-label]="'TITLES.CURRENCIES.CURRENCIES_LIST_TITLE' | translate"
+        [class.not-touchable]="(isHandsetOrTablet$ | async) !== true">
+        <ng-container matColumnDef="supplier">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'CURRENCIES.SUPPLIER' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span appEllipsify [matTooltip]="row.supplier" matTooltipClass="ob-tooltip-nowrap">
+                    {{row.supplier}}
+                </span>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="source">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'CURRENCIES.SUPPLIER_CURRENCY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span>{{row.source}}</span>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="target">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'CURRENCIES.HUB_CURRENCY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span>{{row.target}}</span>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="rate">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell with-divider">
+                {{'CURRENCIES.EXCHANGE_RATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="with-divider">
+                <span>{{row.rate}}</span>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="last_update">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'CURRENCIES.LAST_UPDATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span>{{row.last_update}}</span>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="modifier">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'CURRENCIES.USER' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span appEllipsify [matTooltip]="row.modifier" matTooltipClass="ob-tooltip-nowrap">
+                    {{row.modifier}}
+                </span>
+            </mat-cell>
+        </ng-container>
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="head-cell" [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                <div class="action-buttons" (click)="$event.stopPropagation()">
+                    <button mat-icon-button aria-label="Modify exchange rate" class="ob-button medium"
+                        (click)="openModifyExchangeRateDialog(row)" *ngIf="hasWritePermissions$ | async">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                </div>
+            </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'interactive-row': row.has_transitions}" matRipple
+            (click)="open(row)" [class.ob-row-selected]="(clickedRow$ | async) === row"
+            [matRippleDisabled]="!row.has_transitions"></mat-row>
+    </mat-table>
+    <div class="context-notification-container" fxFlex="0 50 100%" *ngIf="((currenciesMetadata$ | async)?.total === 0)"
+        fxLayout="row" fxLayoutAlign="center start">
+        <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px"
+            fxFlex="80%" fxLayoutAlign="center start">
+            <p>{{'LIST.EMPTY' | translate}}</p>
+        </app-context-notification>
+    </div>
+</div>

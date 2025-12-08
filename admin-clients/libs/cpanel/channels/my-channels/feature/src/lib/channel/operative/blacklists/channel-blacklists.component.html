@@ -1,0 +1,123 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" class="no-top-padding overflow-y-auto"
+    [disabled]="(isInProgress$ | async) || !form.dirty">
+    <div [formGroup]="form" fxLayout="row wrap" fxLayoutGap.gt-sm="40px">
+        <div fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 20px)" fxLayout="column">
+            <div class="blacklist-status-container">
+                <mat-slide-toggle class="ob-slide-toggle" formControlName="emailsBlacklistEnabled">
+                    {{'CHANNELS.BLACKLISTS.EMAILS_SWITCH' | translate}}
+                </mat-slide-toggle>
+            </div>
+            <div class="buttons-container" fxLayoutAlign="end start" fxLayoutGap="10px">
+                <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                    (click)="openCreateBlacklistItemDialog(channelBlacklistTypes.email)">
+                    <mat-icon>add</mat-icon>
+                    {{'CHANNELS.BLACKLISTS.NEW_EMAIL_ITEM_BTN' | translate}}
+                </button>
+                <button mat-stroked-button color="tertiary" class="ob-button medium only-icon"
+                    [matTooltip]="'FORMS.ACTIONS.MORE' | translate" [matMenuTriggerFor]="emailsBlacklistMenu">
+                    <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #emailsBlacklistMenu="matMenu" xPosition="before">
+                    <button mat-menu-item appUploadFile accept=".csv"
+                        (fileChange)="handleFileInput(channelBlacklistTypes.email, $event)">
+                        {{'CHANNELS.BLACKLISTS.UPLOAD_CSV_BTN' | translate}}
+                    </button>
+                    <button mat-menu-item [appDownloadFile]="CSV_TPLS[channelBlacklistTypes.email]">
+                        {{'CHANNELS.BLACKLISTS.DOWNLOAD_CSV_TPL_BTN' | translate}}
+                    </button>
+                    <button mat-menu-item [disabled]="(emailBlacklistMetadata$ | async)?.total === 0"
+                        (click)="openDeleteBlacklistDialog(channelBlacklistTypes.email)">
+                        {{'CHANNELS.BLACKLISTS.DELETE_BLACKLIST_BTN' | translate}}
+                    </button>
+                </mat-menu>
+            </div>
+            <app-searchable-paginated-list fxFlex="1 1 100%" fxLayout="column" [hoverable]="true"
+                [placeholder]="'FORMS.SEARCH.IN_LIST' | translate"
+                (loadData)="filterChangeHandler(channelBlacklistTypes.email, $event)" [data$]="emailBlacklistData$"
+                [metadata$]="emailBlacklistMetadata$" [loading$]="emailBlacklistInProgress$">
+                <div slot="subheader" class="list-header with-action-button">
+                    <div fxFlex="0 1 100%" fxLayoutAlign="space-between">
+                        <span>{{'FORMS.LABELS.EMAIL' | translate}}</span>
+                        <span>{{'FORMS.LABELS.CREATION_DATE' | translate}}</span>
+                    </div>
+                </div>
+                <ng-template #optionTemplate let-row>
+                    <div fxFlex fxLayoutAlign="space-between" class="blacklist-item">
+                        <span>{{row.value}}</span>
+                        <span>{{row.creation_date | dateTime : dateTimeFormats.shortDateTime}}</span>
+                    </div>
+                    <div class="action-buttons" [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true"
+                        (click)="$event.stopPropagation()">
+                        <button mat-icon-button class="ob-button medium"
+                            [matTooltip]="'CHANNELS.BLACKLISTS.DELETE_BLACKLIST_ITEM_BTN' | translate"
+                            (click)="openDeleteBlacklistItemDialog(channelBlacklistTypes.email, row.value)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+                </ng-template>
+            </app-searchable-paginated-list>
+        </div>
+        <div fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 20px)" fxLayout="column">
+            <div class="blacklist-status-container">
+                <mat-slide-toggle class="ob-slide-toggle" formControlName="nifsBlacklistEnabled">
+                    {{'CHANNELS.BLACKLISTS.NIFS_SWITCH' | translate}}
+                </mat-slide-toggle>
+            </div>
+            <div class="buttons-container" fxLayoutAlign="end start" fxLayoutGap="10px">
+                <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                    (click)="openCreateBlacklistItemDialog(channelBlacklistTypes.nif)">
+                    <mat-icon>add</mat-icon>
+                    {{'CHANNELS.BLACKLISTS.NEW_NIF_ITEM_BTN' | translate}}
+                </button>
+                <button mat-stroked-button color="tertiary" class="ob-button medium only-icon"
+                    [matTooltip]="'FORMS.ACTIONS.MORE' | translate" [matMenuTriggerFor]="nifsBlacklistMenu">
+                    <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #nifsBlacklistMenu="matMenu" xPosition="before">
+                    <button mat-menu-item appUploadFile accept=".csv"
+                        (fileChange)="handleFileInput(channelBlacklistTypes.nif, $event)">
+                        {{'CHANNELS.BLACKLISTS.UPLOAD_CSV_BTN' | translate}}
+                    </button>
+                    <button mat-menu-item [appDownloadFile]="CSV_TPLS[channelBlacklistTypes.nif]">
+                        {{'CHANNELS.BLACKLISTS.DOWNLOAD_CSV_TPL_BTN' | translate}}
+                    </button>
+                    <button mat-menu-item [disabled]="(nifBlacklistMetadata$ | async)?.total === 0"
+                        (click)="openDeleteBlacklistDialog(channelBlacklistTypes.nif)">
+                        {{'CHANNELS.BLACKLISTS.DELETE_BLACKLIST_BTN' | translate}}
+                    </button>
+                </mat-menu>
+            </div>
+            <app-searchable-paginated-list fxFlex="1 1 100%" fxLayout="column" [hoverable]="true"
+                [placeholder]="'FORMS.SEARCH.IN_LIST' | translate"
+                (loadData)="filterChangeHandler(channelBlacklistTypes.nif, $event)" [data$]="nifBlacklistData$"
+                [metadata$]="nifBlacklistMetadata$" [loading$]="nifBlacklistInProgress$">
+                <div slot="subheader" class="list-header with-action-button">
+                    <div fxFlex="0 1 100%" fxLayoutAlign="space-between">
+                        <span>{{'FORMS.LABELS.NIF' | translate}}</span>
+                        <span>{{'FORMS.LABELS.CREATION_DATE' | translate}}</span>
+                    </div>
+                </div>
+                <ng-template #optionTemplate let-row>
+                    <div fxFlex fxLayoutAlign="space-between" class="blacklist-item">
+                        <span>{{row.value}}</span>
+                        <span>{{row.creation_date | dateTime : dateTimeFormats.shortDateTime}}</span>
+                    </div>
+                    <div class="action-buttons" [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true"
+                        (click)="$event.stopPropagation()">
+                        <button mat-icon-button class="ob-button medium"
+                            [matTooltip]="'CHANNELS.BLACKLISTS.DELETE_BLACKLIST_ITEM_BTN' | translate"
+                            (click)="openDeleteBlacklistItemDialog(channelBlacklistTypes.nif, row.value)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+                </ng-template>
+            </app-searchable-paginated-list>
+        </div>
+    </div>
+</app-form-container>
+
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

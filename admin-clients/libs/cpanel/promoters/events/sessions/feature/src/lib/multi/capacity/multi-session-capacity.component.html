@@ -1,0 +1,31 @@
+<div fxLayout="column" fxLayoutAlign="start stretch" class="multi-capacity-container">
+    <app-form-container-full *ngIf="template$ | async as template else templateSelection" fxFlex [disabled]="(isDirty$ | async) === false"
+        [sidebarWidth]="standardVenueTemplateComponent.$labelMgrWidth()" (cancel)="cancelChanges()" (save)="saveChanges()">
+        <mat-divider />
+        <app-std-venue-tpl-mgr #standardVenueTemplateComponent fxFlex [editorType]="editorType" [venueTemplate]="template" />
+        <div *ngIf="isSessionCapacityUpdateInProgress$ | async" class="ob-overlay-wrapper" fxLayoutAlign="center start">
+            <div class="ob-overlay-pane">
+                <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px" fxFlex="80%">
+                    <p>{{'EVENTS.SESSION_CAPACITY_UPDATE_IN_PROGRESS' | translate}}</p>
+                    <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                        [attr.aria-label]="('EVENTS.SESSION_CAPACITY_UPDATE_IN_PROGRESS' | translate)" />
+                </app-context-notification>
+            </div>
+        </div>
+        <app-archived-event-mgr [disabled]="isDirty$ | async" slot="actions-bar" />
+    </app-form-container-full>
+    <ng-template #templateSelection>
+        <div *ngIf="templates$ | async as templates" fxLayoutAlign="center">
+            <app-context-notification fxFlex="0 1 700px" class="ob-context-notification" contextType="info">
+                <div fxLayout="row wrap">
+                    <p class="body-1" fxFlex="100%" [innerHTML]="'EVENTS.SESSION.MULTIPLE_TEMPLATES_MULTI_INFO' | translate"></p>
+                    <mat-form-field *ngIf="templates.length > 0" fxFlex="0 1 400px" appearance="outline" class="ob-form-field inline-field">
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" (valueChange)="selectTemplate($event)">
+                            <mat-option *ngFor="let template of templates" [value]="template">{{template.name}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </app-context-notification>
+        </div>
+    </ng-template>
+</div>

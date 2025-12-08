@@ -1,0 +1,252 @@
+<app-form-container (cancel)="cancel()" (save)="save()" [disabled]="!form.dirty" layout="menu" [formGroup]="form">
+    <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{ 'SEASON_TICKET.BOOKING' | translate }}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <form formGroupName="booking" class="booking-form">
+                <div class="season-ticket-form-section flex flex-col">
+                    <p>{{ 'SEASON_TICKET.BOOKING_DESCRIPTION' | translate }}</p>
+                    <mat-checkbox formControlName="enable" color="primary" class="booking-config-check">
+                        {{ 'SEASON_TICKET.ENABLE_BOOKING' | translate }}
+                    </mat-checkbox>
+                    <!-- BOOKING BY TERM -->
+                    <p>{{ 'SEASON_TICKET.BOOKING_BY_TERM' | translate }}</p>
+                    <div class="edition-block flex flex-wrap">
+                        <mat-radio-group formControlName="expirationType" class="booking-term-mode flex flex-col">
+                            <mat-radio-button class="ob-radio-button inline" [value]="typeOrderExpire.never">
+                                <div>
+                                    {{ 'SEASON_TICKET.BOOKING_WITHOUT_TERM' | translate }}
+                                </div>
+                            </mat-radio-button>
+                            <mat-radio-button class="ob-radio-button inline" [value]="typeOrderExpire.afterPurchase">
+                                <div>
+                                    {{ 'SEASON_TICKET.BOOKING_WITH_TERM' | translate }}
+                                </div>
+                            </mat-radio-button>
+                        </mat-radio-group>
+                        <div class="flex">
+                            <div formGroupName="bookingOrder" class="booking-term-block flex">
+                                <div class="flex">
+                                    <mat-form-field appearance="outline" class="ob-form-field booking-term-duration flex-[0_0_68px]">
+                                        <input matInput type="number" aria-label="duration" formControlName="duration" placeholder="0" />
+                                    </mat-form-field>
+                                </div>
+                                <div class="flex">
+                                    <mat-form-field appearance="outline" class="ob-form-field booking-term-time-unit flex-[0_0_120px]">
+                                        <mat-select formControlName="timeUnit">
+                                            <mat-option [value]="seasonTicketRelativeTimeUnits.day">
+                                                {{ 'SEASON_TICKET.TIME_UNITS.' + seasonTicketRelativeTimeUnits.day | translate }}
+                                            </mat-option>
+                                            <mat-option [value]="seasonTicketRelativeTimeUnits.week">
+                                                {{ 'SEASON_TICKET.TIME_UNITS.' + seasonTicketRelativeTimeUnits.week | translate }}
+                                            </mat-option>
+                                            <mat-option [value]="seasonTicketRelativeTimeUnits.month">
+                                                {{ 'SEASON_TICKET.TIME_UNITS.' + seasonTicketRelativeTimeUnits.month | translate }}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                                <span
+                                    [class.disabled]="form.get('booking.expirationType').value !== typeOrderExpire.afterPurchase 
+                                        || !form.get('booking.enable').value"
+                                    class="booking-term-at-label">
+                                    {{ 'SEASON_TICKET.BOOKING_AT_TIME' | translate }}
+                                </span>
+                                <div class="flex">
+                                    <mat-form-field appearance="outline" class="ob-form-field booking-term-time flex-[0_0_68px]">
+                                        <input matInput type="number" aria-label="time" formControlName="time" placeholder="0" />
+                                        @if (form.hasError('min', 'booking.bookingOrder.time')) {
+                                            <mat-error>
+                                                {{ 'FORMS.ERRORS.LOWER_THAN' | translate : { value:
+                                                form.get('booking.bookingOrder.time').getError('min').min } }}
+                                            </mat-error>
+                                        }
+                                        @if (form.hasError('max', 'booking.bookingOrder.time')) {
+                                            <mat-error>
+                                                {{ 'FORMS.ERRORS.HIGHER_THAN' | translate : { value:
+                                                form.get('booking.bookingOrder.time').getError('max').max } }}
+                                            </mat-error>
+                                        }
+                                    </mat-form-field>
+                                </div>
+                                <span
+                                    [class.disabled]="form.get('booking.expirationType').value === typeOrderExpire.afterPurchase 
+                                        || !form.get('booking.enable').value"
+                                    class="booking-hours-label">
+                                    {{ 'SEASON_TICKET.BOOKING_HOURS' | translate }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- BOOKING BY SESSION DATE -->
+                    <p>{{ 'SEASON_TICKET.BOOKING_BY_DATE' | translate }}</p>
+                    <div class="edition-block flex">
+                        <mat-radio-group formControlName="deadlineExpiration" class="booking-date-mode flex flex-col">
+                            <mat-radio-button class="ob-radio-button inline" [value]="typeDeadlineExpiration.never">
+                                {{ 'SEASON_TICKET.BOOKING_WITHOUT_DATE' | translate }}
+                            </mat-radio-button>
+                            <div formGroupName="relativeDate" class="booking-relative-date-block flex">
+                                <mat-radio-button class="ob-radio-button inline" [value]="typeDeadlineExpiration.session" />
+                                <div class="flex">
+                                    <mat-form-field appearance="outline" class="ob-form-field booking-date-duration flex-[0_0_68px]">
+                                        <input matInput type="number" aria-label="duration" formControlName="duration" placeholder="0" />
+                                    </mat-form-field>
+                                </div>
+                                <div class="flex">
+                                    <mat-form-field appearance="outline" class="ob-form-field booking-date-time-unit flex-[0_0_120px]">
+                                        <mat-select formControlName="timeUnit">
+                                            <mat-option [value]="seasonTicketRelativeTimeUnits.hour">
+                                                {{ 'SEASON_TICKET.TIME_UNITS.' + seasonTicketRelativeTimeUnits.hour | translate }}
+                                            </mat-option>
+                                            <mat-option [value]="seasonTicketRelativeTimeUnits.day">
+                                                {{ 'SEASON_TICKET.TIME_UNITS.' + seasonTicketRelativeTimeUnits.day | translate }}
+                                            </mat-option>
+                                            <mat-option [value]="seasonTicketRelativeTimeUnits.week">
+                                                {{ 'SEASON_TICKET.TIME_UNITS.' + seasonTicketRelativeTimeUnits.week | translate }}
+                                            </mat-option>
+                                            <mat-option [value]="seasonTicketRelativeTimeUnits.month">
+                                                {{ 'SEASON_TICKET.TIME_UNITS.' + seasonTicketRelativeTimeUnits.month | translate }}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                                <div class="flex">
+                                    <mat-form-field appearance="outline" class="ob-form-field booking-date-before-after flex-[0_0_120px]">
+                                        <mat-select formControlName="beforeAfter">
+                                            <mat-option [value]="seasonTicketBeforeAfter.before">
+                                                {{ 'SEASON_TICKET.' + seasonTicketBeforeAfter.before | translate }}
+                                            </mat-option>
+                                            <mat-option [value]="seasonTicketBeforeAfter.after">
+                                                {{ 'SEASON_TICKET.' + seasonTicketBeforeAfter.after | translate }}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                                <span
+                                    [class.disabled]="form.get('booking.deadlineExpiration') .value === typeDeadlineExpiration.date || !form.get('booking.enable').value"
+                                    class="before-after-booking-date-label">
+                                    {{ 'SEASON_TICKET.BEFORE_AFTER_SESSION' | translate }}
+                                </span>
+                                @if (form.get( 'booking.relativeDate.timeUnit' ).value !== seasonTicketRelativeTimeUnits.hour) {
+                                    <div>
+                                        <span
+                                            [class.disabled]="form.get( 'booking.deadlineExpiration' ).value === typeDeadlineExpiration.date 
+                                                || !form.get('booking.enable').value"
+                                            class="booking-term-at-label">
+                                            {{ 'SEASON_TICKET.BOOKING_AT_TIME' | translate }}
+                                        </span>
+                                        <div class="flex">
+                                            <mat-form-field appearance="outline" class="ob-form-field booking-relative-date-time flex-[0_0_68px]">
+                                                <input matInput type="number" aria-label="time" formControlName="time" placeholder="0" />
+                                                @if (form.hasError('min', 'booking.relativeDate.time')) {
+                                                    <mat-error>
+                                                        {{ 'FORMS.ERRORS.LOWER_THAN' | translate : { value:
+                                                        form.get('booking.relativeDate.time').getError('min').min } }}
+                                                    </mat-error>
+                                                }
+                                                @if (form.hasError('max', 'booking.relativeDate.time')) {
+                                                    <mat-error>
+                                                        {{ 'FORMS.ERRORS.HIGHER_THAN' | translate : { value:
+                                                        form.get('booking.relativeDate.time').getError('max').max } }}
+                                                    </mat-error>
+                                                }
+                                            </mat-form-field>
+                                        </div>
+                                        <span
+                                            [class.disabled]="form.get('booking.deadlineExpiration').value === typeDeadlineExpiration.date || !form.get('booking.enable').value"
+                                            class="booking-hours-label">
+                                            {{ 'SEASON_TICKET.BOOKING_HOURS' | translate }}
+                                        </span>
+                                    </div>
+                                }
+                            </div>
+                            <div class="booking-concrete-date-block flex">
+                                <mat-radio-button class="ob-radio-button inline" [value]="typeDeadlineExpiration.date">
+                                    {{ 'SEASON_TICKET.BOOKING_DATE_LIMIT' | translate }}
+                                </mat-radio-button>
+                                <app-date-time-picker class="concrete-date-field" formControlName="concreteDate" />
+                            </div>
+                        </mat-radio-group>
+                    </div>
+                </div>
+            </form>
+        </mat-expansion-panel>
+        <!-- INTERACTIVE VENUE -->
+         @if ($interactiveVenueEnabled()) {
+             <mat-expansion-panel [expanded]="true"  formGroupName="interactiveVenue">
+                 <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                     <mat-panel-title>{{ 'SEASON_TICKET.INTERACTIVE_VENUE.TITLE' | translate }}</mat-panel-title>
+                 </mat-expansion-panel-header>
+                 <form id="interactive-venue-form"
+                    class="season-ticket-form-section interactive-venue-form-section">
+                    <mat-checkbox color="primary" formControlName="enabled">
+                        {{'SEASON_TICKET.INTERACTIVE_VENUE.DESCRIPTION' | translate}}
+                    </mat-checkbox>
+                    @if (form.value.interactiveVenue?.enabled) {
+                        <div class="edition-block flex flex-col">
+                           <div class="flex">
+                               @if($interactiveVenues()?.length === 1) {
+                                    <div class="flex flex-col gap-2">
+                                        <span class="ob-label">{{ 'CHANNELS.INTERACTIVE_VENUE.LABEL' | translate }}</span>
+                                        <p>{{ 'CHANNELS.INTERACTIVE_VENUE.'+ $interactiveVenues()[0] | translate }}</p>
+                                    </div>
+                               } @else {
+                                   <mat-form-field  appearance="outline" class="ob-form-field flex-[0_0_446px]">
+                                       <mat-label>
+                                           {{'CHANNELS.INTERACTIVE_VENUE.LABEL' | translate}}
+                                       </mat-label>
+                                       <mat-select formControlName="venueType" 
+                                           [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                           @for (interactiveVenue of $interactiveVenues(); track interactiveVenue) {
+                                               <mat-option
+                                                   [value]="interactiveVenue">
+                                                   {{ 'CHANNELS.INTERACTIVE_VENUE.'+ interactiveVenue | translate }}
+                                               </mat-option>
+                                           }
+                                       </mat-select>
+                                       <mat-error [ob-form-errors]="form" field="interactiveVenue.venueType" />
+                                   </mat-form-field>
+                               } 
+                           </div>
+                           <div formGroupName="venueOptions" class="flex flex-col">
+                            <p>{{ 'SEASON_TICKET.INTERACTIVE_VENUE.OPTIONS_DESCRIPTION' | translate }}</p>
+                               <div class="flex items-center justify-start gap-5">
+                                   <img src="assets/interactive-venue/ico-recinto.svg" [alt]="'EVENTS.INTERACTIVE_VENUE.VENUE_3D' | translate">
+                                   <div class="flex">
+                                       <mat-checkbox formControlName="venueViewEnabled" color="primary">
+                                           {{'SEASON_TICKET.INTERACTIVE_VENUE.VENUE_ENABLED' | translate}}
+                                       </mat-checkbox>
+                                   </div>
+                               </div>
+                                <div class="flex items-center justify-start gap-5">
+                                    <img src="assets/interactive-venue/ico-sector.svg"
+                                        [alt]="'SEASON_TICKET.INTERACTIVE_VENUE.VENUE_SECTOR_VIEW' | translate" />
+                                    <mat-checkbox formControlName="venueSectorViewEnabled" color="primary">
+                                        {{ 'SEASON_TICKET.INTERACTIVE_VENUE.VENUE_SECTOR_VIEW_ENABLED' | translate }}
+                                    </mat-checkbox>
+                                </div>
+                                <div class="flex items-center justify-start gap-5">
+                                    <img src="assets/interactive-venue/ico-butaca.svg"
+                                        [alt]="'SEASON_TICKET.INTERACTIVE_VENUE.VENUE_SEAT_VIEW' | translate" />
+                                    <mat-checkbox formControlName="venueSeatViewEnabled" color="primary">
+                                        {{ 'SEASON_TICKET.INTERACTIVE_VENUE.VENUE_SEAT_VIEW_ENABLED' | translate }}
+                                    </mat-checkbox>
+                                </div>
+                                @if (form.controls.interactiveVenue.controls.venueOptions.touched && form.controls.interactiveVenue.controls.venueOptions.errors?.['required']) {
+                                    <mat-error>{{ 'SEASON_TICKET.INTERACTIVE_VENUE.ONE_REQUIRED_ERROR' | translate }}</mat-error>
+                                }
+                           </div>
+                        </div>
+                    }
+                 </form>
+             </mat-expansion-panel>
+         }
+    </mat-accordion>
+</app-form-container>
+
+@if (isLoadingOrSaving$ |async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

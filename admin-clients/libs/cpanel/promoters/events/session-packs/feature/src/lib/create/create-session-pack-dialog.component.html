@@ -1,0 +1,300 @@
+<div class="create-session-pack-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'TITLES.NEW_SESSION_PACK' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch" class="dialog-grid-form">
+        <form [formGroup]="form" fxLayout="row wrap" fxLayoutGap="30px grid" class="dialog-form">
+            <div fxFlex="100%" fxLayout="column">
+                <div class="field-label partial-refund">{{'EVENTS.SESSION_PACK.PARTIAL_REFUND' | translate}}</div>
+                <div fxFlex="38px" fxLayout="row">
+                    <mat-form-field hidden-outline class="ob-form-field partial-refund-field">
+                        <input fxHide matInput>
+                        <mat-checkbox formControlName="allow_partial_refund" color="primary">
+                            <mat-label>
+                                {{'EVENTS.SESSION_PACK.ENABLE_PARTIAL_REFUND' | translate}}
+                            </mat-label>
+                        </mat-checkbox>
+                    </mat-form-field>
+                    <app-help-button matSuffix [message]="'EVENTS.SESSION_PACK.PARTIAL_REFUND_HELP' | translate" />
+                </div>
+            </div>
+            <mat-divider fxFlex="0 1 100%" class="ob-grid-divider" />
+            <!-- NAME -->
+            <mat-form-field fxFlex="100%" fxFlex.gt-sm="50%" appearance="outline" class="ob-form-field field-with-label name-field">
+                <mat-label>{{'EVENTS.NAME' | translate}}</mat-label>
+                <input matInput #nameField="matInput" aria-label="name" autocomplete="off" [placeholder]="'EVENTS.NAME' | translate"
+                    formControlName="name">
+                <mat-error [ob-form-errors]="form" [field]="'name'" />
+            </mat-form-field>
+            <!-- COLOR -->
+            <div fxFlex="100%" fxFlex.gt-sm="50%">
+                <mat-form-field appearance="outline" fxFlex="90px" class="ob-form-field min-padding">
+                    <mat-label>{{'FORMS.LABELS.COLOR' | translate}}</mat-label>
+                    <app-color-picker formControlName="color" />
+                    <mat-error [ob-form-errors]="form" field="color" />
+                </mat-form-field>
+            </div>
+            <!-- VENUE TEMPLATE -->
+            <div fxFlex="100%" fxFlex.gt-sm="50%">
+                <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field">
+                    <mat-label>{{'EVENTS.SESSION.CAPACITY_TEMPLATE' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.ACTIONS.SELECT' | translate" formControlName="venueTemplate">
+                        <mat-option [fxShow]="(venueTemplates$ | async)?.length > 5">
+                            <app-select-search #venueTemplateSelectSearch [options$]="venueTemplates$" requireSelection="true"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" />
+                        </mat-option>
+                        <mat-option *ngFor="let venueTemplate of venueTemplateSelectSearch.getFilteredOptions$() | async"
+                            [value]="venueTemplate">
+                            {{venueTemplate.name}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form" [field]="'venueTemplate'" />
+                    <app-help-button matSuffix [message]="'EVENTS.SESSION_PACK.VENUE_TEMPLATE_HELP' | translate" />
+                </mat-form-field>
+            </div>
+            <div fxHide fxShow.gt-sm></div>
+            <!-- SESSION -->
+            <div fxFlex="100%" fxFlex.gt-sm="50%" fxLayout="column" class="sessions-container">
+                <div class="field-label">
+                    <span>{{'EVENTS.SESSION_PACK_SESSIONS' | translate}} *</span>
+                    <app-help-button [message]="'EVENTS.SESSION_PACK.SESSIONS_SELECT_HELP' | translate" />
+                </div>
+                <app-searchable-paginated-selection [placeholder]="'FORMS.SEARCH.SESSIONS' | translate"
+                    (loadData)="loadSessionsList($event)" [form]="form.get('sessions')" [pageSize]="pageSize" [data$]="sessions$"
+                    [metadata$]="sessionsMetadata$" [loading$]="sessionsListLoading$" class="sessions-list">
+                    <mat-checkbox slot="filter" color="primary"
+                        [checked]="selectedSessionsLength === (totalSessions$ | async) || (selectedSessionsOnly$ | async)"
+                        [indeterminate]="selectedSessionsLength > 0 && selectedSessionsLength < (totalSessions$ | async)"
+                        [disabled]="(isAllSessionsNotScheduled$ | async) || (selectedSessionsOnly$ | async) || (totalSessions$ | async) === undefined || (totalSessions$ | async) === 0"
+                        [matTooltip]="'FORMS.ACTIONS.SELECT_ALL' | translate" (change)="selectAllSessions($event)"
+                        class="select-all-sessions" />
+                    <div slot="filter" class="badge-container"
+                        [class.empty]="(totalSessions$ | async) === 0 || (isAllSessionsNotScheduled$ | async)">
+                        {{selectedSessionsLength}} / {{(totalSessions$ | async)}}
+                    </div>
+                    <button slot="filter" type="button" mat-icon-button class="ob-button"
+                        [class.active]="selectedSessionsOnly$ | async"
+                        [matTooltip]="'CHANNELS.PROMOTIONS.SHOW_SELECTED_TOOLTIP' | translate"
+                        (click)="showSelectedOnlyClick.emit()">
+                        <mat-icon>visibility</mat-icon>
+                    </button>
+                    <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data" let-selectionChanged="selectionChanged">
+                        <app-selection-list [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged"
+                            [disabledOptionPredicate]="isNotScheduledSession"
+                            [class.field-error]="form.get('sessions').errors && form.get('sessions').touched"
+                            [class.ng-invalid]="form.get('sessions').errors && form.get('sessions').touched">
+                            <ng-template #optionTemplate let-row>
+                                <div fxLayoutAlign="space-between center">
+                                    <div fxLayout="column">
+                                        <span class="session-name">{{row.name}}</span>
+                                        <span class="session-datetime">
+                                            {{row?.start_date | dateTime : dateTimeFormats.shortDateTimeWithWeek}}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span class="session-status">
+                                            {{('EVENTS.SESSION.STATUS_OPTS.' + row.status) | translate}}
+                                        </span>
+                                    </div>
+                                </div>
+                            </ng-template>
+                            <ng-template #noResultsTemplate>
+                                <div class="context-message-container">
+                                    <p class="title">{{'EVENTS.SESSION_PACK.EMPTY_SESSIONS.TITLE' | translate}}</p>
+                                    <p class="desc">{{'EVENTS.SESSION_PACK.EMPTY_SESSIONS.DESCRIPTION' | translate}}</p>
+                                </div>
+                            </ng-template>
+                        </app-selection-list>
+                        <mat-error class="mat-caption" *ngIf="form.get('sessions').touched" [ob-form-errors]="form" field="sessions" />
+                    </ng-template>
+                </app-searchable-paginated-selection>
+            </div>
+            <!-- BLOCKING REASONS -->
+            <div fxFlex="100%" fxFlex.gt-sm="50%" fxLayout="column" class="blocking-reasons-container">
+                <div class="field-label">
+                    <span>{{'EVENTS.ASSIGN_BLOCKED_SEATS' | translate}}</span>
+                    <app-help-button [message]="'EVENTS.SESSION_PACK.BLOCKING_REASONS_HELP' | translate" />
+                </div>
+                <mat-selection-list class="ob-list sessions-list" formControlName="blockingActions" role="list" [disableRipple]="true"
+                    #selectionList>
+                    <mat-list-option *ngFor="let blockingReason of (blockingReasons$ | async)" color="primary" checkboxPosition="before"
+                        [value]="{ id: blockingReason?.id, action: action.value }">
+                        <div fxLayout="row" fxLayoutAlign="start center">
+                            <div fxFlex="60%">
+                                {{blockingReason?.name}}
+                            </div>
+                            <mat-form-field fxFlex="40%" appearance="outline" class="ob-form-field inline-field"
+                                (click)="$event.stopPropagation()">
+                                <mat-select #action [value]="sessionPackBlockingActions.release">
+                                    <mat-option [value]="sessionPackBlockingActions.release">
+                                        {{'EVENTS.SESSION_PACK_BLOCKING_ACTIONS.' + sessionPackBlockingActions.release | translate}}
+                                    </mat-option>
+                                    <mat-option [value]="sessionPackBlockingActions.keep">
+                                        {{'EVENTS.SESSION_PACK_BLOCKING_ACTIONS.' + sessionPackBlockingActions.keep | translate}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </mat-list-option>
+                    <div class="context-message-container" *ngIf="!((blockingReasons$ | async)?.length > 0)">
+                        <p class="title">{{'EVENTS.SESSION_PACK.EMPTY_BLOCK_REASONS.TITLE' | translate}}</p>
+                        <p class="desc">{{'EVENTS.SESSION_PACK.EMPTY_BLOCK_REASONS.DESCRIPTION' | translate}}</p>
+                    </div>
+                </mat-selection-list>
+            </div>
+            <!-- RATES -->
+            <mat-form-field fxFlex="100%" fxFlex.gt-sm="50%" appearance="outline"
+                class="ob-form-field session-form-field no-padding">
+                <mat-label>{{'EVENTS.RATES' | translate}}</mat-label>
+                <input fxHide aria-label="session pack rates" matInput formControlName="sessionRates">
+                <mat-list class="ob-list rates-list" role="list" [class.ng-invalid]="form.get('sessionRates').errors">
+                    <mat-list-item *ngFor="let eventRate of eventRates$ | async" class="rate-item editable-item">
+                        <mat-button-toggle aria-label="Set default rate"
+                            class="ob-icon-button-toggle-simple yellow-icon-appearance ob-button medium only-icon"
+                            [checked]="isDefaultRate(eventRate.id)" [disabled]="isDefaultRate(eventRate.id)"
+                            (click)="setDefaultRate(eventRate.id)">
+                            <mat-icon [ngClass]="isDefaultRate(eventRate.id) ? 'selected' : 'not-selected'">
+                                {{isDefaultRate(eventRate.id) ? 'star' : 'star_border'}}
+                            </mat-icon>
+                        </mat-button-toggle>
+                        <span fxFlex="0 1 100%">{{eventRate.name}}</span>
+                        <mat-button-toggle aria-label="Set visible/not visible rate"
+                            class="ob-icon-button-toggle-simple ob-button small only-icon" [checked]="isVisibleRate(eventRate.id)"
+                            [disabled]="isDefaultRate(eventRate.id)" (click)="setVisibleRate(eventRate.id)">
+                            <mat-icon>visibility</mat-icon>
+                        </mat-button-toggle>
+                    </mat-list-item>
+                </mat-list>
+                <mat-error [ob-form-errors]="form" [field]="'sessionRates'" />
+            </mat-form-field>
+            <div fxFlex="100%" fxFlex.gt-sm="50%" fxLayout="column" fxLayoutGap="30px" fxLayoutAlign="start stretch">
+                <!-- TAXES -->
+                <div>
+                    <mat-form-field fxFlex="0 1 300px" appearance="outline" class="ob-form-field">
+                        <mat-label>{{'EVENTS.SESSION.TICKET_TAXES' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.ACTIONS.SELECT' | translate" formControlName="ticketTax">
+                            <mat-option>
+                                <app-select-search #ticketTaxesSelectSearch [options$]="taxes$"
+                                    [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name"
+                                    requireSelection="true" />
+                            </mat-option>
+                            <mat-option *ngFor="let ticketTax of ticketTaxesSelectSearch.getFilteredOptions$() | async" [value]="ticketTax">
+                                {{ticketTax.name}}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error [ob-form-errors]="form" [field]="'ticketTax'" />
+                        <app-help-button matSuffix [message]="'EVENTS.SESSION_PACK.TICKET_TAX_HELP' | translate" />
+                    </mat-form-field>
+                </div>
+                <!-- SURCHARGES TAXES -->
+                <div>
+                    <mat-form-field fxFlex="0 1 300px" appearance="outline" class="ob-form-field">
+                        <mat-label>{{'EVENTS.SESSION.SURCHARGES_TAXES' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.ACTIONS.SELECT' | translate" formControlName="surchargeTax">
+                            <mat-option>
+                                <app-select-search #surchargeTaxesSelectSearch [options$]="taxes$"
+                                    [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name"
+                                    requireSelection="true" />
+                            </mat-option>
+                            <mat-option *ngFor="let surchargeTax of surchargeTaxesSelectSearch.getFilteredOptions$() | async"
+                                [value]="surchargeTax">
+                                {{surchargeTax.name}}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error [ob-form-errors]="form" [field]="'surchargeTax'" />
+                    </mat-form-field>
+                </div>
+            </div>
+            <mat-divider fxFlex="0 1 100%" class="ob-grid-divider" />
+            <div fxFlex="100%" fxLayout="row">
+                <app-date-time-picker fxFlex="250px" fxFlex.gt-sm="34.5%" class="session-form-field"
+                    [label]="'EVENTS.SESSION.CHANNEL_RELEASE' | translate" formControlName="releaseDate" />
+                <app-help-button class="release-date-help-button"
+                    [message]="'EVENTS.SESSION_PACK.RELEASE_DATE_HELP' | translate" />
+            </div>
+            <mat-divider fxFlex="0 1 100%" class="ob-grid-divider" />
+            <ng-container *ngIf="isBookingsEnabled">
+                <app-date-time-picker fxFlex="250px" fxFlex.gt-sm="50%" class="session-form-field"
+                    [label]="'EVENTS.SESSION.BOOKINGS_START' | translate" formControlName="bookingsStartDate" />
+                <app-date-time-picker fxFlex="250px" fxFlex.gt-sm="50%" class="session-form-field"
+                    [label]="'EVENTS.SESSION.BOOKINGS_END' | translate" formControlName="bookingsEndDate" />
+                <div fxHide fxShow.gt-sm fxFlex.gt-sm="50%"></div>
+                <mat-form-field fxFlex="100%" fxFlex.gt-sm="50%" appearance="outline" class="ob-form-field session-date-custom">
+                    <mat-select [placeholder]="'FORMS.OPTIONS.CUSTOM' | translate" formControlName="bookingEndDateModifier">
+                        <mat-option *ngFor="let dateModifier of sessionDateCustomModifiers" [value]="dateModifier">
+                            {{('EVENTS.SESSION_PACK.DATES_MOD_OPTS.' + dateModifier) | translate}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-divider fxFlex="0 1 calc(100% - 30px)" class="ob-grid-divider" />
+            </ng-container>
+            <app-date-time-picker fxFlex="250px" fxFlex.gt-sm="50%" class="session-form-field"
+                [label]="'EVENTS.SESSION.SALE_START' | translate" formControlName="salesStartDate" />
+            <app-date-time-picker fxFlex="250px" fxFlex.gt-sm="50%" class="session-form-field"
+                [label]="'EVENTS.SESSION.SALE_END' | translate"
+                formControlName="salesEndDate" />
+            <div fxHide fxShow.gt-sm fxFlex.gt-sm="50%"></div>
+            <div fxFlex="100%" fxFlex.gt-sm="50%" fxLayout="row" fxLayoutGap="10px" class="session-date-custom">
+                <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field inline-field">
+                    <mat-select [placeholder]="'FORMS.OPTIONS.CUSTOM' | translate" formControlName="saleEndDateModifier">
+                        <mat-option *ngFor="let dateModifier of sessionDateCustomModifiers" [value]="dateModifier">
+                            {{('EVENTS.SESSION_PACK.DATES_MOD_OPTS.' + dateModifier) | translate}}
+                        </mat-option>
+                    </mat-select>
+                    <app-help-button matSuffix [message]="'EVENTS.SESSION_PACK.END_SALE_HELP' | translate" />
+                </mat-form-field>
+            </div>
+            @if ($showLoyaltyPointsSettings()) {
+                <mat-divider fxFlex="0 1 100%" class="ob-grid-divider" />
+                <div fxFlex fxLayout="column" [formGroup]="loyaltyPointGainConfig">
+                    <span class="ob-label">{{'EVENTS.SESSION_PACK.LOYALTY_POINTS_TITLE' | translate}}</span>
+                    <p>{{'EVENTS.SESSION_PACK.LOYALTY_POINTS_INFO' | translate}}</p>
+                    <mat-radio-group fxLayout="column" formControlName="type">
+                        <mat-radio-button class="ob-radio-button vertical-list" [value]="sessionLoyaltyPointsGainType.sessionPurchased">
+                            <div fxLayout="column">
+                                <div class="option-title">{{'EVENTS.SESSION_PACK.LOYALTY_POINTS_SESSION_PURCHASED' | translate}}</div>
+                                <div>{{'EVENTS.SESSION_PACK.LOYALTY_POINTS_SESSION_PURCHASED_INFO' | translate}}</div>
+                            </div>
+                        </mat-radio-button>
+                        @if (loyaltyPointGainConfig.value.type === sessionLoyaltyPointsGainType.sessionPurchased) {
+                            <div fxFlex fxLayout="row" class="nested-content">
+                                <mat-form-field fxFlex="140px" appearance="outline" class="ob-form-field field-with-label">
+                                    <mat-label>{{'EVENTS.SESSION_PACK.LOYALTY_POINTS_AMOUNT' | translate}}</mat-label>
+                                    <input matInput type="number" placeholder="0" formControlName="amount">
+                                    <mat-error [ob-form-errors]="loyaltyPointGainConfig" [field]="'amount'" />
+                                </mat-form-field>
+                            </div>
+                        }
+                        <mat-radio-button class="ob-radio-button vertical-list" [value]="sessionLoyaltyPointsGainType.ticketPurchased">
+                            <div fxLayout="column">
+                                <div class="option-title">{{'EVENTS.SESSION_PACK.LOYALTY_POINTS_TICKET_PURCHASED' | translate}}</div>
+                                <div>{{'EVENTS.SESSION_PACK.LOYALTY_POINTS_TICKET_PURCHASED_INFO' | translate}}</div>
+                            </div>
+                        </mat-radio-button>
+                        @if (loyaltyPointGainConfig.value.type === sessionLoyaltyPointsGainType.ticketPurchased) {
+                            <div fxFlex fxLayout="row" class="nested-content">
+                                <mat-form-field fxFlex="140px" appearance="outline" class="ob-form-field field-with-label">
+                                    <mat-label>{{'EVENTS.SESSION_PACK.LOYALTY_POINTS_AMOUNT' | translate}}</mat-label>
+                                    <input matInput type="number" placeholder="0" formControlName="amount">
+                                    <mat-error [ob-form-errors]="loyaltyPointGainConfig" [field]="'amount'" />
+                                </mat-form-field>
+                            </div>
+                        }
+                    </mat-radio-group>
+                </div>
+            }
+        </form>
+    </div>
+    <div mat-dialog-actions fxLayout="row wrap" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()" [disabled]="requestInProgress$ | async">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createSessionPack()"
+            [disabled]="requestInProgress$ | async">
+            {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>

@@ -1,0 +1,54 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">
+            {{'VENUE_TPL_EDITOR.NEW_NNZ' | translate}}
+        </h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="this.dialogRef.close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <div [formGroup]="form" fxLayout="row wrap" class="ob-form">
+            <!-- NAME -->
+            <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field">
+                <mat-label [matTooltip]="'FORMS.LABELS.NAME' | translate">
+                    {{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                <input matInput aria-label="name" formControlName="name" [placeholder]="'FORMS.LABELS.NAME' | translate">
+                <mat-error [ob-form-errors]="form" field="name"></mat-error>
+            </mat-form-field>
+            <!-- SECTOR -->
+            <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field">
+                <mat-label [matTooltip]="'VENUE_TPL_EDITOR.SECTOR' | translate">
+                    {{'VENUE_TPL_EDITOR.SECTOR' | translate}}</mat-label>
+                <mat-select formControlName="sector">
+                    <mat-option>
+                        <app-select-search #sectorsSelectSearch [options$]="sectors$" searchField="name" requireSelection="true"
+                            [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                        </app-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let sector of sectorSelectSearchComponent?.getFilteredOptions$() | async" [value]="sector.id"
+                        fxLayout="row">
+                        <span fxFlex [matTooltip]="sector.name">{{sector.name}}</span>
+                    </mat-option>
+                </mat-select>
+                <mat-error [ob-form-errors]="form" field="sector"></mat-error>
+            </mat-form-field>
+            <!-- CAPACITY -->
+            <mat-form-field fxFlex="100px" appearance="outline" class="ob-form-field">
+                <mat-label [matTooltip]="'VENUE_TPL_EDITOR.CAPACITY' | translate">
+                    {{'VENUE_TPL_EDITOR.CAPACITY' | translate}}</mat-label>
+                <input type="number" matInput aria-label="capacity" formControlName="capacity">
+                <mat-error [ob-form-errors]="form" field="capacity"></mat-error>
+            </mat-form-field>
+        </div>
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="this.dialogRef.close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button"
+            [disabled]="form.invalid" (click)="commit()">
+            {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>

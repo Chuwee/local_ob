@@ -1,0 +1,15 @@
+<div class="sales-with-error">
+    <app-error-dashboard-summary
+        [value]="$errorResponsibles().length > 1 ? $totalErrors() : $responsibleOverallCounts()[0].overallCount"
+        [previousValue]="$errorResponsibles().length > 1 ? $previousTotalErrors() : $responsibleOverallCounts()[0].prevOverallCount" />
+    <div class="sales-with-error-overalls">
+        @if ($errorResponsibles().length > 1) {
+            @for(e of $responsibleOverallCounts(); track e) {
+                <app-information-pill
+                    [title]="'ERROR_DASHBOARD.FORM.INFOS.'+e.responsible+'_SALES_WITH_ERROR'"
+                    [value]="e.overallCount"
+                    [previousValue]="e.prevOverallCount" />
+            }
+        }
+    </div>
+</div>

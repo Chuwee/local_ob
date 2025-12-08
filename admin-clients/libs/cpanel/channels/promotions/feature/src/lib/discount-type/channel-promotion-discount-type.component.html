@@ -1,0 +1,84 @@
+<app-form-container [disabled]="!form.dirty || (loading$ | async)" (cancel)="cancel()" (save)="save()">
+    <form [formGroup]="form">
+        <div fxLayout="column" class="promotion-form-section">
+            <p class="mat-subtitle-2">{{'CHANNELS.PROMOTIONS.DISCOUNT_TYPE_DESCRIPTION' | translate}} *</p>
+            <!-- PROMOTION DISCOUNT TYPE -->
+            <mat-radio-group fxLayout="column" formControlName="type" class="release-date-mode">
+                @if(currencies$ | async; as currencies) {
+                    <div fxFlex [fxLayout]="currencies.length > 1 ? 'column' : 'row'">
+                        <mat-radio-button class="ob-radio-button inline" [value]="discountTypes.fixed"
+                            [fxFlex]="currencies.length === 1 ? '200px' : ''">
+                            {{'CHANNELS.PROMOTIONS.DISCOUNT_TYPE_OPTS.FIXED' | translate}}
+                        </mat-radio-button>
+                        @if(this.form.get('type').value === discountTypes.fixed) {
+                            @if(currencies.length === 1) {
+                                <mat-form-field fxFlex="120px" appearance="outline" class="ob-form-field">
+                                    <app-currency-input formControlName="fixValue"
+                                        [placeholder]="0 | localCurrency : currencies[0] : 'narrow'"
+                                        [currencyCode]="currencies[0]" currencyFormat="narrow" />
+                                </mat-form-field>
+                            } @else if(currencies.length > 1) {
+                                <div class="content-scroll nested-content">
+                                    <table mat-table class="ob-table" [dataSource]="$dataSource()">
+                                        @for (currency of currencies; track currency) {
+                                            <ng-container [matColumnDef]="currency" formArrayName="fixedValues">
+                                                <th mat-header-cell *matHeaderCellDef class="default-padding head-cell right price-column">
+                                                    <div fxLayoutAlign="end center">
+                                                        {{currency | localCurrencyPartialTranslation }}
+                                                    </div>
+                                                </th>
+                                                <td mat-cell *matCellDef="let amount"
+                                                    class="default-padding right price-column editable-cell">
+                                                    <div class="write-value">
+                                                        <mat-form-field appearance="outline" class="ob-form-field">
+                                                            @let errorMessage = form.get(['fixedValues', $index, 'amount']) | obErrorMessage$ | async;
+                                                    @if (errorMessage) {
+                                                                <mat-icon matPrefix [obErrorIcon]="errorMessage">
+                                                                    error_outline
+                                                                </mat-icon>
+                                                            }
+                                                            <app-currency-input class="table-input"
+                                                                [formControl]="form.get(['fixedValues', $index, 'amount'])"
+                                                                [placeholder]="0 | localCurrency : currency" [currencyCode]="currency"
+                                                                currencyFormat="narrow" />
+                                                        </mat-form-field>
+                                                    </div>
+                                                </td>
+                                            </ng-container>
+                                        }
+                                        @if (currencies) {
+                                            <!-- eslint-disable-next-line @angular-eslint/template/prefer-self-closing-tags -->
+                                            <tr mat-header-row *matHeaderRowDef="currencies"></tr>
+                                            <!-- eslint-disable-next-line @angular-eslint/template/prefer-self-closing-tags -->
+                                            <tr mat-row *matRowDef="let row; columns: currencies" class="hoverable-row"></tr>
+                                        }
+                                    </table>
+                                </div>
+                            }
+                        }
+                    </div>
+                }
+                <div fxFlex fxLayout="row">
+                    <mat-radio-button class="ob-radio-button inline" [value]="discountTypes.percentage" fxFlex="200px">
+                        {{'CHANNELS.PROMOTIONS.DISCOUNT_TYPE_OPTS.PERCENTUAL' | translate}}
+                    </mat-radio-button>
+                    @if(this.form.get('percentualValue').enabled) {
+                        <mat-form-field fxFlex="120px" appearance="outline"
+                            class="ob-form-field">
+                            <app-percentage-input formControlName="percentualValue" placeholder="{{0 | localNumber : '1.2-2'}}" />
+                        </mat-form-field>
+                    }
+                </div>
+                @if((promotion$ | async)?.type === promotionTypes.collective) {
+                    <mat-radio-button class="ob-radio-button inline" [value]="discountTypes.dynamic">
+                        {{'CHANNELS.PROMOTIONS.DISCOUNT_TYPE_OPTS.DYNAMIC' | translate}}
+                        <div class="dynamic-warning" fxLayoutAlign="start center" fxLayoutGap="8px">
+                            <mat-icon fxFlex="0 0 auto" class="ob-icon small warning">warning</mat-icon>
+                            <span>{{'CHANNELS.PROMOTIONS.DISCOUNT_TYPE_OPTS.DYNAMIC_WARNING' | translate}}</span>
+                        </div>
+                    </mat-radio-button>
+                }
+            </mat-radio-group>
+        </div>
+    </form>
+</app-form-container>

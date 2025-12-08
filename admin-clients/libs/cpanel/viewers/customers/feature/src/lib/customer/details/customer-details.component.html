@@ -1,0 +1,66 @@
+@if (customer$ | async; as customer) {
+    <div class="details-container" fxFlex="0 1 100%" fxLayout="column">
+        <div class="heading-container" fxLayoutAlign="start center">
+            <app-go-back defaultPath="/customers" />
+            <h1 appEllipsify [matTooltip]="customer.name + ' ' + customer.surname + ' - ' + customer.email"
+                class="secondary mat-headline-3">
+                {{ customer.name + ' ' + customer.surname + ' - ' + customer.email }}
+            </h1>
+            @if (canLoggedUserWrite$ | async) {
+                <div fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+                    <!-- Block/UnBlock Customer-->
+                    <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                        [attr.aria-label]="getLockButtonText(customer.status)" [matTooltip]="getLockButtonText(customer.status)"
+                        (click)="lockButtonHandler(customer.status)" [disabled]="isLoadingOrSaving$ | async">
+                        <mat-icon>lock</mat-icon>
+                        {{getLockButtonText(customer.status)}}
+                    </button>
+                </div>
+            }
+        </div>
+        <div class="main-content" fxFlex="0 1 100%" fxLayout="column">
+            <div class="top-actions">
+                <app-nav-tabs-menu type="tabMenu" [elements]="[
+                    {
+                        label: 'CUSTOMER.GENERAL_DATA',
+                        param: 'general-data',
+                        queryParams: {entityId: customer.entity.id}
+                    },
+                    {
+                        label: 'CUSTOMER.PURCHASES',
+                        param: 'purchases',
+                        queryParams: {entityId: customer.entity.id}
+                    },
+                    {
+                        label: 'CUSTOMER.TICKETS.TITLE',
+                        param: 'tickets',
+                        queryParams: {entityId: customer.entity.id}
+                    },
+                    {
+                        label: 'CUSTOMER.SEASON_TICKETS.TITLE',
+                        param: 'season-tickets',
+                        queryParams: {entityId: customer.entity.id}
+                    },
+                    {
+                        label: 'CUSTOMER.FRIENDS_AND_FAMILY.TITLE',
+                        param: 'friends-family',
+                        queryParams: {entityId: customer.entity.id},
+                        show: $isFriendsEnabled()
+                    },
+                    {
+                        label: 'CUSTOMER.LOYALTY_POINTS.TITLE',
+                        param: 'loyalty-points',
+                        queryParams: {entityId: customer.entity.id},
+                        show: $isLoyaltyPointsEnabled()
+                    },
+                    {
+                        label: 'CUSTOMER.NOTES.TITLE',
+                        param: 'notes',
+                        queryParams: {entityId: customer.entity.id}
+                    }
+                ]" />
+            </div>
+            <router-outlet />
+        </div>
+    </div>
+}

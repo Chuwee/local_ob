@@ -1,0 +1,46 @@
+<button mat-stroked-button color="tertiary" class="ob-button medium" [class]="{'active': activeFilters}"
+    [matBadge]="activeFilters || ''" [satPopoverAnchor]="filterPopover" (click)="open()">
+    {{'FORMS.OPEN_FILTER_BTN' | translate}}
+    <mat-icon iconPositionEnd>
+        filter_list
+    </mat-icon>
+</button>
+<sat-popover #filterPopover hasBackdrop yAlign="below" autoFocus="false" restoreFocus="false">
+    <mat-card class="ob-card">
+        <mat-card-content class="form-container">
+            <form [formGroup]="form" fxLayout="column" fxLayoutGap="24px">
+                <div fxLayout="row" class="filter-block">
+                    <div class="ob-label" fxFlex="0 0 100px">
+                        {{'FORMS.LABELS.CATEGORY' | translate}}
+                    </div>
+                    <div class="filter-block-input" fxFlex="0 0 300px">
+                        <mat-form-field appearance="outline" class="ob-form-field tag-select">
+                            <mat-select formControlName="tag" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                                @for (category of categories; track $index) {
+                                    <mat-option [value]="category">
+                                        {{('CHANNELS.FAQS.CATEGORY_OPTS.' + category) | translate}}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </form>
+        </mat-card-content>
+        <mat-card-footer fxLayoutAlign="start center">
+            <div fxFlex="grow" class="left-actions">
+                <a class="ob-link" #removeLink (click)="clear()">
+                    {{'FORMS.REMOVE_FILTERS_BTN' | translate}}
+                </a>
+            </div>
+            <div fxFlex="none" class="right-actions">
+                <button (click)="close()" mat-button class="ob-button small">
+                    {{'FORMS.CLOSE_FILTER_BTN' | translate}}
+                </button>
+                <button (click)="apply()" mat-flat-button color="primary" class="ob-button small">
+                    {{'FORMS.APPLY_FILTER_BTN' | translate}}
+                </button>
+            </div>
+        </mat-card-footer>
+    </mat-card>
+</sat-popover>

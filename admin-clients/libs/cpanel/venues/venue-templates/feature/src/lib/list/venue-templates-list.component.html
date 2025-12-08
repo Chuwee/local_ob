@@ -1,0 +1,115 @@
+<div class="list-container" fxFlex="100%" fxLayout="column">
+    <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">{{'TITLES.VENUE_CONFIGS' | translate}}</h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+            <div *ngIf="userCanWrite$ | async" class="filter-container" fxFlex="none">
+                <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                    [attr.aria-label]="'VENUE_TPLS.NEW_BTN' | translate" (click)="openNewVenueTemplateDialog()">
+                    <mat-icon>add</mat-icon>
+                    {{'VENUE_TPLS.NEW_BTN' | translate}}
+                </button>
+            </div>
+            <div class="filter-container" fxFlex="none">
+                <button mat-icon-button class="ob-button medium" aria-label="refresh" (click)="refresh()">
+                    <mat-icon>autorenew</mat-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="heading-container" fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxFlex="70%" fxLayoutGap="20px" fxLayoutAlign="start center">
+            <div class="filter-container" fxFlex="none">
+                <app-popover appFilter>
+                    <app-venue-templates-list-filter #filterContent [canSelectEntity$]="canSelectEntity$">
+                    </app-venue-templates-list-filter>
+                </app-popover>
+            </div>
+            <div class="search-field" fxFlex="100%">
+                <app-search-input [placeholder]="'FORMS.SEARCH.VENUE_TEMPLATE_LIST' | translate"></app-search-input>
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            <p *ngIf="venueTemplatesMetadata$ | async as venueTemplatesMetadata" class="page-summary"
+                [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: venueTemplatesMetadata">
+            </p>
+            <app-paginator [length]="(venueTemplatesMetadata$ | async)?.total" [pageSize]="venueTemplatesPageSize">
+            </app-paginator>
+        </div>
+    </div>
+    <div class="heading-container heading-divider">
+        <mat-divider></mat-divider>
+    </div>
+    <div class="heading-container">
+        <app-chips appFilter></app-chips>
+    </div>
+    <div class="spinner-container" *ngIf="loadingData$ | async">
+        <mat-spinner></mat-spinner>
+    </div>
+    <mat-table class="ob-table" [dataSource]="venueTemplates$ | async" [trackBy]="trackByFn"
+        matSort [matSortActive]="initSortCol" [matSortDirection]="initSortDir" matSortDisableClear
+        [attr.aria-label]="'TITLES.VENUE_CONFIGS' | translate"
+        [class.not-touchable]="(isHandsetOrTablet$ | async) !== true">
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'FORMS.LABELS.NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="entity_name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'FORMS.LABELS.ENTITY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.entity.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="venue_name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'FORMS.LABELS.VENUE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.venue.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="venue_city">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'FORMS.LABELS.CITY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.venue.city}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="graphic">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'VENUE_TPLS.GRAPHIC' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{'FORMS.LABELS.' + (row.graphic ? 'YES' : 'NO') | translate}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="two-actions-cell head-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="two-actions-cell" [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                <div *ngIf="userCanWrite$ | async" class="action-buttons" (click)="$event.stopPropagation()">
+                    <button *ngIf="canBeCloned(row)" mat-icon-button aria-label="Clone Promoter Venue Template"
+                        class="ob-button medium" (click)="openCloneTemplateDialog(row)">
+                        <mat-icon>file_copy</mat-icon>
+                    </button>
+                    <button mat-icon-button aria-label="Delete Promoter Venue Template"
+                        class="ob-button medium" (click)="openDeleteTemplateDialog(row)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+            </mat-cell>
+        </ng-container>
+        <ng-container *ngIf="displayedColumns$ | async as displayedColumns">
+            <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;" class="interactive-row"
+                [routerLink]="[row.id]"></mat-row>
+        </ng-container>
+    </mat-table>
+    <div class="context-notification-container" fxFlex="0 50 100%" fxLayout="row" fxLayoutAlign="center start"
+        *ngIf="(venueTemplatesMetadata$ | async)?.total === 0">
+        <app-context-notification class="ob-context-notification" contextType="info"
+            fxFlex.gt-sm="600px" fxFlex="80%"
+            fxLayoutAlign="center start">
+            <p>{{'LIST.EMPTY' | translate}}</p>
+        </app-context-notification>
+    </div>
+</div>

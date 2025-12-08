@@ -1,0 +1,48 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title>
+        <div class="flex justify-between">
+            <h2 class="secondary title">{{'TITLES.TICKET_PASSBOOK_ADD_CONTENT' | translate}}</h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <app-tabs-menu mat-dialog-content type="navigation" overrideClasses="padded-tabs-header" [selectedIndex]="initialTabIndex">
+        <ng-template appTab [label]="('TICKET_PASSBOOK.STANDARD_TAB_TITLE' | translate) + ' (' + (standardFieldsSelected$ | async) + ')'">
+            <app-standard-contents-tab
+                [maxFields]="maxFields"
+                [totalFieldsSelected]="totalFieldsSelected$ | async"
+                [passbookAvailableTypeFieldsOpts$]="passbookAvailableTypeFieldsOpts$"
+                [passbookKey]="passbookKey"
+                [passbookAvailableFields$]="passbookAvailableFields$"
+                [formGroup]="newContentFieldsForm"
+                (filterChange)="setNewFilter($event.key, $event.value)" />
+        </ng-template>
+        <ng-template appTab [label]="('TICKET_PASSBOOK.CUSTOM_TAB_TITLE' | translate) + ' (' + (customFieldsSelected$ | async) + ')'">
+            <app-custom-contents-tab class="custom-content-tab" [form]="customContentsForm" [maxFields]="maxFields"
+                [totalFieldsSelected]="totalFieldsSelected$ | async" />
+        </ng-template>
+    </app-tabs-menu>
+    <div mat-dialog-actions fxLayout="row" fxLayoutAlign="space-between center" class="dialog-actions-container">
+        <div>
+            <p class="max-fields" *ngIf="maxFields">
+                {{totalFieldsSelected$ | async}}/{{maxFields}} {{'TICKET_PASSBOOK.SELECTED_CONTENT' | translate}}
+            </p>
+        </div>
+        <div class="dialog-actions">
+            <button type="button" mat-button class="ob-button" (click)="close()" [disabled]="isInProgress$ | async">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button mat-flat-button color="primary" type="button" (click)="save()" class="ob-button"
+                [disabled]="(isInProgress$ | async) || !isCustomTabValid()">
+                {{'TICKET_PASSBOOK.ADD_CONTENT' | translate}}
+            </button>
+        </div>
+    </div>
+</div>
+
+@if(isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

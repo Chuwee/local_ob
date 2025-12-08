@@ -1,0 +1,59 @@
+@if (product$ | async; as product) {
+    <div class="details-container flex flex-1 basis-full flex-col">
+        <div class="heading-container flex flex-row items-center justify-start">
+            <app-go-back defaultPath="/products" />
+            <h1 class="secondary mat-headline-3">{{ product.name }}</h1>
+            <span class="ob-status-badge" [ngClass]="product.product_state === 'ACTIVE' ? 'active' : 'inactive'">
+                {{('PRODUCT.STATUS_OPTS.' + (product.product_state === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE')) | translate}}
+            </span>
+        </div>
+        <div class="main-content flex basis-full flex-col">
+            <div class="top-actions">
+                <app-nav-tabs-menu type="tabMenu" [elements]="[
+                    {
+                        label: 'PRODUCT.GENERAL_DATA.TITLE',
+                        id: 'tab_product_general-data',
+                        param: 'general-data',
+                    },
+                    {
+                        label: 'PRODUCT.TAXES_AND_SURCHARGES.TITLE',
+                        id: 'tab_product_taxes',
+                        param: 'taxes',
+                    },
+                    {
+                        label: 'PRODUCT.COMMUNICATION.TITLE',
+                        id: 'tab_product_communication',
+                        param: 'communication',
+                    },
+                    {
+                        label: 'PRODUCT.DELIVERY.TITLE',
+                        id: 'tab_product_delivery',
+                        param: 'delivery',
+                    },
+                    {
+                        label: 'PRODUCT.EVENTS.TITLE',
+                        id: 'tab_product_events',
+                        param: 'events',
+                        disabled: (isDeliveryConfigSetted$ | async) === false,
+                    },
+                    {
+                        label: 'PRODUCT.CHANNELS.TITLE',
+                        id: 'tab_product_channels',
+                        param: 'channels',
+                    },
+                    {
+                        label: 'PRODUCT.PROMOTIONS.TITLE',
+                        id: 'tab_product_promotions',
+                        param: 'promotions',
+                    },
+                    {
+                        label: 'PRODUCT.DESIGN.TITLE',
+                        id: 'tab_product_design',
+                        param: 'design',
+                    }
+                ]" />
+            </div>
+            <router-outlet />
+        </div>
+    </div>
+}

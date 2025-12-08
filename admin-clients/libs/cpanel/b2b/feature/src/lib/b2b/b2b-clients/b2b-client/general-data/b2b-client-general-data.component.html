@@ -1,0 +1,159 @@
+<app-form-container layout="main" class="overflow-y-auto" (cancel)="cancel()" (save)="save()" [formGroup]="form"
+    [disabled]="!form.dirty || (isInProgress$ | async)">
+    <mat-accordion multi [togglePosition]="'before'">
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>
+                    {{'B2B_CLIENTS.BASIC_DATA' | translate}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <form formGroupName="basicDataGroup" fxLayout="row wrap" fxLayoutGap.gt-sm="40px">
+                <!-- Client Id -->
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 40px)"
+                    fxFlex.gt-md="0 1 calc(33.3% - 40px)" fxLayout="column">
+                    <span class="field-label">{{'FORMS.LABELS.CLIENT_ID' | translate}}</span>
+                    <span>{{b2bClientIdClient$ | async}}</span>
+                </div>
+                <!-- IATA code -->
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 40px)"
+                    fxFlex.gt-md="0 1 calc(33.3% - 40px)" fxLayout="column" *ngIf="b2bClientIataCode$ | async as iataCode">
+                    <span class="field-label">{{'FORMS.LABELS.IATA_CODE' | translate}}</span>
+                    <span>{{iataCode}}</span>
+                </div>
+                <!-- Tax Id -->
+                <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 40px)" fxFlex.gt-md="0 1 calc(33.3% - 40px)" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.TAX_ID_ALT' | translate}}</mat-label>
+                    <input matInput aria-label="taxId" formControlName="taxId" [placeholder]="'FORMS.LABELS.TAX_ID_ALT' | translate">
+                    <mat-error [ob-form-errors]="form" field="basicDataGroup.taxId"></mat-error>
+                </mat-form-field>
+                <!-- Type -->
+                <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 40px)" fxFlex.gt-md="0 1 calc(33.3% - 40px)" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.TYPE' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="categoryType">
+                        <mat-option *ngFor="let categoryType of categoryTypes | keyvalue" [value]="categoryType.value">
+                            {{('B2B_CLIENTS.CATEGORY_TYPES.' + categoryType.value | translate)}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form" field="basicDataGroup.categoryType"></mat-error>
+                </mat-form-field>
+                <!-- Name -->
+                <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 40px)" fxFlex.gt-md="0 1 calc(33.3% - 40px)" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                    <input matInput aria-label="name" formControlName="name" [placeholder]="'FORMS.LABELS.NAME' | translate">
+                    <mat-error [ob-form-errors]="form" field="basicDataGroup.name"></mat-error>
+                </mat-form-field>
+                <!-- Business name -->
+                <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 40px)" fxFlex.gt-md="0 1 calc(33.3% - 40px)" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.BUSINESS_NAME_SOCIAL_REASON' | translate}}</mat-label>
+                    <input matInput aria-label="businessName" formControlName="businessName"
+                        [placeholder]="'FORMS.LABELS.BUSINESS_NAME_SOCIAL_REASON' | translate">
+                    <mat-error [ob-form-errors]="form" field="basicDataGroup.businessName"></mat-error>
+                </mat-form-field>
+                <div fxFlex="100%" fxLayout="row wrap" fxLayoutGap.gt-sm="40px">
+                    <!-- Description -->
+                    <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 40px)" fxFlex.gt-md="0 1 calc(33.3% - 40px)"
+                        appearance="outline"
+                        class="ob-form-field field-with-label ">
+                        <mat-label>{{'FORMS.LABELS.DESCRIPTION' | translate}}</mat-label>
+                        <textarea matInput aria-label="description" [placeholder]="'FORMS.LABELS.DESCRIPTION' | translate"
+                            formControlName="description" rows="5">
+                        </textarea>
+                        <mat-error [ob-form-errors]="form" field="basicDataGroup.description"></mat-error>
+                    </mat-form-field>
+                    <!-- Keywords -->
+                    <div fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 40px)" fxFlex.gt-md="0 1 calc(33.3% - 40px)">
+                        <mat-form-field fxFlex="1 1 auto" appearance="outline" class="ob-form-field field-with-label">
+                            <mat-label>{{'FORMS.LABELS.KEYWORDS' | translate}}</mat-label>
+                            <textarea matInput aria-label="keywords" [placeholder]="'FORMS.LABELS.KEYWORDS' | translate"
+                                formControlName="keywords" rows="5">
+                            </textarea>
+                            <mat-error [ob-form-errors]="form" field="basicDataGroup.keywords"></mat-error>
+                        </mat-form-field>
+                        <div fxLayout="column">
+                            <app-help-button fxFlexOffset="9px" [message]="'B2B_CLIENTS.NEW_B2B_CLIENT.KEYWORDS_INFO' | translate">
+                            </app-help-button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </mat-expansion-panel>
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>
+                    {{'B2B_CLIENTS.CONTACT_DATA' | translate}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <form formGroupName="contactDataGroup" fxLayout="row wrap" fxLayoutGap.gt-sm="40px">
+                <!-- Contact person -->
+                <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 40px)" fxFlex.gt-md="0 1 calc(33.3% - 40px)" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.CONTACT_PERSON' | translate}}</mat-label>
+                    <input matInput aria-label="contactPerson" formControlName="contactPerson"
+                        [placeholder]="'FORMS.LABELS.CONTACT_PERSON' | translate">
+                    <mat-error [ob-form-errors]="form" field="contactDataGroup.contactPerson"></mat-error>
+                </mat-form-field>
+                <!-- Email -->
+                <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 40px)" fxFlex.gt-md="0 1 calc(33.3% - 40px)" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.EMAIL' | translate}}</mat-label>
+                    <input matInput aria-label="email" formControlName="email" [placeholder]="'FORMS.LABELS.EMAIL' | translate">
+                    <mat-error [ob-form-errors]="form" field="contactDataGroup.email"></mat-error>
+                </mat-form-field>
+                <!-- Phone -->
+                <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 40px)" fxFlex.gt-md="0 1 calc(33.3% - 40px)" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.PHONE' | translate}}</mat-label>
+                    <input matInput aria-label="phone" formControlName="phone" [placeholder]="'FORMS.LABELS.PHONE' | translate">
+                    <mat-error [ob-form-errors]="form" field="contactDataGroup.phone"></mat-error>
+                </mat-form-field>
+                <!-- Address -->
+                <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 40px)" fxFlex.gt-md="0 1 calc(33.3% - 40px)" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.ADDRESS' | translate}}</mat-label>
+                    <input matInput aria-label="address" formControlName="address" [placeholder]="'FORMS.LABELS.ADDRESS' | translate">
+                    <mat-error [ob-form-errors]="form" field="contactDataGroup.address"></mat-error>
+                </mat-form-field>
+                <!-- Country -->
+                <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 40px)" fxFlex.gt-md="0 1 calc(33.3% - 40px)" appearance="outline"
+                    class="ob-form-field field-with-label no-grid-spacing">
+                    <mat-label>{{'FORMS.LABELS.COUNTRY' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="country">
+                        <mat-option>
+                            <app-select-search #countrySelectSearch [options$]="countries$"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" requireSelection="true">
+                            </app-select-search>
+                        </mat-option>
+                        <mat-option *ngFor="let country of countrySelectSearch.getFilteredOptions$() | async" [value]="country.code">
+                            {{country.name}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form" field="contactDataGroup.country"></mat-error>
+                </mat-form-field>
+                <!-- Country subdivision -->
+                <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 40px)" fxFlex.gt-md="0 1 calc(33.3% - 40px)" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.COUNTRY_SUBDIVISION' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="countrySubdivision">
+                        <mat-option>
+                            <app-select-search #countrySubdivisionSelectSearch [options$]="filteredRegions$"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" requireSelection="true">
+                            </app-select-search>
+                        </mat-option>
+                        <mat-option *ngFor="let countrySubdivision of countrySubdivisionSelectSearch.getFilteredOptions$() | async"
+                            [value]="countrySubdivision.code">
+                            {{countrySubdivision.name}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form" field="contactDataGroup.countrySubdivision"></mat-error>
+                </mat-form-field>
+            </form>
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+<div class="spinner-container" *ngIf="isInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

@@ -1,0 +1,33 @@
+<div class="dialog-msg-container" fxLayout="column wrap" fxFlex="100%">
+    <div mat-dialog-title fxLayout="row">
+        <div class="title-icon" fxFlex="56px" fxLayout="row" fxLayoutAlign="center center">
+            <mat-icon class="ob-icon large">{{data.type}}</mat-icon>
+        </div>
+    </div>
+    <div mat-dialog-content fxLayout="column">
+        <p class="message-dialog-title-text mat-subtitle-2" fxFlex="auto" [innerHTML]="data.title | translate : data.messageParams"></p>
+        <p class="message-dialog-text" fxFlex="auto" [innerHTML]="data.message | translate : data.messageParams"></p>
+        @if (data.subMessages?.length) {
+            <div class="message-dialog-subtext mat-tiny" fxFlex="auto">
+                @for (subMessage of data.subMessages; track subMessage) {
+                    <p>{{subMessage}}</p>
+                }
+            </div>
+        }
+    </div>
+    <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end">
+        @if (data.showCancelButton) {
+            <button type="button" mat-button class="ob-button" (click)="close()">
+                {{(data.cancelLabel ? data.cancelLabel : 'FORMS.ACTIONS.CANCEL') | translate}}
+            </button>
+        }
+        @if (data.showSecondaryButton) {
+            <button mat-stroked-button class="ob-button" (click)="close('secondary')">
+                {{data.secondaryActionLabel | translate}}
+            </button>
+        }
+        <button mat-flat-button color="primary" class="ob-button" (click)="close(true)">
+            {{data.actionLabel | translate}}
+        </button>
+    </div>
+</div>

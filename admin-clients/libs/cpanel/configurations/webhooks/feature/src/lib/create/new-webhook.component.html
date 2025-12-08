@@ -1,0 +1,83 @@
+<div class="dialog-msg-container flex flex-col">
+    <div mat-dialog-title>
+        <div class="flex flex-auto justify-between items-center">
+            <h2 class="secondary title">{{'TITLES.NEW_WEBHOOK' | translate}}</h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content class="flex flex-col">
+        <form [formGroup]="form" class="flex flex-col">
+            <!-- Operator -->
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'WEBHOOKS.OPERATOR' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="operator">
+                    <mat-option>
+                        <app-select-search #operatorSelectSearch [options$]="operators$"
+                            [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name"
+                            requireSelection="true" />
+                    </mat-option>
+                    @for (operator of operatorSelectSearch.getFilteredOptions$() | async; track operator.id) {
+                        <mat-option [value]="operator">
+                            {{operator.name}}
+                        </mat-option>
+                    }
+                </mat-select>
+                <mat-error [ob-form-errors]="form" field="entity" />
+            </mat-form-field>
+            <!-- Entity -->
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'WEBHOOKS.ENTITY' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="entity">
+                    <mat-option>
+                        <app-select-search #entitySelectSearch [options$]="entities$"
+                            [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name"
+                            requireSelection="true" />
+                    </mat-option>
+                    @for (entity of entitySelectSearch.getFilteredOptions$() | async; track entity.id) {
+                        <mat-option [value]="entity">
+                            {{entity.name}}
+                        </mat-option>
+                    }
+                </mat-select>
+                <mat-error [ob-form-errors]="form" field="entity" />
+            </mat-form-field>
+            <!-- Internal Name -->
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.INTERNAL_NAME' | translate}}</mat-label>
+                <input matInput aria-label="internalName" [placeholder]="'FORMS.LABELS.INTERNAL_NAME' | translate"
+                    formControlName="internalName">
+                <mat-error [ob-form-errors]="form" field="internalName" />
+            </mat-form-field>
+            <!-- Scope -->
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'WEBHOOKS.SCOPE' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="scope">
+                    @for (scope of scopes; track scope) {
+                        <mat-option [value]="scope" [disabled]="isScopeDisabled(scope)">
+                            {{ 'WEBHOOKS.SCOPE_' + scope | translate }}
+                        </mat-option>
+                    }
+                </mat-select>
+                <mat-error [ob-form-errors]="form" field="scope" />
+            </mat-form-field>
+        </form>
+    </div>
+    <div mat-dialog-actions>
+        <div class="flex flex-auto justify-end">
+            <button mat-button type="button" class="ob-button" (click)="close()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createWebhook()">
+                {{'FORMS.ACTIONS.CREATE' | translate}}
+            </button>
+        </div>
+    </div>
+</div>
+
+@if ($isInProgress()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

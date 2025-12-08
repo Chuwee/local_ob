@@ -1,0 +1,221 @@
+<app-form-container layout="menu" [formGroup]="form" (cancel)="cancel()" (save)="save()" [disabled]="!form.dirty || (isLoading$ | async)"
+    class="overflow-y-auto">
+    @if ($canEditUserStatus()) {
+        <div slot="outside" class="flex flex-col user-status gap-2">
+            <!-- User status -->
+            <div class="flex justify-end items-center gap-2">
+                <div class="ob-label">
+                    {{'USER.STATUS' | translate}}
+                </div>
+                <div class="user-status-select flex basis-64">
+                    <mat-form-field appearance="outline"
+                        class="ob-form-field ob-form-field-outline inline-field thin-select-field basis-64">
+                        <mat-select formControlName="userStatus">
+                            <mat-select-trigger>
+                                <span [ngClass]="['status-dot', form.get('userStatus').value?.toLowerCase() || '']">
+                                </span>
+                                <span>{{'USER.STATUS_OPTS.' + form.get('userStatus').value | translate}}</span>
+                            </mat-select-trigger>
+                            @for (status of userStatusList; track status) {
+                                <mat-option [value]="status">
+                                    <span>{{'USER.STATUS_OPTS.' + status | translate}}</span>
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <mat-divider />
+        </div>
+    }
+    <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+        <!-- General Data Panel -->
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'USER.GENERAL_DATA' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <form id="user-general-data" formGroupName="generalData" fxLayout="row wrap">
+                @if (user$ | async; as user) {
+                    <div fxFlex="100%" fxLayout="column" fxLayoutGap="20px">
+
+                        <div fxLayout="row wrap" fxLayoutGap.gt-xs="24px">
+                            <!-- Operator Name (readonly) -->
+                            @if (isSysAdmin$ | async) {
+                                <div class="details-non-editable-field ob-form-field" fxFlex="100%"
+                                    fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                                    fxFlex.gt-sm="0 1 calc(33.3% - 24px)" fxLayout="column">
+                                    <span class="field-label">{{'USER.OPERATOR' | translate}}</span>
+                                    <span>{{user.operator.name}}</span>
+                                </div>
+                            }
+                            <!-- Entity Name (editable) -->
+                            @if ((isOperatorMode$ | async) || (isSysAdmin$ | async)) {
+                                <mat-form-field fxFlex="100%"
+                                    fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                                    fxFlex.gt-sm="0 1 calc(33.3% - 24px)" appearance="outline" class="ob-form-field field-with-label">
+                                    <mat-label>{{'USER.ENTITY' | translate}}</mat-label>
+                                    <mat-select [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate" formControlName="entity">
+                                        <mat-option>
+                                            <app-select-search #entitySelectSearch [options$]="entities$"
+                                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name"
+                                                requireSelection="true" />
+                                        </mat-option>
+                                        @for (entity of entitySelectSearch.getFilteredOptions$() | async; track entity) {
+                                            <mat-option [value]="entity.id">
+                                                {{entity.name}}
+                                            </mat-option>
+                                        }
+                                    </mat-select>
+                                    <mat-error [ob-form-errors]="form" [field]="['generalData', 'entity']" />
+                                </mat-form-field>
+                            } @else {
+
+                                <!-- Entity Name (readonly) -->
+                                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                                    fxFlex.gt-sm="0 1 calc(33.3% - 24px)" fxLayout="column">
+                                    <span class="field-label">{{'USER.ENTITY' | translate}}</span>
+                                    <span>{{user.entity.name}}</span>
+                                </div>
+                            }
+                            <!-- Name -->
+                            <mat-form-field fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.3% - 24px)"
+                                appearance="outline" class="ob-form-field field-with-label">
+                                <mat-label>{{'USER.NAME' | translate}}</mat-label>
+                                <input matInput aria-label="name" [placeholder]="'USER.NAME' | translate" formControlName="name">
+                                <mat-error [ob-form-errors]="form" [field]="['generalData', 'name']" />
+                            </mat-form-field>
+                            <!-- Surname -->
+                            <mat-form-field fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.3% - 24px)"
+                                appearance="outline" class="ob-form-field field-with-label">
+                                <mat-label>{{'USER.SURNAME' | translate}}</mat-label>
+                                <input matInput aria-label="surname" [placeholder]="'USER.SURNAME' | translate" formControlName="surname">
+                                <mat-error [ob-form-errors]="form" [field]="['generalData', 'surname']" />
+                            </mat-form-field>
+                            <!-- Position -->
+                            <mat-form-field fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.3% - 24px)"
+                                appearance="outline" class="ob-form-field field-with-label">
+                                <mat-label>{{'USER.POSITION' | translate}}</mat-label>
+                                <input matInput aria-label="position" [placeholder]="'USER.POSITION' | translate"
+                                    formControlName="position">
+                                <mat-error [ob-form-errors]="form" [field]="['generalData', 'position']" />
+                            </mat-form-field>
+                            <!-- Language -->
+                            <mat-form-field fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.3% - 24px)"
+                                appearance="outline" class="ob-form-field field-with-label">
+                                <mat-label>{{'USER.LANGUAGE' | translate}}</mat-label>
+                                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="language"
+                                    aria-label="language">
+                                    @for (language of languages$ | async; track language) {
+                                        <mat-option [value]="language?.code">
+                                            {{language ? (('LANGUAGES.' + language.code) | translate) : ''}}
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                }
+            </form>
+        </mat-expansion-panel>
+        <!-- Contact Data Panel -->
+        <mat-expansion-panel #contact [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'USER.CONTACT_DATA' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <form id="formContactData" formGroupName="contact" fxLayout="row wrap">
+                <div fxFlex="100%" fxLayout="row wrap" fxLayoutGap.gt-xs="24px">
+                    <!-- Country -->
+                    <mat-form-field fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.3% - 24px)"
+                        appearance="outline" class="ob-form-field field-with-label">
+                        <mat-label>{{'USER.COUNTRY' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="country">
+                            <mat-option>
+                                <app-select-search #countrySelectSearch [options$]="countries$"
+                                    [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name"
+                                    requireSelection="true" />
+                            </mat-option>
+                            @for (country of countrySelectSearch.getFilteredOptions$() | async; track country) {
+                                <mat-option [value]="country.code">
+                                    {{country.name}}
+                                </mat-option>
+                            }
+                        </mat-select>
+                        <mat-error [ob-form-errors]="form" [field]="['contact', 'country']" />
+                    </mat-form-field>
+                    <!-- Contact Region (countrySubdivision) -->
+                    <mat-form-field fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.3% - 24px)"
+                        appearance="outline" class="ob-form-field field-with-label">
+                        <mat-label>{{'USER.COUNTRY_SUBDIVISION' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="countrySubdivision">
+                            @for (region of filteredRegions$ | async; track region) {
+                                <mat-option [value]="region.code">
+                                    {{region.name}}
+                                </mat-option>
+                            }
+                        </mat-select>
+                        <mat-error [ob-form-errors]="form" [field]="['contact', 'countrySubdivision']" />
+                    </mat-form-field>
+                    <!-- City -->
+                    <mat-form-field fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.3% - 24px)"
+                        appearance="outline" class="ob-form-field field-with-label">
+                        <mat-label>{{'USER.CITY' | translate}}</mat-label>
+                        <input matInput aria-label="city" formControlName="city" [placeholder]="'USER.CITY_PLACEHOLDER' | translate">
+                        <mat-error [ob-form-errors]="form" [field]="['contact', 'city']" />
+                    </mat-form-field>
+                    <!-- Address -->
+                    <mat-form-field fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(53.3% - 24px)"
+                        appearance="outline" class="ob-form-field field-with-label">
+                        <mat-label>{{'USER.ADDRESS' | translate}}</mat-label>
+                        <input matInput aria-label="address" formControlName="address"
+                            [placeholder]="'USER.ADDRESS_PLACEHOLDER' | translate">
+                        <mat-error [ob-form-errors]="form" [field]="['contact', 'address']" />
+                    </mat-form-field>
+                    <!-- Postal Code -->
+                    <div fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(13.3% - 24px)">
+                        <mat-form-field fxFlex="120px" fxFlex.gt-xs="100%" appearance="outline" class="ob-form-field field-with-label">
+                            <mat-label>{{'USER.POSTAL_CODE' | translate}}</mat-label>
+                            <input matInput aria-label="postal code" formControlName="postalCode"
+                                [placeholder]="'USER.POSTAL_CODE_PLACEHOLDER' | translate">
+                            <mat-error [ob-form-errors]="form" [field]="['contact', 'postalCode']" />
+                        </mat-form-field>
+                    </div>
+                    <div fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.3% - 24px)"
+                        fxLayoutAlign="space-between">
+                        <!-- Phone -->
+                        <mat-form-field fxFlex="0 1 calc(50% - 12px)" appearance="outline" class="ob-form-field field-with-label">
+                            <mat-label>{{'USER.PHONE' | translate}}</mat-label>
+                            <input matInput aria-label="phone" formControlName="phone" [placeholder]="'USER.PHONE_PLACEHOLDER' | translate">
+                            <mat-error [ob-form-errors]="form" [field]="['contact', 'phone']" />
+                        </mat-form-field>
+                        <!-- Cellphone -->
+                        <mat-form-field fxFlex="0 1 calc(50% - 12px)" appearance="outline" class="ob-form-field field-with-label">
+                            <mat-label>{{'USER.CELLPHONE' | translate}}</mat-label>
+                            <input matInput aria-label="cellphone" formControlName="cellphone"
+                                [placeholder]="'USER.CELLPHONE_PLACEHOLDER' | translate">
+                            <mat-error [ob-form-errors]="form" [field]="['contact', 'cellphone']" />
+                        </mat-form-field>
+                    </div>
+                </div>
+            </form>
+        </mat-expansion-panel>
+        <!-- Notes -->
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'USER.NOTES' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <form fxLayout="row wrap">
+                <mat-form-field fxFlex="100%" fxFlex.gt-xs="0 1 625px" fxFlex.gt-sm="0 1 calc(53.3% - 24px)" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'USER.NOTES' | translate }}</mat-label>
+                    <textarea matInput formControlName="notes" rows="6" [placeholder]="'USER.NOTES_PLACEHOLDER' | translate"></textarea>
+                    <mat-error [ob-form-errors]="form" field="notes" />
+                </mat-form-field>
+            </form>
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+@if (isLoading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,58 @@
+<div class="table-actions flex justify-end">
+    <button mat-stroked-button color="primary" type=" button" class="ob-button" [disabled]="!$enabled()"
+        (click)="openCreateDialog()">
+        <mat-icon fontIcon="add" />{{'CHANNELS.REVIEWS.CONFIG.CUSTOM.NEW' | translate}}
+    </button>
+</div>
+<app-searchable-paginated-list
+    [placeholder]="'ACTIONS.SEARCH' | translate"
+    [emptyListTitle]="'CHANNELS.REVIEWS.CONFIG.CUSTOM.EMPTY_TITLE' | translate"
+    [emptyListDescription]="'CHANNELS.REVIEWS.CONFIG.CUSTOM.EMPTY_DESCRIPTION' | translate"
+    [hideSearch]="false" [hoverable]="true" [smallRows]="false" [pageSize]="pageSize"
+    [data$]="configsData$" [metadata$]="configsMetadata$" [loading$]="loading$"
+    (loadData)="loadElements($event)">
+    <div slot="subheader" class="list-header">
+        <div class="grid grid-cols-7">
+            <span class="list-header-label col-span-4">{{'CHANNELS.REVIEWS.DIALOG_CONFIG.SCOPE.EVENT_TEXT' | translate}}</span>
+            <span class="list-header-label col-span-2">{{'CHANNELS.REVIEWS.CONFIG.FORMS.CRITERIA_LABEL' | translate}}</span>
+            <span class="col-span-1"></span>
+        </div>
+    </div>
+    <ng-template #optionTemplate let-row>
+        <div class="flex-1 grid grid-cols-7 items-center">
+            <div class="col-span-4">
+                <div class="flex gap-4 items-center" appEllipsify>
+                    <span class="scope">
+                        {{'CHANNELS.REVIEWS.CONFIG.FORMS.SCOPE_'+ row.scope +'_TEXT' | translate}}
+                    </span>
+                    @if(row.details.session){
+                        <div class="flex flex-col">
+                            <span>{{row.details.session.name}}</span>
+                            <span>
+                                {{row.details.session.start_date | dateTime : dateTimeFormats.shortDateTimeWithWeek}} -
+                                {{row.details.event.name}}
+                            </span>
+                        </div>
+                    } @else {
+                        <span>{{row.details.event.name}}</span>
+                    }
+                </div>
+            </div>
+            <span class="col-span-2" appEllipsify>
+                {{'CHANNELS.REVIEWS.CONFIG.FORMS.CRITERIA_'+ row.send_criteria +'_TEXT' | translate}}
+            </span>
+            <div class=" col-span-1">
+                <div class="action-buttons flex justify-end items-center" [class.float-actions-cell]="!$isHandsetOrTablet()"
+                    (click)="$event.stopPropagation()">
+                    <button mat-icon-button class="ob-button medium" (click)="openEditDialog(row)">
+                        <mat-icon fontIcon="edit" />
+                    </button>
+                    <button mat-icon-button class="ob-button medium" (click)="openDeleteDialog(row)">
+                        <mat-icon fontIcon="delete" />
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </ng-template>
+</app-searchable-paginated-list>

@@ -1,0 +1,49 @@
+<div mat-dialog-content class="with-wizard-bar">
+    <div *ngIf="hasPreviousRenewals" class="info-container" fxLayout="row" fxLayoutAlign="start center">
+        <mat-icon class="ob-icon small info with-text">info</mat-icon>
+        <span>{{'SEASON_TICKET.RENEWALS.DIALOG_RENEWAL_LIST.HAS_PREVIOUS_RENEWALS_INFO' | translate}}</span>
+    </div>
+    <form class="form-container" fxLayout="column" [formGroup]="candidateFormGroup">
+        <mat-radio-group fxFlex="100%" [formControlName]="candidateTypeControlName" fxLayout.gt-sm="row wrap"
+            fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="center" class="type-options">
+            <mat-radio-button fxFlex="100%" fxFlex.gt-sm="0 0 calc(33% - 20px)" class="ob-radio-card-button"
+                [value]="renewalCandidateTypeEnum.internal">
+                <div class="option-title">
+                    {{'SEASON_TICKET.RENEWALS.DIALOG_RENEWAL_LIST.INTERNAL_CANDIDATE' | translate}}
+                </div>
+                <div>
+                    {{'SEASON_TICKET.RENEWALS.DIALOG_RENEWAL_LIST.INTERNAL_CANDIDATE_DESCRIPTION' | translate}}
+                </div>
+            </mat-radio-button>
+            <mat-radio-button fxFlex="100%" fxFlex.gt-sm="0 0 calc(33% - 20px)" class="ob-radio-card-button"
+                [value]="renewalCandidateTypeEnum.internalAllEntities">
+                <div class="option-title">
+                    {{'SEASON_TICKET.RENEWALS.DIALOG_RENEWAL_LIST.INTERNAL_ALL_ENTITIES_CANDIDATE' | translate}}
+                </div>
+                <div>
+                    {{'SEASON_TICKET.RENEWALS.DIALOG_RENEWAL_LIST.INTERNAL_ALL_ENTITIES_CANDIDATE_DESCRIPTION' | translate}}
+                </div>
+            </mat-radio-button>
+            <mat-radio-button fxFlex="100%" fxFlex.gt-sm="0 0 calc(33% - 20px)" class="ob-radio-card-button"
+                [value]="renewalCandidateTypeEnum.external">
+                <div class="option-title">
+                    {{'SEASON_TICKET.RENEWALS.DIALOG_RENEWAL_LIST.EXTERNAL_CANDIDATE' | translate}}
+                </div>
+                <div>
+                    {{'SEASON_TICKET.RENEWALS.DIALOG_RENEWAL_LIST.EXTERNAL_CANDIDATE_DESCRIPTION' | translate}}
+                </div>
+            </mat-radio-button>
+        </mat-radio-group>
+    </form>
+    <ng-container *ngIf="(candidateType$ | async) === renewalCandidateTypeEnum.internal
+                      || (candidateType$ | async) === renewalCandidateTypeEnum.internalAllEntities">
+        <app-season-ticket-renewal-internal-candidate [candidateFormGroup]="candidateFormGroup"
+            [internalCandidateControlName]="internalCandidateControlName">
+        </app-season-ticket-renewal-internal-candidate>
+    </ng-container>
+    <ng-container *ngIf="(candidateType$ | async) === renewalCandidateTypeEnum.external">
+        <app-season-ticket-renewal-external-candidate [candidateFormGroup]="candidateFormGroup"
+            [externalCandidateControlName]="externalCandidateControlName">
+        </app-season-ticket-renewal-external-candidate>
+    </ng-container>
+</div>

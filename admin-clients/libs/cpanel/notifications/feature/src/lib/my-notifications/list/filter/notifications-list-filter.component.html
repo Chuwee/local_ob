@@ -1,0 +1,71 @@
+<form [formGroup]="filtersForm" fxLayout="column" fxLayoutGap="24px">
+    <ng-container *ngIf="canSelectEntity$ | async">
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label">
+                {{'NOTIFICATIONS.EMAIL_NOTIFICATION.ENTITY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="550px">
+                <mat-form-field appearance="outline" class="ob-form-field entity-select">
+                    <mat-select formControlName="entity" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate"
+                        [compareWith]="compareById">
+                        <mat-option>
+                            <app-select-search #entitySelectSearch [options$]="entities$" searchField="name">
+                            </app-select-search>
+                        </mat-option>
+                        <mat-option *ngFor="let entity of entitySelectSearch.getFilteredOptions$() | async" [value]="entity">
+                            {{entity ? entity.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-divider [inset]="true"></mat-divider>
+    </ng-container>
+    <div fxLayout="row" fxLayoutAlign="space-between" class="filter-block">
+        <div>
+            <div class="ob-label">
+                {{'NOTIFICATIONS.EMAIL_NOTIFICATION.STATUS' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field status-select">
+                    <mat-select formControlName="status" multiple [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option *ngFor="let status of statusList" [value]="status">
+                            {{('NOTIFICATIONS.EMAIL_NOTIFICATION.STATUS_OPTS.' + status) | translate}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    <mat-divider [inset]="true"></mat-divider>
+    <div fxLayout="row" class="filter-block">
+        <div class="ob-label">
+            {{'NOTIFICATIONS.EMAIL_NOTIFICATION.SENT_DATE' | translate}}
+        </div>
+        <div class="filter-block-input" fxFlex="180px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="startDateDP" [placeholder]="dateFormat" formControlName="startDate"
+                    (focus)="startDateDP.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                    (click)="$event.stopPropagation(); startDateDP.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #startDateDP></mat-datepicker>
+            </mat-form-field>
+        </div>
+        <div fxFlex="20px">
+            <span fxFlex class="filter-block-dates-separator"></span>
+        </div>
+        <div class="filter-block-input" fxFlex="180px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="endDateDP" [placeholder]="dateFormat" formControlName="endDate"
+                    (focus)="endDateDP.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                    (click)="$event.stopPropagation(); endDateDP.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #endDateDP></mat-datepicker>
+            </mat-form-field>
+        </div>
+    </div>
+</form>

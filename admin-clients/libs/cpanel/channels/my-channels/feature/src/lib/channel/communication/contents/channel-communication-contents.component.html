@@ -1,0 +1,103 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" class="fit-to-container no-padding overflow-y-auto"
+    [disabled]="!form.dirty || (isInProgress$ | async)">
+    <app-language-bar [languages]="languageList$ | async" [selected]="selectedLanguage$ | async" slot="outside"
+        [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)" />
+    <form [formGroup]="form" fxLayout="row">
+        <div class="portal-contents-list-container">
+            @if (comContents$ | async; as comContents) {
+                <mat-button-toggle-group vertical [formControl]="selectedComContent"
+                    class="ob-outline-button-group">
+                    @for (content of comContents; track content) {
+                        @if((content.id !== SECONDARY_MARKET_LEGAL_TEXT_ID || $entityHasSecondaryMarket())){
+                            <mat-button-toggle [value]="content">
+                                {{('CHANNELS.PORTAL_CONTENTS_IDS.' + content.id) | translate}}
+                            </mat-button-toggle>
+                        }
+                    }
+                </mat-button-toggle-group>
+            }
+        </div>
+        @if (selectedComContent.value; as selectedContent) {
+            <div fxFlex fxLayoutAlign="start stretch"
+                class="portal-content-values-container">
+                <div fxFlex class="content-fields">
+                    @if (('CHANNELS.PORTAL_CONTENTS_IDS.ID_' + selectedContent.id +'.DESCRIPTION' | translate)
+                         !== 'CHANNELS.PORTAL_CONTENTS_IDS.ID_' + selectedContent.id +'.DESCRIPTION') {
+                        <p>
+                            {{('CHANNELS.PORTAL_CONTENTS_IDS.ID_' + selectedContent.id +'.DESCRIPTION') | translate}}
+                        </p>
+                    }
+                    @if (selectedContent.audited) {
+                        <div fxLayout="column" fxLayoutAlign="start stretch">
+                            @if (comHistoricalContents$ | async; as comHistoricalContents) {
+
+                                @if (comHistoricalContents?.length > 1) {
+                                    <div fxFlex class="historical-content-selector">
+                                        <div fxFlex="50%" class="ob-label">
+                                            {{'CHANNELS.LITERALS.HISTORY' | translate}}
+                                        </div>
+                                        <mat-form-field fxFlex="50%" appearance="outline" class="ob-form-field">
+                                            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                                [formControl]="selectedHistory">
+                                                @for (historicalContent of comHistoricalContents; track historicalContent) {
+                                                    <mat-option [value]="historicalContent">
+                                                        {{historicalContent.creationDate ? (historicalContent.creationDate | dateTime :
+                                        dateTimeFormats.shortDateTime) : ('FORMS.DEFAULT_TEXT' | translate)}}
+                                                    </mat-option>
+                                                }
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                }
+                                @if (comHistoricalContents.indexOf(selectedHistory.value) >= 0) {
+                                    <div fxFlex class="historical-content">
+                                        @if (selectedContent.type !== channelContentTypes.text) {
+                                            <mat-form-field fxFlex appearance="outline"
+                                                class="ob-form-field no-padding">
+                                                <app-rich-text-area
+                                                    [formControl]="form.get(['contentValues', selectedContent.id, comHistoricalContents.indexOf(selectedHistory.value)])"
+                                                    class="vertical-stretch" />
+                                            </mat-form-field>
+                                        }
+                                        @if (selectedContent.type === channelContentTypes.text) {
+                                            <mat-form-field fxFlex appearance="outline"
+                                                class="ob-form-field">
+                                                <textarea matInput
+                                                    [formControl]="form.get(['contentValues', selectedContent.id, comHistoricalContents.indexOf(selectedHistory.value)])">
+                                </textarea>
+                                            </mat-form-field>
+                                        }
+                                    </div>
+                                }
+
+                            }
+                        </div>
+                    }
+                    @if (!selectedContent.audited) {
+                        <div fxLayout="column" fxLayoutAlign="start stretch">
+                            @if (selectedContent.type !== channelContentTypes.text) {
+                                <mat-form-field fxFlex appearance="outline"
+                                    class="ob-form-field no-padding">
+                                    <app-rich-text-area [formControl]="form.get(['contentValues', selectedContent.id])"
+                                        class="vertical-stretch" />
+                                </mat-form-field>
+                            }
+                            @if (selectedContent.type === channelContentTypes.text) {
+                                <mat-form-field fxFlex appearance="outline"
+                                    class="ob-form-field">
+                                    <textarea matInput [formControl]="form.get(['contentValues', selectedContent.id])">
+                        </textarea>
+                                </mat-form-field>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </form>
+</app-form-container>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

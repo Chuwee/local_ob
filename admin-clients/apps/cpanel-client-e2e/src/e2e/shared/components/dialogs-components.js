@@ -1,0 +1,27 @@
+const elements = {
+    DIALOG: '.ob-dialog',
+    DIALOG_TEXT: '.message-dialog-text',
+    DIALOG_TITLE: '.mat-mdc-dialog-title',
+    DIALOG_TITLE_TEXT: '.message-dialog-title-text',
+    DIALOG_BUTTON_CONFIRM: '.cdk-overlay-pane.ob-dialog button.mat-primary',
+    INFO_DIALOG: '.cdk-overlay-pane.ob-dialog.info',
+    INFO_BUTTON_CONFIRM: '.cdk-overlay-pane.ob-dialog.info button.mat-primary',
+    WARN_DIALOG: '.cdk-overlay-pane.ob-dialog.warn',
+    WARN_BUTTON_CONFIRM: '.cdk-overlay-pane.ob-dialog.warn button.mat-primary',
+    ALERT_DIALOG: '.cdk-overlay-pane.ob-dialog.alert',
+    ALERT_DIALOG_TITLE: '.message-dialog-title-text',
+    ALERT_DIALOG_TEXT: '.message-dialog-text',
+    ALERT_BUTTON_CONFIRM: '.cdk-overlay-pane.ob-dialog.alert button.mat-primary',
+    ALERT_BUTTON_CANCEL: '.cdk-overlay-pane.ob-dialog.alert button:not(.mat-primary)',
+    UNSAVED_CHANGES_BTN_SAVE: 'button[data-test="save"]',
+    UNSAVED_CHANGES_BTN_STAY: 'button[data-test="cancelNavigation"]',
+    UNSAVED_CHANGES_BTN_DISCARD: 'button[data-test="continueWithoutSaving"]',
+    UNSAVED_CHANGES_MESSAGE_KEY: 'NAV_ACTIONS.UNSAVED_CHANGES_DIALOG_MSG',
+    CONTEXT_NOTIFICATION: 'app-context-notification.ob-context-notification',
+    SNACKBAR: '.snackbar-content',
+    SNACKBAR_SUCCESS: '.snackbar-content.success',
+    SNACKBAR_MSG: '.snackbar-content .main',
+    SELECT_ENTITY_INPUT: 'mat-select[formcontrolname="entityId"]',
+    SELECT_OPTION: 'mat-option'
+}
+export default elements;

@@ -1,0 +1,46 @@
+<app-form-container [disabled]="!(form?.dirty) || (reqInProgress$ | async)" *ngIf="(error$ | async) === false"
+    (cancel)="cancel()" (save)="save()" sidebar>
+    <form [formGroup]="form" fxLayout="column">
+        <!-- PROMOTION GENERAL INFO -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'SEASON_TICKET.PROMOTIONS.GENERAL_INFO' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="row wrap" class="promotion-form-section">
+                <!-- PROMOTION NAME -->
+                <mat-form-field id="name" fxFlex="100%" fxFlex.gt-md="50%" appearance="outline"
+                    class="ob-form-field field-with-label session-form-field">
+                    <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                    <input formControlName="name" matInput [placeholder]="'FORMS.LABELS.NAME' | translate">
+                    <mat-error [ob-form-errors]="form" field="name"></mat-error>
+                </mat-form-field>
+                <mat-form-field id="use-name-as-communication" class="ob-form-field inline-field" fxFlex="100%"
+                    hidden-outline>
+                    <input hidden matInput>
+                    <mat-checkbox formControlName="useNameForCommunication" color="primary">
+                        <mat-label>
+                            {{'SEASON_TICKET.PROMOTIONS.USE_NAME_IN_COMMUNICATION' | translate}}
+                        </mat-label>
+                    </mat-checkbox>
+                </mat-form-field>
+            </div>
+        </mat-expansion-panel>
+        <!-- PROMOTION CHANNEL COMMUNICATION -->
+        <mat-expansion-panel expanded togglePosition="before" class="without-body-padding">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'SEASON_TICKET.PROMOTIONS.CHANNEL_COMMUNICATION' | translate}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-communication-text-content [form]="form" [restrictions]="fieldRestrictions"
+                [languages$]="languages$">
+            </app-communication-text-content>
+        </mat-expansion-panel>
+    </form>
+    <div class="sidebar-container" slot="sidebar" fxLayout="column">
+        <span class="sidebar-label">{{'CHANNELS.PROMOTIONS.USES' | translate}}</span>
+        <span>{{(promotion$ | async)?.usage_limits.promotion_max.current || '0'}}</span>
+    </div>
+</app-form-container>
+<div class="spinner-container" *ngIf="reqInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

@@ -1,0 +1,203 @@
+<form [formGroup]="filtersForm" class="flex flex-col gap-[16px]">
+    <app-context-notification contextType="info" class="min-padding full">
+        {{'ORDER.POPOVER_FILTER_MSG' | translate}}
+    </app-context-notification>
+    <div class="flex flex-col gap-[24px]">
+        @if ($areCurrenciesShown()) {
+            <app-filter-currency-list
+                [formControl]="filtersForm.get(formControlNames.currency)"
+                [startDate]="startDate"
+                [endDate]="endDate" />
+        }
+        @if ((isOperatorMode$ | async) || (isEntityAdmin$ | async)) {
+            <div class="flex filter-block">
+                <div class="flex-none basis-[120px] ob-label">
+                    {{'FORMS.LABELS.CHANNEL_ENTITY' | translate}}
+                </div>
+                <div class="flex-none basis-[540px] filter-block-input">
+                    <mat-form-field appearance="outline" class="ob-form-field">
+                        <app-select-server-search [formControlName]="formControlNames.channelEntity"
+                            [options$]="channelEntities$" [moreOptionsAvailable$]="moreChannelEntitiesAvailable$"
+                            (loadOptions)="loadChannelEntities($event.q, $event.nextPage)" />
+                    </mat-form-field>
+                </div>
+            </div>
+        }
+        <div class="flex filter-block">
+            <div class="flex-none basis-[120px] ob-label">
+                {{'FORMS.LABELS.EVENT_ENTITY' | translate}}
+            </div>
+            <div class="flex-none basis-[540px] filter-block-input">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <app-select-server-search [formControlName]="formControlNames.eventEntity"
+                        [options$]="eventEntities$" [moreOptionsAvailable$]="moreEventEntitiesAvailable$"
+                        (loadOptions)="loadEventEntities($event.q, $event.nextPage)" />
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-divider [inset]="true" />
+        <div class="flex filter-block">
+            <div class="flex-none basis-[120px] ob-label">
+                {{'FORMS.LABELS.CHANNEL' | translate}}
+            </div>
+            <div class="flex-none basis-[540px] filter-block-input">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <app-select-server-search [multiple]="true" [formControlName]="formControlNames.channel"
+                        [unselectLabel]="'FORMS.ACTIONS.UNSELECT_ALL' | translate"
+                        [options$]="channels$" [moreOptionsAvailable$]="moreChannelsAvailable$"
+                        (loadOptions)="loadChannels($event.q, $event.nextPage)" />
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="flex filter-block">
+            <div class="flex-none basis-[120px] ob-label">
+                {{'FORMS.LABELS.TYPE' | translate}}
+            </div>
+            <div class="flex-none basis-[540px] filter-block-input">
+                <mat-form-field appearance="outline" class="ob-form-field status-select">
+                    <mat-select [formControlName]="formControlNames.type" multiple
+                        [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        @for (type of typesList; track type?.id) {
+                            <mat-option [value]="type">
+                                {{type && (type.name | translate)}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        @if ($showCheckboxesRow()) {
+            <div class="flex filter-block">
+                <div class="field-without-label flex gap-[24px] flex-1">
+                    @if ($showOrderAlive()) {
+                        <mat-checkbox color="primary" [formControlName]="formControlNames.orderAlive">
+                            {{'FORMS.LABELS.ORDER_ALIVE' | translate}}
+                        </mat-checkbox>
+
+                    }
+                    @if ($showReallocationRefund()) {
+                        <mat-checkbox color="primary" [formControlName]="formControlNames.reallocationRefund">
+                            {{'FORMS.LABELS.REFUND_FOR_REALLOCATE' | translate}}
+                        </mat-checkbox>
+                    }
+                </div>
+            </div>
+        }
+        <div class="flex justify-between filter-block">
+            <div class="flex">
+                <div class="flex-none basis-[120px] ob-label">
+                    {{'FORMS.LABELS.MERCHANTS' | translate}}
+                </div>
+                <div class="flex-none basis-[220px] filter-block-input">
+                    <mat-form-field appearance="outline" class="ob-form-field">
+                        <app-select-server-search [formControlName]="formControlNames.merchant"
+                            [unselectLabel]="'FORMS.ACTIONS.UNSELECT_ALL' | translate"
+                            [options$]="merchants$" [moreOptionsAvailable$]="moreMerchantsAvailable$"
+                            (loadOptions)="loadMerchants($event.q, $event.nextPage)" />
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="flex">
+                <div class="flex-none secondary-row-label wrapped-label ob-label">
+                    {{'FORMS.LABELS.DELIVERY_METHOD' | translate}}
+                </div>
+                <div class="flex-none basis-[220px] filter-block-input">
+                    <mat-form-field appearance="outline" class="ob-form-field">
+                        <mat-select [formControlName]="formControlNames.delivery" multiple
+                            [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                            @for (deliveryMethod of deliveryMethods; track deliveryMethod?.id) {
+                                <mat-option [value]="deliveryMethod">
+                                    {{deliveryMethod.name | translate}}
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-between filter-block">
+            <div class="flex">
+                <div class="flex-none basis-[120px] wrapped-label ob-label">
+                    {{'FORMS.LABELS.PROFESSIONAL_CLIENT' | translate}}
+                </div>
+                <div class="flex-none basis-[220px] filter-block-input">
+                    <mat-form-field appearance="outline" class="ob-form-field">
+                        <app-select-server-search [formControlName]="formControlNames.client" [multiple]="true"
+                            [unselectLabel]="'FORMS.ACTIONS.UNSELECT_ALL' | translate"
+                            [options$]="clients$" [moreOptionsAvailable$]="moreClientsAvailable$"
+                            (loadOptions)="loadClients($event.q, $event.nextPage)" />
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="flex">
+                <div class="flex-none secondary-row-label ob-label">
+                    {{'FORMS.LABELS.USER' | translate}}
+                </div>
+                <div class="flex-none basis-[220px] filter-block-input">
+                    <mat-form-field appearance="outline" class="ob-form-field">
+                        <app-select-server-search [formControlName]="formControlNames.user"
+                            [unselectLabel]="'FORMS.ACTIONS.UNSELECT_ALL' | translate"
+                            [options$]="users$" [moreOptionsAvailable$]="moreUsersAvailable$"
+                            (loadOptions)="loadUsers($event.q, $event.nextPage)" />
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <mat-divider [inset]="true" />
+        <div class="flex filter-block">
+            <div class="flex-none basis-[120px] ob-label">
+                {{'FORMS.LABELS.EVENT' | translate}}
+            </div>
+            <div class="flex-none basis-[540px] filter-block-input">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <app-select-server-search [multiple]="true" [formControlName]="formControlNames.event"
+                        [unselectLabel]="'FORMS.ACTIONS.UNSELECT_ALL' | translate"
+                        [options$]="events$" [moreOptionsAvailable$]="moreEventsAvailable$"
+                        (loadOptions)="loadEvents($event.q, $event.nextPage)" />
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="flex filter-block">
+            <div class="flex-none basis-[120px] ob-label">
+                {{'FORMS.LABELS.SESSION' | translate}}
+            </div>
+            <div class="flex-none basis-[540px] filter-block-input">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <app-select-server-search [multiple]="true" [formControlName]="formControlNames.session"
+                        [unselectLabel]="'FORMS.ACTIONS.UNSELECT_ALL' | translate"
+                        [options$]="sessions$" [moreOptionsAvailable$]="moreSessionsAvailable$"
+                        (loadOptions)="loadSessions($event.q, $event.nextPage)">
+                        <ng-template #optionTemplate let-row>
+                            @if (row) {
+                                {{row.date_start | dateTime : dateTimeFormats.shortDateTime}} - {{row.name}}
+                            } @else {
+                                {{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}
+                            }
+                        </ng-template>
+                    </app-select-server-search>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="flex filter-block">
+            <div class="flex-none basis-[120px] ob-label">
+                {{'FORMS.LABELS.SESSION_DATE' | translate}}
+            </div>
+            <div class="flex items-center filter-block-input filter-block-time-picker basis-full justify-start">
+                <app-date-time-picker id="start_date" maxErrors="1" class="date-form-field basis-[50%]"
+                    defaultTime="00:00" [formControlName]="formControlNames.sessionDateFrom"
+                    [max]="filtersForm.get(formControlNames.sessionDateTo).value" />
+                <app-date-time-picker id="end_date" maxErrors="1" class="date-form-field basis-[50%]"
+                    [formControlName]="formControlNames.sessionDateTo"
+                    [min]="filtersForm.get(formControlNames.sessionDateFrom).value" />
+                    @if (filtersForm.get(formControlNames.sessionDateFrom).value) {
+                        <button
+                            mat-icon-button
+                            class="ob-button small clear-dates-bt"
+                            (click)="clearSessionDates()">
+                            <mat-icon>clear</mat-icon>
+                        </button>
+                    }
+            </div>
+        </div>
+    </div>
+</form>

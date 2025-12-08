@@ -1,0 +1,94 @@
+<div class="list-container" fxFlex="100%" fxLayout="column">
+
+    <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">{{'TITLES.TERMINALS' | translate}}</h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+            <div class="filter-container" fxFlex="none">
+                <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                    [attr.aria-label]="'TERMINALS.ACTIONS.NEW_TERMINAL' | translate" (click)="createTerminal()">
+                    <mat-icon>add</mat-icon>
+                    {{'TERMINALS.ACTIONS.NEW_TERMINAL' | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="heading-container" fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxFlex="70%" fxLayoutGap="20px" fxLayoutAlign="start center">
+            <div class="filter-container" fxFlex="none">
+                <app-popover appFilter [isOnRemoveFiltersBtnClickEnabled$]="filterContent.filterActive$">
+                    <app-terminals-list-filter #filterContent>
+                    </app-terminals-list-filter>
+                </app-popover>
+            </div>
+            <div class="search-field" fxFlex="100%">
+                <app-search-input [placeholder]="'FORMS.INFOS.SEARCH_BY_NAME' | translate"></app-search-input>
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            <p *ngIf="metadata$ | async as metadata" class="page-summary" [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: metadata"></p>
+            <app-paginator [length]="(metadata$ | async)?.total" [pageSize]="pageSize"></app-paginator>
+        </div>
+    </div>
+
+    <div class="heading-container heading-divider">
+        <mat-divider></mat-divider>
+    </div>
+    <div class="heading-container">
+        <app-chips appFilter></app-chips>
+    </div>
+
+    <mat-table class="ob-table" [dataSource]="terminals$ | async" [trackBy]="trackByFn"
+        [class.not-touchable]="isHandsetOrTablet$ | async" [attr.aria-label]="'TITLES.TERMINALS' | translate">
+        <ng-container [matColumnDef]="cols.name">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'FORMS.LABELS.NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.name}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="cols.entity">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'FORMS.LABELS.ENTITY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.entity.name}}</mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="cols.enabled">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'FORMS.LABELS.STATUS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span class="status-dot" [ngClass]="[row.license.enabled ? 'active' : 'inactive']"></span>
+                {{(row.license.enabled ? 'FORMS.LABELS.ACTIVE' : 'FORMS.LABELS.INACTIVE') | translate}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="cols.actions">
+            <mat-header-cell *matHeaderCellDef class="actions-cell head-cell">
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row; index as i" class="actions-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                <div class="action-buttons" (click)="$event.stopPropagation()">
+                    <button matTooltip="{{'FORMS.ACTIONS.DELETE' | translate}}" mat-icon-button
+                        aria-label="Delete terminal" class="ob-button medium" (click)="deleteTerminal(row)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+            </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="colNames; sticky: true"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: colNames;" class="interactive-row"
+            [routerLink]="[row.id]"></mat-row>
+    </mat-table>
+
+    <div class="context-notification-container" fxFlex="0 50 100%" fxLayout="row" fxLayoutAlign="center start"
+        *ngIf="(metadata$ | async)?.total === 0">
+        <app-context-notification class="ob-context-notification" contextType="info"
+            fxFlex.gt-sm="600px" fxFlex="80%" fxLayoutAlign="center start">
+            <p>{{'LIST.EMPTY' | translate}}</p>
+        </app-context-notification>
+    </div>
+
+    <div class="spinner-container" *ngIf="loading$ | async">
+        <mat-spinner></mat-spinner>
+    </div>
+
+</div>

@@ -1,0 +1,50 @@
+<div fxLayout="column" fxLayoutGap="24px" fxFlex="100%" fxFlex.gt-sm="65%" fxFlex.gt-lg="55%">
+    <div class="spinner-container" *ngIf="(isInProgress$ | async)">
+        <mat-spinner></mat-spinner>
+    </div>
+    <div fxLayoutAlign="end">
+        <button mat-stroked-button color="primary" class="ob-button medium add-button"
+            [attr.aria-label]="'PRODUCER.INVOICES.NEW' | translate" (click)="create()" [disabled]="isInProgress$ | async">
+            <mat-icon>add</mat-icon>
+            {{'PRODUCER.INVOICES.NEW' | translate}}
+        </button>
+    </div>
+    <app-actions-table [data]="invoicePrefixes$" [columns]="columns" (isContentChanging)="isInvoicePrefixTableChangingBS.next($event)">
+
+        <ng-container matColumnDef="default">
+            <mat-header-cell *matHeaderCellDef class="default-cell head-cell" fxFlex="0 0 60px"></mat-header-cell>
+            <mat-cell *matCellDef="let row" class="default-cell" fxFlex="0 0 60px">
+                <app-default-icon (click)="$event.stopPropagation()" [onlyIcon]="true" [tplId]="row.id" [tplName]="row.prefix"
+                    [checked]="row.default" [enabled]="canHaveZeroDefaultInvoicePrefixes || !row.default" [updateDefault]="updateDefault"
+                    [literals]="defaultPrefixInvoiceDefaultLiterals">
+                </app-default-icon>
+            </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="prefix">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'PRODUCER.INVOICES.PREFIX' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row;">{{row.prefix}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="suffix">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'PRODUCER.INVOICES.SUFFIX' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row;">{{row.suffix || '00000000'}}</mat-cell>
+        </ng-container>
+
+        <div empty-list-block class="mat-row no-data-row context-message-container">
+            <div fxLayout="column" fxFlex="100%" fxLayoutAlign="center center">
+                <p class="title">{{'PRODUCER.INVOICES.EMPTY_LIST' | translate}}</p>
+                <p class="body">{{'PRODUCER.INVOICES.EMPTY_LIST_DESCRIPTION' | translate}}</p>
+                <button mat-stroked-button class="ob-button medium add-button"
+                    [attr.aria-label]="'PRODUCER.INVOICES.NEW' | translate" (click)="create()">
+                    {{'PRODUCER.INVOICES.NEW' | translate}}
+                </button>
+            </div>
+        </div>
+
+    </app-actions-table>
+</div>

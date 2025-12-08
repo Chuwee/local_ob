@@ -1,0 +1,86 @@
+<form [formGroup]="filtersForm" fxLayout="column" fxLayoutGap="24px">
+    @if ((canSelectEntity$ | async) && (isOperator$ | async)) {
+
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label" fxFlex="100px">
+                {{'DELIVERY_POINT.ENTITY' | translate}}
+            </div>
+            <div class="filter-block-input">
+                <mat-form-field appearance="outline" class="ob-form-field entity-select" fxFlex="300px">
+                    <mat-select formControlName="entity" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate">
+                        <mat-option>
+                            <app-select-search #entitySelectSearch [options$]="entities$" searchField="name" />
+                        </mat-option>
+                        @for (entity of entitySelectSearch.getFilteredOptions$() | async; track entity) {
+                            <mat-option [value]="entity">
+                                <div appEllipsify [matTooltip]="entity ? entity.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)">
+                                    {{entity ? entity.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                                </div>
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-divider [inset]="true" />
+
+    }
+    <div fxLayout="column" fxLayoutGap="24px">
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label" fxFlex="100px" appEllipsify [matTooltip]="'DELIVERY_POINT.COUNTRY' | translate">
+                {{'DELIVERY_POINT.COUNTRY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="300px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select formControlName="country" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        @for (country of countries$ | async; track country) {
+                            <mat-option [value]="country.code">
+                                <div appEllipsify>
+                                    {{ country.name }}
+                                </div>
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label" fxFlex="100px" appEllipsify [matTooltip]="'DELIVERY_POINT.COUNTRY_SUBDIVISION' | translate">
+                {{'DELIVERY_POINT.COUNTRY_SUBDIVISION' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="300px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select formControlName="country_subdivision" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        @for (region of regions$ | async; track region) {
+                            <mat-option [value]="region.code">
+                                <div appEllipsify>
+                                    {{ region.name }}
+                                </div>
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div formGroupName="status" fxLayout="row" class="filter-block">
+            <div class="ob-label ob-label-checkbox-group inline" fxFlex="100px" appEllipsify
+                [matTooltip]="'DELIVERY_POINT.STATUS' | translate">
+                {{'DELIVERY_POINT.STATUS' | translate}}
+            </div>
+            <div class="filter-block-input" fxLayout="column" fxFlex="300px">
+                <div fxLayout="column" fxLayoutGap="16px">
+                    <div fxLayout="column" fxFlex>
+                        <mat-checkbox formControlName="active" color="primary" class="app-checkbox-wrap-label">
+                            {{'DELIVERY_POINT.STATUS_OPTS.ACTIVE' | translate}}
+                        </mat-checkbox>
+                    </div>
+                    <div fxLayout="column" fxFlex>
+                        <mat-checkbox formControlName="inactive" color="primary" class="app-checkbox-wrap-label">
+                            {{'DELIVERY_POINT.STATUS_OPTS.INACTIVE' | translate}}
+                        </mat-checkbox>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

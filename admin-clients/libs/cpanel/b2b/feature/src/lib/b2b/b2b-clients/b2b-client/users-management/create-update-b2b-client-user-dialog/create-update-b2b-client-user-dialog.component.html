@@ -1,0 +1,85 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="100%" class="secondary title">
+            {{data.action === dialogActions.add ? ('TITLES.NEW_USER' | translate) : ('TITLES.EDIT_USER' | translate)}}
+        </h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column">
+        @if (data.action === dialogActions.add) {
+            <div class="section-block">
+                <p class="section-description">{{'B2B_CLIENTS.USERS_MANAGEMENT.NEW_B2B_USER_DESC' | translate}}</p>
+            </div>
+        }
+        <div [formGroup]="form" fxLayout="column" fxLayoutAlign="start stretch" class="section-block">
+            <!-- Name -->
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                <input matInput aria-label="userCreationName" formControlName="userCreationName"
+                    [placeholder]="'FORMS.LABELS.NAME' | translate">
+                <mat-error [ob-form-errors]="form" field="userCreationName" />
+            </mat-form-field>
+            <!-- Access email (username) -->
+            @if (data.action === dialogActions.add) {
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-label>{{'FORMS.LABELS.ACCESS_EMAIL' | translate}}</mat-label>
+                    <input matInput aria-label="accessEmail" formControlName="accessEmail"
+                        [placeholder]="'FORMS.LABELS.ACCESS_EMAIL' | translate">
+                    <mat-error [ob-form-errors]="form" field="accessEmail" />
+                </mat-form-field>
+            }
+            <!-- Credential reception email -->
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.CREDENTIAL_RECEPTION_EMAIL' | translate}}</mat-label>
+                <input matInput aria-label="credentialReceptionEmail" formControlName="credentialReceptionEmail"
+                    [placeholder]="'FORMS.LABELS.CREDENTIAL_RECEPTION_EMAIL' | translate">
+                <mat-error [ob-form-errors]="form" field="credentialReceptionEmail" />
+            </mat-form-field>
+            <!-- External reference -->
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.EXTERNAL_REFERENCE' | translate}}</mat-label>
+                <input matInput aria-label="externalReference" formControlName="externalReference"
+                    [placeholder]="'FORMS.LABELS.EXTERNAL_REFERENCE' | translate">
+                <mat-error [ob-form-errors]="form" field="externalReference" />
+            </mat-form-field>
+            <!-- User Type -->
+            <mat-form-field appearance="outline" class="ob-form-field" [class.no-grid-spacing]="data.action === dialogActions.update">
+                <mat-label>{{'FORMS.LABELS.B2B_USER_TYPE' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="type">
+                    @for (userType of userTypes | keyvalue; track userType) {
+                        <mat-option [value]="userType.value">
+                            {{('B2B_CLIENTS.USER_TYPE.' + userType.value | translate)}}
+                        </mat-option>
+                    }
+                </mat-select>
+                <mat-error [ob-form-errors]="form" field="basicDataGroup.categoryType" />
+            </mat-form-field>
+            <!-- Readonly Access email (username) -->
+            @if (b2bClientUser$ | async; as b2bClientUser) {
+                <div class="details-non-editable-field ob-form-field"
+                    fxLayout="column">
+                    <span class="field-label">{{'FORMS.LABELS.ACCESS_EMAIL' | translate}}</span>
+                    <span>{{ b2bClientUser.username }}</span>
+                </div>
+            }
+        </div>
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()" [disabled]="isInProgress$ | async">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" [disabled]="(!form.dirty) || (isInProgress$ | async)"
+            (click)="createOrUpdateB2bClientUser()">
+            {{data.action === dialogActions.add
+            ? ('FORMS.ACTIONS.CREATE' | translate)
+            : ('FORMS.ACTIONS.SAVE' | translate)}}
+        </button>
+    </div>
+</div>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,52 @@
+<form [formGroup]="filtersForm" fxLayout="column" fxLayoutGap="24px">
+    <ng-container *ngIf="canSelectEntity$ | async">
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label">
+                {{'USER.ENTITY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="300px">
+                <mat-form-field appearance="outline" class="ob-form-field entity-select">
+                    <app-select-server-search formControlName="entity"
+                        [options$]="entities$" [moreOptionsAvailable$]="moreEntitiesAvailable$"
+                        (loadOptions)="loadEntities($event.q, $event.nextPage)">
+                    </app-select-server-search>
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-divider [inset]="true"></mat-divider>
+    </ng-container>
+    <div fxLayout="row" class="filter-block">
+        <div class="ob-label">
+            {{'FORMS.LABELS.TYPE' | translate}}
+        </div>
+        <div class="filter-block-input" fxFlex="300px">
+            <mat-form-field appearance="outline" class="ob-form-field type-select">
+                <mat-select formControlName="type" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                    <mat-option [value]="null">
+                        {{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}
+                    </mat-option>
+                    <mat-option *ngFor="let type of types" [value]="type">
+                        {{type && type.name | translate}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+    <div fxLayout="row" class="filter-block">
+        <div class="ob-label">
+            {{'FORMS.LABELS.STATUS' | translate}}
+        </div>
+        <div class="filter-block-input" fxFlex="300px">
+            <mat-form-field appearance="outline" class="ob-form-field status-select">
+                <mat-select formControlName="status" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                    <mat-option [value]="null">
+                        {{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}
+                    </mat-option>
+                    <mat-option *ngFor="let status of statuses" [value]="status">
+                        {{status && status.name | translate}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+</form>

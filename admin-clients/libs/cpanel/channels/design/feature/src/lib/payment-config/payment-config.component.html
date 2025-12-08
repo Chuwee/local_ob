@@ -1,0 +1,117 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu"
+    [disabled]="(inProgress$ | async) || !form.dirty || !form.valid" [formGroup]="form">
+    <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+        @if ($isB2cChannel()) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{'CHANNELS.PAYMENT_CONFIG.TITLES.VISUALIZATION' | translate}}
+                        <app-badge badge="INFORMATION_BADGE.NEW_FEATURE" badgeClass="fuchsia" />
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-radio-group class="flex flex-col gap-6" [formControl]="form.controls.mode">
+                    <mat-radio-button class="ob-radio-button" [value]="'ONE_STEP'">
+                        <div class="option-title">
+                            {{'CHANNELS.PAYMENT_CONFIG.FORMS.LABELS.ONE_STEP' | translate}}
+                        </div>
+                        {{'CHANNELS.PAYMENT_CONFIG.FORMS.INFOS.ONE_STEP' | translate}}
+                    </mat-radio-button>
+                    <mat-radio-button class="ob-radio-button" [value]="'TWO_STEP'">
+                        <div class="option-title">
+                            {{'CHANNELS.PAYMENT_CONFIG.FORMS.LABELS.TWO_STEP' | translate}}
+                        </div>
+                        <div class="flex flex-col">
+                            <span>{{'CHANNELS.PAYMENT_CONFIG.FORMS.INFOS.TWO_STEP' | translate}}</span>
+                            <span>{{'CHANNELS.PAYMENT_CONFIG.FORMS.INFOS.TWO_STEP_FIRST' | translate}}</span>
+                            <span>{{'CHANNELS.PAYMENT_CONFIG.FORMS.INFOS.TWO_STEP_SECOND' | translate}}</span>
+                        </div>
+                    </mat-radio-button>
+                </mat-radio-group>
+            </mat-expansion-panel>
+        }
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.PAYMENT_CONFIG.TITLES.INVOICE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div formGroupName="invoice" class="flex flex-col gap-4">
+                <div class="flex flex-col">
+                    <mat-checkbox formControlName="enableInvoicing" color="primary">
+                        <b>{{'CHANNELS.PAYMENT_CONFIG.FORMS.LABELS.ENABLE_INVOICING' | translate}}</b>
+                    </mat-checkbox>
+                    <span class="invoice-description">
+                        {{'CHANNELS.PAYMENT_CONFIG.FORMS.LABELS.ENABLE_INVOICING_DESCRIPTION' | translate }}
+                    </span>
+                </div>
+                @if (isEnabledInvoicing$ | async) {
+                    <div class="invoice-config-container flex flex-col gap-4">
+                        <!-- GENERATION MODE -->
+                        <!-- TODO: uncomment when back is ready -->
+                        <!-- <div class="flex flex-col gap-4">
+                            <span>{{ 'CHANNELS.PAYMENT_CONFIG.FORMS.LABELS.MODE' | translate }}</span>
+                            <mat-radio-group formControlName="invoiceGenerationMode" class="flex flex-col gap-4">
+                                <mat-radio-button class="ob-radio-button" [value]="'MANUAL'">
+                                    <div class="flex flex-col">
+                                        <div class="option-title">{{'CHANNELS.PAYMENT_CONFIG.FORMS.LABELS.MANUAL' | translate}}</div>
+                                        <div>{{'CHANNELS.PAYMENT_CONFIG.FORMS.LABELS.MANUAL_DESCRIPTION' | translate}}</div>
+                                    </div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button" [value]="'AUTOMATIC'">
+                                    <div class="flex flex-col">
+                                        <div class="option-title">{{'CHANNELS.PAYMENT_CONFIG.FORMS.LABELS.AUTOMATIC' | translate}}</div>
+                                        <div>{{'CHANNELS.PAYMENT_CONFIG.FORMS.LABELS.AUTOMATIC_DESCRIPTION' | translate}}</div>
+                                    </div>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        </div>
+                        <mat-divider /> -->
+                        <!-- REQUEST TYPE -->
+                        <div class="flex flex-col gap-4">
+                            <span>{{ 'CHANNELS.PAYMENT_CONFIG.FORMS.LABELS.PURCHASE_LIMIT' | translate }}</span>
+                            <mat-radio-group formControlName="requestType" class="flex flex-col gap-4">
+                                <mat-radio-button class="ob-radio-button" [value]="'MANDATORY'">
+                                    <div class="flex flex-col">
+                                        <div class="option-title">
+                                            {{'CHANNELS.PAYMENT_CONFIG.FORMS.LABELS.PURCHASE_MANDATORY' | translate}}
+                                        </div>
+                                        <div>{{'CHANNELS.PAYMENT_CONFIG.FORMS.LABELS.PURCHASE_MANDATORY_DESCRIPTION' | translate}}</div>
+                                    </div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button" [value]="'BY_AMOUNT'">
+                                    <div class="flex flex-col">
+                                        <div class="option-title">
+                                            {{'CHANNELS.PAYMENT_CONFIG.FORMS.LABELS.PURCHASE_BY_QUANTITY' | translate}}
+                                        </div>
+                                        <div>{{'CHANNELS.PAYMENT_CONFIG.FORMS.LABELS.PURCHASE_BY_QUANTITY_DESCRIPTION' | translate}}</div>
+                                    </div>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        </div>
+                        @if (form.value.invoice.requestType === 'BY_AMOUNT') {
+                            <div formArrayName="thresholds" class="nested-content">
+                                @if(thresholdsCtrl.controls.length > 1){
+                                    <app-tabs-menu type="navigation" overrideClasses="handset">
+                                        @for(thresholdForm of thresholdsCtrl.controls; track thresholdForm){
+                                            @let currency = thresholdForm.controls.currency.value;
+                                            <ng-template appTab [label]="currency | localCurrencyPartialTranslation" [key]="currency">
+                                                <div class="payment-tab-content">
+                                                    <app-payment-config-threshold [form]="thresholdForm" />
+                                                </div>
+                                            </ng-template>
+                                        }
+                                    </app-tabs-menu>
+                                } @else{
+                                                <app-payment-config-threshold [form]="thresholdsCtrl.controls[0]" />
+                                            }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+@if (inProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

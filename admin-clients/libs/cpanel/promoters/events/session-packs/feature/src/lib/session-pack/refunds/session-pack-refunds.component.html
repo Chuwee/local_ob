@@ -1,0 +1,96 @@
+<app-form-container [disabled]="!(form?.dirty) || (loading$ | async)" (cancel)="cancel()" (save)="save()">
+    <mat-accordion [multi]="true" [togglePosition]="'before'" [formGroup]="form">
+        <mat-expansion-panel [expanded]="true" togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.SESSION_PACK.REFUNDED_SEATS_SETTINGS.TITLE' | translate}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="column" formGroupName="refunded_seat_quota" class="refunded-seats-quota">
+                <p class="mat-subtitle-2">{{'EVENTS.SESSION_PACK.REFUNDED_SEATS_SETTINGS.DESCRIPTION' | translate}}</p>
+                <mat-radio-group formControlName="enabled" fxFlex="100%" fxLayout="column" class="refunded-seats-radio-group">
+                    <mat-radio-button class="ob-radio-button" [value]="null">
+                        {{'EVENTS.SESSION_PACK.REFUNDED_SEATS_SETTINGS.DISABLED' | translate}}
+                    </mat-radio-button>
+                    <div fxFlex="100%" fxLayout="row wrap" fxLayoutAlign="start center" class="refunded-seat-quota-block">
+                        <mat-radio-button class="ob-radio-button" [value]="true" #enabledRadio>
+                            {{'EVENTS.SESSION_PACK.REFUNDED_SEATS_SETTINGS.ENABLED' | translate}}
+                        </mat-radio-button>
+                        <mat-form-field id="quota-selector" fxFlex="200px" *ngIf="enabledRadio.checked" appearance="outline"
+                            class="ob-form-field inline-field quota-select">
+                            <mat-select required formControlName="id" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                <mat-option *ngFor="let quota of (quotas$ | async)" [value]="quota.id">
+                                    <div appEllipsify [matTooltip]="quota.name">
+                                        {{quota.name}}
+                                    </div>
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </mat-radio-group>
+            </div>
+            <mat-divider></mat-divider>
+            <div fxLayout="column" class="refunded-seats-status">
+                <p class="mat-subtitle-2">{{'EVENTS.SESSION_PACK.REFUNDED_SEATS_SETTINGS.STATUS' | translate}}</p>
+                <div class="refunded-seats-status-options" fxLayoutAlign="start center" fxLayout="row">
+                    <mat-form-field id="status-selector" fxFlex="200px" appearance="outline"
+                        class="ob-form-field field-with-label status-select">
+                        <mat-label>{{'EVENTS.SESSION_PACK.REFUNDED_STATUS' | translate}}</mat-label>
+                        <mat-select required #statusSelect formControlName="refunded_seat_status"
+                            [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                            <mat-option *ngFor="let seatStatus of seatStatuses" [value]="seatStatus">
+                                <div appEllipsify [matTooltip]="'ENUMS.SEAT_STATUS.' + seatStatus | translate">
+                                    {{'ENUMS.SEAT_STATUS.' + seatStatus | translate}}
+                                </div>
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field id="reason-selector" fxFlex="200px" *ngIf="statusSelect.value === seatStatus.promotorLocked"
+                        appearance="outline" class="ob-form-field field-with-label reason-select">
+                        <mat-label>{{'VENUE_TPLS.BLOCKING_REASON' | translate}}</mat-label>
+                        <mat-select required formControlName="refunded_seat_block_reason_id"
+                            [placeholder]="'VENUE_TPLS.BLOCKING_REASON' | translate">
+                            <mat-option *ngFor="let reason of (blockingReasons$ | async)" [value]="reason.id">
+                                <div appEllipsify [matTooltip]="reason.name">
+                                    {{reason.name}}
+                                </div>
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel [expanded]="true" togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.SESSION_PACK.PARTIAL_REFUND_CONDITIONS' | translate}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayoutGap="10px" fxLayout="row" class="print-refund-price">
+                <mat-form-field hidden-outline class="ob-form-field inline-field" fxFlexAlign="center">
+                    <input fxHide matInput>
+                    <mat-checkbox formControlName="print_refund_price_in_ticket" color="primary">
+                        <mat-label>{{'EVENTS.SESSION_PACK.PRINT_REFUND_PRICE_IN_TICKET' | translate}}</mat-label>
+                    </mat-checkbox>
+                </mat-form-field>
+                <mat-icon class="ob-help-icon" fxFlexAlign="center" [matTooltip]="'EVENTS.SESSION_PACK.PRINT_REFUND_PRICE_HELP' | translate">
+                    help_outline
+                </mat-icon>
+            </div>
+            <mat-divider></mat-divider>
+            <mat-form-field hidden-outline class="ob-form-field inline-field auto-conditions">
+                <input fxHide="true" matInput>
+                <mat-slide-toggle class="ob-slide-toggle" (change)="refundModeChangeHandler($event.checked)"
+                    formControlName="session_pack_automatically_calculate_conditions">
+                    {{'EVENTS.SESSION_PACK.AUTOMATICALLY_CALCULATE_CONDITIONS' | translate}}
+                </mat-slide-toggle>
+                <app-help-button matSuffix [message]="'EVENTS.SESSION_PACK.AUTOMATIC_CONDITIONS_INFO' | translate">
+                </app-help-button>
+            </mat-form-field>
+            <app-partial-refund-percentages-table controlName="session_pack_refund_conditions" [form]="form">
+            </app-partial-refund-percentages-table>
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+
+<div class="spinner-container" *ngIf="loading$ | async">
+    <mat-spinner></mat-spinner>
+</div>

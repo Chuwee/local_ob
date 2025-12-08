@@ -1,0 +1,15 @@
+<ng-container [formGroup]="taxDataFormGroup">
+    <div fxFlex="100%" fxLayout="row" *ngIf="(computedInvoicePrefixes$ | async)?.length">
+        <mat-form-field appearance="outline" fxFlex="0 1 50%" class="ob-form-field field-with-label">
+            <mat-label>{{'EVENTS.PROMOTIONS.TAX_DATA.SELECT_INVOICE_PREFIX_LABEL' | translate}}</mat-label>
+            <mat-select [placeholder]="'FORMS.SELECT.NONE' | translate" formControlName="taxInvoicePrefixId"
+                aria-label="invoice prefix">
+                <mat-option *ngFor="let invoicePrefix of computedInvoicePrefixes$ | async" [value]="invoicePrefix.id">
+                    <div appEllipsify [matTooltip]="invoicePrefix.prefix">
+                        {{invoicePrefix.prefix}}
+                    </div>
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+</ng-container>

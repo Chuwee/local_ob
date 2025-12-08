@@ -1,0 +1,307 @@
+<form [formGroup]="form" class="form-box flex flex-col">
+    <h3 class="section-title"> {{ 'RATE_RESTRICTIONS.RELATIONS.TITLE' | prefix | translate }} </h3>
+    <div class="flex flex-col gap-4">
+        <!-- Period restriction -->
+        @if ($showPeriodRestrictions()) {
+            <mat-checkbox color="primary" formControlName="period_restriction_enabled">
+                {{'RATE_RESTRICTIONS.PERIOD_RESTRICTION.ENABLED' | prefix | translate}}
+            </mat-checkbox>
+        }
+
+        <!-- Rate relations restriction -->
+        <mat-checkbox color="primary" formControlName="rate_relations_restriction_enabled">
+            {{'RATE_RESTRICTIONS.RELATIONS.ENABLED' | prefix | translate}}
+        </mat-checkbox>
+        @if(form.get('rate_relations_restriction_enabled').value) {
+            <div class="nested-content flex flex-col gap-8" formGroupName="rate_relations_restriction">
+                <div class="flex flex-col gap-4">
+                    <span class="body-1">{{ 'RATE_RESTRICTIONS.RELATIONS.RESTRICTION_TYPE_LABEL' | prefix | translate }}</span>
+                    <mat-radio-group formControlName="type" class="flex flex-col gap-4">
+                        <mat-radio-button class="ob-radio-button" [value]="'TICKETS_NUMBER'">
+                            <div class="flex flex-col gap-4">
+                                <div>
+                                    {{'RATE_RESTRICTIONS.RELATIONS.RESTRICTION_TYPE_TICKETS_NUMBER' | prefix | translate}}
+                                </div>
+                                @if (form.get('rate_relations_restriction.type').value === 'TICKETS_NUMBER') {
+                                    <div class="flex flex-row flex-wrap gap-2 items-center">
+                                        <span>{{ 'RATE_RESTRICTIONS.RELATIONS.LOCKED_TICKETS_LABELS.MUST_ADD' | prefix | translate }}</span>
+                                        <mat-form-field appearance="outline" class="ob-form-field inline-field flex-[0_1_96px]">
+                                            <input matInput formControlName="required_tickets_number"
+                                                type="number" inputmode="numeric" min="1" step="1" placeholder="0">
+                                        </mat-form-field>
+                                        <span>{{ 'RATE_RESTRICTIONS.RELATIONS.LOCKED_TICKETS_LABELS.RATES' | prefix | translate }}</span>
+                                        <mat-form-field appearance="outline" class="ob-form-field inline-field flex-[0_1_240px]">
+                                            <mat-select multiple [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                                formControlName="required_rate_ids">
+                                                @for (rate of $filteredRates(); track rate?.id) {
+                                                    <mat-option [value]="rate.id">{{rate.name}}</mat-option>
+                                                }
+                                            </mat-select>
+                                        </mat-form-field>
+                                        <span>{{ 'RATE_RESTRICTIONS.RELATIONS.LOCKED_TICKETS_LABELS.TO_PURCHASE' | prefix  | translate }}</span>
+                                        <span>{{ $rateRestrictions().rate.name }}</span>
+                                    </div>
+                                    <mat-checkbox color="primary" formControlName="price_zone_criteria_any">
+                                        {{'RATE_RESTRICTIONS.PRICE_ZONE_CRITERIA_ANY.ENABLED' | prefix | translate}}
+                                    </mat-checkbox>
+                                }
+                            </div>
+                        </mat-radio-button>
+                        <mat-radio-button class="ob-radio-button" [value]="'MAX_TICKETS_NUMBER'">
+                            <div class="flex flex-col gap-4">
+                                <div>
+                                    {{'RATE_RESTRICTIONS.RELATIONS.RESTRICTION_TYPE_MAX_TICKETS_NUMBER' | prefix | translate}}
+                                </div>
+                                @if (form.get('rate_relations_restriction.type').value === 'MAX_TICKETS_NUMBER') {
+                                    <div class="flex flex-row flex-wrap gap-2 items-center">
+                                        <span>{{ 'RATE_RESTRICTIONS.RELATIONS.REQUIRED_TICKETS_LABELS.RATES' | prefix  | translate }}</span>
+                                        <mat-form-field appearance="outline" class="ob-form-field inline-field flex-[0_1_240px]">
+                                            <mat-select multiple [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                                formControlName="required_rate_ids">
+                                                @for (rate of $filteredRates(); track rate?.id) {
+                                                    <mat-option [value]="rate.id">{{rate.name}}</mat-option>
+                                                }
+                                            </mat-select>
+                                        </mat-form-field>
+                                        <span>{{ 'RATE_RESTRICTIONS.RELATIONS.REQUIRED_TICKETS_LABELS.CAN_ADD' | prefix | translate }}</span>
+                                        <mat-form-field appearance="outline" class="ob-form-field inline-field flex-[0_1_96px]">
+                                            <input matInput formControlName="locked_tickets_number"
+                                                type="number" inputmode="numeric" min="1" step="1" placeholder="0">
+                                        </mat-form-field>
+                                        <span>{{ 'RATE_RESTRICTIONS.RELATIONS.REQUIRED_TICKETS_LABELS.TICKETS_TO_RATE' | prefix | translate }}</span>
+                                        <span>{{ $rateRestrictions().rate.name }}</span>
+                                    </div>
+                                    <mat-checkbox color="primary" formControlName="price_zone_criteria_any">
+                                        {{'RATE_RESTRICTIONS.PRICE_ZONE_CRITERIA_ANY.ENABLED' | prefix | translate}}
+                                    </mat-checkbox>
+                                }
+                            </div>
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </div>
+                <div class="flex flex-col gap-4">
+                    <span class="body-1">{{ 'RATE_RESTRICTIONS.RELATIONS.RESTRICTION_PRICE_ZONE_LABEL' | prefix  | translate }}</span>
+                    <span>{{ 'RATE_RESTRICTIONS.RELATIONS.RESTRICTION_PRICE_ZONE_DESCRIPTION' | prefix  | translate }}</span>
+                    <mat-radio-group formControlName="use_all_zone_prices" class="flex flex-col gap-4">
+                        <mat-radio-button class="ob-radio-button" [value]="true">
+                            <div>
+                                {{'RATE_RESTRICTIONS.RELATIONS.RESTRICTION_TYPE_ALL' | prefix  | translate}}
+                            </div>
+                        </mat-radio-button>
+                        <mat-radio-button class="ob-radio-button" [value]="false">
+                            <div class="flex flex-col gap-4">
+                                <div>
+                                    {{'RATE_RESTRICTIONS.RELATIONS.RESTRICTION_TYPE_SELECT' | prefix  | translate}}
+                                </div>
+                            </div>
+                        </mat-radio-button>
+                        @if (!form.get('rate_relations_restriction.use_all_zone_prices').value) {
+                            <div class="flex flex-col prize-zones-list nested-content">
+                                <mat-selection-list class="ob-list" formControlName="restricted_price_zone_ids">
+                                    @for (venueTemplateWithPz of $groupedVenueTemplatePriceTypes(); track venueTemplateWithPz?.venueTemplateName;) {
+                                        <div class="sub-list">
+                                            <div matSubheader>
+                                                {{ venueTemplateWithPz.venueTemplateName }}
+                                            </div>
+                                            @for (zone of venueTemplateWithPz.priceTypes; track zone?.id) {
+                                                <mat-list-option color="primary" [value]="zone.id" checkboxPosition="before">
+                                                    {{ zone.name }}
+                                                </mat-list-option>
+                                            }
+                                        </div>
+                                    }
+                                </mat-selection-list>
+                                <mat-error [ob-form-errors]="form.get('rate_relations_restriction')"
+                                    field="restricted_price_zone_ids" />
+                            </div>
+                        }
+                    </mat-radio-group>
+                    <mat-checkbox color="primary" formControlName="apply_to_b2b">
+                        {{'RATE_RESTRICTIONS.RELATIONS.APPLY_TO_B2B' | prefix | translate}}
+                    </mat-checkbox>
+                </div>
+            </div>
+        }
+
+        <!-- Max item restriction -->
+        <div class="flex flex-col gap-4">
+            <mat-checkbox color="primary" formControlName="max_item_restriction_enabled">
+                {{'RATE_RESTRICTIONS.MAX_ITEM.ENABLED' | prefix | translate}}
+            </mat-checkbox>
+            @if (form.controls.max_item_restriction_enabled.value) {
+                <div class="nested-content flex flex-col gap-4">
+                    <div class="flex flex-row flex-wrap gap-2 items-center">
+                        <span>{{ 'RATE_RESTRICTIONS.MAX_ITEM.LABELS.CAN_ADD' | prefix | translate }}</span>
+                        <mat-form-field appearance="outline" class="ob-form-field inline-field flex-[0_1_96px]">
+                            <input matInput formControlName="max_item_restriction"
+                                type="number" inputmode="numeric" min="1" step="1" placeholder="0">
+                        </mat-form-field>
+                        <span>{{ 'RATE_RESTRICTIONS.MAX_ITEM.LABELS.OF_RATE' | prefix | translate }}</span>
+                        <span>{{ $rateRestrictions().rate.name }}</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Price zone restriction -->
+        <mat-checkbox color="primary" formControlName="price_type_restriction_enabled">
+            {{'RATE_RESTRICTIONS.PRICE_ZONE_RESTRICTION.ENABLED' | prefix | translate}}
+        </mat-checkbox>
+        @if(form.get('price_type_restriction_enabled').value) {
+            <div class="flex flex-col prize-zones-list nested-content" formGroupName="price_type_restriction">
+                <p class="section-description">{{'RATE_RESTRICTIONS.PRICE_ZONE_RESTRICTION.DESCRIPTION' | prefix | translate}}</p>
+                <mat-selection-list class="ob-list" formControlName="restricted_price_type_ids">
+                    @for (venueTemplateWithPz of $groupedVenueTemplatePriceTypes(); track venueTemplateWithPz?.venueTemplateName;) {
+                        <div class="sub-list">
+                            <div matSubheader>
+                                {{ venueTemplateWithPz.venueTemplateName }}
+                            </div>
+                            @for (zone of venueTemplateWithPz.priceTypes; track zone?.id) {
+                                <mat-list-option color="primary" [value]="zone.id" checkboxPosition="before">
+                                    {{ zone.name }}
+                                </mat-list-option>
+                            }
+                        </div>
+                    }
+                </mat-selection-list>
+                @if (form.controls.price_type_restriction.touched && form.controls.price_type_restriction.hasError('required')) {
+                    <span class="error-description">{{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}</span>
+                }
+                <mat-checkbox color="primary" formControlName="apply_to_b2b">
+                    {{'RATE_RESTRICTIONS.RELATIONS.APPLY_TO_B2B' | prefix | translate}}
+                </mat-checkbox>
+            </div>
+        }
+
+        <!-- Channel restriction -->
+        <mat-checkbox color="primary" formControlName="channel_restriction_enabled">
+            {{'RATE_RESTRICTIONS.CHANNEL_RESTRICTION.ENABLED' | translate}}
+        </mat-checkbox>
+        @if(form.value.channel_restriction_enabled) {
+            <div class="flex flex-col prize-zones-list nested-content">
+                @if ($channelsList()?.length) {
+                    <p class="section-description">{{'RATE_RESTRICTIONS.CHANNEL_RESTRICTION.DESCRIPTION' | translate}}</p>
+                    <mat-selection-list class="ob-list" formControlName="channel_restriction">
+                        @for (channel of $channelsList(); track channel.channel?.id) {
+                            <mat-list-option color="primary" [value]="channel.channel?.id" checkboxPosition="before">
+                                {{ channel.channel?.name }}
+                            </mat-list-option>
+                        }
+                    </mat-selection-list>
+                    @if (form.controls.channel_restriction.touched && form.controls.channel_restriction.hasError('required')) {
+                        <span class="error-description">{{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}</span>
+                    }
+                } @else {
+                    <div class="flex items-center gap-1">
+                        <mat-icon class="ob-icon warning with-text xsmall">warning</mat-icon>
+                        <span>{{ 'RATE_RESTRICTIONS.CHANNEL_RESTRICTION.EMPTY_DESCRIPTION' | prefix | translate }}</span>
+                        <a [routerLink]="channelsPath" class="flex items-center gap-1 ob-link">
+                            <span>{{ 'RATE_RESTRICTIONS.CHANNEL_RESTRICTION.EMPTY_LINK' | prefix | translate }}</span>
+                            <mat-icon class="ob-icon">launch</mat-icon>
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+    <mat-divider class="ob-divider" />
+
+    <!-- Registered users restrictions-->
+    <h3 class="section-title"> {{ 'RATE_RESTRICTIONS.REGISTERED_USERS.TITLE' | prefix | translate }} </h3>
+    <p>{{ 'RATE_RESTRICTIONS.REGISTERED_USERS.DESCRIPTION' | prefix | translate }}</p>
+    <div class="flex flex-col gap-4">
+        <!-- Age restriction -->
+        <mat-checkbox color="primary" formControlName="date_restriction_enabled">
+            {{'RATE_RESTRICTIONS.REGISTERED_USERS.DATE_ENABLED' | prefix | translate}}
+        </mat-checkbox>
+        @if(form.get('date_restriction_enabled').value) {
+            <div class="nested-content flex flex-col gap-4 ">
+                <div class="flex items-start">
+                    <mat-icon class="ob-icon warning with-text xsmall">warning</mat-icon>
+                    <span>{{ 'RATE_RESTRICTIONS.REGISTERED_USERS.DATE_LABELS.WARNING' | prefix | translate }}</span>
+                </div>
+                <div class="wrap with-space items-center" formGroupName="date_restriction">
+                    <span>{{ 'RATE_RESTRICTIONS.REGISTERED_USERS.DATE_LABELS.FROM_DATE' | prefix | translate }}</span>
+                    <mat-form-field appearance="outline" class="ob-form-field inline-field date-field">
+                        <input matInput [matDatepicker]="date" [placeholder]="dateFormat"
+                            formControlName="from" (focus)="date.open()">
+                        <button type="button" mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                            (click)="$event.stopPropagation(); date.open();">
+                            <mat-icon>event</mat-icon>
+                        </button>
+                        <mat-datepicker #date />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="ob-form-field inline-field select-field no-margin-left">
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                            formControlName="mode">
+                            @for (mode of ageRestrictionMode; track mode) {
+                                <mat-option [value]="mode">
+                                    {{ ('RATE_RESTRICTIONS.REGISTERED_USERS.DATE_LABELS.DATE_MODE.' + mode) | prefix | translate }}
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="ob-form-field inline-field date-field">
+                        <input matInput [matDatepicker]="dateTo" [placeholder]="dateFormat"
+                            formControlName="to" (focus)="dateTo.open()">
+                        <button type="button" mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                            (click)="$event.stopPropagation(); dateTo.open();">
+                            <mat-icon class="ob-icon" [class.neutral]="form.get('date_restriction.to').disabled">event</mat-icon>
+                        </button>
+                        <mat-datepicker #dateTo />
+                    </mat-form-field>
+                    <span>{{ 'RATE_RESTRICTIONS.REGISTERED_USERS.DATE_LABELS.RATE' | prefix | translate }}</span>
+                </div>
+            </div>
+        }
+        <!-- Customer type restriction -->
+        @if ($customerTypes()?.length) {
+            <mat-checkbox color="primary" formControlName="customer_type_restriction_enabled">
+                {{'RATE_RESTRICTIONS.REGISTERED_USERS.CUSTOMER_TYPE_ENABLED' | prefix | translate}}
+            </mat-checkbox>
+            @if(form.get('customer_type_restriction_enabled').value) {
+                <div class="flex flex-col gap-2 nested-content">
+                    <div class="flex flex-row justify-start customer-types-warning">
+                        <mat-icon class="ob-icon small warning with-text">warning</mat-icon>
+                        {{'RATE_RESTRICTIONS.REGISTERED_USERS.CUSTOMER_TYPE_LABELS.CLIENT_TYPE_WARNING' | prefix | translate}}
+                    </div>
+                    <div class="wrap items-center">
+                        <span>{{ 'RATE_RESTRICTIONS.REGISTERED_USERS.CUSTOMER_TYPE_LABELS.CLIENT_TYPE' | prefix | translate }}</span>
+                        <mat-form-field appearance="outline" class="ob-form-field inline-field select-field">
+                            <mat-select multiple [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                formControlName="customer_type_restriction">
+                                @for (ct of $customerTypes(); track ct?.id) {
+                                    <mat-option [value]="ct.id">{{ct.name}}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                        <span>{{ 'RATE_RESTRICTIONS.REGISTERED_USERS.CUSTOMER_TYPE_LABELS.RATE' | prefix | translate }}</span>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</form>
+
+@if (form.dirty && ((form.valueChanges | async) || true)) {
+    <div class="flex justify-start items-center gap-2 edit-mode-actions">
+        <div class="flex flex-1 items-center editing-mode-message">
+            <mat-icon class="ob-icon small info with-text">info</mat-icon>
+            {{'SESSION.PRESALES.EDITING_MODE' | prefix | translate}}
+        </div>
+        <button type="button" mat-button class="ob-button medium"
+            (click)="cancel()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button type="button" mat-flat-button class="ob-button medium" color="primary" (click)="save()"
+            [disabled]="!form.dirty || $isLoading()">
+            {{'FORMS.ACTIONS.UPDATE' | translate}}
+        </button>
+    </div>
+}
+
+@if ($isLoading()) {
+    <div class="spinner-container">
+        <mat-progress-spinner mode="indeterminate" />
+    </div>
+}

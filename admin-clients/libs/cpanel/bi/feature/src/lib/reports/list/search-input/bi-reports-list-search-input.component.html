@@ -1,0 +1,27 @@
+<mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field inline-field-bottom">
+    <button matPrefix mat-icon-button (click)="$event.stopPropagation(); search();" class="ob-button large no-hover-ripple"
+        [attr.aria-label]="'BI.REPORTS.ACTIONS.SEARCH_BUTTON' | translate" [title]="'BI.REPORTS.ACTIONS.SEARCH_BUTTON' | translate">
+        <mat-icon>search</mat-icon>
+    </button>
+    <input matInput type="text" aria-label="Search" [formControl]="searchInput" (keyup.enter)="search()" [matAutocomplete]="auto"
+        [placeholder]="'BI.REPORTS.FORMS.INFOS.SEARCH_BUTTON' | translate">
+    <mat-autocomplete #auto="matAutocomplete">
+        @for(category of biReportsSuggestions$ | async; track $index) {
+            <mat-optgroup [label]="category.name">
+                @for (report of category.reports; track report.id) {
+                    <mat-option [value]="report.name">
+                        <span [innerHTML]="report.name | biReportsListSearchInputHighlight: searchInput.value" (click)="load(report)">
+                        </span>
+                    </mat-option>
+                }
+            </mat-optgroup>
+        }
+    </mat-autocomplete>
+    @if (isReportsSearch$ | async) {
+        <button mat-icon-button matSuffix (click)="$event.stopPropagation(); clearSearch()"
+            class="ob-button large no-hover-ripple"
+            [attr.aria-label]="'FORMS.DELETE.SEARCH' | translate" [title]="'FORMS.DELETE.SEARCH' | translate">
+            <mat-icon>clear</mat-icon>
+        </button>
+    }
+</mat-form-field>

@@ -1,0 +1,75 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="100%" class="secondary title">{{'MAPPINGS.BULK_CLEAN_TITLE' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content>
+        <div class="form-container" fxLayout="column">
+            <p>{{'MAPPINGS.BULK_DESC' | translate}}</p>
+            <mat-radio-group fxLayout="column" fxLayoutGap="8px" fxLayoutAlign="center"
+                [formControl]="form.controls.uploadManually" class="radio-group-container">
+                <mat-radio-button class="ob-radio-card-button" [value]="false">
+                    <div class="option-title">{{'MAPPINGS.BULK_CLEAN_CSV_TITLE' | translate}}</div>
+                    <div>
+                        {{'MAPPINGS.BULK_CLEAN_CSV_DESC' | translate}}
+                    </div>
+                </mat-radio-button>
+                <mat-radio-button class="ob-radio-card-button" [value]="true">
+                    <div class="option-title">{{"MAPPINGS.BULK_CLEAN_MANUAL_TITLE" | translate}}</div>
+                    <div>
+                        {{"MAPPINGS.BULK_CLEAN_MANUAL_DESC" | translate}}
+                    </div>
+                </mat-radio-button>
+            </mat-radio-group>
+
+            <ng-container *ngIf="form.controls.uploadManually.valid && !form.value.uploadManually">
+                <app-import-events-selection [formGroup]="form" [selectionFormGroup]="csvSelectionForm"
+                    (updateIdsToClean)="updateIdsToCleanHandler($event)">
+                </app-import-events-selection>
+            </ng-container>
+            <ng-container *ngIf="form.controls.uploadManually.valid && form.value.uploadManually">
+                <div fxLayout="column" fxLayoutGap="8px">
+                    <div fxFlex="row" fxLayoutGap="16px" class="add-id-container">
+                        <div fxFlex fxLayout="column">
+                            <mat-form-field appearance="outline" class="ob-form-field" fxFlex="100%">
+                                <input matInput [placeholder]="'MAPPINGS.BULK_CLEAN_NEW_ID' | translate"
+                                    [formControl]="form.controls.manuallyIdInput" (keyup.enter)="addEventChip()">
+                            </mat-form-field>
+                            <mat-error *ngIf="!form.controls.manuallyIdInput.valid" class="mat-error">
+                                {{'MAPPINGS.BULK_CLEAN_NEW_ID_ERROR' | translate}}
+                            </mat-error>
+                        </div>
+                        <button mat-stroked-button color="primary" type="button"
+                            class="ob-button medium add-button" (click)="addEventChip()"
+                            [disabled]="form.value.manuallyIdInput.length === 0 || form.value.idsToClean?.length === maxEventsToClean || !form.controls.manuallyIdInput.valid">
+                            {{'MAPPINGS.BULK_CLEAN_MANUAL_BTN' | translate}}
+                        </button>
+                    </div>
+                    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" class="badge-with-text-container">
+                        <div class="badge-container" [class.empty]="(chipsEventsToClean$ | async)?.length === 0">
+                            {{(chipsEventsToClean$ | async).length}} / {{maxEventsToClean}}
+                        </div>
+                        <span class="events-to-clean-text">{{'MAPPINGS.BULK_CLEAN_MANUAL_RESUME' | translate}}:</span>
+                    </div>
+                    <app-chips [chips$]="chipsEventsToClean$"
+                        class="ellipsified-chips without-max-height" overrideClasses="handset"
+                        (removeEmitter)="removeChip($event)">
+                    </app-chips>
+                </div>
+
+            </ng-container>
+        </div>
+    </div>
+    <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button"
+            [disabled]="!form.controls.uploadManually.valid || !form.controls.idsToClean.valid"
+            (click)="cleanEvents()">
+            {{'MAPPINGS.BULK_CLEAN_BTN' | translate}}
+        </button>
+    </div>
+</div>

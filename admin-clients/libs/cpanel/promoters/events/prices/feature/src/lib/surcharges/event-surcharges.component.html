@@ -1,0 +1,111 @@
+<app-form-container [disabled]="(isLoadingOrSaving$ | async) || !form.dirty" (cancel)="cancel()" (save)="save()" layout="menu">
+    <div fxFlex="0 1 100%" fxLayout="column" *ngIf="(surcharges$ | async)">
+        <div fxFlex="0 1 100%" fxLayout="column">
+            <div class="section-block">
+                <p class="section-description">{{'EVENTS.SURCHARGES.DESCRIPTION' | translate}}</p>
+            </div>
+            <div class="section-block" fxLayout="column">
+                <h3 class="section-title">{{'EVENTS.SURCHARGES.GENERICS' | translate}}</h3>
+                <div class="entity-surcharges-import-btn">
+                    <a class="ob-link" (click)="importEntitySurcharges()">{{'EVENTS.IMPORT_SURCHARGES' | translate}}</a>
+                </div>
+                <app-range-table [form]="form.get(types.generic)" [data]="surcharges.get(types.generic)"
+                    [currency]="currency$ | async" [currencyFormat]="'narrow'" type="generic" />
+                <mat-checkbox fxFlex="none" color="primary" id="generic-surcharges-limit" class="surcharges-limit-check"
+                    [formControl]="form.get(types.generic+'.limit.enabled')">
+                    {{ 'EVENTS.SURCHARGES.GENERIC_LIMIT_ENABLE' | translate }}
+                </mat-checkbox>
+                <div class="limit-container dependent-section" *ngIf="form.get(types.generic + '.limit.enabled').value">
+                    <!-- MIN -->
+                    <mat-form-field fxFlex="120px" appearance="outline" class="ob-form-field field-with-label min-field">
+                        <mat-label>{{'FORMS.LABELS.MIN' | translate}}</mat-label>
+                        <app-currency-input [formControl]="form.get(types.generic+'.limit.min')"
+                            [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                            [placeholder]="0 | localCurrency:(currency$ | async):'narrow'" />
+                    </mat-form-field>
+                    <!-- MAX -->
+                    <mat-form-field fxFlex="120px" appearance="outline" class="ob-form-field field-with-label max-field">
+                        <mat-label>{{'FORMS.LABELS.MAX' | translate}}</mat-label>
+                        <app-currency-input [formControl]="form.get(types.generic+'.limit.max')"
+                            [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                            [placeholder]="0 | localCurrency:(currency$ | async):'narrow'" />
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="section-block" fxLayout="column">
+                <h3 class="section-title">{{'EVENTS.SURCHARGES.INVITATIONS' | translate}}</h3>
+                <app-range-table [form]="form.get(types.invitation)" [data]="surcharges.get(types.invitation)"
+                    [currency]="currency$ | async" [currencyFormat]="'narrow'" type="invitation" />
+                <mat-checkbox fxFlex="none" color="primary" id="invitation-surcharges-limit" class="surcharges-limit-check"
+                    [formControl]="form.get(types.invitation+'.limit.enabled')">
+                    {{ 'EVENTS.SURCHARGES.INVITATION_LIMIT_ENABLE' | translate }}
+                </mat-checkbox>
+                <div class="limit-container dependent-section" *ngIf="form.get(types.invitation + '.limit.enabled').value">
+                    <!-- MIN -->
+                    <mat-form-field fxFlex="120px" appearance="outline" class="ob-form-field field-with-label min-field">
+                        <mat-label>{{'FORMS.LABELS.MIN' | translate}}</mat-label>
+                        <app-currency-input [formControl]="form.get(types.invitation+'.limit.min')"
+                            [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                            [placeholder]="0 | localCurrency:(currency$ | async):'narrow'" />
+                    </mat-form-field>
+                    <!-- MAX -->
+                    <mat-form-field fxFlex="120px" appearance="outline" class="ob-form-field field-with-label max-field">
+                        <mat-label>{{'FORMS.LABELS.MAX' | translate}}</mat-label>
+                        <app-currency-input [formControl]="form.get(types.invitation+'.limit.max')"
+                            [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                            [placeholder]="0 | localCurrency:(currency$ | async):'narrow'" />
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="section-block" fxLayout="column">
+                <h3 class="section-title">{{'EVENTS.SURCHARGES.PROMOTIONS' | translate}}</h3>
+                <app-range-table [form]="form.get(types.promotion)" [data]="surcharges.get(types.promotion)"
+                    [currency]="currency$ | async" [currencyFormat]="'narrow'" type="promotion" />
+                <mat-checkbox fxFlex="none" color="primary" id="promotion-alternative-charges" class="surcharges-limit-check"
+                    [formControl]="form.get(types.promotion + '.allow_channel_use_alternative_charges')">
+                    {{ 'EVENTS.SURCHARGES.PROMOTION_ALTERNATIVE_CHARGES_ENABLE' | translate }}
+                </mat-checkbox>
+                <mat-checkbox fxFlex="none" color="primary" id="promotion-surcharges-limit" class="surcharges-limit-check"
+                    [formControl]="form.get(types.promotion+'.limit.enabled')">
+                    {{ 'EVENTS.SURCHARGES.PROMOTION_LIMIT_ENABLE' | translate }}
+                </mat-checkbox>
+                <div class="limit-container dependent-section" *ngIf="form.get(types.promotion + '.limit.enabled').value">
+                    <!-- MIN -->
+                    <mat-form-field fxFlex="120px" appearance="outline" class="ob-form-field field-with-label min-field">
+                        <mat-label>{{'FORMS.LABELS.MIN' | translate}}</mat-label>
+                        <app-currency-input [formControl]="form.get(types.promotion+'.limit.min')"
+                            [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                            [placeholder]="0 | localCurrency:(currency$ | async):'narrow'" />
+                    </mat-form-field>
+                    <!-- MAX -->
+                    <mat-form-field fxFlex="120px" appearance="outline" class="ob-form-field field-with-label max-field">
+                        <mat-label>{{'FORMS.LABELS.MAX' | translate}}</mat-label>
+                        <app-currency-input [formControl]="form.get(types.promotion+'.limit.max')"
+                            [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                            [placeholder]="0 | localCurrency:(currency$ | async):'narrow'" />
+                    </mat-form-field>
+                </div>
+            </div>
+            @if (hasSecondaryMarket$ | async) {
+                <div #secondaryMarket class="section-block" fxLayout="column">
+                    <h3 class="section-title">{{'EVENTS.SURCHARGES.SECONDARY_MARKET' | translate}}</h3>
+                    <app-range-table [form]="form.get(types.secondaryMarket)" [data]="surcharges.get(types.secondaryMarket)"
+                        [currency]="currency$ | async" [currencyFormat]="'narrow'" type="generic" />
+                </div>
+            }
+            @if (changeSeatSurchargesAvailable$ | async) {
+                <div #changeService class="section-block" fxLayout="column">
+                    <h3 class="section-title">{{'EVENTS.SURCHARGES.TITLES.RELOCATION' | translate}}</h3>
+                    <p class="section-description">{{'EVENTS.SURCHARGES.FORMS.INFOS.RELOCATION' | translate}}</p>
+                    <app-range-table [form]="form.get(types.changeSeat)" [data]="surcharges.get(types.changeSeat)"
+                        [currency]="currency$ | async" [currencyFormat]="'narrow'" type="generic" />
+                </div>
+            }
+        </div>
+    </div>
+</app-form-container>
+@if (isLoadingOrSaving$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

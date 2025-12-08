@@ -1,0 +1,58 @@
+<app-form-container layout="menu" class="overflow-y-auto" (cancel)="cancel()" (save)="save()" [disabled]="isSaveCancelDisabled$ | async"
+    [formGroup]="form">
+    <form *ngIf="tour$ | async as tour">
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>
+                    {{'TOUR.GENERAL_DATA' | translate}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxFlex="100%" fxLayout="column">
+                <div fxLayout="column" class="toggle-container">
+                    <div class="toggle-field" fxLayout="column">
+                        <div fxFlex="28px" fxLayout="row">
+                            <mat-slide-toggle class="ob-slide-toggle" formControlName="status">
+                                {{'TOUR.TOGGLE_STATUS' | translate}}
+                            </mat-slide-toggle>
+                        </div>
+                    </div>
+                    <mat-divider fxFlex="100%"></mat-divider>
+                    <div fxLayout="column">
+                        <div fxFlex="30px"></div>
+                    </div>
+                </div>
+                <div fxLayout="row">
+                    <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.lt-lg="80%"
+                        fxLayout="column" aria-label="entity">
+                        <span class="field-label">{{'FORMS.LABELS.ENTITY' | translate}}</span>
+                        <span>{{tour.entity.name}}</span>
+                    </div>
+                </div>
+                <div fxFlex="100%" fxLayout="row">
+                    <mat-form-field fxFlex="500px" fxFlex.lt-lg="80%" appearance="outline"
+                        class="ob-form-field field-with-label"
+                        *ngIf="canLoggedUserWrite$ | async; else tourTitleReadOnlyTemplate">
+                        <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                        <input matInput aria-label="namr" [placeholder]="'FORMS.LABELS.NAME' | translate"
+                            formControlName="name">
+                        <mat-error [ob-form-errors]="form" field="name"></mat-error>
+                    </mat-form-field>
+                    <ng-template #tourTitleReadOnlyTemplate>
+                        <div class="details-non-editable-field ob-form-field" fxFlex="100%"
+                            fxFlex.lt-lg="80%" fxLayout="column" aria-label="name">
+                            <span class="field-label">{{'FORMS.LABELS.NAME' | translate}}</span>
+                            <span>{{tour.name}}</span>
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel expanded togglePosition="before" *ngIf="tour.events?.length">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'TOUR.EVENTS.TITLE' | translate}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-tour-events-list [tourEvents$]="tourEvents$"></app-tour-events-list>
+        </mat-expansion-panel>
+    </form>
+</app-form-container>

@@ -1,0 +1,62 @@
+<app-form-container layout="menu" class="overflow-y-auto" hideActionBar>
+    <div class="flex">
+        <div class="flex-[0_1_680px]">
+            <p>{{'ENTITY.BANK_ACCOUNTS.INFO' | translate}}</p>
+
+            @if ($bankAccounts()?.length) {
+                <div class="flex flex-col gap-4">
+                    <div class="table-actions flex justify-end">
+                        <button mat-stroked-button class="ob-button" color="primary" (click)="openNewBankAccountDialog()">
+                            <mat-icon>add</mat-icon>
+                            {{'ENTITY.BANK_ACCOUNTS.NEW_BTN' | translate | uppercase}}
+                        </button>
+                    </div>
+
+                    <mat-table class="ob-table" [dataSource]="$bankAccounts()">
+                        <ng-container matColumnDef="name">
+                            <mat-header-cell *matHeaderCellDef class="head-cell input-column">
+                                {{ 'ENTITY.BANK_ACCOUNTS.TABLE.NAME' | translate }}
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row" class="cell">
+                                {{ row.name }}
+                            </mat-cell>
+                        </ng-container>
+
+                        <ng-container matColumnDef="actions">
+                            <mat-header-cell *matHeaderCellDef class="actions-cell head-cell float-actions-cell" />
+                            <mat-cell *matCellDef="let row" class="two-actions-cell float-actions-cell">
+                                <div class="action-buttons" (click)="$event.stopPropagation()">
+                                    <button mat-icon-button aria-label="Edit bank account" class="ob-button medium"
+                                        (click)="openEditBankAccountDialog(row)">
+                                        <mat-icon>edit</mat-icon>
+                                    </button>
+                                    <button mat-icon-button aria-label="Delete bank account" class="ob-button medium"
+                                        (click)="deleteBankAccount(row)">
+                                        <mat-icon>delete</mat-icon>
+                                    </button>
+                                </div>
+                            </mat-cell>
+                        </ng-container>
+
+                        <mat-header-row *matHeaderRowDef="displayedColumns;" class="dense-row" />
+                        <mat-row *matRowDef="let row; columns: displayedColumns" class="dense-row hoverable-row" />
+                    </mat-table>
+                </div>
+            } @else {
+                <app-empty-state-tiny [title]="'ENTITY.BANK_ACCOUNTS.EMPTY_LIST_TITLE' | translate"
+                    [description]="'ENTITY.BANK_ACCOUNTS.EMPTY_LIST_DESCRIPTION' | translate">
+                    <button mat-stroked-button class="ob-button" color="primary" (click)="openNewBankAccountDialog()">
+                        <mat-icon>add</mat-icon>
+                        {{'ENTITY.BANK_ACCOUNTS.NEW_BTN' | translate | uppercase}}
+                    </button>
+                </app-empty-state-tiny>
+            }
+        </div>
+    </div>
+</app-form-container>
+
+@if ($isLoading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,64 @@
+<div class="list-setting-container">
+    <mat-accordion [togglePosition]="'before'">
+        <mat-expansion-panel #keywordsPanel [expanded]="true" class="ob-expansion-card">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*" hideToggle="true">
+                <mat-panel-title>{{title}}</mat-panel-title>
+                <div *ngIf="keywordsPanel.expanded"
+                    class="add-button-container" fxLayoutAlign="end start" fxLayoutGap="10px">
+                    <button mat-stroked-button color="primary" [disabled]="(hasWritePermissions$ | async) === false"
+                        type="button" class="ob-button medium add-button" (click)="$event.stopPropagation(); addElementDialog()">
+                        <mat-icon>add</mat-icon>
+                        {{newElementTitle}}
+                    </button>
+                </div>
+            </mat-expansion-panel-header>
+            <div>
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="filters">
+                    <div fxFlex fxLayoutAlign="start center" fxLayoutGap="8px">
+                        <ng-content select="[slot='filter']" />
+                        <app-search-input [placeholder]="placeHolder"
+                            (valueChanged)="changeSearchText($event)" fxFlex="0 1 600px" class="search-input" />
+                    </div>
+                    <div class="paginator above">
+                        <mat-paginator hidePageSize fxFlex="0 0 auto" class="with-range-label transparent"
+                            [pageIndex]="listPage$ | async" [pageSize]="pageLimit"
+                            [length]="(filteredList$ | async)?.length" (page)="changePage($event)" />
+                    </div>
+                </div>
+                <div class="paginated-list" *ngIf="(isLoading$ | async) === false">
+                    <mat-list class="ob-list small-rows">
+                        <div class="list-header">
+                            <span>{{elementTitle}}</span>
+                        </div>
+                        <div class="list-items-container" [class.interactive]="hasWritePermissions$ | async">
+                            <mat-list-item *ngFor="let c of (pagedList$ | async)"
+                                [class.hoverable-item]="hasWritePermissions$ | async">
+                                <div fxLayout="row" fxLayoutAlign="space-between center" fxFlex="100%">
+                                    <div fxLayout="row" fxLayoutAlign="start center">
+                                        <span appEllipsify class="o-hidden-text-row" [matTooltip]="c">{{c}}</span>
+                                    </div>
+                                    <div fxLayout="row" fxLayoutAlign="end center">
+                                        <div class="actions-container" fxLayout="row" fxLayoutAlign="end center">
+                                            <button mat-icon-button aria-label="delete" class="ob-button xsmall"
+                                                [matTooltip]="deleteTooltip"
+                                                *ngIf="hasWritePermissions$ | async"
+                                                (click)="deleteElementFromList(c)">
+                                                <mat-icon>delete</mat-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-list-item>
+                        </div>
+                    </mat-list>
+                    <div *ngIf="(filteredList$ | async)?.length === 0">
+                        <app-empty-state-tiny fxFlex [title]="'FORMS.SELECT.NO_RESULTS' | translate" />
+                    </div>
+                </div>
+                <div class="spinner-container" *ngIf="isLoading$ | async">
+                    <mat-spinner />
+                </div>
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+</div>

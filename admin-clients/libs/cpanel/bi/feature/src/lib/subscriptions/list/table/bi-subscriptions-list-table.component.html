@@ -1,0 +1,44 @@
+@if (subscriptions.length > 0) {
+    <mat-table class="ob-table" [dataSource]="subscriptions"
+        [attr.aria-label]="'BI.SUBSCRIPTIONS.TITLES.TABLE' | translate">
+        <ng-container [matColumnDef]="columns[0]">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'BI.SUBSCRIPTIONS.LISTS.COL_SUBSCRIPTION_NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row;">{{row.name}}</mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="columns[1]">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'BI.SUBSCRIPTIONS.LISTS.COL_REPORT_NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row;">{{row.report}}</mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="columns[2]">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'BI.SUBSCRIPTIONS.LIST.COL_SUBSCRIPTION_SCHEDULE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row;">{{row.scheduled}}
+            </mat-cell>
+        </ng-container>
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="two-actions-cell head-cell float-actions-cell">
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="two-actions-cell float-actions-cell">
+                <div class="action-buttons" (click)="$event.stopPropagation()">
+                    <button mat-icon-button aria-label="Delete" class="ob-button medium"
+                        [matTooltip]="'BI.SUBSCRIPTIONS.ACTIONS.DELETE_SUBS' | translate" (click)="deleteEmitter.emit(row)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                    <button mat-icon-button aria-label="Delete" class="ob-button medium"
+                        [matTooltip]="'BI.SUBSCRIPTIONS.ACTIONS.SEND_SUBS' | translate" (click)="sendSubscriptionEmitter.emit(row)">
+                        <mat-icon>send</mat-icon>
+                    </button>
+                </div>
+            </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="columns; sticky: true"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: columns;" class="dense-row hoverable-row">
+        </mat-row>
+    </mat-table>
+}

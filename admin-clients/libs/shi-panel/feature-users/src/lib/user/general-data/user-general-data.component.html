@@ -1,0 +1,120 @@
+<app-form-container [formGroup]="form" (cancel)="cancel()" (save)="save()" layout="main"
+    [disabled]="!form.dirty || (isLoading$ | async) || !canEditUser"
+    class="overflow-y-auto">
+    @if ($canChangeStatus()) {
+        <div slot="outside">
+            <!-- User status -->
+            <div class="user-status" fxLayout="row" fxLayoutAlign="center">
+                <div fxFlex="0 1 1280px" fxLayoutAlign="end center" fxLayoutGap="10px">
+                    <div class="ob-label">
+                        {{'USER.STATUS' | translate}}
+                    </div>
+                    <div class="user-status-select" fxFlex="220px">
+                        <mat-form-field fxFlex appearance="outline"
+                            class="ob-form-field ob-form-field-outline inline-field thin-select-field">
+                            <mat-select formControlName="userStatus">
+                                <mat-select-trigger>
+                                    <span [ngClass]="['status-dot', form.get('userStatus').value?.toLowerCase() || '']">
+                                    </span>
+                                    <span>{{'USER.STATUS_OPTS.' + form.get('userStatus').value | translate}}</span>
+                                </mat-select-trigger>
+                                @for (status of userStatusList; track status) {
+                                    <mat-option [value]="status">
+                                        <span>{{'USER.STATUS_OPTS.' + status | translate}}</span>
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <mat-divider />
+        </div>
+    }
+    <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+        <!-- General Data Panel -->
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'USER.GENERAL_DATA' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <form id="user-general-data" formGroupName="generalData" fxLayout="row wrap"
+                *ngIf="canEditUser else notEditable">
+                <div *ngIf="user$ | async as user" fxFlex="100%" fxLayout="column" fxLayoutGap="20px">
+                    <div fxLayout="row wrap" fxLayoutGap.gt-xs="24px">
+                        <!-- Name -->
+                        <mat-form-field fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.3% - 24px)"
+                            appearance="outline" class="ob-form-field field-with-label">
+                            <mat-label>{{'USER.NAME' | translate}}</mat-label>
+                            <input matInput aria-label="name" [placeholder]="'USER.NAME' | translate" formControlName="name">
+                            <mat-error [ob-form-errors]="form" [field]="['generalData', 'name']" />
+                        </mat-form-field>
+                        <!-- Surname -->
+                        <mat-form-field fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.3% - 24px)"
+                            appearance="outline" class="ob-form-field field-with-label">
+                            <mat-label>{{'USER.SURNAME' | translate}}</mat-label>
+                            <input matInput aria-label="last_name" [placeholder]="'USER.SURNAME' | translate" formControlName="last_name">
+                            <mat-error [ob-form-errors]="form" [field]="['generalData', 'last_name']" />
+                        </mat-form-field>
+                    </div>
+                    <div fxLayout="row wrap" fxLayoutGap.gt-xs="24px">
+                        <!-- Email - not editable -->
+                        <div fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.3% - 24px)"
+                            class="details-non-editable-field ob-form-field" fxLayout="column">
+                            <span class="field-label">{{'USER.EMAIL' | translate}}</span>
+                            <span>{{ user.username }}</span>
+                        </div>
+                        <!-- Role -->
+                        <mat-form-field *ngIf="isOwner else isNotOwner" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                            fxFlex.gt-sm="0 1 calc(33.3% - 24px)" appearance="outline" class="ob-form-field">
+                            <mat-label>{{'USERS.ROLE' | translate}}</mat-label>
+                            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="role">
+                                <mat-option *ngFor="let userRole of userRoles" [value]="userRole.id">
+                                    {{ userRole.name | translate }}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error [ob-form-errors]="form" [field]="['generalData', 'role']" />
+                        </mat-form-field>
+                        <ng-template #isNotOwner>
+                            <div fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.3% - 24px)"
+                                class="details-non-editable-field ob-form-field" fxLayout="column">
+                                <span class="field-label">{{'USER.ROLE' | translate}}</span>
+                                <span>{{'USERS.ROLE_OPTS.' + user.role | translate}}</span>
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+            </form>
+            <ng-template #notEditable>
+                <div *ngIf="user$ | async as user" fxFlex="100%" fxLayout="column" fxLayoutGap="20px">
+                    <div fxLayout="row wrap" fxLayoutGap.gt-xs="24px">
+                        <div fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.3% - 24px)"
+                            class="details-non-editable-field ob-form-field" fxLayout="column">
+                            <span class="field-label">{{'USER.NAME' | translate}}</span>
+                            <span>{{user.name}}</span>
+                        </div>
+                        <div fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.3% - 24px)"
+                            class="details-non-editable-field ob-form-field" fxLayout="column">
+                            <span class="field-label">{{'USER.SURNAME' | translate}}</span>
+                            <span>{{user.surname}}</span>
+                        </div>
+                    </div>
+                    <div fxLayout="row wrap" fxLayoutGap.gt-xs="24px">
+                        <div fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.3% - 24px)"
+                            class="details-non-editable-field ob-form-field" fxLayout="column">
+                            <span class="field-label">{{'USER.EMAIL' | translate}}</span>
+                            <span>{{ user.username }}</span>
+                        </div>
+                        <div fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.3% - 24px)"
+                            class="details-non-editable-field ob-form-field" fxLayout="column">
+                            <span class="field-label">{{'USER.ROLE' | translate}}</span>
+                            <span>{{'USERS.ROLE_OPTS.' + user.role | translate}}</span>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+<div class="spinner-container" *ngIf="isLoading$ | async">
+    <mat-spinner />
+</div>

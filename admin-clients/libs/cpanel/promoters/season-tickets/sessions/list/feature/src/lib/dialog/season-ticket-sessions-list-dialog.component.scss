@@ -1,0 +1,56 @@
+$warn-color: var(--ob-theme-color-warn);
+$alert-color: var(--ob-theme-color-alert);
+$ob-white: var(--ob-theme-color-white);
+$z-index-top-sticky-element: 100;
+$top-sticky-element-height: 60px;
+$action-sticky-element-height: 40px;
+
+.mdc-dialog__content {
+    padding-top: 0;
+    .info-container {
+        background-color: $ob-white;
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        height: $top-sticky-element-height;
+        z-index: $z-index-top-sticky-element;
+        .info-warning {
+            color: $alert-color;
+        }
+    }
+    .actions-container {
+        background-color: $ob-white;
+        position: -webkit-sticky;
+        position: sticky;
+        top: $top-sticky-element-height;
+        height: $action-sticky-element-height;
+        z-index: $z-index-top-sticky-element;
+        .mat-radio-button ~ .mat-radio-button {
+            margin-left: 16px;
+        }
+    }
+    .table-container {
+        // 90vh -
+        // (mat-dialog-actions(56 + 20 p-top) - mat-dialog-title(47 + 25 p-top) - .ob-dialog.mdc-dialog__content(20 p-top)) -
+        // $top-sticky-element-height - $action-sticky-element-height
+        max-height: calc(90vh - 168px - #{$top-sticky-element-height} - #{$action-sticky-element-height});
+        .ob-table {
+            mat-header-row {
+                z-index: $z-index-top-sticky-element !important;
+                top: calc(#{$top-sticky-element-height} + #{$action-sticky-element-height}) !important;
+            }
+            mat-cell:first-of-type,
+            mat-header-cell:first-of-type {
+                padding-left: 1px;
+                margin-right: 0;
+            }
+            .season-ticket-details-icon {
+                padding-top: 4px;
+                padding-right: 5px;
+                .icon-error {
+                    color: $warn-color;
+                }
+            }
+        }
+    }
+}

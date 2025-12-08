@@ -1,0 +1,61 @@
+<div class="fields">
+    <div class="field">
+        <span class="ob-label">{{'FORMS.LABELS.TYPE' | translate}}</span>
+        <span>{{('ENUMS.TYPE_OPTS.' + order.type) | translate}}</span>
+    </div>
+    <div class="field">
+        <span class="ob-label">{{'FORMS.LABELS.ORDER_CODE' | translate}}</span>
+        <span class="field-value">
+            {{order.code}}
+            <app-copy-text [copyText]="order.code" class="copy-code-button" />
+        </span>
+    </div>
+    <div class="field">
+        <span class="ob-label">{{'FORMS.LABELS.CHANNEL' | translate}}</span>
+        <span>{{order.channel.name}}</span>
+    </div>
+    <div class="field">
+        <span class="ob-label">{{'FORMS.LABELS.DATE' | translate}}</span>
+        <span>{{order.date | dateTime : dateTimeFormats.shortDateTime}}</span>
+    </div>
+    <div class="field">
+        <span class="ob-label">{{'FORMS.LABELS.ENTITY' | translate}}</span>
+        <span>{{order.channel.entity.name}}</span>
+    </div>
+    <div *ngIf="order.user" class="field">
+        <span class="ob-label">{{'FORMS.LABELS.USERNAME' | translate}}</span>
+        <span appEllipsify [matTooltip]="order.user.username">{{order.user.username}}</span>
+    </div>
+    <div *ngIf="order.shared_user" class="field">
+        <span class="ob-label">{{'FORMS.LABELS.SHARED_USER' | translate}}</span>
+        <span appEllipsify [matTooltip]="order.shared_user.username">
+            {{order.shared_user.username}}
+        </span>
+    </div>
+    <div *ngIf="order.booking_expires" class="field">
+        <span class="ob-label">{{'FORMS.LABELS.BOOKING_EXPIRES' | translate}}</span>
+        <span>{{order.booking_expires | localDateTime : dateTimeFormats.shortDateTime}}</span>
+    </div>
+    <div *ngIf="order.point_of_sale" class="field">
+        <span class="ob-label">{{'FORMS.LABELS.POINT_OF_SALE' | translate}}</span>
+        <span>{{order.point_of_sale.name}}</span>
+    </div>
+    <div *ngIf="order.terminal" class="field">
+        <span class="ob-label">{{'FORMS.LABELS.TERMINAL' | translate}}</span>
+        <span>{{order.terminal.name}}</span>
+    </div>
+    <div *ngIf="order.external_code" class="field">
+        <span class="ob-label">{{'FORMS.LABELS.EXTERNAL_CODE' | translate}}</span>
+        <span>{{order.external_code}}</span>
+    </div>
+    <div *ngIf="order.payment_detail?.voucher" class="field">
+        <span class="ob-label">{{'FORMS.LABELS.VOUCHER' | translate}}</span>
+        <div class="field-value">
+            <span>{{order.payment_detail.voucher.code}}</span>
+            <app-copy-text class="copy-code-button" [copyText]="order.payment_detail.voucher.code"
+                [copyOk]="'ORDER.VOUCHER.CODE_COPY_OK' | translate"
+                [copyKo]="'ORDER.VOUCHER.CODE_COPY_KO' | translate"
+                [copyTooltip]="'ORDER.VOUCHER.COPY_CODE' | translate" />
+        </div>
+    </div>
+</div>

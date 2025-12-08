@@ -1,0 +1,35 @@
+<div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch" [class.with-wizard-bar]="showWizardBar">
+    <form [formGroup]="nnzFormGroup" fxLayout="column" fxLayoutAlign="start stretch">
+        <mat-form-field *ngIf="showSectorSelector" appearance="outline" class="ob-form-field">
+            <mat-label>{{'FORMS.LABELS.SECTOR' | translate}}</mat-label>
+            <mat-select [formControlName]="formControlNames.sector" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                <mat-option *ngFor="let sector of sectorSelectSearch.getFilteredOptions$() | async"
+                    [value]="sector?.id">
+                    {{sector?.name}}
+                </mat-option>
+                <mat-option>
+                    <app-select-search #sectorSelectSearch requireSelection [options$]="sectors$"
+                        searchField="name">
+                    </app-select-search>
+                </mat-option>
+            </mat-select>
+            <mat-error [ob-form-errors]="nnzFormGroup" [field]="formControlNames.sector"></mat-error>
+        </mat-form-field>
+        <mat-form-field *ngIf="showZoneName" appearance="outline" class="ob-form-field">
+            <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+            <input matInput aria-label="name" required [placeholder]="'FORMS.LABELS.NAME' | translate"
+                [formControlName]="formControlNames.name">
+            <mat-error [ob-form-errors]="nnzFormGroup" [field]="formControlNames.name"></mat-error>
+        </mat-form-field>
+        <div *ngIf="showCapacityIncreaseInfo" fxLayout="row" fxLayoutAlign="start center" class="zone-increase-info section-block">
+            <mat-icon class="ob-icon small info with-text">info</mat-icon>
+            <span [innerHTML]="'VENUE_TPL_MGR.FORMS.INFOS.ZONE_CAPACITY_INCREASE' | translate"></span>
+        </div>
+        <mat-form-field *ngIf="showCapacityField" appearance="outline" class="ob-form-field">
+            <mat-label>{{'FORMS.LABELS.CAPACITY' | translate}}</mat-label>
+            <input matInput type="number" aria-label="capacity" required
+                [placeholder]="'FORMS.LABELS.CAPACITY' | translate" [formControlName]="formControlNames.capacity">
+            <mat-error [ob-form-errors]="nnzFormGroup" [field]="formControlNames.capacity"></mat-error>
+        </mat-form-field>
+    </form>
+</div>

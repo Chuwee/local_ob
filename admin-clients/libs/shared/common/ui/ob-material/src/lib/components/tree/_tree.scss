@@ -1,0 +1,53 @@
+@mixin tree-override($palettes, $colors) {
+    $ob-bg-2: map-get($colors, ob-bg-2);
+
+    .ob-tree-table {
+        mat-tree-node {
+            border-bottom: 1px solid $ob-bg-2;
+            &.hoverable-tree-node {
+                .action-category-button {
+                    visibility: hidden;
+                }
+                .editable-tree-cell {
+                    .ob-form-field {
+                        width: 100%;
+                        &:not(.with-error) .mat-form-field-wrapper {
+                            padding-bottom: 0;
+                        }
+                        .mat-form-field-wrapper {
+                            margin: 0;
+                            .mat-form-field-infix {
+                                padding: 0.625em 0 0.375em 0;
+                            }
+                        }
+                    }
+                }
+                &:not(:hover) {
+                    .editable-tree-cell {
+                        .ob-form-field:not(.ob-form-field-outline) {
+                            &.mat-form-field-appearance-outline:not(
+                                    .mat-focused
+                                ):not(.mat-form-field-invalid) {
+                                .mat-form-field-outline {
+                                    color: transparent;
+                                    background-color: transparent;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            &.hoverable-tree-node:hover {
+                background-color: $ob-bg-2;
+                .action-category-button {
+                    visibility: visible;
+                }
+            }
+            .action-buttons-container {
+                .action-category-button[disabled] {
+                    cursor: not-allowed;
+                }
+            }
+        }
+    }
+}

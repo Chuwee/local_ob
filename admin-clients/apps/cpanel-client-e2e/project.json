@@ -1,0 +1,35 @@
+{
+  "name": "cpanel-client-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/cpanel-client-e2e/src",
+  "projectType": "application",
+  "tags": [],
+  "implicitDependencies": ["cpanel-client"],
+  "targets": {
+    "e2e": {
+      "executor": "@nx/cypress:cypress",
+      "options": {
+        "cypressConfig": "apps/cpanel-client-e2e/cypress.config.ts",
+        "devServerTarget": "cpanel-client:serve",
+        "testingType": "e2e"
+      },
+      "outputs": ["{projectRoot}/mochawesome-report/**"],
+      "configurations": {
+        "production": {
+          "devServerTarget": "cpanel-client:serve:production"
+        }
+      }
+    },
+    "e2e-remote": {
+      "executor": "@OneboxTM/tools:e2e",
+      "options": {
+        "upload": true,
+        "reports": "apps/cpanel-client-e2e/mochawesome-report",
+        "environments": "apps/cpanel-client-e2e/environments.json"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

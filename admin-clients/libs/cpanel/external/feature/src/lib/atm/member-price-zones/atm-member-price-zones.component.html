@@ -1,0 +1,54 @@
+<div class="template-section" fxLayout="column" *ngIf="(venueTpls$ | async) as templates">
+    <mat-form-field *ngIf="templates?.length > 1" appearance="outline"
+        class="ob-form-field venue-tpl-select">
+        <mat-label>{{'EVENTS.SELECT_EVENT_TEMPLATE' | translate}}</mat-label>
+        <mat-select id="venue-selector" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate"
+            [formControl]="venueTplCtrl">
+            <mat-option *ngFor="let venue of (venueTpls$ | async)" [value]="venue">
+                {{venue?.name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    <div class="details-non-editable-field" *ngIf="templates?.length === 1">
+        <span class="field-label">{{'EVENTS.SELECT_EVENT_TEMPLATE' | translate}}</span>
+        <span>{{(venueTpls$ | async)[0]?.name}}</span>
+    </div>
+    <app-context-notification *ngIf="templates.length === 0"
+        class="ob-context-notification" contextType="info" fxFlex="100%">
+        <p>{{'LIST.EMPTY' | translate}}</p>
+    </app-context-notification>
+</div>
+
+<div [formGroup]="memberZonesForm" class="price-zones-list" fxLayout="column" *ngIf="priceTypes$ | async as zones">
+    <div *ngFor="let zone of zones" fxFlex="0 0 50px" fxLayoutAlign="space-between center">
+        <span>{{zone.name}}</span>
+        <div fxFlex="0 1 225px">
+            <mat-form-field fxFlex="0 1 185px" appearance="outline" class="ob-form-field inline-field">
+                <mat-select #select [formControlName]="zone.id" (valueChange)="setMemberType($event, zone.id)"
+                    [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                    <mat-option *ngFor="let type of memberTypes" [value]="type">
+                        {{type}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <div fxFlex="0 1 40px" fxLayoutAlign="end center">
+                <button mat-icon-button class="ob-button medium" [attr.aria-label]="'FORMS.ACTIONS.DELETE' | translate"
+                    [disabled]="!select.value" (click)="setMemberType(select.value, null)">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="action-buttons" fxLayout="column">
+    <div fxFlex="0 1 70px" fxLayoutAlign="end center">
+        <button color="primary" mat-flat-button class="ob-button medium" (click)="save()" [disabled]="!valid || !memberZonesForm.dirty">
+            {{'FORMS.ACTIONS.SAVE'| translate}}
+        </button>
+    </div>
+</div>
+
+<div class="spinner-container" *ngIf="inProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

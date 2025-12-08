@@ -1,0 +1,160 @@
+$primary-color: var(--ob-theme-color-primary);
+$font-weight-bold: 700;
+$font-weight-semi-bold: 500;
+$transition-speed: 180ms;
+$transition-easing: ease-out;
+$circle-radius: 30px;
+
+:host {
+    display: inline-block;
+    width: 100%;
+
+    .days {
+        width: 14%;
+        float: left;
+        text-align: center;
+        margin-bottom: 5px;
+
+        &.startSelection,
+        &.endSelection,
+        &.between {
+            button.days-btn {
+                background-color: $primary-color;
+            }
+            p {
+                color: #fff;
+            }
+        }
+
+        &.startSelection,
+        &.endSelection {
+            position: relative;
+
+            &::before,
+            &::after {
+                height: $circle-radius;
+                width: 50%;
+                content: "";
+                position: absolute;
+                top: 0;
+                display: block;
+            }
+
+            &.is-last-wrap::before,
+            &.is-last-wrap::after {
+                border-radius: 0 30px 30px 0;
+            }
+        }
+
+        &.startSelection {
+            &::after {
+                background-color: $primary-color;
+                right: 0;
+            }
+        }
+
+        &.endSelection {
+            &::after {
+                background-color: $primary-color;
+                left: 0;
+            }
+        }
+
+        &.between {
+            button.days-btn {
+                background-color: var(--ion-color-primary);
+                width: 100%;
+                border-radius: 0;
+                position: relative;
+
+                p {
+                    color: #fff;
+                    position: relative;
+                    z-index: 999;
+                }
+
+                &::after {
+                    content: "";
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: $circle-radius;
+                    background-color: $primary-color;
+                    z-index: 0;
+                }
+            }
+        }
+
+        &:nth-of-type(7n),
+        &:nth-of-type(7n + 1) {
+            width: 15%;
+        }
+
+        .marked p {
+            font-weight: $font-weight-semi-bold;
+        }
+
+        .on-selected {
+            border: none;
+            background-color: $primary-color;
+            p {
+                color: #fff;
+            }
+        }
+
+        .today p {
+            font-weight: $font-weight-bold;
+        }
+
+        .last-month-day p,
+        .next-month-day p {
+            color: #fff;
+        }
+    }
+
+    button.days-btn {
+        border-radius: $circle-radius;
+        width: $circle-radius;
+        display: block;
+        margin: 0 auto;
+        padding: 0;
+        height: $circle-radius;
+        background-color: transparent;
+        position: relative;
+        z-index: 2;
+        outline: 0;
+
+        p {
+            margin: 0;
+            font-family: Nunito Sans;
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 14px;
+            letter-spacing: 0em;
+            text-align: center;
+            color: var(--ob-theme-color-black);
+        }
+
+        &[disabled] p {
+            color: rgba(0, 0, 0, 0.25);
+        }
+
+        &.on-selected small {
+            transition: bottom 0.3s;
+            bottom: -14px;
+        }
+
+        small {
+            overflow: hidden;
+            display: block;
+            left: 0;
+            right: 0;
+            bottom: -5px;
+            position: absolute;
+            z-index: 1;
+            text-align: center;
+            font-weight: 200;
+        }
+    }
+}

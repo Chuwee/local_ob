@@ -1,0 +1,62 @@
+<div class="dialog-msg-container send_email_dialog" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.SEND_EMAIL_DIALOG.TITLE' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <p class="field-label">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.EMAIL_SUMMARY' | translate}}</p>
+        <div class="row">
+            <div class="details-non-editable-field ob-form-field" fxFlex="50%" fxLayout="column">
+                <span class="field-label">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.SENDER' | translate}}</span>
+                <span>noreply&#64;oneboxtds.com</span>
+            </div>
+            <div class="details-non-editable-field ob-form-field" fxFlex="50%" fxLayout="column">
+                <span class="field-label">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.SUBJECT' | translate}}</span>
+                <span>{{ subject }}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="details-non-editable-field ob-form-field" fxFlex="50%" fxLayout="column">
+                <span class="field-label">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.EVENT' | translate}}</span>
+                <span>{{(event$ | async)?.name}}</span>
+            </div>
+            <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-md="50%" fxLayout="column">
+                <span class="field-label">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.RECIPIENTS_TOTAL' | translate}}</span>
+                <span>{{ totalRecipients$ | async }}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-md="50%" fxLayout="column">
+                <span class="field-label">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.SESSION' | translate}}</span>
+                <span *ngIf="!!!(sessionNames$ | async)">-</span>
+                <ul *ngIf="sessionNames$ | async">
+                    <li *ngFor="let sessionName of (sessionNames$ | async)">
+                        {{sessionName}}
+                    </li>
+                </ul>
+            </div>
+            <div class="details-non-editable-field ob-form-field" fxFlex="50%" fxLayout="column">
+                <span class="field-label">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.CHANNEL' | translate}}</span>
+                <span *ngIf="!!!(channelNames$ | async)">-</span>
+                <ul *ngIf="channelNames$ | async">
+                    <li *ngFor="let channelName of (channelNames$ | async)">
+                        {{channelName}}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="spinner-container" *ngIf="isLoading$ | async">
+        <mat-spinner></mat-spinner>
+    </div>
+    <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="submit()">
+            {{'FORMS.ACTIONS.SEND' | translate}}
+        </button>
+    </div>
+</div>

@@ -1,0 +1,98 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" class="overflow-y-auto"
+    [disabled]="!form.dirty || (isInProgress$ | async)">
+    <app-language-bar [languages]="languageList$ | async" [selected]="selectedLanguage$ | async" slot="outside"
+        [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)" />
+    <form [formGroup]="form" class="flex flex-wrap">
+        <p class="basis-full mat-body-2 section-description">
+            {{ 'CHANNELS.EMAILS_COMMUNICATION.PURCHASE_CONFIRM.DESCRIPTION' | translate }}
+        </p>
+
+        <div class="basis-full sm:basis-1/2 flex items-center">
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label grow">
+                <mat-label>
+                    {{ 'CHANNELS.EMAILS_COMMUNICATION.PURCHASE_CONFIRM.SUBJECT' | translate }}
+                </mat-label>
+                <input matInput aria-label="subject"
+                    [placeholder]="'CHANNELS.EMAILS_COMMUNICATION.PURCHASE_CONFIRM.SUBJECT' | translate"
+                    formControlName="subject">
+            </mat-form-field>
+
+            <app-help-button [message]="'CHANNELS.EMAILS_COMMUNICATION.PURCHASE_CONFIRM.SUBJECT_INFO' | translate" />
+        </div>
+
+        <mat-form-field appearance="outline" class="ob-form-field no-padding field-with-label basis-full">
+            <mat-label>{{'CHANNELS.EMAILS_COMMUNICATION.PURCHASE_CONFIRM.HEADER' | translate}}</mat-label>
+            <app-rich-text-area [autoresize]="{min: 100, max: 500}" formControlName="header"
+                [autocompleterItems]="placeholdersMap['header']" class="vertical-stretch" />
+        </mat-form-field>
+        <p class="basis-full mat-subtitle-2">
+            {{ 'CHANNELS.EMAILS_COMMUNICATION.PURCHASE_CONFIRM.DELIVERY_METHOD' | translate }}
+        </p>
+        <p class="basis-full mat-body-2">
+            {{ 'CHANNELS.EMAILS_COMMUNICATION.PURCHASE_CONFIRM.DELIVERY_METHOD_DESC' | translate }}
+        </p>
+
+        <app-tabs-menu class="basis-full" type="language" formGroupName="deliveryMethods" overrideClasses="vertical">
+            <ng-template appTab lazyLoad [label]="'CHANNELS.EMAILS_COMMUNICATION.PURCHASE_CONFIRM.MAIL_SENDING' | translate">
+                <mat-form-field appearance="outline" class="ob-form-field no-padding">
+                    <app-rich-text-area formControlName="mailSending" [autocompleterItems]="placeholdersMap['mailSending']"
+                        class="vertical-stretch" />
+                </mat-form-field>
+            </ng-template>
+            <ng-template appTab lazyLoad [label]="'CHANNELS.EMAILS_COMMUNICATION.PURCHASE_CONFIRM.VENUE_PICKUP' | translate">
+                <mat-form-field appearance="outline" class="ob-form-field no-padding">
+                    <app-rich-text-area formControlName="venuePickUp" [autocompleterItems]="placeholdersMap['venuePickUp']"
+                        class="vertical-stretch" />
+                </mat-form-field>
+            </ng-template>
+            <ng-template appTab lazyLoad [label]="'CHANNELS.EMAILS_COMMUNICATION.PURCHASE_CONFIRM.MOBILE_SENDING' | translate">
+                <mat-form-field appearance="outline" class="ob-form-field no-padding">
+                    <app-rich-text-area formControlName="mobileSending" [autocompleterItems]="placeholdersMap['mobileSending']"
+                        class="vertical-stretch" />
+                </mat-form-field>
+            </ng-template>
+            @if (channelWebTypes.includes(channelType)) {
+                <ng-template appTab lazyLoad
+                    [label]="'CHANNELS.EMAILS_COMMUNICATION.PURCHASE_CONFIRM.WHATSAPP' | translate">
+                    <mat-form-field appearance="outline" class="ob-form-field no-padding">
+                        <app-rich-text-area formControlName="whatsapp" [autocompleterItems]="placeholdersMap['whatsapp']"
+                            class="vertical-stretch" />
+                    </mat-form-field>
+                </ng-template>
+            }
+        </app-tabs-menu>
+
+        @if (channelWebTypes.includes(channelType)) {
+            <mat-form-field appearance="outline" class="ob-form-field no-padding field-with-label basis-full">
+                <mat-label>{{'CHANNELS.EMAILS_COMMUNICATION.PURCHASE_CONFIRM.CUSTOM_MODULE' | translate}}</mat-label>
+                <app-rich-text-area [autoresize]="{min: 100, max: 200}" formControlName="customModule"
+                    [autocompleterItems]="placeholdersMap['customModule']" class="vertical-stretch" />
+            </mat-form-field>
+            @if (hasSmartBooking$ | async) {
+                <mat-form-field appearance="outline" class="ob-form-field no-padding field-with-label basis-full">
+                    <mat-label>{{'CHANNELS.EMAILS_COMMUNICATION.PURCHASE_CONFIRM.SMART_BOOKING_CUSTOM_MODULE' | translate}}</mat-label>
+                    <app-rich-text-area [autoresize]="{min: 100, max: 200}" formControlName="smartBookingCustomModule"
+                        [autocompleterItems]="placeholdersMap['smartBookingCustomModule']" class="vertical-stretch" />
+                </mat-form-field>
+            }
+
+            @if ((isNewReceiptEnabled$ | async) === false) {
+                <mat-form-field appearance="outline" class="ob-form-field no-padding field-with-label basis-full">
+                    <mat-label>{{'CHANNELS.EMAILS_COMMUNICATION.PURCHASE_CONFIRM.DOWNLOAD_TICKETS' | translate}}</mat-label>
+                    <app-rich-text-area [autoresize]="{min: 100, max: 200}" formControlName="downloadTickets"
+                        [autocompleterItems]="placeholdersMap['downloadTickets']" class="vertical-stretch" />
+                </mat-form-field>
+            }
+        }
+        <mat-form-field appearance="outline" class="ob-form-field no-padding field-with-label basis-full">
+            <mat-label>{{'CHANNELS.EMAILS_COMMUNICATION.PURCHASE_CONFIRM.FOOTER' | translate}}</mat-label>
+            <app-rich-text-area [autoresize]="{min: 100, max: 800}" formControlName="footer"
+                [autocompleterItems]="placeholdersMap['footer']" class="vertical-stretch" />
+        </mat-form-field>
+    </form>
+</app-form-container>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

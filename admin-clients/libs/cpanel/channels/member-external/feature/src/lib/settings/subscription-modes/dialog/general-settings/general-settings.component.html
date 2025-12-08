@@ -1,0 +1,97 @@
+<div [formGroup]="form" fxLayout="column">
+    <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+        <mat-label>{{'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.SID' | translate}}</mat-label>
+        <input matInput aria-label="sid" formControlName="sid"
+            [placeholder]="'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.SID_PLACEHOLDER' | translate">
+        <mat-error [ob-form-errors]="form" field="sid"></mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+        <mat-label>{{'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.NAME' | translate}}</mat-label>
+        <input matInput aria-label="name" formControlName="name"
+            [placeholder]="'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.NAME_PLACEHOLDER' | translate">
+        <mat-error [ob-form-errors]="form" field="name"></mat-error>
+    </mat-form-field>
+
+    <mat-divider class="ob-form-divider"></mat-divider>
+
+    <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+        <mat-label>{{'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.CAPACITIES' | translate}}</mat-label>
+        <mat-select multiple formControlName="capacities" aria-label="capacities"
+            [placeholder]="'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.CAPACITIES_PLACEHOLDER' | translate">
+            <mat-option>
+                <app-select-search #capacitiesSearch [options$]="capacities$" searchField="name" requireSelection="true"
+                    [placeholderLabel]="'FORMS.SEARCH.NAME' | translate">
+                </app-select-search>
+            </mat-option>
+            <mat-option *ngFor="let capacity of capacitiesSearch.getFilteredOptions$() | async" [value]="capacity.id">
+                {{capacity.id}}: {{capacity.name}}
+            </mat-option>
+        </mat-select>
+        <mat-error [ob-form-errors]="form" field="capacities"></mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+        <mat-label>{{'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.ROLES' | translate}}</mat-label>
+        <mat-select multiple formControlName="roles" aria-label="roles"
+            [placeholder]="'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.ROLES_PLACEHOLDER' | translate">
+            <mat-option>
+                <app-select-search #rolesSearch [options$]="roles$" searchField="name" requireSelection="true"
+                    [placeholderLabel]="'FORMS.SEARCH.NAME' | translate">
+                </app-select-search>
+            </mat-option>
+            <mat-option *ngFor="let role of rolesSearch.getFilteredOptions$() | async" [value]="role.id">
+                {{role.id}}: {{role.name}}
+            </mat-option>
+        </mat-select>
+        <mat-error [ob-form-errors]="form" field="roles"></mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+        <mat-label>{{'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.DEFAULT_ROLE' | translate}}</mat-label>
+        <mat-select formControlName="default_buy_role_id" aria-label="default_buy_role_id"
+            [placeholder]="'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.DEFAULT_ROLE_PLACEHOLDER' | translate">
+            <mat-option>
+                <app-select-search #defaultroleSearch [options$]="roles$" searchField="name" requireSelection="true"
+                    [placeholderLabel]="'FORMS.SEARCH.NAME' | translate">
+                </app-select-search>
+            </mat-option>
+            <mat-option *ngFor="let role of defaultroleSearch.getFilteredOptions$() | async" [value]="role.id">
+                {{role.id}}: {{role.name}}
+            </mat-option>
+        </mat-select>
+        <mat-error [ob-form-errors]="form" field="default_buy_role_id"></mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+        <mat-label>{{'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.PERIODICITIES' | translate}}</mat-label>
+        <mat-select multiple formControlName="periodicities" aria-label="periodicities"
+            [placeholder]="'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.PERIODICITIES_PLACEHOLDER' | translate">
+            <mat-option>
+                <app-select-search #periodSearch [options$]="periodicities$" searchField="name" requireSelection="true"
+                    [placeholderLabel]="'FORMS.SEARCH.NAME' | translate">
+                </app-select-search>
+            </mat-option>
+            <mat-option *ngFor="let period of periodSearch.getFilteredOptions$() | async" [value]="period.id">
+                {{period.id}}: {{period.name}}
+            </mat-option>
+        </mat-select>
+        <mat-error [ob-form-errors]="form" field="periodicities"></mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+        <mat-label>{{'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.DEFAULT_PERIODICITY' | translate}}</mat-label>
+        <mat-select formControlName="default_buy_periodicity" aria-label="default_buy_periodicity"
+            [placeholder]="'CHANNELS.MEMBER_EXTERNAL.SUBSCRIPTION_MODES.DEFAULT_PERIODICITY_PLACEHOLDER' | translate">
+            <mat-option>
+                <app-select-search #defaultperiodSearch [options$]="periodicities$" searchField="name" requireSelection="true"
+                    [placeholderLabel]="'FORMS.SEARCH.NAME' | translate">
+                </app-select-search>
+            </mat-option>
+            <mat-option *ngFor="let period of defaultperiodSearch.getFilteredOptions$() | async" [value]="period.id">
+                {{period.id}}: {{period.name}}
+            </mat-option>
+        </mat-select>
+        <mat-error [ob-form-errors]="form" field="default_buy_periodicity"></mat-error>
+    </mat-form-field>
+</div>

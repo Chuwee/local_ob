@@ -1,0 +1,567 @@
+{
+  "root": true,
+  "ignorePatterns": [
+    "node_modules/**/*",
+    ".angular/**/*",
+    ".nx/**/*",
+    ".vscode/**/*",
+    "dist/**/*",
+    "tmp/**/*",
+    "**/proxy.conf.js"
+  ],
+  "plugins": [
+    "@nx"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "*.js"
+      ],
+      "parserOptions": {
+        "ecmaVersion": 2020
+      }
+    },
+    {
+      "files": [
+        "*.ts"
+      ],
+      "parserOptions": {
+        "project": [
+          "tsconfig.base.json"
+        ],
+        "createDefaultProgram": true
+      },
+      "parser": "@typescript-eslint/parser",
+      "extends": [
+        "plugin:@nx/angular",
+        "plugin:@angular-eslint/template/process-inline-templates",
+        "plugin:import/recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:import/typescript"
+      ],
+      "plugins": [
+        "import",
+        "unused-imports",
+        "@angular-eslint",
+        "@typescript-eslint"
+      ],
+      "settings": {
+        "import/resolver": {
+          "typescript": {
+            "alwaysTryTypes": true,
+            "project": [
+              "tsconfig.base.json"
+            ]
+          }
+        }
+      },
+      "rules": {
+        "@typescript-eslint/no-restricted-imports": [
+          "warn",
+          {
+            "paths": [
+              {
+                "name": "@angular/flex-layout",
+                "message": "\n\nATENTION\nUsing @angular/flex-layout is deprected and will be removed in the future, please use css or tailwind instead.\n\n"
+              }
+            ]
+          }
+        ],
+        "@typescript-eslint/no-duplicate-enum-values": "warn",
+        "@typescript-eslint/explicit-member-accessibility": [
+          "error",
+          {
+            "accessibility": "no-public"
+          }
+        ],
+        "@angular-eslint/no-input-rename": "off",
+        "@angular-eslint/no-output-rename": "off",
+        "@angular-eslint/component-selector": [
+          "error",
+          {
+            "type": "element",
+            "prefix": [
+              "app",
+              "ob",
+              "cpanel",
+              "shipanel"
+            ],
+            "style": "kebab-case"
+          }
+        ],
+        "@angular-eslint/directive-selector": [
+          "error",
+          {
+            "type": "attribute",
+            "prefix": [
+              "app",
+              "ob",
+              "cpanel",
+              "shipanel"
+            ],
+            "style": "camelCase"
+          }
+        ],
+        "@angular-eslint/prefer-on-push-component-change-detection": "error",
+        "@typescript-eslint/ban-types": "error",
+        "@typescript-eslint/consistent-type-assertions": "error",
+        "dot-notation": "off",
+        "@typescript-eslint/dot-notation": "error",
+        "@typescript-eslint/member-ordering": [
+          "error",
+          {
+            "default": [
+              "private-field",
+              "protected-field",
+              "public-field",
+              "constructor",
+              "public-method",
+              "protected-method",
+              "private-method"
+            ]
+          }
+        ],
+        "@typescript-eslint/naming-convention": [
+          "error",
+          {
+            "selector": "default",
+            "format": [
+              "camelCase"
+            ]
+          },
+          {
+            "selector": "variable",
+            "format": [
+              "camelCase",
+              "UPPER_CASE"
+            ]
+          },
+          {
+            "selector": [
+              "parameter"
+            ],
+            "modifiers": [
+              "unused"
+            ],
+            "filter": {
+              "regex": "^(_|_.*_)$",
+              "match": true
+            },
+            "format": null
+          },
+          {
+            "selector": [
+              "property",
+              "parameterProperty",
+              "accessor"
+            ],
+            "modifiers": [
+              "private"
+            ],
+            "format": [
+              "camelCase"
+            ],
+            "leadingUnderscore": "require"
+          },
+          {
+            "selector": [
+              "property",
+              "parameterProperty",
+              "accessor"
+            ],
+            "modifiers": [
+              "private",
+              "readonly"
+            ],
+            "format": [
+              "UPPER_CASE",
+              "camelCase"
+            ],
+            "leadingUnderscore": "allow"
+          },
+          {
+            "selector": [
+              "property"
+            ],
+            "modifiers": [
+              "readonly"
+            ],
+            "format": [
+              "camelCase",
+              "UPPER_CASE"
+            ]
+          },
+          {
+            "selector": [
+              "objectLiteralProperty",
+              "typeProperty"
+            ],
+            "format": [
+              "camelCase",
+              "snake_case"
+            ]
+          },
+          {
+            "selector": "typeLike",
+            "format": [
+              "PascalCase"
+            ]
+          }
+        ],
+        "@nx/enforce-module-boundaries": [
+          "error",
+          {
+            "enforceBuildableLibDependency": true,
+            "allow": [],
+            "depConstraints": [
+              {
+                "sourceTag": "scope:cpanel",
+                "onlyDependOnLibsWithTags": [
+                  "scope:cpanel",
+                  "scope:shared"
+                ]
+              },
+              {
+                "sourceTag": "scope:shi-panel",
+                "onlyDependOnLibsWithTags": [
+                  "scope:shi-panel",
+                  "scope:shared"
+                ]
+              },
+              {
+                "sourceTag": "scope:storybook",
+                "onlyDependOnLibsWithTags": [
+                  "scope:shared"
+                ]
+              },
+              {
+                "sourceTag": "scope:shared",
+                "onlyDependOnLibsWithTags": [
+                  "scope:shared"
+                ]
+              },
+              {
+                "sourceTag": "type:app",
+                "onlyDependOnLibsWithTags": [
+                  "type:feature",
+                  "type:util",
+                  "type:data-access",
+                  "type:ui"
+                ]
+              },
+              {
+                "sourceTag": "type:feature",
+                "onlyDependOnLibsWithTags": [
+                  "type:feature",
+                  "type:util",
+                  "type:data-access",
+                  "type:ui"
+                ]
+              },
+              {
+                "sourceTag": "type:ui",
+                "onlyDependOnLibsWithTags": [
+                  "type:util",
+                  "type:ui",
+                  "type:data-access"
+                ]
+              },
+              {
+                "sourceTag": "type:data-access",
+                "onlyDependOnLibsWithTags": [
+                  "type:util",
+                  "type:data-access"
+                ]
+              },
+              {
+                "sourceTag": "type:util",
+                "onlyDependOnLibsWithTags": [
+                  "type:util"
+                ]
+              }
+            ]
+          }
+        ],
+        "@typescript-eslint/explicit-function-return-type": [
+          "error",
+          {
+            "allowExpressions": true
+          }
+        ],
+        "@typescript-eslint/no-unnecessary-type-assertion": "error",
+        "@typescript-eslint/default-param-last": "warn",
+        "@typescript-eslint/no-empty-function": [
+          "warn",
+          {
+            "allow": [
+              "constructors"
+            ]
+          }
+        ],
+        "@typescript-eslint/no-explicit-any": "warn",
+        "@typescript-eslint/no-unnecessary-boolean-literal-compare": "warn",
+        "@typescript-eslint/prefer-enum-initializers": "warn",
+        "@typescript-eslint/unbound-method": [
+          "error",
+          {
+            "ignoreStatic": true
+          }
+        ],
+        "eqeqeq": [
+          "error",
+          "always",
+          {
+            "null": "ignore"
+          }
+        ],
+        "object-shorthand": "error",
+        "@typescript-eslint/no-unused-vars": "off",
+        "unused-imports/no-unused-imports": "warn",
+        "unused-imports/no-unused-vars": [
+          "warn",
+          {
+            "argsIgnorePattern": "^(_|_.*_)$"
+          }
+        ],
+        "import/namespace": "off",
+        "import/no-useless-path-segments": "warn",
+        "import/first": "warn",
+        "import/newline-after-import": "warn",
+        "import/order": [
+          "warn",
+          {
+            "groups": [
+              "builtin",
+              "external",
+              "internal",
+              "parent",
+              "sibling",
+              "index"
+            ],
+            "newlines-between": "never",
+            "alphabetize": {
+              "order": "asc"
+            }
+          }
+        ],
+        "arrow-body-style": "warn",
+        "array-bracket-spacing": "warn",
+        "arrow-parens": [
+          "warn",
+          "as-needed"
+        ],
+        "computed-property-spacing": "warn",
+        "curly": [
+          "warn",
+          "multi-line",
+          "consistent"
+        ],
+        "max-len": [
+          "warn",
+          {
+            "code": 140
+          }
+        ],
+        "new-parens": "warn",
+        "no-multiple-empty-lines": [
+          "warn",
+          {
+            "max": 1
+          }
+        ],
+        "quote-props": [
+          "warn",
+          "as-needed"
+        ],
+        "space-before-function-paren": [
+          "warn",
+          {
+            "anonymous": "never",
+            "asyncArrow": "always",
+            "named": "never"
+          }
+        ],
+        "@typescript-eslint/array-type": "warn",
+        "brace-style": [
+          "warn",
+          "1tbs",
+          {
+            "allowSingleLine": true
+          }
+        ],
+        "@typescript-eslint/comma-dangle": "warn",
+        "@typescript-eslint/comma-spacing": "warn",
+        "@typescript-eslint/func-call-spacing": "warn",
+        "@typescript-eslint/keyword-spacing": "warn",
+        "lines-between-class-members": [
+          "warn",
+          "always",
+          {
+            "exceptAfterSingleLine": true
+          }
+        ],
+        "@typescript-eslint/member-delimiter-style": "warn",
+        "object-curly-spacing": [
+          "warn",
+          "always"
+        ],
+        "@typescript-eslint/prefer-optional-chain": "warn",
+        "@typescript-eslint/prefer-reduce-type-parameter": "warn",
+        "@typescript-eslint/space-infix-ops": "warn",
+        "quotes": [
+          "warn",
+          "single",
+          {
+            "allowTemplateLiterals": true
+          }
+        ],
+        "@typescript-eslint/semi": [
+          "warn",
+          "always"
+        ],
+        "@typescript-eslint/type-annotation-spacing": "warn"
+      }
+    },
+    {
+      "files": [
+        "*.html"
+      ],
+      "extends": [
+        "plugin:@nx/angular-template"
+      ],
+      "rules": {
+        "max-len": [
+          "warn",
+          {
+            "code": 140
+          }
+        ],
+        "@angular-eslint/template/no-any": "error",
+        "@angular-eslint/template/no-duplicate-attributes": "warn",
+        "@angular-eslint/template/eqeqeq": [
+          "error",
+          {
+            "allowNullOrUndefined": true
+          }
+        ],
+        "@angular-eslint/template/prefer-control-flow": "warn",
+        "@angular-eslint/template/prefer-self-closing-tags": "warn",
+        "@angular-eslint/template/use-track-by-function": "warn"
+      }
+    },
+    {
+      "files": [
+        "*.state.ts"
+      ],
+      "rules": {
+        "@typescript-eslint/member-ordering": "off"
+      }
+    },
+    {
+      "files": [
+        "*.stories.ts"
+      ],
+      "rules": {
+        "@typescript-eslint/naming-convention": [
+          "error",
+          {
+            "selector": "default",
+            "format": [
+              "camelCase"
+            ]
+          },
+          {
+            "selector": "variable",
+            "format": [
+              "camelCase",
+              "UPPER_CASE",
+              "PascalCase"
+            ]
+          },
+          {
+            "selector": [
+              "parameter"
+            ],
+            "modifiers": [
+              "unused"
+            ],
+            "filter": {
+              "regex": "^(_|_.*_)$",
+              "match": true
+            },
+            "format": null
+          },
+          {
+            "selector": [
+              "property",
+              "parameterProperty",
+              "accessor"
+            ],
+            "modifiers": [
+              "private"
+            ],
+            "format": [
+              "camelCase"
+            ],
+            "leadingUnderscore": "require"
+          },
+          {
+            "selector": [
+              "property",
+              "parameterProperty",
+              "accessor"
+            ],
+            "modifiers": [
+              "private",
+              "readonly"
+            ],
+            "format": [
+              "UPPER_CASE",
+              "camelCase"
+            ],
+            "leadingUnderscore": "allow"
+          },
+          {
+            "selector": [
+              "property"
+            ],
+            "modifiers": [
+              "readonly"
+            ],
+            "format": [
+              "camelCase",
+              "UPPER_CASE"
+            ]
+          },
+          {
+            "selector": [
+              "objectLiteralProperty",
+              "typeProperty"
+            ],
+            "format": [
+              "camelCase",
+              "snake_case"
+            ]
+          },
+          {
+            "selector": "typeLike",
+            "format": [
+              "PascalCase"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "{package,project}.json"
+      ],
+      "parser": "jsonc-eslint-parser",
+      "rules": {
+        "@nx/dependency-checks": [
+          "error"
+        ]
+      }
+    }
+  ]
+}

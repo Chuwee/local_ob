@@ -1,0 +1,133 @@
+<div class="dialog-msg-container flex flex-col">
+    <div mat-dialog-title>
+        <div class="flex justify-between basis-full">
+            <h2 class="secondary title">{{'TITLES.NEW_EVENT' | translate}}</h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content>
+        <form [formGroup]="form" class="flex flex-col justify-start align-stretch">
+            @if(canSelectEntity$ | async) {
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'EVENTS.ENTITY' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate" formControlName="entity">
+                        <mat-option>
+                            <app-select-search #entitySelectSearch [options$]="entities$"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" requireSelection="true" />
+                        </mat-option>
+                        @for (entity of entitySelectSearch.getFilteredOptions$() | async; track entity.id) {
+                            <mat-option [value]="entity">
+                                {{entity.name}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form.controls.entity" />
+                </mat-form-field>
+            }
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>{{'EVENTS.PRODUCER' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="producer">
+                    <mat-option>
+                        <app-select-search #producerSelectSearch [options$]="producers$"
+                            [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" requireSelection="true" />
+                    </mat-option>
+                    @for (producer of producerSelectSearch.getFilteredOptions$() | async; track producer.id) {
+                        <mat-option [value]="producer">
+                            {{producer.name}}
+                        </mat-option>
+                    }
+                </mat-select>
+                <mat-error [ob-form-errors]="form.controls.producer" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>{{'EVENTS.NAME' | translate}}</mat-label>
+                <input matInput aria-label="name" [placeholder]="'EVENTS.NAME' | translate" formControlName="name">
+                <mat-error [ob-form-errors]="form.controls.name" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>{{'EVENTS.CATEGORY' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="category">
+                    <mat-option>
+                        <app-select-search #categorySelectSearch [options$]="categories$"
+                            [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                            searchField="description" requireSelection="true" />
+                    </mat-option>
+                    @for (category of categorySelectSearch.getFilteredOptions$() | async; track category.id) {
+                        <mat-option [value]="category">
+                            {{ 'ENTITY.CATEGORY_OPTS.'+ category.code | translate }}
+                        </mat-option>
+                    }
+                </mat-select>
+                <mat-error [ob-form-errors]="form.controls.category" />
+            </mat-form-field>
+            @if((currencies$ | async)?.length > 1) {
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.CURRENCY' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="currency">
+                        <mat-option>
+                            <app-select-search #currencySelectSearch [options$]="currencies$ | localCurrenciesFullTranslation$"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="description"
+                                requireSelection="true" />
+                        </mat-option>
+                        @for (currency of currencySelectSearch.getFilteredOptions$() | async; track currency.code) {
+                            <mat-option [value]="currency">
+                                {{currency.description}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form.controls.currency" />
+                </mat-form-field>
+            }
+            @if(types$ | async) {
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'EVENTS.TYPE' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="type">
+                        @for (type of (types$ | async); track $index) {
+                            <mat-option [value]="type">
+                                {{'EVENTS.TYPE_OPTS.' + type | translate}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form.controls.type" />
+                </mat-form-field>
+            }
+            @if (form.controls.type.value === eventType.normal || form.controls.type.value === eventType.activity) {
+                @if((inventoryProviders$ | async); as inventoryProviders){
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                        <mat-label>{{'VENUE_TPLS.INVENTORY' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="inventory">
+                            @for (inventory of inventoryProviders; track inventory) {
+                                <mat-option [value]="inventory">
+                                    <div> {{'VENUES.INVENTORY.'+ inventory | translate}}</div>
+                                </mat-option>
+                                <mat-option [value]="'internal'">{{'VENUES.INVENTORY.INTERNAL'| translate}}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                    @if (form.controls.inventory.value === externalInventoryProviders.sga && form.controls.type.value === eventType.normal){
+                        <app-new-event-sga-fields [entity]="this.form.controls.entity.value" [form]="form" />
+                    }
+                }
+            }
+            @if (enableAvetFields$ | async) {
+                <app-new-event-avet-fields [entities]="entities$ | async" [form]="form" />
+            }
+        </form>
+    </div>
+    <div mat-dialog-actions align="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createEvent()">
+            {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>
+
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

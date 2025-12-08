@@ -1,0 +1,57 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'TITLES.NEW_MAPPING' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <form [formGroup]="form" fxLayout="column" fxLayoutAlign="start stretch">
+            <h3 class="dialog-section-title">{{'NEW_MAPPING.STUBHUB' | translate | uppercase}}</h3>
+            <mat-form-field appearance="outline" class="ob-form-field no-grid-spacing">
+                <mat-label>{{'NEW_MAPPING.SHI_ID' | translate}}</mat-label>
+                <input matInput type="number" class="input-number-no-arrows" aria-label="shi_id"
+                    [placeholder]="'NEW_MAPPING.SHI_ID' | translate" formControlName="shi_id">
+                <mat-error [ob-form-errors]="form" field="shi_id"></mat-error>
+            </mat-form-field>
+            <h3 class="dialog-section-title">{{'NEW_MAPPING.SUPPLIER' | translate | uppercase}}</h3>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'NEW_MAPPING.SUPPLIER' | translate}}</mat-label>
+                <mat-select formControlName="supplier" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                    <mat-option *ngFor="let supplier of suppliers$ | async" [value]="supplier.id">
+                        {{supplier?.name | translate}}
+                    </mat-option>
+                </mat-select>
+                <mat-error [ob-form-errors]="form" field="supplier"></mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'NEW_MAPPING.SUPPLIER_ID' | translate}}</mat-label>
+                <input matInput class="input-number-no-arrows" aria-label="name"
+                    [placeholder]="'NEW_MAPPING.SUPPLIER_ID' | translate"
+                    formControlName="supplier_id">
+                <mat-error [ob-form-errors]="form" field="supplier_id"></mat-error>
+            </mat-form-field>
+            <mat-form-field hidden-outline class="ob-form-field">
+                <div [matTooltip]="!(favoriteAvailable$ | async) ? ('NEW_MAPPING.FORMS.INFOS.FAV_LIMIT_EXCEEDED' | translate) : ''">
+                    <input fxHide matInput>
+                    <mat-checkbox formControlName="favorite" color="primary">
+                        <mat-label>
+                            {{'NEW_MAPPING.FORMS.INFOS.ADD_TO_FAVORITE' | translate}}
+                        </mat-label>
+                    </mat-checkbox>
+                </div>
+            </mat-form-field>
+        </form>
+    </div>
+    <div class="spinner-container" *ngIf="loadingData$ | async">
+        <mat-spinner></mat-spinner>
+    </div>
+    <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createMapping()">
+            {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>

@@ -1,0 +1,25 @@
+<div mat-dialog-title>
+    <h2 class="secondary title">{{'ACTIONS.SELECT_ENTITY' | translate}}</h2>
+</div>
+<div mat-dialog-content>
+    <div class="flex">
+        <mat-form-field appearance="outline" class="ob-form-field field-with-label flex-1">
+            <mat-label>{{'FORMS.LABELS.ENTITY' | translate}}</mat-label>
+            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" [formControl]="entityIdCtrl">
+                <mat-option>
+                    <app-select-search #entitySelectSearch [options$]="entities$" searchField="name" requireSelection="true"
+                        [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" />
+                </mat-option>
+                @for(entity of (entitySelectSearch.getFilteredOptions$() | async); track entity.id){
+                    <mat-option [value]="entity.id">{{entity.name}}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+    </div>
+</div>
+<div mat-dialog-actions align="end">
+    <button mat-flat-button color="primary" type="button" class="ob-button"
+        [disabled]="!entityIdCtrl.valid" (click)="save()">
+        {{'FORMS.ACTIONS.SELECT' | translate}}
+    </button>
+</div>

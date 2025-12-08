@@ -1,0 +1,35 @@
+<div fxLayout="column" class="promotion-form-section" [formGroup]="ratesForm">
+    <p class="mat-subtitle-2">{{'SEASON_TICKET.PROMOTIONS.RATES_DESCRIPTION' | translate}}</p>
+    <mat-radio-group formControlName="type" fxLayout="column">
+        <mat-radio-button class="inline" [value]="promotionRatesScope.all">
+            {{'SEASON_TICKET.PROMOTIONS.RATES_OPTS.ALL' | translate}}
+        </mat-radio-button>
+        <mat-radio-button #restrictedRadio class="inline" [value]="promotionRatesScope.restricted"
+            [disabled]="!((rates$ | async)?.length > 0)"
+            [matTooltip]="'SEASON_TICKET.PROMOTIONS.RATES_EMPTY_LIST' | translate"
+            [matTooltipDisabled]="!restrictedRadio.disabled || (loading$ | async)"
+            matTooltipPosition="left"
+            matTooltipClass="no-margin">
+            {{'SEASON_TICKET.PROMOTIONS.RATES_OPTS.SELECT' | translate}}
+        </mat-radio-button>
+    </mat-radio-group>
+    <div fxFlex>
+        <div [fxShow]="ratesForm.get('type').value === promotionRatesScope.restricted"
+            class="promotion-rates-container nested-content">
+            <div fxLayout="row" class="rates-list-container"
+                [class.field-error]="ratesForm.hasError('required', 'ids') && ratesForm.get('ids').touched">
+                <mat-selection-list *ngIf="(rates$ | async)?.length" fxFlex="100%" class="ob-list rates-list"
+                    formControlName="ids">
+                    <mat-list-option *ngFor="let rate of rates$ | async" color="primary" [value]="rate.id"
+                        checkboxPosition="before">
+                        {{rate?.name}}
+                    </mat-list-option>
+                </mat-selection-list>
+            </div>
+            <span *ngIf="ratesForm.hasError('required', 'ids') && ratesForm.get('ids').touched"
+                class="error-description">
+                {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+            </span>
+        </div>
+    </div>
+</div>

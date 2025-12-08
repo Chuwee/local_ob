@@ -1,0 +1,118 @@
+<app-form-container layout="main" class="overflow-y-auto" (cancel)="cancel()" (save)="save()" [formGroup]="eventDeliveryPointsCtrl"
+    [disabled]="!eventDeliveryPointsCtrl.dirty">
+    <div class="section-block">
+        <h3 class="section-title">{{'PRODUCT.EVENTS.DETAIL.DELIVERY.ASSIGN_TO_EVENTS_TITLE' | translate}} *</h3>
+        <p>{{ 'PRODUCT.EVENTS.DETAIL.DELIVERY.ASSIGN_TO_EVENTS_LABEL' | translate }}</p>
+        <app-product-delivery-points-selector class="delivery-points-selector-container"
+            [form]="eventDeliveryPointsCtrl" />
+        @if (eventDeliveryPointsCtrl.dirty) {
+            <p fxLayout="row" fxLayoutAlign="start center" class="info-p">
+                <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                <span>{{'PRODUCT.EVENTS.DETAIL.DELIVERY.SAVE_EVENT_DELIVERIES' | translate}}</span>
+            </p>
+        }
+    </div>
+    @if ((allProductDeliveryPoints$ | async)?.length) {
+        <div class="sessions-selection section-block"
+            [class.field-error]="sessionsCtrl.hasError('atLeastOneRequired') && sessionsCtrl.touched">
+            <p class="ob-label">{{ 'PRODUCT.EVENTS.DETAIL.DELIVERY.ASSIGN_TO_SESSIONS_TITLE' | translate }}</p>
+            <p>{{ 'PRODUCT.EVENTS.DETAIL.DELIVERY.ASSIGN_TO_SESSIONS_LABEL' | translate }}</p>
+
+            <app-searchable-paginated-selection
+                [placeholder]="'FORMS.SEARCH_EVENT_FIELD' | translate"
+                [pageSize]="pageSize" [form]="sessionsCtrl"
+                [data$]="allConfigSessionsData$" [metadata$]="allConfigSessionsMetadata$"
+                (loadData)="reloadSessionsList($event)">
+                <div slot="filter" class="badge-container" [class.empty]="!(allConfigSessionsMetadata$ | async)?.total">
+                    {{sessionsCtrl.value?.length}} / {{(allConfigSessionsMetadata$ | async)?.total || 0}}
+                </div>
+                <button slot="filter" mat-icon-button color="tertiary" class="ob-button only-icon"
+                    [class.active]="configSessionsSelectedOnly$ | async"
+                    [disabled]="sessionsCtrl.value?.length === 0"
+                    [matTooltip]="'PRODUCT.EVENTS.DETAIL.SESSIONS.SHOW_SELECTED_TOOLTIP' | translate"
+                    (click)="changeSessionsSelectedOnly()">
+                    <mat-icon>visibility</mat-icon>
+                </button>
+                @if (canWrite$ | async) {
+                    <button slot="filter" [disabled]="!sessionsCtrl.value?.length" mat-icon-button
+                        color="tertiary" class="ob-button only-icon" (click)="openSetSessionsDeliveryPointsDialog()">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                }
+                <div slot="filter" class="filter-container" fxFlex="none">
+                    <app-sessions-selector-filter
+                        [disabled]="!$eventDeliveryPoints()?.length"
+                        (filterChange)="filterChangeHandler($event)" />
+                </div>
+                <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data" let-selectionChanged="selectionChanged">
+                    <app-selection-list [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged" class="small-rows">
+                        <div slot="subheader" class="list-header">
+                            <div fxLayoutAlign="space-between" fxFlex="0 1 100%">
+                                <div fxLayout="row" fxLayoutAlign="start center" fxFlex="0 1 210px" appEllipsify>
+                                    <mat-checkbox fxLayoutAlign="start end" color="primary"
+                                        [disabled]="(configSessionsSelectedOnly$ | async) || (allConfigSessionsMetadata$ | async)?.total === 0"
+                                        [checked]="sessionsCtrl.value?.length > 0 &&
+                                        sessionsCtrl.value?.length === (allConfigSessionsMetadata$ | async)?.total ||
+                                        (configSessionsSelectedOnly$ | async)"
+                                        [indeterminate]="sessionsCtrl.value?.length > 0 &&
+                                            sessionsCtrl.value?.length < (allConfigSessionsMetadata$ | async)?.total"
+                                        (change)="selectAll($event)" />
+                                    <span>{{'FORMS.LABELS.SESSIONS' | translate}}</span>
+                                </div>
+                                <div fxFlex="0 1 170px" fxLayoutAlign="start center" appEllipsify>
+                                    <span>{{'FORMS.LABELS.DATE' | translate}}</span>
+                                </div>
+                                <div fxFlex="0 1 280px" fxLayoutAlign="start center" fxLayoutGap="8px" appEllipsify>
+                                    <span>{{'FORMS.LABELS.DELIVERY_POINTS' | translate}}</span>
+                                    <mat-icon class="ob-help-icon"
+                                        [matTooltip]="'PRODUCT.EVENTS.DETAIL.SESSIONS.DELIVERY_COLUMN_TOOLTIP' | translate">
+                                        help_outline
+                                    </mat-icon>
+                                </div>
+                                <div fxFlex="0 1 60px">
+                                </div>
+                            </div>
+                        </div>
+                        <ng-template #optionTemplate let-row>
+                            <div fxLayoutAlign="space-between center" class="session-option" fxFlex="0 1 100%">
+                                <div fxFlex="0 1 170px" appEllipsify>
+                                    <span>@if(row.smartbooking) {
+                                            <b>{{ 'FORMS.LABELS.SMART_BOOKING_TYPE' | translate }} | </b>
+                                        }{{row.name}}</span>
+                                </div>
+                                <div fxFlex="0 1 170px" appEllipsify>
+                                    <span>{{row.start | dateTime : dateTimeFormats.shortDateTimeWithWeek}}</span>
+                                </div>
+                                <div fxFlex="0 1 280px" appEllipsify
+                                    [matTooltip]="getDeliveryPointsNames(row.delivery_points) || defaultEventDeliveryPoints">
+                                    @if (row.delivery_points?.length) {
+                                        <span class="status-dot info"></span>
+                                    }
+                                    <span>{{ getDeliveryPointsNames(row.delivery_points) || defaultEventDeliveryPoints }}</span>
+                                </div>
+                                <div fxFlex="0 1 60px" class="action-buttons float-actions-cell">
+                                    @if (canWrite$ | async) {
+                                        <button slot="filter" mat-icon-button color="tertiary" class="ob-button only-icon single-edit"
+                                            (click)="openSetSessionsDeliveryPointsDialog(row)">
+                                            <mat-icon>edit</mat-icon>
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </ng-template>
+                        <ng-template #noResultsTemplate>
+                            <app-empty-state-tiny
+                                [title]="$getEmptyStateTitle() | translate"
+                                [description]="$getEmptyStateDesc() | translate" />
+                        </ng-template>
+                    </app-selection-list>
+                </ng-template>
+            </app-searchable-paginated-selection>
+        </div>
+    }
+</app-form-container>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,51 @@
+<app-form-container [disabled]="!(form?.dirty) || (reqInProgress$ | async)" layout="main" (cancel)="cancel()"
+    (save)="save()">
+    <form [formGroup]="form">
+        <!-- TEMPLATE PRINCIPAL INFO -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'VENUE_TPLS.PRINCIPAL_INFO' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-activity-venue-template-main-data [form]="mainForm" />
+        </mat-expansion-panel>
+        <!-- PRICE TYPES AND QUOTAS -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'VENUE_TPLS.ACTIVITY_TICKET_TYPE_QUOTAS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="row wrap">
+                <!-- PRICE TYPES, OR TICKET TYPES -->
+                <app-tabs-menu type="navigation" fxFlex="100%" fxFlex.gt-sm="50%" class="template-form-section">
+                    <ng-template appTab [label]="'VENUE_TPLS.TICKET_TYPES' | translate">
+                        <app-activity-venue-template-price-types />
+                    </ng-template>
+                    <ng-template appTab lazyLoad [label]="'EVENTS.PRICEZONE.TITLE_DESCRIPTION_TRANSLATE_TABLE' | translate">
+                        <app-price-type-translations [form]="translationsForm" [languages$]="languages$"
+                            [venueTplId]="(venueTemplate$ | async)?.id" />
+                    </ng-template>
+                </app-tabs-menu>
+                <app-tabs-menu type="navigation" fxFlex="100%" fxFlex.gt-sm="50%" class="template-form-section">
+                    <ng-template appTab [label]="'VENUE_TPLS.QUOTAS' | translate">
+                        <app-activity-venue-template-quotas />
+                    </ng-template>
+                </app-tabs-menu>
+            </div>
+        </mat-expansion-panel>
+        <!-- LIMITS -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'VENUE_TPLS.ACTIVITY_CAPACITIES' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="template-form-section" fxLayout="column" fxLayoutAlign="start stretch">
+                <p class="limits-description">{{'VENUE_TPLS.ACTIVITY_CAPACITIES_INFO' | translate}}</p>
+                <app-activity-venue-template-limits [form]="limitsForm" [venueTemplate]="venueTemplate$ | async"
+                    [showVisibility]="false" />
+            </div>
+        </mat-expansion-panel>
+    </form>
+</app-form-container>
+@if(reqInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

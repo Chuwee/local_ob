@@ -1,0 +1,55 @@
+<div class="left-bar-container">
+    <div fxFlex class="left-bar" fxLayout="column" fxLayoutAlign="start stretch">
+        <div class="left-sidebar-title" fxLayout="column">
+            <div fxLayout="row" fxLayoutAlign="justify center">
+                <h2 class="title">{{'VENUE.SPACES.TITLE' | translate}}</h2>
+                <button mat-icon-button aria-label="new-space" type="button" class="ob-button mat-stroked-button xsmall"
+                    (click)="openNewVenueSpaceDialog()" *ngIf="venueSpaceCreateAndDeleteCapability$ | async">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+            <div fxFlex>
+                <p class="results-count" [innerHTML]="('RESULTS.TOTAL' | translate) + ': ' + (totalVenueSpaces$ | async)"></p>
+            </div>
+        </div>
+        <div fxFlex="36px" class="left-sidebar-header" fxLayoutAlign="end center">
+            <button mat-icon-button aria-label="delete-space" class="ob-button small" (click)="openDeleteVenueSpaceDialog()"
+                [disabled]="(totalVenueSpaces$ | async) === 0" *ngIf="venueSpaceCreateAndDeleteCapability$ | async">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </div>
+        <div fxLayout="column" fxFlex class="list-container">
+            <mat-selection-list class="ob-lateral-select-list" appLastPathGuardListener disableRipple [multiple]="false"
+                [currValue]="(venueSpace$ | async)?.id" (selectionChange)="selectionChangeHandler($event.options[0]?.value)">
+                <mat-list-option class="with-badge with-select-button" *ngFor="let item of (venueSpacesList$ | async)" [value]="item.id"
+                    [selected]="item.id === (venueSpace$ | async)?.id" [id]="'space-list-option-' + item.id">
+                    <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                        <button mat-icon-button class="ob-button medium default-btn" (click)="updateDefaultSpace(item, $event)"
+                            [disabled]="item.default || (venueSpaceCreateAndDeleteCapability$ | async) === false"
+                            [matTooltip]="'VENUE.SPACES.MARK_DEFAULT' | translate">
+                            <mat-icon class="default-icon" [class.default-icon-checked]="item.default">
+                                {{item.default ? 'star' : 'star_outline'}}
+                            </mat-icon>
+                        </button>
+                        <div fxLayout="column" class="space-main-info">
+                            <span class="list-item-title" appEllipsify [matTooltip]="item.name">
+                                {{item.name}}
+                            </span>
+                            <span class="list-item-subtitle">
+                                {{('FORMS.LABELS.MAX_CAPACITY' | translate) + ': ' +
+                                (item.capacity?.type === venueSpaceCapacityType.unlimited
+                                ? ('FORMS.OPTIONS.UNLIMITED' | translate)
+                                : item.capacity?.value)}}
+                            </span>
+                        </div>
+                    </div>
+                </mat-list-option>
+            </mat-selection-list>
+        </div>
+    </div>
+    <div *ngIf="(isInProgress$ | async)" class="loading-state-container" fxLayoutAlign="center center">
+        <div class="loading-state-background" fxLayout="row" fxLayoutAlign="center center">
+            <mat-spinner></mat-spinner>
+        </div>
+    </div>
+</div>

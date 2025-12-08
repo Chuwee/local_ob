@@ -1,0 +1,15 @@
+<ng-container [formGroup]="taxDataFormGroup">
+    <div fxFlex="100%" fxLayout="row" class="session-data-container" *ngIf="(isProducerDataType$ | async)">
+        <mat-form-field appearance="outline" class="ob-form-field field-with-label nested-content" fxFlex="0 1 50%">
+            <mat-label>{{'EVENTS.PROMOTIONS.TAX_DATA.SELECT_PRODUCER_LABEL' | translate}}</mat-label>
+            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="taxProducerId"
+                aria-label="producer">
+                <mat-option *ngFor="let producer of producers$ | async" [value]="producer?.id">
+                    <div appEllipsify [matTooltip]="producer?.name + ' - ' + producer?.nif">
+                        {{producer?.name}} - {{producer?.nif}}
+                    </div>
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+</ng-container>

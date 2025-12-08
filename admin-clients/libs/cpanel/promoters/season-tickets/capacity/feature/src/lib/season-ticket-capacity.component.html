@@ -1,0 +1,53 @@
+<div fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="stretch">
+    <div fxFlex="0 1 100%" fxLayoutAlign="center stretch" class="season-ticket-session">
+        <div *ngIf="isGenerationStatusInProgress$ | async" class="ob-overlay-wrapper">
+            <div class="ob-overlay-pane">
+                <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px" fxFlex="80%">
+                    <p>{{'SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate}}</p>
+                    <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                        [attr.aria-label]="('SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate)" />
+                </app-context-notification>
+            </div>
+        </div>
+        <div *ngIf="isCapacityUpdateInProgress$ | async" class="ob-overlay-wrapper">
+            <div class="ob-overlay-pane pane-center">
+                <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px" fxFlex="80%">
+                    <p>{{'SEASON_TICKET.CAPACITY_UPDATE_IN_PROGRESS' | translate}}</p>
+                    <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                        [attr.aria-label]="('SEASON_TICKET.CAPACITY_UPDATE_IN_PROGRESS' | translate)" />
+                </app-context-notification>
+            </div>
+        </div>
+        <div fxLayout="column" fxFlex="0 1 100%" fxLayoutAlign="start stretch">
+            <app-std-venue-tpl-mgr fxFlex="0 1 100%" [editorType]="venueTemplateEditorType.seasonTicketTemplate"
+                *ngIf="(isGenerationStatusReady$ | async) && venueTemplate$ | async as venueTemplate"
+                [venueTemplate]="venueTemplate" (userAction)="userVenueAction($event)" [editorEnabled]="showEditorBtn$ | async"
+                (gotoEditor)="this.gotoEditor()">
+                @if($isSga()){
+                    <button mat-icon-button aria-label="Refresh" class="ob-button small" slot="header"
+                        [matTooltip]="'EVENTS.SESSION.CAPACITY_REFRESH_EXTERNAL' | translate" (click)="refreshExternalAvailability()">
+                        <mat-icon>published_with_changes</mat-icon>
+                    </button>
+                }
+            </app-std-venue-tpl-mgr>
+        </div>
+    </div>
+    <div class="bottom-actions-bar" fxFlex="0 0 60px" fxLayout="row" fxLayoutAlign="center center">
+        <div class="bottom-action-subbar" fxFlex="1 1 100%" fxLayout="row" fxLayoutAlign="end center">
+            <button type="button" mat-button class="ob-button medium"
+                [disabled]="(isDirty$ | async) === false || (isGenerationStatusReady$ | async) === false || (isLoading$ | async)"
+                (click)="cancel()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button type="button" mat-flat-button class="ob-button medium" color="primary"
+                [disabled]="(isDirty$ | async) === false || (isGenerationStatusReady$ | async) === false || (isLoading$ | async)"
+                (click)="save()">
+                {{'FORMS.ACTIONS.UPDATE' | translate}}
+            </button>
+        </div>
+        <span fxFlex="0 0 {{sidebarWidth$ | async}}" fxHide.lt-md></span>
+    </div>
+    <div class="spinner-container" *ngIf="isLoading$ | async">
+        <mat-spinner />
+    </div>
+</div>

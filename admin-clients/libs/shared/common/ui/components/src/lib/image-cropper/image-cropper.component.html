@@ -1,0 +1,103 @@
+@let loading = $loading();
+@let warningMessage = $warningMessage();
+@let zoom = $zoom();
+@let cropper = $cropper();
+
+<!-- LOADING -->
+@if (loading) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}
+<!-- WARNING -->
+@if (warningMessage) {
+    <mat-error class="cropper-warning">{{warningMessage | translate}}</mat-error>
+}
+
+<!-- CROPPER WRAPPER -->
+<div class="cropper-wrapper">
+    <!-- CROPPER -->
+    <div class="cropper">
+        <img alt="image" [src]="$imageUrl()" (load)="imageLoaded($event)" (error)="imageLoadError()" [class.cropper-loading]="loading">
+    </div>
+</div>
+
+<!-- CROPPER TOOLBAR WRAPPER -->
+<div class="cropper-toolbar-wrapper">
+    <!-- CROPPER TOOLBAR -->
+    <div class="cropper-toolbar flex justify-between items-center">
+        <div class="flex gap-[10px]">
+            <span>{{'IMAGE_CROPPER.RESOLUTION' | translate}}: <span class="cropper-size">{{cropBoxData?.width}}</span> x <span
+                    class="cropper-size">{{cropBoxData?.height}}</span></span>
+        </div>
+        <div class="flex gap-[10px]">
+            <button matTooltip="{{'IMAGE_CROPPER.FIT_CROPPER' | translate}}"
+                mat-button aria-label="fit to cropper"
+                class="ob-button small only-icon"
+                [disabled]="disabled"
+                (click)="fitCrop()">
+                <mat-icon svgIcon="fit-content" />
+            </button>
+            <button matTooltip="{{'IMAGE_CROPPER.FILL_CROPPER' | translate}}"
+                mat-button aria-label="fill to cropper"
+                class="ob-button small only-icon"
+                [disabled]="disabled"
+                (click)="fillCrop()">
+                <mat-icon svgIcon="fill-content" />
+            </button>
+            <mat-divider vertical />
+            <button matTooltip="{{'IMAGE_CROPPER.ROTATE_LEFT' | translate}}"
+                mat-button aria-label="rotate left"
+                class="ob-button small only-icon"
+                [disabled]="disabled"
+                (click)="cropper.rotate(-90)">
+                <mat-icon>rotate_left</mat-icon>
+            </button>
+            <button matTooltip="{{'IMAGE_CROPPER.ROTATE_RIGHT' | translate}}"
+                mat-button aria-label="rotate right"
+                class="ob-button small only-icon"
+                [disabled]="disabled"
+                (click)="cropper.rotate(90)">
+                <mat-icon>rotate_right</mat-icon>
+            </button>
+            <button matTooltip="{{'IMAGE_CROPPER.SWAP_HORIZONTAL' | translate}}"
+                mat-button aria-label="swap horizontal"
+                class="ob-button small only-icon"
+                [disabled]="disabled"
+                (click)="cropper.scaleX(cropper.getData().scaleX * -1)">
+                <mat-icon>swap_horiz</mat-icon>
+            </button>
+            <button matTooltip="{{'IMAGE_CROPPER.SWAP_VERTICAL' | translate}}"
+                mat-button aria-label="swap vertical"
+                class="ob-button small only-icon"
+                [disabled]="disabled"
+                (click)="cropper.scaleY( cropper.getData().scaleY * -1)">
+                <mat-icon>swap_vert</mat-icon>
+            </button>
+            <mat-divider vertical />
+            <button matTooltip="{{'IMAGE_CROPPER.ZOOM_OUT' | translate}}"
+                mat-button aria-label="zoom out"
+                class="ob-button small only-icon"
+                (click)="cropper.zoom(-0.1)"
+                [disabled]="disabled || zoom.min >= zoom.value">
+                <mat-icon>zoom_out</mat-icon>
+            </button>
+            <mat-slider class="ob-slider" [min]="zoom.min" [max]="zoom.max" step="0.1" color="primary" [disabled]="disabled">
+                <input matSliderThumb [value]="zoom.value" (valueChange)="cropper.zoomTo($event / 100)">
+            </mat-slider>
+            <button matTooltip="{{'IMAGE_CROPPER.ZOOM_IN' | translate}}"
+                mat-button aria-label="zoom in"
+                class="ob-button small only-icon"
+                (click)="cropper.zoom(0.1)"
+                [disabled]="disabled || zoom.max <= zoom.value">
+                <mat-icon>zoom_in</mat-icon>
+            </button>
+            <mat-divider vertical />
+            <div class="flex justify-between items-center">
+                {{'IMAGE_CROPPER.FILL_COLOR' | translate}}
+                <app-color-picker [matTooltip]="!disabled ? ('IMAGE_CROPPER.FILL_COLOR' | translate) : ''"
+                    [disabled]="disabled" [allowEmptyColor]="true" [formControl]="fillColor" />
+            </div>
+        </div>
+    </div>
+</div>

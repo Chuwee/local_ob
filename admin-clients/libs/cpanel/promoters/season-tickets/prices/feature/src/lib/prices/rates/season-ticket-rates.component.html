@@ -1,0 +1,29 @@
+<app-form-container [hideActionBar]="true" layout="menu">
+    @if ($isGenerationStatusInProgress()) {
+        <div class="ob-overlay-wrapper" slot="overlay">
+            <div class="flex ob-overlay-pane pane-sticky">
+                <app-context-notification contextType="info" class="ob-context-notification flex-[0_1_680px]">
+                    <p>{{'SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate}}</p>
+                    <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                        [attr.aria-label]="('SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate)" />
+                </app-context-notification>
+            </div>
+        </div>
+    }
+    <div class="flex">
+        <app-tabs-menu type="navigation" class="flex-[0_1_680px]">
+            <ng-template appTab [label]="'SEASON_TICKET.RATES_LIST' | translate">
+                <app-season-ticket-rates-list />
+            </ng-template>
+            <ng-template appTab [label]="'SEASON_TICKET.RATES_RESTRICTIONS.TITLE' | translate">
+                <app-restricted-rates-list [contextId]="$seasonTicket()?.id" [entityId]="$seasonTicket()?.entity?.id"
+                    [rates]="$seasonTicketRates()" [venueTemplates]="$seasonTicket()?.venue_templates" showPeriodRestrictions />
+            </ng-template>
+        </app-tabs-menu>
+    </div>
+</app-form-container>
+@if ($isInProgress()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,130 @@
+<div class="list-container" fxFlex="0 1 100%" fxLayout="column">
+    <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">
+                {{'TITLES.NOTIFICATIONS.MY_EMAIL_NOTIFICATIONS_EMAILS' | translate}}
+                <span [matTooltip]="'INFORMATION_BADGE.BETA_FEATURE_TOOLTIP_INFO' | translate"
+                    class="ob-badge info">
+                    {{'INFORMATION_BADGE.BETA_FEATURE' | translate}}
+                </span>
+            </h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+            <div class="filter-container" fxFlex="none">
+                <button *ngIf="canWrite$ | async"
+                    mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                    [attr.aria-label]="'NOTIFICATIONS.EMAIL_NOTIFICATION.NEW_BTN' | translate"
+                    (click)="openNewNotificationDialog()">
+                    <mat-icon>add</mat-icon>
+                    {{'NOTIFICATIONS.EMAIL_NOTIFICATION.NEW_BTN' | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="heading-container" fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxFlex="70%" fxLayoutGap="20px" fxLayoutAlign="start center">
+            <div class="filter-container" fxFlex="none">
+                <app-popover appFilter>
+                    <app-notifications-list-filter #filterContent [canSelectEntity$]="canSelectEntity$" />
+                </app-popover>
+            </div>
+            <div class="search-field" fxFlex="100%">
+                <app-search-input [placeholder]="'FORMS.SEARCH.NOTIFICATION_EMAIL_LIST' | translate" />
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            <p *ngIf="notificationsMetadata$ | async as notificationsMetadata" class="page-summary"
+                [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: notificationsMetadata">
+            </p>
+            <app-paginator [length]="(notificationsMetadata$ | async)?.total" [pageSize]="notificationsPageSize" />
+        </div>
+    </div>
+    <div class="heading-container">
+        <app-chips appFilter />
+    </div>
+    <div class="heading-container heading-aggregated" *ngIf="notificationsAggregatedData$">
+        <app-aggregated-data [aggregatedData]="notificationsAggregatedData$ | async" [aggregationMetrics]="aggDataNotification" />
+    </div>
+    <div class="spinner-container" *ngIf="loadingData$ | async">
+        <mat-spinner />
+    </div>
+    <mat-table class="ob-table" [dataSource]="notifications$ | async" matSort [matSortActive]="initSortCol" [matSortDirection]="initSortDir"
+        matSortDisableClear [attr.aria-label]="'TITLES.NOTIFICATIONS.MY_EMAIL_NOTIFICATIONS_EMAILS' | translate"
+        [class.not-touchable]="(isHandsetOrTablet$ | async) !== true">
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="entity">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.ENTITY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.entity && row.entity.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="created_date">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'NOTIFICATIONS.EMAIL_NOTIFICATION.CREATION_DATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.created_date | localDateTime : dateTimeFormats.shortDate}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="summary.sent_date">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'NOTIFICATIONS.EMAIL_NOTIFICATION.SENT_DATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.summary?.sent_date | localDateTime : dateTimeFormats.shortDate}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="summary.total">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'NOTIFICATIONS.EMAIL_NOTIFICATION.RECIPIENTS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.summary?.total}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.STATUS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span class="status-dot-spinner" *ngIf="(row.status === notificationStatus.inProgress) else statusDot">
+                    <mat-spinner diameter="15" />
+                </span>
+                <ng-template #statusDot>
+                    <span [ngClass]="['status-dot', row.status.toLowerCase()]"></span>
+                </ng-template>
+                {{'NOTIFICATIONS.EMAIL_NOTIFICATION.STATUS_OPTS.' + row.status | translate}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="actions-cell head-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true" />
+            <mat-cell *matCellDef="let row" class="actions-cell" [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                <div class="action-buttons" (click)="$event.stopPropagation()">
+                    <button mat-icon-button aria-label="Delete notification" class="ob-button medium"
+                        [matTooltip]="'NOTIFICATIONS.EMAIL_NOTIFICATION.DELETE_BTN' | translate"
+                        (click)="openDeleteNotificationDialog(row)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+            </mat-cell>
+        </ng-container>
+        <ng-container *ngIf="displayedColumns$ | async as displayedColumns">
+            <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" />
+            <mat-row *matRowDef="let row; columns: displayedColumns;" class="interactive-row" [routerLink]="[row.code]" />
+        </ng-container>
+    </mat-table>
+    <app-empty-state [fxShow]="(notificationsMetadata$ | async)?.total === 0 && !hasAppliedFilters" fxFlex="100%"
+        [title]="'NOTIFICATIONS.EMAIL_NOTIFICATION.EMPTY_NOTIFICATIONS_LIST_TITLE' | translate"
+        [description]="'NOTIFICATIONS.EMAIL_NOTIFICATION.EMPTY_NOTIFICATIONS_LIST_DESCRIPTION' | translate">
+        <button mat-flat-button class="ob-button" color="primary" (click)="openNewNotificationDialog()">
+            <mat-icon>add</mat-icon>
+            {{'NOTIFICATIONS.EMAIL_NOTIFICATION.NEW_BTN' | translate}}
+        </button>
+    </app-empty-state>
+    <div class="context-notification-container" *ngIf="((notificationsMetadata$ | async)?.total === 0) && hasAppliedFilters"
+        fxFlex="0 50 100%"
+        fxLayout="row"
+        fxLayoutAlign="center start">
+        <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px"
+            fxFlex="80%" fxLayoutAlign="center start">
+            <p>{{'LIST.EMPTY' | translate}}</p>
+        </app-context-notification>
+    </div>
+</div>

@@ -1,0 +1,88 @@
+<app-form-container *ngIf="(note$ | async) as note; else emptyNotes" [hideActionBar]="!userCanWrite" #formContainer
+    [disabled]="(isSaveCancelEnabled$ | async) === false || (isSaveCancelEnabled$ | async) === null" (cancel)="cancel()" (save)="save()"
+    sidebar>
+    <div class="note-details-container" fxFlex="100%">
+        <div fxFlex="1 1 100%" fxLayout="column" fxLayoutAlign="stretch">
+            <form [formGroup]="form" *ngIf="note" fxLayout="column">
+                <div fxFlex="100%" fxLayout="column">
+                    <div fxFlex="100%" fxLayout="row">
+                        <ng-container [ngTemplateOutlet]="userCanWrite ? noteTitleCanWrite : noteTitleReadOnlyTemplate"
+                            [ngTemplateOutletContext]="{note: note, form: form}">
+                        </ng-container>
+                    </div>
+                    <div fxFlex="100%" fxLayout="row">
+                        <div fxFlex="685px" fxFlex.lt-lg="80%" fxLayout="column">
+                            <mat-form-field id="title" appearance="outline" class="ob-form-field field-with-label">
+                                <mat-label>{{'NOTES.NOTE_DESCRIPTION' | translate}}</mat-label>
+                                <textarea matInput rows="10"
+                                    [attr.aria-label]="'NOTES.NOTE_DESCRIPTION' | translate"
+                                    [placeholder]="'NOTES.NOTE_DESCRIPTION_PLACEHOLDER' | translate"
+                                    formControlName="description">
+                                </textarea>
+                                <mat-error [ob-form-errors]="form" field="description"></mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- NOTE SIDE INFO -->
+    <div slot="sidebar" class="note-sidebar-container">
+        <div class="note-sidebar-container-data" fxLayout="column">
+            <span class="note-sidebar-label">{{'NOTES.CREATION_TITLE' | translate}}</span>
+            <span [matTooltip]="'NOTES.CREATED_AT' | translate">
+                {{note.dates.create_date | dateTime : showDateTime ? dateTimeFormats.shortDateTime : dateTimeFormats.shortDate}}
+            </span>
+            <span [matTooltip]="'NOTES.USER_CREATED_AT' | translate">
+                {{note.users?.create_user?.name}}
+            </span>
+            <span [matTooltip]="'NOTES.EMAIL_CREATED_AT' | translate">
+                {{note.users?.create_user?.username}}
+            </span>
+
+            <span class="note-sidebar-label">{{'NOTES.UPDATE_TITLE' | translate}}</span>
+            <span [matTooltip]="'NOTES.UPDATED_AT' | translate">
+                {{note.dates.update_date | dateTime : showDateTime ? dateTimeFormats.shortDateTime : dateTimeFormats.shortDate}}
+            </span>
+            <span [matTooltip]="'NOTES.USER_UPDATED_AT' | translate">
+                {{note.users?.update_user?.name}}
+            </span>
+            <span [matTooltip]="'NOTES.EMAIL_UPDATED_AT' | translate">
+                {{note.users?.update_user?.username}}
+            </span>
+        </div>
+    </div>
+</app-form-container>
+
+<ng-template #emptyNotes>
+    <app-empty-state [fxShow]="totalNotes === 0" fxFlex="100%" [title]="'NOTES.EMPTY_LIST_MESSAGE' | translate">
+        <ng-container *ngIf="userCanWrite">
+            <p class="body">{{'NOTES.CREATE_MESSAGE' | translate}}</p>
+            <button mat-flat-button class="ob-button" color="primary" (click)="addNote.emit()" [disabled]="isLoading$ | async">
+                <mat-icon>add</mat-icon>
+                {{'NOTES.NEW' | translate}}
+            </button>
+        </ng-container>
+    </app-empty-state>
+</ng-template>
+
+<ng-template #noteTitleCanWrite let-form="form">
+    <mat-form-field fxFlex="500px" fxFlex.lt-lg="80%" appearance="outline" class="ob-form-field field-with-label" [formGroup]="form"
+        *ngIf="userCanWrite; else noteTitleReadOnlyTemplate">
+        <mat-label>{{'NOTES.NOTE_TITLE' | translate}}</mat-label>
+        <input matInput aria-label="title" formControlName="title" [placeholder]="'NOTES.NOTE_TITLE_PLACEHOLDER' | translate">
+        <mat-error [ob-form-errors]="form" field="title"></mat-error>
+    </mat-form-field>
+</ng-template>
+
+<ng-template #noteTitleReadOnlyTemplate let-note="note">
+    <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.lt-lg="80%" fxLayout="column" aria-label="title">
+        <span class="field-label">{{'NOTES.NOTE_TITLE' | translate}}</span>
+        <span>{{note.title}}</span>
+    </div>
+</ng-template>
+
+<div class="spinner-container" *ngIf="isLoading$ | async">
+    <mat-spinner></mat-spinner>
+</div>

@@ -1,0 +1,145 @@
+<div class="create-pack-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">
+            {{'TITLES.NEW_PACK' | translate}}
+        </h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch" [formGroup]="form">
+        <!--
+        <p>{{'CHANNELS.PACK.CHOOSE_TYPE' | translate}}:</p>
+        <mat-radio-group [formControl]="form.controls['type']" fxFlex="100%" fxLayout="column"
+            fxLayoutGap="16px">
+            <mat-radio-button [disabled]="true" class="ob-radio-card-button" [value]="creationTypes.manual">
+                <div class="option-title">{{'CHANNELS.PACK.TYPE_MANUAL.TITLE' | translate}}</div>
+                <div>
+                    {{'CHANNELS.PACK.TYPE_MANUAL.DESCRIPTION' | translate}}
+                </div>
+            </mat-radio-button>
+            <mat-radio-button class="ob-radio-card-button" [value]="creationTypes.automatic">
+                <div class="option-title">{{'CHANNELS.PACK.TYPE_AUTOMATIC.TITLE' | translate}}</div>
+                <div>
+                    {{'CHANNELS.PACK.TYPE_AUTOMATIC.DESCRIPTION' | translate}}
+                </div>
+            </mat-radio-button>
+        </mat-radio-group>
+        @if(form.controls['type'].value === creationTypes.automatic) { -->
+        <div fxLayout="column">
+            <!-- <mat-divider class="ob-form-divider" /> -->
+            @if (canSelectEntity$ | async) {
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.ENTITY' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate" formControlName="entity">
+                        <mat-option>
+                            <app-select-search #entitySelectSearch [options$]="entities$"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" requireSelection="true" />
+                        </mat-option>
+                        @for (entity of entitySelectSearch.getFilteredOptions$() | async; track entity) {
+                            <mat-option [value]="entity">
+                                {{entity.name}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form" field="entity" />
+                </mat-form-field>
+            }
+            <div fxFlex>
+                <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label name-field">
+                    <mat-label>{{'CHANNELS.PACK.NAME' | translate}}</mat-label>
+                    <input matInput #nameField="matInput" aria-label="name" autocomplete="off"
+                        [placeholder]="'CHANNELS.PACK.NAME_PLACEHOLDER' | translate"
+                        formControlName="name">
+                    <mat-error [ob-form-errors]="form" field="name" />
+                </mat-form-field>
+            </div>
+            <mat-divider class="ob-form-divider" />
+            <p>{{'CHANNELS.PACK.AUTOMATIC_DESCRIPTION' | translate}}</p>
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.EVENT' | translate}}</mat-label>
+                <app-select-server-search [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="event"
+                    [options$]="events$" [moreOptionsAvailable$]="moreEventsAvailable$"
+                    (loadOptions)="loadEvents($event.q)">
+                    <ng-template #optionTemplate let-row>
+                        {{row.name}}
+                    </ng-template>
+                </app-select-server-search>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.VENUE_TEMPLATE' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="venueTpl">
+                    <mat-option>
+                        <app-select-search #venueSelectSearch [options$]="venueTemplates$" requireSelection="true"
+                            [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" />
+                    </mat-option>
+                    @for (venue of venueSelectSearch.getFilteredOptions$() | async; track venue.id) {
+                        <mat-option [value]="venue.id">
+                            {{venue?.id}} - {{venue?.name}}
+                        </mat-option>
+                    }
+                </mat-select>
+                <mat-error [ob-form-errors]="form.controls['venueTpl']" />
+            </mat-form-field>
+            @if ((venueTemplates$ | async)?.length > 1) {
+                <div class="info-msg" fxFlex="100%" fxLayout="row" fxLayoutAlign="start start">
+                    <mat-icon class="ob-icon xsmall info with-text">info</mat-icon>
+                    <span>{{ 'CHANNELS.PACKS.VENUE_TEMPLATE.INFO' | translate }}</span>
+                </div>
+            }
+            <mat-form-field fxFlex fxFlex.xs="100%" fxFlex.gt-xs="30%" appearance="outline"
+                class="ob-form-field field-with-label session-field"
+                [ngClass]="{'session-field-single': form.controls['session'].value?.length === 1}">
+                <mat-label>{{'FORMS.LABELS.SESSION' | translate}}</mat-label>
+                <app-select-server-search formControlName="session"
+                    [options$]="sessions$" [moreOptionsAvailable$]="moreSessionsAvailable$" [multiple]="true"
+                    [unselectLabel]="'FORMS.ACTIONS.UNSELECT_ALL' | translate" [maxSelectItems]="subItemsLimit"
+                    (loadOptions)="loadSessions($event.q, $event.nextPage)">
+                    <ng-template #optionTemplate let-row>
+                        <div>
+                            @if(row.start_date) {
+                                {{row.start_date | dateTime : dateTimeFormats.shortDateTime}} -
+                            }@if(row.settings?.smart_booking?.type === 'SMART_BOOKING') {
+                                <b>{{ 'FORMS.LABELS.SMART_BOOKING_TYPE' | translate }} | </b>
+                            }
+                            {{row.name}}
+                        </div>
+                    </ng-template>
+                </app-select-server-search>
+                <mat-error [ob-form-errors]="form" field="session" />
+            </mat-form-field>
+        </div>
+        @if(form.controls['session'].value?.length === 1) {
+            <mat-checkbox color="primary" formControlName="allowAddSessions">
+                {{'CHANNELS.PACK.ALLOW_ADD_SESSIONS' | translate}}
+            </mat-checkbox>
+        }
+        <div fxFlex>
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label flex">
+                <mat-label>{{'PACK.TAXES.TICKET_TAX' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="ticket_taxes">
+                    @for (tax of $entityTaxes(); track tax) {
+                        <mat-option [value]="tax.id">
+                            {{tax.name}}
+                        </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <!-- } -->
+    </div>
+    <div mat-dialog-actions fxLayout="row wrap" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createSessionPack()"
+            [disabled]="isLoading$ | async"> {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>
+
+@if (isLoading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

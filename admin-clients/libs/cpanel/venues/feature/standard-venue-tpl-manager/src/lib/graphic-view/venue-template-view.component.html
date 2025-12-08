@@ -1,0 +1,52 @@
+<div class="template-container">
+    <div #templateContainer fxLayout="row" fxLayoutAlign="stretch stretch" class="graphic-template-container">
+        <app-venue-template-svg #venueTemplateSVGComponent fxFlex="0 1 100%" fxLayout="none"
+            matTooltip="" [matTooltipDisabled]="true" matTooltipClass="ob-venue-tooltip" appVenueTplViewTooltip [svg]="svg$ | async"
+            (elementClick)="elementClick($event)" (elementsSurrounded)="elementsSurrounded($event)"
+            (elementDoubleClick)="elementDoubleClick($event)" />
+        <div class="overlay-container">
+            <div class="nav-view-background"></div>
+            <div *ngIf="viewsPath?.length" class="nav-view-container" fxLayout="row no wrap" fxLayoutAlign="start center">
+                <div *ngIf="viewsPath.length > 1" class="back-button flex view-link" [matTooltip]="'NAV_ACTIONS.RETURN' | translate"
+                    (click)="navigateToPrevView()">
+                    <mat-icon class="ob-icon xsmall">arrow_back</mat-icon>
+                </div>
+                <ng-container *ngFor="let view of viewsPath; let last = last">
+                    <span fxFlex="0 {{view.name.length / minViewNameLength}} auto" class="view-link mat-caption"
+                        [class.current]="currentView === view"
+                        [matTooltip]="view.name + '\n' + view.code"
+                        (click)="navigateToView(view)">
+                        {{view.name}}
+                    </span>
+                    <span *ngIf="!last" class="ob-link-separator">></span>
+                </ng-container>
+            </div>
+            <div fxLayout="column" class="zoom-button-container">
+                <button mat-icon-button class="ob-button mat-stroked-button medium zoom-button"
+                    [attr.aria-label]="'NAV_ACTIONS.ZOOM_IN' | translate" [matTooltip]="'NAV_ACTIONS.ZOOM_IN' | translate"
+                    (click)="venueTemplateSVGComponent.zoomIn()">
+                    <mat-icon>zoom_in</mat-icon>
+                </button>
+                <button mat-icon-button class="ob-button mat-stroked-button medium zoom-button"
+                    [attr.aria-label]="'NAV_ACTIONS.ZOOM_OUT' | translate" [matTooltip]="'NAV_ACTIONS.ZOOM_OUT' | translate"
+                    (click)="venueTemplateSVGComponent.zoomOut()">
+                    <mat-icon>zoom_out</mat-icon>
+                </button>
+                <button mat-icon-button class="ob-button mat-stroked-button medium zoom-button"
+                    [attr.aria-label]="'NAV_ACTIONS.FIT' | translate" [matTooltip]="'NAV_ACTIONS.FIT' | translate"
+                    (click)="fitGraphicView()">
+                    <mat-icon>fullscreen</mat-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="!loaded || (loading$ | async)" class="loading-state-container" fxLayoutAlign="center center">
+        <div class="loading-state-background" fxLayout="row" fxLayoutAlign="center center">
+            <mat-spinner *ngIf="(loading$ | async) || venueTemplate?.status === venueTemplateStatus.inProgress" />
+            <div *ngIf="(loading$ | async) !== true && venueTemplate?.status !== venueTemplateStatus.inProgress"
+                class="error-icon" fxLayoutAlign="center center">
+                <mat-icon>cancel</mat-icon>
+            </div>
+        </div>
+    </div>
+</div>

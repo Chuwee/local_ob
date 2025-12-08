@@ -1,0 +1,146 @@
+<div class="list-container detail" fxFlex="0 1 100%" fxLayout="column" *ngIf="voucherGroup$ | async as voucherGroup">
+    <div class="heading-container heading-aggregated without-overflow-hidden">
+        <app-aggregated-data [aggregatedData]="vouchersAggregatedData$ | async" [aggregationMetrics]="aggDataVouchers"
+            [currency]="currency$ | async" [currencyFormat]="'narrow'" />
+    </div>
+    <app-form-container layout="main" [hideActionBar]="true" class="no-top-padding">
+        <div class="heading-container second-level-list">
+            <div class="actions-container" fxLayoutAlign="end">
+                <div *ngIf="voucherGroup.type === voucherGroupType.manual && userCanWrite$ | async" class="filter-container">
+                    <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                        [attr.aria-label]="'VOUCHER.NEW_BTN' | translate" [matTooltip]="'VOUCHER.NEW_BTN' | translate"
+                        (click)="openNewVoucherDialog()" data-test="newCodeBtn">
+                        <mat-icon>add</mat-icon>
+                        {{'VOUCHER.NEW_BTN' | translate}}
+                    </button>
+                </div>
+                <div class="filter-container" fxFlex="none">
+                    <button mat-stroked-button color="tertiary" class="ob-button medium only-icon" [matMenuTriggerFor]="vouchersListMenu"
+                        data-test="actionsBtn">
+                        <mat-icon>more_horiz</mat-icon>
+                    </button>
+                    <mat-menu #vouchersListMenu="matMenu">
+                        <button mat-menu-item *ngIf="voucherGroup.type === voucherGroupType.manual"
+                            (click)="importVoucherCodes(voucherGroup.validation_method)">
+                            {{'VOUCHER.CODES.UPLOAD_CSV_BTN' | translate}}
+                        </button>
+                        <button mat-menu-item [disabled]="(vouchersMetadata$ | async)?.total === 0" (click)="exportVouchers()"
+                            data-test="exportBtn">
+                            {{'VOUCHER.CODES.EXPORT_CSV_BTN' | translate}}
+                        </button>
+                    </mat-menu>
+                </div>
+            </div>
+        </div>
+        <app-searchable-paginated-selection #selection [placeholder]="'FORMS.SEARCH.CODES' | translate"
+            (loadData)="loadVouchersList($event)" [pageSize]="pageSize" [data$]="vouchers$"
+            [metadata$]="vouchersMetadata$" [loading$]="reqInProgress$" class="small-search-input">
+            <ng-template #selectionTemplate let-data="data">
+                <app-selection-table [data]="data" [columns]="displayedColumns" [linkedRows]="true" [linkParamKey]="'code'">
+                    <ng-container matColumnDef="code">
+                        <mat-header-cell *matHeaderCellDef class="head-cell code">
+                            {{'FORMS.LABELS.CODE' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="code">
+                            {{row.code}}
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="pin">
+                        <mat-header-cell *matHeaderCellDef class="head-cell pin right">
+                            {{'FORMS.LABELS.PIN' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="pin right">
+                            {{row.pin}}
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="balance">
+                        <mat-header-cell *matHeaderCellDef class="head-cell balance right">
+                            {{'FORMS.LABELS.BALANCE' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="balance right">
+                            {{row.balance | localCurrency:(currency$ | async):'narrow'}}
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="uses">
+                        <mat-header-cell *matHeaderCellDef class="head-cell uses right">
+                            {{'FORMS.LABELS.USES' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="uses right">
+                            {{row.usage.used ? row.usage.used : 0}}
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="limit">
+                        <mat-header-cell *matHeaderCellDef class="head-cell limit right">
+                            {{'FORMS.LABELS.USES_LIMIT' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="limit right">
+                            {{((row.usage.limit.type === unlimited || row.usage.limit.value === 0)
+                            ? 'VOUCHER_GROUP.TYPE_OPTS.' + unlimited : row.usage.limit.value) | translate}}
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="expiration">
+                        <mat-header-cell *matHeaderCellDef class="head-cell expiration right">
+                            {{'FORMS.LABELS.EXPIRATION' | translate }}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="expiration right">
+                            {{row.expiration.date
+                            ? (row.expiration.date | localDateTime : dateTimeFormats.shortDate)
+                            : ('VOUCHER_GROUP.TYPE_OPTS.UNLIMITED' | translate)}}
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="status">
+                        <mat-header-cell *matHeaderCellDef class="head-cell status" fxLayoutAlign="center center">
+                            {{'FORMS.LABELS.STATUS' | translate }}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="status" fxLayoutAlign="center center">
+                            <span [ngClass]="['status-dot', row.status?.toLowerCase() || '']"></span>
+                            {{'VOUCHER.STATUS_OPTS.' + row.status | translate}}
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="actions">
+                        <mat-header-cell *matHeaderCellDef class="actions-cell head-cell"
+                            [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true" />
+                        <mat-cell *matCellDef="let row; index as i" class="actions-cell"
+                            [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                            <div class="action-buttons" (click)="$event.stopPropagation()">
+                                <button matTooltip="{{'FORMS.ACTIONS.DELETE' | translate}}" mat-icon-button
+                                    aria-label="Delete collective code" class="ob-button medium"
+                                    (click)="openDeleteVoucherDialog(row)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </div>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-template #noResultsTemplate>
+                        <ng-container *ngIf="voucherGroup.type === voucherGroupType.manual else newCodesNotAllowed">
+                            <div class="context-message-container">
+                                <div fxFlex="100%" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="15px">
+                                    <p class="title">{{'VOUCHERS.CODES.EMPTY_LIST_MESSAGE' | translate}}</p>
+                                    <p>{{'VOUCHERS.CODES.CREATE_MESSAGE' | translate}}</p>
+                                    <button mat-stroked-button class="ob-button" (click)="openNewVoucherDialog()">
+                                        {{'VOUCHER.CREATE_CODE' | translate}}
+                                    </button>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <ng-template #newCodesNotAllowed>
+                            <div class="context-message-container">
+                                <div fxFlex="100%" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="15px">
+                                    <p class="title">{{'VOUCHERS.CODES.EMPTY_LIST_MESSAGE' | translate}}</p>
+                                    <p class="title" *ngIf="voucherGroup.type === voucherGroupType.external else giftCard">
+                                        {{'VOUCHERS.CODES.EMPTY_EXTERNAL_LIST_INFO' | translate}}
+                                    </p>
+                                    <ng-template #giftCard>
+                                        <p class="title">
+                                            {{'VOUCHERS.CODES.EMPTY_LIST_INFO' | translate}}
+                                        </p>
+                                    </ng-template>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </ng-template>
+                </app-selection-table>
+            </ng-template>
+        </app-searchable-paginated-selection>
+    </app-form-container>
+</div>

@@ -1,0 +1,39 @@
+@if((session$ | async); as session){
+    <app-form-container-full [sidebarWidth]="standardVenueTemplateComponent?.$labelMgrWidth()" [hideActionBar]="isRelocating$ | async"
+        [disabled]="!$isDirty()" (cancel)="cancel()" (save)="save()">
+        <app-std-venue-tpl-mgr #standardVenueTemplateComponent fxFlex="0 1 100%"
+            [editorType]="getEditorType()" [session]="session" [unrestrictedPack]="isRestrictedPack()"
+            [linkedSessions]="linkedSessions$ | async"
+            [canRelocate]="canRelocate$ | async" [relocateSeatsInfo]="seatsToRelocateInfo$ | async"
+            (userAction)="userVenueAction($event)">
+            @if((showRefreshExternalAvailability$ | async) || $isSga()){
+                <button mat-icon-button aria-label="Refresh" class="ob-button small" slot="header"
+                    [matTooltip]="'EVENTS.SESSION.CAPACITY_REFRESH_EXTERNAL' | translate" (click)="refreshExternalAvailability()">
+                    <mat-icon>published_with_changes</mat-icon>
+                </button>
+            }@else if(showRemapSession$ | async) {
+                <button mat-stroked-button type="button" mat-flat-button class="ob-button small" color="tertiary" (click)="remap()"
+                    slot="header">
+                    {{'VENUE_TPL_MGR.ACTIONS.REMAP' | translate}}
+                </button>
+            }
+        </app-std-venue-tpl-mgr>
+        @if(isSessionCapacityUpdateInProgress$ | async){
+            <div class="ob-overlay-wrapper">
+                <div class="ob-overlay-pane pane-center">
+                    <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px" fxFlex="80%">
+                        <p>{{'EVENTS.SESSION_CAPACITY_UPDATE_IN_PROGRESS' | translate}}</p>
+                        <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                            [attr.aria-label]="('EVENTS.SESSION_CAPACITY_UPDATE_IN_PROGRESS' | translate)" />
+                    </app-context-notification>
+                </div>
+            </div>
+        }
+        <app-archived-event-mgr slot="actions-bar" [disabled]="$isDirty()"/>
+        @if(loading$ | async){
+            <div class="spinner-container">
+                <mat-spinner />
+            </div>
+        }
+    </app-form-container-full>
+}

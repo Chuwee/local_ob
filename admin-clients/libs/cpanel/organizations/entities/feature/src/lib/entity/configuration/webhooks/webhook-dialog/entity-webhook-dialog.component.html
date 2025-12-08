@@ -1,0 +1,33 @@
+<div class="dialog-webhook-container">
+    <div mat-dialog-title>
+        <div class="flex flex-row justify-between">
+            <h2 class="secondary title">
+                {{ (actionType === 'NEW' ? 'WEBHOOKS.NEW_BTN' : 'FORMS.ACTIONS.EDIT') | translate }}
+            </h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon fontIcon="close" />
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content>
+        <form [formGroup]="form">
+            <app-webhook [id]="webhookId" [options]="options" [isSysAdminForm]="false" />
+        </form>
+        @if($isInProgress()){
+            <div class="spinner-container">
+                <mat-spinner />
+            </div>
+        }
+    </div>
+    <div mat-dialog-actions>
+        <div class="flex-1 flex flex-row justify-end">
+            <button type="button" mat-button class="ob-button" (click)="close()">
+                {{ 'FORMS.ACTIONS.CANCEL' | translate }}
+            </button>
+            <button mat-flat-button color="primary" type="button" class="ob-button" (click)="save()"
+                [disabled]="!form.dirty || form.invalid || $isInProgress()">
+                {{ (actionType === 'NEW' ? 'FORMS.ACTIONS.CREATE' : 'FORMS.ACTIONS.UPDATE') | translate }}
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,12 @@
+<app-shell [sectionList$]="sectionList$"
+    [expandedMenuLogo]="'logo' | customResourcesPipe$ | async"
+    [collapsedMenuLogo]="'tiny' | customResourcesPipe$ | async">
+    <ng-template #reportsTemplate let-sidenavOpen="sidenavOpen">
+        @if ((user$ | async)?.reports; as reports) {
+            <app-sidenav-reports [reports]="reports" class="bi-legacy-acces" [sidenavOpened]="sidenavOpen" />
+        }
+    </ng-template>
+    <ng-template #topbarTemplate let-sidenavToggled="sidenavToggled">
+        <app-topbar [user]="user$ | async" (sidenavToggled)="sidenavToggled.emit($event)" />
+    </ng-template>
+</app-shell>

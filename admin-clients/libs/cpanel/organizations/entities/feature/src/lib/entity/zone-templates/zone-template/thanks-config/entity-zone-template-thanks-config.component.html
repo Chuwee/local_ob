@@ -1,0 +1,171 @@
+<app-form-container layout="main" class="no-padding" [disabled]="!form.dirty" [formGroup]="form" (cancel)="cancel()" (save)="save()">
+    <div class="flex grow">
+        <div class="details-container flex flex-col flex-[0_1_880px]">
+            <div class="flex flex-col flex-[0_1_100%]">
+                <div class="details-form-container">
+                    <h3 class="section-title">
+                        {{ 'CHANNELS.THANK_YOU_PAGE_CONFIG.TITLES.MODULES' | translate }}
+                    </h3>
+                    <span class="section-description">
+                        {{ 'CHANNELS.THANK_YOU_PAGE_CONFIG.TITLES.MODULES_DESCRIPTION' | translate }}
+                    </span>
+                    @if ($modules(); as blocks) {
+                        <div class="flex flex-col gap-6">
+                            @if (!blocks.length && !($loading())) {
+                                <app-empty-state-tiny
+                                    [title]="'CHANNELS.THANK_YOU_PAGE_CONFIG.EMPTY_LIST' | translate"
+                                    [description]="'CHANNELS.THANK_YOU_PAGE_CONFIG.EMPTY_LIST_DESCRIPTION' | translate"
+                                    [emptyBorder]="true">
+                                    <button mat-stroked-button type="button" class="ob-button small" color="primary"
+                                        (click)="createBlock()">
+                                        <mat-icon>add</mat-icon>
+                                        {{ 'CHANNELS.THANK_YOU_PAGE_CONFIG.ADD_ELEMENT' | translate }}
+                                    </button>
+                                </app-empty-state-tiny>
+                            } @else {
+                                <div class="section-box-card flex flex-col">
+                                    <div class="flex items-center justify-end basis-[60px]">
+                                        <span
+                                            [matTooltip]="'CHANNELS.THANK_YOU_PAGE_CONFIG.MAX_ELEMENTS_REACHED' | translate"
+                                            [matTooltipDisabled]="!$canCreateBlock()"
+                                            [style.cursor]="'not-allowed'">
+                                            <button
+                                                mat-stroked-button
+                                                color="primary"
+                                                class="ob-button small add-button"
+                                                [attr.aria-label]="'CHANNELS.THANK_YOU_PAGE_CONFIG.ADD_ELEMENT' | translate"
+                                                (click)="createBlock()"
+                                                [disabled]="$canCreateBlock()">
+                                                {{ 'CHANNELS.THANK_YOU_PAGE_CONFIG.ADD_ELEMENT' | translate }}
+                                                <mat-icon>add</mat-icon>
+                                            </button>
+                                        </span>
+                                    </div>
+
+                                    <mat-accordion [multi]="true" [togglePosition]="'before'" class="flex flex-col"
+                                        formGroupName="contents">
+                                        @for (block of blocks; track block.blockId) {
+                                            @if(block.enabled) {
+                                                <div class="flex items-baseline justify-between gap-4"
+                                                    [formGroupName]="block.blockId">
+                                                    <mat-expansion-panel #panel class="ob-expansion-card flex-[0_1_100%]">
+                                                        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                                            <mat-panel-title>
+                                                                {{ 'CHANNELS.THANK_YOU_PAGE_CONFIG.ELEMENT_MODULE' | translate }}
+                                                                {{ getTitle(block.blockId) }}
+                                                            </mat-panel-title>
+
+                                                            <div class="header-actions flex items-center gap-4">
+                                                                @if(block.type === 'SMARTBOOKING') {
+                                                                    <span class="ob-status-badge neutral">
+                                                                        {{ 'CHANNELS.THANK_YOU_PAGE_CONFIG.TYPE_OPTS.SMARTBOOKING' | translate }}
+                                                                    </span>
+                                                                    <mat-divider vertical="true" class="flex-auto" />
+                                                                }
+                                                                <div>
+                                                                    <mat-checkbox
+                                                                        (click)="$event.stopPropagation()"
+                                                                        color="primary"
+                                                                        [formControl]="getVisibleControl(block.blockId)"
+                                                                        [checked]="block.visible">
+                                                                        {{ 'EVENTS.PORTAL_DESIGN.ACTIONS.ENABLE' | translate }}
+                                                                    </mat-checkbox>
+                                                                </div>
+                                                                <mat-divider vertical="true" class="flex-auto" />
+                                                                <button
+                                                                    mat-icon-button
+                                                                    color="tertiary"
+                                                                    class="ob-button medium"
+                                                                    (click)="$event.stopPropagation(); delete(block)">
+                                                                    <mat-icon>delete</mat-icon>
+                                                                </button>
+                                                            </div>
+                                                        </mat-expansion-panel-header>
+
+                                                        <div class="card-content flex flex-col gap-4">
+                                                            @if($languages(); as languages) {
+                                                                <app-tabs-menu
+                                                                    type="language"
+                                                                    overrideClasses="communication-form-section no-left-padding no-bottom-margin">
+                                                                    @for(lang of languages; track $index) {
+                                                                        <ng-container>
+                                                                            <ng-template appTab lazyLoad
+                                                                                [label]="('LANGUAGES.' + lang) | translate">
+                                                                                <div
+                                                                                    mat-dialog-content
+                                                                                    class="communication-tab-content flex flex-col gap-1 items-stretch"
+                                                                                    [formGroup]="getTranslationControl(block.blockId, lang)">
+                                                                                    <div class="flex flex-col flex-[1_1_100%]">
+                                                                                        <span class="field-label">
+                                                                                            {{ 'CHANNELS.THANK_YOU_PAGE_CONFIG.ELEMENT_TITLE' | translate }}
+                                                                                        </span>
+                                                                                        <mat-form-field appearance="outline"
+                                                                                            class="ob-form-field">
+                                                                                            @let controlTitle = getTranslationControl(block.blockId, lang).controls.title;
+                                                                                            <!-- { fix indentation } -->
+                                                                                            <input
+                                                                                                matInput
+                                                                                                aria-label="title"
+                                                                                                [placeholder]="'CHANNELS.THANK_YOU_PAGE_CONFIG.ELEMENT_TITLE' | translate"
+                                                                                                [formControl]="controlTitle" />
+                                                                                            @if(controlTitle.invalid && controlTitle.touched){
+                                                                                                <mat-icon matSuffix class="warn"
+                                                                                                    matTooltipClass="ob-tooltip-error"
+                                                                                                    [matTooltip]="controlTitle | translateFormError | async">
+                                                                                                    error_outline
+                                                                                                </mat-icon>
+                                                                                            }
+                                                                                        </mat-form-field>
+                                                                                    </div>
+                                                                                    @let controlContent = getTranslationControl(block.blockId, lang).controls.content;
+                                                                                    <!-- { fix indentation } -->
+                                                                                    <div class="flex flex-col flex-[1_1_100%]"
+                                                                                        [class.error]="controlContent.invalid && controlContent.touched">
+                                                                                        <span class="field-label">
+                                                                                            {{ 'CHANNELS.THANK_YOU_PAGE_CONFIG.ELEMENT_CONTENT' | translate }}
+                                                                                        </span>
+                                                                                        <mat-form-field appearance="outline"
+                                                                                            class="ob-form-field no-padding">
+                                                                                            <app-rich-text-area
+                                                                                                aria-label="Content"
+                                                                                                [placeholder]="'CHANNELS.THANK_YOU_PAGE_CONFIG.ELEMENT_CONTENT_PLACEHOLDER' | translate"
+                                                                                                [formControl]="controlContent" />
+                                                                                            <mat-error
+                                                                                                [ob-form-errors]="controlContent" />
+                                                                                        </mat-form-field>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </ng-template>
+                                                                        </ng-container>
+                                                                    }
+                                                                </app-tabs-menu>
+                                                            }
+                                                        </div>
+                                                    </mat-expansion-panel>
+                                                </div>
+                                            }
+                                        }
+                                    </mat-accordion>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <mat-divider vertical="true" class="flex-auto" />
+        <div class="flex-[0_0_200px]">
+            <div class="template-legend flex flex-col items-start justify-start">
+                <img
+                    src="assets/ob-portal-design/thank-you-page/thank-you-modules.svg"
+                    [alt]="'CHANNELS.THANK_YOU_PAGE_CONFIG.MODULE_LEGEND_TITLE' | translate" />
+            </div>
+        </div>
+    </div>
+</app-form-container>
+
+@if($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

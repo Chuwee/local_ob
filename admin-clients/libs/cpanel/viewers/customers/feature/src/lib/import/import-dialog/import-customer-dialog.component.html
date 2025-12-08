@@ -1,0 +1,58 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title>
+        <div class="flex flex-row justify-between items-center">
+            <h2 class="flex secondary title">{{'CUSTOMER.IMPORT_DIALOG.TITLE' | translate}}</h2>
+            <button mat-icon-button type="button" class="ob-button small" [disabled]="isLoading$ | async" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <app-wizard-bar [steps]="mapToStepsTitles(steps)" [enableNavigation]="true"
+        (stepClick)="goToStep($event)" />
+    @if ((currentStep$ | async) === 0) {
+        <app-import-customer-options
+            [optionsFormGroup]="optionsFormGroup" [entityControlName]="entityControlName"
+            [overrideControlName]="overrideControlName" [dateFormatControlName]="dateFormatControlName"
+            [productsControlName]="productsControlName" [productsTypeControlName]="productsTypeControlName"
+            [productsWithVendorControlName]="productsWithVendorControlName" [productVendorControlName]="productVendorControlName"
+            (isLoading)="optionsLoadingHandler($event)" />
+    }
+    @if ((currentStep$ | async) === 1) {
+        <app-import-customer-selection
+            [selectionFormGroup]="selectionFormGroup" [selectionControlName]="selectionControlName" [entity]="$entity()"
+            [importOptions]="importOptions" [hasEntityCustomerTypes]="$hasEntityCustomerTypes()" [customerFields]="$adminCustomerFields()"
+            (isLoading)="selectionLoadingHandler($event)" />
+    }
+    @if ((currentStep$ | async) === 2) {
+        <app-import-customer-header-match
+            [headerMatchFormGroup]="headerMatchFormGroup" [headerMatchControlName]="headerMatchControlName"
+            (isLoading)="headerMatchLoadingHandler($event)" />
+    }
+    <div mat-dialog-actions>
+        <div class="flex flex-row basis-full justify-end">
+            <button type="button" mat-button class="ob-button"
+                [disabled]="isLoading$ | async" (click)="close()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button mat-stroked-button color="tertiary" type="button" class="ob-button"
+                (click)="previousStep()"
+                [disabled]="(isPreviousDisabled$ | async)">
+                <mat-icon>arrow_back</mat-icon>
+                {{'FORMS.ACTIONS.PREVIOUS' | translate}}
+            </button>
+            <button mat-flat-button color="primary" type="button" class="ob-button"
+                (click)="nextStep()"
+                [disabled]="(isNextDisabled$ | async)">
+                {{nextText$ | async}}
+                @if ((currentStep$ | async) !== steps.length - 1) {
+                    <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+                }
+            </button>
+        </div>
+    </div>
+</div>
+@if (isLoading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,166 @@
+@let event = $event();
+
+<div class="status-bar flex justify-end items-center">
+    <span>
+        <b>{{ 'CUSTOMER.TICKETS.GENERAL_DATA.STATUS' | translate }}: </b>
+        @if (event?.status) {
+            <span>{{ 'CUSTOMER.TICKET.STATUS_OPTS.' + event?.status | translate }}</span>
+        }
+    </span>
+</div>
+<app-form-container layout="main" [hideActionBar]="true">
+    <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+        <!-- PRINCIPAL INFO -->
+        <mat-expansion-panel [expanded]="true" class="section" >
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CUSTOMER.TICKETS.GENERAL_DATA.EVENT_INFO' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex flex-col gap-6">
+                <div class="flex flex-wrap gap-y-6 justify-between">
+                    <div class="flex flex-col flex-[1_0_50%] gap-2">
+                        <span class="ob-label">{{ 'CUSTOMER.TICKETS.GENERAL_DATA.EVENT.ENTITY' | translate }}</span>
+                        <span>{{ event?.entity.name }}</span>
+                    </div>
+                    <div class="flex flex-col flex-[1_0_50%] gap-2">
+                        <span class="ob-label">{{ 'CUSTOMER.TICKETS.GENERAL_DATA.EVENT.NAME' | translate }}</span>
+                        <span>{{ event?.name }}</span>
+                    </div>
+                    <div class="flex flex-col flex-[1_0_50%] gap-2">
+                        <span class="ob-label">{{ 'CUSTOMER.TICKETS.GENERAL_DATA.EVENT.PRODUCER' | translate }}</span>
+                        <span>{{ event?.producer.name }}</span>
+                    </div>
+                </div>
+                <div>
+                    <a class="ob-link flex items-center gap-1" target="_blank" 
+                        [routerLink]="['/events', event?.id]">
+                        <span>{{ "CUSTOMER.TICKETS.GENERAL_DATA.GO_TO_EVENT" | translate }}</span>
+                        <mat-icon class="ob-icon xsmall" iconPositionEnd>launch</mat-icon>
+                    </a>
+                </div>
+            </div>
+        </mat-expansion-panel >
+        <!-- ALLOCATION_INFO -->
+        <mat-expansion-panel [expanded]="true" class="section" >
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CUSTOMER.TICKETS.GENERAL_DATA.TICKETS_INFO' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex flex-col gap-6">
+                @for (products of $selectedProductsByOrder() | keyvalue; track products.key) {
+                    <div class="flex flex-col gap-4">
+                        <div class="flex justify-between items-center">
+                            <span class="total-count">
+                                {{'CUSTOMER.TICKETS.GENERAL_DATA.TOTAL_COUNT' | translate: {totalCount: products.value.length} }}
+                            </span>
+                            <button mat-stroked-button class="ob-button small" (click)="showTickets(products.key)"
+                                    [attr.aria-label]="'CUSTOMER.TICKETS.GENERAL_DATA.SEE_TICKET' | translate">
+                                {{'CUSTOMER.TICKETS.GENERAL_DATA.SEE_TICKETS' | translate}}
+                            </button>
+                        </div>
+                        <div class="flex flex-col gap-6">
+                            <mat-table class="ob-table dense-table" [dataSource]="products.value">
+                                <ng-container matColumnDef="ticket">
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header="session_name"
+                                        class="head-cell ticket">{{'CUSTOMER.TICKETS.GENERAL_DATA.TICKET' | translate}}
+                                    </mat-header-cell>
+                                    <mat-cell *matCellDef="let row" class="ticket">
+                                        <span class="flex flex-wrap gap-1">
+                                            <b>{{row.ticket.allocation.sector?.name}}</b>
+                                            <span>
+                                                @if (row.ticket?.allocation.type === 'NUMBERED') {
+                                                    {{ 'FORMS.LABELS.ROW' | translate }}:
+                                                    <b>{{row.ticket.allocation.row?.name}}</b> -
+                                                } @else {
+                                                    {{ 'FORMS.LABELS.ZONE' | translate }}:
+                                                    <b>{{row.ticket.allocation.not_numbered_area?.name}}</b> -
+                                                }
+                                                {{ 'FORMS.LABELS.SEAT' | translate }}:
+                                                <b>{{row.ticket.allocation.seat?.name}}</b>
+                                            </span>
+                                        </span>
+                                    </mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="name">
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header="name" class="head-cell width100">
+                                        {{'CUSTOMER.TICKETS.GENERAL_DATA.NAME' | translate}}
+                                    </mat-header-cell>
+                                    <mat-cell *matCellDef="let row" class="width100">
+                                        {{row.buyer_data?.name}}
+                                    </mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="surname">
+                                    <mat-header-cell *matHeaderCellDef
+                                        class="head-cell width100">{{'CUSTOMER.TICKETS.GENERAL_DATA.SURNAME' | translate}}
+                                    </mat-header-cell>
+                                    <mat-cell *matCellDef="let row" class="width100">
+                                        {{row.buyer_data?.surname}}
+                                     </mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="rate">
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header="rate" class="head-cell">
+                                        {{'CUSTOMER.TICKETS.GENERAL_DATA.RATE' | translate}}
+                                    </mat-header-cell>
+                                    <mat-cell *matCellDef="let row">
+                                        {{row.ticket.rate.name}}
+                                    </mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="price">
+                                    <mat-header-cell *matHeaderCellDef
+                                        class="head-cell width100">{{'CUSTOMER.TICKETS.GENERAL_DATA.PRICE' | translate}}
+                                    </mat-header-cell>
+                                    <mat-cell *matCellDef="let row" class="width100">
+                                        {{row.price.final | localCurrency: row.price.currency }}
+                                    </mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="status">
+                                    <mat-header-cell *matHeaderCellDef
+                                        class="head-cell width100">{{'CUSTOMER.TICKETS.GENERAL_DATA.TICKET_STATUS' | translate}}
+                                    </mat-header-cell>
+                                    <mat-cell *matCellDef="let row" class="width100">
+                                        <span class="status-dot" [class.sold]="row.state === 'PURCHASE'"></span>
+                                        <span>{{'TICKET.STATE_OPTS.' + row.state | translate}}</span>
+                                    </mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="actions">
+                                    <mat-header-cell *matHeaderCellDef class="head-cell width50"/>
+                                    <mat-cell *matCellDef="let row" class="width50">
+                                        <button mat-icon-button color="tertiary" class="ob-button medium only-icon"
+                                            [matMenuTriggerFor]="ticketsMenu">
+                                            <mat-icon>more_horiz</mat-icon>
+                                        </button>
+                                        <mat-menu #ticketsMenu="matMenu">
+                                            <a mat-menu-item class="ob-button medium" target="_blank" 
+                                                [routerLink]="['/transactions', row.order?.code, 'tickets', row.id ]"
+                                                    [attr.aria-label]="'CUSTOMER.TICKETS.GENERAL_DATA.GO_TO_TICKET' | translate">
+                                                 {{'CUSTOMER.TICKETS.GENERAL_DATA.GO_TO_TICKET' | translate}}
+                                            </a>
+                                        </mat-menu>
+                                    </mat-cell>
+                                </ng-container>
+                                <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="dense-row" />
+                                <mat-row *matRowDef="let row; columns: displayedColumns;" class="dense-row" />
+                            </mat-table>
+                            <a class="ob-link flex items-center flex-[1_0_50%] gap-1" target="_blank" 
+                                [routerLink]="['/transactions', products?.key]">
+                                <span>{{ "CUSTOMER.TICKETS.GENERAL_DATA.SEE_TRANSACTION" | translate }}</span>
+                                <mat-icon class="ob-icon xsmall" iconPositionEnd>launch</mat-icon>
+                            </a>
+                        </div>
+                    </div>
+                    @if(!$last) {
+                        <mat-divider />
+                    }
+                }
+                @if (!($selectedProductsByOrder() | keyvalue)?.length) {
+                    <app-empty-state-tiny [title]="'CUSTOMER.TICKETS.GENERAL_DATA.EMPTY_TICKETS_TITLE' | translate"
+                        [description]="'CUSTOMER.TICKETS.GENERAL_DATA.EMPTY_TICKETS_MESSAGE' | translate" />
+                }
+            </div>
+        </mat-expansion-panel >
+    </mat-accordion>
+</app-form-container>
+
+@if ($isLoading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

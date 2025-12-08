@@ -1,0 +1,17 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu"
+    [disabled]="$isInProgress()|| (!form.dirty)">
+    <h3 class="section-title">{{'ENTITY.CUSTOMER_AREA.PERSONAL_DATA.TITLE' | translate}}</h3>
+    <p>{{'ENTITY.CUSTOMER_AREA.DESCRIPTION_USER' | translate}}</p>
+    @if(userForms$ | async; as userForms ){
+        <div class="section-block flex flex-col" [formGroup]="form">
+            <div>
+                <app-entity-customer-forms #customerForms [form]="form" [customerForms]="userForms" />
+            </div>
+        </div>
+    }
+    @if($isInProgress()) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+</app-form-container>

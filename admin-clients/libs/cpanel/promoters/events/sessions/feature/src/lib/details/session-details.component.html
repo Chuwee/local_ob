@@ -1,0 +1,96 @@
+@if(isSessionGenerationInProgress$ | async) {
+    <div class="ob-overlay-wrapper">
+        <div class="ob-overlay-pane">
+            <app-context-notification class="ob-context-notification" contextType="info">
+                <p>{{'EVENTS.SESSION_GENERATION_STATUS_IN_PROGRESS' | translate}}</p>
+                <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                    [attr.aria-label]="('EVENTS.SESSION_GENERATION_STATUS_IN_PROGRESS' | translate)" />
+            </app-context-notification>
+        </div>
+    </div>
+}
+
+<app-nav-tabs-menu type="horizontalSubtab" [elements]="[
+{
+    label: 'EVENTS.PLANNING',
+    id: 'tab_event_sessions_planning',
+    param: 'planning',
+},
+{
+    label: 'EVENTS.ATTRIBUTES',
+    id: 'tab_event_sessions_attributes',
+    param: 'attributes',
+    show: hasAttributes$ | async
+},
+{
+    label: 'EVENTS.CAPACITY',
+    id: 'tab_event_sessions_capacity',
+    param: (isActivityCapacity$ | async) ? 'capacity-activity' : 'capacity',
+    disabled: (isActivityCapacity$ | async) ? false : (archived$ | async),
+    tooltip: (isActivityCapacity$ | async) ? null : {
+        text: 'EVENTS.ARCHIVED_DISABLED_SECTION_INFO',
+        disabled: (archived$ | async) === false
+    }
+},
+{
+    label: 'EVENTS.ELEMENTS_INFO.SESSIONS_TITLE',
+    id: 'tab_event_sessions_element-info',
+    param: 'elements-info',
+},
+{
+    label: 'EVENTS.PRESALES',
+    id: 'tab_event_sessions_presales',
+    param: 'presales'
+},
+{
+    label: 'EVENTS.OCUPATION.TITLE',
+    id: 'tab_event_sessions_seat-status',
+    param: 'seat-status',
+    disabled: archived$ | async,
+    tooltip: {
+        text: 'EVENTS.ARCHIVED_DISABLED_SECTION_INFO',
+        disabled: (archived$ | async) === false
+    }
+},
+{
+    label: 'EVENTS.COMMUNICATION.TITLE',
+    id: 'tab_event_sessions_communication',
+    param: 'communication',
+},
+{
+    label: 'EVENTS.DYNAMIC_PRICES.TITLE',
+    id: 'tab_event_sessions_dynamic-prices',
+    param: 'dynamic-prices',
+    show: isLowEnv
+},
+{
+    label: 'EVENTS.ACCESS_CONTROL',
+    id: 'tab_event_sessions_access-control',
+    param: 'access-control',
+},
+{
+    label: 'EVENTS.SESSION.SECONDARY_MARKET',
+    id: 'tab_event_sessions_secondary-market',
+    param: 'secondary-market',
+    show: showSecondaryMarketConfig$ | async
+},
+{
+    label: 'EVENTS.OTHER_SETTINGS',
+    id: 'tab_event_sessions_other-settings',
+    param: 'other-settings',
+},
+{
+    label: 'EVENTS.SESSION.CONF_CODES',
+    id: 'tab_event_sessions_code-configuration',
+    param: 'code-configuration',
+    show: enableSessionCodeConfiguration$ | async
+},
+{
+    label: 'EVENTS.SESSION.AUTOMATIC_SALES.TITLE',
+    id: 'tab_event_sessions_automatic_sales',
+    param: 'automatic-sales',
+    show: enableAutomaticSales$ | async
+}
+]" [disabled]="isSessionGenerationError$ | async" />
+
+<router-outlet />

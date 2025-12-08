@@ -1,0 +1,119 @@
+<div class="list-container" fxFlex="0 1 100%" fxLayout="column">
+    <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">{{'TITLES.TICKET_TEMPLATES' | translate}}</h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+            <div class="filter-container" fxFlex="none" *ngIf="ticketTemplateCreationCapability$ | async">
+                <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                    [attr.aria-label]="'TICKET_TEMPLATE.NEW_BTN' | translate" (click)="openNewTicketTemplateDialog()">
+                    <mat-icon>add</mat-icon>
+                    {{'TICKET_TEMPLATE.NEW_BTN' | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="heading-container" fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxFlex="70%" fxLayoutGap="20px" fxLayoutAlign="start center">
+            <div class="filter-container" fxFlex="none">
+                <app-popover appFilter>
+                    <app-ticket-templates-list-filter #filterContent [canSelectEntity$]="canSelectEntity$" />
+                </app-popover>
+            </div>
+            <div class="search-field" fxFlex="100%">
+                <app-search-input [placeholder]="'FORMS.SEARCH.TICKET_TEMPLATE_LIST' | translate" />
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            <p *ngIf="ticketTemplatesMetadata$ | async as ticketTemplatesMetadata" class="page-summary"
+                [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: ticketTemplatesMetadata">
+                <!-- eslint-disable-next-line @angular-eslint/template/prefer-self-closing-tags -->
+            </p>
+            <app-paginator [length]="(ticketTemplatesMetadata$ | async)?.total" [pageSize]="ticketTemplatesPageSize" />
+        </div>
+    </div>
+    <div class="heading-container heading-divider">
+        <mat-divider />
+    </div>
+    <div class="heading-container">
+        <app-chips appFilter />
+    </div>
+    <div class="spinner-container" *ngIf="ticketTemplatesLoading$ | async">
+        <mat-spinner />
+    </div>
+    <mat-table class="ob-table" [dataSource]="ticketTemplates$ | async" [trackBy]="trackByFn"
+        matSort [matSortActive]="initSortCol" [matSortDirection]="initSortDir" matSortDisableClear
+        [attr.aria-label]="'TITLES.TICKET_TEMPLATES' | translate"
+        [class.not-touchable]="(isHandsetOrTablet$ | async) !== true">
+        <ng-container matColumnDef="default">
+            <mat-header-cell *matHeaderCellDef class="default-cell head-cell" fxFlex="0 0 60px" />
+            <mat-cell *matCellDef="let row" class="default-cell" fxFlex="0 0 60px" fxLayoutAlign="end">
+                <app-default-icon (click)="$event.stopPropagation()" onlyIcon="true" [enabled]="!row.default" showWarning="true"
+                    [tplName]="row.name" [checked]="row.default" [tplId]="row.id" [updateDefault]="updateDefault"
+                    [literals]="defaultTicketTemplateLiterals" />
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'FORMS.LABELS.NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="entity">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'FORMS.LABELS.ENTITY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.entity && row.entity.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="format">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'TICKET_TEMPLATE.FORMAT' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span>{{'TICKET_TEMPLATE.FORMAT_OPTS.' + row.design?.format | translate}}</span>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="design">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'TICKET_TEMPLATE.DESIGN' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.design?.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="printer">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'TICKET_TEMPLATE.PRINTER' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.design?.printer}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="paper_type">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'TICKET_TEMPLATE.PAPER_TYPE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.design?.paper_type}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="two-actions-cell head-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true" />
+            <mat-cell *matCellDef="let row" class="two-actions-cell" [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                <div fxLayout="row" class="action-buttons" (click)="$event.stopPropagation()">
+                    <button mat-icon-button aria-label="Copy Ticket Template"
+                        [matTooltip]="'TICKET_TEMPLATE.COPY_BTN' | translate"
+                        class="ob-button medium" (click)="openCloneTicketTemplate(row)">
+                        <mat-icon>content_copy</mat-icon>
+                    </button>
+                    <button mat-icon-button aria-label="Delete Ticket Template"
+                        [matTooltip]="'TICKET_TEMPLATE.DELETE_BTN' | translate"
+                        class="ob-button medium" (click)="openDeleteTicketTemplateDialog(row)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+            </mat-cell>
+        </ng-container>
+        <ng-container *ngIf="displayedColumns$ | async as displayedColumns">
+            <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" />
+            <mat-row *matRowDef="let row; columns: displayedColumns;" class="interactive-row"
+                [routerLink]="[row.id, 'general-data']" />
+        </ng-container>
+    </mat-table>
+    <div class="context-notification-container" *ngIf="(ticketTemplatesMetadata$ | async)?.total === 0" fxFlex="0 50 100%"
+        fxLayout="row" fxLayoutAlign="center start">
+        <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px" fxFlex="80%"
+            fxLayoutAlign="center start">
+            <p>{{'LIST.EMPTY' | translate}}</p>
+        </app-context-notification>
+    </div>
+</div>

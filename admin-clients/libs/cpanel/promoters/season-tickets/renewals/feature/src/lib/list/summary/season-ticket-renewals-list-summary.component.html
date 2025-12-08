@@ -1,0 +1,50 @@
+@if ((summary$ | async); as summary) {
+    <app-header-summary [collapsedLabel]="'ACTIONS.TOTALS.SHOW' | translate">
+        <div appEllipsify class="header-summary-detail"
+            [matTooltip]="'SEASON_TICKET.RENEWALS.SUMMARY.ORIGIN_SEASON_TICKET' | translate">
+            <span class="renewal-info-header">
+                {{'SEASON_TICKET.RENEWALS.SUMMARY.ORIGIN_SEASON_TICKET' | translate}}
+            </span>
+            <span class="renewal-info-content flex flex-col items-end justify-center">
+                <span class="renewal-from flex-1">
+                    {{summary.origin_season_ticket_name}}
+                </span>
+                <span class="renewal-date flex-1">
+                    <span>
+                        {{'SEASON_TICKET.RENEWALS.SUMMARY.IMPORT_DATE' | translate}}
+                    </span>
+                    <span>
+                        {{summary.renewal_import_date | localDateTime : dateTimeFormats.shortDate}}
+                    </span>
+                </span>
+            </span>
+        </div>
+        <div appEllipsify class="header-summary-detail"
+            [matTooltip]="'SEASON_TICKET.RENEWALS.SUMMARY.SUCCESS_IMPORTS' | translate">
+            <span>{{'SEASON_TICKET.RENEWALS.SUMMARY.SUCCESS_IMPORTS' | translate}}</span>
+            <span class="flex flex-row justify-end items-center">
+            <ng-container>
+                <mat-icon class="correct-icon ob-icon small">done</mat-icon>
+                {{summary.mapped_imports | localNumber}}
+            </ng-container>
+        </span>
+        </div>
+        <div appEllipsify class="header-summary-detail"
+            [matTooltip]="'SEASON_TICKET.RENEWALS.SUMMARY.FAILED_IMPORTS' | translate">
+            <span>{{'SEASON_TICKET.RENEWALS.SUMMARY.FAILED_IMPORTS' | translate}}</span>
+            <span class="flex flez-row justify-end items-center">
+            <ng-container>
+                <mat-icon class="error-icon ob-icon small">warning</mat-icon>
+                {{summary.not_mapped_imports | localNumber}}
+            </ng-container>
+        </span>
+        </div>
+        <div appEllipsify class="header-summary-detail"
+            [matTooltip]="'SEASON_TICKET.RENEWALS.SUMMARY.TOTAL_RENEWALS' | translate">
+            <span>{{'SEASON_TICKET.RENEWALS.SUMMARY.TOTAL_RENEWALS' | translate}}</span>
+            <span>
+                {{summary.total_imports | localNumber}}
+            </span>
+        </div>
+    </app-header-summary>
+}

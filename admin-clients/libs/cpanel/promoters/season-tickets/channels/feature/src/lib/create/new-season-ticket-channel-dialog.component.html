@@ -1,0 +1,86 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxLayout="row" fxFlex="auto" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'TITLES.SALES_SELECT_CHANNELS' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <div class="filter-container" fxLayoutGap="20px">
+        <form [formGroup]="filtersForm" fxFlex="200px">
+            <mat-form-field fxFlex="200px" appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>{{'CHANNELS.TYPE' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate" formControlName="type">
+                    <mat-option>
+                        {{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}
+                    </mat-option>
+                    <mat-option *ngFor="let type of channelType | keyvalue" [value]="type.value">
+                        {{type.value && 'CHANNELS.TYPE_OPTS.' + type.value | translate}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </form>
+        <div class="search-field" fxFlex>
+            <app-search-input (valueChanged)="loadChannels('SEARCH_INPUT', $event)"
+                [placeholder]="('FORMS.SEARCH_CHANNEL_FIELD' | translate)">
+            </app-search-input>
+        </div>
+    </div>
+
+    <div mat-dialog-content fxLayout="row">
+        <form fxFlex="100%" [formGroup]="newSeasonTicketChannelForm" fxLayout="row wrap">
+            <mat-selection-list fxFlex="100%" gdColumns="1fr" gdColumns.gt-sm="1fr 1fr"
+                formControlName="channelsList" class="ob-grid-select-list">
+                <div *ngFor="let channel of (channelsListData$ | async)"
+                    [matTooltip]="'SEASON_TICKET.CHANNELS_LIMIT' | translate"
+                    [matTooltipDisabled]="(channelsSelected$ | async) < 10 || channel.selected ||
+                    newSeasonTicketChannelForm.get('channelsList')?.value?.indexOf(channel.id) >= 0">
+                    <mat-list-option fxFlex="100%" color="primary" #channelOption [value]="channel.id"
+                        [disabled]="channel.selected || ((channelsSelected$ | async) >= 10 && !channelOption.selected)">
+                        <div fxFlex fxLayout="row" fxLayoutAlign="start center">
+                            <img *ngIf="channel.entity.logo" [alt]="channel.name" [src]="channel.entity.logo"
+                                class="thumbnail" />
+                            <mat-icon *ngIf="!channel.entity.logo" class="material-icons thumbnail default">
+                                image
+                            </mat-icon>
+                            <span fxFlex class="card-title" appEllipsify [matTooltip]="channel.name">
+                                {{channel.name}}
+                            </span>
+                            <mat-icon *ngIf="channel.selected" class="right-check">done</mat-icon>
+                        </div>
+                    </mat-list-option>
+                </div>
+            </mat-selection-list>
+            <div class="context-notification-container" fxFlex="100%" fxLayout="row" fxLayoutAlign="center start"
+                *ngIf="(channelListMetadata$ | async)?.total === 0">
+                <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px"
+                    fxFlex="80%" fxLayoutAlign="center start">
+                    <p>{{'LIST.EMPTY' | translate}}</p>
+                </app-context-notification>
+            </div>
+        </form>
+    </div>
+
+    <div mat-dialog-actions fxLayoutAlign="center">
+        <div>
+            <p>
+                {{ 'SEASON_TICKET.CHANNEL_SELECTED' | translate : ({canalesSeleccionados: ((channelsSelected$ |
+                async))}) }}
+            </p>
+        </div>
+        <div fxFlex fxLayoutAlign="end">
+            <button type="button" mat-button class="ob-button" (click)="close()"
+                [disabled]="(isChannelListLoading$ | async) || (isChannelListSaving$ | async)">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button mat-flat-button color="primary" type="button" class="ob-button"
+                (click)="addNewSeasonTicketChannel()" [disabled]="!(newSeasonTicketChannelForm.valid)
+                || (isChannelListLoading$ | async) || (isChannelListSaving$ | async)">
+                {{'FORMS.ACTIONS.SELECT' | translate}}
+            </button>
+        </div>
+    </div>
+</div>
+<div class="spinner-container" *ngIf="(isChannelListLoading$ | async) || (isChannelListSaving$ | async)">
+    <mat-spinner></mat-spinner>
+</div>

@@ -1,0 +1,82 @@
+<form [formGroup]="form" fxLayout="column" fxLayoutGap="24px">
+    @if ((canSelectOperator$ | async)) {
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label">
+                {{'USER.OPERATOR' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="300px">
+                <mat-form-field appearance="outline" class="ob-form-field operator-select">
+                    <mat-select formControlName="operator" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate">
+                        <mat-option>
+                            <app-select-search #operatorSelectSearch [options$]="operators$" searchField="name" />
+                        </mat-option>
+                        @for (operator of operatorSelectSearch.getFilteredOptions$() | async; track operator) {
+                            <mat-option [value]="operator">
+                                <div appEllipsify
+                                    [matTooltip]="operator ? operator.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)">
+                                    {{operator ? operator.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                                </div>
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-divider [inset]="true" />
+    }
+    @if ((canSelectEntity$ | async)) {
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label">
+                {{'USER.ENTITY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="300px">
+                <mat-form-field appearance="outline" class="ob-form-field entity-select">
+                    <mat-select formControlName="entity" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate">
+                        <mat-option>
+                            <app-select-search #entitySelectSearch [options$]="entities$" searchField="name" />
+                        </mat-option>
+                        @for (entity of entitySelectSearch.getFilteredOptions$() | async; track entity) {
+                            <mat-option [value]="entity">
+                                <div appEllipsify [matTooltip]="entity ? entity.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)">
+                                    {{entity ? entity.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                                </div>
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-divider [inset]="true" />
+    }
+    <div formGroupName="status" fxLayout="row" class="filter-block">
+        <div class="ob-label ob-label-checkbox-group inline">
+            {{'USER.STATUS' | translate}}
+        </div>
+        <div class="filter-block-input" fxLayout="column" fxFlex="300px" fxLayoutGap="20px">
+            <div fxLayout="row" fxLayoutGap="20px">
+                <div fxLayout="column" fxFlex>
+                    <mat-checkbox formControlName="active" color="primary" class="app-checkbox-wrap-label">
+                        {{'USER.STATUS_OPTS.ACTIVE' | translate}}
+                    </mat-checkbox>
+                </div>
+                <div fxLayout="column" fxFlex>
+                    <mat-checkbox formControlName="pending" color="primary" class="app-checkbox-wrap-label">
+                        {{'USER.STATUS_OPTS.PENDING' | translate}}
+                    </mat-checkbox>
+                </div>
+            </div>
+            <div fxLayout="row" fxLayoutGap="20px">
+                <div fxLayout="column" fxFlex>
+                    <mat-checkbox formControlName="blocked" color="primary" class="app-checkbox-wrap-label">
+                        {{'USER.STATUS_OPTS.BLOCKED' | translate}}
+                    </mat-checkbox>
+                </div>
+                <div fxLayout="column" fxFlex>
+                    <mat-checkbox formControlName="tempBlocked" color="primary" class="app-checkbox-wrap-label">
+                        {{'USER.STATUS_OPTS.TEMPORARY_BLOCKED' | translate}}
+                    </mat-checkbox>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

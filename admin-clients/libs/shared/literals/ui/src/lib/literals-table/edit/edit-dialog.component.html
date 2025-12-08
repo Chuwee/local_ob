@@ -1,0 +1,45 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">
+            {{'CHANNELS.LITERALS.EDIT_LITERAL_TITLE' | translate}}
+        </h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column">
+        <p>{{'CHANNELS.LITERALS.EDIT_LITERAL_INFO' | translate}}</p>
+        <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxLayout="column">
+            <span class="field-label">{{'FORMS.LABELS.NEW_LITERAL_KEY' | translate}}</span>
+            <span class="key" style="word-break: break-all;">{{content.key}}</span>
+        </div>
+        <mat-form-field appearance="outline" class="ob-form-field field-with-label" *ngIf="editor === editors.string">
+            <mat-label>{{'FORMS.LABELS.NEW_LITERAL_VALUE'| translate}}</mat-label>
+            <textarea matInput rows="6" [placeholder]="'CHANNELS.LITERALS.NEW_LITERAL_VALUE_PLACEHOLDER' | translate"
+                [formControl]="control">
+            </textarea>
+        </mat-form-field>
+        <mat-form-field *ngIf="editor === editors.html" fxFlex appearance="outline" class="ob-form-field field-with-label no-padding">
+            <mat-label>{{'FORMS.LABELS.NEW_LITERAL_VALUE'| translate}}</mat-label>
+            <app-rich-text-area [formControl]="control" class="vertical-stretch"></app-rich-text-area>
+        </mat-form-field>
+        <section *ngIf="showHtmlEditor" fxLayoutAlign="start center" fxLayoutGap="8px">
+            <mat-slide-toggle class="ob-slide-toggle" color="primary" (change)="toggleHtml($event)">
+                {{'CHANNELS.LITERALS.TOGGLE_HTML'| translate}}
+            </mat-slide-toggle>
+            <mat-icon class="ob-help-icon" [matTooltip]="'CHANNELS.LITERALS.TOGGLE_HTML_INFO' | translate">
+                help_outline
+            </mat-icon>
+        </section>
+    </div>
+
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="accept()"
+            [disabled]="control && !control.dirty">
+            {{'FORMS.ACTIONS.MODIFY' | translate}}
+        </button>
+    </div>
+</div>

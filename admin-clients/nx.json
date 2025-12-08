@@ -1,0 +1,161 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "@nx-aws-plugin/nx-aws-cache",
+      "options": {
+        "awsBucket": "nx-cache-ob/admin",
+        "awsRegion": "eu-west-1",
+        "awsProfile": "services"
+      }
+    }
+  },
+  "namedInputs": {
+    "styled": ["default", "sharedGlobals"],
+    "default": [
+      "{projectRoot}/**/*",
+      "!{projectRoot}/environments.json",
+      "!{projectRoot}/src/info.json"
+    ],
+    "production": [
+      "default",
+      "!{projectRoot}/.eslintrc.json",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/tsconfig.spec.json",
+      "!{projectRoot}/jest.config.[jt]s",
+      "!{projectRoot}/**/*.stories.@(js|jsx|ts|tsx|mdx)",
+      "!{projectRoot}/.storybook/**/*",
+      "!{projectRoot}/tsconfig.storybook.json",
+      "!{projectRoot}/src/test-setup.[jt]s"
+    ],
+    "workspaceStories": ["{workspaceRoot}/**/*.stories.@(js|jsx|ts|tsx|mdx)"],
+    "sharedGlobals": [
+      "{workspaceRoot}/libs/shared/styles/**",
+      "{workspaceRoot}/libs/shared/ui/ob-material/**/*.scss"
+    ]
+  },
+  "targetDefaults": {
+    "deploy": {
+      "dependsOn": [
+        {
+          "target": "environment",
+          "params": "forward"
+        },
+        "info"
+      ]
+    },
+    "info": {
+      "dependsOn": ["build"]
+    },
+    "build": {
+      "dependsOn": ["reset", "environment", "^build"],
+      "inputs": ["production", "^production"],
+      "cache": true
+    },
+    "serve": {
+      "dependsOn": ["environment"]
+    },
+    "lint": {
+      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
+      "cache": true
+    },
+    "test": {
+      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+      "cache": true
+    },
+    "build-storybook": {
+      "inputs": [
+        "default",
+        "^production",
+        "{projectRoot}/.storybook/**/*",
+        "{projectRoot}/tsconfig.storybook.json"
+      ],
+      "cache": true
+    },
+    "deploy-storybook": {
+      "dependsOn": ["build-storybook-host"]
+    },
+    "build-storybook-host": {
+      "inputs": ["styled", "workspaceStories", "^production"],
+      "cache": true
+    },
+    "e2e": {
+      "inputs": ["default", "^production"],
+      "cache": true
+    },
+    "@nx/jest:jest": {
+      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+      "cache": true,
+      "options": {
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    },
+    "@nx/eslint:lint": {
+      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
+      "cache": true
+    },
+    "@nx/angular:ng-packagr-lite": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
+    }
+  },
+  "cli": {
+    "analytics": false,
+    "schematicCollections": ["@angular-eslint/schematics"],
+    "packageManager": "npm"
+  },
+  "defaultProject": "cpanel-client",
+  "generators": {
+    "@nx/angular:application": {
+      "style": "scss",
+      "linter": "eslint",
+      "unitTestRunner": "jest",
+      "e2eTestRunner": "none",
+      "standalone": true
+    },
+    "@nx/angular:library": {
+      "linter": "eslint",
+      "unitTestRunner": "jest",
+      "buildable": true,
+      "standalone": true,
+      "changeDetection": "OnPush"
+    },
+    "@nx/angular:component": {
+      "style": "scss",
+      "changeDetection": "OnPush",
+      "inlineStyle": false,
+      "inlineTemplate": false,
+      "standalone": true
+    },
+    "@nx/angular:move": {
+      "skipFormat": true
+    }
+  },
+  "pluginsConfig": {
+    "@nx/js": {
+      "analyzeSourceFiles": true
+    }
+  },
+  "plugins": [
+    {
+      "plugin": "@nx/storybook/plugin",
+      "options": {
+        "serveStorybookTargetName": "storybook",
+        "buildStorybookTargetName": "build-storybook",
+        "testStorybookTargetName": "test-storybook",
+        "staticStorybookTargetName": "build-storybook-host"
+      }
+    }
+  ],
+  "useInferencePlugins": false,
+  "defaultBase": "origin/master",
+  "parallel": 5,
+  "useLegacyCache": true
+}

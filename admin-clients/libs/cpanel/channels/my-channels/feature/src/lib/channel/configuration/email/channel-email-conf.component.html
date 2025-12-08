@@ -1,0 +1,140 @@
+<app-form-container *ngIf="(error$ | async) === null" layout="menu" [disabled]="!(form?.dirty) || (reqInProgress$ | async)"
+    (cancel)="cancel()" (save)="save()">
+    <form [formGroup]="form">
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.EMAIL_SERVER.SERVER' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="row wrap" formGroupName="server">
+                <p fxFlex="100%" class="channel-email-server-description">
+                    {{'CHANNELS.EMAIL_SERVER_DESCRIPTION' | translate}}
+                </p>
+                <mat-radio-group class="server-type-container" fxFlex.lt-md="100%" fxLayout="column" fxLayoutGap="20px"
+                    formControlName="type">
+                    <mat-radio-button [value]="emailServerType.onebox">
+                        {{'CHANNELS.EMAIL_SERVER.DEFAULT' | translate}}
+                    </mat-radio-button>
+                    <mat-radio-button [value]="emailServerType.other">
+                        {{'CHANNELS.EMAIL_SERVER.CUSTOM' | translate}}
+                    </mat-radio-button>
+                </mat-radio-group>
+                <div fxFlex.lt-md="100%" fxFlex formGroupName="configuration" class="custom-server-config-container">
+                    <div fxFlex fxLayout="row wrap" class="custom-server-config">
+                        <mat-form-field fxFlex="100%" fxFlex.gt-sm="1 1 50%" appearance="outline"
+                            class="ob-form-field field-with-label">
+                            <mat-label>{{'CHANNELS.EMAIL_SERVER.SERVER' | translate}}</mat-label>
+                            <input matInput formControlName="server">
+                            <mat-error *ngIf="form.hasError('required', 'configuration.server')">
+                                {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                            </mat-error>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                            <mat-label>{{'CHANNELS.EMAIL_SERVER.PORT' | translate}}</mat-label>
+                            <input type="number" fxFlex="100px" matInput formControlName="port">
+                            <mat-error *ngIf="form.hasError('required', 'configuration.port')">
+                                {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                            </mat-error>
+                        </mat-form-field>
+                        <mat-form-field fxFlex="100%" fxFlex.gt-sm="1 1 50%" appearance="outline"
+                            class="ob-form-field field-with-label">
+                            <mat-label>{{'CHANNELS.EMAIL_SERVER.USER' | translate}}</mat-label>
+                            <input matInput formControlName="user">
+                        </mat-form-field>
+                        <mat-form-field fxFlex="100%" fxFlex.gt-sm="1 1 50%" appearance="outline"
+                            class="ob-form-field field-with-label">
+                            <mat-label>{{'CHANNELS.EMAIL_SERVER.PASSWORD' | translate}}</mat-label>
+                            <input type="password" matInput formControlName="password" (focusin)="passwordFocusIn()"
+                                (focusout)="passwordFocusOut()">
+                        </mat-form-field>
+                        <mat-form-field fxFlex="100%" fxFlex.gt-sm="1 1 50%" appearance="outline"
+                            class="ob-form-field field-with-label">
+                            <mat-label>{{'CHANNELS.EMAIL_SERVER.CONNECTION_SECURITY' | translate}}</mat-label>
+                            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                formControlName="security">
+                                <mat-option *ngFor="let securityType of conectionSecurityTypes" [value]="securityType">
+                                    {{'CHANNELS.EMAIL_SERVER.CON_SEC.' + securityType | translate}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div fxLayoutAlign="space-between" fxFlex="100%">
+                            <mat-form-field hidden-outline class="ob-form-field inline-field">
+                                <input fxHide matInput>
+                                <mat-checkbox color="primary" formControlName="requireAuth">
+                                    <mat-label>{{'CHANNELS.EMAIL_SERVER.REQUIRE_AUTHENTICATION' | translate}}</mat-label>
+                                </mat-checkbox>
+                            </mat-form-field>
+                            <button (click)="testEmail()" [disabled]="!isTestEnabled" mat-stroked-button color="primary"
+                                type="button" class="ob-button medium add-button">
+                                {{'CHANNELS.EMAIL_SERVER.TEST' | translate}}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.EMAIL_TEMPLATES.TEMPLATES' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="row wrap" formGroupName="templates">
+                <mat-table *ngIf="templatesForm.controls.length" class="ob-table"
+                    [class.not-touchable]="(isHandsetOrTablet$ | async) !== true"
+                    [dataSource]="notificationEmailTemplates$ | async">
+                    <ng-container matColumnDef="type">
+                        <mat-header-cell *matHeaderCellDef class="head-cell">
+                            {{'CHANNELS.EMAIL_TEMPLATES.TEMPLATE' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            <span>{{'CHANNELS.EMAIL_TEMPLATES.TMPL_TYPES.' + row.type | translate}}</span>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="from">
+                        <mat-header-cell *matHeaderCellDef class="head-cell">
+                            {{'CHANNELS.EMAIL_TEMPLATES.FROM' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row; index as i" class="editable-cell">
+                            <mat-form-field appearance="outline" class="ob-form-field" [formGroupName]="i">
+                                <div class="write-value-temp">
+                                    @let errorMessage = templatesForm.controls[i].get('from') | obErrorMessage$ | async;
+                                    <input matInput formControlName="from">
+                                    @if (errorMessage) {
+                                        <mat-icon matSuffix [obErrorIcon]="errorMessage">
+                                            error_outline
+                                        </mat-icon>
+                                    }
+                                </div>
+                            </mat-form-field>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="alias">
+                        <mat-header-cell *matHeaderCellDef class="head-cell">
+                            {{'CHANNELS.EMAIL_TEMPLATES.ALIAS' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row; index as i" class="editable-cell">
+                            <mat-form-field appearance="outline" class="ob-form-field" [formGroupName]="i">
+                                <input matInput formControlName="alias">
+                            </mat-form-field>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="cco">
+                        <mat-header-cell *matHeaderCellDef class="head-cell">
+                            {{'CHANNELS.EMAIL_TEMPLATES.CCO' | translate}}
+                            <app-help-button [message]="'CHANNELS.CCO_FIELD_HELP' | translate"></app-help-button>
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row; index as i" class="editable-cell">
+                            <mat-form-field appearance="outline" class="ob-form-field" [formGroupName]="i">
+                                <input matInput formControlName="cco">
+                            </mat-form-field>
+                        </mat-cell>
+                    </ng-container>
+                    <mat-header-row *matHeaderRowDef="displayedColumns" class="dense-row"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: displayedColumns; index as i"
+                        class="dense-row interactive-row"></mat-row>
+                </mat-table>
+            </div>
+        </mat-expansion-panel>
+    </form>
+</app-form-container>
+<div class="spinner-container" *ngIf="reqInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

@@ -1,0 +1,81 @@
+<button mat-stroked-button color="tertiary" class="ob-button small" [class.active]="filterPopover.isOpen()"
+    [satPopoverAnchor]="filterPopover" (click)="filterPopover.toggle()">
+    {{'FORMS.OPEN_FILTER_BTN' | translate}}
+    <mat-icon iconPositionEnd>filter_list</mat-icon>
+</button>
+<sat-popover #filterPopover hasBackdrop yAlign="below" autoFocus="false" restoreFocus="false">
+    <mat-card class="ob-card">
+        <mat-card-content class="form-container">
+            <form [formGroup]="filtersForm" fxLayout="column" fxLayoutGap="16px">
+                <ng-container *ngIf="canSelectEntity$ | async">
+                    <div fxLayout="row" class="filter-block">
+                        <div class="ob-label" fxFlex="0 1 90px">
+                            {{'FORMS.LABELS.ENTITY' | translate}}
+                        </div>
+                        <div class="filter-block-input" fxFlex="0 0 300px">
+                            <mat-form-field appearance="outline" class="ob-form-field venue-tpl-select">
+                                <mat-select formControlName="entityId" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate">
+                                    <mat-option>
+                                        <app-select-search #entitySelectSearch [options$]="entities$" searchField="name">
+                                        </app-select-search>
+                                    </mat-option>
+                                    <mat-option *ngFor="let entity of entitySelectSearch.getFilteredOptions$() | async"
+                                        [value]="entity ? entity.id : entityId$ | async">
+                                        <div appEllipsify
+                                            [matTooltip]="entity ? entity.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)">
+                                            {{entity ? entity.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                                        </div>
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <mat-divider [inset]="true"></mat-divider>
+                </ng-container>
+                <div fxLayout="row" class="filter-block">
+                    <div class="ob-label" fxFlex="0 1 90px">
+                        {{'FORMS.LABELS.STATUS' | translate}}
+                    </div>
+                    <div class="filter-block-input" fxFlex="0 0 300px">
+                        <mat-form-field appearance="outline" class="ob-form-field status-select">
+                            <mat-select formControlName="status" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                                <mat-option [value]="">
+                                    {{'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate}}
+                                </mat-option>
+                                <mat-option *ngFor="let status of statusList" [value]="status.id">
+                                    {{status.name | translate}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <mat-divider [inset]="true"></mat-divider>
+                <div fxLayout="row" class="filter-block">
+                    <div class="ob-label">
+                        {{'FORMS.LABELS.NAME' | translate}}
+                    </div>
+                    <div class="filter-block-input">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <input matInput formControlName="q">
+                        </mat-form-field>
+                    </div>
+                </div>
+            </form>
+        </mat-card-content>
+        <mat-card-footer fxLayoutAlign="start center">
+            <div fxFlex="grow" class="left-actions">
+                <a class="ob-link" #removeLink (click)="onRemoveFiltersBtnClick()">
+                    {{'FORMS.REMOVE_FILTERS_BTN' | translate}}
+                </a>
+            </div>
+            <div fxFlex="none" class="right-actions">
+                <button (click)="onCloseBtnClick()" mat-button class="ob-button small">
+                    {{'FORMS.CLOSE_FILTER_BTN' | translate}}
+                </button>
+                <button (click)="onApplyBtnClick()" mat-flat-button color="primary" class="ob-button small">
+                    {{'FORMS.APPLY_FILTER_BTN' | translate}}
+                </button>
+            </div>
+        </mat-card-footer>
+    </mat-card>
+</sat-popover>

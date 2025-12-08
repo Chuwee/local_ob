@@ -1,0 +1,160 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title>
+        <div class="flex flex-row items-center">
+            <div class="basis-full">
+                <h2 class="secondary title">{{$zoneDynamicPrices()?.price_zone_name}}</h2>
+                <span class="mat-body-2">
+                    {{'EVENTS.SESSION.DYNAMIC_PRICES.SIDEBAR.VENUE_CAPACITY' | translate}} - {{$zoneDynamicPrices()?.capacity}}
+                </span>
+            </div>
+            <button mat-icon-button type="button" class="ob-button small" (click)="dialogRef.close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content>
+        <div class="flex flex-col gap-2">
+            <div class="flex flex-row justify-end">
+                <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                    [attr.aria-label]="'EVENTS.SESSION.DYNAMIC_PRICES.ACTIONS.CREATE_NEW_DYNAMIC_PRICE' | translate"
+                    (click)="newZoneDynamicPrice()">
+                    <mat-icon>add</mat-icon>
+                    {{'EVENTS.SESSION.DYNAMIC_PRICES.ACTIONS.CREATE_NEW_DYNAMIC_PRICE' | translate}}
+                </button>
+            </div>
+            <mat-accordion [multi]="true" [togglePosition]="'before'">
+                @for (dynamicPrice of $vmZoneDynamicPrices(); track dynamicPrice.order) {
+                    <div class="dynamic-price-container">
+                        <div class="status-container" [class.active]="dynamicPrice.status_dynamic_price === 'ACTIVE'"
+                            [class.pending]="dynamicPrice.status_dynamic_price === 'PENDING'"
+                            [class.complete]="dynamicPrice.status_dynamic_price === 'COMPLETE'">
+                        </div>
+                        <mat-expansion-panel class="ob-expansion-card">
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                <mat-panel-title>{{dynamicPrice.name}}</mat-panel-title>
+                                @if (dynamicPrice.status_dynamic_price === 'PENDING' ||
+                                (dynamicPrice.status_dynamic_price === 'ACTIVE' && $zoneDynamicPrices()?.editable)) {
+                                    <button mat-icon-button color="tertiary" class="ob-button small"
+                                        [matMenuTriggerFor]="actions"
+                                        (click)="$event.stopPropagation()">
+                                        <mat-icon>more_horiz</mat-icon>
+                                    </button>
+                                    <mat-menu #actions="matMenu">
+                                        <button mat-menu-item (click)="editZoneDynamicPrice(dynamicPrice)">
+                                            {{'FORMS.ACTIONS.EDIT' | translate}}
+                                        </button>
+                                        <button mat-menu-item (click)="deleteZoneDynamicPrice(dynamicPrice)">
+                                            {{'FORMS.ACTIONS.DELETE' | translate}}
+                                        </button>
+                                    </mat-menu>
+                                }
+                            </mat-expansion-panel-header>
+                            <ng-template matExpansionPanelContent>
+                                <div class="flex flex-col gap-6 gray-card-content">
+                                    <app-tabs-menu type="language" overrideClasses="no-left-padding"
+                                        [selectedIndex]="$defaultLanguageIndex()">
+                                        @for (language of $languages(); track $index) {
+                                            <ng-template appTab lazyLoad [label]="('LANGUAGES.' + language) | translate">
+                                                <span class="dynamic-price-translation">
+                                                    {{dynamicPrice.translations | sessionZoneDynamicPriceTranslation:language}}
+                                                </span>
+                                            </ng-template>
+                                        }
+                                    </app-tabs-menu>
+                                    <div class="flex flex-row gap-2 dynamic-price-padded">
+                                        @if (dynamicPrice.condition_types.length > 1) {
+                                            <div class="flex flex-row items-center justify-start or-divider">
+                                                <div>{{'EVENTS.SESSION.DYNAMIC_PRICES.LABELS.OR' | translate}}</div>
+                                            </div>
+                                        }
+                                        <div class="flex flex-col gap-8">
+                                            @if (dynamicPrice.condition_types.includes('DATE')) {
+                                                <div class="flex flex-row gap-8 items-center">
+                                                    <div class="ob-status-badge tag capitalized flex flex-row items-center">
+                                                        <mat-icon class="ob-icon xsmall with-text">calendar_today</mat-icon>
+                                                        <div>{{'EVENTS.SESSION.DYNAMIC_PRICES.TABLE.TAGS.DATE' | translate}}</div>
+                                                    </div>
+                                                    <div class="flex flex-row gap-1.5 items-center">
+                                                        <div>
+                                                            {{dynamicPrice.valid_date | localDateTime: dateTimeFormats.shortDate}}
+                                                        </div>
+                                                        <div class="date-divider"></div>
+                                                        <div>
+                                                            {{dynamicPrice.valid_date | localDateTime: dateTimeFormats.shortTime}}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                            @if (dynamicPrice.condition_types.includes('CAPACITY')) {
+                                                <div class="flex flex-row gap-8">
+                                                    <div class="ob-status-badge tag capitalized flex flex-row items-center">
+                                                        <mat-icon class="ob-icon xsmall with-text">event_seat</mat-icon>
+                                                        <div>{{'EVENTS.SESSION.DYNAMIC_PRICES.TABLE.TAGS.CAPACITY' | translate}}</div>
+                                                    </div>
+                                                    <div>{{dynamicPrice.capacity}}</div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col gap-2 dynamic-price-padded">
+                                        <span class="mat-subtitle-2">
+                                            {{ 'EVENTS.SESSION.DYNAMIC_PRICES.SIDEBAR.LABEL.PRICE_RATES' | translate }}
+                                        </span>
+                                        <div class="basis-full expansion-card-subcontent">
+                                            <table mat-table class="ob-table" [dataSource]="dynamicPrice.dynamic_rates_price">
+                                                <ng-container [matColumnDef]="displayedColumns[0]">
+                                                    <th mat-header-cell *matHeaderCellDef class="default-padding head-cell">
+                                                        {{'FORMS.LABELS.RATE' | translate}}
+                                                    </th>
+                                                    <td mat-cell *matCellDef="let row;" class="default-padding">
+                                                        {{row.name}}
+                                                    </td>
+                                                </ng-container>
+                                                <ng-container [matColumnDef]="displayedColumns[1]">
+                                                    <th mat-header-cell *matHeaderCellDef class="head-cell price-column">
+                                                        {{'FORMS.LABELS.PRICE' | translate}}
+                                                    </th>
+                                                    <td mat-cell *matCellDef="let row" class="right price-column">
+                                                        {{row.price | localCurrency:$currency():'narrow'}}
+                                                    </td>
+                                                </ng-container>
+                                                <tr mat-header-row *matHeaderRowDef="displayedColumns" class="dense-row" ></tr>
+                                                <tr mat-row *matRowDef="let row; columns: displayedColumns"
+                                                    class="hoverable-row dense-row" >
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </mat-expansion-panel>
+                    </div>
+                }
+            </mat-accordion>
+            @if (!$isLoading() && !$vmZoneDynamicPrices().length) {
+                <div class="flex flex-row justify-center">
+                    <app-empty-state-tiny class="flex-1" [title]="'EVENTS.SESSION.DYNAMIC_PRICES.SIDEBAR.EMPTY_TITLE' | translate"
+                        [description]="'EVENTS.SESSION.DYNAMIC_PRICES.SIDEBAR.EMPTY_DESCRIPTION' | translate" />
+                </div>
+            }
+        </div>
+    </div>
+    @let actionButtonsDisabled = $isLoading() || !$dirty();
+    <div mat-dialog-actions>
+        <div class="flex flex-row justify-end basis-full">
+            <button mat-button type="button" class="ob-button" (click)="cancelChanges()" [disabled]="actionButtonsDisabled">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button mat-flat-button color="primary" type="button" class="ob-button" (click)="save()" [disabled]="actionButtonsDisabled">
+                {{'FORMS.ACTIONS.SAVE' | translate}}
+            </button>
+        </div>
+    </div>
+</div>
+
+
+@if ($isLoading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

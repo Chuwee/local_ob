@@ -1,0 +1,26 @@
+<h2 class="section-title parent">{{'BI.REPORTS.TITLES.TABS' | translate}}</h2>
+<app-tabs-menu type="navigation" overrideClasses="padded-tabs-header handset" dynamicHeight>
+    @for (category of vmReports; track $index) {
+        <ng-template appTab [label]="category.name | uppercase">
+            @if (category.subcategories.length === 1) {
+                @for (report of category.subcategories[0].reports; track report.id) {
+                    <app-report-list-element [biReport]="report" />
+                }
+            } @else {
+                <mat-accordion class="details-form-container" multi [togglePosition]="'before'">
+                    @for (subcategory of category.subcategories; track $index) {
+                        <mat-expansion-panel expanded>
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                <mat-panel-title>{{subcategory.name}}</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            @for (report of subcategory.reports; track report.id) {
+                                <app-report-list-element [biReport]="report" />
+                            }
+                        </mat-expansion-panel>
+                    }
+                </mat-accordion>
+            }
+        </ng-template>
+    }
+</app-tabs-menu>
+

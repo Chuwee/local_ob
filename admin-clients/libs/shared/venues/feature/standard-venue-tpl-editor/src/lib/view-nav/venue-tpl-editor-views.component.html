@@ -1,0 +1,37 @@
+<div fxFlex="100%" fxLayout="column" fxLayoutAlign="stretch">
+    <div class="left-sidebar-title">
+        <h2 class="title">{{'VENUE_TPL_EDITOR.VIEWS' | translate}}</h2>
+        <button mat-icon-button [attr.aria-label]="'VENUE_TPL_EDITOR.NEW_VIEW_BTN' | translate"
+            [matTooltip]="'VENUE_TPL_EDITOR.NEW_VIEW_BTN' | translate"
+            [disabled]="(mode$ | async) !== editorModes.base"
+            type="button" class="ob-button mat-stroked-button xsmall" (click)="openNewViewDialog()">
+            <mat-icon>add</mat-icon>
+        </button>
+        <div fxFlex="0 1 100%" fxLayoutAlign="end center">
+            <button mat-icon-button [attr.aria-label]="'VENUE_TPL_EDITOR.ACTIONS.GO_TO_PREVIOUS_VIEW' | translate"
+                [matTooltip]="'VENUE_TPL_EDITOR.ACTIONS.GO_TO_PREVIOUS_VIEW' | translate"
+                [disabled]="!$hasPrevView()" type="button" class="ob-button xsmall" (click)="goToPrevView()">
+                <mat-icon>navigate_before</mat-icon>
+            </button>
+            <button mat-icon-button [attr.aria-label]="'VENUE_TPL_EDITOR.ACTIONS.GO_TO_NEXT_VIEW' | translate"
+                [matTooltip]="'VENUE_TPL_EDITOR.ACTIONS.GO_TO_NEXT_VIEW' | translate"
+                [disabled]="!$hasNextView()" type="button" class="ob-button xsmall" (click)="goToNextView()">
+                <mat-icon>navigate_next</mat-icon>
+            </button>
+        </div>
+    </div>
+    <mat-form-field appearance="outline" class="ob-form-field field-with-label inline-field view-selector">
+        <mat-select [formControl]="control">
+            <mat-option>
+                <app-select-search #viewSelectSearch [options$]="views$" searchField="view.name" requireSelection="true"
+                    [placeholderLabel]="'ACTIONS.SEARCH' | translate">
+                </app-select-search>
+            </mat-option>
+            <mat-option *ngFor="let viewData of viewSelectSearchComponent?.getFilteredOptions$() | async" [value]="viewData" fxLayout="row">
+                <mat-icon *ngIf="viewData.view.root" svgIcon="star-icon" class="no-margin star" fxLayoutGap="8px">
+                </mat-icon>
+                <span fxFlex appEllipsify [matTooltip]="viewData.view.name">{{viewData.view.name}}</span>
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</div>

@@ -1,0 +1,468 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="(isInProgress$ | async) || !form.dirty">
+    @if ($channel(); as channel) {
+        <mat-accordion [multi]="true" [togglePosition]="'before'" [formGroup]="form">
+            <!-- DATA PROTECTION FORMS -->
+            @if ((channel.type === channelTypes.boxOffice && isDataProtectionModuleAllowedByEntity$ | async) ||
+        (channel.settings.allow_data_protection_fields === true && (isOperatorOrCnlMgr$ | async))) {
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'DATA_PROTECTION' | prefix | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div fxLayout="column">
+                        <p>{{'DATA_PROTECTION_FLAG_DESC' | prefix | translate}}</p>
+                        <div fxFlex="45px" fxLayout="row" fxLayoutAlign="start center" class="enable-b2b-check-container">
+                            <mat-form-field fxFlex="100%" hidden-outline class="ob-form-field" formGroupName="channel">
+                                <input fxHide matInput>
+                                <mat-checkbox color="primary" formControlName="enableDataProtection" class="inline">
+                                    {{'ENABLE_DATA_PROTECTION_MODULE' | prefix | translate}}
+                                </mat-checkbox>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    @if ((channelProtectionDataForms$ | async) !== null && channel?.settings?.allow_data_protection_fields === true) {
+                        <div fxLayout="row">
+                            <app-channel-forms fxFlex="0 1 680px"
+                                [formGroup]="buyerDataProtectionDataForm"
+                                [channelForms$]="channelProtectionDataForms$"
+                                [columnsSettings]="$channelFormsColumnsSettings()"
+                                showRules="false" />
+                        </div>
+                    }
+                </mat-expansion-panel>
+            }
+
+            <!-- CHANNEL FORMS -->
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'FORM_FIELDS_TITLE' | prefix | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-channel-forms fxFlex="0 1 680px" [formGroup]="buyerDataForm"
+                    [channelForms$]="channelForms$" [columnsSettings]="$channelFormsColumnsSettings()" />
+            </mat-expansion-panel>
+
+            @if (!(channel | isBoxOffice) && (isB2bAndB2bAllowedByEntity$ | async) !== true) {
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'ADDITIONAL_CONDITIONS_TITLE' | prefix | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    @if (!(channel | isExternalWhitelabelType)) {
+
+                        <p>{{'ADDITIONAL_CONDITIONS_DESC' | prefix | translate}}</p>
+                        @if (additionalConditions$ | async; as additionalConditions) {
+                            <div fxLayout="row">
+                                <app-additional-conditions-table fxFlex="0 1 680px"
+                                    [data]="additionalConditions"
+                                    [form]="form.get('additionalConditions')"
+                                    [channel]="channel" />
+                            </div>
+                        }
+
+                    }
+
+                    <ng-container formGroupName="purchaseConfig">
+                        <p class="section-label mat-subtitle-2">
+                            {{'COMMERCIAL_INFORMATION_CONSENT_LABEL' | prefix | translate}}
+                        </p>
+                        <mat-radio-group formControlName="commercialConsentType" fxLayout="column">
+                            <mat-radio-button class="inline" [value]="commercialConsentTypes.doNotRequest">
+                                {{'COMMERCIAL_INFORMATION_CONSENT_TYPE.DO_NOT_REQUEST' | prefix | translate}}
+                            </mat-radio-button>
+                            <mat-radio-button class="inline" [value]="commercialConsentTypes.checkToAccept">
+                                {{'COMMERCIAL_INFORMATION_CONSENT_TYPE.CHECK_TO_ACCEPT' | prefix | translate}}
+                            </mat-radio-button>
+                            <mat-radio-button class="inline" [value]="commercialConsentTypes.checkToDecline">
+                                {{'COMMERCIAL_INFORMATION_CONSENT_TYPE.CHECK_TO_DECLINE' | prefix | translate}}
+                            </mat-radio-button>
+                        </mat-radio-group>
+
+                        @if (!(channel | isExternalWhitelabelType)) {
+
+                            <p class="section-label mat-subtitle-2">
+                                {{'ACCEPT_ALL_AGREEMENTS.TITLE' | prefix | translate}}
+                            </p>
+                            <mat-checkbox fxLayoutAlign="start end" formControlName="showAcceptAllOption" color="primary">
+                                {{'ACCEPT_ALL_AGREEMENTS.LABEL' | prefix | translate}}
+                            </mat-checkbox>
+
+                        }
+                    </ng-container>
+                </mat-expansion-panel>
+            }
+
+
+            @if ((isB2bAndB2bAllowedByEntity$ | async) !== true && cancellationServices$ | async; as providers) {
+                <mat-expansion-panel expanded
+                    formGroupName="cancellationServices" [fxHide]="!providers.length">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'CANCELLATION_SERVICES' | prefix | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <p>{{'CANCELLATION_SERVICES_DESCRIPTION' | prefix | translate}}</p>
+                    <div class="flex flex-col basis-full gap-7">
+                        <div formGroupName="providers" class="cancellation-services-section flex flex-wrap">
+                            @for (item of providers; track item.id) {
+                                <div class="cancellation-services-list">
+                                    <mat-checkbox [formControlName]="item.id" color="primary">
+                                        {{item.name}}
+                                    </mat-checkbox>
+                                </div>
+                            }
+                        </div>
+                        <div class="flex flex-col gap-4" formGroupName="defaultSelectedPolicy">
+                            <span>{{'INSURERS.FORMS.INFOS.POLICY.DEFAULT_SELECTION' | translate }}</span>
+                            <div class="flex align-center">
+                                <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                                <span>{{'INSURERS.DEFAULT_SELECTION.INFO' | translate }}</span>
+                            </div>
+                            <mat-checkbox color="primary" formControlName="enabled" [disabled]="!$hasAnyDefaultSelected()">
+                                {{'INSURERS.FORMS.LABELS.POLICY.DEFAULT_SELECTION' | translate}}
+                            </mat-checkbox>
+                            <mat-form-field appearance="outline" class="ob-form-field">
+                                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                    formControlName="policy">
+                                    @for (item of $defaultSelectedCancellationServices(); track item.id) {
+                                        <mat-option [value]="item.id">{{ item.name }}</mat-option>
+                                    }
+                                </mat-select>
+                                <mat-error [ob-form-errors]="form" field="cancellationServices.defaultSelectedPolicy.policy" />
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </mat-expansion-panel>
+            }
+
+            @if (!(channel | isMembersChannel)) {
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'TICKETS_TITLE' | prefix | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div fxLayout="row wrap">
+                        <div fxFlex="0 1 100%" fxLayout="column" [formGroup]="limitsForm">
+                            <div fxFlex="45px" fxLayout="row" fxLayoutAlign="start center">
+                                {{'PURCHASE_MAX_LIMIT' | prefix | translate}}
+                                <mat-form-field appearance="outline" fxFlex="80px" class="ob-form-field inline-field value-field">
+                                    <input matInput type="number" formControlName="purchaseMax" placeholder="0">
+                                </mat-form-field>
+                                <mat-error [ob-form-errors]="form" field="channel.limits.purchaseMax" />
+                            </div>
+                            @if (channel.type === channelTypes.web || channel.type === channelTypes.webB2B) {
+                                <div fxFlex="45px" fxLayout="row" fxLayoutAlign="start center">
+                                    {{'PRESELECTED_ITEMS' | prefix | translate}}
+                                    <mat-form-field appearance="outline" fxFlex="80px" class="ob-form-field inline-field value-field">
+                                        <input matInput type="number" formControlName="preselected_items" placeholder="0">
+                                    </mat-form-field>
+                                    @if (form.get('channel.limits.preselected_items').errors?.['max']) {
+                                        <mat-error>
+                                            <span class="inline-flex items-center gap-1 ob-error-message">
+                                                <mat-icon>error</mat-icon>
+                                                {{'PRESELECTED_ITEMS_ERROR' | prefix | translate}}
+                                            </span>
+                                        </mat-error>
+                                    }
+                                </div>
+                            }
+                            @if (channel?.type === channelTypes.boxOffice) {
+                                <div fxFlex="45px" fxLayout="row" fxLayoutAlign="start center">
+                                    {{'BOOKING_MAX_LIMIT' | prefix | translate}}
+                                    <mat-form-field appearance="outline" fxFlex="80px" class="ob-form-field inline-field value-field">
+                                        <input matInput type="number" formControlName="bookingMax" placeholder="0">
+                                    </mat-form-field>
+                                    <mat-error [ob-form-errors]="form" field="channel.limits.bookingMax" />
+                                </div>
+                                <div fxFlex="45px" fxLayout="row" fxLayoutAlign="start center">
+                                    {{'ISSUE_MAX_LIMIT' | prefix | translate}}
+                                    <mat-form-field appearance="outline" fxFlex="80px" class="ob-form-field inline-field value-field">
+                                        <input matInput type="number" formControlName="issueMax" placeholder="0">
+                                    </mat-form-field>
+                                    <mat-error [ob-form-errors]="form" field="channel.limits.issueMax" />
+                                </div>
+
+                            }
+                        </div>
+                        @if (channel?.type !== channelTypes.boxOffice && !channel.settings.v4_enabled && (isOperatorMgr$ | async)) {
+                            <div fxFlex="0 1 100%" fxLayout="column"
+                                class="automatic-seat-selection-container">
+                                <mat-divider class="ob-divider" />
+                                <div fxFlex="45px" fxLayout="row" fxLayoutAlign="start center"
+                                    class="automatic-seat-selection-check-container">
+                                    <mat-checkbox color="primary" [formControl]="channelForm.controls.allowAutomaticSeatSelection"
+                                        class="inline">
+                                        {{'ALLOW_AUTOMATIC_SEAT_SELECTION' | prefix | translate}}
+                                    </mat-checkbox>
+                                </div>
+                                <div class="automatic-seat-selection-desc-container" fxLayout="row">
+                                    <mat-icon>warning</mat-icon>
+                                    <p class="automatic-seat-selection-desc">
+                                        {{'AUTOMATIC_SEAT_SELECTION_DESC' | prefix | translate}}
+                                    </p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </mat-expansion-panel>
+            }
+            <!--Registration-->
+            @if (!(channel | isExternalWhitelabelType) && showBuyerRegistration$ | async) {
+                <mat-expansion-panel [expanded]="true"
+                    formGroupName="purchaseConfig">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'BUYER_REGISTRATION_TITLE' | prefix | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <p>{{'BUYER_REGISTRATION_DESC' | prefix | translate}}</p>
+                    <mat-radio-group formControlName="buyerRegistrationType" fxLayout="column">
+                        <mat-radio-button class="inline" [value]="buyerRegistrationTypes.disabled">
+                            {{'BUYER_REGISTRATION_TYPE.DISABLED' | prefix | translate}}
+                        </mat-radio-button>
+                        <mat-radio-button class="inline" [value]="buyerRegistrationTypes.required">
+                            {{'BUYER_REGISTRATION_TYPE.REQUIRED' | prefix | translate}}
+                        </mat-radio-button>
+                        <mat-radio-button class="inline" [value]="buyerRegistrationTypes.optional">
+                            {{'BUYER_REGISTRATION_TYPE.OPTIONAL' | prefix | translate}}
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </mat-expansion-panel>
+            }
+
+
+            <!--Support-->
+            @if (isSupportEmailEnabled$ | async) {
+                <mat-expansion-panel [expanded]="true" [formGroup]="supportEmailForm">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'SUPPORT_EMAIL.TITLE' | prefix | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div fxLayout="column">
+                        <p>{{'SUPPORT_EMAIL.DESCRIPTION' | prefix | translate}}</p>
+                        <div fxLayout="column" fxLayoutGap="8px">
+                            <mat-checkbox color="primary" formControlName="enabled">
+                                {{'SUPPORT_EMAIL.ENABLE' | prefix | translate}}
+                            </mat-checkbox>
+                            <div fxLayout="row">
+                                <mat-form-field fxFlex="0 1 calc(100% - 24px)" fxFlex.gt-sm="0 1 calc(40% - 24px)"
+                                    appearance="outline" class="ob-form-field field-with-label nested-content">
+                                    <mat-label>{{'SUPPORT_EMAIL.INPUT.LABEL' | prefix | translate}}</mat-label>
+                                    <input matInput aria-label="address" formControlName="address"
+                                        placeholder="{{'SUPPORT_EMAIL.INPUT.PLACEHOLDER' | prefix | translate}}">
+                                    <mat-error [ob-form-errors]="supportEmailForm" field="address" />
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </mat-expansion-panel>
+            }
+
+            @if (isInvitationsEnabled$ | async) {
+                <mat-expansion-panel [expanded]="true" [formGroup]="invitationsForm">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'INVITATIONS.TITLE' | prefix | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <p>{{'INVITATIONS.DESCRIPTION' | prefix | translate}}</p>
+                    <mat-checkbox #inviEnable color="primary" formControlName="enabled" class="inline">
+                        {{'INVITATIONS.ENABLE' | prefix | translate}}
+                    </mat-checkbox>
+                    @if (inviEnable.checked) {
+                        <div class="nested-block nested-content">
+                            <mat-radio-group #invitSelectMode="matRadioGroup"
+                                formControlName="selection_mode" fxLayout="column">
+                                <mat-radio-button class="inline" [value]="invitationMode.auto">
+                                    {{'INVITATIONS.AUTO' | prefix | translate}}
+                                </mat-radio-button>
+                                <mat-radio-button class="inline" value="MANUAL">
+                                    {{'INVITATIONS.MANUAL' | prefix | translate}}
+                                </mat-radio-button>
+                            </mat-radio-group>
+                            @if (invitSelectMode?.value === 'MANUAL') {
+                                <mat-radio-group class="nested-block nested-content" formControlName="manual_mode"
+                                    fxLayout="column">
+                                    <mat-radio-button class="inline" [value]="invitationMode.manualNone">
+                                        {{'INVITATIONS.NONE' | prefix | translate}}
+                                    </mat-radio-button>
+                                    <mat-radio-button class="inline" [value]="invitationMode.manualAll">
+                                        {{'INVITATIONS.ALL' | prefix | translate}}
+                                    </mat-radio-button>
+                                </mat-radio-group>
+                            }
+                        </div>
+                    }
+                </mat-expansion-panel>
+            }
+            @if (isBoxOfficeAndB2bAllowedByEntity$ | async) {
+                <mat-expansion-panel [expanded]="true" formGroupName="channel">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'B2B_MODULE_TITLE' | prefix | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div fxLayout="column">
+                        <p>{{'B2B_MODULE_DESC' | prefix | translate}}</p>
+                        <div fxFlex="45px" fxLayout="row" fxLayoutAlign="start center" class="enable-b2b-check-container">
+                            <mat-checkbox color="primary" formControlName="enableB2B" class="inline">
+                                {{'ENABLE_B2B_MODULE' | prefix | translate}}
+                            </mat-checkbox>
+                        </div>
+                    </div>
+                </mat-expansion-panel>
+            }
+            @if (entityVendors$ | async; as vendors) {
+                <ng-container formGroupName="vendor">
+                    <mat-expansion-panel expanded formGroupName="sso">
+                        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                            <mat-panel-title>{{'SSO_VENDORS_TITLE' | prefix | translate}}</mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <p>{{'SSO_VENDORS_DESCRIPTION' | prefix | translate}}</p>
+                        <mat-checkbox color="primary" formControlName="allowed" #ssoEnabler>
+                            {{'USER_DATA_VENDORS_ENABLED' | prefix | translate}}
+                        </mat-checkbox>
+                        @if (ssoEnabler.checked) {
+                            <div class="sso-vendors">
+                                <mat-radio-group formControlName="vendors" fxLayout="column" class="vendors-options">
+                                    @for (vendor of vendors; track vendor) {
+                                        <mat-radio-button class="inline" [value]="vendor">
+                                            {{vendor}}
+                                        </mat-radio-button>
+                                    }
+                                </mat-radio-group>
+                                <mat-error #error [ob-form-errors]="form" field="vendor.sso.vendors" />
+                            </div>
+                        }
+                    </mat-expansion-panel>
+                    <mat-expansion-panel expanded formGroupName="userData">
+                        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                            <mat-panel-title>{{'USER_DATA_VENDORS_TITLE' | prefix | translate}}</mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <p>{{'USER_DATA_VENDORS_DESCRIPTION' | prefix | translate}}</p>
+                        <mat-checkbox color="primary" formControlName="allowed" #userDataEnabler>
+                            {{'USER_DATA_VENDORS_ENABLED' | prefix | translate}}
+                        </mat-checkbox>
+                        @if (userDataEnabler.checked) {
+                            <div fxLayout="column" class="user-data-vendors">
+                                <mat-checkbox color="primary" formControlName="mandatory_login">
+                                    {{'USER_DATA_VENDORS_MANDATORY_LOGIN' | prefix | translate}}
+                                </mat-checkbox>
+                                <mat-checkbox color="primary" formControlName="editable_data">
+                                    {{'USER_DATA_VENDORS_EDITABLE_DATA' | prefix | translate}}
+                                </mat-checkbox>
+                                <mat-radio-group formControlName="vendors" fxLayout="column" class="vendors-options">
+                                    @for (vendor of vendors; track vendor) {
+                                        <mat-radio-button class="inline" [value]="vendor">
+                                            {{vendor}}
+                                        </mat-radio-button>
+                                    }
+                                </mat-radio-group>
+                                <mat-error #error [ob-form-errors]="form" field="vendor.userData.vendors" />
+                            </div>
+                        }
+                    </mat-expansion-panel>
+                </ng-container>
+            }
+            @if (entityAllowMembers$ | async) {
+                <mat-expansion-panel expanded formGroupName="channel">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'LINKED_COSTUMERS_TITLE' | prefix | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <mat-checkbox color="primary" formControlName="enableLinkedCustomers">
+                        {{'LINKED_COSTUMERS_ENABLED' | prefix | translate}}
+                    </mat-checkbox>
+                </mat-expansion-panel>
+            }
+            @if(channel?.type === channelTypes.boxOffice || ((channel | isWebB2bChannel) && (channel | isV4$ | async))){
+                <mat-expansion-panel expanded formGroupName="channel">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'ASSIGNATION_CUSTOMER_TITLE' | prefix | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div formGroupName="customerAssignation" class="flex flex-col">
+                        <mat-checkbox color="primary" formControlName="enabled">
+                            {{'ASSIGNATION_CUSTOMER_ENABLED' | prefix | translate}}
+                        </mat-checkbox>
+                        @if (form.value.channel.customerAssignation?.enabled) {
+                            <mat-radio-group class="flex flex-col nested-content assignation-type"
+                                formControlName="mode">
+                                <mat-radio-button class="ob-radio-button align" [value]="'OPTIONAL'">
+                                    {{'ASSIGNATION_CUSTOMER_OPTIONAL' | prefix | translate}}
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button align" [value]="'REQUIRED'">
+                                    {{'ASSIGNATION_CUSTOMER_REQUIRED' | prefix | translate}}
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        }
+                    </div>
+                </mat-expansion-panel>
+            }
+            <!-- LOYALTY-POINTS -->
+            @if ($showLoyaltyPointsSettings() && channel.type === channelTypes.web) {
+                <mat-expansion-panel expanded togglePosition="before" formGroupName="purchaseConfig">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>
+                            {{'EVENTS.CHANNEL.LOYALTY_POINTS' | translate}}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="flex flex-col events-channel-form-section loyalty-program" formGroupName="loyaltyProgram">
+                        <p class="field-with-label">{{'EVENTS.CHANNEL.LOYALTY_POINTS_INFO' | translate}}</p>
+                        <div class="flex flex-row flex-wrap">
+                            <div class="flex flex-row flex-wrap">
+                                <mat-radio-group class="flex flex-col gap-4" formControlName="type">
+                                    <mat-radio-button class="ob-radio-button align" [value]="'PURCHASE'">
+                                        {{'EVENTS.CHANNEL.LOYALTY_RECEPTION_PURCHASE' | translate}}
+                                    </mat-radio-button>
+                                    <mat-radio-button class="ob-radio-button align" [value]="'PURCHASE_START'">
+                                        <div class="flex flex-row items-baseline">
+                                            <label>{{'EVENTS.CHANNEL.LOYALTY_RECEPTION_PURCHASE_START_PREFIX' | translate}}</label>
+                                            <mat-form-field class="ob-form-field inline-field value-field loyalty-program-hours"
+                                                appearance="outline">
+                                                <input matInput type="number" formControlName="purchaseHours" placeholder="1" min="1">
+                                            </mat-form-field>
+                                            <label>{{'EVENTS.CHANNEL.LOYALTY_RECEPTION_PURCHASE_START_SUFIX' | translate }}</label>
+                                        </div>
+                                    </mat-radio-button>
+                                    <mat-radio-button class="ob-radio-button align" [value]="'SESSION_START'">
+                                        <div class="flex flex-row items-baseline">
+                                            <label>{{'EVENTS.CHANNEL.LOYALTY_RECEPTION_SESSION_START_PREFIX' | translate}}</label>
+                                            <mat-form-field class="ob-form-field inline-field value-field loyalty-program-hours"
+                                                appearance="outline">
+                                                <input matInput type="number" formControlName="sessionHours" placeholder="1" min="1">
+                                            </mat-form-field>
+                                            <label>{{'EVENTS.CHANNEL.LOYALTY_RECEPTION_SESSION_START_SUFIX' | translate }}</label>
+                                        </div>
+                                    </mat-radio-button>
+                                </mat-radio-group>
+                            </div>
+                        </div>
+                    </div>
+                </mat-expansion-panel>
+            }
+            @if (channel.type === channelTypes.web) {
+                <mat-expansion-panel expanded formGroupName="channel">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'CHANNELS.TITLES.RESEND_TICKETS' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="flex flex-col gap-6">
+                        <mat-checkbox class="resend-tickets" color="primary" formControlName="resendTickets">
+                            <div class="option-title">
+                                {{'CHANNELS.FORMS.LABELS.RESEND_TICKETS' | translate}}
+                            </div>
+                            <div class="flex flex-col">
+                                <span>{{'CHANNELS.FORMS.INFOS.RESEND_TICKETS' | translate}}</span>
+                                <span>{{'CHANNELS.FORMS.INFOS.RESEND_TICKETS_MESSAGE' | translate}}</span>
+                            </div>
+                        </mat-checkbox>
+                        @let url = channel.url + '/resend';
+                        <div class="flex items-center gap-1 link-container">
+                            <span>
+                                <span class="link-label">URL:</span>
+                                {{url}}
+                    </span>
+                    <app-copy-text [copyText]="url"
+                        [copyOk]="'RESEND_TICKETS.LINK_COPY_OK' | prefix | translate"
+                        [copyKo]="'RESEND_TICKETS.LINK_COPY_KO' | prefix | translate"
+                        [copyTooltip]="'RESEND_TICKETS.COPY_LINK' | prefix | translate" />
+                    <app-help-button [message]="'FORMS.INFOS.RESEND_TICKETS_TOOLTIP' | prefix | translate" />
+                    </div>
+                    </div>
+                </mat-expansion-panel>
+            }
+        </mat-accordion>
+        }
+</app-form-container>
+
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

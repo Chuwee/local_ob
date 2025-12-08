@@ -1,0 +1,28 @@
+<app-form-container layout="menu" hideActionBar>
+    <ng-container *ngIf="(showAtmFeatures$ | async) && (event$ | async) as event">
+        <mat-accordion class="details-form-container" togglePosition="before" multi>
+            <mat-expansion-panel expanded>
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{'VENDOR_FEATURES.ATM_MEMBER_FAKE_PROMOTIONS.TITLE' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div fxFlex="0 1 600px">
+                    <p>{{'VENDOR_FEATURES.ATM_MEMBER_FAKE_PROMOTIONS.DESCRIPTION' | translate}}</p>
+                    <app-atm-member-promotions [event]="event" />
+                </div>
+            </mat-expansion-panel>
+            <mat-expansion-panel expanded *ngIf="event.type === eventTypes.activity">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{'VENDOR_FEATURES.ATM_MEMBER_PRICE_ZONES.TITLE' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div fxFlex="0 1 600px">
+                    <p>{{'VENDOR_FEATURES.ATM_MEMBER_PRICE_ZONES.DESCRIPTION' | translate}}</p>
+                    <app-atm-member-price-zones [event]="event" />
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </ng-container>
+</app-form-container>

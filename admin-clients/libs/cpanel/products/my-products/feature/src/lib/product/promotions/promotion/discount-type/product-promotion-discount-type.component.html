@@ -1,0 +1,40 @@
+<app-form-container [disabled]="!form.dirty || $loading()" (cancel)="cancel()" (save)="save()">
+    <form [formGroup]="form">
+        <div fxLayout="column">
+            <p class="mat-subtitle-2">{{'PRODUCT.PROMOTIONS.DISCOUNT_TYPE_DESCRIPTION' | translate}} *</p>
+            <mat-radio-group fxLayout="column" formControlName="type" class="release-date-mode">
+                <div fxFlex fxLayout="row">
+                    <mat-radio-button class="ob-radio-button inline" [value]="discountTypes.fixed" fxFlex="200px">
+                        {{'PRODUCT.PROMOTIONS.DISCOUNT_TYPE_OPTS.FIXED' | translate}}
+                    </mat-radio-button>
+                    @if (this.form.get('type').value === discountTypes.fixed) {
+                        <mat-form-field fxFlex="120px" appearance="outline" class="ob-form-field">
+                            <app-currency-input formControlName="fixValue" currencyFormat="narrow"
+                                [placeholder]="0 | localCurrency : $product().currencyCode : 'narrow'"
+                                [currencyCode]="$product().currencyCode" />
+                        </mat-form-field>
+                    }
+                </div>
+                <div fxFlex fxLayout="row">
+                    <mat-radio-button class="ob-radio-button inline" [value]="discountTypes.percentage" fxFlex="200px">
+                        {{'PRODUCT.PROMOTIONS.DISCOUNT_TYPE_OPTS.PERCENTUAL' | translate}}
+                    </mat-radio-button>
+                    @if (this.form.get('percentualValue').enabled) {
+                        <mat-form-field fxFlex="120px" appearance="outline" class="ob-form-field">
+                            <app-percentage-input formControlName="percentualValue" placeholder="{{0 | localNumber : '1.2-2'}}" />
+                        </mat-form-field>
+                    }
+                </div>
+                @if ($promotion().type === promotionTypes.collective) {
+                    <mat-radio-button class="ob-radio-button inline" [value]="discountTypes.dynamic">
+                        {{'PRODUCT.PROMOTIONS.DISCOUNT_TYPE_OPTS.DYNAMIC' | translate}}
+                        <div class="option-body dynamic-warning" fxLayoutAlign="start center" fxLayoutGap="8px">
+                            <mat-icon fxFlex="0 0 auto" class="ob-icon small warning">warning</mat-icon>
+                            <span>{{'PRODUCT.PROMOTIONS.DISCOUNT_TYPE_OPTS.DYNAMIC_WARNING' | translate}}</span>
+                        </div>
+                    </mat-radio-button>
+                }
+            </mat-radio-group>
+        </div>
+    </form>
+</app-form-container>

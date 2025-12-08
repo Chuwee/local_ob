@@ -1,0 +1,36 @@
+<ng-container *ngFor="let field of fields$ | async" [formGroup]="form.get('fields')">
+    <ng-container *ngIf="field.type === 'text' || field.type === 'number'">
+        <mat-label [attr.name]="field.id">{{field.label | translate}}</mat-label>
+        <mat-form-field [attr.name]="field.id" appearance="outline" class="ob-form-field inline-field no-margin">
+            <input [type]="field.type" matInput [formControlName]="field.id" [attr.aria-label]="field.id"
+                [placeholder]="(field.placeholder || '') | translate">
+            <mat-error [ob-form-errors]="form" [field]="[field.id]"></mat-error>
+        </mat-form-field>
+    </ng-container>
+    <ng-container *ngIf="field.type === 'select' || field.type === 'multiselect'">
+        <mat-label [attr.name]="field.id">{{field.label | translate}}</mat-label>
+        <mat-form-field [attr.name]="field.id" appearance="outline" class="ob-form-field inline-field no-margin">
+            <mat-select #select [multiple]="field.type === 'multiselect'"
+                [formControlName]="field.id" [attr.aria-label]="field.id"
+                [placeholder]="(field.placeholder || 'FORMS.SELECT.PLACE_HOLDER') | translate">
+                <ng-container *ngIf="field.type === 'multiselect'">
+                    <mat-option>
+                        <app-select-search #search searchField="name"
+                            [requireSelection]="true" [options$]="field.source$"
+                            [placeholderLabel]="'FORMS.SEARCH.NAME' | translate">
+                        </app-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let option of search.getFilteredOptions$() | async" [value]="option.id">
+                        {{option.name}}
+                    </mat-option>
+                </ng-container>
+                <ng-container *ngIf="field.type !== 'multiselect'">
+                    <mat-option *ngFor="let option of field.source$ | async" [value]="option.id">
+                        {{option.name}}
+                    </mat-option>
+                </ng-container>
+            </mat-select>
+            <mat-error [ob-form-errors]="form" [field]="[field.id]"></mat-error>
+        </mat-form-field>
+    </ng-container>
+</ng-container>

@@ -1,0 +1,29 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{('PRODUCER.INVOICES.NEW' | translate )}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <form [formGroup]="form" mat-dialog-content (ngSubmit)="save()" fxLayout="column">
+        <div fxFlex="100%" fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="center center">
+            <mat-form-field fxFlex="1 1 100%" appearance="outline" class="ob-form-field field-with-label prefix">
+                <mat-label>{{'PRODUCER.INVOICES.PREFIX' | translate}}</mat-label>
+                <input matInput autocomplete="off" formControlName="prefix"
+                    oninput="value = value.trim().toUpperCase()" />
+                <mat-error [ob-form-errors]="form" field="prefix"></mat-error>
+                <app-help-button matSuffix [message]="'PRODUCER.INVOICES.PREFIX_HELP' | translate">
+                </app-help-button>
+            </mat-form-field>
+        </div>
+    </form>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="save()"
+            [disabled]="form && !form.dirty">
+            {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>

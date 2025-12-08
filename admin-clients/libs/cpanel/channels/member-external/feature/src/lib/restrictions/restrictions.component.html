@@ -1,0 +1,69 @@
+<div class="restrictions-container">
+    <p class="mat-subtitle-2">{{'MEMBER_EXTERNAL.RESTRICTIONS.TITLE' | translate }}</p>
+
+    <p>{{'MEMBER_EXTERNAL.RESTRICTIONS.DESCRIPTION' | translate }}</p>
+
+    <div class="section-box-card" fxLayout="column">
+        <div fxFlex="60px" fxLayoutAlign="space-between center">
+            <div fxLayout="column" *ngIf="(mainCapacity$ | async) as capacity">
+                <span class="mat-subtitle-2">{{'MEMBER_EXTERNAL.RESTRICTIONS.CAPACITY' | translate}}</span>
+                <span>{{capacity.id}}: {{capacity.name}}</span>
+            </div>
+            <button mat-stroked-button color="primary" class="ob-button medium add-button"
+                [attr.aria-label]="'MEMBER_EXTERNAL.CAPACITIES.CREATE' | translate"
+                (click)="add()">
+                <mat-icon>add</mat-icon>
+                {{'MEMBER_EXTERNAL.RESTRICTIONS.CREATE' | translate}}
+            </button>
+        </div>
+
+        <mat-accordion [multi]="true" [togglePosition]="'before'">
+            <mat-expansion-panel #panel class="ob-expansion-card"
+                *ngFor="let restriction of restrictions$ | async; trackBy: trackBy"
+                [expanded]="restriction.loaded" (opened)="load(restriction)">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{restriction.restriction_name}}</mat-panel-title>
+                    <span class="restriction-status" fxFlexAlign="center">
+                        <span [ngClass]="['status-dot',
+                        restriction.editing ? 'info' : restriction.activated ? 'active' : 'inactive'
+                    ]"></span>
+                        {{'MEMBER_EXTERNAL.RESTRICTIONS.' +
+                    (restriction.editing ? 'EDITING' : restriction.activated ? 'ACTIVE' : 'INACTIVE')
+                    | translate}}
+                    </span>
+                    <button mat-icon-button color="tertiary" class="ob-button small"
+                        [matMenuTriggerFor]="actions"
+                        (click)="$event.stopPropagation()">
+                        <mat-icon>more_horiz</mat-icon>
+                    </button>
+                    <mat-menu #actions="matMenu">
+                        <button mat-menu-item (click)="rename(restriction)">
+                            {{'MEMBER_EXTERNAL.RESTRICTIONS.EDIT_NAME' | translate}}
+                        </button>
+                        <button mat-menu-item (click)="remove(restriction)">
+                            {{'MEMBER_EXTERNAL.RESTRICTIONS.DELETE' | translate}}
+                        </button>
+                    </mat-menu>
+                </mat-expansion-panel-header>
+                <app-members-restriction
+                    [form]="form.get(restriction.sid)"
+                    [restriction]="restriction">
+                </app-members-restriction>
+            </mat-expansion-panel>
+        </mat-accordion>
+
+
+        <div class="context-message-container" *ngIf="(loadingList$ | async) === false"
+            [fxShow]="(restrictions$ | async)?.length === 0" fxFlex="100%" fxLayout="row" fxLayoutAlign="center">
+            <div fxFlex="100%" fxLayout="column" fxLayoutAlign=" center" fxLayoutGap="15px">
+                <p class="title">{{'MEMBER_EXTERNAL.RESTRICTIONS.EMPTY_TITLE' | translate}}</p>
+                <p class="desription">{{'MEMBER_EXTERNAL.RESTRICTIONS.EMPTY_DESCRIPTION' | translate}}</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="spinner-container" *ngIf="loadingList$ | async">
+        <mat-spinner></mat-spinner>
+    </div>
+</div>

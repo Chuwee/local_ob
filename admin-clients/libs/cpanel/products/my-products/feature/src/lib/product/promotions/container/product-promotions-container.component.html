@@ -1,0 +1,28 @@
+<div fxFlex="0 0 100%" fxLayout="column" fxLayoutAlign="stretch stretch">
+    <mat-drawer-container fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="stretch">
+        <mat-drawer #drawer mode="side" opened fxFlex="0 0 {{$sidebarWidth()}}">
+            <app-product-promotions-list />
+        </mat-drawer>
+        <mat-drawer-content fxFlex="0 1 100%" fxLayout="column" class="promotion-editor-container">
+            <div class="ob-sidebar-toggle" (click)="drawer.toggle();" [ngClass]="{'collapsed': !drawer.opened}">
+                <span class="arrow"></span>
+            </div>
+            @if ($promotionListMetadata()?.total) {
+                <router-outlet />
+            } @else {
+                <app-empty-state fxFlex="100%" [title]="'PRODUCT.PROMOTIONS.EMPTY_LIST_MESSAGE' | translate"
+                    [description]="'PRODUCT.PROMOTIONS.CREATE_MESSAGE' | translate">
+                    <button mat-flat-button class="ob-button" color="primary" (click)="$filterComponent().openNewPromotionDialog()">
+                        <mat-icon>add</mat-icon>
+                        {{'PRODUCT.PROMOTIONS.NEW' | translate}}
+                    </button>
+                </app-empty-state>
+            }
+            @if ($isLoadingPromotion()) {
+                <div class="spinner-container">
+                    <mat-spinner></mat-spinner>
+                </div>
+            }
+        </mat-drawer-content>
+    </mat-drawer-container>
+</div>

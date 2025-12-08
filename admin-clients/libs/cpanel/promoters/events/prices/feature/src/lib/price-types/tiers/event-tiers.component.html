@@ -1,0 +1,207 @@
+<app-form-container [disabled]="!tiersForm.dirty" (cancel)="cancel()" (save)="save()" layout="menu">
+    <div class="tiers-types-table-container">
+        <p class="tiers-description" [innerHtml]="'EVENTS.TIERS.PRICE_DESCRIPTION' | translate"></p>
+        <form [formGroup]="tiersForm" fxLayout="column" (keydown.enter)="$event.preventDefault()">
+
+            <div class="event-template-container" *ngIf="(venueTemplates$ | async) as templates">
+                <mat-form-field *ngIf="templates.length > 1" appearance="outline" class="ob-form-field venue-tpl-select"
+                    fxFlex="400px">
+                    <mat-label>{{'EVENTS.SELECT_EVENT_TEMPLATE' | translate}}</mat-label>
+                    <mat-select id="venue-selector" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate"
+                        [formControl]="venueTplCtrl">
+                        <mat-option *ngFor="let venue of templates" [value]="venue">
+                            {{venue?.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <div class="details-non-editable-field" *ngIf="templates.length === 1" fxLayout="column">
+                    <span class="field-label">{{'EVENTS.SELECT_EVENT_TEMPLATE' | translate}}</span>
+                    <span>{{templates[0]?.name}}</span>
+                </div>
+                <p *ngIf="!templates.length" class="body-1 no-templates-message">{{'EVENTS.NO_TEMPLATES' |
+                    translate}}</p>
+            </div>
+
+            <app-tabs-menu type="navigation">
+                <ng-template appTab [label]="'EVENTS.PRICEZONE.TITLE_TIERS_CONFIGURATION_TABLE' | translate">
+                    <div fxLayout="column">
+                        <div fxFlex="100%" fxLayout="column" class="event-form-feature-activation"
+                            formGroupName="draggableTable">
+                            <div fxFlex="40px" fxLayoutGap="15px" fxLayout="row">
+                                <mat-form-field fxFlex="40px" hidden-outline class="ob-form-field">
+                                    <input fxHide="true" matInput>
+                                    <mat-slide-toggle class="ob-slide-toggle" (change)="onDragChange($event.checked)"
+                                        formControlName="enabled" />
+                                </mat-form-field>
+                                <span fxLayoutAlign="start center">{{'EVENTS.CUSTOM_ORDER' | translate}}</span>
+                                <mat-icon fxFlexAlign="center" [matTooltip]="'EVENTS.CUSTOM_ORDER_INFO' | translate"
+                                    class="ob-help-icon">
+                                    help_outline
+                                </mat-icon>
+                            </div>
+                        </div>
+
+                        <div class="tiers-table-container">
+                            <table mat-table formGroupName="tiersTable" id="tiersTable" class="ob-table" cdkDropList
+                                (cdkDropListDropped)="onListDrop($event)" *ngIf="vmEventTiers$ | async as eventTiers"
+                                [dataSource]="eventTiers" multiTemplateDataRows>
+
+                                <!-- PRICE ZONE GROUP -->
+
+                                <ng-container matColumnDef="price_zone">
+                                    <th mat-header-cell *matHeaderCellDef class="head-cell draggable-head">
+                                        {{'EVENTS.TIERS.TABLE_PRICE_ZONE' | translate}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let row; let index = dataIndex;" class="draggable-column"
+                                        [class.first-column]="!isTdShown(index, eventTiers)">
+                                        <div fxLayout="row" *ngIf="isTdShown(index, eventTiers)" class="price-zone-cell">
+                                            <mat-icon class="action-icon" *ngIf="draggableTable.value.enabled">
+                                                drag_indicator
+                                            </mat-icon>
+                                            <div class="price-zone-name-container">
+                                                <p><b>{{row.price_type.name}}</b></p>
+                                                <span>{{'EVENTS.TIERS.TABLE_CAPACITY' | translate}}:
+                                                    {{row.price_type.capacity}}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </ng-container>
+
+                                <!-- TIERS -->
+
+                                <ng-container matColumnDef="tiers_name">
+                                    <th mat-header-cell *matHeaderCellDef class="head-cell">
+                                        {{'EVENTS.TIERS.TABLE_TIERS_NAME' | translate}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let row; let index = dataIndex;" class="editable-cell">
+                                        <div class="write-value">
+                                            <div class="signal-tier-container">
+                                                <div class="signal-tier"
+                                                    [class.active]="row.active && !isTdShown(index, eventTiers)">
+                                                </div>
+                                            </div>
+                                            <mat-form-field appearance="outline" class="ob-form-field"
+                                                *ngIf="!isTdShown(index, eventTiers)">
+                                                <input matInput aria-label="name" [placeholder]="'EVENTS.NAME' | translate"
+                                                    [formControl]="tiersTable.at(index).get(row.id+'name')">
+                                            </mat-form-field>
+                                        </div>
+                                    </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="condition_change">
+                                    <th mat-header-cell *matHeaderCellDef class="head-cell">
+                                        {{'EVENTS.TIERS.TABLE_CONDITION_CHANGE' | translate}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let row; let index = dataIndex;" class="editable-cell">
+                                        <div class="write-value">
+                                            <mat-form-field appearance="outline" class="ob-form-field"
+                                                *ngIf="!isTdShown(index, eventTiers)">
+                                                <mat-select [formControl]="tiersTable.at(index).get(row.id+'condition')"
+                                                    (selectionChange)="changedCondition(index, row.id, $event.value)">
+                                                    <mat-option *ngFor="let tierCond of eventTierConditions | keyvalue"
+                                                        [value]="tierCond.value">
+                                                        {{'EVENTS.TIERS.TABLE_' + tierCond.value | translate}}
+                                                    </mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+                                    </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="price">
+                                    <th mat-header-cell *matHeaderCellDef class="head-cell small-head">
+                                        {{'EVENTS.TIERS.TABLE_PRICE' | translate}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let row; let index = dataIndex;" class="editable-cell">
+                                        <div class="write-value">
+                                            <mat-form-field appearance="outline" class="ob-form-field"
+                                                *ngIf="!isTdShown(index, eventTiers)">
+                                                <app-currency-input [formControl]="tiersTable.at(index).get(row.id+'price')"
+                                                    [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                                                    [placeholder]="0 | localCurrency:(currency$ | async):'narrow'" />
+                                            </mat-form-field>
+                                        </div>
+                                    </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="start_date">
+                                    <th mat-header-cell *matHeaderCellDef class="head-cell large-head">
+                                        {{'EVENTS.TIERS.TABLE_START_DATE' | translate}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let row; let index = dataIndex;" class="editable-cell">
+                                        <div class="write-value date-picker-container">
+                                            <app-date-time-picker *ngIf="!isTdShown(index, eventTiers)"
+                                                [formControl]="tiersTable.at(index).get(row.id+'start_date')" />
+                                        </div>
+                                    </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="sell_limit">
+                                    <th mat-header-cell *matHeaderCellDef class="head-cell small-head">
+                                        {{'EVENTS.TIERS.TABLE_SELL_LIMIT' | translate}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let row; let index = dataIndex;" class="editable-cell">
+                                        <div class="write-value">
+                                            <mat-form-field appearance="outline" class="ob-form-field"
+                                                *ngIf="(!isTdShown(index, eventTiers)) && isNewTier(row.id)">
+                                                <input matInput aria-label="name"
+                                                    [formControl]="tiersTable.at(index).get(row.id+'limit')">
+                                            </mat-form-field>
+                                        </div>
+                                    </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="tier-actions" stickyEnd>
+                                    <th mat-header-cell *matHeaderCellDef class="head-cell">
+                                    </th>
+                                    <td mat-cell *matCellDef="let row; let index = dataIndex;" class="action-cell">
+                                        <div (click)="$event.stopPropagation()" *ngIf="!isTdShown(index, eventTiers)">
+                                            <div class="action-buttons" fxFlex="30px">
+                                                <button *ngIf="isLastTier(row.price_type.id)" mat-icon-button aria-label="Delete tier"
+                                                    class="ob-button small" tabIndex="-1"
+                                                    (click)="deleteEventTier(row)">
+                                                    <mat-icon>delete</mat-icon>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="actions">
+                                    <th mat-header-cell *matHeaderCellDef class="head-cell small-head">
+                                        {{'EVENTS.TIERS.TABLE_ADD_TIER' | translate}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let row; let index = dataIndex;"
+                                        [class.first-column]="!isTdShown(index, eventTiers)">
+                                        <div class="action-buttons" (click)="$event.stopPropagation()"
+                                            *ngIf="isTdShown(index, eventTiers)">
+                                            <button mat-icon-button aria-label="Add tier"
+                                                class="ob-button mat-stroked-button small"
+                                                (click)="addNewEventTier(row)">
+                                                <mat-icon>add</mat-icon>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </ng-container>
+
+                                <tr mat-header-row *matHeaderRowDef="tiersTableHead" class="dense-row"></tr>
+                                <tr mat-row *matRowDef="let row; columns: tiersTableHead; let index = dataIndex"
+                                    [cdkDragDisabled]="!draggableTable.value.enabled || !isTdShown(index, eventTiers)"
+                                    class="dense-row hoverable-row draggable-row" cdkDrag [cdkDragData]="row"
+                                    (mouseover)="isOver = true;" (mouseout)="isOver = false;"></tr>
+                            </table>
+                        </div>
+
+                        <div class="spinner-container" *ngIf="isTierInProgress$ | async">
+                            <mat-spinner />
+                        </div>
+                    </div>
+                </ng-template>
+                <ng-template appTab [label]="'EVENTS.PRICEZONE.TITLE_TIERS_COMMUNICATION_TABLE' | translate">
+                    <app-tiers-communication-table [eventId]="eventId" />
+                </ng-template>
+            </app-tabs-menu>
+        </form>
+    </div>
+</app-form-container>

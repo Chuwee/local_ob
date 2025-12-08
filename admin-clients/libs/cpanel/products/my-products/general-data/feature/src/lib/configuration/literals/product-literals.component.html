@@ -1,0 +1,66 @@
+@if ((languageList$ | async) && (setAttributeForm$ | async) && (valuesLiterals$ | async)) {
+    <app-form-container (cancel)="reload()" (save)="save$()" layout="menu" [disabled]="!form.dirty" [formGroup]="form">
+        <app-language-bar [languages]="languageList$ | async" [selected]="selectedLanguageBS | async"
+            (changed)="changeLanguage($event)" [changeGuard]="canChangeLanguage" slot="outside">
+        </app-language-bar>
+        <!-- ATTRIBUTE SELECTOR -->
+        <div fxLayout="row">
+            @if (attributes$ | async; as attributes) {
+                @if (attributes.length > 1) {
+                    <mat-form-field class="ob-form-field field-with-label" fxFlex="328px" appearance="outline">
+                        <mat-label>{{'PRODUCT.VARIANTS.FORMS.LABELS.ATTRIBUTE' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" [formControl]="selectedAttributeId">
+                            @for (attr of attributes; track attr.attribute_id) {
+                                <mat-option [value]="attr.attribute_id">
+                                    {{attr.name}}
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                } @else if (attributes.length === 1) {
+                    <div fxLayout="column">
+                        <span class="field-label">{{'PRODUCT.VARIANTS.FORMS.LABELS.ATTRIBUTE' | translate}}</span>
+                        <span class="details-non-editable-field" aria-label="name">{{ attributes[0].name }}</span>
+                    </div>
+                }
+            }
+        </div>
+        <!-- ATTRIBUTE LITERAL -->
+        <div fxLayout="row">
+            <mat-form-field class="ob-form-field field-with-label" fxFlex="328px" appearance="outline">
+                <mat-label>{{'PRODUCT.VARIANTS.FORMS.LABELS.TRANSLATION' | translate}}</mat-label>
+                <input matInput aria-label="name"
+                    [placeholder]="attributeLiteralForm.value || selectedAttributeName.value"
+                    [formControl]="attributeLiteralForm">
+            </mat-form-field>
+        </div>
+        <mat-divider class="ob-divider"></mat-divider>
+        <!-- VALUES LITERALS -->
+        <h3 class="section-title">{{'PRODUCT.VARIANTS.TITLES.ATTRIBUTES.VALUES' | translate}}</h3>
+        <app-search-table [dataSource]="valuesLiterals$" [columns]="columns" [filter]="filter"
+            [placeholder]="'PRODUCT.VARIANTS.FORMS.LITERALS.SEARCH_PLACEHOLDER' | translate">
+            <ng-container matColumnDef="key">
+                <mat-header-cell *matHeaderCellDef class="head-cell no-margin">
+                    {{'PRODUCT.VARIANTS.FORMS.LABELS.VALUE' | translate}}
+                </mat-header-cell>
+                <mat-cell class="no-margin" *matCellDef="let row">{{row.key}}</mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="value">
+                <mat-header-cell *matHeaderCellDef class="head-cell input-column no-margin">
+                    {{'PRODUCT.VARIANTS.FORMS.LABELS.TRANSLATION' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row" class="editable-cell no-margin">
+                    <mat-form-field appearance="outline" class="ob-form-field" subscriptSizing="dynamic">
+                        <input matInput [placeholder]="'PRODUCT.VARIANTS.LITERALS.TABLE_VALUE_PLACEHOLDER' | translate"
+                            [formControl]="valuesLiteralsForm.controls[row.id].controls.value">
+                    </mat-form-field>
+                </mat-cell>
+            </ng-container>
+        </app-search-table>
+    </app-form-container>
+}
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner></mat-spinner>
+    </div>
+}

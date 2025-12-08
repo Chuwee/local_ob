@@ -1,0 +1,159 @@
+<div class="login-activation flex items-center" [class.disabled]="statusCtrl.disabled"
+    [matTooltip]="'LOGIN_CONFIG.DISABLED_ACTIVATION_DESC' | translate"
+    [matTooltipDisabled]="statusCtrl.enabled" slot="outsite">
+    <mat-slide-toggle class="ob-slide-toggle ob-label" [formControl]="statusCtrl"
+        (change)="handleStatusChange($event.checked)" [matTooltipDisabled]="!statusCtrl.enabled"
+        [matTooltip]="isChannel ? ('LOGIN_CONFIG.ACTIVATE_LOGIN_CHANNEL_TOOLTIP' | translate)  :
+            ('LOGIN_CONFIG.ACTIVATE_LOGIN_ENTITY_TOOLTIP' | translate)">
+        {{(isChannel ? 'LOGIN_CONFIG.ACTIVATE_LOGIN' : 'LOGIN_CONFIG.ACTIVATE_ENTITY_LOGIN') | translate}}
+    </mat-slide-toggle>
+</div>
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="!form.dirty" [formGroup]="form">
+    <mat-expansion-panel expanded togglePosition="before">
+        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+            <mat-panel-title>{{ 'LOGIN_CONFIG.USER_LOGIN_TITLE' | translate }}</mat-panel-title>
+        </mat-expansion-panel-header>
+        @if (isChannel) {
+            @if ($customersLink(); as customersLink) {
+                <div class="actions-bar flex justify-start items-center">
+                    <div class="flex justify-start items-center gap-1">
+                        <div class="flex justify-start items-center">
+                            <span class="copy-label">{{'LOGIN_CONFIG.LINK_LABEL' | translate}}</span>
+                            <span class="copy-link">{{customersLink}}</span>
+                        </div>
+                        <app-copy-text [copyText]="customersLink"
+                            [copyOk]="'LOGIN_CONFIG.COPY_LINK_OK' | translate"
+                            [copyKo]="'LOGIN_CONFIG.COPY_LINK_KO' | translate"
+                            [copyTooltip]="'LOGIN_CONFIG.COPY_LINK' | translate" />
+                    </div>
+                    <div class="go-link">
+                        <a mat-button aria-label="Go to link" class="ob-button medium" target="_blank" href="{{customersLink}}">
+                            <span>{{'LOGIN_CONFIG.GO_TO_LINK' | translate}}</span>
+                            <mat-icon iconPositionEnd>launch</mat-icon>
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+        <div class="login-container">
+            @if (!isChannel && !($entity() | isItalianEntity)) {
+                <p class="body-1 description">{{ 'LOGIN_CONFIG.USER_LOGIN_DESCRIPTION' | translate }}</p>
+            }
+            @if (isChannel) {
+                <div class="flex flex-col">
+                    <mat-radio-group class="flex flex-col gap-5" [formControl]="form.controls.entityConfig">
+                        <mat-radio-button class="ob-radio-button" [value]="'ENTITY_CONFIG'">
+                            <div class="flex items-center gap-2">
+                                {{'LOGIN_CONFIG.ENTITY_CONFIG' | translate}}
+                                @if ($canGoToEntity()) {
+                                    <a aria-label="Go to link" class="ob-link flex items-center gap-1" target="_blank"
+                                        [routerLink]="['/entities', entityId, 'register-users', 'login-config']">
+                                        <span>{{'LOGIN_CONFIG.GO_TO_ENTITY_CUSTOMER_LOGIN' | translate}} </span>
+                                        <mat-icon class="ob-icon xsmall" iconPositionEnd>launch</mat-icon>
+                                    </a>
+                                }
+                            </div>
+                        </mat-radio-button>
+                        <mat-radio-button class="ob-radio-button" [value]="'CHANNEL_CONFIG'">
+                            {{'LOGIN_CONFIG.CHANNEL_CONFIG' | translate}}
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </div>
+            }
+            @if (!isChannel || this.form.controls.entityConfig.value === 'CHANNEL_CONFIG') {
+                @if ($entity() | isItalianEntity) {
+                    <p [class.italian-compliance-channel-login-info]="isChannel">
+                        {{'LOGIN_CONFIG.FORMS.INFOS.VENDOR_WITH_CUSTOMER_LOGIN' | translate}}
+                    </p>
+                    <ob-vendor-login customerRegistry [formGroup]="form.controls.vendorWithCustomerLogin"
+                        [customerTypes]="$customerTypes() || []" [isChannel]="isChannel" />
+                } @else {
+                    <mat-radio-group class="flex flex-col gap-6" [class.channel-config]="isChannel" [formControl]="form.controls.loginType">
+                        @if (hasAuthVendors) {
+                            <div>
+                                <mat-radio-button class="ob-radio-button" [value]="'VENDOR'">
+                                    <div class="option-title">
+                                        {{'LOGIN_CONFIG.FORMS.LABELS.VENDOR_LOGIN' | translate}}
+                                    </div>
+                                    {{'LOGIN_CONFIG.FORMS.INFOS.VENDOR_LOGIN' | translate}}
+                                </mat-radio-button>
+                                @if (form.controls.loginType.value === 'VENDOR') {
+                                    <ob-vendor-login [formGroup]="form.controls.vendorLogin" [isChannel]="isChannel" />
+                                }
+                            </div>
+                            <div>
+                                <mat-radio-button class="ob-radio-button" [value]="'VENDOR_WITH_CUSTOMER'">
+                                    <div class="option-title">
+                                        {{'LOGIN_CONFIG.FORMS.LABELS.VENDOR_WITH_CUSTOMER_LOGIN' | translate}}
+                                    </div>
+                                    {{'LOGIN_CONFIG.FORMS.INFOS.VENDOR_WITH_CUSTOMER_LOGIN' | translate}}
+                                </mat-radio-button>
+                                @if (form.controls.loginType.value === 'VENDOR_WITH_CUSTOMER') {
+                                    <ob-vendor-login customerRegistry [formGroup]="form.controls.vendorWithCustomerLogin"
+                                        [customerTypes]="$customerTypes() || []" [isChannel]="isChannel" />
+                                }
+                            </div>
+                        }
+                        <div>
+                            <mat-radio-button class="ob-radio-button" [value]="'DEFAULT'">
+                                <div class="option-title">
+                                    {{'LOGIN_CONFIG.FORMS.LABELS.CUSTOMERS_LOGIN' | translate}}
+                                </div>
+                                {{'LOGIN_CONFIG.FORMS.INFOS.CUSTOMERS_LOGIN' | translate}}
+                            </mat-radio-button>
+                            @if (form.controls.loginType.value === 'DEFAULT') {
+                                <ob-customer-login [formGroup]="form.controls.customerLogin" [customerTypes]="$customerTypes()"
+                                    [isChannel]="isChannel" />
+                            }
+                        </div>
+                        <div>
+                            <mat-radio-button class="ob-radio-button" [value]="'COLLECTIVE'">
+                                <div class="option-title">
+                                    {{'LOGIN_CONFIG.FORMS.LABELS.COLLECTIVE_LOGIN' | translate}}
+                                </div>
+                                {{'LOGIN_CONFIG.FORMS.INFOS.COLLECTIVE_LOGIN' | translate}}
+                            </mat-radio-button>
+                            @if (form.controls.loginType.value === 'COLLECTIVE') {
+                                <ob-collective-login [formGroup]="form.controls.collectiveLogin" />
+                            }
+                        </div>
+                    </mat-radio-group>
+                }
+            }
+
+        </div>
+    </mat-expansion-panel>
+    @if (!isChannel) {
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{ 'LOGIN_CONFIG.VIRTUAL_QUEUES_TITLE' | translate }}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="inline-flex flex-col gap-2">
+                <mat-slide-toggle class="ob-slide-toggle ob-label" [formControl]="form.get('queues.active')" (change)="($event.checked)">
+                    {{ 'LOGIN_CONFIG.VIRTUAL_QUEUE' | translate }}
+                </mat-slide-toggle>
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label alias-input">
+                    <mat-label>{{ 'LOGIN_CONFIG.ALIAS' | translate }}</mat-label>
+                    <input matInput [placeholder]="'LOGIN_CONFIG.ALIAS_PLACEHOLDER' | translate" [formControl]="form.get('queues.alias')">
+                    <mat-error [ob-form-errors]="form" [field]="['queues', 'alias']" />
+                </mat-form-field>
+            </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{ 'LOGIN_CONFIG.PREVIOUS_ORDERS_TITLE' | translate }}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-checkbox [formControl]="form.controls.autoAssignPreviousOrders" color="primary">
+                <div class="option-title">
+                    {{'LOGIN_CONFIG.FORMS.LABELS.AUTO_ASSIGN_PREVIOUS_ORDERS_TITLE' | translate}}
+                </div>
+                {{ 'LOGIN_CONFIG.FORMS.LABELS.AUTO_ASSIGN_PREVIOUS_ORDERS' | translate }}
+            </mat-checkbox>
+        </mat-expansion-panel>
+    }
+</app-form-container>
+@if ($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

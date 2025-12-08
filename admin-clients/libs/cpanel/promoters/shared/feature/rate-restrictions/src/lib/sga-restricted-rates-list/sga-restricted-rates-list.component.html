@@ -1,0 +1,80 @@
+<div class="flex flex-col">
+    <mat-accordion [multi]="true" [togglePosition]="'before'">
+        @for(rate of filteredPriceTypesByRate$ | async; track rate.id) {
+            @if(rate.filteredPriceTypes?.length > 0 || rate.maxItem){
+                <mat-expansion-panel [id]="'rate-restriction-expansion-' + rate.id"
+                    class="ob-expansion-card" [expanded]="openedId === rate.id"
+                    (opened)="openedId = rate.id" (closed)="openedId = null">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title class="justify-between">
+                            <span>{{rate.name}}</span>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="list-box flex flex-col gap-2">
+                        @if(rate.maxItem) {
+                            <div class="flex flex-col">
+                                <h3 class="section-title">
+                                    {{'EVENTS.SESSION.RATES_RESTRICTIONS.SGA_MAX_ITEM' | translate}}
+                                </h3>
+                                <div class="flex flex-row flex-wrap gap-2 items-center">
+                                    <span>{{ 'RATE_RESTRICTIONS.MAX_ITEM.LABELS.CAN_ADD' | prefix | translate }}</span>
+                                    <span>{{ rate.maxItem }}</span>
+                                    <span>{{ 'RATE_RESTRICTIONS.MAX_ITEM.LABELS.OF_RATE' | prefix | translate }}</span>
+                                    <span>{{ rate.name }}</span>
+                                </div>
+                            </div>
+                            <mat-divider class="ob-divider" />
+                        }
+                        @if(rate.filteredPriceTypes?.length > 0) {
+                            <div class="flex flex-col gap-4">
+                                <div class="flex flex-col">
+                                    <h3 class="section-title">
+                                        {{'EVENTS.SESSION.RATES_RESTRICTIONS.SGA_PRICE_TYPES' | translate}}
+                                    </h3>
+                                    <div class="flex flex-row flex-wrap gap-2 items-center">
+                                        <span>{{ 'RATE_RESTRICTIONS.PRICE_TYPES.LABELS.RATE_NAME' | prefix | translate }}</span>
+                                        <span>{{ rate.name }}</span>
+                                        <span>{{ 'RATE_RESTRICTIONS.PRICE_TYPES.LABELS.PRICE_TYPES' | prefix | translate }}</span>
+                                    </div>
+                                </div>
+                                @if(rate.filteredPriceTypes.length > defaultPageSize){
+                                    <div class="flex items-center gap-4">
+                                        <p class="page-summary" [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: {
+                                    startItem: getPaginatorStartItem(ratePages.get(rate.id)?.value || 0),
+                                    endItem: getPaginatorEndItem(ratePages.get(rate.id)?.value || 0, rate.filteredPriceTypes.length),
+                                    total: rate.filteredPriceTypes.length
+                                }"></p>
+                                        <mat-paginator
+                                            [length]="rate.filteredPriceTypes.length"
+                                            [pageSize]="defaultPageSize"
+                                            [pageIndex]="ratePages.get(rate.id)?.value || 0"
+                                            [hidePageSize]="true"
+                                            (page)="pageFilter($event, rate.id)" />
+                                    </div>
+                                }
+                                <div class="flex flex-col">
+                                    <mat-list class="ob-list">
+                                        @for(priceType of getPagedPriceTypes(rate); track priceType.id){
+                                            <mat-list-item>
+                                                <span>{{ priceType.name }}</span>
+                                            </mat-list-item>
+                                        }
+                                    </mat-list>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                </mat-expansion-panel>
+            }
+        } @empty {
+            <app-empty-state [hideImage]="true"
+                [title]="'RATES_RESTRICTIONS.EMPTY_LIST_MESSAGE.TITLE' | prefix | translate" />
+        }
+    </mat-accordion>
+</div>
+@if ($isLoading()) {
+    <div class="spinner-container">
+        <mat-progress-spinner mode="indeterminate" />
+    </div>
+}

@@ -1,0 +1,40 @@
+<mat-accordion [multi]="true" [togglePosition]="'before'" *ngIf="(language$ | async) as lang"
+    [formGroup]="formAttributes">
+    <mat-expansion-panel [expanded]="true" *ngFor="let attr of (attributeList$ | async)">
+        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+            <mat-panel-title>{{attr.texts.name[lang] || attr.name}}</mat-panel-title>
+        </mat-expansion-panel-header>
+        <ng-container [ngSwitch]="attr.type">
+            <ng-container
+                *ngSwitchCase="attr.selection_type === attributeSelectionType.single && attributeType.defined">
+                <mat-radio-group fxFlex="100%" fxLayout="row wrap" [formControlName]="attr.id">
+                    <mat-radio-button fxFlex.sm="100%" fxFlex.md="50%" fxFlex.gt-md="33%" [value]="value.id"
+                        *ngFor="let value of attr.texts.values">
+                        {{value.value[lang] || value.name}}
+                    </mat-radio-button>
+                </mat-radio-group>
+            </ng-container>
+            <div *ngSwitchCase="attr.selection_type === attributeSelectionType.multiple && attributeType.defined"
+                fxFlex="100%" fxLayout="row wrap" [formGroupName]="attr.id">
+                <mat-checkbox class="app-checkbox-wrap-label" fxFlex.sm="100%" fxFlex.md="50%" fxFlex.gt-md="33%"
+                    color="primary" [formControlName]="value.id" *ngFor="let value of attr.texts.values">
+                    {{value.value[lang] || value.name}}
+                </mat-checkbox>
+            </div>
+            <ng-container *ngSwitchCase="attributeType.numeric">
+                <mat-form-field fxFlex="100%" fxFlex.md="50%" fxFlex.gt-md="200px" appearance="outline"
+                    class="ob-form-field">
+                    <input matInput [attr.aria-label]="attr.name" [formControlName]="attr.id" type="number">
+                    <mat-error [ob-form-errors]="formAttributes" [field]="attr.id.toString()"></mat-error>
+                </mat-form-field>
+            </ng-container>
+            <ng-container *ngSwitchCase="attributeType.alphanumeric">
+                <mat-form-field fxFlex="100%" fxFlex.md="50%" fxFlex.gt-md="300px" appearance="outline"
+                    class="ob-form-field">
+                    <input matInput [attr.aria-label]="attr.name" [formControlName]="attr.id">
+                    <mat-error [ob-form-errors]="formAttributes" [field]="attr.id.toString()"></mat-error>
+                </mat-form-field>
+            </ng-container>
+        </ng-container>
+    </mat-expansion-panel>
+</mat-accordion>

@@ -1,0 +1,64 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxLayoutAlign="start stretch" fxFlex="100%">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="0 1 100%" class="secondary title">
+            {{(isLinkableAction ?
+            'SEASON_TICKET.CAPACITY.LINKABLE_SEATS_TITLE' :
+            'SEASON_TICKET.CAPACITY.NOT_LINKABLE_SEATS_TITLE') | translate}}
+        </h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="cancel()" [disabled]="isLoading$ | async">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <form [formGroup]="form" fxLayout="row wrap">
+            <div fxFlex="100%" fxLayout="row wrap" class="read-values-container">
+                <div *ngIf="sector$ | async as sector" class="details-non-editable-field ob-form-field" fxFlex="50%"
+                    fxLayout="column">
+                    <span class="field-label">{{'FORMS.LABELS.SECTOR' | translate}}</span>
+                    <span>{{sector.name}}</span>
+                </div>
+                <div *ngIf="nnz$ | async as nnz" class="details-non-editable-field ob-form-field" fxFlex="50%"
+                    fxLayout="column">
+                    <span class="field-label">{{'FORMS.LABELS.ZONE' | translate}}</span>
+                    <span>{{nnz.name}}</span>
+                </div>
+            </div>
+            <span class="mat-subtitle-2">{{'FORMS.LABELS.APPLY_CHANGES_TO' | translate}}</span>
+            <mat-form-field hidden-outline fxFlex="100%" class="ob-form-field">
+                <input fxHide matInput formControlName="allTickets">
+                <mat-radio-group fxFlex="100%" fxLayout="column" class="ticket-count-radio-group"
+                    formControlName="allTickets">
+                    <mat-radio-button [value]="true" fxFlex="50%">
+                        <mat-label>{{'VENUE_TPL_MGR.FORMS.LABELS.ALL_TICKETS' | translate}}</mat-label>
+                    </mat-radio-button>
+                    <mat-radio-button [value]="false">
+                        <mat-label>{{'VENUE_TPL_MGR.FORMS.LABELS.TICKETS_AMOUNT' | translate}}</mat-label>
+                    </mat-radio-button>
+                </mat-radio-group>
+            </mat-form-field>
+            <mat-form-field fxFlex="30%" appearance="outline" class="ob-form-field count-input">
+                <input matInput formControlName="count" type="number">
+                <mat-error *ngIf="countControl.hasError('required')">
+                    {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                </mat-error>
+                <mat-error *ngIf="countControl.hasError('min')">
+                    {{'FORMS.ERRORS.LOWER_THAN' | translate : ({ value: countControl.getError('min').min }) }}
+                </mat-error>
+                <mat-error *ngIf="countControl.hasError('max')">
+                    {{'FORMS.ERRORS.HIGHER_THAN' | translate : ({ value: countControl.getError('max').max }) }}
+                </mat-error>
+            </mat-form-field>
+        </form>
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="cancel()"
+            [disabled]="isLoading$ | async">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button"
+            [disabled]="!form.valid || (isLoading$ | async)"
+            (click)="save()">
+            {{'FORMS.ACTIONS.SAVE' | translate}}
+        </button>
+    </div>
+</div>

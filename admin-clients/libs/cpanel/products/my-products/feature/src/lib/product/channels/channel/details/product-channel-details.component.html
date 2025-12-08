@@ -1,0 +1,31 @@
+<div class="main-content" fxFlex="0 1 100%" fxLayout="column">
+    @if ($selectedProductChannel()) {
+        <app-nav-tabs-menu type="horizontalSubtab" [elements]="$isNotBoxOfficeChannel() ?
+        [{
+            label: 'PRODUCT.CHANNELS.DETAIL.CONFIGURATION.TITLE',
+            id: 'tab_product_channel_config',
+            param: 'configuration',
+        },
+        {
+            label: 'PRODUCT.CHANNELS.DETAIL.PREVIEW.TITLE',
+            id: 'tab_product_channel_preview',
+            param: 'preview',
+            disabled: !$productEvents() || $productEvents()?.length === 0 || !$selectedProductChannel()?.standalone_enabled,
+            tooltip: {
+                    text: 'PRODUCT.CHANNELS.DETAIL.PREVIEW.REQUEST_REQUIRED',
+                    disabled: $productEvents()?.length > 0 && $selectedProductChannel()?.standalone_enabled
+                }
+        }]
+        : [ {
+            label: 'PRODUCT.CHANNELS.DETAIL.CONFIGURATION.TITLE',
+            id: 'tab_product_channel_config',
+            param: 'configuration'
+        }]"/>
+    }
+    <router-outlet />
+    @if (isInProgress$ | async) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+</div>

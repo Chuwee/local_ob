@@ -1,0 +1,84 @@
+<form [formGroup]="filtersForm" class="flex flex-col gap-6 form-container">
+    <div class="flex flex-row filter-block">
+        <div class="ob-label label-width">
+            {{'SEASON_TICKET.RENEWALS.LIST.ENTITY' | translate}}
+        </div>
+        <div class="filter-block-input flex-1">
+            <mat-form-field appearance="outline" class="ob-form-field entity-select">
+                <mat-select formControlName="entity" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate"
+                    [compareWith]="compareWith">
+                    <mat-option>
+                        <app-select-search #entitySelectSearch [options$]="renewalsEntities$" searchField="name" />
+                    </mat-option>
+                    @for (entity of entitySelectSearch.getFilteredOptions$() | async; track entity?.id) {
+                        <mat-option [value]="entity">
+                            {{entity?.name || ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                        </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+    <div class="flex flex-col justify-between gap-6">
+        <div class="flex flex-row filter-block">
+            <div class="ob-label label-width">
+                {{'SEASON_TICKET.RENEWALS.LIST.MAPPING_STATUS' | translate}}
+            </div>
+            <div class="filter-block-input flex-1">
+                <mat-form-field appearance="outline" class="ob-form-field type-select">
+                    <mat-select formControlName="mapping_status"
+                        [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option [value]="null">
+                            {{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}
+                        </mat-option>
+                        @for (mappingStatus of mappingStatusList; track $index) {
+                            <mat-option [value]="mappingStatus">
+                                {{mappingStatus && (mappingStatus.name | translate)}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="flex flex-row filter-block">
+            <div class="ob-label label-width">
+                {{'SEASON_TICKET.RENEWALS.LIST.RENEWAL_STATUS' | translate}}
+            </div>
+            <div class="filter-block-input flex-1">
+                <mat-form-field appearance="outline" class="ob-form-field type-select">
+                    <mat-select formControlName="renewal_status"
+                        [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option [value]="null">
+                            {{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}
+                        </mat-option>
+                        @for (renewalStatus of $renewalStatusList(); track $index) {
+                            <mat-option [value]="renewalStatus">
+                                {{renewalStatus?.name | translate}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="flex flex-row filter-block">
+            <div class="ob-label label-width">
+                {{'SEASON_TICKET.RENEWALS.LIST.TYPE' | translate}}
+            </div>
+            <div class="filter-block-input flex-1">
+                <mat-form-field appearance="outline" class="ob-form-field type-select">
+                    <mat-select formControlName="auto_renewal"
+                        [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option [value]="null">
+                            {{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}
+                        </mat-option>
+                        @for (renewalType of renewalTypeList; track $index) {
+                            <mat-option [value]="renewalType">
+                                {{renewalType?.name | translate}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+</form>

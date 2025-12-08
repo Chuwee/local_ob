@@ -1,0 +1,54 @@
+<form [formGroup]="filtersForm" fxLayout="column" fxLayoutGap="16px">
+    <app-context-notification contextType="info" class="min-padding full">
+        {{'ORDER.POPOVER_FILTER_MSG' | translate}}
+    </app-context-notification>
+    <div fxLayout="column" fxLayoutGap="24px">
+        <div fxLayout="row" fxLayoutAlign="space-between" class="filter-block">
+            @if ($areCurrenciesShown()) {
+                <app-filter-currency-list [formControl]="filtersForm.get('currency')" [startDate]="startDate" [endDate]="endDate" />
+            }
+            <!-- MERCHANT -->
+            <div>
+                <div class="ob-label" fxFlex="120px">
+                    {{'FORMS.LABELS.MERCHANTS' | translate}}
+                </div>
+                <div class="filter-block-input" fxFlex="183px">
+                    <mat-form-field appearance="outline" class="ob-form-field">
+                        <app-select-server-search formControlName="merchant" [unselectLabel]="'FORMS.ACTIONS.UNSELECT_ALL' | translate"
+                            [options$]="merchants$" [moreOptionsAvailable$]="moreMerchantsAvailable$"
+                            (loadOptions)="loadMerchants($event.q, $event.nextPage)" />
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        @if ($isOperatorMode() || $isEntityAdmin()) {
+            <div fxLayout="row" class="filter-block">
+                <div class="ob-label" fxFlex="120px">
+                    {{'FORMS.LABELS.CHANNEL_ENTITY' | translate}}
+                </div>
+                <div class="filter-block-input" fxFlex="540px">
+                    <mat-form-field appearance="outline" class="ob-form-field">
+                        <app-select-server-search formControlName="channelEntity"
+                            [options$]="channelEntities$" [moreOptionsAvailable$]="moreChannelEntitiesAvailable$"
+                            (loadOptions)="loadFilterChannelEntities($event.q, $event.nextPage)" />
+                    </mat-form-field>
+                </div>
+            </div>
+        }
+        @if ($isOperatorMode() || $isEntityAdmin() || $areCurrenciesShown()) {
+            <mat-divider [inset]="true" />
+        }
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label" fxFlex="120px">
+                {{'FORMS.LABELS.CHANNEL' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="540px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <app-select-server-search [multiple]="true" formControlName="channel"
+                        [options$]="channels$" [moreOptionsAvailable$]="moreChannelsAvailable$"
+                        (loadOptions)="loadFilterChannels($event.q, $event.nextPage)" />
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+</form>

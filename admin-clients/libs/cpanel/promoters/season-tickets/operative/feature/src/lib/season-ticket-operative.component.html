@@ -1,0 +1,30 @@
+<div class="flex flex-1">
+    @if($isGenerationStatusInProgress()) {
+        <div class="ob-overlay-wrapper" fxLayoutAlign="center start"
+            slot="overlay">
+            <div class="ob-overlay-pane pane-sticky">
+                <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px"
+                    fxFlex="80%">
+                    <p>{{'SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate}}</p>
+                    <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                        [attr.aria-label]="('SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate)" />
+                </app-context-notification>
+            </div>
+        </div>
+    }
+    <div class="subtabs-container flex flex-col flex-[0_0_200px]">
+        <mat-button-toggle-group vertical [value]="$deepPath()" class="ob-subtab" appLastPathGuardListener
+            [currValue]="$deepPath()">
+            <mat-button-toggle  routerLink="planning" value="planning">
+                {{'SEASON_TICKET.OPERATIVE.PLANNING.TITLE' | translate}}
+            </mat-button-toggle>
+            <mat-button-toggle  routerLink="presales" value="presales">
+                {{'SEASON_TICKET.OPERATIVE.PRESALES.TITLE' | translate}}
+            </mat-button-toggle>
+            <mat-button-toggle  routerLink="options" value="options">
+                {{'SEASON_TICKET.OPERATIVE.OPTIONS.TITLE' | translate}}
+            </mat-button-toggle>
+        </mat-button-toggle-group>
+    </div>
+    <router-outlet />
+</div>

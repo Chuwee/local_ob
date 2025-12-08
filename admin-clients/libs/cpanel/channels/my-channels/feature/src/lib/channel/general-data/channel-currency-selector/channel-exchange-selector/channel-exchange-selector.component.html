@@ -1,0 +1,20 @@
+<p class="section-description">{{ 'CHANNELS.CURRENCY_EXCHANGE.DESCRIPTION' | translate }}</p>
+<div class="container">
+    <mat-checkbox color="primary" [formControl]="currencyExchangeCtrl.controls.useCurrencyExchange">
+        {{ 'CHANNELS.CURRENCY_EXCHANGE.ACTION' | translate }}
+    </mat-checkbox>
+    @if (currencyExchangeCtrl.controls.useCurrencyExchange.value){
+        <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+            <mat-label>{{ 'CHANNELS.CURRENCY_EXCHANGE.DEFAULT' | translate }}</mat-label>
+            <mat-select [formControl]="currencyExchangeCtrl.controls.currencySelected"
+                [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                @for (currency of $currencies(); track currency.code) {
+                    <mat-option [value]="currency.code">
+                        {{ currency.code | localCurrencyFullTranslation }}
+                    </mat-option>
+                }
+            </mat-select>
+            <mat-error [ob-form-errors]="currencyExchangeCtrl.controls.currencySelected" />
+        </mat-form-field>
+    }
+</div>

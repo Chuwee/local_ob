@@ -1,0 +1,143 @@
+<ion-header class="ob-layout__header weekly-sales-detail__header">
+    <ion-toolbar>
+        <back-button
+            [breadcrumbs]=" true"
+            viewTitle="{{ 'WEEKLY_SALES_DETAIL.TITLE'| translate }}" />
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="ob-layout__content weekly-sales-detail__content">
+    <div>
+        <div class="weekly-sales-detail__chip-selector" #chipSelector>
+            <ion-chip (click)="selectSaleOption('tickets')" class="weekly-sales-detail__chip activated"
+                [class.activated]="$salesOption() === 'tickets'">
+                {{"WEEKLY_SALES_DETAIL.CHIPS.TICKETS" | translate}}
+            </ion-chip>
+            <ion-chip (click)="selectSaleOption('transactions')" class="weekly-sales-detail__chip"
+                [class.activated]="$salesOption() === 'transactions'">
+                {{"WEEKLY_SALES_DETAIL.CHIPS.TRANSACTIONS" | translate}}
+            </ion-chip>
+        </div>
+        <div class="weekly-sales-detail__chart">
+            @if(!$isLoading()){
+                <chart [chartData]="$weeklyChartData()" />
+            }@else {
+                <ion-spinner class="ob-spinner weekly-sales-detail__spinner" name="crescent" />
+            }
+        </div>
+        <div class="weekly-sales-detail__date-section">
+            <ion-text (click)="openDateSelector()" class="weekly-sales-detail__date-selector">
+                <span>
+                    {{"MONTHS.LONG-"+(selectedTime?.startDate | dateTime: 'MM') | uppercase | translate}}
+                    {{selectedTime?.endDate | dateTime: 'yyyy'}}
+                </span>
+                <ion-icon name="caret-down-outline" />
+            </ion-text>
+            <!-- Selector de Fecha -->
+            <div class="weekly-sales-detail__date-chips">
+                <ion-icon (click)="subtractWeek()" name="chevron-back-outline" class="weekly-sales-detail__date-chip-arrow" />
+                <ion-chip [attr.data-first-day]="selectedTime?.startDate" [attr.data-last-day]="selectedTime?.endDate"
+                    class="weekly-sales-detail__date-chip weekly-sales-detail__chip">
+                    {{getCompleteFormattedDate(selectedTime?.startDate)}} - {{getCompleteFormattedDate(selectedTime?.endDate)}}
+                </ion-chip>
+                <ion-icon (click)="addWeek()" name="chevron-forward-outline" class="weekly-sales-detail__date-chip-arrow" />
+            </div>
+        </div>
+
+        <!-- Card Resumen total -->
+        <ion-card class="card-group">
+            <ion-card-header>
+                <ion-card-title>
+                    @if($salesOption() === 'transactions'){
+                        <ion-icon src="./assets/media/icons/chart.svg" />
+                    }
+                    @if($salesOption() === 'tickets'){
+                        <ion-icon src="./assets/media/icons/ticket.svg" />
+                    }
+                    {{"WEEKLY_SALES_DETAIL.AMOUNT_TITLE" | translate}}
+                </ion-card-title>
+                @if($salesOption() === 'tickets'){
+                    <ion-card-subtitle>
+                        {{"WEEKLY_SALES_DETAIL.SUBTITLE.TICKETS" | translate}}
+                    </ion-card-subtitle>
+                }
+                @if($salesOption() === 'transactions'){
+                    <ion-card-subtitle>
+                        {{"WEEKLY_SALES_DETAIL.SUBTITLE.TRANSACTIONS" | translate}}
+                    </ion-card-subtitle>
+                }
+                @if(!$isLoading()){
+                    <ion-card-content>
+                        <span>{{"WEEKLY_SALES_DETAIL.TOTAL" | translate}}</span>
+                        <!-- Total Transaction -->
+                        <!-- TODO:  Create a new pipeline that allows you to put the currency
+                       in front of or behind the value, applying a different style to the currency and the value-->
+                       @if($salesOption() === 'transactions'){
+                        <div>
+                            <span class="text-amount">
+                                {{$weeklyTotal() | localCurrency: ' '}}
+                            </span>
+                            <span class="text-currency">
+                                {{defaultCurrencyUser| localCurrencySymbol}}
+                            </span>
+                        </div>
+                       }
+                        <!-- Total Tickets-->
+                        @if($salesOption() === 'tickets'){
+                            <div>
+                                <span class="text-amount">
+                                    {{$weeklyTotal()}}
+                                </span>
+                                <span class="text-currency">
+                                    {{"WEEKLY_SALES_DETAIL.TICKET_ABBREVIATION" | translate}}
+                                </span>
+                            </div>
+                        }
+                    </ion-card-content>
+                }@else {
+                    <ion-skeleton-text [animated]="true" />
+                }
+            </ion-card-header>
+        </ion-card>
+
+        <!--  Listado semanal -->
+        <ion-list lines="full" class="summary-list">
+            @for(dayAmount of $weeklyChartData(); track $index){
+                <ion-item>
+                    <ion-label slot="start">{{ "WEEKDAYS."+getDayName(dayAmount.indexOfWeek)|uppercase|translate}}</ion-label>
+                    @if(!$isLoading()){
+                        <div slot="end" style="padding-right: .5em;">
+                            <!-- List Transactions -->
+                            @if(dayAmount.value !== 0 && $salesOption() === 'transactions'){
+                                <div>
+                                    <span class="text-amount-list"> {{ dayAmount.value | localCurrency:' '}}</span>
+                                    <span class="text-currency-list">{{defaultCurrencyUser| localCurrencySymbol}}</span>
+                                </div>
+                            }
+                            <!-- List Tickets -->
+                            @if(dayAmount.value !== 0 && $salesOption() === 'tickets'){
+                                <div>
+                                    <span class="text-amount-list">{{ dayAmount.value}}</span>
+                                    <span class="text-currency-list">{{"WEEKLY_SALES_DETAIL.TICKET_ABBREVIATION" | translate}}</span>
+                                </div>
+                            }
+                            @if(dayAmount.value === 0){
+                                <span>---</span>
+                            }    
+                        </div>
+                    }@else{
+                        <ion-skeleton-text [animated]="true" />
+                    }
+                </ion-item>
+            }
+        </ion-list>
+    </div>
+</ion-content>
+
+<modal [isOpen]="isDateSelectorOpen" (closeModal)="closeDateSelector()">
+    @if(isDateSelectorOpen){
+        <date-picker
+        [selectedTime]="selectedTime.startDate"
+        (selectDate)="loadWeekFromMonthSelector($event)" />
+    }
+</modal>

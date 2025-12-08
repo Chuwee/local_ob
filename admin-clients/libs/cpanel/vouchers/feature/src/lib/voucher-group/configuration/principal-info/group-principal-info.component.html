@@ -1,0 +1,29 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="!form.dirty">
+    <form [formGroup]="form">
+        <!-- PROMOTION GENERAL INFO -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'VOUCHER_GROUP.GENERAL_INFO' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="column" fxFlex="0 1 70%">
+                <!-- VOUCHER GROUP NAME -->
+                <mat-form-field id="name" fxFlex="0 1 calc(100% - 20px)" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                    <input formControlName="name" matInput [placeholder]="'FORMS.LABELS.NAME' | translate">
+                    <mat-error [ob-form-errors]="form" [field]="['name']"></mat-error>
+                </mat-form-field>
+                <!-- VOUCHER GROUP DESCRIPTION -->
+                <mat-form-field id="description" fxFlex="0 1 calc(100% - 20px)" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.DESCRIPTION' | translate}}</mat-label>
+                    <textarea matInput formControlName="description" rows="8"></textarea>
+                    <mat-error [ob-form-errors]="form" [field]="['description']"></mat-error>
+                </mat-form-field>
+            </div>
+        </mat-expansion-panel>
+    </form>
+</app-form-container>
+<div class="spinner-container" *ngIf="reqInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

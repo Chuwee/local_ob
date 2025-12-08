@@ -1,0 +1,41 @@
+<div class="venue-tpl-editor-work-area" (appResize)="zoomButtons.updateViewportSize($event)" [resizeDelay]="0">
+    <div class="work-area-viewport"
+        (click)="$currentModifier()?.outerClick($event)"
+        (dblclick)="$currentModifier()?.outerDblClick($event)"
+        (mousedown)="$currentModifier()?.outerMouseDown($event)"
+        (mousemove)="$currentModifier()?.outerMouseMove($event)"
+        (mouseup)="$currentModifier()?.outerMouseUp($event)">
+        <div class="work-area" [ngStyle]="workAreaCoordinates$ | async">
+            <div #svgContainer class="venue-tpl-editor-svg-container"
+                [class.graphic-elements-not-active]="(interactionMode$ | async) === interactionMode.interactive"
+                [class.interactive-elements-not-active]="(interactionMode$ | async) === interactionMode.graphic"
+                [innerHTML]="safeSvg$ | async">
+            </div>
+            <div class="info-layer-container" *ngIf="selectedVisualizationModes$ | async as selectedVisualizationModes">
+                <app-venue-tpl-editor-weights-info-layer *ngIf="selectedVisualizationModes.includes(visualizationModes.weights)">
+                </app-venue-tpl-editor-weights-info-layer>
+                <app-venue-tpl-editor-blocks-info-layer *ngIf="selectedVisualizationModes.includes(visualizationModes.blocks)">
+                </app-venue-tpl-editor-blocks-info-layer>
+                <app-venue-tpl-editor-names-info-layer *ngIf="selectedVisualizationModes.includes(visualizationModes.names)">
+                </app-venue-tpl-editor-names-info-layer>
+            </div>
+            <div class="modifier-container" *ngIf="mode$ | async as mode">
+                <app-venue-tpl-editor-svg-transforms #modifier class="modifier" *ngIf="mode === modes.base">
+                </app-venue-tpl-editor-svg-transforms>
+                <app-venue-tpl-editor-seat-matrix #modifier class="modifier" *ngIf="mode === modes.seatMatrixCreate">
+                </app-venue-tpl-editor-seat-matrix>
+                <app-venue-tpl-editor-seat-matrix #modifier class="modifier" *ngIf="mode === modes.seatMatrixIncrease"
+                    continueRowsMode="true">
+                </app-venue-tpl-editor-seat-matrix>
+                <app-venue-tpl-editor-blocks-setup #modifier class="modifier" *ngIf="mode === modes.blocksSetup">
+                </app-venue-tpl-editor-blocks-setup>
+                <app-venue-tpl-editor-weights-setup #modifier class="modifier" *ngIf="mode === modes.weightsSetup">
+                </app-venue-tpl-editor-weights-setup>
+            </div>
+        </div>
+    </div>
+    <div class="fixed-controls">
+        <app-venue-tpl-editor-zoom-buttons #zoomButtons>
+        </app-venue-tpl-editor-zoom-buttons>
+    </div>
+</div>

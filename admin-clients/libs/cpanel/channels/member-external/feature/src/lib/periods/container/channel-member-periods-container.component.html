@@ -1,0 +1,27 @@
+<div class="period-container" *ngIf="elements$ | async as elements">
+    <!-- PERIOD STATUS INFO -->
+    <div class="status-notifications-container">
+        <div class="status-bar">
+            <div class="period-activation" [class.disabled]="form.controls.active.disabled"
+                [matTooltip]="'CHANNELS.MEMBER_EXTERNAL.PERIODS.DISABLED_ACTIVATION_DESC' | translate"
+                [matTooltipDisabled]="form.controls.active.enabled">
+                <mat-slide-toggle
+                    matTooltip="{{'CHANNELS.MEMBER_EXTERNAL.AVAILABILITY_QUERY.SLIDE_TOOLTIP' | translate}}"
+                    (change)="handleStatusChange($event.checked)" class="ob-slide-toggle" color="primary"
+                    [formControl]="form.controls.active" [matTooltipDisabled]="!form.get('active').disabled">
+                    {{('CHANNELS.MEMBER_EXTERNAL.PERIODS.SLIDE_LABEL_OPTS.' + (period$ | async)) | translate }}
+                </mat-slide-toggle>
+            </div>
+            <div class="period-status">
+                <span class="ob-label">
+                    {{'CHANNELS.MEMBER_EXTERNAL.PERIODS.STATUS' | translate}}:
+                </span>
+                <span class="ob-status-badge period-status-badge" [ngClass]="(status$ | async) ? 'active' : 'inactive'">
+                    {{('CHANNELS.MEMBER_EXTERNAL.PERIODS.STATUS_OPTS.' + ((status$ | async) ? 'ACTIVE' : 'INACTIVE')) | translate}}
+                </span>
+            </div>
+        </div>
+    </div>
+    <app-nav-tabs-menu *ngIf="elements.length > 1" type="navigation" [elements]="elements"></app-nav-tabs-menu>
+    <router-outlet (activate)="childComponentChange($event)"></router-outlet>
+</div>

@@ -1,0 +1,34 @@
+<div class="review-config grid gap-8">
+    <p>{{'CHANNELS.REVIEWS.CONFIG.DESCRIPTION' | translate}}</p>
+    <section class="config-form">
+        <h3 class="section-title">{{'CHANNELS.REVIEWS.CONFIG.DEFAULT.TITLE' | translate}}</h3>
+        <form class="grid gap-6" [formGroup]="$configForm()">
+            <ob-review-config-criteria-control [formControl]="$configForm()?.get('criteria')" />
+            <div class="grid gap-4">
+                <label class="mat-subtitle-2" for="timeGroup">{{'CHANNELS.REVIEWS.CONFIG.FORMS.TIME_LABEL' | translate}}</label>
+                <div id="timeGroup" class="flex items-baseline gap-2" formGroupName="time">
+                    <span>{{'CHANNELS.REVIEWS.CONFIG.FORMS.TIME_TEXT_1' | translate}}</span>
+                    <mat-form-field appearance="outline" class="ob-form-field basis-[96px]">
+                        <input matInput type="number" formControlName="value">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="ob-form-field basis-[120px]">
+                        <mat-select formControlName="unit">
+                            <mat-option value="DAYS">{{'FORMS.LABELS.DAYS' | translate}}</mat-option>
+                            <mat-option value="HOURS">{{'FORMS.LABELS.HOURS' | translate}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <span>{{'CHANNELS.REVIEWS.CONFIG.FORMS.TIME_TEXT_2' | translate}}</span>
+                </div>
+            </div>
+        </form>
+    </section>
+    <section>
+        <h3 class="section-title">{{'CHANNELS.REVIEWS.CONFIG.CUSTOM.TITLE' | translate}}</h3>
+        <ob-review-config-elements [channelId]="$channelId()" [enabled]="$enabled()" />
+    </section>
+</div>
+@if($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

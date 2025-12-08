@@ -1,0 +1,41 @@
+<div>
+    <ob-select [filterOptions]="statusOptions" [value]="event?.status || null" [isMultiple]="false"
+        [label]="'EVENT_DETAIL.INFO.STATUS' | translate" (valueChange)="eventStatusChange($event)" />
+    <div class="info-tab__price">
+        <ion-text>{{'EVENT_DETAIL.INFO.PRICE'| translate}}</ion-text>
+    </div>
+    <ob-select [filterOptions]="templateOptions" [isMultiple]="false" [value]="selectTemplateId"
+        [label]="'EVENT_DETAIL.INFO.TEMPLATE_PROMOTION' | translate" (valueChange)="selectTemplate($event)" />
+    <ob-select [filterOptions]="pricesOptions" [isMultiple]="false" [value]="selectPriceZone"
+        [label]="'EVENT_DETAIL.INFO.ZONE_OF_PRICE' | translate" (valueChange)="selectPrice($event)" />
+
+    <div class="info-tab__list-prices-content">
+        @if(getKeys(filterPrice).length === 0){
+            <div>
+                <ion-text class="info-tab__list-prices-content-label-header">{{'EVENT_DETAIL.INFO.NO_PRICE' | translate}}</ion-text>
+            </div>
+        }
+        @if(getKeys(filterPrice).length > 0){
+            <div>
+                @for(key of getKeys(filterPrice); track $index){
+                    <div>
+                        <span class="info-tab__list-prices-content-label-header">{{key|uppercase}}</span>
+                        <ion-row>
+                            @for(price of filterPrice[key]; track $index){
+                                <ion-col size="4">
+                                    <div class="info-tab__price-card">
+                                        <ion-text class="info-tab__price-card-label">{{price.rate.name}}</ion-text>
+                                        <ion-text class="info-tab__price-card-value">
+                                            {{price.value| localCurrency: event.currency_code}}
+                                        </ion-text>
+                                    </div>
+                                </ion-col>
+                            }
+                        </ion-row>
+                    </div>
+                }    
+            </div>
+        }
+
+    </div>
+</div>

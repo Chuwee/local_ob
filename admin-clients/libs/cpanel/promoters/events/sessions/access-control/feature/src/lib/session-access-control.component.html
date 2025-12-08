@@ -1,0 +1,30 @@
+<app-form-container [disabled]="!(form?.dirty)" (cancel)="cancel()" (save)="save()">
+    <!-- ACCESS CONTROL SETTINGS -->
+    <mat-accordion [multi]="true" [togglePosition]="'before'" [formGroup]="form">
+        <mat-expansion-panel expanded *ngIf="(isAvet$ | async) !== true && sessionType === sessionTypes.session"
+            togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.SESSION.ACCESS_CONTROL' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-session-access-control-configuration [form]="form.get('access_control')">
+            </app-session-access-control-configuration>
+        </mat-expansion-panel>
+        <!-- INTERNAL BARCODES -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.SESSION.WHITE_LIST.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-session-internal-barcodes></app-session-internal-barcodes>
+        </mat-expansion-panel>
+        <!-- EXTERNAL BARCODES -->
+        <mat-expansion-panel expanded togglePosition="before" class="with-context-overlay" *ngIf="sessionType === sessionTypes.session">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.SESSION.EXTERNAL_BARCODES.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-session-external-barcodes></app-session-external-barcodes>
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+<div class="spinner-container" *ngIf="reqInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

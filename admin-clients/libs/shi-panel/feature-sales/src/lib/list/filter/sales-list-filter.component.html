@@ -1,0 +1,242 @@
+<form [formGroup]="filtersForm" class="flex flex-col gap-6">
+    <div class="filter-block flex flex-row items-center">
+        <div class="ob-label filter-label">
+            {{'SALES.LAST_UPDATE' | translate}}
+        </div>
+        <div class="filter-block-input combined">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="startDateSD" [placeholder]="dateFormat" formControlName="startDateUpdate"
+                    (focus)="startDateSD.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                    (click)="$event.stopPropagation(); startDateSD.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #startDateSD />
+            </mat-form-field>
+        </div>
+        <div class="filter-input-divider"></div>
+        <div class="filter-block-input combined">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="endDateSD" [placeholder]="dateFormat" formControlName="endDateUpdate"
+                    (focus)="endDateSD.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                    (click)="$event.stopPropagation(); endDateSD.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #endDateSD />
+            </mat-form-field>
+        </div>
+    </div>
+    <div class="filter-block flex flex-row items-center">
+        <div class="ob-label filter-label">
+            {{'SALES.IN_HAND_DATE' | translate}}
+        </div>
+        <div class="filter-block-input combined">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="startInHandDateSD" [placeholder]="dateFormat" formControlName="startInHandDate"
+                    (focus)="startInHandDateSD.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                    (click)="$event.stopPropagation(); startInHandDateSD.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #startInHandDateSD />
+            </mat-form-field>
+        </div>
+        <div class="filter-input-divider"></div>
+        <div class="filter-block-input combined">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="endInHandDateSD" [placeholder]="dateFormat" formControlName="endInHandDate"
+                    (focus)="endInHandDateSD.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                    (click)="$event.stopPropagation(); endInHandDateSD.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #endInHandDateSD />
+            </mat-form-field>
+        </div>
+    </div>
+    <div class="filter-block flex flex-row justify-between items-start gap-x-14">
+        <div class="flex flex-row">
+            <div class="ob-label filter-label">
+                {{'SALES.SALES_LIST_FILTER.SUPPLIER' | translate}}
+            </div>
+            <div class="filter-block-input">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select formControlName="supplier" multiple [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        @for (supplier of (suppliers$ | async); track $index) {
+                            <mat-option [value]="supplier">
+                                {{supplier?.name | translate}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="flex flex-row">
+            <div class="ob-label filter-label">
+                {{'SALES.SALES_LIST_FILTER.DELIVERY_METHOD' | translate}}
+            </div>
+            <div class="filter-block-input">
+                <mat-form-field class="ob-form-field" appearance="outline">
+                    <mat-select formControlName="delivery_method" multiple [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        @for (method of (deliveryMethods$ | async); track $index) {
+                            <mat-option [value]="method">
+                                {{method?.name | translate}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    <div class="filter-block flex flex-row justify-between items-start gap-x-14">
+        <div class="flex flex-row">
+            <div class="ob-label filter-label">
+                {{'SALES.SALES_LIST_FILTER.LAST_ERROR' | translate}}
+            </div>
+            <div class="filter-block-input">
+                <mat-form-field class="ob-form-field" appearance="outline">
+                    <mat-select multiple aria-label="last_error"
+                        [formControl]="this.filtersForm.controls.last_error_description"
+                        [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option>
+                            <app-select-search #errorsSearch searchField="name"
+                                [requireSelection]="true" [options$]="lastErrors$"
+                                [placeholderLabel]="'FORMS.SEARCH.LAST_ERROR' | translate" />
+                        </mat-option>
+                        @if (showClearLastErrorsSelection$ | async) {
+                            <div class="mat-option" (click)="deselectAllLastErrors()">
+                                <span class="mat-option-text">
+                                    {{ 'FORMS.ACTIONS.UNSELECT_ALL' | translate }}
+                                </span>
+                            </div>
+                        }
+                        @for (error of errorsSearch.getFilteredOptions$() | async; track error.name) {
+                            <mat-option [value]="error">
+                                <div class="flex">
+                                    <span appEllipsify [matTooltip]="error?.name" class="last-error-option">
+                                        {{error?.name | translate}}
+                                    </span>
+                                </div>
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="flex flex-row">
+            <div class="ob-label filter-label">
+                {{'SALES.SALES_LIST_FILTER.STATUS' | translate}}
+            </div>
+            <div class="filter-block-input">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select formControlName="status" multiple [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        @for (status of statusList; track $index) {
+                            <mat-option [value]="status">
+                                {{status?.name | translate}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    <div class="filter-block flex flex-row justify-between items-start gap-x-14">
+        <div class="flex flex-row">
+            <div class="ob-label filter-label">
+                {{'MAPPINGS.MAPPINGS_LIST_FILTER.COUNTRY' | translate}}
+            </div>
+            <div class="filter-block-input">
+                <mat-form-field class="ob-form-field" appearance="outline">
+                    <mat-select multiple aria-label="countries"
+                        [formControl]="this.filtersForm.controls.country"
+                        [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option>
+                            <app-select-search #countriesSearch searchField="name"
+                                [requireSelection]="true" [options$]="countries$"
+                                [placeholderLabel]="'FORMS.SEARCH.COUNTRY_CODE' | translate" />
+                        </mat-option>
+                        @if (showClearCountriesSelection$ | async) {
+                            <div class="mat-option" (click)="deselectAllCountries()">
+                                <span class="mat-option-text">
+                                    {{ 'FORMS.ACTIONS.UNSELECT_ALL' | translate }}
+                                </span>
+                            </div>
+                        }
+                        @for (country of countriesSearch.getFilteredOptions$() | async; track $index) {
+                            <mat-option [value]="country">
+                                {{country?.name}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="flex flex-row">
+            <div class="ob-label filter-label">
+                {{'SALES.SALES_LIST_FILTER.CURRENCY' | translate}}
+            </div>
+            <div class="filter-block-input">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select formControlName="currency" multiple [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        @for (currency of (currencies$ | async); track $index) {
+                            <mat-option [value]="currency">
+                                {{currency?.name | translate}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    <div class="filter-block flex flex-row justify-between items-start gap-x-14">
+        <div class="flex flex-row">
+            <div class="ob-label filter-label">
+                {{'MAPPINGS.MAPPINGS_LIST_FILTER.TAXONOMIES' | translate}}
+            </div>
+            <div class="filter-block-input">
+                <mat-form-field class="ob-form-field" appearance="outline">
+                    <mat-select multiple aria-label="taxonomies" formControlName="taxonomies"
+                        [placeholder]="'MAPPINGS.MAPPINGS_LIST_FILTER.TAXONOMIES' | translate">
+                        <mat-option>
+                            <app-select-search #searchTaxonomy searchField="name"
+                                [requireSelection]="true" [options$]="taxonomies$"
+                                [placeholderLabel]="'FORMS.SEARCH.TAXONOMIES' | translate" />
+                        </mat-option>
+                        @if (this.showTaxonomyClearSelection$ | async) {
+                            <div class="mat-option"
+                                (click)="deselectAllTaxonomies()">
+                                <span class="mat-option-text">
+                                    {{ 'FORMS.ACTIONS.UNSELECT_ALL' | translate }}
+                                </span>
+                            </div>
+                        }
+                        @for ( taxonomy of searchTaxonomy.getFilteredOptions$() | async; track $index) {
+                            <mat-option [value]="taxonomy">
+                                {{taxonomy?.name}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    <div class="filter-block flex flex-row items-center">
+        <div class="ob-label filter-label">
+            {{'FORMS.LABELS.DAYS_TO_EVENT' | translate}}
+        </div>
+        <div class="filter-block-input combined">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [placeholder]="'FORMS.LABELS.DAYS_TO_EVENT_LTE_PLACEHOLDER' | translate"
+                    [formControl]="filtersForm.controls.daysToEventLte" type="number">
+            </mat-form-field>
+        </div>
+        <div class="filter-input-divider"></div>
+        <div class="filter-block-input combined">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [placeholder]="'FORMS.LABELS.DAYS_TO_EVENT_GTE_PLACEHOLDER' | translate"
+                    [formControl]="filtersForm.controls.daysToEventGte" type="number">
+            </mat-form-field>
+        </div>
+    </div>
+</form>

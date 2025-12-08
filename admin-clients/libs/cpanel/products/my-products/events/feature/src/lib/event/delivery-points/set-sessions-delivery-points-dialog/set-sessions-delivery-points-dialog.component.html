@@ -1,0 +1,34 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'PRODUCT.EVENTS.DETAIL.SET_SESSIONS_DELIVERY_POINTS.TITLE' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        @if (!!data?.session) {
+            <div>
+                <p class="ob-label"> {{ 'PRODUCT.EVENTS.DETAIL.SET_SESSIONS_DELIVERY_POINTS.HEADER' | translate }}</p>
+                <span> {{ data.session.name }} - {{ data.session.start | dateTime : dateTimeFormats.shortDateTimeWithWeek}}</span>
+            </div>
+        }
+        @if (!!data?.session) {
+            <mat-divider class="ob-divider" />
+        }
+        <p>{{ 'PRODUCT.EVENTS.DETAIL.SET_SESSIONS_DELIVERY_POINTS.DESCRIPTION' | translate }}</p>
+        <app-product-delivery-points-selector [form]="form.get('deliveryPoints')" />
+    </div>
+    <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="setSessionsDeliveryPoints()">
+            {{'FORMS.ACTIONS.SAVE' | translate}}
+        </button>
+    </div>
+</div>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

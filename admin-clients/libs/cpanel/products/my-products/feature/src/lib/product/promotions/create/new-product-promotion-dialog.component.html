@@ -1,0 +1,50 @@
+<div class="dialog-msg-container">
+    <form [formGroup]="form" class="new-promotion">
+        <div mat-dialog-title class="new-promotion__title">
+            <h2 class="secondary title">{{'PRODUCT.PROMOTIONS.NEW' | translate}}</h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+        <div mat-dialog-content>
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label new-promotion__input">
+                <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                <input matInput aria-label="name" [placeholder]="'FORMS.LABELS.NAME' | translate"
+                    formControlName="name" autocomplete="off">
+                <mat-error [ob-form-errors]="form" field="name" />
+            </mat-form-field>
+            <!-- TODO: Display when manual promos exist -->
+            <!-- <mat-divider class="ob-form-divider"></mat-divider>
+            <mat-radio-group formControlName="type" class="new-promotion__radio-group">
+                <mat-radio-button class="ob-radio-card-button"
+                    [value]="creationTypes.automatic">
+                    <div class="option-title">{{'PRODUCT.PROMOTIONS.NEW_AUTOMATIC' | translate}}</div>
+                    <div>
+                        {{'PRODUCT.PROMOTIONS.INFO_AUTOMATIC' | translate}}
+                    </div>
+                </mat-radio-button>
+                <mat-radio-button class="ob-radio-card-button"
+                    [value]="creationTypes.collective" [disabled]="true">
+                    <div class="option-title">{{'PRODUCT.PROMOTIONS.NEW_MANUAL' | translate}}</div>
+                    <div>
+                        {{'PRODUCT.PROMOTIONS.INFO_MANUAL' | translate}}
+                    </div>
+                </mat-radio-button>
+            </mat-radio-group> -->
+        </div>
+        <div mat-dialog-actions align="end">
+            <button [disabled]="$loading()" type="button" mat-button class="ob-button" (click)="close()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button [disabled]="!form.valid || $loading()" mat-flat-button color="primary" class="ob-button"
+                (click)="create()">
+                {{'FORMS.ACTIONS.CREATE' | translate}}
+            </button>
+        </div>
+    </form>
+</div>
+@if ($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

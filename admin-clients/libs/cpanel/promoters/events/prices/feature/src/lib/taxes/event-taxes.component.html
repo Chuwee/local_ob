@@ -1,0 +1,48 @@
+<!-- TODO: Remove isTestTaxes when  taxes end -->
+@if(isTestTaxes){
+    <app-form-container [disabled]="$isLoadingOrSaving() || !form.dirty" layout="menu" (cancel)="cancel()"
+        (save)="save()" [formGroup]="form">
+        <div class="section-block flex flex-col gap-8">
+            <div>
+                <p class="section-description">{{'EVENTS.TAXES.DESCRIPTION' | translate}}</p>
+                <mat-radio-group #taxDisplay="matRadioGroup" formControlName="taxes" class="flex flex-col gap-4">
+                    <div class="flex flex-col gap-4">
+                        <div class="flex flex-col gap-0">
+                            <mat-radio-button [value]="taxesMode.included">
+                                <span class="ob-label">{{'EVENTS.TAXES.FORMS.LABELS.INCLUDED' | translate}}</span>
+                            </mat-radio-button>
+                            <span class="radio-content">
+                                {{'EVENTS.TAXES.FORMS.INFOS.INCLUDED' | translate}}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-0">
+                        <mat-radio-button [value]="taxesMode.onTop">
+                            <span class="ob-label">{{'EVENTS.TAXES.FORMS.LABELS.ON_TOP' | translate}}</span>
+                        </mat-radio-button>
+                        <span class="radio-content">
+                            {{ 'EVENTS.TAXES.FORMS.INFOS.ON_TOP' | translate }}
+                        </span>
+                    </div>
+                </mat-radio-group>
+            </div>
+
+            <div class="flex flex-col gap-4">
+                <div class="section-description legal-warning">
+                    <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                    <span>{{'EVENTS.TAXES.WARNING' | translate }}</span>
+                </div>
+                <a aria-label="Go to link" class="ob-link" target="_blank"
+                    [routerLink]="['/events', $event().id, 'sessions']">
+                    <span>{{'EVENTS.TAXES.GO_TO_SESSIONS' | translate}}</span>
+                    <mat-icon class="ob-icon xsmall" iconPositionEnd>launch</mat-icon>
+                </a>
+            </div>
+        </div>
+    </app-form-container>
+    @if($isLoadingOrSaving()){
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+}

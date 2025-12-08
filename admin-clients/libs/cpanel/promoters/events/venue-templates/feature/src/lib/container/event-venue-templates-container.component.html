@@ -1,0 +1,28 @@
+<div fxFlex="0 0 100%" fxLayout="column" fxLayoutAlign="stretch stretch">
+    <mat-drawer-container fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="stretch">
+        <mat-drawer #drawer mode="side" opened fxFlex="0 0 {{$listWidth()}}">
+            <app-event-venue-templates-list></app-event-venue-templates-list>
+        </mat-drawer>
+        <mat-drawer-content fxFlex="0 1 100%" fxLayout="column">
+            <div class="ob-sidebar-toggle" [class.collapsed]="!drawer.opened" (click)="drawer.toggle()">
+                <span class="arrow"></span>
+            </div>
+            <router-outlet></router-outlet>
+            @if(($empty())) {
+                <app-empty-state fxFlex="100%"
+                    [title]="'EVENTS.VENUE_TPLS.EMPTY_LIST_MESSAGE' | translate"
+                    [description]="'EVENTS.VENUE_TPLS.CREATE_MESSAGE' | translate">
+                    <button mat-flat-button class="ob-button" color="primary" (click)="newTemplate()">
+                        <mat-icon>add</mat-icon>
+                        {{'EVENTS.VENUE_TPLS.NEW' | translate}}
+                    </button>
+                </app-empty-state>
+            }
+            @if($loading()) {
+                <div class="spinner-container">
+                    <mat-spinner />
+                </div>
+            }
+        </mat-drawer-content>
+    </mat-drawer-container>
+</div>

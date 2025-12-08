@@ -1,0 +1,37 @@
+<div class="collective-entity-container"
+    [class.field-error]="entitiesForm.hasError('required') && entitiesForm.touched">
+    <app-searchable-paginated-selection #selection [placeholder]="'FORMS.SEARCH.COLLECTIVE_ENTITY' | translate"
+        (loadData)="loadPagedCollectiveEntities($event)" [form]="entitiesForm" [data$]="collectiveEntityList$"
+        [metadata$]="collectiveEntityMetadata$" [loading$]="reqInProgress$">
+        <div slot="filter" class="badge-container" [class.empty]="!(collectiveEntityMetadata$ | async)?.total">
+            {{entitiesForm?.value?.length}} / {{(totalEntities$ | async) || 0}}
+        </div>
+        <button slot="filter" type="button" mat-flat-button class="show-selected-only-button ob-button" color="tertiary"
+            [class.active]="selectedOnly$ | async" [disabled]="entitiesForm?.value?.length === 0"
+            [matTooltip]="'COLLECTIVE.EXTERNAL_VALIDATOR_AUTH.SHOW_SELECTED_TOOLTIP' | translate"
+            (click)="changeSelectedOnly()">
+            <mat-icon>visibility</mat-icon>
+            {{'COLLECTIVE.EXTERNAL_VALIDATOR_AUTH.SHOW_SELECTED' | translate}}
+        </button>
+        <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data" let-selectionChanged="selectionChanged">
+            <app-selection-list [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged"
+                class="small-rows">
+                <div slot="subheader" class="list-header">
+                    <span>{{'FORMS.LABELS.COLLECTIVE_ENTITY_ASSIGN' | translate}}</span>
+                </div>
+                <ng-template #optionTemplate let-row>
+                    <div fxLayoutAlign="space-between center">
+                        <span>{{row.name}}</span>
+                        <button *ngIf="row.enabled && (isExternalUserPass$ | async)" mat-icon-button
+                            (click)="$event.stopPropagation(); openValidatorAuthEditDialog(row)"
+                            matTooltip="{{'COLLECTIVE.EXTERNAL_VALIDATOR_AUTH.EDIT_TOOLTIP' | translate}}"
+                            aria-label="Edit collective entity auth" class="ob-button small">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                    </div>
+                </ng-template>
+            </app-selection-list>
+        </ng-template>
+    </app-searchable-paginated-selection>
+</div>
+<mat-error [ob-form-errors]="entitiesForm"></mat-error>

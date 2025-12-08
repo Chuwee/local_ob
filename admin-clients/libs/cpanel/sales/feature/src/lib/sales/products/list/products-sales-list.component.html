@@ -1,0 +1,222 @@
+<div class="list-container" fxFlex="100%" fxLayout="column">
+    <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">{{'TITLES.PRODUCTS_SALES' | translate}}</h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+            <div class="filter-container" fxFlex="none">
+                <button mat-icon-button class="ob-button medium" aria-label="refresh" (click)="refresh()">
+                    <mat-icon> autorenew</mat-icon>
+                </button>
+            </div>
+            @if (isExportEnabled$ | async) {
+                <div class="filter-container" fxFlex="none">
+                    <button mat-stroked-button color="tertiary" class="ob-button medium only-icon" [matMenuTriggerFor]="productsListMenu">
+                        <mat-icon>more_horiz</mat-icon>
+                    </button>
+                    <mat-menu #productsListMenu="matMenu">
+                        <button mat-menu-item [disabled]="$productsMetadata()?.total === 0" (click)="exportProducts()">
+                            {{'TICKET.EXPORT_PRODUCTS.BTN' | translate}}
+                        </button>
+                    </mat-menu>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="heading-container" fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxFlex="80%" fxLayoutGap="20px" fxLayoutAlign="start center">
+            <div class="filter-container" fxFlex="none">
+                <app-popover-date-range-picker-filter [matTooltip]="'ORDER.TRANSACTION_DATE' | translate" />
+            </div>
+            <div class="filter-container" fxFlex="none">
+                <app-popover appFilter>
+                    <app-products-sales-list-filter [startDate]="startDate" [endDate]="endDate" #filterContent />
+                </app-popover>
+            </div>
+            <div class="search-field" fxFlex="100%">
+                <app-search-input [placeholder]="'TICKET.SEARCH_INPUT' | translate" (valueChanged)="applyRelevance($event)" />
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            @if ($productsMetadata(); as productsMetadata) {
+                <p class="page-summary" [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: productsMetadata"></p>
+            }
+            <app-paginator [length]="$productsMetadata()?.total" [pageSize]="productsPageSize" />
+        </div>
+    </div>
+    <div class="heading-container">
+        <app-chips appFilter [showDivider]="false" />
+    </div>
+    @if ($productsAggregatedData()?.aggregatedData) {
+        <div class="heading-container heading-aggregated">
+            <app-aggregated-data [aggregatedData]="$productsAggregatedData().aggregatedData"
+                [aggregationMetrics]="$productsAggregatedData().aggregationMetrics"
+                [defaultHiddenColumns]="['totalCharges']" [currency]="$productsAggregatedData().currency" [currencyFormat]="'narrow'" />
+        </div>
+    }
+    @if ($loadingData()) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+    <mat-table class="ob-table ob-table-drop-list" [dataSource]="products$ | async" [trackBy]="trackByFn"
+        cdkDropList (cdkDropListDropped)="dropItem($event)" cdkDropListOrientation="horizontal"
+        matSort matSortDisableClear (matSortChange)="unapplyRelevance()" [matSortActive]="initSortCol" [matSortDirection]="initSortDir"
+        [attr.aria-label]="'TITLES.PRODUCTS' | translate"
+        [hidden]="!($productsMetadata()?.total > 0)">
+        <ng-container [matColumnDef]="productsListColumns.code">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(productsListColumns.code)" cdkDragLockAxis="x"
+                fxFlex="0 0 192px" *matHeaderCellDef class="head-cell ob-draggable-column">
+                {{'FORMS.LABELS.CODE' | translate}}</mat-header-cell>
+            <mat-cell fxFlex="0 0 192px" *matCellDef="let row">
+                <div fxFlex="0 0 100%" fxLayoutAlign="start center">
+                    <span fxFlex="0 1 100%" appEllipsify [matTooltip]="row.order.code">{{row.order.code}}</span>
+                    <app-copy-text [copyText]="row.order?.code" class="copy-button" />
+                </div>
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="productsListColumns.product">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(productsListColumns.product)" cdkDragLockAxis="x"
+                fxFlex="0 0 160px" *matHeaderCellDef class="head-cell ob-draggable-column">
+                {{'ORDER.PRODUCTS_DATA.NAME' | translate}}</mat-header-cell>
+            <mat-cell fxFlex="0 0 160px" *matCellDef="let row">
+                <div fxFlex="0 0 100%" fxLayoutAlign="start center">
+                    <span fxFlex="0 1 100%" appEllipsify [matTooltip]="row.product.name">{{row.product.name}}</span>
+                </div>
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="productsListColumns.variant">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(productsListColumns.variant)" cdkDragLockAxis="x"
+                fxFlex="0 0 160px" *matHeaderCellDef class="head-cell ob-draggable-column">
+                {{'ORDER.PRODUCTS_DATA.VARIANT' | translate}}</mat-header-cell>
+            <mat-cell fxFlex="0 0 160px" *matCellDef="let row">
+                <div fxFlex="0 0 100%" fxLayoutAlign="start center">
+                    <span fxFlex="0 1 100%" appEllipsify
+                        [matTooltip]="row.product.attribute1?.value?.name | variantText: row.product.attribute2?.value?.name | translate">
+                        {{row.product.attribute1?.value?.name | variantText: row.product.attribute2?.value?.name | translate}}
+                    </span>
+                </div>
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="productsListColumns.purchaseDate">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(productsListColumns.purchaseDate)" cdkDragLockAxis="x"
+                *matHeaderCellDef mat-sort-header class="head-cell ob-draggable-column width130">
+                {{'TICKET.PURCHASE_DATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width130">
+                {{row.order.date | dateTime : dateTimeFormats.shortDateTime}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="productsListColumns.barcode">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(productsListColumns.barcode)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell ob-draggable-column width100">
+                {{'TICKET.BARCODE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width100">
+                <span>{{row.product.barcode | obfuscateString : undefined}}</span>
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="productsListColumns.channel">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(productsListColumns.channel)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell ob-draggable-column width200">
+                {{'TICKET.CHANNEL_NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width200">{{row.channel.name}}</mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="productsListColumns.client">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(productsListColumns.client)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell ob-draggable-column width200">
+                {{'TICKET.CLIENT' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width200">
+                <div fxFlex="0 0 100%" fxLayoutAlign="start center">
+                    <div class="ob-text-ellipsis" [matTooltip]="(row.buyer_data?.email ?? '')  + '\n' + (row.buyer_data?.name ?? '') +
+                    '\n' + (row.buyer_data?.surname ?? '') + '\n' + (row.buyer_data?.phone ?? '')">
+                        <div class="ob-text-ellipsis">
+                            {{row.buyer_data?.email}}
+                        </div>
+                        <div class="ob-text-ellipsis">
+                            {{row.buyer_data?.name ?? ''}}
+                        </div>
+                        <div class="ob-text-ellipsis">
+                            {{row.buyer_data?.surname ?? ''}}
+                        </div>
+                    </div>
+                    <app-copy-text [copyText]="row.buyer_data?.email" [copyTooltip]="'ORDER.COPY_EMAIL' | translate"
+                        class="copy-button" />
+                </div>
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="productsListColumns.prints">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(productsListColumns.prints)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell right ob-draggable-column width100">
+                {{'TICKET.PRINTS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="right width100">
+                {{'--'}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="productsListColumns.validation">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(productsListColumns.validation)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell ob-draggable-column width100">
+                {{'TICKET.VALIDATION' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width100">
+                <mat-icon *ngIf="isTicketStateValidForValidations(row.state); else noValidations"
+                    [class.mat-warn]="!row.product?.validation_last_date">lens
+                </mat-icon>
+                <ng-template #noValidations>&minus;</ng-template>
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="productsListColumns.state">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(productsListColumns.state)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell ob-draggable-column width100">
+                {{'TICKET.STATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width100">
+                <span>{{'PRODUCT.SALE_STATE_OPTS.' + row.state | translate}}</span>
+            </mat-cell>
+        </ng-container>
+        <ng-container stickyEnd [matColumnDef]="productsListColumns.price">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(productsListColumns.price)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell ob-draggable-column width100 final_price">
+                {{'TICKET.FINAL_PRICE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="final_price width100">{{row.price?.final |
+                localCurrency:row.price?.currency}}</mat-cell>
+        </ng-container>
+        <ng-container stickyEnd [matColumnDef]="productsListColumns.actions">
+            <mat-header-cell *matHeaderCellDef class="actions-cell head-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                <button mat-stroked-button color="secondary" class="ob-button xsmall only-icon"
+                    [matTooltip]="'ACTIONS.TABLE.SELECT_COLUMNS' | translate" (click)="changeColSelection()">
+                    <mat-icon>settings</mat-icon>
+                </button>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="actions-cell" />
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" />
+        <mat-row *matRowDef="let row; columns: displayedColumns;" class="interactive-row"
+            [routerLink]="[row.order?.code + '-' + row.id]" />
+    </mat-table>
+    @if ($productsMetadata()?.total === 0) {
+        <div class="context-notification-container" fxFlex="0 50 100%" fxLayout="row"
+            fxLayoutAlign="center start">
+            <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px" fxFlex="80%"
+                fxLayoutAlign="center start">
+                @if (emptyListWithWordAndDates$ | async) {
+                    <div fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="20px">
+                        <p>{{'TICKET.EMPTY_LIST_WITH_KEYWORD' | translate}}</p>
+                        <button mat-stroked-button color="primary" type="button" class="ob-button medium"
+                            [attr.aria-label]="'ORDER.REMOVE_DATES_FILTER' | translate"
+                            (click)="removeDatesFilter()">
+                            {{'TICKET.REMOVE_DATES_FILTER_BTN' | translate}}
+                        </button>
+                    </div>
+                } @else {
+                    <p>{{'LIST.EMPTY' | translate}}</p>
+                }
+            </app-context-notification>
+        </div>
+    }
+</div>

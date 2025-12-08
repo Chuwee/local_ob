@@ -1,0 +1,39 @@
+<app-header-summary *ngIf="(summary$ | async) as seasonTicketSummary"
+    fxFlex="0 1 100%" [collapsedLabel]="'ACTIONS.TOTALS.SHOW' | translate">
+    <div appEllipsify class="header-summary-detail" [matTooltip]="'SEASON_TICKET.SUMMARY_ASSIGNED_SESSIONS' | translate">
+        <span>{{'SEASON_TICKET.SUMMARY_ASSIGNED_SESSIONS' | translate}}</span>
+        <span fxLayout="row" fxLayoutAlign="end center">
+            <ng-container *ngIf="seasonTicketSummary.valid_sessions as valid_sessions">
+                <mat-icon class="session-valid-icon ob-icon small">done</mat-icon>
+                {{valid_sessions | localNumber}}
+            </ng-container>
+            <ng-container *ngIf="seasonTicketSummary.assigned_sessions as assigned_sessions">
+                <mat-icon class="session-assigned-icon ob-icon small">done</mat-icon>
+                {{assigned_sessions | localNumber}}
+            </ng-container>
+            <ng-container *ngIf="!seasonTicketSummary.valid_sessions && !seasonTicketSummary.assigned_sessions">
+                {{noSummaryInfo | localNumber}}
+            </ng-container>
+        </span>
+    </div>
+    <div appEllipsify class="header-summary-detail" [matTooltip]="'SEASON_TICKET.SUMMARY_SESSIONS_ON_SALE' | translate">
+        <span>{{'SEASON_TICKET.SUMMARY_SESSIONS_ON_SALE' | translate}}</span>
+        <span>
+            {{seasonTicketSummary.sessions_on_sale | localNumber}}
+        </span>
+    </div>
+    <div appEllipsify class="header-summary-detail" [matTooltip]="'SEASON_TICKET.SUMMARY_LISTED_EVENTS' | translate">
+        <span>{{'SEASON_TICKET.SUMMARY_LISTED_EVENTS' | translate}}</span>
+        <span>
+            {{seasonTicketSummary.listed_events | localNumber}}
+        </span>
+    </div>
+    <div appEllipsify class="header-summary-detail" [matTooltip]="'SEASON_TICKET.SUMMARY_TOTAL_SESSIONS' | translate">
+        <span>
+            {{'SEASON_TICKET.SUMMARY_TOTAL_SESSIONS' | translate}}
+        </span>
+        <span>
+            {{seasonTicketSummary.total_sessions | localNumber}}
+        </span>
+    </div>
+</app-header-summary>

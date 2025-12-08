@@ -1,0 +1,93 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="(reqInProgress$ | async) || !form.dirty">
+    <p class="body-1 description">{{ 'SALE_REQUEST.PAYMENT_METHODS.DESCRIPTION' | translate }}</p>
+    <div class="sale-request-payment-methods-groups-radio-group">
+        <mat-form-field fxFlex="100%" hidden-outline>
+            <input fxHide="true" matInput>
+            <mat-radio-group fxFlex="100%" fxLayout="column" [formControl]="form.controls.customGateways">
+                <mat-radio-button [value]="false" class="sale-request-payment-methods-group-radio-button">
+                    <mat-label>{{'SALE_REQUEST.PAYMENT_METHODS.DEFAULT' | translate}}</mat-label>
+                </mat-radio-button>
+                <mat-radio-button [value]="true" class="sale-request-payment-methods-group-radio-button">
+                    <mat-label>{{'SALE_REQUEST.PAYMENT_METHODS.CUSTOM' | translate}}</mat-label>
+                </mat-radio-button>
+            </mat-radio-group>
+        </mat-form-field>
+    </div>
+
+    @let activeAndDefaultRequiredErroMessage = form.controls.gateways
+        | obErrorMessage$
+        | async;
+
+    @if (form.controls.customGateways.value) {
+        <app-options-table [disabled]="(reqInProgress$ | async)" [activeRequired]="true"
+            [data]="gateways$" [form]="form.controls.gateways" [columns]="$columns()"
+            [class.field-error]="!!activeAndDefaultRequiredErroMessage" class="nested-content">
+
+            <ng-container matColumnDef="id">
+                <mat-header-cell *matHeaderCellDef class="head-cell name">
+                    {{ 'SALE_REQUEST.PAYMENT_METHODS.PAYMENT_METHOD' | translate }}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row; index as i" class="name">
+                    {{ row.gateway_sid }}
+                </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+                <mat-header-cell *matHeaderCellDef class="head-cell name">
+                    {{ 'SALE_REQUEST.PAYMENT_METHODS.NAME' | translate }}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row; index as i" class="name">
+                    {{ row.name }}
+                </mat-cell>
+            </ng-container>
+
+            @if ($hasBenefits) {
+                <ng-container matColumnDef="benefits">
+                    <mat-header-cell *matHeaderCellDef class="head-cell name">
+                        {{ 'SALE_REQUESTS.PAYMENT_METHODS.LISTS.COL_BENEFITS' | translate }}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row; index as i" class="name">
+                        @if (row.allow_benefits && row.has_benefits) {
+                            <span class="ob-status-badge neutral capitalized flex flex-row items-center">
+                                {{ 'SALE_REQUESTS.PAYMENT_METHODS.LISTS.BENEFITS_CONFIGURED' | translate }}
+                            </span>
+                        }
+                    </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                    <mat-header-cell *matHeaderCellDef class="actions-cell head-cell float-actions-cell" />
+                    <mat-cell *matCellDef="let row; index as i" class="actions-cell float-actions-cell">
+                        @if (row.allow_benefits) {
+                            <div class="action-buttons">
+                                <button mat-icon-button
+                                    matTooltip="{{'FORMS.ACTIONS.EDIT' | translate}}"
+                                    aria-label="Edit element info" class="ob-button medium" (click)="editElementsInfo(row)">
+                                    <mat-icon>edit</mat-icon>
+                                </button>
+                            </div>
+                        }
+                    </mat-cell>
+                </ng-container>
+            }
+
+            @if ((gateways$ | async)?.length === 0) {
+                <ng-container slot="empty">
+                    <app-empty-state-tiny [title]="'CHANNELS.PAYMENT_METHODS.EMPTY_LIST.TITLE' | translate"
+                        [description]="'CHANNELS.PAYMENT_METHODS.EMPTY_LIST.DESCRIPTION' | translate" />
+                </ng-container>
+            }
+        </app-options-table>
+    }
+
+    @if (activeAndDefaultRequiredErroMessage) {
+        <span class="ob-error-message nested-content">{{activeAndDefaultRequiredErroMessage}}</span>
+    }
+
+</app-form-container>
+
+@if (reqInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

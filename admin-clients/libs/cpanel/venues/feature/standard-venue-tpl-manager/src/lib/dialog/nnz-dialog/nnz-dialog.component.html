@@ -1,0 +1,36 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">
+            {{windowTitleKey | translate}}
+        </h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()" [disabled]="isLoading$ | async">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <app-wizard-bar *ngIf="showQuotaSelector" [steps]="mapToStepsTitles(steps)" [enableNavigation]="true"
+        (stepClick)="goToStep($event)">
+    </app-wizard-bar>
+    <app-zone *ngIf="(currentStep$ | async) === 0" [nnzFormGroup]="nnzFormGroup" [formControlNames]="formControlNames" [sectors$]="sectors$"
+        [showCapacityField]="showCapacityField" [showSectorSelector]="showSectorSelector" [showWizardBar]="showQuotaSelector"
+        [showZoneName]="showZoneName" [showCapacityIncreaseInfo]="showCapacityIncreaseInfo">
+    </app-zone>
+    <app-quota *ngIf="(currentStep$ | async) === 1" [nnzFormGroup]="nnzFormGroup" [quotaFormGroup]="quotaFormGroup"
+        [formControlNames]="formControlNames">
+    </app-quota>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()" [disabled]="isLoading$ | async">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-stroked-button color="tertiary" type="button" class="ob-button" *ngIf="showQuotaSelector" (click)="previousStep()"
+            [disabled]="(isPreviousDisabled$ | async)">
+            <mat-icon>arrow_back</mat-icon>
+            {{'FORMS.ACTIONS.PREVIOUS' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" [disabled]="(isNextDisabled$ | async)" (click)="nextStep()">
+            {{nextText$ | async}}
+        </button>
+    </div>
+</div>
+<div class="spinner-container" *ngIf="isLoading$ | async">
+    <mat-spinner></mat-spinner>
+</div>

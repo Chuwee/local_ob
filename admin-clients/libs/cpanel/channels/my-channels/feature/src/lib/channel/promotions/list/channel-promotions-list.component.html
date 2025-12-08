@@ -1,0 +1,72 @@
+<div class="left-bar-container">
+    <div fxFlex class="left-bar" fxLayout="column" fxLayoutAlign="justify">
+        <div class="left-sidebar-title" fxLayout="column">
+            <div fxLayout="row" fxLayoutAlign="justify center">
+                <h2 class="title">{{'CHANNELS.PROMOTIONS.TITLE' | translate}}</h2>
+                <button mat-icon-button aria-label="New promotion" type="button" *ngIf="canCreate$ | async"
+                    class="ob-button mat-stroked-button xsmall" (click)="openNewPromotionDialog()"
+                    [matTooltip]="'CHANNELS.PROMOTIONS.NEW' | translate">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+            <div fxFlex>
+                <p class="results-count" [innerHTML]="('RESULTS.TOTAL' | translate) + ': ' + (totalPromotions$ | async)">
+                </p>
+            </div>
+        </div>
+        <div fxFlex="36px" class="left-sidebar-header" fxLayoutAlign="end center">
+            <button mat-icon-button aria-label="Clone performance" class="ob-button small"
+                *ngIf="canCreate$ | async" (click)="openClonePromotionDialog(selectedPromotionId)"
+                [disabled]="!selectedPromotionId || selectedPromotionType === 'PACK'"
+                [matTooltip]="'CHANNELS.PROMOTIONS.DUPLICATE' | translate">
+                <mat-icon>content_copy</mat-icon>
+            </button>
+            <button mat-icon-button aria-label="Delete promotion" class="ob-button small"
+                *ngIf="canCreate$ | async" (click)="openDeletePromotionDialog()"
+                [disabled]="!selectedPromotionId  || selectedPromotionType === 'PACK'"
+                [matTooltip]="'CHANNELS.PROMOTIONS.DELETE' | translate">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </div>
+        <div fxLayout="column" fxFlex class="list-container">
+            <mat-selection-list (selectionChange)="selectionChangeHandler($event.options[0]?.value)"
+                class="ob-lateral-select-list" appLastPathGuardListener disableRipple
+                [currValue]="(channelPromotion$ | async)?.id" [multiple]="false">
+                <mat-list-option #option *ngFor="let item of (promotionList$ | async)" [value]="item.id"
+                    [selected]="item.id === selectedPromotionId" [disabled]="option.selected" class="with-badge"
+                    [id]="'promotion-list-option-' + item.id">
+                    <div fxFlex="0 0 100%">
+                        <div fxFlex fxLayout="column" fxLayoutAlign="start stretch" class="item-data">
+                            <span class="list-item-title" appEllipsify [matTooltip]="item.name"
+                                [matTooltipShowDelay]="500">
+                                {{item.name}}
+                            </span>
+                            <span
+                                *ngIf="item.validity_period && item.validity_period.type === validityPeriodType.period"
+                                class="list-item-subtitle"
+                                appEllipsify
+                                [matTooltip]="(item.validity_period?.start_date | dateTime : dateTimeFormats.shortDateTimeAlt) + ' - ' +
+                                    (item.validity_period?.end_date | dateTime : dateTimeFormats.shortDateTimeAlt)"
+                                matTooltipClass="ob-tooltip-nowrap" [matTooltipShowDelay]="800">
+                                {{item.validity_period.start_date | dateTime : dateTimeFormats.shortDate}} -
+                                {{item.validity_period.end_date | dateTime : dateTimeFormats.shortDate}}
+                            </span>
+                        </div>
+                        <div class="badge-container" fxLayoutAlign="center center" fxLayoutGap="5px">
+                            <span class="small-badge ob-status-badge" [ngClass]="item.status.toLowerCase()"
+                                [matTooltip]="('CHANNELS.PROMOTIONS.TYPE_OPTS.' + item.type.toUpperCase() | translate) + ' - ' +
+                                    ('CHANNELS.PROMOTIONS.STATUS_OPTS.' + item.status.toUpperCase() | translate)"
+                                [matTooltipShowDelay]="800">
+                                {{('CHANNELS.PROMOTIONS.TYPE_OPTS.' + item.type.toUpperCase() |
+                            translate).substring(0,1)}}
+                            </span>
+                        </div>
+                    </div>
+                </mat-list-option>
+            </mat-selection-list>
+        </div>
+    </div>
+    <div class="spinner-container" *ngIf="loadingList$ | async">
+        <mat-spinner></mat-spinner>
+    </div>
+</div>

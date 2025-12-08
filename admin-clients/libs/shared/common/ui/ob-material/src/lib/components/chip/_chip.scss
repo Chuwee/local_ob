@@ -1,0 +1,70 @@
+@use '@angular/material' as mat;
+@mixin chip-override($palettes, $colors, $typography) {
+    $foreground: map-get($palettes, foreground);
+    $border-color: mat.m2-get-color-from-palette($foreground, text, 0.4);
+    $border-color-hover: mat.m2-get-color-from-palette($foreground, text, 0.6);
+    $ob-white: map-get($colors, ob-white);
+
+    .ob-chip-list {
+        &.handset {
+            @media screen and (max-width: 599.98px) and (orientation: portrait),
+            screen and (max-width: 959.98px) and (orientation: landscape) {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                &::-webkit-scrollbar {
+                    display: none;
+                }
+                .mdc-evolution-chip-set__chips {
+                    flex-wrap: nowrap;
+                    margin-top: 0;
+                    .mat-mdc-chip.mat-mdc-standard-chip {
+                        flex-shrink: 0;
+                    }
+                }
+            }
+        }
+
+        .mdc-evolution-chip-set__chips {
+            margin-top: -4px;
+            margin-bottom: -4px;
+        }
+
+        .mat-mdc-standard-chip {
+            --mdc-chip-label-text-font: Nunito Sans;
+            --mdc-chip-label-text-line-height: 18px;
+            --mdc-chip-label-text-size: 12px;
+        }
+
+        .mat-mdc-chip.mat-mdc-standard-chip {
+            border: 1px solid $border-color;
+            transition: border-color 0.1s ease-in;
+            min-height: 28px;
+            box-sizing: border-box;
+            background-color: $ob-white;
+            height: 1px;
+            &:hover {
+                border-color: $border-color-hover;
+                &::after {
+                    opacity: 0;
+                }
+            }
+            &:focus::after {
+                opacity: 0;
+            }
+            &:not(.mdc-evolution-chip--disabled) {
+                &:active {
+                    box-shadow: none;
+                }
+                .mat-mdc-chip-remove {
+                    opacity: 0.4;
+                    font-weight: bold;
+                    transition: opacity 0.1s ease-in;
+                    overflow: visible;
+                    &:hover {
+                        opacity: 1;
+                    }
+                }
+            }
+        }
+    }
+}

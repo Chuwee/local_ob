@@ -1,0 +1,43 @@
+@use '@angular/material' as mat;
+@mixin progress-bar-override($palettes, $colors) {
+    $primary: map-get($palettes, primary);
+    $warn-palette: map-get($palettes, warn);
+    $info-palette: map-get($palettes, info);
+    $success-palette: map-get($palettes, success);
+    $white: map-get($colors, ob-white);
+
+    .ob-progress-bar {
+        @include progress-bar-color(
+            $bar: mat.m2-get-color-from-palette($primary, lighter),
+            $indicator: mat.m2-get-color-from-palette($info-palette, 500)
+        );
+        &.empty {
+            @include progress-bar-color($indicator: $white, $bar: $white);
+        }
+        &.warn {
+            @include progress-bar-color(
+                $bar: mat.m2-get-color-from-palette($warn-palette, 200),
+                $indicator: mat.m2-get-color-from-palette($warn-palette)
+            );
+        }
+        &.info {
+            @include progress-bar-color(
+                $bar: mat.m2-get-color-from-palette($info-palette, 200),
+                $indicator: mat.m2-get-color-from-palette($info-palette)
+            );
+        }
+        &.success {
+            @include progress-bar-color(
+                $bar: mat.m2-get-color-from-palette($success-palette, 200),
+                $indicator: mat.m2-get-color-from-palette($success-palette)
+            );
+        }
+    }
+}
+
+@mixin progress-bar-color($indicator, $bar) {
+    --mdc-linear-progress-active-indicator-color: #{$indicator};
+    .mdc-linear-progress__buffer-bar {
+        background-color: $bar;
+    }
+}

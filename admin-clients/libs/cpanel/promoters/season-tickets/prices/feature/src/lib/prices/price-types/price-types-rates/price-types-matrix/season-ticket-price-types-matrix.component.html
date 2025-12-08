@@ -1,0 +1,86 @@
+<div class="price-types-matrix-container">
+  <form [formGroup]="pricesForm" fxLayout="column">
+    <app-tabs-menu type="navigation">
+      <ng-template appTab [label]="'SEASON_TICKET.PRICEZONE.TITLE_CONFIGURATION_TABLE' | translate">
+        <div fxLayout="column">
+          <div fxFlex="100%" fxLayout="column" class="season-ticket-form-feature-activation"
+            formGroupName="draggableTable" id="section_season-ticket_price-types_custom-order-info">
+            <div fxFlex="40px" fxLayout="row" fxLayoutAlign="start center">
+              <mat-slide-toggle class="ob-slide-toggle" (change)="onDragChange($event.checked)" formControlName="enabled">
+                {{'EVENTS.CUSTOM_ORDER' | translate}}
+              </mat-slide-toggle>
+              <mat-icon [matTooltip]="'EVENTS.CUSTOM_ORDER_INFO' | translate" class="ob-help-icon">
+                help_outline
+              </mat-icon>
+            </div>
+          </div>
+
+          <div class="prices-table-container">
+            @if (seasonTicketPricesMatrix$ | async; as seasonTicketPrices) {
+              <table mat-table formGroupName="pricesMatrix" id="pricesTable" class="ob-table"
+                [dataSource]="seasonTicketPrices" cdkDropList (cdkDropListDropped)="onListDrop($event)">
+                <ng-container [matColumnDef]="pricesTableHead[0]" sticky>
+                  <th mat-header-cell *matHeaderCellDef class="head-cell border-right">
+                    {{'VENUE_TPLS.' + pricesTableHead[0] | translate}}
+                  </th>
+                  <td mat-cell *matCellDef="let row" class="draggable-column border-right">
+                    <div class="title-price-column" fxLayout="row" fxLayoutAlign="start center">
+                      <mat-icon [fxHide]="!draggableTable.value.enabled" class="action-icon">
+                        drag_indicator
+                      </mat-icon>
+                      <p>{{row[0]}}</p>
+                    </div>
+                  </td>
+                </ng-container>
+                @for (rateName of rateNames; track rateName; let i = $index) {
+                  <ng-container [matColumnDef]="rateName"
+                    [formArrayName]="rateName">
+                    <th mat-header-cell *matHeaderCellDef class="head-cell right price-column input-column">
+                      <div fxLayoutAlign="end center">
+                        @if (defaultRatesMap[rateName]) {
+                          <mat-icon class="default-rate-icon"
+                            matTooltip="{{'SEASON_TICKET.DEFAULT_RATE' | translate}}">
+                            star
+                          </mat-icon>
+                        }
+                        <span appEllipsify [matTooltip]="rateName">{{rateName}}</span>
+                      </div>
+                    </th>
+                    <td mat-cell *matCellDef="let row; index as j" class="right price-column"
+                      [class.editable-cell]="isSeasonTicketEditable$ | async">
+                      <div class="write-value">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                          @let errorMessage = pricesMatrix.get([rateName,j]) | obErrorMessage$ | async;
+                          @if (errorMessage) {
+                            <mat-icon matIconPrefix [obErrorIcon]="errorMessage">
+                              error_outline
+                            </mat-icon>
+                          }
+                          <app-currency-input [formControlName]="j" class="table-input"
+                            [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                            [placeholder]="0 | localCurrency:(currency$ | async):'narrow'">
+                          </app-currency-input>
+                        </mat-form-field>
+                      </div>
+                    </td>
+                  </ng-container>
+                }
+                <tr mat-header-row *matHeaderRowDef="pricesTableHead" class="dense-row"></tr>
+                <tr mat-row *matRowDef="let row; columns: pricesTableHead;" class="dense-row"
+                  [class.hoverable-row]="isSeasonTicketEditable$ | async"
+                  [class.ob-draggable-row]="draggableTable.value.enabled"
+                  [cdkDragDisabled]="!draggableTable.value.enabled"
+                cdkDrag cdkDragBoundary=".mat-table" [cdkDragData]="row"></tr>
+              </table>
+            }
+          </div>
+        </div>
+      </ng-template>
+      <ng-template appTab lazyLoad [label]="'EVENTS.PRICEZONE.TITLE_DESCRIPTION_TRANSLATE_TABLE' | translate">
+        <app-price-type-translations fxFlex="50%" [form]="channelContentsGroup"
+          [languages$]="languages$" [venueTplId]="(venueTemplate$ | async)?.id">
+        </app-price-type-translations>
+      </ng-template>
+    </app-tabs-menu>
+  </form>
+</div>

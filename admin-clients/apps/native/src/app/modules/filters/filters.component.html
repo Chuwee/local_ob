@@ -1,0 +1,95 @@
+<ion-header class="ob-layout__header filters__header">
+    <ion-toolbar>
+        <back-button [isModal]="true" [viewTitle]="'FILTERS.TITLE' | translate" />
+        <ion-buttons class="filters__header-end" slot="end" (click)="removeFilters()">
+            <ion-button [disabled]="filterIsEmpty">
+                {{ "FILTERS.REMOVE-FILTERS" | translate }}
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+<ion-content class="ob-layout__content filters__content">
+    <ion-list>
+        @for(filter of $listOfFilters(); track $index){
+            @if(filter.filterType === 'picker' || filter.filterType === 'checkboxlist'){
+                <ion-item lines="none" class="filters__input">
+                    <ion-label data-override-styles="" class="ob-input input-label" position="stacked"> 
+                        {{ "FILTERS." + filter.filterName | translate }}
+                    </ion-label>
+                    <ion-item button (click)="openFilter(filter)"  class="itemSelect">
+                        <ion-label data-override-styles="" class="ob-input">
+                            <p>{{loadTextToDisplay(filter)}}</p>
+                            <!-- <p>{{filter.filterplaceHolder}}</p> -->
+                        </ion-label> 
+                        <ion-icon class="select__input-arrow" name="chevron-down-outline" />
+                    </ion-item>
+                </ion-item>
+            }
+            @if(filter.filterType === 'buttons'){
+                <ion-item lines="none" class="filters__input">
+                    <ion-label data-override-styles="" class="ob-input input-label" position="stacked">{{ "FILTERS." + filter.filterName |
+                        translate }}</ion-label>
+                    <div class="filters__button-groups">
+                        @for(option of filter.filterOptions; track $index){
+                            <ion-button [color]="option.isSelected ? 'primary' : 'medium'" size="small"
+                            (click)="onClickFilterButton(option.value, filter.key)">
+                            {{ option.label }}
+                        </ion-button>
+                        }
+                    </div>
+                </ion-item>
+            }
+            @if(filter.filterType === 'checkbox'){
+                <ion-item lines="none" class="filters__input">
+                    <div class="filters__button-groups">
+                        <ion-checkbox class="checkbox-list-typeahead__checkbox" [checked]="filter.filterOptions[0].isSelected"
+                            [value]="filter.filterOptions[0].isSelected" (ionChange)="onSaveCheckbox($event, filter.key)" justify="start"
+                            labelPlacement="end">
+                            {{ "FILTERS." + filter.filterName | translate }}
+                        </ion-checkbox>
+                    </div>
+                </ion-item>
+            }
+            @if(filter.filterType === 'hour_range'){
+                <ion-item lines="none" class="filters__range_hour">
+                    <ion-label data-override-styles="" class="ob-input input-label" position="stacked">
+                        {{ "FILTERS." + filter.filterName | translate }}
+                    </ion-label>
+                    @for(option of filter.filterOptions; track $index){
+                        <ion-button fill="clear" size="small"
+                        (click)="removeFilterItem(option.value, filter.key)">
+                        {{ option.label }}
+                        <ion-icon slot="end" color="primary" name="trash" />
+                    </ion-button>
+                    }
+
+                    <ion-button color="default" fill="clear" size="small" (click)="openFilter(filter)">
+                        {{ "FILTERS.HOUR_RANGE.ADD_NEW" | translate }}
+                        <ion-icon slot="end" color="primary" name="add-circle-outline" />
+                    </ion-button>
+                </ion-item>
+            }
+        }
+
+    </ion-list>
+</ion-content>
+<ion-footer class="ob-layout__footer filters__footer">
+    <ion-toolbar>
+        <ion-button data-override-styles="" expand="full" class="ob-btn primary size--medium" (click)="applyFilters()">
+            {{ "FILTERS.APPLY-BTN" | translate }}
+        </ion-button>
+    </ion-toolbar>
+</ion-footer>
+
+<modal modalTitle="{{ 'FILTERS.' + modalTitle | translate }}" [isOpen]="modalIsOpen" (closeModal)="this.closeModal()">
+    @if(modalIsOpen && modalType === 'picker'){
+        <picker [items]="filterOptions" [selectedItems]="filterValuesAlreadySelected" (pickEmitter)="onSave($event, modalKey)" />
+    }
+    @if(modalIsOpen && modalType === 'checkboxlist'){
+        <checkbox-list-typeahead class="ion-page" [searchPlaceHolder]="modalPlaceHolder"
+        [items]="filterOptions" [selectedItems]="filterValuesAlreadySelected" (saveEmitter)="onSave($event, modalKey)" />
+    }
+    @if(modalIsOpen && modalType === 'hour_range'){
+        <time-picker [selectedTime]="ranges" [onlyTime]="true" (pickEmitter)="addTimeToRangeHour($event)" />
+    }
+</modal>

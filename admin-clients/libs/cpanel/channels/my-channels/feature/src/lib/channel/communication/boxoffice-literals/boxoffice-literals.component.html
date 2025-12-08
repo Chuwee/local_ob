@@ -1,0 +1,69 @@
+<app-form-container [formGroup]="form" (cancel)="cancel()" (save)="save()" layout="menu" class="no-padding overflow-y-auto"
+    [disabled]="!form.dirty || (isInProgress$ | async)">
+
+    <app-language-bar [languages]="languageList$ | async" [selected]="selectedLanguage$ | async" slot="outside"
+        [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)">
+    </app-language-bar>
+
+    <app-search-table [filter]="filter" [dataSource]="literals$" [columns]="columns" formGroupName="literalValues">
+        <ng-container [matColumnDef]="columns[0]">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'CHANNELS.LITERALS.TABLE_HEAD_KEY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                {{('CHANNELS.BOXOFFICE_CONTENTS_IDS.' + row.id) | translate}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="columns[1]">
+            <mat-header-cell *matHeaderCellDef class="head-cell input-column">
+                {{'CHANNELS.LITERALS.TABLE_HEAD_VALUE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="editable-cell">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <input matInput
+                        [placeholder]="'CHANNELS.LITERALS.TABLE_VALUE_PLACEHOLDER' | translate"
+                        [formControlName]="row.id.toString()">
+                </mat-form-field>
+            </mat-cell>
+        </ng-container>
+    </app-search-table>
+
+    <div class="content-fields">
+        <div *ngFor="let content of nonTextLiterals$ | async" class="rich-text-field">
+            <mat-form-field *ngIf="content.type !== channelContentTypes.profiledTemplate" fxFlex
+                appearance="outline" class="ob-form-field field-with-label no-padding">
+                <mat-label>{{('CHANNELS.BOXOFFICE_CONTENTS_IDS.' + content.id) | translate}}</mat-label>
+                <app-rich-text-area [formControl]="form.get(['literalValues', content.id])"
+                    class="vertical-stretch">
+                </app-rich-text-area>
+            </mat-form-field>
+            <div *ngIf="content.type === channelContentTypes.profiledTemplate && (entityProfiles$ | async)?.length" fxLayout="column"
+                fxLayoutAlign="start stretch">
+                <div fxFlex>
+                    <mat-form-field fxFlex fxFlex.gt-sm="50%" fxFlex.gt-md="30%" appearance="outline"
+                        class="ob-form-field field-with-label">
+                        <mat-label>{{'CHANNELS.LITERALS.PROFILE_LABEL' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                            [formControl]="selectedProfile">
+                            <mat-option *ngFor="let entityProfile of entityProfiles$ | async" [value]="entityProfile.id">
+                                {{entityProfile.name}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <mat-form-field *ngIf="selectedProfile.value" fxFlex appearance="outline"
+                    class="ob-form-field field-with-label no-padding">
+                    <mat-label>{{('CHANNELS.BOXOFFICE_CONTENTS_IDS.' + content.id) | translate}}</mat-label>
+                    <app-rich-text-area
+                        [formControl]="form.get(['literalValues', content.id, selectedProfile.value])"
+                        class="vertical-stretch">
+                    </app-rich-text-area>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+
+</app-form-container>
+<div class="spinner-container" *ngIf="isInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

@@ -1,0 +1,89 @@
+@if ((disabler$ | async) === false) {
+    <div fxLayout="row wrap">
+        <div fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="end end">
+            <button type="button" mat-stroked-button class="ob-button small add" color="primary" (click)="newRange()">
+                <mat-icon>add</mat-icon>
+                {{'RANGES.NEW' | translate }}
+            </button>
+        </div>
+    </div>
+}
+@if (ranges) {
+    <form [formGroup]="rangesArray" (keydown.enter)="$event.preventDefault()">
+        <div class="ranges-table-container" [class]="type">
+            <table mat-table id="rangesTable" class="ob-table" [dataSource]="ranges$"
+                [ngClass]="{'not-touchable': (isHandsetOrTablet$ | async) !== true}">
+                <ng-container [matColumnDef]="rangeColumn.name" sticky>
+                    <th mat-header-cell *matHeaderCellDef class="head-cell range-header-title border-right" [class]="type">
+                        {{ ('RANGES.TITLE') | translate}}
+                    </th>
+                    <td mat-cell *matCellDef="let range" class="border-right">
+                        <div class="range-title flex flex-row align-center">
+                            {{formatRangeName(range)}}&nbsp;
+                            @if (isLastRange(range)) {
+                                <mat-icon>all_inclusive</mat-icon>
+                            }
+                        </div>
+                    </td>
+                </ng-container>
+                @for (column of inputColumns; track column) {
+                    <ng-container [matColumnDef]="column">
+                        <th mat-header-cell *matHeaderCellDef class="head-cell right price-column input-column">
+                            <div fxLayoutAlign="end center">
+                                {{('RANGES.' + column.toUpperCase()) | translate}}
+                            </div>
+                        </th>
+                        <td mat-cell *matCellDef="let range; index as j" class="right price-column"
+                            [ngClass]="{'editable-cell': (disabler$ | async) === false}">
+                            @if (column !== rangeColumn.percentage) {
+                                <div class="write-value currency-value">
+                                    <mat-form-field appearance="outline" class="ob-form-field" subscriptSizing="dynamic">
+                                        @let errorMessage = range.ctrl.get(column) | obErrorMessage$ | async;
+                                        @if (errorMessage) {
+                                            <mat-icon matPrefix [obErrorIcon]="errorMessage">
+                                                error_outline
+                                            </mat-icon>
+                                        }
+                                        <app-currency-input [formControl]="range.ctrl.get(column)" class="table-input"
+                                            [placeholder]="0 | localCurrency:currency:currencyFormat"
+                                            [currencyCode]="currency" [currencyFormat]="currencyFormat" />
+                                    </mat-form-field>
+                                </div>
+                            }
+                            @if (column === rangeColumn.percentage) {
+                                <div class="write-value percentage-value">
+                                    <mat-form-field appearance="outline" class="ob-form-field" subscriptSizing="dynamic">
+                                        @let errorMessage = range.ctrl.get(column) | obErrorMessage$ | async;
+                                        @if (errorMessage) {
+                                            <mat-icon matPrefix [obErrorIcon]="errorMessage">
+                                                error_outline
+                                            </mat-icon>
+                                        }
+                                        <app-percentage-input [formControl]="range.ctrl.get(column)" class="table-input"
+                                            placeholder="{{0 | localNumber : '1.2-2'}}" />
+                                    </mat-form-field>
+                                </div>
+                            }
+                        </td>
+                    </ng-container>
+                }
+                <ng-container [matColumnDef]="rangeColumn.actions" stickyEnd>
+                    <th mat-header-cell *matHeaderCellDef class="actions-cell head-cell"></th>
+                    <td mat-cell *matCellDef="let range" class="actions-cell">
+                        @if (ranges.length > 1) {
+                            <div class="action-buttons">
+                                <button mat-icon-button aria-label="Delete Range" class="ob-button small"
+                                    tabIndex="-1" (click)="deleteRange(range)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </div>
+                        }
+                    </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="columns" class="dense-row"></tr>
+                <tr mat-row *matRowDef="let row; columns: columns; index as j" class="dense-row"
+                    [ngClass]="{'hoverable-row': (disabler$ | async) === false}"></tr>
+            </table>
+        </div>
+    </form>
+}

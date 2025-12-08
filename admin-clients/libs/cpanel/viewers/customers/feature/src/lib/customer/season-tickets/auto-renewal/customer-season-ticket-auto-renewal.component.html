@@ -1,0 +1,137 @@
+@let seasonTicket = $seasonTicket();
+@let sepaForm = form.controls.sepaForm;
+@if(!$isCustomerManaged()) {
+    <app-form-container (cancel)="cancel()" (save)="save()" [formGroup]="sepaForm"
+        [disabled]="!sepaForm.dirty || (loading$ | async)" layout="menu">
+        <div slot="outside" class="status-notifications-container flex justify-start">
+            <div class="status-bar">
+                <mat-slide-toggle (change)="handleStatusChange()" class="ob-slide-toggle" color="primary"
+                    [formControl]="form.controls.enabled" [matTooltip]="$importTooltip() | translate">
+                    {{ 'CUSTOMER.SEASON_TICKETS.AUTO_RENEWAL.STATUS.ENABLED'| translate }}
+                </mat-slide-toggle>
+            </div>
+        </div>
+        @if (seasonTicket?.settings.operative.renewal.renewal_type === 'CSV_IMPORT') {
+            <div class="flex justify-center full">
+                <app-context-notification class="min-padding flex-[0_0_80%]" contextType="info">
+                    <span>{{'CUSTOMER.SEASON_TICKETS.AUTO_RENEWAL.CSV_IMPORT.INFO' | translate}}</span>
+                </app-context-notification>
+            </div>
+        } @else {
+            <div class="flex flex-col gap-6">
+                @if ($hasManagedFriends()) {
+                    <span class="flex flex-row justify-start">
+                        <mat-icon class="ob-icon xsmall info with-text">info</mat-icon>
+                        <span>{{ 'CUSTOMER.SEASON_TICKETS.AUTO_RENEWAL.FRIENDS_INFO' | translate }}</span>
+                    </span>
+                }
+                <div class="flex flex-col">
+                    <h3 class="section-title">
+                        {{'SEASON_TICKETS.GENERAL_DATA.AUTOMATIC_RENEWAL.PAYMENT_DETAILS_TITLE' | translate}}
+                    </h3>
+                    <form [formGroup]="sepaForm" class="grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                        @let fields = $sepaFieldNames();
+                        <!-- Name -->
+                        @if (fields.includes('name')) {
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                                <mat-label>{{'CUSTOMER.NAME' | translate}}</mat-label>
+                                <input matInput aria-label="name" [placeholder]="'CUSTOMER.NAME' | translate" formControlName="name">
+                                <mat-error [ob-form-errors]="sepaForm" field="name" />
+                            </mat-form-field>
+                        }
+                        <!-- Country -->
+                        @if (fields.includes('country')) {
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                                <mat-label>{{'CUSTOMER.COUNTRY' | translate}}</mat-label>
+                                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="country"
+                                    aria-label="country">
+                                    <mat-option>
+                                        <app-select-search #countrySelectSearch [options$]="countries$" requireSelection="true"
+                                            [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" />
+                                    </mat-option>
+                                    @for (country of countrySelectSearch.getFilteredOptions$() | async; track country) {
+                                        <mat-option [value]="country?.code">
+                                            {{country ? country.name : ''}}
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        }
+                        <!-- Postal Code-->
+                        @if (fields.includes('postal_code')) {
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                                <mat-label>{{'CUSTOMER.POSTAL_CODE' | translate}}</mat-label>
+                                <input matInput aria-label="postal code" [placeholder]="'CUSTOMER.POSTAL_CODE' | translate"
+                                    formControlName="postal_code">
+                                <mat-error [ob-form-errors]="sepaForm" field="postal_code" />
+                            </mat-form-field>
+                        }
+                        <!-- City-->
+                        @if (fields.includes('city')) {
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                                <mat-label>{{'CUSTOMER.CITY' | translate}}</mat-label>
+                                <input matInput aria-label="city" [placeholder]="'CUSTOMER.CITY' | translate" formControlName="city">
+                                <mat-error [ob-form-errors]="sepaForm" field="city" />
+                            </mat-form-field>
+                        }
+                        <!-- Address -->
+                        @if (fields.includes('address')) {
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                                <mat-label>{{'CUSTOMER.ADDRESS' | translate}}</mat-label>
+                                <input matInput aria-label="address" [placeholder]="'CUSTOMER.ADDRESS' | translate"
+                                    formControlName="address">
+                                <mat-error [ob-form-errors]="sepaForm" field="address" />
+                            </mat-form-field>
+                        }
+                        <!-- IBAN-->
+                        @if (fields.includes('iban')) {
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                                <mat-label>{{'CUSTOMER.IBAN' | translate}}</mat-label>
+                                <input matInput aria-label="iban" [placeholder]="'CUSTOMER.IBAN' | translate" formControlName="iban">
+                                <mat-error [ob-form-errors]="sepaForm" field="iban" />
+                            </mat-form-field>
+                        }
+                        <!-- BIC -->
+                        @if (fields.includes('bic')) {
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                                <mat-label>{{'CUSTOMER.BIC' | translate}}</mat-label>
+                                <input matInput aria-label="bic" [placeholder]="'CUSTOMER.BIC' | translate"
+                                    formControlName="bic">
+                                <mat-error [ob-form-errors]="sepaForm" field="bic" />
+                            </mat-form-field>
+                        }
+                    </form>
+                </div>
+            </div>
+        }
+    </app-form-container>
+    } @else {
+        <div class="context-notification-container">
+            @let customerManagers = $customerManagers();
+            @if (customerManagers.concatenated !== '') {
+                <div class="flex justify-center full">
+                    <app-context-notification class="min-padding flex-[0_0_80%]" contextType="info">
+                        <span (click)="handleManagerClick($event)"
+                            [innerHTML]="'CUSTOMER.SEASON_TICKETS.AUTO_RENEWAL.CUSTOMER_MANAGED_BY_MULTIPLE_FRIENDS' | translate :
+                ({ lastFriend: customerManagers.lastFriend, concatenated: customerManagers.concatenated })">
+                        </span>
+                    </app-context-notification>
+                </div>
+            } @else {
+                <div class="flex justify-center full">
+                    <app-context-notification class="min-padding flex-[0_0_80%]" contextType="info">
+                        <span (click)="handleManagerClick($event)"
+                            [innerHTML]="'CUSTOMER.SEASON_TICKETS.AUTO_RENEWAL.CUSTOMER_MANAGED_BY_SINGLE_FRIEND' | translate :
+                    ({ friend: customerManagers.lastFriend })">
+                        </span>
+                    </app-context-notification>
+                </div>
+            }
+        </div>
+    }
+
+    @if (loading$ | async) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }

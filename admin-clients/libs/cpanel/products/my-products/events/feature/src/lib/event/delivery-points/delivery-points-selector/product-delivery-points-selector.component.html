@@ -1,0 +1,33 @@
+<app-selection-list [pageForm]="form" [class.field-error]="form.hasError('atLeastOneRequired') && form.touched"
+    [data]="allDeliveryPoints$ | async" class="small-rows">
+    <div slot="subheader" class="list-header">
+        <div fxFlex="0 1 100%">
+            @if ((allDeliveryPoints$ | async); as dPoints) {
+                <mat-checkbox
+                    [checked]="dPoints?.length > 0 && dPoints?.length === form.value.length"
+                    [disabled]="!dPoints?.length" color="primary"
+                    [indeterminate]="form.value.length > 0 && form.value.length < dPoints?.length"
+                    (change)="handleDeliveryPointsSelectionGroupChange($event.checked)" />
+            }
+            <span>{{'FORMS.LABELS.DELIVERY_POINTS' | translate}}</span>
+        </div>
+    </div>
+    <ng-template #optionTemplate let-row>
+        <span>{{row.name}}</span>
+    </ng-template>
+    <ng-template #noResultsTemplate>
+        <app-empty-state-tiny
+            [title]="'PRODUCT.EVENTS.DETAIL.DELIVERY_SELECTOR.EMPTY_STATE.TITLE' | translate"
+            [description]="'PRODUCT.EVENTS.DETAIL.DELIVERY_SELECTOR.EMPTY_STATE.DESCRIPTION' | translate">
+            <a mat-stroked-button class="ob-button medium mat-primary" routerLink="/delivery-points" target="_blank">
+                {{'DELIVERY_POINT.NEW_BTN' | translate}}
+                <mat-icon>launch</mat-icon>
+            </a>
+        </app-empty-state-tiny>
+    </ng-template>
+</app-selection-list>
+@if (form.hasError('atLeastOneRequired') && form.touched) {
+    <mat-error>
+        {{'PRODUCT.EVENTS.DETAIL.DELIVERY_SELECTOR.AT_LEAST_ONE_REQUIRED' | translate}}
+    </mat-error>
+}

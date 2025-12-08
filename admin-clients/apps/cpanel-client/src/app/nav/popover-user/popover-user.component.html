@@ -1,0 +1,23 @@
+@if ($user(); as user) {
+    <div class="popover-user-button avatar avatar-sm" [class.active]="userPopover.isOpen()" [satPopoverAnchor]="userPopover"
+        (click)="userPopover.toggle()" matTooltip="{{user.email + '\n' + user.name + ' ' + user.last_name}}">
+        {{(user.name?.[0] || '') + ' ' + (user.last_name?.[0] || '')}}
+    </div>
+
+    <sat-popover #userPopover hasBackdrop yAlign="below" autoFocus="false" restoreFocus="false">
+        <mat-card class="ob-card">
+            <mat-card-content class="avatar-content">
+                <div class="avatar avatar-lg">{{(user.name?.[0] || '') + ' ' + (user.last_name?.[0] || '')}}</div>
+                <div class="avatar-info">
+                    <span class="mat-body-strong">{{user.name + ' ' + user.last_name}}</span>
+                    <span>{{user.email}}</span>
+                </div>
+            </mat-card-content>
+            <mat-card-footer class="avatar-footer">
+                <button mat-stroked-button color="tertiary" class="ob-button" (click)="logout()">
+                    {{'FORMS.LOGOUT' | translate}}
+                </button>
+            </mat-card-footer>
+        </mat-card>
+    </sat-popover>
+}

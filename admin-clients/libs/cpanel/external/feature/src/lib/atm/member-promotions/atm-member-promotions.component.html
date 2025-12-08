@@ -1,0 +1,36 @@
+@if (promotions$ | async; as promotions) {
+    <div class="promotions-list">
+        <app-selection-list [data]="promotions" [pageForm]="form">
+            <ng-template #optionTemplate let-row>
+                <div fxLayoutAlign="space-between">
+                    <span>{{row.name}}</span>
+                    @if (row.dates?.end && row.dates?.start) {
+                        <span>
+                            {{row.dates.start | dateTime : dateTimeFormats.shortDate}} -
+                            {{row.dates.end | dateTime : dateTimeFormats.shortDate}}
+                        </span>
+                    }
+                </div>
+            </ng-template>
+        </app-selection-list>
+        @if(promotions.length === 0) {
+            <app-context-notification class="ob-context-notification" contextType="info" fxFlex="100%">
+                <p>{{'LIST.EMPTY' | translate}}</p>
+            </app-context-notification>
+        }
+    </div>
+}
+
+<div fxLayout="column">
+    <div fxFlex="0 1 70px" fxLayoutAlign="end center">
+        <button color="primary" mat-flat-button class="ob-button medium" (click)="run()" [disabled]="!selectedIds?.length">
+            {{'FORMS.ACTIONS.RUN'| translate}}
+        </button>
+    </div>
+</div>
+
+@if (loading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

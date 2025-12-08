@@ -1,0 +1,75 @@
+<div fxFill>
+    @let channel = channel$ | async;
+    <div fxFlex="0 0 200px" fxLayout="column" class="subtabs-container">
+        <mat-button-toggle-group vertical [value]="deepPath$ | async" class="ob-subtab" fxFlex="1 0 100%"
+            appLastPathGuardListener [currValue]="(deepPath$ | async)">
+            <mat-button-toggle [fxHide]="(channel | isMembersChannel)" routerLink="surcharges" value="surcharges">
+                {{'CHANNELS.SURCHARGES.TITLE' | translate}}
+    </mat-button-toggle>
+    <mat-button-toggle [fxShow]="(channel | isMembersChannel)" routerLink="member-surcharges" value="member-surcharges">
+        {{'CHANNELS.SURCHARGES.TITLE' | translate}}
+    </mat-button-toggle>
+    <mat-button-toggle [fxHide]="(channel | isMembersChannel)" routerLink="commissions" value="commissions">
+        {{'CHANNELS.COMMISSIONS.TITLE' | translate}}
+    </mat-button-toggle>
+    <mat-button-toggle [fxHide]="(channel | isExternalWhitelabelType)
+            || ((isNewReceiptEnabled$ | async) === false) || (channel | isMembersChannel)"
+        routerLink="delivery-methods" value="delivery-methods">
+        {{'CHANNELS.DELIVERY_METHODS.TITLE' | translate}}
+    </mat-button-toggle>
+    <mat-button-toggle [fxHide]="(channel | isExternalWhitelabelType)
+            || (isNewReceiptEnabled$ | async) || (channel | isMembersChannel)"
+        routerLink="legacy-delivery-methods" value="legacy-delivery-methods">
+        {{'CHANNELS.DELIVERY_METHODS.TITLE' | translate}}
+    </mat-button-toggle>
+    <mat-button-toggle [fxHide]="(channel | isExternalWhitelabelType) || !(channel | isMembersChannel)"
+        routerLink="members-delivery-methods" value="members-delivery-methods">
+        {{'CHANNELS.DELIVERY_METHODS.TITLE' | translate}}
+    </mat-button-toggle>
+    <mat-button-toggle routerLink="options" value="options">
+        {{'CHANNELS.OPTIONS.TITLE' | translate}}
+    </mat-button-toggle>
+    <mat-button-toggle [fxHide]="!(channel | isWebChannel) || (channel | isExternalWhitelabelType)" routerLink="blacklists"
+        value="blacklists">
+        {{'CHANNELS.BLACKLISTS.TITLE' | translate}}
+    </mat-button-toggle>
+    <mat-button-toggle [fxHide]="!(channel | isWebChannel) || (channel | isExternalWhitelabelType)"
+        routerLink="cross-selling" value="cross-selling">
+        {{'CHANNELS.CROSS_SELLING.TITLE' | translate}}
+    </mat-button-toggle>
+    <mat-button-toggle [fxHide]="!(channel | isWebChannel)" routerLink="cross-restrictions"
+        value="cross-restrictions">
+        {{'CHANNELS.CROSS_RESTRICTIONS.TITLE' | translate}}
+    </mat-button-toggle>
+    <mat-button-toggle [fxHide]="!(channel.type === webBoxOfficeType) || (channel | isExternalWhitelabelType)"
+        routerLink="booking" value="booking">
+        {{'CHANNELS.BOOKING.TITLE' | translate}}
+    </mat-button-toggle>
+    <mat-button-toggle [fxHide]="!(channel | isWebChannelVouchers) || (channel | isExternalWhitelabelType)"
+        routerLink="gift-card" value="gift-card">
+        {{'CHANNELS.GIFT_CARD.TITLE' | translate}}
+    </mat-button-toggle>
+    <mat-button-toggle [fxHide]="!(channel | isWebB2bChannel)" routerLink="sharing" value="sharing">
+        {{'CHANNELS.TITLES.BOOKINGS_SHARING' | translate}}
+    </mat-button-toggle>
+    <mat-button-toggle [fxHide]="!(channel | isWebB2bChannel) || (hideB2BPublishingSection$ | async) || channel?.settings?.v4_enabled"
+        routerLink="b2b-publishing"
+        value="b2b-publishing">
+        {{'CHANNELS.B2B_PUBLISHING.TITLE' | translate}}
+    </mat-button-toggle>
+    <mat-button-toggle [fxHide]="(hideDonationsSection$ | async) || (channel | isWebV4$ | async) === false"
+        routerLink="donations" value="donations">
+        {{'CHANNELS.DONATIONS.TITLE' | translate}}
+    </mat-button-toggle>
+    @if ((showLoginConfig$ | async) && channel?.type === webType) {
+        <mat-button-toggle routerLink="login-config" value="login-config"
+            data-test="login-config">
+            {{'CHANNELS.CUSTOMER_LOGIN.TITLE' | translate}}
+        </mat-button-toggle>
+    }
+    </mat-button-toggle-group>
+</div>
+<div fxLayout="column" class="operative-container">
+    <router-outlet />
+</div>
+</div>

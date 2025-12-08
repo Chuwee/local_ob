@@ -1,0 +1,79 @@
+{
+  "name": "shared-common-ui-ob-material",
+  "$schema": "../../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/common/ui/ob-material/src",
+  "prefix": "admin-clients",
+  "projectType": "library",
+  "tags": ["scope:shared", "type:ui"],
+  "targets": {
+    "build": {
+      "executor": "@nx/angular:ng-packagr-lite",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
+      "inputs": ["styled", "^production"],
+      "options": {
+        "project": "libs/shared/common/ui/ob-material/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/shared/common/ui/ob-material/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/shared/common/ui/ob-material/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/shared/common/ui/ob-material/jest.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "storybook": {
+      "executor": "@storybook/angular:start-storybook",
+      "options": {
+        "port": 4400,
+        "configDir": "libs/shared/common/ui/ob-material/.storybook",
+        "browserTarget": "shared-common-ui-ob-material:build-storybook",
+        "compodoc": false
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
+      }
+    },
+    "build-storybook": {
+      "executor": "@storybook/angular:build-storybook",
+      "outputs": ["{options.outputDir}"],
+      "options": {
+        "outputDir": "dist/storybook/shared-ui-ob-material",
+        "configDir": "libs/shared/common/ui/ob-material/.storybook",
+        "browserTarget": "shared-common-ui-ob-material:build-storybook",
+        "compodoc": false,
+        "styles": ["libs/shared/common/ui/ob-material/src/styles.scss"]
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
+      }
+    },
+    "static-storybook": {
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "shared-common-ui-ob-material:build-storybook",
+        "staticFilePath": "dist/storybook/shared-ui-ob-material"
+      },
+      "configurations": {
+        "ci": {
+          "buildTarget": "shared-common-ui-ob-material:build-storybook:ci"
+        }
+      }
+    }
+  }
+}

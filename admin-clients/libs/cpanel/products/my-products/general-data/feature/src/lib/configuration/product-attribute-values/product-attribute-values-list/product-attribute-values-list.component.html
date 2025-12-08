@@ -1,0 +1,68 @@
+<div class="section-block">
+    <h3 class="section-title">{{ $attribute().name }}</h3>
+    <div fxLayout="row wrap" fxLayoutGap="8px" class="add-value">
+        <mat-form-field appearance="outline" class="ob-form-field inline-field" fxFlex="35%"
+            [class.cursor-not-allowed]="$disableNewValueInput()"
+            [matTooltip]="$maxVariantsReached()
+                ? ('PRODUCT.VARIANTS.FORMS.INFOS.MAX_VARIANTS_REACHED' | translate : { max: $maxSelection() })
+                : 'PRODUCT.VARIANTS.FORMS.INFOS.ATTRIBUTE_VALUE_CREATION_DISABLED' | translate"
+            [matTooltipDisabled]="!$disableNewValueInput()">
+            <input matInput aria-label="name" [formControl]="newAttributeValue"
+                [placeholder]="'PRODUCT.VARIANTS.FORMS.LABELS.ATTRIBUTE_VALUE_NAME' | translate">
+        </mat-form-field>
+        <div fxFlex="none">
+            <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                [attr.aria-label]="'PRODUCT.VARIANTS.ACTIONS.CREATE_ATTRIBUTE_VALUE' | translate"
+                [disabled]="$disableNewValueInput() || !newAttributeValue.value"
+                (click)="addNewValue()">
+                <mat-icon>add</mat-icon>
+                {{'PRODUCT.VARIANTS.ACTIONS.CREATE_ATTRIBUTE_VALUE' | translate}}
+            </button>
+        </div>
+    </div>
+    @if ($attributeValues().length) {
+        <div class="attribute-values-list-container">
+            <mat-list class="ob-list" role="list" [class.field-error]="$invalidList() && valuesList.touched"
+                cdkDropList [cdkDropListData]="$attributeValues()" (cdkDropListDropped)="onListDrop($event)"
+                [cdkDropListSortingDisabled]="valuesList.invalid || $attributeValues().length <= 1">
+                @for (value of $attributeValues(); track value.value_id; let i = $index) {
+                    <mat-list-item cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".ob-list"
+                        class="editable-item with-position" role="listitem" [id]="value.value_id">
+                        <span class="ob-round-badge badge-list-position">
+                            {{i + 1}}
+                        </span>
+                        <mat-icon class="drag-icon">
+                            drag_indicator
+                        </mat-icon>
+                        <div fxFlex class="write-value">
+                            <div fxFlex="65%">
+                                <input #attributeInput type="text" [formControl]="valuesList.controls.at(i)"
+                                    [class.invalid]="valuesList.at(i).touched && valuesList.at(i).invalid"
+                                    [placeholder]="'PRODUCT.VARIANTS.FORMS.LABELS.ATTRIBUTE_VALUE_NAME' | translate"
+                                    (blur)="updateValue(i)" (mousedown)="$event.stopPropagation()">
+                            </div>
+                        </div>
+                        <div class="delete-action">
+                            @if ($action() === 'CREATE' || $attributeValues().length > 2) {
+                                <button type="button" mat-icon-button class="ob-button medium" aria-label="Delete product attribute"
+                                    (click)="deleteValue(value.value_id)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            }
+                        </div>
+                    </mat-list-item>
+                }
+            </mat-list>
+            @if ($invalidList() && valuesList.touched) {
+                <mat-error>
+                    {{('PRODUCT.VARIANTS.FORMS.ERRORS.MIN_VALUES' | translate : { min: minValues })}}
+                </mat-error>
+            }
+        </div>
+    }
+</div>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner></mat-spinner>
+    </div>
+}

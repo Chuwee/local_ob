@@ -1,0 +1,116 @@
+<!-- PROMOTION LIMITS -->
+<div [formGroup]="form">
+    <div fxLayout="column" class="promotion-form-section" formGroupName="limits">
+        <ng-container *ngIf="(promotion$ | async)?.type !== promotionTypes.automatic">
+            <div id="section_promotions_limits" fxLayout="column">
+                <p class="mat-subtitle-2">{{'EVENTS.PROMOTIONS.LIMITS' | translate}}</p>
+                <div fxLayoutAlign="start center" fxFlex="45px" fxLayout="row" formGroupName="packsMin">
+                    <mat-checkbox color="primary" formControlName="enabled" class="inline">
+                        {{'EVENTS.PROMOTIONS.PACKS_LIMIT' | translate}}
+                    </mat-checkbox>
+                    <div *ngIf="form.get('limits.packsMin.enabled').value" fxLayoutAlign="start center">
+                        <mat-form-field appearance="outline" fxFlex="80px" class="ob-form-field inline-field value-field">
+                            <input matInput type="number" formControlName="limit" placeholder="0" min="1">
+                        </mat-form-field>
+                        <mat-error [ob-form-errors]="form" [field]="['limits', 'packsMin', 'limit']">
+                        </mat-error>
+                    </div>
+                    <mat-icon fxFlexAlign="center" class="ob-help-icon" [matTooltip]="'EVENTS.PROMOTIONS.PACKS_LIMIT_INFO' | translate">
+                        help_outline
+                    </mat-icon>
+                </div>
+                <div fxLayoutAlign="start center" fxFlex="45px" fxLayout="row" formGroupName="purchaseMin">
+                    <mat-checkbox color="primary" formControlName="enabled" class="inline">
+                        {{'EVENTS.PROMOTIONS.PROMOTION_PURCHASE_MIN_LIMIT' | translate}}
+                    </mat-checkbox>
+                    <div *ngIf="form.get('limits.purchaseMin.enabled').value" fxLayoutAlign="start center">
+                        <mat-form-field appearance="outline" fxFlex="80px" class="ob-form-field inline-field value-field">
+                            <input matInput type="number" formControlName="limit" placeholder="0" min="1">
+                        </mat-form-field>
+                        <mat-error [ob-form-errors]="form" [field]="['limits', 'purchaseMin', 'limit']">
+                        </mat-error>
+                    </div>
+                </div>
+                <mat-divider class="ob-form-divider"></mat-divider>
+            </div>
+        </ng-container>
+        <!-- EVENT -->
+        <div id="section_promotions_event-max-limit" fxLayout="column">
+            <p class="mat-subtitle-2">{{'EVENTS.PROMOTIONS.PROMOTION_MAX_LIMIT_TITLE' | translate}}</p>
+            <div fxLayoutAlign="start center" fxFlex="45px" fxLayout="row" formGroupName="promotionMax">
+                <mat-checkbox color="primary" formControlName="enabled" class="inline">
+                    {{'EVENTS.PROMOTIONS.EVENT_MAX_LIMIT' | translate}}
+                </mat-checkbox>
+                <div *ngIf="form.get('limits.promotionMax.enabled').value" fxLayoutAlign="start center">
+                    <mat-form-field appearance="outline" fxFlex="80px" class="ob-form-field inline-field value-field">
+                        <input matInput type="number" formControlName="limit" placeholder="0" min="1">
+                    </mat-form-field>
+                    <mat-error [ob-form-errors]="form" [field]="['limits', 'promotionMax', 'limit']">
+                    </mat-error>
+                </div>
+            </div>
+            <div fxLayoutAlign="start center" fxFlex="45px" fxLayout="row" formGroupName="eventUserMax"
+                *ngIf="isUserLimitsEnabled$ | async">
+                <mat-checkbox color="primary" formControlName="enabled" class="inline">
+                    {{'EVENTS.PROMOTIONS.EVENT_USER_MAX_LIMIT' | translate}}
+                </mat-checkbox>
+                <div *ngIf="form.get('limits.eventUserMax.enabled').value" fxLayoutAlign="start center">
+                    <mat-form-field appearance="outline" fxFlex="80px" class="ob-form-field inline-field value-field">
+                        <input matInput type="number" formControlName="limit" placeholder="0" min="1">
+                    </mat-form-field>
+                    <mat-error [ob-form-errors]="form" [field]="['limits', 'eventUserMax', 'limit']">
+                    </mat-error>
+                </div>
+            </div>
+            <mat-divider class="ob-form-divider"></mat-divider>
+        </div>
+        <!-- SESSION -->
+        <div id="section_promotions_session-max-limit" fxLayout="column">
+            <p class="mat-subtitle-2">{{'EVENTS.PROMOTIONS.SESSION_MAX_LIMIT_TITLE' | translate}}</p>
+            <div fxLayoutAlign="start center" fxFlex="45px" fxLayout="row" formGroupName="sessionMax">
+                <mat-checkbox color="primary" formControlName="enabled" class="inline">
+                    {{'EVENTS.PROMOTIONS.SESSION_MAX_LIMIT' | translate}}
+                </mat-checkbox>
+                <div *ngIf="form.get('limits.sessionMax.enabled').value" fxLayoutAlign="start center">
+                    <mat-form-field appearance="outline" fxFlex="80px" class="ob-form-field inline-field value-field">
+                        <input matInput type="number" formControlName="limit" placeholder="0" min="1">
+                    </mat-form-field>
+                    <mat-error [ob-form-errors]="form" [field]="['limits', 'sessionMax', 'limit']">
+                    </mat-error>
+                </div>
+            </div>
+            <div fxLayoutAlign="start center" fxFlex="45px" fxLayout="row" formGroupName="sessionUserMax"
+                *ngIf="isUserLimitsEnabled$ | async">
+                <mat-checkbox color="primary" formControlName="enabled" class="inline">
+                    {{'EVENTS.PROMOTIONS.SESSION_USER_MAX_LIMIT' | translate}}
+                </mat-checkbox>
+                <div *ngIf="form.get('limits.sessionUserMax.enabled').value" fxLayoutAlign="start center">
+                    <mat-form-field appearance="outline" fxFlex="80px" class="ob-form-field inline-field value-field">
+                        <input matInput type="number" formControlName="limit" placeholder="0" min="1">
+                    </mat-form-field>
+                    <mat-error [ob-form-errors]="form" [field]="['limits', 'sessionUserMax', 'limit']">
+                    </mat-error>
+                </div>
+            </div>
+            <mat-divider class="ob-form-divider"></mat-divider>
+        </div>
+        <!-- OPERATION -->
+        <ng-container *ngIf="(promotion$ | async)?.type !== promotionTypes.automatic">
+            <div id="section_promotions_operation-max-limit" fxLayout="column">
+                <p class="mat-subtitle-2">{{'EVENTS.PROMOTIONS.PROMOTION_PURCHASE_MAX_LIMIT_TITLE' | translate}}</p>
+                <div fxFlex="45px" fxLayout="row" formGroupName="purchaseMax" fxLayoutAlign="start center">
+                    <mat-checkbox color="primary" formControlName="enabled" class="inline">
+                        {{'EVENTS.PROMOTIONS.PROMOTION_PURCHASE_MAX_LIMIT' | translate}}
+                    </mat-checkbox>
+                    <div *ngIf="form.get('limits.purchaseMax.enabled').value" fxLayoutAlign="start center">
+                        <mat-form-field appearance="outline" fxFlex="100px" class="ob-form-field inline-field value-field">
+                            <input matInput type="number" formControlName="limit" placeholder="0" min="1">
+                        </mat-form-field>
+                        <mat-error [ob-form-errors]="form" [field]="['limits', 'purchaseMax', 'limit']">
+                        </mat-error>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</div>

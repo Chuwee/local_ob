@@ -1,0 +1,55 @@
+<div class="order-general-data-container" fxLayout="column" fxFlex="100%" *ngIf="order$ | async as order">
+    <app-form-container [hideActionBar]="true" layout="main" class="no-top-padding">
+        <div fxLayout="column">
+            <div class="main-content" fxLayout="row wrap" fxLayoutAlign="space-between start">
+                <div fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="stretch">
+                    <div fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="center stretch">
+                        <mat-accordion class="details-form-container" fxFlex="0 1 845px" [multi]="true" togglePosition="before">
+                            <mat-expansion-panel [expanded]="true">
+                                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                    <mat-panel-title>{{'MEMBER_ORDER.DATA' | translate}}</mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <app-member-order-data [order]="order"></app-member-order-data>
+                            </mat-expansion-panel>
+                            <mat-expansion-panel [expanded]="true">
+                                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                    <mat-panel-title>{{'MEMBER_ORDER.USERS' | translate}}</mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <app-member-order-users [order]="order"></app-member-order-users>
+                            </mat-expansion-panel>
+                            <mat-expansion-panel [expanded]="true" *ngIf="hasMembership">
+                                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                    <mat-panel-title>
+                                        {{'MEMBER_ORDER.MEMBERS' | translate}}
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <app-member-order-items [order]="order" [isNewMember]="true"></app-member-order-items>
+                            </mat-expansion-panel>
+                            <mat-expansion-panel [expanded]="true" *ngIf="hasAllocation">
+                                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                    <mat-panel-title>
+                                        {{'MEMBER_ORDER.LOCATIONS' | translate}}
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <app-member-order-items [order]="order"></app-member-order-items>
+                            </mat-expansion-panel>
+                            <mat-expansion-panel [expanded]="true">
+                                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                    <mat-panel-title>{{'MEMBER_ORDER.PAYMENTS' | translate}}</mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <app-member-order-payments [order]="order"></app-member-order-payments>
+                            </mat-expansion-panel>
+                        </mat-accordion>
+                        <mat-divider vertical="true" fxFlexAlign="stretch"></mat-divider>
+                        <div class="ob-summary sidebar-container" fxFlex="0 1 340px" fxLayout="column">
+                            <app-member-order-price [order]="order"></app-member-order-price>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </app-form-container>
+</div>
+<div class="spinner-container" *ngIf="reqInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

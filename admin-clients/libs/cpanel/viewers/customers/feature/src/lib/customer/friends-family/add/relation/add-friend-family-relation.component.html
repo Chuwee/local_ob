@@ -1,0 +1,37 @@
+<div mat-dialog-content class="with-wizard-bar flex flex-col">
+    <div class="flex flex-col gap-6" [formGroup]="$relationForm()">
+        <div class="form-container flex flex-col">
+            <mat-radio-group formControlName="addType" class="type-options flex flex-col md:flex-row gap-4 align-center">
+                <mat-radio-button class="ob-radio-card-button flex shrink basis-full md:basis-[calc(50%-10px)]"
+                    [value]="customerType.existing">
+                    <div class="option-title">{{'CUSTOMER.FRIENDS_AND_FAMILY.SELECTION_ADD' | translate}}</div>
+                    <div>
+                        {{'CUSTOMER.FRIENDS_AND_FAMILY.SELECTION_ADD_DESCRIPTION' | translate}}
+                    </div>
+                </mat-radio-button>
+                <mat-radio-button class="ob-radio-card-button flex shrink basis-full md:basis-[calc(50%-10px)]" [value]="customerType.new">
+                    <div class="option-title">{{'CUSTOMER.FRIENDS_AND_FAMILY.SELECTION_CREATE' | translate}}</div>
+                    <div>
+                        {{'CUSTOMER.FRIENDS_AND_FAMILY.SELECTION_CREATE_DESCRIPTION' | translate}}
+                    </div>
+                </mat-radio-button>
+            </mat-radio-group>
+        </div>
+        <div class="flex flex-col gap-4">
+            <span class="ob-label">{{'CUSTOMER.FRIENDS_AND_FAMILY.RELATION_TITLE' | translate}}</span>
+            <mat-radio-group formControlName="type" class="flex flex-col gap-4">
+                @for (relation of customerFriendRelation; track relation) {
+                    <mat-radio-button class="ob-radio-button" [value]="relation">
+                        <div class="flex flex-col">
+                            <span class="ob-label">{{'CUSTOMER.FRIENDS_AND_FAMILY.RELATION_' + relation + '_TITLE' | translate}}</span>
+                            <span>{{'CUSTOMER.FRIENDS_AND_FAMILY.RELATION_' + relation + '_DESCRIPTION' | translate }}</span>
+                            <!-- TODO: uncomment when implemented in customers project -->
+                            <!-- <span>{{'CUSTOMER.FRIENDS_AND_FAMILY.RELATION_' + relation + '_DESCRIPTION' + 
+                                (relation === 'FRIEND' ? '_' + $friendsRelationType() : '') | translate }}</span> -->
+                        </div>
+                    </mat-radio-button>
+                }
+            </mat-radio-group>
+        </div>
+    </div>
+</div>

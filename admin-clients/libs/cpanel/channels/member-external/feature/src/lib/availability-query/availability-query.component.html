@@ -1,0 +1,39 @@
+<app-form-container class="overflow-y-auto" (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="form.pristine" [formGroup]="form">
+    <div slot="outside" class="status-notifications-container" fxLayoutAlign="start center">
+        <mat-slide-toggle
+            matTooltip="{{'CHANNELS.MEMBER_EXTERNAL.AVAILABILITY_QUERY.SLIDE_TOOLTIP' | translate}}"
+            (change)="save()" class="ob-slide-toggle" color="primary"
+            formControlName="public_availability_enabled" [matTooltipDisabled]="!form.get('public_availability_enabled').disabled">
+            {{'CHANNELS.MEMBER_EXTERNAL.AVAILABILITY_QUERY.SLIDE_LABEL' | translate }}
+        </mat-slide-toggle>
+    </div>
+    <div fxLayout="column">
+        <p class="mat-subtitle-2">{{'CHANNELS.MEMBER_EXTERNAL.AVAILABILITY_QUERY.INFO_LABEL' | translate }}</p>
+        <mat-radio-group fxFlex.lt-md="100%" fxLayout="column" fxLayoutGap="16px"
+            formControlName="internal_link">
+            <mat-radio-button [value]="true">
+                <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center">
+                    <mat-label>{{'CHANNELS.MEMBER_EXTERNAL.AVAILABILITY_QUERY.RADIO_INTERNAL_URL' | translate}}</mat-label>
+                    <app-help-button
+                        [message]="'CHANNELS.MEMBER_EXTERNAL.AVAILABILITY_QUERY.RADIO_INTERNAL_URL_HELP' | translate" />
+                </div>
+            </mat-radio-button>
+            <mat-radio-button [value]="false">
+                {{'CHANNELS.MEMBER_EXTERNAL.AVAILABILITY_QUERY.RADIO_EXTERNAL_URL' | translate}}
+            </mat-radio-button>
+        </mat-radio-group>
+        <div fxLayout="row">
+            <mat-form-field fxFlex="500px" *ngIf="!form.value.internal_link"
+                appearance="outline" class="ob-form-field nested-field nested-content">
+                <input matInput type="text" formControlName="landing_button_url" spellcheck="false" placeholder="URL" />
+                <mat-error [ob-form-errors]="form" [field]="['landing_button_url']" />
+            </mat-form-field>
+        </div>
+    </div>
+</app-form-container>
+
+@if (inProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

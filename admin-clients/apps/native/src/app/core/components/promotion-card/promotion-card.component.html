@@ -1,0 +1,27 @@
+<ion-card data-override-styles class="ob-native-card promotion-card">
+    <ion-card-content class="promotion-card__content">
+        <div class="promotion-card__block promotion-card__text-block" (click)="goToPromotionDetail()">
+            @if(promotion.dates.start && promotion.dates.end){
+                <span class="promotion-card__text-block--light">
+                    {{promotion.dates.start | dateTime: dateTimeFormats.shortDate }}
+                    - {{promotion.dates.end | dateTime: dateTimeFormats.shortDate }}
+                </span>
+            }
+            <span class="promotion-card__text-block--bold">
+                {{promotion.name}}
+            </span>
+        </div>
+        <div class="promotion-card__block">
+            <div [class]="'promotion-card__status-item ' + getStatusClass()">
+                <span> {{('EVENT_DETAIL.PROMOTION_CARD.TYPE_OPTS.' + promotion.type.toUpperCase() | translate).substring(0,1)}}</span>
+            </div>
+        </div>
+        <div class="promotion-card__block">
+            <ion-toggle #toggleBtn [checked]="promotion.status === 'ACTIVE'" mode='ios' class="promotion-card__toggle ob-toggle"
+                color="primary" (ionChange)="updateStatus($event)" />
+        </div>
+        <div class="promotion-card__block" (click)="goToPromotionDetail()">
+            <ion-icon name="chevron-forward-outline" class="promotion-card__arrow" />
+        </div>
+    </ion-card-content>
+</ion-card>

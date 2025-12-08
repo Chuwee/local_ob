@@ -1,0 +1,54 @@
+<app-form-container layout="menu" *ngIf="configurations$ | async" hideActionBar>
+
+    <p class="body-1 description">{{'MEMBER_EXTERNAL.ADVANCED.DESCRIPTION.' + (period$ | async) | translate}}</p>
+
+    <app-search-table [dataSource]="configurations$" [columns]="['type', 'operation', 'implementation', 'actions']" [pageSize]="8"
+        [filter]="filter">
+        <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'MEMBER_EXTERNAL.ADVANCED.TYPE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{'MEMBER_EXTERNAL.ADVANCED.TYPES.' + row.type | translate }}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="operation">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'MEMBER_EXTERNAL.ADVANCED.OPERATION' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{'MEMBER_EXTERNAL.ADVANCED.OPERATIONS.' + row.operation_name | translate }}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="implementation">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'MEMBER_EXTERNAL.ADVANCED.IMPLEMENTATION' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" [class.error]="!row.implementation">
+                {{row.implementation || 'MEMBER_EXTERNAL.ADVANCED.MISSING_IMPLEMENTATION' | translate}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef></mat-header-cell>
+            <mat-cell *matCellDef="let row" class="actions-buttons">
+                <button *ngIf="row.implementation" mat-icon-button [matTooltip]="'FORMS.ACTIONS.MODIFY' | translate"
+                    aria-label="Edit Config" class="ob-button small" (click)="show(row)">
+                    <mat-icon>edit</mat-icon>
+                </button>
+                <button *ngIf="!row.implementation" mat-icon-button [matTooltip]="'FORMS.ACTIONS.ADD' | translate"
+                    aria-label="Add Config" class="ob-button small" (click)="show(row)">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </mat-cell>
+        </ng-container>
+    </app-search-table>
+
+</app-form-container>
+
+<div *ngIf="loading$ | async" class="spinner-container">
+    <mat-spinner></mat-spinner>
+</div>
+
+<div *ngIf="error$ | async" fxFlex="0 1 1080px" fxLayout="column">
+    <div fxFlex="0 0 300px" fxLayoutAlign="center center">
+        <app-context-notification class="ob-context-notification" contextType="warn">
+            {{'MEMBER_EXTERNAL.ADVANCED.ERROR' | translate}}
+        </app-context-notification>
+    </div>
+</div>

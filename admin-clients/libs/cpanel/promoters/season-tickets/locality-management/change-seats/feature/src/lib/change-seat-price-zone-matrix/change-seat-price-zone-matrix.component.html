@@ -1,0 +1,86 @@
+<div class="price-types-matrix-container">
+    <div id="changeSeatsPricesData" class="flex flex-col">
+        <div class="filters flex gap-4 items-center">
+            @if (rowZones) {
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label select-rate">
+                    <mat-label class="ob-label">{{'RATE_TYPES' | prefix | translate}}</mat-label>
+                    <mat-select [formControl]="rateTypeControl">
+                        @for (rate of seasonTicketRates$ | async; track rate) {
+                            <mat-option [value]="rate.id">{{rate.name}}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            }
+            <div class="price-type-action">
+                <app-price-types-filter (filterChange)="filterChangeHandler($event)"
+                    [priceTypes$]="seasonTicketPriceTypes$" />
+            </div>
+        </div>
+        <div class="flex flex-col">
+            <div class="prices-table-container">
+                @if (seasonTicketPricesMatrix$ | async; as seasonTicketPrices) {
+                    <table mat-table [formGroup]="form.get('change_seats_prices_data_form')" id="pricesTable" class="ob-table"
+                        [dataSource]="seasonTicketPrices">
+                        <!-- Custom header -->
+                        @for (headerText of customHeaderRow; track $index) {
+                            <ng-container [matColumnDef]="headerText.key" [sticky]="$index === 0">
+                                <th mat-header-cell *matHeaderCellDef [attr.colspan]="headerText.colspanSize" [style]="headerText.styles"
+                                    class="additional-headers-th-row border-right default-padding first-column">
+                                    {{ headerText.key | prefix | translate | uppercase }}
+                                </th>
+                            </ng-container>
+                        }
+
+                        <!-- First column (source price-types names) -->
+                        <ng-container [matColumnDef]="pricesTableHead[0]" sticky>
+                            <th mat-header-cell *matHeaderCellDef class="head-cell border-right first-column">{{pricesTableHead[0]}}</th>
+                            <td mat-cell *matCellDef="let row" class="border-right default-padding first-column">
+                                <div>
+                                    <span>{{priceTypeNames[row[0]]}}</span>
+                                </div>
+                            </td>
+                        </ng-container>
+                        <!-- Prices values -->
+                        @for (zone of rowZones; track zone) {
+                            <ng-container [matColumnDef]="zone.name" [formArrayName]="zone.id">
+                                <!-- First row (target price-types names) -->
+                                <th mat-header-cell *matHeaderCellDef class="head-cell right price-column input-column">
+                                    <div class="justify-end align-center">
+                                        <span appEllipsify [matTooltip]="zone.name">{{zone.name}}</span>
+                                    </div>
+                                </th>
+                                <!-- Editable prices values -->
+                                <td mat-cell *matCellDef="let row; index as j" class="right price-column"
+                                    [class.editable-cell]="isSeasonTicketEditable$ | async">
+                                    <div class="write-value"
+                                        [matTooltip]="'CHANGE_SEAT.PRICE_ZONE.TOOLTIP_INPUT' | prefix | translate"
+                                        [matTooltipDisabled]="isSeasonTicketEditable$ | async">
+                                        <mat-form-field appearance="outline" class="ob-form-field">
+                                            @let errorMessage = form.get(['change_seats_prices_data_form', zone.id, j]) |
+                                            obErrorMessage$ | async;
+                                            @if (errorMessage) {
+                                                <mat-icon matPrefix [obErrorIcon]="errorMessage">
+                                                    error_outline
+                                                </mat-icon>
+                                            }
+                                            <app-currency-input [formControlName]="j" class="table-input"
+                                                [placeholder]="0 | localCurrency: $currency()" [currencyCode]="$currency()"
+                                                [currencyFormat]="'narrow'" />
+                                        </mat-form-field>
+                                    </div>
+                                </td>
+                            </ng-container>
+                        }
+
+                        <tr mat-header-row *matHeaderRowDef="['PRICE_TYPES.ORIGIN', 'PRICE_TYPES.TARGET']; sticky: true"
+                            class="additional-headers-tr-row dense-row"></tr>
+                        <tr mat-row *matHeaderRowDef="pricesTableHead; sticky: true" class="dense-row"></tr>
+                        <tr mat-row *matRowDef="let row; columns: pricesTableHead;" class="dense-row"
+                            [class.hoverable-row]="isSeasonTicketEditable$ | async"
+                            [class.readonly-cell]="(isSeasonTicketEditable$ | async) === false"></tr>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+</div>

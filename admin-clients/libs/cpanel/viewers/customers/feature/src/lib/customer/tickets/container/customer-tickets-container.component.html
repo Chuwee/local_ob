@@ -1,0 +1,19 @@
+<div class="flex-[0_0_100%] flex flex-col justify-stretch items-stretch">
+    <mat-drawer-container class="flex-1 flex flex-row">
+        <mat-drawer #drawer mode="side" opened class="tickets-list-container">
+            <app-customer-tickets-list />
+        </mat-drawer>
+        <mat-drawer-content class="tickets-container flex flex-col flex-[0_1_100%]">
+            <div class="ob-sidebar-toggle" (click)="drawer.toggle();" [class.collapsed]="!drawer.opened">
+                <span class="arrow"></span>
+            </div>
+            @if (!this.$ticketProducts()?.length) {
+                <app-empty-state class="flex-1 flex"
+                    [title]="'CUSTOMER.TICKETS.EMPTY_LIST_TITLE' | translate"
+                    [description]="'CUSTOMER.TICKETS.EMPTY_LIST_DESCRIPTION' | translate" />
+            } @else {
+                <router-outlet />
+            }
+        </mat-drawer-content>
+    </mat-drawer-container>
+</div>

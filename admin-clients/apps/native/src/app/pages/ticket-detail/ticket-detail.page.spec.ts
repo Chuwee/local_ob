@@ -1,0 +1,21 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TicketDetailPage } from './ticket-detail.page';
+
+describe('TicketDetailPage', () => {
+    let component: TicketDetailPage;
+    let fixture: ComponentFixture<TicketDetailPage>;
+
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            declarations: [TicketDetailPage]
+        }).compileComponents();
+
+        fixture = TestBed.createComponent(TicketDetailPage);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
+
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
+});

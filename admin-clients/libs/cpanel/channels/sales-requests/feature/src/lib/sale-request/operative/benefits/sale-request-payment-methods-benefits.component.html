@@ -1,0 +1,91 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title>
+        <div class="flex flex-row items-center">
+            <div class="basis-full">
+                <h2 class="secondary title">{{'SALE_REQUESTS.PAYMENT_METHODS.BENEFITS.TITLES.DETAIL' | translate}}</h2>
+                <span class="mat-body-2">
+                    {{data.gatewayName}}
+                </span>
+            </div>
+            <button mat-icon-button type="button" class="ob-button small" [disabled]="$someBeingModified()"
+                (click)="dialogRef.close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content>
+        <div class="flex flex-col gap-2">
+            @if (!$inProgress() && $vmSaleRequestsBenefits()?.length) {
+                <div class="flex flex-row justify-end">
+                    <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                        [disabled]="$vmSaleRequestsBenefits().length === 2"
+                        [attr.aria-label]="'SALE_REQUEST.PAYMENT_METHODS.BENEFITS.ACTIONS.CREATE_NEW_BENEFIT' | translate"
+                        (click)="create()">
+                        <mat-icon>add</mat-icon>
+                        {{'SALE_REQUEST.PAYMENT_METHODS.BENEFITS.ACTIONS.CREATE_NEW_BENEFIT' | translate}}
+                    </button>
+                </div>
+            }
+            <mat-accordion [multi]="true" [togglePosition]="'before'">
+                <!-- tack by benefit.type because then if already present, the component is not destroyed and rendered again.
+                    The logic inside the component takes this into account -->
+                @for (benefit of $vmSaleRequestsBenefits(); track benefit.type) {
+                    @if (benefit.type === 'PRESALE') {
+                        <mat-expansion-panel #expansionPanel class="ob-expansion-card" expanded>
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                <mat-panel-title>
+                                    {{'SALE_REQUESTS.PAYMENT_METHODS.BENEFITS.TITLES.PRESALES' | translate}}
+                                </mat-panel-title>
+                                <button mat-icon-button class="ob-button small" (click)="delete('PRESALE'); $event.stopPropagation()">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </mat-expansion-panel-header>
+                            <ng-template matExpansionPanelContent>
+                                <app-sale-request-payment-methods-benefits-presales
+                                    [vmSaleRequestGatewayBenefit]="benefit" (editOutput)="edit('PRESALE')"
+                                    (deleteOutput)="delete('PRESALE')" (saveOutput)="save($event)" (cancelOutput)="cancel('PRESALE')" />
+                            </ng-template>
+                        </mat-expansion-panel>
+                    } @else {
+                        <mat-expansion-panel class="ob-expansion-card" expanded>
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                <mat-panel-title>
+                                    {{'SALE_REQUESTS.PAYMENT_METHODS.BENEFITS.TITLES.INSTALLMENTS' | translate}}
+                                </mat-panel-title>
+                                <button mat-icon-button class="ob-button small" (click)="delete('INSTALLMENTS'); $event.stopPropagation()">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </mat-expansion-panel-header>
+                            <ng-template matExpansionPanelContent>
+                                <app-sale-request-payment-methods-benefits-installments
+                                    [vmSaleRequestGatewayBenefit]="benefit" (editOutput)="edit('INSTALLMENTS')"
+                                    (deleteOutput)="delete('INSTALLMENTS')" (saveOutput)="save($event)"
+                                    (cancelOutput)="cancel('INSTALLMENTS')" />
+                            </ng-template>
+                        </mat-expansion-panel>
+                    }
+                }
+            </mat-accordion>
+            @if (!$inProgress() && !$vmSaleRequestsBenefits()?.length) {
+                <div>
+                    <app-empty-state-tiny
+                        [title]="'SALE_REQUESTS.PAYMENT_METHODS.BENEFITS.TITLES.EMPTY_BENEFITS' | translate"
+                        [description]="'SALE_REQUESTS.PAYMENT_METHODS.BENEFITS.INFOS.EMPTY_BENEFITS' | translate"
+                        [emptyBorder]="true">
+                        <button (click)="create()" mat-stroked-button type="button" class="ob-button medium"
+                            color="primary">
+                            <mat-icon>add</mat-icon>
+                            {{'SALE_REQUEST.PAYMENT_METHODS.BENEFITS.ACTIONS.CREATE_NEW_BENEFIT' | translate}}
+                        </button>
+                    </app-empty-state-tiny>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@if ($inProgress()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

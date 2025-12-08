@@ -1,0 +1,264 @@
+@if (isOperator$ | async) {
+    <div class="flex justify-end items-center entity-status">
+        <app-status-select class="basis-64" [element]="entity$ | async" statusType="ENTITY" [label]="'FORMS.LABELS.STATUS'"
+            [statusList]="entityStatus" [updateStatus]="updateStatus">
+            <ng-template #optionTemplate let-row>
+                {{'ENTITY.STATUS_OPTS.' + row | translate}}
+            </ng-template>
+        </app-status-select>
+    </div>
+    <mat-divider />
+}
+<app-form-container [sidebar]="(showCustomization$ | async) && ((isSysAdmin$ | async) === false)" (cancel)="cancel()" (save)="save()"
+    layout="menu" [disabled]="!form.dirty">
+    @if (entity$ | async; as entity) {
+        <form [formGroup]="form">
+            <!-- ENTITY GENERAL DATA -->
+            <mat-expansion-panel expanded togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'ENTITY.PRINCIPAL_INFO.GENERAL_DATA' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="flex flex-col" formGroupName="generalData">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-x-[25px] w-full">
+                        <!-- ENTITY NAME -->
+                        <mat-form-field id="name" class="col-span-1 ob-form-field field-with-label" appearance="outline">
+                            <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                            <input formControlName="name" matInput [placeholder]="'FORMS.LABELS.NAME' | translate">
+                            <mat-error [ob-form-errors]="form" [field]="['generalData', 'name']" />
+                        </mat-form-field>
+                        <!-- ENTITY NAME -->
+                        <mat-form-field id="name" class="col-span-1 ob-form-field field-with-label" appearance="outline">
+                            <mat-label>{{'FORMS.LABELS.REFERENCE' | translate}}</mat-label>
+                            <input formControlName="reference" matInput [placeholder]="'FORMS.LABELS.REFERENCE' | translate">
+                            <mat-error [ob-form-errors]="form" [field]="['generalData', 'reference']" />
+                        </mat-form-field>
+                        <!-- ENTITY SHORT NAME -->
+                        @if (entity.id === entity.operator.id) {
+                            <div data-test="shortName" class="col-span-1 flex flex-col details-non-editable-field ob-form-field">
+                                <span class="field-label">{{'ENTITY.SHORT_NAME' | translate}}</span>
+                                <span>{{entity.short_name}}</span>
+                            </div>
+                        }
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-x-[25px] w-full">
+                        <!-- ENTITY NIF -->
+                        <mat-form-field id="nif" class="col-span-1 ob-form-field field-with-label" appearance="outline">
+                            <mat-label>{{'FORMS.LABELS.NIF' | translate}}</mat-label>
+                            <input formControlName="nif" matInput [placeholder]="'FORMS.LABELS.NIF' | translate">
+                            <mat-error [ob-form-errors]="form" [field]="['generalData', 'nif']" />
+                        </mat-form-field>
+                        <!-- ENTITY SOCIAL REASON -->
+                        <mat-form-field id="socialReason" class="col-span-1 ob-form-field field-with-label" appearance="outline">
+                            <mat-label>{{'ENTITY.SOCIAL_REASON' | translate}}</mat-label>
+                            <input formControlName="socialReason" matInput
+                                [placeholder]="'ENTITY.SOCIAL_REASON' | translate">
+                            <mat-error [ob-form-errors]="form" [field]="['generalData', 'socialReason']" />
+                        </mat-form-field>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-x-[25px] w-full">
+                        <!-- CORPORATE COLOR -->
+                        <div class="col-sapn-1">
+                            <mat-form-field id="color" class="ob-form-field min-padding field-with-label basis-[90px]" appearance="outline">
+                                <mat-label>{{'FORMS.LABELS.CORPORATE_COLOR' | translate}}</mat-label>
+                                <app-color-picker formControlName="color" />
+                                <mat-error [ob-form-errors]="form" [field]="['generalData', 'color']" />
+                            </mat-form-field>
+                        </div>
+                        @if (entity?.external_reference) {
+                            <div class="col-sapn-1 flex flex-col details-non-editable-field ob-form-field">
+                                <span class="field-label">{{'ENTITY.EXTERNAL_REFERENCE' | translate}}</span>
+                                <span>{{entity.external_reference}}</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </mat-expansion-panel>
+            <!-- ENTITY CUSTOMIZATION -->
+            @if ((showCustomization$ | async) && ((isSysAdmin$ | async) === false)) {
+                <mat-expansion-panel expanded togglePosition="before">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'ENTITY.PRINCIPAL_INFO.CUSTOMIZATION.TITLE' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="flex flex-col section-block" formGroupName="customization">
+                        <!-- LOGOS -->
+                        <h3 class="section-title">{{'ENTITY.PRINCIPAL_INFO.CUSTOMIZATION.LOGOS.TITLE' | translate}}</h3>
+                        <p>{{'ENTITY.PRINCIPAL_INFO.CUSTOMIZATION.LOGOS.BODY' | translate}}</p>
+                        <div class="flex flex-row gap-[24px]">
+                            <div class="flex flex-row gap-[16px]">
+                                <div class="ob-round-badge badge-customization">1</div>
+                                <div class="image-uploader flex flex-col">
+                                    <app-image-uploader label="ENTITY.PRINCIPAL_INFO.CUSTOMIZATION.LOGO.FORMAT"
+                                        [imageRestrictions]="imageRestrictions['logo']"
+                                        formControlName="logo" previewerScaleFactor="1.75" allowSvg
+                                        [style.width]="imageRestrictions['logo'].width*1.75 + 'px'"
+                                        [iconTooltip]="'UPLOAD_IMAGE.FORMS.INFOS.SVG_PNG_TOOLTIP' | translate" />
+                                </div>
+                            </div>
+                            <div class="flex flex-row gap-[16px]">
+                                <div class="ob-round-badge badge-customization">2</div>
+                                <div class="image-uploader flex flex-col">
+                                    <app-image-uploader label="ENTITY.PRINCIPAL_INFO.CUSTOMIZATION.TINY.FORMAT" previewerScaleFactor="5"
+                                        [imageRestrictions]="imageRestrictions['tiny']" formControlName="tiny"
+                                        [style.width]="imageRestrictions['tiny'].width*5 + 'px'" allowSvg
+                                        [iconTooltip]="'UPLOAD_IMAGE.FORMS.INFOS.SVG_PNG_TOOLTIP' | translate" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col section-block" formGroupName="customization">
+                        <!-- FAVICON -->
+                        <h3 class="section-title">{{'ENTITY.PRINCIPAL_INFO.CUSTOMIZATION.FAVICON.TITLE' | translate}}</h3>
+                        <p>{{'ENTITY.PRINCIPAL_INFO.CUSTOMIZATION.FAVICON.BODY' | translate}}</p>
+                        <div class="flex flex-row gap-[16px]">
+                            <div class="ob-round-badge badge-customization">3</div>
+                            <div class="image-uploader flex flex-col">
+                                <app-image-uploader label="ENTITY.PRINCIPAL_INFO.CUSTOMIZATION.FAVICON.FORMAT"
+                                    [imageRestrictions]="imageRestrictions['favicon']"
+                                    formControlName="favicon" previewerScaleFactor="8" allowSvg
+                                    [style.width]="imageRestrictions['favicon'].width*8 + 'px'"
+                                    [iconTooltip]="'UPLOAD_IMAGE.FORMS.INFOS.SVG_ICO_TOOLTIP' | translate" />
+                            </div>
+                        </div>
+                    </div>
+                    <mat-divider class="ob-form-divider" />
+                    <div class="flex flex-col section-block" formGroupName="customization">
+                        <!-- REPORT -->
+                        <h3 class="section-title">{{'ENTITY.PRINCIPAL_INFO.CUSTOMIZATION.REPORTS.TITLE' | translate}}</h3>
+                        <p>{{'ENTITY.PRINCIPAL_INFO.CUSTOMIZATION.REPORTS.BODY' | translate}}</p>
+                        <div class="flex flex-row gap-[16px]">
+                            <div class="image-uploader flex flex-col">
+                                <app-image-uploader label="ENTITY.PRINCIPAL_INFO.CUSTOMIZATION.REPORTS.FORMAT"
+                                    [imageRestrictions]="imageRestrictions['reports']"
+                                    formControlName="reports" previewerScaleFactor="1.75" allowSvg
+                                    [style.width]="imageRestrictions['reports'].width*1.75 + 'px'"
+                                    [iconTooltip]="'UPLOAD_IMAGE.FORMS.INFOS.SVG_PNG_TOOLTIP' | translate" />
+                            </div>
+                        </div>
+                    </div>
+                </mat-expansion-panel>
+            }
+            <!-- ENTITY PROFILE DATA -->
+            @if ((isOperator$ | async) && ((isOperatorEntity$ | async) === false)) {
+                <mat-expansion-panel expanded togglePosition="before">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'ENTITY.PRINCIPAL_INFO.PROFILE' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div formGroupName="settings" fxLayout="column" fxLayoutGap="20px">
+                        <mat-checkbox color="primary" formControlName="isVenueEntity">
+                            {{'ENTITY.TYPE_OPTS.VENUE_ENTITY' | translate}}
+                        </mat-checkbox>
+
+                        <mat-checkbox color="primary" formControlName="isEventEntity">
+                            {{'ENTITY.TYPE_OPTS.EVENT_ENTITY' | translate}}
+                        </mat-checkbox>
+                        <mat-checkbox color="primary" formControlName="isMultiproducer" class="secondary-type-option">
+                            {{'ENTITY.TYPE_OPTS.MULTI_PRODUCER' | translate}}
+                        </mat-checkbox>
+                        <mat-checkbox color="primary" formControlName="allowActivityEvents" class="secondary-type-option">
+                            {{'ENTITY.TYPE_OPTS.ACTIVITY_EVENTS' | translate}}
+                        </mat-checkbox>
+
+                        <mat-checkbox color="primary" formControlName="isChannelEntity">
+                            {{'ENTITY.TYPE_OPTS.CHANNEL_ENTITY' | translate}}
+                        </mat-checkbox>
+                        <div class="settings-field">
+                            <mat-checkbox color="primary" formControlName="enableMultieventCart" class="secondary-type-option">
+                                {{'ENTITY.TYPE_OPTS.MULTIEVENT_CART' | translate}}
+                            </mat-checkbox>
+                        </div>
+                        <div class="settings-field">
+                            <mat-checkbox color="primary" formControlName="enableProfessional" class="terciary-type-option">
+                                {{'ENTITY.TYPE_OPTS.ENABLE_B2B' | translate}}
+                            </mat-checkbox>
+                        </div>
+                        @if(!entity?.settings?.enable_v4_configs){
+                            <div class="settings-field">
+                                <mat-checkbox color="primary" formControlName="allowB2BPublishing" class="quaternary-type-option">
+                                    {{'ENTITY.TYPE_OPTS.ALLOW_B2B_PUBLISHING' | translate}}
+                                </mat-checkbox>
+                            </div>
+                        }
+                        @if (isAvetEntity) {
+                            <div class="settings-field" fxLayoutGap="20px">
+                                <mat-checkbox color="primary" formControlName="allowMultiAvetCart" class="terciary-type-option">
+                                    {{'ENTITY.TYPE_OPTS.MULTIEVENT_AVET_CART' | translate}}
+                                </mat-checkbox>
+                            </div>
+                        }
+                        <mat-checkbox color="primary" formControlName="allowSecondaryMarket" class="secondary-type-option">
+                            {{'ENTITY.TYPE_OPTS.SECONDARY_MARKET' | translate}}
+                        </mat-checkbox>
+
+                        <mat-checkbox color="primary" formControlName="allowInvitations" class="secondary-type-option">
+                            {{'ENTITY.TYPE_OPTS.INVITATIONS' | translate}}
+                        </mat-checkbox>
+
+                        <mat-checkbox color="primary" formControlName="isInsurancer">
+                            {{'ENTITY.TYPE_OPTS.INSURANCER' | translate}}
+                        </mat-checkbox>
+                    </div>
+                </mat-expansion-panel>
+            }
+            <!-- ENTITY LANGUAGES -->
+            <mat-expansion-panel expanded togglePosition="before" id="formLanguages">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'ENTITY.PRINCIPAL_INFO.LANGUAGES' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-language-selector #languageSelector [data]="languageSelectorData" [enableDefaultSelection]="true"
+                    [description]="( 'ENTITY.LANGUAGES_DESCRIPTION' ) | translate" />
+            </mat-expansion-panel>
+            <!-- ENTITY COMMENTS -->
+            <mat-expansion-panel expanded togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'ENTITY.PRINCIPAL_INFO.COMMENTS' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-form-field id="comments" fxFlex="0 1 calc(100% - 20px)" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.COMMENTS' | translate}}</mat-label>
+                    <textarea matInput formControlName="comments" rows="8"></textarea>
+                    <mat-error [ob-form-errors]="form" field="comments" />
+                </mat-form-field>
+            </mat-expansion-panel>
+            <!-- V4 CONFIGS -->
+            @if (isSysAdmin$ | async) {
+                <mat-expansion-panel expanded togglePosition="before">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'ENTITY.PRINCIPAL_INFO.TITLES.V4_CONFIGS' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <mat-checkbox color="primary" formControlName="enabledV4Configs">
+                        {{'ENTITY.PRINCIPAL_INFO.FORMS.LABELS.V4_CONFIGS' | translate}}
+                    </mat-checkbox>
+                </mat-expansion-panel>
+            }
+        </form>
+    }
+    @if ((showCustomization$ | async) && ((isSysAdmin$ | async) === false)) {
+        <div class="sidebar-container" slot="sidebar"
+            fxLayout="column"
+            fxLayoutGap="8px">
+            <div>
+                <img src="assets/entity-customization/logo.svg" [alt]="'' | translate">
+                <br>
+                <span class="sidebar-label">{{'ENTITY.PRINCIPAL_INFO.SIDEBAR.LOGO.TITLE' | translate}}</span>
+                <p>{{'ENTITY.PRINCIPAL_INFO.SIDEBAR.LOGO.FORMAT' | translate}}</p>
+            </div>
+            <div>
+                <img src="assets/entity-customization/tiny_logo.svg" [alt]="'' | translate">
+                <br>
+                <span class="sidebar-label">{{'ENTITY.PRINCIPAL_INFO.SIDEBAR.TINY_LOGO.TITLE' | translate}}</span>
+                <p>{{'ENTITY.PRINCIPAL_INFO.SIDEBAR.TINY_LOGO.FORMAT' | translate}}</p>
+            </div>
+            <div>
+                <img src="assets/entity-customization/favicon.svg" [alt]="'' | translate">
+                <br>
+                <span class="sidebar-label">{{'ENTITY.PRINCIPAL_INFO.SIDEBAR.FAVICON.TITLE' | translate}}</span>
+                <p>{{'ENTITY.PRINCIPAL_INFO.SIDEBAR.FAVICON.FORMAT' | translate}}</p>
+            </div>
+        </div>
+    }
+</app-form-container>
+@if (reqInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

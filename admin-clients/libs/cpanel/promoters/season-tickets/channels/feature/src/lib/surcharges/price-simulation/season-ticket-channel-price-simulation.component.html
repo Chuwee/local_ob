@@ -1,0 +1,74 @@
+<div *ngIf="(priceSimulations$ | async)  as priceSimulationRates" fxFlex="100%" fxLayout="column">
+    <p class="rates-count">
+        {{('SEASON_TICKET.CHANNEL.PRICE_SIMULATION.RATES_COUNT' | translate) + ': ' + priceSimulationRates.length}}
+    </p>
+    <div *ngFor="let rate of priceSimulationRates" class="section-block">
+        <h3 class="section-title">{{rate.rateName | uppercase}}</h3>
+        <mat-table class="ob-table not-touchable" [dataSource]="rate.priceTypes"
+            [attr.aria-label]="'SEASON_TICKET.CHANNEL.PRICE_SIMULATION' | translate">
+            <ng-container matColumnDef="price-type">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'SEASON_TICKET.CHANNEL.PRICE_SIMULATION.PRICE_TYPE' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">{{row.priceTypeName}}
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="promotion">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'SEASON_TICKET.CHANNEL.PRICE_SIMULATION.PROMOTION_NAME' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    <div class="promotion-name" fxFlex="0 0" fxLayout="column wrap" fxLayoutGap="10px">
+                        <span *ngFor="let promo of row.promotions" fxLayoutAlign="start start">{{promo.name}}</span>
+                    </div>
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="promotion-type">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'SEASON_TICKET.CHANNEL.PRICE_SIMULATION.PROMOTION_TYPE' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    <div class="promotion-type" fxLayout="column wrap" fxLayoutGap="10px">
+                        <span class="promotion-type-badge" *ngFor="let promo of row.promotions">
+                            {{'EVENTS.PROMOTIONS.TYPE_OPTS.' + promo.type.toUpperCase() + '.SHORT' | translate}}
+                        </span>
+                    </div>
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="base">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'SEASON_TICKET.CHANNEL.PRICE_SIMULATION.BASE_PRICE' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">{{row.base | localCurrency:(currency$ | async):'narrow'}}
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="promoter-surcharges">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'SEASON_TICKET.CHANNEL.PRICE_SIMULATION.PROMOTER_SURCHARGES' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">{{row.promoterSurcharges | localCurrency:(currency$ | async):'narrow'}}
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="channel-surcharges">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'SEASON_TICKET.CHANNEL.PRICE_SIMULATION.CHANNEL_SURCHARGES' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">{{row.channelSurcharges | localCurrency:(currency$ | async):'narrow'}}
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="total">
+                <mat-header-cell *matHeaderCellDef class="head-cell right total-column">
+                    {{'SEASON_TICKET.CHANNEL.PRICE_SIMULATION.TOTAL_PRICE' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row" class="right total-column">{{row.total | localCurrency:(currency$ | async):'narrow'}}
+                </mat-cell>
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="displayedColumns;"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        </mat-table>
+    </div>
+</div>
+
+<div *ngIf="isLoading$ | async" fxFlex="100%" fxLayout="column" fxLayoutAlign="center center">
+    <mat-spinner></mat-spinner>
+</div>

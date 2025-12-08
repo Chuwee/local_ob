@@ -1,0 +1,25 @@
+<div fxLayout="row wrap" fxLayoutAlign="stretch">
+    <div fxLayout="column">
+        <p fxLayout="row" class="description">
+            {{ 'SEASON_TICKET.SUBSCRIPTIONS_LIST_DESCRIPTION' | translate }}
+        </p>
+    </div>
+</div>
+<form id="customerRelationshipData" fxLayout="row wrap" fxLayoutAlign="space-between">
+    <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 0 calc(50% - 20px)" appearance="outline" class="ob-form-field field-with-label">
+        <mat-label>{{ 'EVENTS.SUBSCRIPTIONS_LIST' | translate }}</mat-label>
+        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+            [formControl]="customerRelationshipDataForm.controls.subscription_list_id">
+            <mat-option [value]="null">
+                <div appEllipsify [matTooltip]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                    {{ 'FORMS.SELECT.PLACE_HOLDER' | translate }}
+                </div>
+            </mat-option>
+            <mat-option *ngFor=" let subscriptions of entitySubscriptionListsBS | async " [value]="subscriptions.id">
+                <div appEllipsify [matTooltip]="subscriptions.name">
+                    {{ subscriptions.name }}
+                </div>
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</form>

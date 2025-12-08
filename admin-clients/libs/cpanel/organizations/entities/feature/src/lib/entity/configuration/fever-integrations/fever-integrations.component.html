@@ -1,0 +1,38 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="!form.dirty" [formGroup]="form">
+    <!-- FEVERZONE -->
+    @if ($isAllowFeverZoneShown()) {
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{ 'ENTITY.FEVER_ZONE.TITLE' | translate }}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <section id="fever-zone" class="flex flex-col gap-[24px]">
+                <div class="flex flex-wrap">
+                    <mat-checkbox class="flex justify-start" [formControlName]="formControlNames.allowFeverZone">
+                        {{ 'ENTITY.FEVER_ZONE.ALLOW.LABEL' | translate }}
+                    </mat-checkbox>
+                </div>
+            </section>
+        </mat-expansion-panel>
+    }
+    <!-- CHANNEL -->
+    <!-- Hidden for now, as it is not implemented yet -->
+    @if ($isOperatorManager() && false) {
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{ 'ENTITY.TITLES.SALE_CHANNEL' | translate }}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <section id="sale-channel" class="flex flex-col gap-[24px]">
+                <div class="flex flex-wrap">
+                    <mat-checkbox [formControlName]="formControlNames.pbQuestions">
+                        <span class="questions-checkbox-label"> {{ 'ENTITY.FORMS.LABELS.POST_BOOKING_QUESTIONS' | translate }} </span>
+                        <div>{{ 'ENTITY.FORMS.INFOS.SALE_CHANNEL' | translate }}</div>
+                    </mat-checkbox>
+                </div>
+            </section>
+        </mat-expansion-panel>
+    }
+</app-form-container>
+
+@if ($reqInProgress()) {
+    <div class="spinner-container"> <mat-spinner /> </div>
+}

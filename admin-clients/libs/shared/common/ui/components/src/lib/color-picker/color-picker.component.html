@@ -1,0 +1,57 @@
+<div class="color-picker" fxLayout="row" fxLayoutAlign="start stretch" [class.disabled-color-picker]="colorControl.disabled">
+    <div fxLayout="row" fxLayoutAlign="start stretch" class="color-picker-color-rect"
+        [satPopoverAnchor]="popover" (click)="popover.toggle()">
+        <ng-container *ngIf="colorControl.value && colorControl.value !== 'transparent' else emptyColor">
+            <div fxFlex="50px" [style.backgroundColor]="colorControl.value" class="color-rect"></div>
+        </ng-container>
+        <ng-template #emptyColor>
+            <div fxFlex="50px" class="empty-color" fxLayoutAlign="center center">
+                <div class="empty-color-line"></div>
+                <div fxFlex="100%" class="empty-color-box"></div>
+            </div>
+        </ng-template>
+    </div>
+    <div fxLayoutAlign="center center">
+        <button mat-icon-button aria-label="colorize" class="ob-button xsmall color-picker-button"
+            [satPopoverAnchor]="popover" (click)="popover.toggle()">
+            <mat-icon>colorize</mat-icon>
+        </button>
+    </div>
+</div>
+<sat-popover #popover hasBackdrop yAlign="center" xAlign="after" [autoFocus]="false" [restoreFocus]="false"
+    [forceAlignment]="false">
+    <div class="color-picker-popover">
+        <div class="color-picker-wrapper ob-color-picker">
+            <color-chrome [color]="tempColor" [disableAlpha]="true" (onChangeComplete)="changeHandler($event)">
+            </color-chrome>
+            <div *ngIf="customColors" class="colors-group">
+                <p class="colors-group-label">
+                    {{'FORMS.LABELS.MY_COLORS' | translate}}
+                </p>
+                <color-circle [color]="tempColor" [colors]="customColors" [circleSize]="22" [circleSpacing]="9"
+                    (onChangeComplete)="changeHandler($event)"></color-circle>
+            </div>
+            <div class="colors-group">
+                <p class="colors-group-label">
+                    {{'FORMS.LABELS.DEFAULT_COLORS' | translate}}
+                </p>
+                <color-circle [color]="tempColor" [colors]="defaultColors" [circleSize]="22" [circleSpacing]="9"
+                    (onChangeComplete)="changeHandler($event)"></color-circle>
+                <div class="colors-group-empty" *ngIf="allowEmptyColor">
+                    <div fxFlex="22px" fxLayoutAlign="center center" (click)="changeHandler('transparent')">
+                        <div class="empty-color-line"></div>
+                        <div fxFlex="100%" class="empty-color-circle" [class.selected]="tempColor === 'transparent'"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="color-picker-footer" fxLayout="row" fxLayoutAlign="end">
+            <button type="button" mat-button class="ob-button" (click)="popover.toggle()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button mat-flat-button color="primary" class="ob-button" (click)="commitColor(); popover.toggle()">
+                {{'FORMS.ACTIONS.SELECT' | translate}}
+            </button>
+        </div>
+    </div>
+</sat-popover>

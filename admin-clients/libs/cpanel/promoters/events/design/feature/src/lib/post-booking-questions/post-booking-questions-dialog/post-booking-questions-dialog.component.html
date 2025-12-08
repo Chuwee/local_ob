@@ -1,0 +1,44 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title>
+        <div class="flex justify-between">
+            <h2 class="secondary title">
+                {{ 'EVENTS.QUESTIONS.TITLES.QUESTIONS_LIST' | translate }}
+            </h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+
+    <div mat-dialog-content class="questions-selection-container">
+        <p>{{ 'EVENTS.QUESTIONS.FORMS.INFOS.PB_QUESTIONS_DIALOG' | translate }}</p>
+
+        <app-searchable-paginated-selection
+            [placeholder]="'EVENTS.QUESTIONS.FORMS.LABELS.SEARCH_QUESTIONS' | translate"
+            [data$]="questions$" [metadata$]="metadata$" [loading$]="loading$"
+            [pageSize]="pageSize" [form]="control" (loadData)="changeFilter($event)">
+
+            <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data" let-selectionChanged="selectionChanged">
+                <app-selection-list [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged">
+                    <ng-template #optionTemplate let-row>
+                        <div class="flex justify-between">
+                            <span>{{ row.name }}</span>
+                        </div>
+                    </ng-template>
+                </app-selection-list>
+            </ng-template>
+        </app-searchable-paginated-selection>
+    </div>
+
+    <div mat-dialog-actions>
+        <div class="flex justify-end flex-grow">
+            <button mat-flat-button type="button" class="ob-button" (click)="close()">
+                {{ 'FORMS.ACTIONS.CANCEL' | translate }}
+            </button>
+            <button mat-flat-button color="primary" type="button"
+                class="ob-button" [disabled]="control.pristine" (click)="save()">
+                {{ 'FORMS.ACTIONS.OK' | translate }}
+            </button>
+        </div>
+    </div>
+</div>

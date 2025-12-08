@@ -1,0 +1,45 @@
+<div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch" class="with-wizard-bar">
+    <div fxLayout="row wrap" class="info-container">
+        <p fxFlex="0 0 100%">{{targetCapacityDeltaLiteral}}</p>
+    </div>
+    <div>
+        <form [formGroup]="quotaFormGroup" fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="32px">
+            <div class="details-non-editable-field ob-form-field"
+                fxLayout="column">
+                <span class="field-label">{{capacityDeltaLiteral}}&nbsp;</span>
+                <span>{{absCapacityDelta}}</span>
+            </div>
+            <mat-form-field fxFlex="90%" appearance="outline" class="ob-form-field">
+                <mat-label>{{quotaCountersLiteral}}</mat-label>
+                <mat-select [formControlName]="formControlNames.quota" [placeholder]="'FORMS.ACTIONS.SELECT' | translate"
+                    #matSelect>
+                    <mat-select-trigger *ngIf="matSelect.value as quotaCounter">
+                        <div fxLayout="row" fxLayoutAlign="start center" [style.min-width]="'0'">
+                            <span appEllipsify>
+                                {{quotaCounter.label.literal || quotaCounter.label.literalKey | translate}}&nbsp;
+                            </span>
+                            <span>({{quotaCounter.count}})</span>
+                        </div>
+                    </mat-select-trigger>
+                    <mat-option>
+                        <app-select-search #quotaCountersSelectSearch [options$]="quotaCounters$"
+                            [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="label.literal"
+                            requireSelection="true">
+                        </app-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let quotaCounter of quotaCountersSelectSearch.getFilteredOptions$() | async"
+                        [value]="quotaCounter" [disabled]="quotaCounter.disabled">
+                        <div fxLayout="row" fxLayoutAlign="start center" [style.min-width]="'0'">
+                            <span appEllipsify
+                                [matTooltip]="quotaCounter.label.literal || quotaCounter.label.literalKey | translate">
+                                {{quotaCounter.label.literal || quotaCounter.label.literalKey | translate}}&nbsp;
+                            </span>
+                            <span>({{quotaCounter.count}})</span>
+                        </div>
+                    </mat-option>
+                </mat-select>
+                <mat-error [ob-form-errors]="quotaFormGroup" [field]="formControlNames.quota"></mat-error>
+            </mat-form-field>
+        </form>
+    </div>
+</div>

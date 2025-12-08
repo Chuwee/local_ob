@@ -1,0 +1,81 @@
+<form [formGroup]="filtersForm" fxLayout="column" fxLayoutGap="24px">
+    <ng-container *ngIf="canSelectEntity$ | async">
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label">
+                {{'USER.ENTITY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="300px">
+                <mat-form-field appearance="outline" class="ob-form-field entity-select">
+                    <mat-select formControlName="entity" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate">
+                        <mat-option>
+                            <app-select-search #entitySelectSearch [options$]="entities$" searchField="name" />
+                        </mat-option>
+                        <mat-option *ngFor="let entity of entitySelectSearch.getFilteredOptions$() | async" [value]="entity">
+                            <div appEllipsify [matTooltip]="entity ? entity.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)">
+                                {{entity ? entity.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                            </div>
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <ng-container *ngIf="(currencies$ | async) as currencies">
+            <div *ngIf="currencies.length > 1" fxLayout="row" class="filter-block">
+                <div class="ob-label">
+                    {{'FORMS.LABELS.CURRENCY' | translate}}
+                </div>
+                <div class="filter-block-input" fxFlex="300px">
+                    <mat-form-field appearance="outline" class="ob-form-field status-select">
+                        <mat-select formControlName="currency" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate"
+                            [compareWith]="compareWith">
+                            <mat-option>
+                                <app-select-search #currencySelectSearch [options$]="currencies$ | localCurrenciesFullTranslation$"
+                                    [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="description" />
+                            </mat-option>
+                            <mat-option
+                                *ngFor="let currency of currencySelectSearch.getFilteredOptions$() | async | currencyFilterItemValues"
+                                [value]="currency">
+                                {{currency.description ?? ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+        </ng-container>
+        <mat-divider [inset]="true" />
+    </ng-container>
+    <div fxLayout="row" class="filter-block">
+        <div class="ob-label">
+            {{'FORMS.LABELS.TYPE' | translate}}
+        </div>
+        <div class="filter-block-input" fxFlex="300px">
+            <mat-form-field appearance="outline" class="ob-form-field type-select">
+                <mat-select formControlName="type" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                    <mat-option [value]="null">
+                        {{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}
+                    </mat-option>
+                    <mat-option *ngFor="let type of types" [value]="type">
+                        {{type && type.name | translate}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+    <div fxLayout="row" class="filter-block">
+        <div class="ob-label">
+            {{'FORMS.LABELS.STATUS' | translate}}
+        </div>
+        <div class="filter-block-input" fxFlex="300px">
+            <mat-form-field appearance="outline" class="ob-form-field status-select">
+                <mat-select formControlName="status" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                    <mat-option [value]="null">
+                        {{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}
+                    </mat-option>
+                    <mat-option *ngFor="let status of statuses" [value]="status">
+                        {{status && status.name | translate}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+</form>

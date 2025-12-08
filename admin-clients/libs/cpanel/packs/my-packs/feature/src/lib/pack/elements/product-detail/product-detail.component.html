@@ -1,0 +1,121 @@
+<div fxLayout="column" fxFlex="1 1 100%" fxLayoutGap="16px">
+    <form [formGroup]="form" class="form-box">
+        <div fxLayout="column" fxLayoutGap="16px" class="gray-card-content">
+            <div fxFlex="1 1 100%" fxLayoutGap="8px" fxLayoutAlign="space-between center" class="details-description">
+                <span> {{ 'CHANNELS.PACKS.PRODUCT.DESCRIPTION' | translate }} </span>
+                @if(packType === 'AUTOMATIC'){
+                    <button mat-stroked-button color="tertiary" class="ob-button medium"
+                        (click)="edit()" [disabled]="item.editing">
+                        {{'MEMBER_EXTERNAL.RESTRICTIONS.EDIT' | translate}}
+                    </button>
+                }
+            </div>
+            <div class="card-info" fxLayout="column" fxLayoutGap="24px">
+                @if(packType === 'AUTOMATIC') {
+                    <div fxLayout="column" fxLayoutGap="16px">
+                        <span class="details-title">
+                            {{ 'FORMS.LABELS.PRODUCT_VARIANT' | translate }}
+                        </span>
+                        @if((productVariants$ | async); as productVariants;){
+                            <mat-form-field appearance="outline" class="ob-form-field">
+                                <mat-select formControlName="variant">
+                                    @for (variant of productVariants; track variant) {
+                                        <mat-option [value]="variant.id">{{variant.name}}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        }
+                    </div>
+                    <div fxLayout="column" fxLayoutGap="16px">
+                        <span class="details-title">
+                            {{ 'CHANNELS.PACKS.PRODUCT.DELIVERY_POINT.LABEL' | translate }}
+                        </span>
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <app-select-server-search [multiple]="false"
+                                [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="delivery_point"
+                                [options$]="deliveryPoints$" [moreOptionsAvailable$]="moreDeliveryPointsAvailable$"
+                                [loadOptionsOnInit]="true" (loadOptions)="loadProductDeliveryPoints($event.q, $event.nextPage)" />
+                        </mat-form-field>
+                    </div>
+                    <div fxLayout="column" fxLayoutGap="16px">
+                        <span class="details-title">
+                            {{ 'CHANNELS.PACKS.ELEMENTS.CREATE.PRODUCT.BARS_CODE.LABEL' | translate }}
+                        </span>
+                        <mat-radio-group formControlName="shared_barcode" fxLayout="column"
+                            fxLayoutGap="8px">
+                            <mat-radio-button class="inline" [value]="true">
+                                {{'CHANNELS.PACKS.ELEMENTS.CREATE.PRODUCT.BARS_CODE.SHARED_DESCRIPTION' | translate}}
+                            </mat-radio-button>
+                            <mat-radio-button class="inline" [value]="false">
+                                {{'CHANNELS.PACKS.ELEMENTS.CREATE.PRODUCT.BARS_CODE.UNIQUE_DESCRIPTION' | translate}}
+                            </mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+                } @else if (packType === 'MANUAL') {
+                    <div fxLayout="column" fxLayoutGap="16px">
+                        <span class="details-title">
+                            {{ 'FORMS.LABELS.PRODUCT_VARIANT' | translate }}
+                        </span>
+                        @for ((variant of productVariants$ | async); track $index;) {
+                            {{variant.name}}{{(!$last) ? ',': ' '}}
+                        }
+                    </div>
+                    <div fxLayout="column" fxLayoutGap="16px">
+                        <span class="details-title">
+                            {{ 'CHANNELS.PACKS.PRODUCT.DELIVERY_POINT.LABEL' | translate }}
+                        </span>
+                        @for ((deliveryPoint of deliveryPoints$ | async); track $index;) {
+                            {{deliveryPoint.name}}{{(!$last) ? ',': ' '}}
+                        }
+                    </div>
+                }
+                <div class="flex flex-row gap-[24px]">
+                    <div fxLayout="column" fxLayoutGap="8px" fxFlex="1 1 40%">
+                        <span class="details-title">{{'CHANNELS.PACKS.FORMS.INFOS.DISPLAY_PACK_DETAIL' | translate}}</span>
+                        <mat-checkbox color="primary" formControlName="display_item_in_channels">
+                            <mat-label>{{'CHANNELS.PACKS.FORMS.LABELS.DISPLAY_PACK_DETAIL' | translate}}</mat-label>
+                        </mat-checkbox>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-[8px]">
+                    <mat-label class="details-title flex items-center">
+                        {{'CHANNELS.PACKS.FORMS.LABELS.INFORMATIVE_PRICE' | translate}}
+                        <app-help-button [message]="'CHANNELS.PACKS.ELEMENTS.INFORMATIVE_PRICE_INFO' | translate" />
+                    </mat-label>
+                    <mat-checkbox color="primary" formControlName="informative_price_check">
+                        <mat-label>{{'CHANNELS.PACKS.FORMS.LABELS.DEFINE_INFORMATIVE_PRICE' | translate}}</mat-label>
+                    </mat-checkbox>
+                    @if(this.form.controls.informative_price_check.value) {
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label radio-content">
+                            <mat-label>{{'CHANNELS.PACKS.FORMS.LABELS.NEW_INFORMATIVE_PRICE' | translate}}</mat-label>
+                            <app-currency-input formControlName="informative_price"
+                                [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                                [placeholder]="0 | localCurrency: (currency$ | async) :'narrow'" />
+                        </mat-form-field>
+                    }
+                </div>
+            </div>
+        </div>
+    </form>
+    @if(item.editing){
+        <div fxLayoutAlign="end center" fxLayoutGap="8px">
+            @if(!this.$pack().has_sales) {
+                <div class="flex flex-1 items-center editing-mode-message">
+                    <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                    {{'MEMBER_EXTERNAL.RESTRICTIONS.EDITING_MODE' | translate}}
+                </div>
+            } @else {
+                <div class="flex flex-1 items-center editing-mode-message">
+                    <mat-icon class="ob-icon small warning with-text">warning</mat-icon>
+                    {{'CHANNELS.PACKS.ELEMENTS.EDITING_WITH_SALES' | translate}}
+                </div>
+            }
+            <button type="button" mat-button class="ob-button medium" (click)="cancel()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button type="button" mat-flat-button class="ob-button medium" color="primary" (click)="save()" [disabled]="!form.dirty">
+                {{'FORMS.ACTIONS.UPDATE' | translate}}
+            </button>
+        </div>
+    }
+</div>

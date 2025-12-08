@@ -1,0 +1,141 @@
+// USE THIS FILE WHEN MIGRATE TO MDC
+@use '@angular/material' as mat;
+@mixin mdc-radio-override($palettes, $colors, $typography) {
+
+    $primary-color: mat.m2-get-color-from-palette(map-get($palettes, primary));
+    $primary-color-opacity-15: mat.m2-get-color-from-palette(map-get($palettes, primary), 0.15);
+    $primary-color-opacity-35: mat.m2-get-color-from-palette(map-get($palettes, primary), 0.35);
+    $accent-color: mat.m2-get-color-from-palette(map-get($palettes, accent));
+    $accent-color-opacity-15: mat.m2-get-color-from-palette(map-get($palettes, accent), 0.15);
+    $accent-color-opacity-35: mat.m2-get-color-from-palette(map-get($palettes, accent), 0.35);
+    $warn-color: mat.m2-get-color-from-palette(map-get($palettes, warn));
+    $warn-color-opacity-15: mat.m2-get-color-from-palette(map-get($palettes, warn), 0.15);
+    $warn-color-opacity-35: mat.m2-get-color-from-palette(map-get($palettes, warn), 0.35);
+    $ob-grey: map-get($colors, ob-grey);
+    $ob-grey-dark: map-get($colors, ob-grey-dark);
+    $ob-bg-3: map-get($colors, ob-bg-3);
+    $ob-grey-light-10: map-get($colors, ob-grey-light-10);
+    $ob-grey-light-20: map-get($colors, ob-grey-light-20);
+
+    mat-radio-group {
+        &.ng-touched.ng-invalid {
+            .mdc-radio__outer-circle {
+                --mdc-radio-unselected-icon-color: #{$warn-color};
+            }
+        }
+    }
+    .mat-mdc-radio-button:not(.mat-mdc-radio-checked), .mat-mdc-radio-button {
+        .mdc-radio__native-control:disabled {
+            +.mdc-radio__background, &:not(:checked)+.mdc-radio__background {
+                .mdc-radio__inner-circle, .mdc-radio__outer-circle {
+                    --mdc-radio-disabled-selected-icon-color: $ob-grey-light-20;
+                    border-color: $ob-grey-light-20;
+                    background-color: $ob-bg-3;
+                    opacity: 1;
+                }
+            }
+        }
+    }
+
+    .mat-mdc-radio-button .mdc-radio {
+        --mdc-radio-state-layer-size: 24px;
+    }
+
+    mat-radio-button {
+        &.ob-radio-card-button {
+            border: 1px solid $ob-grey;
+
+            &:hover:not(:has(.mdc-radio--disabled)) {
+                background-color: $ob-grey-light-10;
+            }
+
+            &.mat-primary.mat-mdc-radio-checked {
+                border-color: $primary-color;
+                background-color: $primary-color-opacity-15;
+
+                &:hover {
+                    background-color: $primary-color-opacity-35;
+                }
+            }
+
+            &.mat-accent.mat-mdc-radio-checked {
+                border-color: $accent-color;
+                background-color: $accent-color-opacity-15;
+
+                &:hover {
+                    background-color: $accent-color-opacity-35;
+                }
+            }
+
+            &.mat-warn.mat-mdc-radio-checked {
+                border-color: $warn-color;
+                background-color: $warn-color-opacity-15;
+
+                &:hover {
+                    background-color: $warn-color-opacity-35;
+                }
+            }
+
+            &:has(.mdc-radio--disabled) {
+                border-color: $ob-grey-light-10;
+            }
+
+            .mdc-form-field {
+                --mdc-radio-disabled-unselected-icon-color: #{$ob-grey-light-10};
+                white-space: normal;
+                padding: 10px;
+                width: calc(100% - 20px);
+
+                label {
+                    width: 100%;
+                }
+            }
+        }
+
+        &.ob-radio-card-button,
+        &.ob-radio-button {
+            &.inline {
+                padding-top: 12px;
+                padding-bottom: 32px;
+            }
+
+            &.vertical-list {
+                padding: 10px 0;
+                display: flex;
+            }
+
+            &.align {
+                .mdc-radio {
+                    align-self: center;
+                }
+            }
+            &.disabled-with-contrast .mdc-form-field {
+                .mdc-radio--disabled + label > * {
+                    color: inherit;
+                }
+            }
+            .mdc-radio {
+                padding: 0 4px 0 0;
+            }
+        }
+
+        &.ob-radio-image-button {
+            .mdc-form-field {
+                align-items: flex-start;
+            }
+        }
+        &.ob-radio-image-button.with-label .mdc-form-field {
+            align-items: center;
+        }
+
+        .option-title {
+            font: var(--ob-theme-font-body-2);
+            line-height: 22px;
+            margin-bottom: 2px;
+        }
+
+        .mdc-radio {
+            align-self: flex-start;
+        }
+    }
+}

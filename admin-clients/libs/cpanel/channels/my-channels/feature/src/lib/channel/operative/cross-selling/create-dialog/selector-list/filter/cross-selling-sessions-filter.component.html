@@ -1,0 +1,94 @@
+<button mat-stroked-button color="tertiary" class="ob-button medium" [class.active]="activeFilters"
+    [matBadge]="activeFilters || ''" [satPopoverAnchor]="filterPopover" (click)="openFilters()">
+    {{'FORMS.OPEN_FILTER_BTN' | translate}}
+    <mat-icon iconPositionEnd>
+        filter_list
+    </mat-icon>
+</button>
+<sat-popover #filterPopover hasBackdrop yAlign="below" xAlign="after" autoFocus="false" restoreFocus="false">
+    <mat-card class="ob-card">
+        <mat-card-content class="form-container">
+            <form [formGroup]="form" fxLayout="column" fxLayoutGap="24px">
+                <div fxLayout="row" class="filter-block">
+                    <div class="ob-label" fxFlex="0 0 100px">
+                        {{'FORMS.LABELS.STATUS' | translate}}
+                    </div>
+                    <div class="filter-block-input" fxFlex="0 0 300px">
+                        <mat-form-field appearance="outline" class="ob-form-field status-select">
+                            <mat-select formControlName="status" multiple
+                                [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                                @for (status of statusList; track status.id) {
+                                    <mat-option [value]="status.id">
+                                        {{status && (status.name | translate)}}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>◊
+                <mat-divider [inset]="true" />
+                <div fxLayout="row" class="filter-block">
+                    <div class="ob-label" fxFlex="0 0 100px">
+                        {{'DATES.START_DATE' | translate}}
+                    </div>
+                    <div class="filter-block-input" fxFlex="0 0 140px">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <input matInput [matDatepicker]="initStartDateDP" [placeholder]="dateFormat"
+                                autocomplete="off" formControlName="initStartDate" (focus)="initStartDateDP.open()"
+                                [max]="form.get('finalStartDate')?.value">
+                            <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                                (click)="$event.stopPropagation(); initStartDateDP.open();">
+                                <mat-icon>event</mat-icon>
+                            </button>
+                            <mat-datepicker #initStartDateDP />
+                        </mat-form-field>
+                    </div>
+                    <div fxFlex="0 0 20px">
+                        <span fxFlex class="filter-block-dates-separator"></span>
+                    </div>
+                    <div class="filter-block-input" fxFlex="0 0 140px">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <input matInput [matDatepicker]="finalStartDateDP" [placeholder]="dateFormat"
+                                autocomplete="off" formControlName="finalStartDate" (focus)="finalStartDateDP.open()"
+                                [min]="form.get('initStartDate')?.value">
+                            <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                                (click)="$event.stopPropagation(); finalStartDateDP.open();">
+                                <mat-icon>event</mat-icon>
+                            </button>
+                            <mat-datepicker #finalStartDateDP />
+                        </mat-form-field>
+                    </div>
+                </div>
+                <mat-divider [inset]="true" />
+                <div fxLayout="column" class="filter-block">
+                    <span class="field-label">{{'DATES.WEEKDAYS' | translate}}</span>
+                    <div>
+                        <mat-button-toggle-group class="ob-round-button-group weekdays-selector" multiple="true"
+                            formControlName="weekdays">
+                            @for (day of weekdays; track day.key) {
+                                <mat-button-toggle [value]="day.key">
+                                    {{day.label}}
+                                </mat-button-toggle>
+                            }
+                        </mat-button-toggle-group>
+                    </div>
+                </div>
+            </form>
+        </mat-card-content>
+        <mat-card-footer fxLayoutAlign="start center">
+            <div fxFlex="grow" class="left-actions">
+                <a class="ob-link" #removeLink (click)="clearFilters()">
+                    {{'FORMS.REMOVE_FILTERS_BTN' | translate}}
+                </a>
+            </div>
+            <div fxFlex="none" class="right-actions">
+                <button (click)="closeFilters()" mat-button class="ob-button small">
+                    {{'FORMS.CLOSE_FILTER_BTN' | translate}}
+                </button>
+                <button (click)="applyFilters()" mat-flat-button color="primary" class="ob-button small" [disabled]="form.invalid">
+                    {{'FORMS.APPLY_FILTER_BTN' | translate}}
+                </button>
+            </div>
+        </mat-card-footer>
+    </mat-card>
+</sat-popover>

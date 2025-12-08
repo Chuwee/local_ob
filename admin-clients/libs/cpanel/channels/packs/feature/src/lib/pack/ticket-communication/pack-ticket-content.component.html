@@ -1,0 +1,26 @@
+<app-form-container class="no-top-padding" (cancel)="cancel()" (save)="save()" [disabled]="!form.dirty">
+    <app-language-bar [languages]="languages$ | async" [selected]="selectedLanguage$ | async"
+        [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)" class="sticky">
+    </app-language-bar>
+    <div>
+        <div class="details-container" fxFlex="0 1 880px">
+            <p class="section-description">{{'CHANNELS.PACKS.TICKET_COMMUNICATION_DESCRIPTION' | translate}}</p>
+        </div>
+        <mat-divider vertical="true" fxFlexAlign="stretch"></mat-divider>
+        <div fxFlex="0 0 200px"></div>
+    </div>
+    <app-pack-ticket-content-pdf #pdfContent [form]="form" [language$]="selectedLanguage$">
+    </app-pack-ticket-content-pdf>
+    <app-pack-ticket-content-printer #printerContent [form]="form" [language$]="selectedLanguage$">
+    </app-pack-ticket-content-printer>
+    <div fxFlex="grow" class="bottom-content">
+        <div fxFlex="0 1 880px"></div>
+        <mat-divider vertical="true" fxFlexAlign="stretch"></mat-divider>
+        <div fxFlex="0 0 200px"></div>
+    </div>
+</app-form-container>
+@if(isLoadingOrSaving$ | async) {
+    <div class="spinner-container">
+        <mat-spinner></mat-spinner>
+    </div>
+}

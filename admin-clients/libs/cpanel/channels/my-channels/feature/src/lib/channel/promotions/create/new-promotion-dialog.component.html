@@ -1,0 +1,47 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <form [formGroup]="form" fxLayout="column">
+        <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+            <h2 fxFlex="100%" class="secondary title">{{'CHANNELS.PROMOTIONS.NEW' | translate}}</h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+        <div mat-dialog-content fxLayout="column">
+            <div fxFlex>
+                <mat-form-field fxFlex="0 1 550px" appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                    <input matInput aria-label="name" [placeholder]="'FORMS.LABELS.NAME' | translate"
+                        formControlName="name" autocomplete="off">
+                    <mat-error [ob-form-errors]="form" field="name"></mat-error>
+                </mat-form-field>
+            </div>
+            <mat-divider class="ob-form-divider"></mat-divider>
+            <mat-radio-group formControlName="type" fxFlex="100%" fxLayout="row wrap" fxLayout.lt-md="column"
+                fxLayoutGap="10px" fxLayoutAlign="center" class="promotion-type-options">
+                <mat-radio-button fxFlex="0 1 calc(50% - 10px)" fxFlex.lt-md="100%" class="ob-radio-card-button"
+                    [value]="creationTypes.automatic">
+                    <div class="option-title">{{'CHANNELS.PROMOTIONS.NEW_AUTOMATIC' | translate}}</div>
+                    <div>
+                        {{'CHANNELS.PROMOTIONS.INFO_AUTOMATIC' | translate}}
+                    </div>
+                </mat-radio-button>
+                <mat-radio-button fxFlex="0 1 calc(50% - 10px)" fxFlex.lt-md="100%" class="ob-radio-card-button"
+                    [value]="creationTypes.collective">
+                    <div class="option-title">{{'CHANNELS.PROMOTIONS.NEW_MANUAL' | translate}}</div>
+                    <div>
+                        {{'CHANNELS.PROMOTIONS.INFO_MANUAL' | translate}}
+                    </div>
+                </mat-radio-button>
+            </mat-radio-group>
+        </div>
+        <div mat-dialog-actions fxLayoutAlign="end">
+            <button [disabled]="(saving$ | async)" type="button" mat-button class="ob-button" (click)="close()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button [disabled]="!form.valid || (saving$ | async)" mat-flat-button color="primary" class="ob-button"
+                (click)="create()">
+                {{'FORMS.ACTIONS.CREATE' | translate}}
+            </button>
+        </div>
+    </form>
+</div>

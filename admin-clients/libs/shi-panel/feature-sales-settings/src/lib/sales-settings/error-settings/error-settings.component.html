@@ -1,0 +1,33 @@
+<app-form-container [formGroup]="form" (cancel)="cancel()" (save)="save()" layout="main"
+    [disabled]="!$formChanged()" class="overflow-y-auto" [hideActionBar]="!$hasWritePermissions()">
+    <form class="error-settings-form">
+        <mat-accordion [togglePosition]="'before'">
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'ERROR_SETTINGS.TITLES.WHITELIST' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="settings-list-description">{{'ERROR_SETTINGS.FORMS.INFOS.WHITELIST' | translate}}</div>
+                <app-error-setting-container
+                    [listControl]="form.controls.retry_confirm_errors"
+                    [title]="'ERROR_SETTINGS.TITLES.CONFIRM_ERRORS' | translate"
+                    [placeHolder]="'ERROR_SETTINGS.FORMS.INFOS.SEARCH_BY_ERROR' | translate"
+                    [elementTitle]="'ERROR_SETTINGS.FORMS.LABELS.CONFIRM_ERROR' | translate"
+                    [newElementTitle]="'ERROR_SETTINGS.ACTIONS.ADD_NEW_ERROR' | translate"
+                    [deleteTooltip]="'ERROR_SETTINGS.ACTIONS.DELETE_ERROR' | translate"
+                    (deleteElement)="deleteElement('retry_confirm_errors', $event)"
+                    (addElement)="addElement('retry_confirm_errors', 'ERROR_SETTINGS.FORMS.LABELS.ERROR')">
+                </app-error-setting-container>
+                <app-error-setting-container
+                    [listControl]="form.controls.retry_fulfill_errors"
+                    [title]="'ERROR_SETTINGS.TITLES.FULFILL_ERRORS' | translate"
+                    [placeHolder]="'ERROR_SETTINGS.FORMS.INFOS.SEARCH_BY_ERROR' | translate"
+                    [elementTitle]="'ERROR_SETTINGS.FORMS.LABELS.FULFILL_ERROR' | translate"
+                    [newElementTitle]="'ERROR_SETTINGS.ACTIONS.ADD_NEW_ERROR' | translate"
+                    [deleteTooltip]="'ERROR_SETTINGS.ACTIONS.DELETE_ERROR' | translate"
+                    (deleteElement)="deleteElement('retry_fulfill_errors', $event)"
+                    (addElement)="addElement('retry_fulfill_errors', 'ERROR_SETTINGS.FORMS.LABELS.ERROR')">
+                </app-error-setting-container>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </form>
+</app-form-container>

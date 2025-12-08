@@ -1,0 +1,656 @@
+<app-form-container [disabled]="!(form?.dirty)" (cancel)="cancelChanges()" (save)="save()">
+    <form [formGroup]="generalForm" class="session-form-container">
+        <!-- SESSION DATA -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.SESSION.DETAILS_MULTI' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="row wrap" class="session-form-section">
+                <!-- NAME -->
+                <mat-form-field id="name" fxFlex="100%" fxFlex.gt-md="50%" appearance="outline"
+                    class="ob-form-field field-with-label session-form-field">
+                    <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                    <input formControlName="name" matInput [placeholder]="'FORMS.LABELS.NAME' | translate">
+                    <mat-error *ngIf="generalForm.get('name').hasError('maxlength')">
+                        {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({
+                        value:
+                        eventFieldsRestrictions.eventNameLength
+                        })}}
+                    </mat-error>
+                    <mat-error *ngIf="generalForm.get('name').hasError('pattern')">
+                        {{'FORMS.ERRORS.INVALID_CHARACTERS' | translate}}
+                    </mat-error>
+                </mat-form-field>
+                <!-- STATUS -->
+                <mat-form-field id="status" fxFlex="100%" fxFlex.gt-md="50%" appearance="outline"
+                    class="ob-form-field field-with-label session-form-field">
+                    <mat-label>{{'EVENTS.STATUS' | translate}}</mat-label>
+                    <mat-select formControlName="status" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                        <mat-option [value]="null">
+                            {{'FORMS.SELECT.NO_SELECTION' | translate}}
+                        </mat-option>
+                        <mat-option *ngFor="let status of sessionStatuses" [value]="status">
+                            {{('EVENTS.SESSION.STATUS_OPTS.' + status) | translate}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <!-- RATES -->
+                <div fxFlex="100%" fxFlex.gt-md="80%" fxLayout="row wrap">
+                    <mat-checkbox fxFlex="100%" formControlName="editRates" color="primary" class="modify-rates-check">
+                        {{'EVENTS.SESSION.MODIFY_RATES_MULTI' | translate}}
+                    </mat-checkbox>
+                    <div fxFlex="100%" class="rates-container" [class.blocked]="!generalForm.get('editRates').value">
+                        <mat-form-field *ngIf="(isAvet$ | async) === false" fxFlex="100%"
+                            class="ob-form-field field-with-label mat-form-field-outline-hidden session-form-field" appearance="outline">
+                            <mat-label>{{'EVENTS.RATES' | translate}}</mat-label>
+                            <input fxHide="true" matInput>
+                            <mat-list class="ob-list rates-list" role="list">
+                                <mat-list-item *ngFor="let rate of rates$ | async" class="rate-item editable-item">
+                                    <mat-button-toggle aria-label="Set default rate"
+                                        class="ob-icon-button-toggle-simple yellow-icon-appearance ob-button medium only-icon"
+                                        [checked]="isDefaultRate(rate.id)" [disabled]="isDefaultRate(rate.id)"
+                                        (click)="setDefaultRate(rate.id)">
+                                        <mat-icon [ngClass]="isDefaultRate(rate.id) ? 'selected' : 'not-selected'">
+                                            {{isDefaultRate(rate.id) ? 'star' : 'star_border'}}
+                                        </mat-icon>
+                                    </mat-button-toggle>
+                                    <span fxFlex="0 1 100%">{{rate.name}}</span>
+                                    <mat-button-toggle aria-label="Set visible/not visible rate"
+                                        class="ob-icon-button-toggle-simple ob-button small only-icon" [checked]="isVisibleRate(rate.id)"
+                                        [disabled]="isDefaultRate(rate.id)" (click)="setVisibleRate(rate.id)">
+                                        <mat-icon>visibility</mat-icon>
+                                    </mat-button-toggle>
+                                </mat-list-item>
+                            </mat-list>
+                            <mat-error *ngIf="generalForm.get('rates').hasError('required')">
+                                {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <!-- TICKET TAX -->
+                <mat-form-field id="ticketTax" fxFlex="100%" fxFlex.gt-md="50%" appearance="outline"
+                    class="ob-form-field field-with-label session-form-field">
+                    <mat-label>{{'EVENTS.SESSION.TICKET_TAXES' | translate}}</mat-label>
+                    <mat-select formControlName="ticketTax" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                        <mat-option [value]="null">
+                            {{'FORMS.SELECT.NO_SELECTION' | translate}}
+                        </mat-option>
+                        <mat-option *ngFor="let tax of taxes$ | async" [value]="tax">
+                            {{tax.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </mat-expansion-panel>
+        <!-- OPERATIVE SECTION -->
+        <mat-expansion-panel expanded togglePosition="before" [formGroup]="operativeDatesForm">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.SESSION.OPERATIVE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="column" class="session-form-section">
+                <!-- AVAILABLE ACTIVITY TICKET TYPE -->
+                <div *ngIf="isGroupsAllowed" fxLayout="column" class="session-form-block" formGroupName="activitySaleType">
+                    <mat-checkbox fxFlex="100%" formControlName="editEnable" color="primary" class="edit-release-check">
+                        {{'EVENTS.SESSION.EDIT_ACTIVITY_SALE_TYPE_MULTI' | translate}}
+                    </mat-checkbox>
+                    <div fxFlex class="edition-block">
+                        <mat-radio-group fxLayout="column" formControlName="enable">
+                            <mat-radio-button class="ob-radio-button vertical-list" [value]="activitySaleType.individual">
+                                <div>{{'EVENTS.SESSION.ACTIVITY_TICKET_INDIVIDUAL' | translate}}</div>
+                            </mat-radio-button>
+                            <mat-radio-button class="ob-radio-button vertical-list" [value]="activitySaleType.mixed">
+                                <div>{{'EVENTS.SESSION.ACTIVITY_TICKET_MIXED' | translate}}</div>
+                            </mat-radio-button>
+                            <mat-radio-button class="ob-radio-button vertical-list" [value]="activitySaleType.group">
+                                <div>{{'EVENTS.SESSION.ACTIVITY_TICKET_GROUP' | translate}}</div>
+                            </mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+                </div>
+                <div *ngIf="!operativeDatesForm.valid && !isTrulyInvalidOperativeDatesForm()" fxLayout="row" fxLayoutAlign="start center"
+                    class="invalid-dates-advice section-block">
+                    <mat-icon class="ob-icon small neutral with-text">info</mat-icon>
+                    <span>{{'EVENTS.SESSION.INVALID_DATES_ADVICE' | translate}}</span>
+                </div>
+                <!-- RELEASE DATE BLOCKS -->
+                <div fxLayout="column" formGroupName="release">
+                    <div fxLayout="column" class="session-form-section-header">
+                        <mat-divider fxFlex="100%" />
+                        <div fxFlex="40px" fxLayout="row" fxLayoutAlign="start center">
+                            <span fxFlex="0 1 100%" fxLayoutAlign="start center">
+                                {{'EVENTS.SESSION.CHANNEL_RELEASE' | translate}}
+                            </span>
+                        </div>
+                        <mat-divider fxFlex="100%" class="session-form-field" />
+                    </div>
+                    <!-- ACTIVATION -->
+                    <div fxLayout="column" class="session-form-block">
+                        <mat-checkbox fxFlex="100%" formControlName="editEnable" color="primary" class="edit-release-check">
+                            {{'EVENTS.SESSION.EDIT_RELEASE_ACTIVATION_MULTI' | translate}}
+                        </mat-checkbox>
+                        <div fxFlex class="edition-block">
+                            <mat-radio-group formControlName="enable" class="release-activation">
+                                <mat-radio-button class="ob-radio-button vertical-list" [value]="true">
+                                    <div>{{'EVENTS.SESSION.ACTIVATE_RELEASE' | translate}}</div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button vertical-list" [value]="false">
+                                    <div>{{'EVENTS.SESSION.DEACTIVATE_RELEASE' | translate}}</div>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                    <!-- EDIT DATES -->
+                    <div fxLayout="column" class="session-form-block">
+                        <mat-checkbox fxFlex="100%" formControlName="editDate" color="primary" class="edit-release-dates-check">
+                            {{'EVENTS.SESSION.EDIT_RELEASE_DATES_MULTI' | translate}}
+                        </mat-checkbox>
+                        <div fxLayout="row wrap" fxFlex class="edition-block">
+                            <mat-radio-group fxLayout="column" formControlName="dateMode" class="release-date-mode">
+                                <mat-radio-button class="ob-radio-button inline" [value]="sessionsDateMode.fixed">
+                                    <div>{{'EVENTS.SESSION.FIXED_DATE' | translate}}</div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button inline" [value]="sessionsDateMode.relative">
+                                    <div>{{'EVENTS.SESSION.RELATIVE_DATE' | translate}}</div>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                            <div fxFlex fxLayout="row wrap">
+                                <app-date-time-picker fxFlex="100%" class="session-form-field" formControlName="date" />
+                                <div fxFlex="100%" fxLayout="row wrap" formGroupName="relativeDate">
+                                    <mat-form-field fxFlex="0 1 68px" appearance="outline" class="ob-form-field relative-date-duration">
+                                        <input matInput type="number" aria-label="duration" formControlName="duration" placeholder="0">
+                                    </mat-form-field>
+                                    <mat-form-field fxFlex="0 1 120px" appearance="outline" class="ob-form-field relative-date-time-unit">
+                                        <mat-select formControlName="timeUnit">
+                                            <mat-option *ngFor="let timeUnit of timeUnitList" [value]="timeUnit">
+                                                {{'EVENTS.SESSION.TIME_UNITS.' + timeUnit | translate}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <span class="before-session-label" [class.disabled]="operativeDatesForm.get('release.dateMode').value !== sessionsDateMode.relative
+                                    || !operativeDatesForm.get('release.editDate').value">
+                                        {{'EVENTS.SESSION.BEFORE_SESSION' | translate}}
+                                    </span>
+                                    <div fxLayout="row">
+                                        <mat-checkbox color="primary" formControlName="addTime" class="relative-date-add-time inline">
+                                            {{'EVENTS.SESSION.ADD_TIME' | translate}}
+                                        </mat-checkbox>
+                                        <app-time-picker formControlName="fixedTime" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- BOOKING DATE BLOCKS -->
+                <div *ngIf="showBookingSettings$ | async" fxLayout="column" formGroupName="booking">
+                    <div fxLayout="column" class="session-form-section-header">
+                        <mat-divider fxFlex="100%" />
+                        <div fxFlex="40px" fxLayout="row" fxLayoutAlign="start center">
+                            <span fxFlex="0 1 100%" fxLayoutAlign="start center">
+                                {{'EVENTS.SESSION.BOOKINGS' | translate}}
+                            </span>
+                        </div>
+                        <mat-divider fxFlex="100%" class="session-form-field" />
+                    </div>
+                    <!-- ACTIVATION -->
+                    <div fxLayout="column" class="session-form-block">
+                        <mat-checkbox fxFlex="100%" formControlName="editEnable" color="primary" class="edit-bookings-check">
+                            {{'EVENTS.SESSION.EDIT_BOOKINGS_ACTIVATION_MULTI' | translate}}
+                        </mat-checkbox>
+                        <div fxFlex class="edition-block">
+                            <mat-radio-group formControlName="enable" class="bookings-activation">
+                                <mat-radio-button class="ob-radio-button vertical-list" [value]="true">
+                                    <div>{{'EVENTS.SESSION.ACTIVATE_BOOKINGS' | translate}}</div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button vertical-list" [value]="false">
+                                    <div>{{'EVENTS.SESSION.DEACTIVATE_BOOKINGS' | translate}}</div>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                    <!-- START BOOKING DATE -->
+                    <div fxLayout="column" class="session-form-block" formGroupName="start">
+                        <mat-checkbox fxFlex="100%" formControlName="editDate" color="primary" class="edit-bookings-start-dates-check">
+                            {{'EVENTS.SESSION.EDIT_BOOKINGS_START_DATES_MULTI' | translate}}
+                        </mat-checkbox>
+                        <div fxLayout="row wrap" fxFlex class="edition-block">
+                            <mat-radio-group fxLayout="column" formControlName="dateMode" class="bookings-start-date-mode">
+                                <mat-radio-button class="ob-radio-button inline" [value]="sessionsDateMode.fixed">
+                                    <div>{{'EVENTS.SESSION.FIXED_DATE' | translate}}</div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button inline" [value]="sessionsDateMode.relative">
+                                    <div>{{'EVENTS.SESSION.RELATIVE_DATE' | translate}}</div>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                            <div fxFlex fxLayout="row wrap">
+                                <app-date-time-picker fxFlex="100%" class="session-form-field" formControlName="date" />
+                                <div fxFlex="100%" fxLayout="row wrap" formGroupName="relativeDate">
+                                    <mat-form-field fxFlex="0 1 68px" appearance="outline" class="ob-form-field relative-date-duration">
+                                        <input matInput type="number" aria-label="duration" formControlName="duration" placeholder="0">
+                                    </mat-form-field>
+                                    <mat-form-field fxFlex="0 1 120px" appearance="outline" class="ob-form-field relative-date-time-unit">
+                                        <mat-select formControlName="timeUnit">
+                                            <mat-option *ngFor="let timeUnit of timeUnitList" [value]="timeUnit">
+                                                {{'EVENTS.SESSION.TIME_UNITS.' + timeUnit | translate}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <span [class.disabled]="operativeDatesForm.get('booking.start.dateMode').value !== sessionsDateMode.relative
+                                        || !operativeDatesForm.get('booking.start.editDate').value" class="before-session-label">
+                                        {{'EVENTS.SESSION.BEFORE_SESSION' | translate}}
+                                    </span>
+                                    <div fxLayout="row">
+                                        <mat-checkbox color="primary" formControlName="addTime" class="relative-date-add-time inline">
+                                            {{'EVENTS.SESSION.ADD_TIME' | translate}}
+                                        </mat-checkbox>
+                                        <app-time-picker formControlName="fixedTime" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END BOOKING DATE -->
+                    <div fxLayout="column" class="session-form-block" formGroupName="end">
+                        <mat-checkbox fxFlex="100%" formControlName="editDate" color="primary" class="edit-bookings-end-dates-check">
+                            {{'EVENTS.SESSION.EDIT_BOOKINGS_END_DATES_MULTI' | translate}}
+                        </mat-checkbox>
+                        <div fxLayout="row wrap" fxFlex class="edition-block">
+                            <mat-radio-group fxLayout="column" formControlName="dateMode" class="bookings-end-date-mode">
+                                <mat-radio-button class="ob-radio-button inline" [value]="sessionsDateMode.fixed">
+                                    <div>{{'EVENTS.SESSION.FIXED_DATE' | translate}}</div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button inline" [value]="sessionsDateMode.relative">
+                                    <div>{{'EVENTS.SESSION.RELATIVE_DATE' | translate}}</div>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                            <div fxFlex fxLayout="row wrap">
+                                <app-date-time-picker fxFlex="100%" class="session-form-field" formControlName="date" />
+                                <div fxFlex="100%" fxLayout="row wrap" formGroupName="relativeDate">
+                                    <mat-form-field fxFlex="0 1 68px" appearance="outline" class="ob-form-field relative-date-duration">
+                                        <input matInput type="number" aria-label="duration" formControlName="duration" placeholder="0">
+                                    </mat-form-field>
+                                    <mat-form-field fxFlex="0 1 120px" appearance="outline" class="ob-form-field relative-date-time-unit">
+                                        <mat-select formControlName="timeUnit">
+                                            <mat-option *ngFor="let timeUnit of timeUnitList" [value]="timeUnit">
+                                                {{'EVENTS.SESSION.TIME_UNITS.' + timeUnit | translate}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field fxFlex="0 1 120px" appearance="outline"
+                                        class="ob-form-field session-before-after-selector">
+                                        <mat-select formControlName="beforeAfter">
+                                            <mat-option *ngFor="let moment of sessionBeforeAfterList" [value]="moment">
+                                                {{'EVENTS.SESSION.' + moment | translate}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <div fxLayout="row">
+                                        <mat-checkbox color="primary" formControlName="addTime" class="relative-date-add-time inline">
+                                            {{'EVENTS.SESSION.ADD_TIME' | translate}}
+                                        </mat-checkbox>
+                                        <app-time-picker formControlName="fixedTime" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- SALE DATE BLOCKS -->
+                <div fxLayout="column" formGroupName="sale">
+                    <div fxLayout="column" class="session-form-section-header">
+                        <mat-divider fxFlex="100%" />
+                        <div fxFlex="40px" fxLayout="row" fxLayoutAlign="start center">
+                            <span fxFlex="0 1 100%" fxLayoutAlign="start center">
+                                {{'EVENTS.SESSION.SALE' | translate}}
+                            </span>
+                        </div>
+                        <mat-divider fxFlex="100%" class="session-form-field" />
+                    </div>
+                    <!-- ACTIVATION -->
+                    <div fxLayout="column" class="session-form-block">
+                        <mat-checkbox fxFlex="100%" formControlName="editEnable" color="primary" class="edit-sale-check">
+                            {{'EVENTS.SESSION.EDIT_SALE_ACTIVATION_MULTI' | translate}}
+                        </mat-checkbox>
+                        <div class="edition-block">
+                            <mat-radio-group formControlName="enable" class="sale-activation">
+                                <mat-radio-button class="ob-radio-button vertical-list" [value]="true">
+                                    <div>{{'EVENTS.SESSION.ACTIVATE_SALE' | translate}}</div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button vertical-list" [value]="false">
+                                    <div>{{'EVENTS.SESSION.DEACTIVATE_SALE' | translate}}</div>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                    <!-- START SALE DATE -->
+                    <div fxLayout="column" class="session-form-block" formGroupName="start">
+                        <mat-checkbox fxFlex="100%" formControlName="editDate" color="primary" class="edit-sale-start-dates-check">
+                            {{'EVENTS.SESSION.EDIT_SALE_START_DATES_MULTI' | translate}}
+                        </mat-checkbox>
+                        <div fxLayout="row wrap" fxFlex class="edition-block">
+                            <mat-radio-group fxLayout="column" formControlName="dateMode" class="sale-start-date-mode">
+                                <mat-radio-button class="ob-radio-button inline" [value]="sessionsDateMode.fixed">
+                                    <div>{{'EVENTS.SESSION.FIXED_DATE' | translate}}</div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button inline" [value]="sessionsDateMode.relative">
+                                    <div>{{'EVENTS.SESSION.RELATIVE_DATE' | translate}}</div>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                            <div fxFlex fxLayout="row wrap">
+                                <app-date-time-picker fxFlex="100%" class="session-form-field" formControlName="date" />
+                                <div fxFlex="100%" fxLayout="row wrap" formGroupName="relativeDate">
+                                    <mat-form-field fxFlex="0 1 68px" appearance="outline" class="ob-form-field relative-date-duration">
+                                        <input matInput type="number" aria-label="duration" formControlName="duration" placeholder="0">
+                                    </mat-form-field>
+                                    <mat-form-field fxFlex="0 1 120px" appearance="outline" class="ob-form-field relative-date-time-unit">
+                                        <mat-select formControlName="timeUnit">
+                                            <mat-option *ngFor="let timeUnit of timeUnitList" [value]="timeUnit">
+                                                {{'EVENTS.SESSION.TIME_UNITS.' + timeUnit | translate}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <span [class.disabled]="operativeDatesForm.get('sale.start.dateMode').value !== sessionsDateMode.relative
+                                        || !operativeDatesForm.get('sale.start.editDate').value" class="before-session-label">
+                                        {{'EVENTS.SESSION.BEFORE_SESSION' | translate}}
+                                    </span>
+                                    <div fxLayout="row">
+                                        <mat-checkbox color="primary" formControlName="addTime" class="relative-date-add-time inline">
+                                            {{'EVENTS.SESSION.ADD_TIME' | translate}}
+                                        </mat-checkbox>
+                                        <app-time-picker formControlName="fixedTime" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END BOOKING DATE -->
+                    <div fxLayout="column" class="session-form-block" formGroupName="end">
+                        <mat-checkbox fxFlex="100%" formControlName="editDate" color="primary" class="edit-sale-end-dates-check">
+                            {{'EVENTS.SESSION.EDIT_SALE_END_DATES_MULTI' | translate}}
+                        </mat-checkbox>
+                        <div fxLayout="row wrap" fxFlex class="edition-block">
+                            <mat-radio-group fxLayout="column" formControlName="dateMode" class="sale-end-date-mode">
+                                <mat-radio-button class="ob-radio-button inline" [value]="sessionsDateMode.fixed">
+                                    <div>{{'EVENTS.SESSION.FIXED_DATE' | translate}}</div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button inline" [value]="sessionsDateMode.relative">
+                                    <div>{{'EVENTS.SESSION.RELATIVE_DATE' | translate}}</div>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                            <div fxFlex fxLayout="row wrap">
+                                <app-date-time-picker fxFlex="100%" class="session-form-field" formControlName="date" />
+                                <div fxFlex="100%" fxLayout="row wrap" formGroupName="relativeDate">
+                                    <mat-form-field fxFlex="0 1 68px" appearance="outline" class="ob-form-field relative-date-duration">
+                                        <input matInput type="number" aria-label="duration" formControlName="duration" placeholder="0">
+                                    </mat-form-field>
+                                    <mat-form-field fxFlex="0 1 120px" appearance="outline" class="ob-form-field relative-date-time-unit">
+                                        <mat-select formControlName="timeUnit">
+                                            <mat-option *ngFor="let timeUnit of timeUnitList" [value]="timeUnit">
+                                                {{'EVENTS.SESSION.TIME_UNITS.' + timeUnit | translate}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field fxFlex="0 1 120px" appearance="outline"
+                                        class="ob-form-field session-before-after-selector">
+                                        <mat-select formControlName="beforeAfter">
+                                            <mat-option *ngFor="let moment of sessionBeforeAfterList" [value]="moment">
+                                                {{'EVENTS.SESSION.' + moment | translate}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <div fxLayout="row">
+                                        <mat-checkbox color="primary" formControlName="addTime" class="relative-date-add-time inline">
+                                            {{'EVENTS.SESSION.ADD_TIME' | translate}}
+                                        </mat-checkbox>
+                                        <app-time-picker formControlName="fixedTime" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- SECONDARY MARKET SALE DATE BLOCKS -->
+                <div *ngIf="showSecondaryMarketSettings$ | async" fxLayout="column" formGroupName="secondary_market_sale">
+                    <div fxLayout="column" class="session-form-section-header">
+                        <mat-divider fxFlex="100%" />
+                        <div fxFlex="40px" fxLayout="row" fxLayoutAlign="start center">
+                            <span fxFlex="0 1 100%" fxLayoutAlign="start center">
+                                {{'EVENTS.SESSION.SECONDARY_MARKET_SALE' | translate}}
+                            </span>
+                        </div>
+                        <mat-divider fxFlex="100%" class="session-form-field" />
+                    </div>
+                    <!-- ACTIVATION -->
+                    <div fxLayout="column" class="session-form-block">
+                        <mat-checkbox fxFlex="100%" formControlName="editEnable" color="primary" class="edit-sale-check">
+                            {{'EVENTS.SESSION.EDIT_SECONDARY_MARKET_SALE_ACTIVATION_MULTI' | translate}}
+                        </mat-checkbox>
+                        <div class="edition-block">
+                            <mat-radio-group formControlName="enable" class="sale-activation">
+                                <mat-radio-button class="ob-radio-button vertical-list" [value]="true">
+                                    <div>{{'EVENTS.SESSION.ACTIVATE_SECONDARY_MARKET_SALE' | translate}}</div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button vertical-list" [value]="false">
+                                    <div>{{'EVENTS.SESSION.DEACTIVATE_SECONDARY_MARKET_SALE' | translate}}</div>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                    <!-- START SECONDARY MARKET SALE DATE -->
+                    <div fxLayout="column" class="session-form-block" formGroupName="start">
+                        <mat-checkbox fxFlex="100%" formControlName="editDate" color="primary" class="edit-sale-start-dates-check">
+                            {{'EVENTS.SESSION.EDIT_SECONDARY_MARKET_SALE_START_DATES_MULTI' | translate}}
+                        </mat-checkbox>
+                        <div fxLayout="row wrap" fxFlex class="edition-block">
+                            <mat-radio-group fxLayout="column" formControlName="dateMode" class="sale-start-date-mode">
+                                <mat-radio-button class="ob-radio-button inline" [value]="sessionsDateMode.fixed">
+                                    <div>{{'EVENTS.SESSION.FIXED_DATE' | translate}}</div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button inline" [value]="sessionsDateMode.relative">
+                                    <div>{{'EVENTS.SESSION.RELATIVE_DATE' | translate}}</div>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                            <div fxFlex fxLayout="row wrap">
+                                <app-date-time-picker fxFlex="100%" class="session-form-field" formControlName="date" />
+                                <div fxFlex="100%" fxLayout="row wrap" formGroupName="relativeDate">
+                                    <mat-form-field fxFlex="0 1 68px" appearance="outline" class="ob-form-field relative-date-duration">
+                                        <input matInput type="number" aria-label="duration" formControlName="duration" placeholder="0">
+                                    </mat-form-field>
+                                    <mat-form-field fxFlex="0 1 120px" appearance="outline" class="ob-form-field relative-date-time-unit">
+                                        <mat-select formControlName="timeUnit">
+                                            <mat-option *ngFor="let timeUnit of timeUnitList" [value]="timeUnit">
+                                                {{'EVENTS.SESSION.TIME_UNITS.' + timeUnit | translate}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <span [class.disabled]="operativeDatesForm.get('sale.start.dateMode').value !== sessionsDateMode.relative
+                                        || !operativeDatesForm.get('sale.start.editDate').value" class="before-session-label">
+                                        {{'EVENTS.SESSION.BEFORE_SESSION' | translate}}
+                                    </span>
+                                    <div fxLayout="row">
+                                        <mat-checkbox color="primary" formControlName="addTime" class="relative-date-add-time inline">
+                                            {{'EVENTS.SESSION.ADD_TIME' | translate}}
+                                        </mat-checkbox>
+                                        <app-time-picker formControlName="fixedTime" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END SECONDARY MARKET SALE DATE -->
+                    <div fxLayout="column" class="session-form-block" formGroupName="end">
+                        <mat-checkbox fxFlex="100%" formControlName="editDate" color="primary" class="edit-sale-end-dates-check">
+                            {{'EVENTS.SESSION.EDIT_SECONDARY_MARKET_SALE_END_DATES_MULTI' | translate}}
+                        </mat-checkbox>
+                        <div fxLayout="row wrap" fxFlex class="edition-block">
+                            <mat-radio-group fxLayout="column" formControlName="dateMode" class="sale-end-date-mode">
+                                <mat-radio-button class="ob-radio-button inline" [value]="sessionsDateMode.fixed">
+                                    <div>{{'EVENTS.SESSION.FIXED_DATE' | translate}}</div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button inline" [value]="sessionsDateMode.relative">
+                                    <div>{{'EVENTS.SESSION.RELATIVE_DATE' | translate}}</div>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                            <div fxFlex fxLayout="row wrap">
+                                <app-date-time-picker fxFlex="100%" class="session-form-field" formControlName="date" />
+                                <div fxFlex="100%" fxLayout="row wrap" formGroupName="relativeDate">
+                                    <mat-form-field fxFlex="0 1 68px" appearance="outline" class="ob-form-field relative-date-duration">
+                                        <input matInput type="number" aria-label="duration" formControlName="duration" placeholder="0">
+                                    </mat-form-field>
+                                    <mat-form-field fxFlex="0 1 120px" appearance="outline" class="ob-form-field relative-date-time-unit">
+                                        <mat-select formControlName="timeUnit">
+                                            <mat-option *ngFor="let timeUnit of timeUnitList" [value]="timeUnit">
+                                                {{'EVENTS.SESSION.TIME_UNITS.' + timeUnit | translate}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field fxFlex="0 1 120px" appearance="outline"
+                                        class="ob-form-field session-before-after-selector">
+                                        <mat-select formControlName="beforeAfter">
+                                            <mat-option *ngFor="let moment of sessionBeforeAfterList" [value]="moment">
+                                                {{'EVENTS.SESSION.' + moment | translate}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <div fxLayout="row">
+                                        <mat-checkbox color="primary" formControlName="addTime" class="relative-date-add-time inline">
+                                            {{'EVENTS.SESSION.ADD_TIME' | translate}}
+                                        </mat-checkbox>
+                                        <app-time-picker formControlName="fixedTime" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-expansion-panel>
+        <!-- ACCESS CONTROL SECTION -->
+        <mat-expansion-panel expanded togglePosition="before" [formGroup]="generalForm">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.SESSION.ACCESS_CONTROL' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="column" class="session-form-section">
+                <div fxLayout="column" formGroupName="accessControl">
+                    <!-- EDIT ACCESS TIME -->
+                    <div fxLayout="column" class="session-form-block">
+                        <mat-checkbox fxFlex="100%" formControlName="editAccessTime" color="primary" class="edit-access-time-check">
+                            {{'EVENTS.SESSION.EDIT_ACCESS_TIME_MULTI' | translate}}
+                        </mat-checkbox>
+                        <div fxLayout="column" fxFlex class="edition-block">
+                            <mat-radio-group fxLayout="column" formControlName="accessTimeMode" class="access-time-mode">
+                                <mat-radio-button class="ob-radio-button vertical-list" [value]="sessionsAccessTimeMode.automatic">
+                                    <div>{{'EVENTS.SESSION.AUTOMATIC_ACCESS_TIME' | translate}}</div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button vertical-list" [value]="sessionsAccessTimeMode.relative">
+                                    <div>{{'EVENTS.SESSION.RELATIVE_ACCESS_TIME' | translate}}</div>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                            <div fxFlex fxLayout="column" formGroupName="relativeAccessTime">
+                                <div fxFlex="100%" fxLayout="row wrap" formGroupName="opening" class="nested-content">
+                                    <span fxFlex="0 0 155px" class="access-time-label" [class.disabled]="generalForm.get('accessControl.accessTimeMode').value !== sessionsDateMode.relative
+                                        || !generalForm.get('accessControl.editAccessTime').value">
+                                        {{'EVENTS.SESSION.ACCESS_CONTROL_OPENING' | translate}}
+                                    </span>
+                                    <mat-form-field fxFlex="0 1 68px" appearance="outline"
+                                        class="ob-form-field relative-access-time-duration">
+                                        <input matInput type="number" aria-label="duration" formControlName="duration" placeholder="0">
+                                    </mat-form-field>
+                                    <mat-form-field fxFlex="0 1 120px" appearance="outline"
+                                        class="ob-form-field relative-acces-time-time-unit">
+                                        <mat-select formControlName="timeUnit">
+                                            <mat-option [value]="relativeTimeUnits.minutes">
+                                                {{'EVENTS.SESSION.TIME_UNITS.' + relativeTimeUnits.minutes | translate}}
+                                            </mat-option>
+                                            <mat-option [value]="relativeTimeUnits.hours">
+                                                {{'EVENTS.SESSION.TIME_UNITS.' + relativeTimeUnits.hours | translate}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <span [class.disabled]="generalForm.get('accessControl.accessTimeMode').value !== sessionsDateMode.relative
+                                                                            || !generalForm.get('accessControl.editAccessTime').value"
+                                        class="before-session-label">
+                                        {{'EVENTS.SESSION.BEFORE_SESSION' | translate}}
+                                    </span>
+                                </div>
+                                <div fxFlex="100%" fxLayout="row wrap" formGroupName="closing" class="nested-content">
+                                    <span fxFlex="0 0 155px" class="access-time-label"
+                                        [class.disabled]="generalForm.get('accessControl.accessTimeMode').value !== sessionsDateMode.relative
+                                                                                            || !generalForm.get('accessControl.editAccessTime').value">
+                                        {{'EVENTS.SESSION.ACCESS_CONTROL_CLOSING' | translate}}
+                                    </span>
+                                    <mat-form-field fxFlex="0 1 68px" appearance="outline"
+                                        class="ob-form-field relative-access-time-duration">
+                                        <input matInput type="number" aria-label="duration" formControlName="duration" placeholder="0">
+                                    </mat-form-field>
+                                    <mat-form-field fxFlex="0 1 120px" appearance="outline"
+                                        class="ob-form-field relative-acces-time-time-unit">
+                                        <mat-select formControlName="timeUnit">
+                                            <mat-option [value]="relativeTimeUnits.minutes">
+                                                {{'EVENTS.SESSION.TIME_UNITS.' + relativeTimeUnits.minutes | translate}}
+                                            </mat-option>
+                                            <mat-option [value]="relativeTimeUnits.hours">
+                                                {{'EVENTS.SESSION.TIME_UNITS.' + relativeTimeUnits.hours | translate}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field fxFlex="0 1 120px" appearance="outline"
+                                        class="ob-form-field session-before-after-selector">
+                                        <mat-select formControlName="beforeAfter">
+                                            <mat-option *ngFor="let moment of sessionBeforeAfterList" [value]="moment">
+                                                {{'EVENTS.SESSION.' + moment | translate}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <span
+                                        [class.disabled]="generalForm.get('accessControl.accessTimeMode').value !== sessionsDateMode.relative || !generalForm.get('accessControl.editAccessTime').value"
+                                        class="before-after-session-label">
+                                        {{'EVENTS.SESSION.BEFORE_AFTER_SESSION' | translate}}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- EDIT ACCESS SPACE -->
+                    <div *ngIf="showAccessSpace$ | async" fxLayout="column" class="session-form-block">
+                        <mat-checkbox fxFlex="100%" formControlName="editAccessSpace" color="primary" class="edit-access-space-check">
+                            {{'EVENTS.SESSION.EDIT_ACCESS_SPACE_MULTI' | translate}}
+                        </mat-checkbox>
+                        <div fxLayout="column" fxFlex class="edition-block">
+                            <mat-radio-group fxLayout="column" formControlName="accessSpaceMode" class="access-space-mode">
+                                <mat-radio-button class="ob-radio-button vertical-list" [value]="sessionsAccessSpaceMode.default">
+                                    <div>{{'EVENTS.SESSION.DEFAULT_ACCESS_SPACE' | translate}}</div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button vertical-list" [value]="sessionsAccessSpaceMode.custom">
+                                    <div>{{'EVENTS.SESSION.CUSTOM_ACCESS_SPACE' | translate}}</div>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                            <div fxFlex="100%" fxLayout="row wrap">
+                                <mat-form-field fxFlex="100%" fxFlex.gt-md="50%" appearance="outline"
+                                    class="ob-form-field field-with-label nested-content session-form-field space-selector">
+                                    <mat-label>{{'VENUES.SPACE' | translate}}</mat-label>
+                                    <mat-select formControlName="customAccessSpace" fxFlex="100%"
+                                        [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                        <mat-option *ngFor="let space of spaces$ | async" [value]="space.id">
+                                            <div appEllipsify [matTooltip]="space.name">
+                                                {{space.name}}
+                                            </div>
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="form.hasError('required', 'settings.access_control.space_id')">
+                                        {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-expansion-panel>
+    </form>
+    <app-archived-event-mgr slot="actions-bar" [disabled]="form.dirty || (isLoading$ | async)" />
+</app-form-container>
+<div class="spinner-container" *ngIf="isLoading$ | async">
+    <mat-spinner />
+</div>

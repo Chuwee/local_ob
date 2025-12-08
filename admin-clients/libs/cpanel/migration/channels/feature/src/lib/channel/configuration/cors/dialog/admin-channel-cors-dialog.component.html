@@ -1,0 +1,41 @@
+<div class="dialog-cors-container">
+    <div mat-dialog-title>
+        <div class="flex flex-row justify-between">
+            <h2 class="secondary title">
+                {{ (isDialogTypeCreate ? 'ADMIN_CHANNEL.CONFIGURATION.CORS.ACTIONS.CREATE' :'FORMS.ACTIONS.EDIT' ) | translate }}
+            </h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon fontIcon="close" />
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content>
+        <form [formGroup]="form">
+            <div class="flex">
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label flex-[0_1_100%]">
+                    <mat-label>{{ 'ADMIN_CHANNEL.CONFIGURATION.CORS.FORMS.LABELS.ORIGIN' | translate }}</mat-label>
+                    <input matInput [placeholder]="'ADMIN_CHANNEL.CONFIGURATION.CORS.FORMS.LABELS.ORIGIN' | translate"
+                        formControlName="origin" aria-label="origin">
+                    @if (form.controls.origin.hasError('notUnique')) {
+                        <mat-error class="under_error">
+                            {{'ADMIN_CHANNEL.CONFIGURATION.CORS.FORMS.ERRORS.INCLUDED' | translate}}
+                        </mat-error>
+                    } @else {
+                        <mat-error [ob-form-errors]="form" field="origin" />
+                    }
+                </mat-form-field>
+            </div>
+        </form>
+    </div>
+    <div mat-dialog-actions>
+        <div class="flex-1 flex flex-row justify-end">
+            <button type="button" mat-button class="ob-button" (click)="close()">
+                {{ 'FORMS.ACTIONS.CANCEL' | translate }}
+            </button>
+            <button mat-flat-button color="primary" type="button" class="ob-button" (click)="save()"
+                [disabled]="!form.dirty || form.invalid || $isInProgress()">
+                {{ (isDialogTypeCreate ? 'FORMS.ACTIONS.ADD' : 'FORMS.ACTIONS.SAVE_CHANGES') | translate }}
+            </button>
+        </div>
+    </div>
+</div>

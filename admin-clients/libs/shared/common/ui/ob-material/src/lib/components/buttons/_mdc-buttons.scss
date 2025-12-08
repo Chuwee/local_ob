@@ -1,0 +1,98 @@
+@mixin mdc-buttons-override($palettes, $colors) {
+    $primary: map-get($palettes, primary);
+    $white: map-get($colors, ob-white);
+    $black: map-get($colors, ob-black);
+
+    .ob-mdc-button {
+        &.mdc-button {
+            // text properties
+            text-transform: uppercase;
+            white-space: nowrap;
+            &.x-small {
+                height: 26px;
+            }
+            &.small {
+                height: 30px;
+            }
+            //&.medium { // default size
+            height: 36px;
+            //}
+            &.large {
+                height: 42px;
+            }
+            // common style - padding
+            &.mat-mdc-button,
+            &.mat-mdc-outlined-button {
+                padding: 0 20px;
+            }
+            // common style - borderRadius
+            &.mat-mdc-button {
+                --mdc-text-button-container-shape: 2px;
+            }
+            &.mat-mdc-outlined-button {
+                --mdc-outlined-button-container-shape: 2px;
+            }
+            // light button, for buttons inside dark or colored containers like template increase feature
+            &.light-button {
+                --mat-mdc-button-ripple-color: #{$white};
+                --mat-mdc-button-persistent-ripple-color: #{$white}; // hover background color
+                &:hover .mat-mdc-button-persistent-ripple::before { // hover background opacity
+                    opacity: 0.15;
+                }
+                &.mat-mdc-button {
+                    &:not(:active) {
+                        --mdc-text-button-label-text-color: #{$white};
+                    }
+
+                    --mdc-text-button-disabled-label-text-color: #{rgba($white, 0.6)};
+                }
+                &.mat-mdc-outlined-button {
+                    &:not(:active) {
+                        --mdc-outlined-button-label-text-color: #{$white};
+                    }
+
+                    --mdc-outlined-button-outline-color: #{$white};
+                    --mdc-outlined-button-disabled-label-text-color: #{rgba($white, 0.6)};
+                    --mdc-outlined-button-disabled-outline-color: #{rgba($white, 0.3)};
+                }
+            }
+        }
+        &.mat-mdc-icon-button{
+            &.mat-mdc-button-base {
+                &:hover .mat-mdc-button-persistent-ripple::before {
+                    opacity: 0.1;
+                }
+                .mat-mdc-button-touch-target {
+                    width: 100%;
+                    height: 100%;
+                }
+                .mat-icon {
+                    // don't understand why this is required, is lost in any place
+                    font-size: var(--mdc-icon-button-icon-size);
+                    width: unset;
+                    height: unset;
+                    line-height: unset;
+                }
+                &.mat-mdc-button-base {
+                    padding: calc((var(--mdc-icon-button-state-layer-size) - var(--mdc-icon-button-icon-size)) / 2) 0;
+                }
+                &.x-small {
+                    --mdc-icon-button-state-layer-size: 26px;
+                    --mdc-icon-button-icon-size: 18px;
+                }
+                &.small {
+                    --mdc-icon-button-state-layer-size: 30px;
+                    --mdc-icon-button-icon-size: 20px;
+                }
+                //&.medium { // default size
+                --mdc-icon-button-state-layer-size: 36px;
+                --mdc-icon-button-icon-size: 22px;
+                //}
+                &.large {
+                    --mdc-icon-button-state-layer-size: 42px;
+                    --mdc-icon-button-icon-size: 24px;
+                }
+            }
+        }
+    }
+}

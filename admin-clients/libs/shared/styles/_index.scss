@@ -1,0 +1,106 @@
+@use 'sass:map';
+@use '@angular/material' as mat;
+@use 'libs/shared/common/ui/ob-material/src' as theme;
+
+@forward 'libs/shared/common/ui/ob-material/src' as mat-*;
+
+$palettes: theme.$ob-palettes;
+$typography: theme.$ob-typography;
+$colors: theme.$ob-colors;
+$theme: theme.$ob-theme;
+
+@function color($name, $colors: $colors) {
+    @return map.get($colors, $name);
+}
+
+@function palette($name, $palettes: $palettes) {
+    @return map.get($palettes, $name);
+}
+
+@function font($name, $typograghy: $typography) {
+    @return #{mat.m2-font-weight($typography, $name)} #{mat.m2-font-size($typography, $name)}/#{mat.m2-line-height($typography, $name)} #{mat.m2-font-family($typography, $name)};
+}
+
+@mixin typography($name, $typograghy: $typography) {
+    @include mat.m2-typography-level($typograghy, $name);
+}
+
+$accent-color: mat.m2-get-color-from-palette(palette(accent));
+$menu-color: mat.m2-get-color-from-palette(palette(menu));
+$disabled-color: mat.m2-get-color-from-palette(palette(foreground), disabled);
+$warn-color: mat.m2-get-color-from-palette(palette(warn));
+$success-color: mat.m2-get-color-from-palette(palette(success));
+$info-color: mat.m2-get-color-from-palette(palette(info));
+$alert-color: mat.m2-get-color-from-palette(palette(alert));
+
+$warn-color-darker: mat.m2-get-color-from-palette(palette(warn), 900);
+$success-color-darker: mat.m2-get-color-from-palette(palette(success), 900);
+$info-color-darker: mat.m2-get-color-from-palette(palette(info), 900);
+$alert-color-darker: mat.m2-get-color-from-palette(palette(alert), 900);
+$accent-color-darker: mat.m2-get-color-from-palette(palette(accent), 900);
+
+$warn-color-lighter: mat.m2-get-color-from-palette(palette(warn), 50);
+$success-color-lighter: mat.m2-get-color-from-palette(palette(success), 50);
+$info-color-lighter: mat.m2-get-color-from-palette(palette(info), 50);
+$alert-color-lighter: mat.m2-get-color-from-palette(palette(alert), 50);
+$accent-color-lighter: mat.m2-get-color-from-palette(palette(accent), 50);
+
+@mixin theme-variables() {
+    html {
+        --ob-theme-font-caption: #{font(caption)};
+        --ob-theme-font-tiny: #{font(tiny)};
+        --ob-theme-font-button: #{font(button)};
+        --ob-theme-font-input: #{font(input)};
+        --ob-theme-font-body-1: #{font(body-1)};
+        --ob-theme-font-body-2: #{font(body-2)};
+        --ob-theme-font-display-2: #{font(display-2)};
+        --ob-theme-font-title: #{font(title)};
+        --ob-theme-font-headline: #{font(headline)};
+        --ob-theme-font-subheading-1: #{font(subheading-1)};
+        --ob-theme-font-subheading-2: #{font(subheading-2)};
+        --ob-theme-color-primary: #{mat.m2-get-color-from-palette(palette(primary))}; // 500
+        --ob-theme-color-secondary: #{mat.m2-get-color-from-palette(palette(primary), darker)}; // 900
+        --ob-theme-color-primary-50: #{mat.m2-get-color-from-palette(palette(primary), 50)};
+        --ob-theme-color-primary-100: #{mat.m2-get-color-from-palette(palette(primary), 100)};
+        --ob-theme-color-primary-200: #{mat.m2-get-color-from-palette(palette(primary), 200)};
+        --ob-theme-color-primary-900: #{mat.m2-get-color-from-palette(palette(primary), 900)};
+        --ob-theme-color-background-menu: #{$menu-color};
+        --ob-theme-color-disabled: #{$disabled-color};
+        --ob-theme-color-white: #{color(ob-white)};
+        --ob-theme-color-bg-1: #{color(ob-bg-1)};
+        --ob-theme-color-bg-2: #{color(ob-bg-2)};
+        --ob-theme-color-bg-3: #{color(ob-bg-3)};
+        --ob-theme-color-grey-light-10: #{color(ob-grey-light-10)};
+        --ob-theme-color-grey-light-20: #{color(ob-grey-light-20)};
+        --ob-theme-color-grey: #{color(ob-grey)};
+        --ob-theme-color-grey-dark: #{color(ob-grey-dark)};
+        --ob-theme-color-bg-dark-10: #{color(ob-bg-dark-10)};
+        --ob-theme-color-bg-dark-20: #{color(ob-bg-dark-20)};
+        --ob-theme-color-black: #{color(ob-black)};
+        --ob-theme-color-yellow: #{color(ob-yellow)};
+        --ob-theme-color-blue: #{color(ob-blue)};
+        --ob-theme-color-fuchsia: #{color(ob-fuchsia)};
+        --ob-theme-color-neutral: #{color(ob-neutral)};
+        --ob-theme-color-tertiary: #{color(ob-tertiary)};
+        --ob-theme-color-success: #{$success-color};
+        --ob-theme-color-warn: #{$warn-color};
+        --ob-theme-color-info: #{$info-color};
+        --ob-theme-color-alert: #{$alert-color};
+        --ob-theme-color-accent: #{$accent-color};
+        --ob-theme-color-success-darker: #{$success-color-darker};
+        --ob-theme-color-warn-darker: #{$warn-color-darker};
+        --ob-theme-color-info-darker: #{$info-color-darker};
+        --ob-theme-color-alert-darker: #{$alert-color-darker};
+        --ob-theme-color-accent-darker: #{$accent-color-darker};
+        --ob-theme-color-success-lighter: #{$success-color-lighter};
+        --ob-theme-color-warn-lighter: #{$warn-color-lighter};
+        --ob-theme-color-info-lighter: #{$info-color-lighter};
+        --ob-theme-color-alert-lighter: #{$alert-color-lighter};
+        --ob-theme-color-accent-lighter: #{$accent-color-lighter};
+    }
+
+    .admonition {
+        --admonition-background-color: var(--ob-theme-color-primary-50);
+        --admonition-color: var(--ob-theme-color-primary-900);
+    }
+}

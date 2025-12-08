@@ -1,0 +1,30 @@
+@let model = { table: table$ | async };
+
+<div class="filter-container" fxLayoutGap="20px">
+    <app-search-input fxFlex="0 1 400px" [searchOnInteraction]="searchOnInteraction"
+        (valueChanged)="changeSearch($event)" [placeholder]="placeholder" />
+    <div class="paginator" fxFlex fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="10px">
+        <!-- eslint-disable-next-line @angular-eslint/template/prefer-self-closing-tags -->
+        @if (model.table) {
+            <p class="page-summary" [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: model.table"></p>
+        }
+        <mat-paginator #paginator hidePageSize (page)="changePage($event)"
+            [pageSize]="pageSize" [pageIndex]="model.table?.page" [length]="model.table?.total" />
+    </div>
+</div>
+
+<div class="table-container">
+    <mat-table class="ob-table" [dataSource]="(table$ | async)?.data" [trackBy]="trackBy()">
+        <ng-content />
+        @if (header) {
+            <mat-header-row *matHeaderRowDef="columns" class="dense-row" />
+        }
+        <mat-row *matRowDef="let row; columns: columns; index as j" class="dense-row hoverable-row" />
+    </mat-table>
+    @if ((table$ | async)?.data?.length === 0) {
+        <div fxLayout="row" fxLayoutAlign="center">
+            <app-empty-state-tiny fxFlex [title]="(emptyListTitle || 'LIST.EMPTY' | translate)"
+                [description]="emptyListDescription | translate" />
+        </div>
+    }
+</div>

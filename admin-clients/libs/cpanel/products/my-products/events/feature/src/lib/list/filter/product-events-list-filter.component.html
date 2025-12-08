@@ -1,0 +1,79 @@
+<button mat-stroked-button color="tertiary" [class]="'ob-button small small-paddings ' + {'active': activeFilters}"
+    [matBadge]="activeFilters || ''" [satPopoverAnchor]="filterPopover" (click)="open()">
+    {{'FORMS.OPEN_FILTER_BTN' | translate}}
+    <mat-icon iconPositionEnd>
+        filter_list
+    </mat-icon>
+</button>
+<sat-popover #filterPopover hasBackdrop yAlign="below" autoFocus="false" restoreFocus="false">
+    <mat-card class="ob-card">
+        <mat-card-content class="form-container">
+            <form [formGroup]="form" class="flex flex-col gap-4">
+                <div class="filter-block flex">
+                    <div class="ob-label flex-[0_0_176px]">
+                        {{'PRODUCT.EVENTS.FILTER.EVENT_STATUS_LABEL' | translate}}
+                    </div>
+                    <div class="filter-block-input flex flex-[0_0_232px]">
+                        <mat-form-field appearance="outline" class="ob-form-field type-select">
+                            <mat-select formControlName="event_status" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                                @for (status of eventStatuses; track status) {
+                                    <mat-option [value]="status.id">
+                                        {{status.name | translate}}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="filter-block flex">
+                    <div class="ob-label flex-[0_0_176px]">
+                        {{'PRODUCT.EVENTS.FILTER.EVENT_START_DATE_LABEL' | translate}}
+                    </div>
+                    <div class="filter-block-input flex flex-[0_0_232px]">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <input matInput [matDatepicker]="eventDateDP" [placeholder]="dateFormat"
+                                autocomplete="off" formControlName="event_date" (focus)="eventDateDP.open()">
+                            <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                                (click)="$event.stopPropagation(); eventDateDP.open();">
+                                <mat-icon>event</mat-icon>
+                            </button>
+                            <mat-datepicker #eventDateDP />
+                        </mat-form-field>
+                    </div>
+                </div>
+                <mat-divider [inset]="true" />
+                <div class="filter-block flex">
+                    <div class="ob-label flex-[0_0_176px]">
+                        {{'PRODUCT.EVENTS.FILTER.RELATION_STATUS_LABEL' | translate}}
+                    </div>
+                    <div class="filter-block-input flex flex-[0_0_232px]">
+                        <mat-form-field appearance="outline" class="ob-form-field type-select">
+                            <mat-select formControlName="status" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                                @for (status of statuses; track status) {
+                                    <mat-option [value]="status.id">
+                                        {{'PRODUCT.EVENTS.FILTER.RELATION_STATUS_OPTS.' + status.name | translate}}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </form>
+        </mat-card-content>
+        <mat-card-footer class="flex justify-start items-center">
+            <div class="flex-grow left-actions">
+                <a class="ob-link" #removeLink (click)="clear()">
+                    {{'FORMS.REMOVE_FILTERS_BTN' | translate}}
+                </a>
+            </div>
+            <div class="flex-none right-actions">
+                <button (click)="close()" mat-button class="ob-button small">
+                    {{'FORMS.CLOSE_FILTER_BTN' | translate}}
+                </button>
+                <button (click)="apply()" mat-flat-button color="primary" class="ob-button small">
+                    {{'FORMS.APPLY_FILTER_BTN' | translate}}
+                </button>
+            </div>
+        </mat-card-footer>
+    </mat-card>
+</sat-popover>

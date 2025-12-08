@@ -1,0 +1,109 @@
+<div fxLayout="column" fxFlex="0 0 852px" class="details-container">
+    <mat-accordion [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel [expanded]="true" (expandedChange)="ticketContentExpanded = $event">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.SESSION.COMMUNICATION.TICKET_CONTENTS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <form id="SessionTicketContentContent" [formGroup]="ticketContentForm" fxLayout="column">
+                <div class="section-block" fxLayout="column">
+                    <h3 class="section-title">{{'EVENTS.SESSION.COMMUNICATION.TICKET_CONTENT.TITLE' | translate}}</h3>
+                    <span *ngIf="multiple" class="multiple-warning">{{'EVENTS.SESSION.COMMUNICATION.MULTIPLE_WARNING' | translate}}</span>
+                    <div fxFlex="100%" fxLayout="row">
+                        <div fxFlex="47px">
+                            <span class="ob-round-badge badge-pdf">1</span>
+                        </div>
+                        <mat-form-field fxFlex="500px" fxFlex.lt-md="100%" appearance="outline"
+                            class="ob-form-field field-with-label">
+                            <mat-label>{{'EVENTS.SESSION.COMMUNICATION.TICKET_CONTENT.TITLE_LABEL' | translate}}</mat-label>
+                            <input matInput aria-label="title" [placeholder]="sessionName" formControlName="pdfTitle">
+                            <mat-error *ngIf="ticketContentForm.hasError('maxlength', 'pdfTitle')">
+                                {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value:
+                                textRestrictions.titleMaxLength})}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div fxFlex="100%" fxLayout="row" *ngIf="multiple">
+                        <mat-checkbox color="primary" formControlName="setDefaultPdfBody" class="set-default">
+                            {{'EVENTS.SESSION.COMMUNICATION.MULTIPLE_DEFAULT_IMAGE' | translate}}
+                        </mat-checkbox>
+                    </div>
+                    <div fxFlex="100%" fxLayout="row" class="disabled">
+                        <!--[ngClass]="{ disabled: ticketContentForm.get('setDefaultPdfBody')?.value }">-->
+                        <div fxFlex="47px">
+                            <span class="ob-round-badge badge-pdf">2</span>
+                        </div>
+                        <div fxFlex="500px" fxFlex.lt-lg="100%" fxLayout="column">
+                            <span class="field-label">
+                                {{'EVENTS.SESSION.COMMUNICATION.TICKET_CONTENT.MAIN_IMAGE.TITLE' | translate}}
+                            </span>
+                            <p class="field-description">
+                                {{'EVENTS.SESSION.COMMUNICATION.TICKET_CONTENT.MAIN_IMAGE.INFO' | translate }}
+                            </p>
+                            <div fxFlex="100%" fxLayout="row">
+                                <div fxFlex="326px" fxLayout="column" class="image-uploader">
+                                    <app-image-uploader [imageRestrictions]="pdfBodyImageRestrictions"
+                                        formControlName="pdfBody"></app-image-uploader>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="section-block" fxLayout="column">
+                    <h3 class="section-title">{{'EVENTS.SESSION.COMMUNICATION.TICKET_CONTENT.PRINTER_TITLE' | translate}}</h3>
+                    <span *ngIf="multiple" class="multiple-warning">{{'EVENTS.SESSION.COMMUNICATION.MULTIPLE_WARNING' | translate}}</span>
+                    <div fxFlex="100%" fxLayout="row">
+                        <div fxFlex="47px">
+                            <span class="ob-round-badge badge-printer">1</span>
+                        </div>
+                        <mat-form-field fxFlex="500px" fxFlex.lt-md="100%" appearance="outline"
+                            class="ob-form-field field-with-label">
+                            <mat-label>{{'EVENTS.SESSION.COMMUNICATION.TICKET_CONTENT.PRINTER_TITLE_LABEL' | translate}}
+                            </mat-label>
+                            <input matInput aria-label="title" [placeholder]="sessionName" formControlName="printerTitle">
+                            <mat-error *ngIf="ticketContentForm.hasError('maxlength', 'printerTitle')">
+                                {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value:
+                                textRestrictions.titleMaxLength})}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div fxFlex="100%" fxLayout="row" *ngIf="multiple">
+                        <mat-checkbox color="primary" formControlName="setDefaultPrinterBody" class="set-default">
+                            {{'EVENTS.SESSION.COMMUNICATION.MULTIPLE_DEFAULT_IMAGE' | translate}}
+                        </mat-checkbox>
+                    </div>
+                    <div fxFlex="100%" fxLayout="row"
+                        [ngClass]="{ disabled: ticketContentForm.get('setDefaultPrinterBody')?.value }">
+                        <div fxFlex="47px">
+                            <span class="ob-round-badge badge-printer">2</span>
+                        </div>
+                        <div fxFlex="500px" fxFlex.lt-lg="100%" fxLayout="column">
+                            <span class="field-label">
+                                {{'EVENTS.SESSION.COMMUNICATION.TICKET_CONTENT.PRINTER_MAIN_IMAGE.TITLE' | translate}}
+                            </span>
+                            <p class="field-description">
+                                {{'EVENTS.SESSION.COMMUNICATION.TICKET_CONTENT.PRINTER_MAIN_IMAGE.INFO' | translate }}
+                            </p>
+                            <div fxFlex="100%" fxLayout="row">
+                                <div fxFlex="326px" fxLayout="column" class="image-uploader">
+                                    <app-image-uploader [imageRestrictions]="printerBodyImageRestrictions"
+                                        formControlName="printerBody"></app-image-uploader>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </mat-expansion-panel>
+    </mat-accordion>
+</div>
+<mat-divider vertical="true" fxFlexAlign="stretch"></mat-divider>
+<div fxFlex="0 1 200px" [fxHide]="!ticketContentExpanded">
+    <div class="ticket-template-legend ticket-template-pdf" fxLayout="column" fxLayoutAlign="start start">
+        <img src="assets/ticket-template/pdf-ticket-session-template.svg"
+            [alt]="'EVENTS.SESSION.COMMUNICATION.TICKET_CONTENT.PDF_TEMPLATE' | translate">
+    </div>
+    <div class="ticket-template-legend ticket-template-printer" fxLayout="column" fxLayoutAlign="start start">
+        <img src="assets/ticket-template/printer-ticket-session-template.svg"
+            [alt]="'EVENTS.SESSION.COMMUNICATION.TICKET_CONTENT.PRINTER_TEMPLATE' | translate">
+    </div>
+</div>

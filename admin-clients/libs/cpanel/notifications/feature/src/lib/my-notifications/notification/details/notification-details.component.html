@@ -1,0 +1,230 @@
+<div class="details-container" fxFlex="0 1 100%" fxLayout="column" *ngIf="notificationDetail$ | async as notificationDetail">
+    <div class="heading-container only-title" fxLayoutAlign="start center">
+        <app-go-back defaultPath="/notifications" [redoPath]="notificationDetail.code"></app-go-back>
+        <h1 class="secondary mat-headline-3">{{notificationDetail.name}}</h1>
+    </div>
+    <div class="main-content" fxFlex="0 1 100%" fxLayout="column">
+        <div class="actions-bar" fxLayout="column">
+            <div fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="center">
+                <div fxFlex="0 1 1305px">
+                    <div fxFlex="0 1 100%" fxLayout="row" fxLayoutGap="10px" class="actions-container-with-status">
+                        <div class="filter-container" fxFlex="none">
+                            <button mat-button type="button" class="ob-button small"
+                                [attr.aria-label]="'ACTIONS.SEND_EMAIL.BTN' | translate"
+                                [matTooltip]="'ACTIONS.SEND_EMAIL.BTN' | translate" [matMenuTriggerFor]="sendEmailMenu"
+                                [disabled]="notificationDetail.status === notificationStatus.sent ||
+                                notificationDetail.status === notificationStatus.inProgress ||
+                                !recipientsForm.valid || !contentsForm.get('subject').value || !contentsForm.get('body').value">
+                                <mat-icon>send</mat-icon>
+                                {{'ACTIONS.SEND_EMAIL.BTN' | translate}}
+                            </button>
+                            <mat-menu #sendEmailMenu="matMenu">
+                                <button mat-menu-item (click)="recipientsForm.valid && contentsForm.get('subject').value &&
+                                    contentsForm.get('body').value && openSendEmailModal()"
+                                    [disabled]="maxEmailsExceeded || !recipientsForm.valid ||
+                                    !contentsForm.get('subject').value || !contentsForm.get('body').value">
+                                    {{'ACTIONS.SEND_MASSIVE_EMAIL.BTN' | translate}}
+                                </button>
+                                <button mat-menu-item (click)="openSendTestEmailModal()">
+                                    {{'ACTIONS.SEND_TEST_EMAIL.BTN' | translate}}
+                                </button>
+                            </mat-menu>
+                        </div>
+                        <button mat-button type="button" class="ob-button small" [attr.aria-label]="'ACTIONS.DELETE_EMAIL.BTN' | translate"
+                            [matTooltip]="'ACTIONS.DELETE_EMAIL.BTN' | translate" (click)="openDeleteNotificationDialog()"
+                            [disabled]="notificationDetail.status === notificationStatus.inProgress">
+                            <mat-icon>delete</mat-icon>
+                            {{'ACTIONS.DELETE_EMAIL.BTN' | translate}}
+                        </button>
+                        <!-- TODO: status in websockets -->
+                        <div fxLayoutGap="10px" class="notification-status">
+                            <label class="ob-label">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.STATUS' | translate}}: </label>
+                            <span class="status-dot-spinner"
+                                *ngIf="(notificationDetail.status === notificationStatus.inProgress) else statusDot">
+                                <mat-spinner diameter="15"></mat-spinner>
+                            </span>
+                            <ng-template #statusDot>
+                                <span [ngClass]="['status-dot', notificationDetail.status.toLowerCase()]"></span>
+                            </ng-template>
+                            {{'NOTIFICATIONS.EMAIL_NOTIFICATION.STATUS_OPTS.' + notificationDetail.status | translate}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <app-form-container
+            *ngIf="notificationDetail.status !== notificationStatus.sent && notificationDetail.status !== notificationStatus.inProgress"
+            layout="main" (cancel)="cancel()" (save)="save()" [disabled]="!form.dirty || !form.valid || (isLoadingOrSaving$ | async)">
+            <mat-accordion class="details-form-container" [multi]="true" togglePosition="before">
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>
+                            {{'NOTIFICATIONS.EMAIL_NOTIFICATION.DETAIL.GENERAL_DATA' | translate}}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <form id="principalInfo" [formGroup]="generalDataForm" fxLayout="row wrap">
+                        <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxLayout="column">
+                            <span class="field-label">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.ENTITY' | translate}}</span>
+                            <span>{{notificationDetail.entity?.name}}</span>
+                        </div>
+                        <mat-form-field fxFlex="500px" fxFlex.lt-md="100%" appearance="outline"
+                            class="ob-form-field field-with-label">
+                            <mat-label>{{'NOTIFICATIONS.EMAIL_NOTIFICATION.NAME' | translate}}</mat-label>
+                            <input matInput aria-label="name" [placeholder]="'NOTIFICATIONS.EMAIL_NOTIFICATION.NAME' | translate"
+                                formControlName="name">
+                            <mat-error [ob-form-errors]="generalDataForm" field="name"></mat-error>
+                        </mat-form-field>
+                    </form>
+                </mat-expansion-panel>
+                <mat-expansion-panel [expanded]="true" class="recipients-form-container without-body-padding">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>
+                            {{'NOTIFICATIONS.EMAIL_NOTIFICATION.DETAIL.RECIPIENTS' | translate}}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div fxLayout="column" class="sticky-sub-header">
+                        <div class="expansion-sub-header" fxFlex="100%" fxLayout="row">
+                            <div fxFlex.gt-sm="50%" fxLayout="column">
+                                <div fxFlex="20px" fxLayout="row">
+                                    <span fxFlex="0 1 100%" fxLayoutAlign="start center" class="totals"
+                                        [ngClass]="{'max_emails': maxEmailsExceeded}">
+                                        <span class="totals-title">
+                                            {{'NOTIFICATIONS.EMAIL_NOTIFICATION.DETAIL.TOTAL_SELECTED_RECIPIENTS' | translate}}
+                                        </span>
+                                        <span *ngIf="!!!(totalRecipientsLoading$ | async)">{{ totalRecipients$ | async }}</span>
+                                        <mat-spinner *ngIf="totalRecipientsLoading$ | async" color="accent" diameter="15">
+                                        </mat-spinner>
+                                    </span>
+                                </div>
+                                <div fxFlex="20px" fxLayout="row" fxLayoutAlign="start center" class="permited"
+                                    [ngClass]="{'max_emails': maxEmailsExceeded}">
+                                    <mat-icon class="ob-icon xsmall with-text">info</mat-icon>
+                                    <span>
+                                        {{ maxEmailsExceeded ?
+                                        ('NOTIFICATIONS.EMAIL_NOTIFICATION.DETAIL.MAX_EMAILS_EXCEEDED' | translate: {maxEmailsPermited})
+                                        : ('NOTIFICATIONS.EMAIL_NOTIFICATION.DETAIL.MAX_EMAILS_PERMITED' | translate:
+                                        {maxEmailsPermited}) }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div fxFlex.gt-sm="50%" fxLayout="column">
+                                <div fxFlex="100%" fxLayout="column" fxLayoutAlign="center end">
+                                    <button mat-stroked-button color="tertiary" class="ob-button small" (click)="exportRecipients()"
+                                        [disabled]="(isExportLoading$ | async) || !recipientsForm.get('event').value || maxEmailsExceeded">
+                                        <mat-icon>file_download</mat-icon>
+                                        {{'NOTIFICATIONS.EMAIL_NOTIFICATION.DETAIL.DOWNLOAD_RECIPIENTS' | translate}}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div fxLayoutAlign="stretch" class="expansion-body" fxLayout="column">
+                        <p fxLayout="row" class="description">
+                            {{'NOTIFICATIONS.EMAIL_NOTIFICATION.DETAIL.RECIPIENTS_DESCRIPTION' | translate}}
+                        </p>
+                        <form id="recipients" [formGroup]="recipientsForm" fxLayout="row wrap" fxLayoutAlign="space-between">
+                            <mat-form-field fxFlex="100%" fxFlex.gt-sm="50%" appearance="outline"
+                                class="ob-form-field field-with-label">
+                                <mat-label>{{'NOTIFICATIONS.EMAIL_NOTIFICATION.EVENT' | translate}}</mat-label>
+                                <app-select-server-search
+                                    formControlName="event"
+                                    [placeholder]="'NOTIFICATIONS.EMAIL_NOTIFICATION.SELECT_EVENT' | translate"
+                                    [options$]="events$"
+                                    (loadOptions)="loadEventsFiltered($event)">
+                                </app-select-server-search>
+                            </mat-form-field>
+                            <!-- SESSIONS -->
+                            <div [class.atomic-saving-error]="errors.saveNotificationSessions" fxFlex="100%">
+                                <app-notification-sessions [sessionsForm]="recipientsForm.get('sessions')"
+                                    [eventId$]="eventId$" [entityId]="entityId">
+                                </app-notification-sessions>
+                                <span *ngIf="errors.saveNotificationSessions" class="error-description">
+                                    {{'NOTIFICATIONS.EMAIL_NOTIFICATION.ATOMIC_SAVING_ERROR' | translate}}
+                                </span>
+                            </div>
+                            <!-- CHANNELS -->
+                            <div class="notification-channels" [class.atomic-saving-error]="errors?.saveNotificationChannels" fxFlex="100%">
+                                <app-notification-channels [eventId$]="eventId$" [channelsForm]="recipientsForm.get('channels')"
+                                    [entityId]="entityId">
+                                </app-notification-channels>
+                                <span *ngIf="errors?.saveNotificationChannels" class="error-description">
+                                    {{'NOTIFICATIONS.EMAIL_NOTIFICATION.ATOMIC_SAVING_ERROR' | translate}}
+                                </span>
+                            </div>
+                            <mat-divider fxFlex="0 1 100%"></mat-divider>
+                            <div class="notification-dates" fxLayout="row wrap" fxLayoutAlign="space-between" fxFlex="100%"
+                                formGroupName="purchase_date">
+                                <p fxFlex="100%" class="field-with-label">
+                                    {{'NOTIFICATIONS.EMAIL_NOTIFICATION.DETAILS.DATES_DESCRIPTION' | translate}}
+                                </p>
+                                <app-date-time-picker fxFlex="100%" fxFlex.gt-sm="50%" defaultTime="00:00"
+                                    [label]="'NOTIFICATIONS.EMAIL_NOTIFICATION.DETAILS.START_DATE' | translate" formControlName="from">
+                                </app-date-time-picker>
+                                <app-date-time-picker fxFlex="100%" fxFlex.gt-sm="50%" defaultTime="00:00"
+                                    [label]="'NOTIFICATIONS.EMAIL_NOTIFICATION.DETAILS.END_DATE' | translate" formControlName="to">
+                                </app-date-time-picker>
+                                <mat-error [ob-form-errors]="recipientsForm" field="purchase_date">
+                                </mat-error>
+                            </div>
+                            <mat-divider fxFlex="0 1 100%"></mat-divider>
+                            <div class="allow-advertising" fxLayout="row wrap" fxLayoutAlign="space-between" fxFlex="100%">
+                                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                                    <input fxHide matInput>
+                                    <mat-checkbox color="primary" formControlName="exclude_commercial_mailing_not_allowed">
+                                        <mat-label>{{'NOTIFICATIONS.EMAIL_NOTIFICATION.DETAILS.ALLOW_ADVERTISING' | translate}}</mat-label>
+                                    </mat-checkbox>
+                                </mat-form-field>
+                            </div>
+                        </form>
+                    </div>
+                </mat-expansion-panel>
+                <!-- EMAIL CONTENTS -->
+                <mat-expansion-panel [expanded]="true" class="contents-form-container">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>
+                            {{'NOTIFICATIONS.EMAIL_NOTIFICATION.DETAIL.CONTENTS' | translate}}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <form id="contentsInfo" [formGroup]="contentsForm" fxLayout="row wrap">
+                        <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label no-badge-field">
+                            <mat-label>{{'NOTIFICATIONS.EMAIL_NOTIFICATION.SUBJECT' | translate}}</mat-label>
+                            <input matInput aria-label="name" [placeholder]="'NOTIFICATIONS.EMAIL_NOTIFICATION.SUBJECT' | translate"
+                                formControlName="subject">
+                            <mat-error [ob-form-errors]="contentsForm" field="subject"></mat-error>
+                        </mat-form-field>
+                        <div fxFlex="100%" fxLayout="row wrap">
+                            <div fxFlex="100%" fxLayout="row">
+                                <div fxFlex="35px">
+                                    <span class="ob-round-badge">1</span>
+                                </div>
+                                <div fxFlex="grow" fxLayout="column">
+                                    <mat-form-field fxFlex="100%" appearance="outline"
+                                        class="ob-form-field no-padding textarea-field">
+                                        <mat-label class="field-label">
+                                            {{'NOTIFICATIONS.EMAIL_NOTIFICATION.BODY' | translate}}
+                                        </mat-label>
+                                        <app-rich-text-area [autoresize]="{min: 100, max: 800}" formControlName="body"
+                                            [autocompleterItems]="'NOTIFICATIONS.EMAIL_NOTIFICATION.BODY'"
+                                            class="vertical-stretch">
+                                        </app-rich-text-area>
+                                        <mat-error [ob-form-errors]="contentsForm" field="body"></mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </mat-expansion-panel>
+            </mat-accordion>
+        </app-form-container>
+        <app-form-container hideActionBar
+            *ngIf="notificationDetail.status === notificationStatus.sent || notificationDetail.status === notificationStatus.inProgress"
+            layout="main">
+            <app-notification-summary [subject]="contentsForm.get('subject').value" [notificationDetail$]="notificationDetail$">
+            </app-notification-summary>
+        </app-form-container>
+        <div class="spinner-container" *ngIf="(isLoadingOrSaving$ | async) && notificationDetail.status !== notificationStatus.sent
+            && notificationDetail.status !== notificationStatus.inProgress">
+            <mat-spinner></mat-spinner>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,48 @@
+<div class="flex left-bar-container">
+    <div class="flex flex-1 flex-col justify-between left-bar">
+        <div class="flex flex-col left-sidebar-title">
+            <div class="flex items-center">
+                <h2 class="title">{{'CUSTOMER.SEASON_TICKETS.TITLE' | translate}}</h2>
+            </div>
+            <div class="flex-1">
+                <p class="results-count" [innerHTML]="('RESULTS.TOTAL' | translate) + ': ' + $seasonTicketProducts()?.size"></p>
+            </div>
+        </div>
+        <div class="flex flex-1 flex-col list-container">
+            <mat-accordion displayMode="flat" class="ob-accordion-list tiny" fxFlex fxLayout="column">
+                <mat-selection-list class="ob-lateral-select-list" appLastPathGuardListener
+                    [currValue]="'name hardcoded'" [multiple]="false">
+                    @for (stGroup of $seasonTicketProducts() | keyvalue; track stGroup.key) {
+                        <mat-expansion-panel #groupPanel
+                            class="session-group-item exclude-body-padding mat-elevation-z0 exclude-header-padding"
+                            [expanded]="$seasonTicket()?.id === stGroup.key">
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*" class="session-group-header"
+                                [class.selected]="$seasonTicket()?.id === stGroup.key">
+                                <mat-panel-title>
+                                    <span class="group-title" appEllipsify [matTooltip]="stGroup.value[0]?.seasonTicketName">
+                                        {{stGroup.value[0]?.seasonTicketName}}
+                                    </span>
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+                             @for(stItem of stGroup.value; track stItem.id) {
+                                <mat-list-option
+                                    #option [disabled]="option.disabled"
+                                    [selected]="lastProductId === stItem.id"
+                                    [value]="stItem.id" (click)="selectionChangeHandler(stItem)"
+                                    [id]="'st-products-list-option-' + stItem.id">
+                                    <span class="list-item-title">
+                                        {{stItem?.ticket?.allocation?.sector?.name}} |
+                                        {{stItem?.ticket?.allocation?.type === 'NUMBERED' 
+                                            ? stItem?.ticket?.allocation?.row?.name
+                                            : stItem?.ticket?.allocation?.not_numbered_area?.name }} |
+                                         {{stItem?.ticket?.allocation?.seat?.name}}
+                                    </span>
+                                </mat-list-option>
+                             }
+                        </mat-expansion-panel>
+                    }
+                </mat-selection-list>
+            </mat-accordion>
+        </div>
+    </div>
+</div>

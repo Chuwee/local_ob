@@ -1,0 +1,11 @@
+export const saleTimelineStructure = [
+    'SHI_SALE',
+    'SUPPLIER_HOLD_REQUEST',
+    'SUPPLIER_SALE_REQUEST',
+    'SUPPLIER_SALE',
+    'SHI_SALE_CONFIRM',
+    'SUPPLIER_SALE_UPDATE_REQUEST',
+    'SHI_SALE_UPDATE',
+    'SUPPLIER_FULFILL',
+    'SHI_FULFILL'
+];

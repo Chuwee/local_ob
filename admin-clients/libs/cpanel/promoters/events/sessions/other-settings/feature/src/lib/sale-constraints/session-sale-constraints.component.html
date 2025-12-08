@@ -1,0 +1,172 @@
+<form [formGroup]="saleConstraintsGroup" class="flex flex-col">
+
+    <!-- BY ORDER -->
+    <mat-checkbox formControlName="enableCartTicketsLimit" color="primary">
+        <b>{{'EVENTS.SESSION.OTHER_SETTINGS.ORDER_LIMITS.ENABLE' | translate}}</b>
+    </mat-checkbox>
+
+    <div class="nested flex flex-col" [class.mb]="saleConstraintsGroup?.get('enableCartTicketsLimit').value">
+        <p>{{ 'EVENTS.SESSION.OTHER_SETTINGS.ORDER_LIMITS.DESCRIPTION' | translate }}</p>
+        <div class="flex flex-1">
+            @if(saleConstraintsGroup?.get('enableCartTicketsLimit').value){
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label flex-[0_0_50px]">
+                    <mat-label>{{'EVENTS.SESSION.OTHER_SETTINGS.QUANTITY' | translate}}</mat-label>
+                    <input matInput type="number" min="0" placeholder="0" formControlName="cartTicketsLimit" autocomplete="off">
+                </mat-form-field>
+            }
+        </div>
+        @if(saleConstraintsGroup?.get('enableCartTicketsLimit').value){
+            <mat-checkbox formControlName="enablePriceGroupLimits" color="primary">
+                {{'EVENTS.SESSION.OTHER_SETTINGS.ACTIVATE_ZONE_PRICE_LIMIT' | translate}}
+            </mat-checkbox>
+        }
+        @if(saleConstraintsGroup?.get('enablePriceGroupLimits').value){
+            <mat-table formArrayName="priceGroupLimitsMatrix"
+                class="ob-table nested" [dataSource]="priceTypes$">
+                <!-- PRICE ZONE GROUP -->
+                <ng-container [matColumnDef]="priceZoneLimitTableHead[0]">
+                    <mat-header-cell id="name" *matHeaderCellDef class="head-cell price-zone-header">
+                        {{'EVENTS.SESSION.OTHER_SETTINGS.PZ_TABLE_PRICE_ZONE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        {{row.name}}
+                    </mat-cell>
+                </ng-container>
+                <!-- MIN -->
+                <ng-container [matColumnDef]="priceZoneLimitTableHead[1]">
+                    <mat-header-cell id="min" *matHeaderCellDef class="head-cell input-column">
+                        {{'EVENTS.SESSION.OTHER_SETTINGS.PZ_MIN' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row; let i = index" class="editable-cell">
+                        <div class="write-value currency-value" [formGroupName]="i">
+                            <mat-form-field appearance="outline" class="ob-form-field" subscriptSizing="dynamic">
+                                <input matInput type="number" min="0" placeholder="0" formControlName="min" autocomplete="off">
+                                @let errorMessage = priceGroupLimitsMatrix.at(i).get('min') | obErrorMessage$ | async;
+                                @if (errorMessage) {
+                                    <mat-icon matSuffix [obErrorIcon]="errorMessage">error_outline</mat-icon>
+                                }
+                            </mat-form-field>
+                        </div>
+                    </mat-cell>
+                </ng-container>
+                <!-- MAX -->
+                <ng-container [matColumnDef]="priceZoneLimitTableHead[2]">
+                    <mat-header-cell id="max" *matHeaderCellDef class="head-cell input-index">
+                        {{'EVENTS.SESSION.OTHER_SETTINGS.PZ_MAX' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row; let i = index" class="editable-cell">
+                        <div class="write-value currency-value" [formGroupName]="i">
+                            <mat-form-field appearance="outline" class="ob-form-field" subscriptSizing="dynamic">
+                                <input matInput type="number" min="0" placeholder="0" formControlName="max" autocomplete="off">
+                                @let errorMessage = priceGroupLimitsMatrix.at(i).get('max') | obErrorMessage$ | async;
+                                @if (errorMessage) {
+                                    <mat-icon matSuffix [obErrorIcon]="errorMessage">error_outline</mat-icon>
+                                }
+                            </mat-form-field>
+                        </div>
+                    </mat-cell>
+                </ng-container>
+                <mat-header-row *matHeaderRowDef="priceZoneLimitTableHead; sticky: true" class="dense-row" />
+                <mat-row *matRowDef="let row; columns: priceZoneLimitTableHead" class="dense-row hoverable-row" />
+            </mat-table>
+        }
+    </div>
+
+    <!-- BY CUSTOMER -->
+    <div class="flex flex-col">
+        <mat-checkbox formControlName="customers_limits_enabled" color="primary">
+            <b>{{'EVENTS.SESSION.OTHER_SETTINGS.CUSTOMER_LIMITS.ENABLE' | translate}}</b>
+        </mat-checkbox>
+        <div class="nested" [class.mb]="saleConstraintsGroup.get('customers_limits_enabled').value">
+            <p>{{ 'EVENTS.SESSION.OTHER_SETTINGS.CUSTOMER_LIMITS.DESCRIPTION' | translate }}</p>
+            @if(saleConstraintsGroup.get('customers_limits_enabled').value) {
+                <mat-radio-group class="flex-col" [formControl]="saleConstraintsGroup.get('customer_limits_type')">
+                    <div class="flex-col justify-center items-between basis-full">
+                        <mat-radio-button class="ob-radio-button vertical-list basis-full" [value]="'session'">
+                            <div>{{'EVENTS.SESSION.OTHER_SETTINGS.CUSTOMER_LIMITS.BY_SESSION' | translate}}</div>
+                        </mat-radio-button>
+                        @if (saleConstraintsGroup.get('customer_limits_type').value === 'session') {
+                            <div class="flex flex-col gap-2">
+                                <div class="custom-message flex flex-start align-start nested-content">
+                                    <mat-icon class="ob-icon xsmall info with-text">info</mat-icon>
+                                    <span>
+                                        {{ ($maxCustomerTicketsLimit() ?
+                                                'EVENTS.SESSION.OTHER_SETTINGS.CUSTOMER_LIMITS.BY_SESSION_MAX_MESSAGE'
+                                            :
+                                                'EVENTS.SESSION.OTHER_SETTINGS.CUSTOMER_LIMITS.BY_SESSION_MESSAGE'
+                                            ) | translate }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <mat-form-field appearance="outline"
+                                        class="ob-form-field field-with-label flex-[0_0_50px] radio-nested-field nested-content">
+                                        <mat-label>{{'EVENTS.SESSION.TICKET_LIMIT.DESCRIPTION' | translate}}</mat-label>
+                                        <input matInput type="number" min="0" placeholder="0" formControlName="customerTicketsLimit"
+                                            [attr.max]="$maxCustomerTicketsLimit()" autocomplete="off">
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="flex-col justify-center items-between basis-full">
+                        <mat-radio-button class="ob-radio-button vertical-list basis-full" [value]="'price_zone'">
+                            <div>{{'EVENTS.SESSION.OTHER_SETTINGS.CUSTOMER_LIMITS.BY_PRICE_ZONE' | translate}}</div>
+                        </mat-radio-button>
+                        @if (saleConstraintsGroup.get('customer_limits_type').value === 'price_zone') {
+                            <div class="flex flex-col gap-4 radio-nested-field nested-content"
+                                formArrayName="price_type_limits">
+                                <!-- PRICE-TYPE LIMITS LIST -->
+                                @for(limit of customerPriceTypeLimits.controls; track limit;) {
+                                    <div class="flex flex-1 flex-row items-center" [formGroupName]="$index">
+                                        <!-- PRICE-TYPE -->
+                                        <mat-form-field appearance="outline"
+                                            class="ob-form-field field-with-label inline-field flex-[0_0_300px]">
+                                            <mat-label class="ob-form-field field-with-label">
+                                                {{'EVENTS.SESSION.OTHER_SETTINGS.CUSTOMER_LIMITS._PRICE_ZONE' | translate}}
+                                            </mat-label>
+                                            <mat-select formControlName="price_type_id"
+                                                [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                                @for(pt of $availableCustomerPriceTypes(); track pt.id) {
+                                                    <mat-option [disabled]="pt.disabled" [value]="pt.id">
+                                                        {{pt.name}}
+                                                    </mat-option>
+                                                }
+                                            </mat-select>
+                                        </mat-form-field>
+                                        <mat-divider class="ob-divider" />
+                                        <!-- MAX -->
+                                        <mat-form-field appearance="outline"
+                                            class="ob-form-field field-with-label inline-field flex-[0_0_150px]">
+                                            <mat-label class="ob-form-field field-with-label">
+                                                {{'EVENTS.SESSION.OTHER_SETTINGS.CUSTOMER_LIMITS.PZ_MAX' | translate}}
+                                            </mat-label>
+                                            <input matInput type="number" min="0" formControlName="max" placeholder="0">
+                                        </mat-form-field>
+                                        <button mat-icon-button class="ob-button small"
+                                            [disabled]="$first && customerPriceTypeLimits.at(0).invalid"
+                                            (click)="deleteCustomerPriceTypeLimit($index)">
+                                            <mat-icon>delete</mat-icon>
+                                        </button>
+                                    </div>
+                                }
+                                @let lastPriceType = customerPriceTypeLimits.at(customerPriceTypeLimits.length - 1);
+                                @if($allowAddCustomerPriceTypeLimit()) {
+                                    <div class="add-limit flex flex-row items-center" [class.disabled]="lastPriceType?.invalid"
+                                        (click)="(lastPriceType?.valid) && addCustomerPriceTypeLimit()">
+                                        <button mat-icon-button type="button" [disabled]="lastPriceType?.invalid"
+                                            class="ob-button mat-stroked-button xsmall">
+                                            <mat-icon>add</mat-icon>
+                                        </button>
+                                        <span>
+                                            {{'EVENTS.SESSION.OTHER_SETTINGS.CUSTOMER_LIMITS.ADD_LIMIT' | translate}}
+                                        </span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </mat-radio-group>
+            }
+        </div>
+    </div>
+</form>

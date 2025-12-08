@@ -1,0 +1,209 @@
+<div class="details-container" fxLayout="column" fxFlex="0 1 880px">
+    <div fxFlex="0 1 100%" fxLayout="column">
+        <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+            <mat-expansion-panel [expanded]="true" (expandedChange)="isPdfContentExpanded = $event">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{'SALE_REQUEST.COMMUNICATION.TICKET.TICKET_PDF' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div id="pdfContent" fxLayout="column">
+                    <div class="section-block" fxLayout="column">
+                        <h3 class="section-title">{{'SALE_REQUEST.COMMUNICATION.TICKET.CONTENTS' | translate}}</h3>
+                        <div fxFlex="100%" fxLayout="row">
+                            <div fxFlex="47px">
+                                <span class="ob-round-badge badge-pdf">1</span>
+                            </div>
+                            <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                                fxLayout="column">
+                                <span class="field-label">
+                                    {{'SALE_REQUEST.COMMUNICATION.TICKET.TEXT.TITLE.LABEL' | translate}}
+                                </span>
+                                <ng-container
+                                    *ngIf="(texts$ | async)?.[saleRequestTicketContentTextType.title]?.value as title else noTitle">
+                                    <span>{{title}}</span>
+                                </ng-container>
+                                <ng-template #noTitle>
+                                    <div class="content-not-defined-message" fxLayout="row" fxLayoutAlign="start center">
+                                        <mat-icon class="ob-icon small with-text">info</mat-icon>
+                                        <span>{{'SALE_REQUEST.COMMUNICATION.TICKET.TEXT.TITLE.NOT_DEFINED' | translate}}</span>
+                                    </div>
+                                </ng-template>
+                            </div>
+                        </div>
+                        <div fxFlex="100%" fxLayout="row">
+                            <div fxFlex="47px">
+                                <span class="ob-round-badge badge-pdf">2</span>
+                            </div>
+                            <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                                fxLayout="column">
+                                <span class="field-label">
+                                    {{'SALE_REQUEST.COMMUNICATION.TICKET.TEXT.SUBTITLE.LABEL' | translate}}
+                                </span>
+                                <ng-container
+                                    *ngIf="(texts$ | async)?.[saleRequestTicketContentTextType.subtitle]?.value
+                                        as subtitle else noSubtitle">
+                                    <span>{{subtitle}}</span>
+                                </ng-container>
+                                <ng-template #noSubtitle>
+                                    <div class="content-not-defined-message" fxLayout="row" fxLayoutAlign="start center">
+                                        <mat-icon class="ob-icon small with-text">info</mat-icon>
+                                        <span>{{'SALE_REQUEST.COMMUNICATION.TICKET.TEXT.SUBTITLE.NOT_DEFINED' | translate}}</span>
+                                    </div>
+                                </ng-template>
+                            </div>
+                        </div>
+                        <div fxFlex="100%" fxLayout="row">
+                            <div fxFlex="47px">
+                                <span class="ob-round-badge badge-pdf">3</span>
+                            </div>
+                            <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                                fxLayout="column">
+                                <span class="field-label">
+                                    {{'SALE_REQUEST.COMMUNICATION.TICKET.TEXT.ADDITIONAL_DATA.LABEL' | translate}}
+                                </span>
+                                <ng-container
+                                    *ngIf="(texts$ | async)?.[saleRequestTicketContentTextType.additionalData]?.value
+                                        as additionalData else noAdditionalData">
+                                    <span>{{additionalData}}</span>
+                                </ng-container>
+                                <ng-template #noAdditionalData>
+                                    <div class="content-not-defined-message" fxLayout="row" fxLayoutAlign="start center">
+                                        <mat-icon class="ob-icon small with-text">info</mat-icon>
+                                        <span>{{'SALE_REQUEST.COMMUNICATION.TICKET.TEXT.ADDITIONAL_DATA.NOT_DEFINED' | translate}}</span>
+                                    </div>
+                                </ng-template>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-block" fxLayout="column">
+                        <h3 class="section-title">{{'SALE_REQUEST.COMMUNICATION.TICKET.IMAGES' | translate}}</h3>
+                        <div fxFlex="100%" fxLayout="row">
+                            <div fxFlex="47px">
+                                <span class="ob-round-badge badge-pdf">4</span>
+                            </div>
+                            <div fxLayout="column" class="details-non-editable-field ob-form-field">
+                                <span class="field-label">
+                                    {{'SALE_REQUEST.COMMUNICATION.TICKET.IMAGE.BODY.LABEL' | translate}}
+                                </span>
+                                <div fxLayout="row"
+                                    *ngIf="(images$ | async)?.[saleRequestTicketContentImageType.body] as bodyUrl else noBodyImage">
+                                    <img fxFlex="75%" [src]="bodyUrl" class="body-image" alt="" />
+                                </div>
+                                <ng-template #noBodyImage>
+                                    <div class="content-not-defined-message" fxLayout="row" fxLayoutAlign="start center">
+                                        <mat-icon class="ob-icon small with-text">info</mat-icon>
+                                        <span>{{'SALE_REQUEST.COMMUNICATION.TICKET.IMAGE.BODY.NOT_DEFINED' | translate}}</span>
+                                    </div>
+                                </ng-template>
+                            </div>
+                        </div>
+                        <div fxFlex="100%" fxLayout="row" fxLayoutGap="5%">
+                            <div fxFlex="45%" fxLayout="row">
+                                <div fxFlex="47px">
+                                    <span class="ob-round-badge badge-pdf">5</span>
+                                </div>
+                                <div fxLayout="column" class="details-non-editable-field ob-form-field">
+                                    <span class="field-label">
+                                        {{'SALE_REQUEST.COMMUNICATION.TICKET.IMAGE.BANNER_MAIN.LABEL' | translate}}
+                                    </span>
+                                    <div fxLayout="row"
+                                        *ngIf="(images$ | async)?.[saleRequestTicketContentImageType.bannerMain]
+                                            as bannerMainUrl else noBannerMain">
+                                        <img fxFlex="100%" [src]="bannerMainUrl" class="promoter-image" alt="" />
+                                    </div>
+                                    <ng-template #noBannerMain>
+                                        <div class="content-not-defined-message" fxLayout="row" fxLayoutAlign="start center">
+                                            <mat-icon class="ob-icon small with-text">info</mat-icon>
+                                            <span>{{'SALE_REQUEST.COMMUNICATION.TICKET.IMAGE.BANNER_MAIN.NOT_DEFINED' | translate}}</span>
+                                        </div>
+                                    </ng-template>
+                                </div>
+                            </div>
+                            <div fxFlex="45%" fxLayout="row">
+                                <div fxFlex="47px">
+                                    <span class="ob-round-badge badge-pdf">6</span>
+                                </div>
+                                <div fxLayout="column" class="details-non-editable-field ob-form-field">
+                                    <span class="field-label">
+                                        {{'SALE_REQUEST.COMMUNICATION.TICKET.IMAGE.EVENT_BANNER_SECONDARY.LABEL' |
+                                        translate}}
+                                    </span>
+                                    <div fxLayout="row"
+                                        *ngIf="(images$ | async)?.[saleRequestTicketContentImageType.bannerSecondary]
+                                            as bannerSecondaryUrl else noBannerSecondary">
+                                        <img fxFlex="100%" [src]="bannerSecondaryUrl" class="promoter-image" alt="" />
+                                    </div>
+                                    <ng-template #noBannerSecondary>
+                                        <div class="content-not-defined-message" fxLayout="row" fxLayoutAlign="start center">
+                                            <mat-icon class="ob-icon small with-text">info</mat-icon>
+                                            <span>
+                                                {{'SALE_REQUEST.COMMUNICATION.TICKET.IMAGE.EVENT_BANNER_SECONDARY.NOT_DEFINED' | translate}}
+                                            </span>
+                                        </div>
+                                    </ng-template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <form [formGroup]="pdfContentForm" fxFlex="100%">
+                        <div class="section-block" fxLayout="column">
+                            <h3 class="section-title">
+                                {{'SALE_REQUEST.COMMUNICATION.TICKET.IMAGE.HEADER.TITLE' | translate}}
+                            </h3>
+                            <p>{{'SALE_REQUEST.COMMUNICATION.TICKET.IMAGE.HEADER.INFO' | translate }}</p>
+                            <div fxFlex="100%" fxLayout="row">
+                                <div fxFlex="47px">
+                                    <span class="ob-round-badge badge-pdf">7</span>
+                                </div>
+                                <div fxFlex fxLayout="column" class="image-uploader">
+                                    <app-image-uploader [imageRestrictions]="imageRestrictions['pdfHeader']"
+                                        formControlName="header">
+                                    </app-image-uploader>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="section-block" fxLayout="column">
+                            <h3 class="section-title">
+                                {{'SALE_REQUEST.COMMUNICATION.TICKET.IMAGE.BANNER_SECONDARY.TITLE' | translate}}
+                            </h3>
+                            <p>{{'SALE_REQUEST.COMMUNICATION.TICKET.IMAGE.BANNER_SECONDARY.INFO' | translate }}</p>
+                            <div fxFlex="100%" fxLayout="row wrap" fxLayoutGap="28px">
+                                <div fxFlex="none" fxLayout="row">
+                                    <div fxFlex="47px">
+                                        <span class="ob-round-badge badge-pdf">8</span>
+                                    </div>
+                                    <div fxFlex="520px" fxLayout="column" class="image-uploader">
+                                        <app-image-uploader [imageRestrictions]="imageRestrictions['pdfBanner']"
+                                            formControlName="banner"></app-image-uploader>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+</div>
+<mat-divider vertical="true" fxFlexAlign="stretch"></mat-divider>
+<div fxFlex="0 0 200px">
+    <div class="ticket-template-legend legend-pdf" [fxHide]="!isPdfContentExpanded" fxLayout="column"
+        fxLayoutAlign="start start">
+        <img src="assets/ticket-template/pdf-ticket-sale-request-template.svg"
+            [alt]="'SALE_REQUEST.COMMUNICATION.TICKET.TICKET_PDF' | translate">
+        <button mat-flat-button class="ob-button xsmall ticket-template-preview" (click)="openTicketPreview()"
+            [disabled]="(template$ | async) === null">
+            <mat-icon>visibility</mat-icon>
+            {{'ACTIONS.SEE_TICKET.BTN' | translate}}
+        </button>
+        <div class="legend-title">{{'EVENTS.TEMPLATE' | translate}}</div>
+        <div class="legend-value">{{(template$ | async)?.name || '-'}}</div>
+        <div class="legend-title">{{'EVENTS.PRINTER.TITLE' | translate}}</div>
+        <div class="legend-value">{{(template$ | async)?.design.printer || '-'}}</div>
+        <div class="legend-title">{{'EVENTS.PAPER.TITLE' | translate}}</div>
+        <div class="legend-value">{{(template$ | async)?.design.paper_type || '-'}}</div>
+        <div class="legend-title">{{'CHANNELS.DESIGN.TITLE' | translate}}</div>
+        <div class="legend-value">{{(template$ | async)?.design.name || '-'}}</div>
+    </div>
+</div>

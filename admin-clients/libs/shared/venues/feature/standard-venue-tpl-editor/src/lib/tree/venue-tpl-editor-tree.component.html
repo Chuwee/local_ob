@@ -1,0 +1,88 @@
+<div fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="start stretch">
+    <div class="tree-header">
+        <h2 class="title">{{'VENUE_TPL_EDITOR.SECTORS' | translate}}</h2>
+        <button mat-icon-button class="ob-button mat-stroked-button xsmall" type="button"
+            [attr.aria-label]="'VENUE_TPL_EDITOR.ADD_SECTOR' | translate"
+            [matTooltip]="'VENUE_TPL_EDITOR.ADD_SECTOR' | translate"
+            [disabled]="(baseEditorMode$ | async) === false" (click)="openNewSectorDialog()">
+            <mat-icon>add</mat-icon>
+        </button>
+        <div fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="end center">
+            <mat-button-toggle class="ob-icon-button-toggle x-small"
+                [attr.aria-label]="'VENUE_TPL_EDITOR.ACTIONS.FILTER_VIEW_ITEMS' | translate"
+                [matTooltip]="'VENUE_TPL_EDITOR.ACTIONS.FILTER_VIEW_ITEMS' | translate"
+                [checked]="filteringInViewItems$ | async" (click)="toggleFilterInViewItems()">
+                <mat-icon>filter_list</mat-icon>
+            </mat-button-toggle>
+        </div>
+    </div>
+    <cdk-virtual-scroll-viewport #scrollViewport
+        class="tree-viewport" fxFlex="0 1 100%" [itemSize]="28" [minBufferPx]="560" [maxBufferPx]="1120"
+        (appResize)="scrollViewport.checkViewportSize()" [resizeDelay]="100">
+        @if (treeSource$ | async; as treeSource) {
+            <div class="tree-node-container">
+                <div *cdkVirtualFor="let wrapper of treeSource" [fxHide]="wrapper.id === rootItem"
+                    class="tree-node" fxLayout="row" fxLayoutAlign="start center"
+                    [style.padding-left]="(wrapper.level - 1) * 4 + 'px'"
+                    [class.selectable]="wrapper.selectable" [class.selected]="wrapper.selected || wrapper.partiallySelected"
+                    (click)="treeSource.toggle(wrapper)">
+                    <div class="tree-arrow-icon">
+                        <mat-icon [fxShow]="wrapper.expandable">
+                            {{!treeSource.isExpanded(wrapper) ? 'keyboard_arrow_right' : 'keyboard_arrow_down'}}
+                        </mat-icon>
+                    </div>
+                    @if ((baseEditorMode$ | async) && wrapper.selectable) {
+                        <mat-checkbox color="primary" class="xsmall tree-checkbox small-touch-area"
+                            [disabled]="wrapper.disabled"
+                            [checked]="wrapper.selected" [indeterminate]="wrapper.partiallySelected"
+                            (click)="selectNode($event, wrapper)" />
+                    }
+                    @if (wrapper.item.itemType !== aisleItemType) {
+                        <span class="tree-node-label"
+                            [class.tree-node-label-disabled]="wrapper.disabled"
+                            appEllipsify [matTooltip]="wrapper.label">
+                                {{
+                            ((wrapper.item.itemType === rowItemType ? 'VENUE_TPL_EDITOR.ROW'
+                                : wrapper.item.itemType === seatItemType ? 'VENUE_TPL_EDITOR.SEAT'
+                                    : '') | translate)
+                            + ' ' + wrapper.label
+                            }}
+                        </span>
+                    }
+                    @if ((wrapper.editable || wrapper.deletable) && (baseEditorMode$ | async)) {
+                        <div class="tree-node-actions">
+                            @if (wrapper.editable) {
+                                <button mat-icon-button aria-label="Edit"
+                                    class="ob-button xsmall tree-node-action-button"
+                                    [matTooltip]="'FORMS.ACTIONS.EDIT' | translate"
+                                    (click)="editNode($event, wrapper)">
+                                    <mat-icon>edit</mat-icon>
+                                </button>
+                            }
+                            @if (wrapper.deletable) {
+                                <button mat-icon-button aria-label="Delete"
+                                    class="ob-button xsmall tree-node-action-button"
+                                    [matTooltip]="'FORMS.ACTIONS.DELETE' | translate"
+                                    (click)="deleteNode($event, wrapper)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            }
+                        </div>
+                    }
+                    @if (wrapper.totalSeats !== undefined) {
+                        <span class="mat-caption total-seats"
+                            [class.tree-node-label-disabled]="wrapper.disabled">
+                            {{wrapper.totalSeats | localNumber}}
+                        </span>
+                    }
+                    <!-- AISLE -->
+                    @if (wrapper.item.itemType === aisleItemType) {
+                        <div class="aisle-node mat-caption">
+                            {{'VENUE_TPL_EDITOR.AISLE' | translate}}
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </cdk-virtual-scroll-viewport>
+</div>

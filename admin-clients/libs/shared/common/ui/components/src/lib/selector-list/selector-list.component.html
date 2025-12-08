@@ -1,0 +1,19 @@
+<div fxLayout="column">
+    <div fxLayout="row" fxFlex="0 1" fxLayoutAlign="center center" class="search-container">
+        <app-search-input [placeholder]="searchInputPlaceholder" searchOnInteraction
+            (valueChanged)="searchkeyTrigger.emit($event)" />
+    </div>
+    <mat-selection-list #selectionlist [formControl]="ngControl.control" class="ob-tabs-select-list"
+        [compareWith]="compareById" multiple="false" disableRipple>
+        <div class="selector-list-title">
+            {{listTitle}}
+        </div>
+        @for (item of options$ | async; track item.id) {
+            <mat-list-option [value]="item" [selected]="isSelected(item.id, value)" class="with-badge">
+                @if (optionTemplateRef) {
+                    <ng-container *ngTemplateOutlet="optionTemplateRef; context: {$implicit: item}" />
+                }
+            </mat-list-option>
+        }
+    </mat-selection-list>
+</div>

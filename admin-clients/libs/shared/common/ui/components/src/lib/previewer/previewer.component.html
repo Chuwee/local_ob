@@ -1,0 +1,22 @@
+<div class="previewer-container" (click)="close()">
+    <mat-toolbar class="previewer-toolbar" (click)="$event.stopPropagation()">
+        <mat-icon>image</mat-icon>
+        <span class="previewer-title">{{file?.name}}</span>
+        <span class="flex-auto"></span>
+        <a mat-icon-button class="ob-button medium" target="_blank" [href]="resolvePath()" [download]="file?.name">
+            <mat-icon>get_app</mat-icon>
+        </a>
+        @if (!file?.contentType.includes('svg') && !file?.contentType.includes('ico')) {
+            <button mat-icon-button
+                class="ob-button medium" (click)="close(true)">
+                <mat-icon>edit</mat-icon>
+            </button>
+        }
+        <button mat-icon-button class="ob-button medium" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </mat-toolbar>
+    <div class="previewer-image-container" (click)="$event.stopPropagation()">
+        <img [alt]="file?.name" [src]="resolvePath()" />
+    </div>
+</div>

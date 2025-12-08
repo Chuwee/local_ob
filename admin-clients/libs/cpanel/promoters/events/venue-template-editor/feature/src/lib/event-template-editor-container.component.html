@@ -1,0 +1,20 @@
+<div *ngIf="event$ | async as event" fxFlex="0 1 100%" fxLayout="column" class="details-container">
+    <div class="heading-container" fxLayoutAlign="start center">
+        <div class="back-link" fxLayoutAlign="center center">
+            <a [routerLink]="['/events', event.id, 'venue-templates', (venueTemplate$ | async)?.id, 'standard']"
+                [matTooltip]="'NAV_ACTIONS.RETURN' | translate">
+                <mat-icon>arrow_back</mat-icon>
+            </a>
+        </div>
+        <h1 class="secondary mat-headline-3">{{ event.name }} - {{ (venueTemplate$ | async)?.name}}</h1>
+        <img src="assets/la-liga.svg" alt="la liga" *ngIf="event | isAvetEvent" class="logo-la-liga heading-element">
+        <span class="highlighted-box heading-element" *ngIf="event.archived">{{'EVENTS.ARCHIVED' | translate}}</span>
+    </div>
+    <app-standard-venue-tpl-editor
+        [operatorMode]="operatorMode$ | async"
+        [mmcIntegrationEnabled]="mmcIntegrationEnabled$ | async"
+        [inUse]="isInUse$ | async"
+        [capacityIncreaseEnabled]="capacityIncreaseEnabled$ | async"
+        [capacityIncreaseInProgress]="increasingCapacity$ | async">
+    </app-standard-venue-tpl-editor>
+</div>

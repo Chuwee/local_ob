@@ -1,0 +1,134 @@
+<div class="flex flex-col basis-full dialog-msg-container">
+    <div mat-dialog-title>
+        <div class="flex flex-row items-center">
+            <span class="basis-full secondary title">{{'NEW_PRESALE_DIALOG.TITLE' | prefix | translate}}</span>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content class="flex flex-row">
+        <form [formGroup]="form" class="flex flex-col" [class.gap-6]="onlyCustomersValidation">
+            @if(externalProvider) {
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label"
+                    [subscriptSizing]="selectedInventoryProvider === externalProvider ? 'fixed' : 'dynamic'">
+                    <mat-label>{{'VENUE_TPLS.INVENTORY' | translate}}</mat-label>
+                    <mat-select formControlName="inventory_provider">
+                        <mat-option [value]="'internal'">
+                            {{'VENUES.INVENTORY.INTERNAL'| translate}}
+                        </mat-option>
+                        <mat-option [value]="externalProvider">
+                            {{'VENUES.INVENTORY.'+ externalProvider | translate}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form" field="inventory_provider" />
+                </mat-form-field>
+                @if(selectedInventoryProvider !== externalProvider) {
+                    <mat-divider class="ob-form-divider fields-divider" />
+                }
+            }
+            @if (selectedInventoryProvider === externalProvider) {
+                <div class="flex flex-col justify-start items-stretch">
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label" [subscriptSizing]="'dynamic'">
+                        <mat-label>{{'NEW_PRESALE_DIALOG.EXTERNAL_PRESALE' | prefix | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                            [formControl]="form.controls.presale_external_id">
+                            @for (presale of externalPresales$ | async; track presale.id) {
+                                <mat-option [value]="presale.id">
+                                    {{presale.name}}
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <mat-divider class="ob-form-divider fields-divider" />
+            } @else {
+                @if(!onlyCustomersValidation) {
+                    <p>{{'NEW_PRESALE_DIALOG.DESCRIPTION' | prefix | translate}}</p>
+                    <mat-radio-group formControlName="type" class="flex flex-col basis-full gap-3">
+                        <mat-radio-button class="ob-radio-card-button" [value]="validatorTypes.collective"
+                            [disabled]="!!!(collectives$ | async)?.length">
+                            <div class="option-title">{{'NEW_PRESALE_DIALOG.NEW_FROM_COLLECTIVE' | prefix | translate}}</div>
+                            <div>
+                                {{'NEW_PRESALE_DIALOG.INFO_FROM_COLLECTIVE' | prefix | translate}}
+                            </div>
+                        </mat-radio-button>
+                        <mat-radio-button class="ob-radio-card-button" [value]="validatorTypes.customers">
+                            <div class="option-title">{{'NEW_PRESALE_DIALOG.NEW_CUSTOMERS' | prefix | translate}}</div>
+                            <div>
+                                {{'NEW_PRESALE_DIALOG.INFO_CUSTOMERS' | prefix | translate}}
+                            </div>
+                        </mat-radio-button>
+                    </mat-radio-group>
+                    @if(form.controls.type.value) {
+                        <mat-divider class="ob-form-divider fields-divider" />
+                    }
+                } @else {
+                    <div class="flex flex-col">
+                        <p>{{ 'NEW_PRESALE_DIALOG.ONLY_CUSTOMERS_VALIDATION.DESCRIPTION' | prefix | translate}}</p>
+                        <div class="flex flex-col gap-3">
+                            <span><b>{{'NEW_PRESALE_DIALOG.ONLY_CUSTOMERS_VALIDATION.CLIENT_LABEL' | prefix | translate}}</b></span>
+                            <span>{{'NEW_PRESALE_DIALOG.ONLY_CUSTOMERS_VALIDATION.CLIENT_DESCRIPTION' | prefix | translate}}</span>
+                        </div>
+                    </div>
+                }
+            }
+            <div class="flex flex-col">
+                @if (form.controls.type.value ; as formTypeValue) {
+                    <div class="flex flex-col">
+                        @if (formTypeValue === validatorTypes.collective) {
+                            <p class="collective-description">
+                                {{'NEW_PRESALE_DIALOG.SELECT_COLLECTIVE_INFO' | prefix | translate}}
+                            </p>
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                                <mat-label>{{'NEW_PRESALE_DIALOG.COLLECTIVE' | prefix | translate}}</mat-label>
+                                <mat-select [placeholder]="'NEW_PRESALE_DIALOG.SELECT_COLLECTIVE' | prefix | translate"
+                                    formControlName="collective">
+                                    <mat-option>
+                                        <app-select-search #collectiveSelectSearch [options$]="collectives$"
+                                            [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name"
+                                            [requireSelection]="true" />
+                                    </mat-option>
+                                    @for (collective of collectiveSelectSearch.getFilteredOptions$() | async; track collective) {
+                                        <mat-option
+                                            [value]="collective.id">
+                                            {{collective.name}}
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                                <mat-error [ob-form-errors]="form" field="collective" />
+                            </mat-form-field>
+                        }
+                        @if (selectedInventoryProvider === externalProvider) {
+                            <p class="collective-description">
+                                {{'NEW_PRESALE_DIALOG.EXTERNAL_PRESALE_INFO' | prefix | translate}}
+                            </p>
+                        }
+                        <mat-form-field appearance="outline" class="basis-full ob-form-field field-with-label">
+                            <mat-label>{{'NEW_PRESALE_DIALOG.NAME' | prefix | translate}}</mat-label>
+                            <input matInput aria-label="name" formControlName="presale_name"
+                                [placeholder]="'NEW_PRESALE_DIALOG.NAME_PLACEHOLDER' | prefix | translate">
+                            <mat-error [ob-form-errors]="form" field="presale_name" />
+                        </mat-form-field>
+                    </div>
+                }
+            </div>
+        </form>
+        @if ((isLoading$ | async) || (loadingExtPresales$ | async)) {
+            <div class="spinner-container">
+                <mat-spinner />
+            </div>
+        }
+    </div>
+    <div mat-dialog-actions>
+        <div class="flex flex-row basis-full justify-end">
+            <button type="button" mat-button class="ob-button" (click)="close()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createPresale()"
+                [disabled]="(!form.dirty) || !form.valid || (isLoading$ | async) || (loadingExtPresales$ | async)">
+                {{'FORMS.ACTIONS.CREATE' | translate}}
+            </button>
+        </div>
+    </div>
+</div>

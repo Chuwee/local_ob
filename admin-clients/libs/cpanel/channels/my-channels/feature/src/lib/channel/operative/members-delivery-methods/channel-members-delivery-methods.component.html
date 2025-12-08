@@ -1,0 +1,27 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu"
+    [disabled]="(inProgress$ | async) || !form.dirty" [formGroup]="form">
+
+    <!-- MEMBERS VIEW -->
+    <p class="mat-body-2">
+        {{ 'CHANNELS.DELIVERY_METHODS.MEMBERS.DESCRIPTION' | translate }}
+    </p>
+    <mat-checkbox color="primary" formControlName="passbook" fxLayout="row wrap" fxLayoutAlign="start start"
+        class="app-checkbox-wrap-label members-checkbox">
+        <div class="title">{{'CHANNELS.DELIVERY_METHODS.MEMBERS_PASSBOOK.LABEL' | translate}}</div>
+        <div>{{'CHANNELS.DELIVERY_METHODS.MEMBERS_PASSBOOK.DESCRIPTION' | translate}}
+        </div>
+    </mat-checkbox>
+    <mat-checkbox color="primary" formControlName="use_nfc" fxLayout="row wrap" fxLayoutAlign="start start"
+        class="app-checkbox-wrap-label members-checkbox">
+        <div class="title">{{'CHANNELS.DELIVERY_METHODS.MEMBERS_NFC.LABEL' | translate}}</div>
+        <div>{{'CHANNELS.DELIVERY_METHODS.MEMBERS_NFC.DESCRIPTION' | translate}}
+        </div>
+    </mat-checkbox>
+
+</app-form-container>
+
+@if (inProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

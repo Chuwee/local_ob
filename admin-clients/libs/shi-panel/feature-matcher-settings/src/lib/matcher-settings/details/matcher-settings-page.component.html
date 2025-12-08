@@ -1,0 +1,32 @@
+<div class="details-container" fxFlex="0 1 100%" fxLayout="column">
+    <div class="heading-container" fxLayoutAlign="start center">
+        <h1 class="secondary mat-headline-3">
+            {{'TITLES.MATCHER_SETTINGS' | translate}}
+        </h1>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end center">
+            <app-supplier-selection-button [supplier]="selectedSupplierName$ | async"
+                (valueChanged)="changeSelectedSupplier($event)" />
+        </div>
+    </div>
+    <div class="main-content" fxFlex="0 1 100%" fxLayout="column">
+        <div class="top-actions">
+            <app-nav-tabs-menu type="tabMenu" [elements]="[
+                {
+                    label: 'MATCHER_SETTINGS.TITLES.LIST_SETTINGS',
+                    param: 'list-settings',
+                    queryParams: { supplier: selectedSupplierName$ | async },
+                    active: (deepPath$ | async) === 'list-settings',
+                    disabled: (isLoading$ | async) === false
+                },
+                {
+                    label: 'MATCHER_SETTINGS.TITLES.EXPORT_SETTINGS',
+                    param: 'export-settings',
+                    queryParams: { supplier: selectedSupplierName$ | async },
+                    active: (deepPath$ | async) === 'export-settings',
+                    disabled: (isLoading$ | async) === false
+                }
+            ]" />
+        </div>
+        <router-outlet (activate)="childComponentChange($event)" />
+    </div>
+</div>

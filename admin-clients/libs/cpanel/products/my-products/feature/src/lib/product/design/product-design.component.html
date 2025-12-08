@@ -1,0 +1,27 @@
+@if ($product(); as product) {
+    <app-form-container layout="main" [disabled]="!form.dirty || (inProgress$ | async)" [formGroup]="form"
+        (cancel)="cancel()" (save)="save()">
+        <p class="section-description">{{'PRODUCT.DESIGN.DESCRIPTION' | translate }}</p>
+        <div class="flex flex-col gap-4">
+            <mat-label class="ob-label">{{'PRODUCT.DESIGN.CONTENT_VISIBILITY_TITLE' | translate}}</mat-label>
+            <mat-checkbox color="primary" formControlName="hide_delivery_date_time">
+                {{'PRODUCT.DESIGN.HIDE_DELIVERY_DATE' | translate}}
+            </mat-checkbox>
+            <mat-checkbox color="primary" formControlName="hide_delivery_point">
+                {{'PRODUCT.DESIGN.HIDE_DELIVERY_POINT' | translate}}
+            </mat-checkbox>
+            @if(form.get('hide_delivery_point').value) {
+                <div class="flex items-start warning_message">
+                    <mat-icon class="ob-icon warning with-text xsmall">warning</mat-icon>
+                    <span>{{ 'PRODUCT.DESIGN.HIDE_DELIVERY_POINT_WARNING' | translate }}</span>
+                </div>
+            }
+        </div>
+    </app-form-container>
+}
+
+@if (inProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,111 @@
+<form [formGroup]="filtersForm" fxLayout="column" fxLayoutGap="24px">
+    <div fxLayout="row" fxLayoutAlign="space-between" fxLayoutGap="50px" class="filter-block">
+        <div>
+            <div class="ob-label" fxFlex="180px">
+                {{'MATCHINGS.MATCHINGS_LIST_FILTER.STATUS' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select [formControl]="this.filtersForm.controls.status" multiple
+                        [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option *ngFor="let status of statusList" [value]="status">
+                            {{status?.name | translate}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div>
+            <div class="ob-label" fxFlex="180px">
+                {{'MATCHINGS.MATCHINGS_LIST_FILTER.COUNTRY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field fxFlex="100%" class="ob-form-field" appearance="outline">
+                    <mat-select multiple aria-label="countries"
+                        [formControl]="this.filtersForm.controls.country_code"
+                        [placeholder]="'MAPPINGS.MAPPINGS_LIST_FILTER.COUNTRY' | translate">
+                        <mat-option>
+                            <app-select-search #search searchField="name"
+                                [requireSelection]="true" [options$]="countries$"
+                                [placeholderLabel]="'FORMS.SEARCH.COUNTRY_CODE' | translate">
+                            </app-select-search>
+                        </mat-option>
+                        <div *ngIf="(this.showClearSelection$ | async)" class="mat-option"
+                            (click)="deselectAll()">
+                            <span class="mat-option-text">
+                                {{ 'FORMS.ACTIONS.UNSELECT_ALL' | translate }}
+                            </span>
+                        </div>
+                        <mat-option *ngFor="let country of search.getFilteredOptions$() | async"
+                            [value]="country">
+                            {{country.id}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="space-between" fxLayoutGap="50px" class="filter-block">
+        <div>
+            <div class="ob-label" fxFlex="180px">
+                {{'MATCHINGS.MATCHING_LIST_FILTER.SHI_TAXONOMIES' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select [formControl]="this.filtersForm.controls.shi_taxonomies" multiple
+                        [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option *ngFor="let taxonomy of (shiTaxonomies$ | async)" [value]="taxonomy">
+                            {{taxonomy?.name | translate}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div>
+            <div class="ob-label" fxFlex="180px">
+                {{'MATCHINGS.MATCHING_LIST_FILTER.SUPPLIER_TAXONOMIES' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select [formControl]="this.filtersForm.controls.supplier_taxonomies" multiple
+                        [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option *ngFor="let taxonomy of (supplierTaxonomies$ | async)" [value]="taxonomy">
+                            {{taxonomy?.name | translate}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    <mat-divider [inset]="true"></mat-divider>
+    <div fxLayout="row" class="filter-block">
+        <div class="ob-label" fxFlex="180px">
+            {{'MATCHINGS.MATCHINGS_LIST_FILTER.DATE' | translate}}
+        </div>
+        <div class="filter-block-input" fxFlex="180px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="startDate" [placeholder]="dateFormat" [formControl]="this.filtersForm.controls.date"
+                    (focus)="startDate.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                (click)="$event.stopPropagation(); startDate.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #startDate></mat-datepicker>
+            </mat-form-field>
+        </div>
+        <div fxFlex="20px">
+            <span fxFlex class="filter-block-dates-separator"></span>
+        </div>
+        <div class="filter-block-input" fxFlex="180px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="endDate" [placeholder]="dateFormat" [formControl]="this.filtersForm.controls.date_end"
+                    (focus)="endDate.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                (click)="$event.stopPropagation(); endDate.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #endDate></mat-datepicker>
+            </mat-form-field>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,52 @@
+<p class="mat-body-2">{{'CUSTOMER.TRANSFER.TRANSFER_DIALOG.FORM.INFO' | translate}}</p>
+@let form = $form();
+<form [formGroup]="form" class="flex flex-col justify-start items-stretch gap-4">
+    <div class="flex flex-row flex-wrap justify-between items-stretch sm:gap-4">
+        <mat-form-field appearance="outline" class="ob-form-field field-with-label no-error no-margin no-grid-spacing flex-[1_1_100%] 
+            sm:flex-[0_1_calc(50%-8px)]">
+            <mat-label>{{'CUSTOMER.TRANSFER.TRANSFER_DIALOG.FORM.NAME' | translate}}</mat-label>
+            <input matInput aria-label="name"
+                [placeholder]="'CUSTOMER.TRANSFER.TRANSFER_DIALOG.FORM.NAME' | translate"
+                [formControl]="form.controls.name">
+            <mat-error [ob-form-errors]="form.controls.name" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="ob-form-field field-with-label no-error no-margin no-grid-spacing flex-[1_1_100%] 
+            sm:flex-[0_1_calc(50%-8px)]">
+            <mat-label>{{'CUSTOMER.TRANSFER.TRANSFER_DIALOG.FORM.SURNAME' | translate}}</mat-label>
+            <input matInput aria-label="surname"
+                [placeholder]="'CUSTOMER.TRANSFER.TRANSFER_DIALOG.FORM.SURNAME' | translate"
+                [formControl]="form.controls.surname">
+            <mat-error [ob-form-errors]="form.controls.surname" />
+        </mat-form-field>
+    </div>
+    @if ($emailSubmit()) {
+        <mat-form-field appearance="outline" class="ob-form-field field-with-label no-error no-grid-spacing flex-[1_1_100%] 
+            sm:flex-[0_1_calc(50%-8px)]">
+            <mat-label>{{'CUSTOMER.TRANSFER.TRANSFER_DIALOG.FORM.EMAIL' | translate}}</mat-label>
+            <input matInput aria-label="email"
+                [placeholder]="'CUSTOMER.TRANSFER.TRANSFER_DIALOG.FORM.EMAIL' | translate"
+                [formControl]="form.controls.email">
+            <mat-error [ob-form-errors]="form.controls.email" />
+        </mat-form-field>
+    } @else {
+        <div class="flex flex-col">
+            <p class="mat-subtitle-2">{{'CUSTOMER.TRANSFER.TRANSFER_DIALOG.FORM.DELIVERY_METHOD.INFO' | translate}} *</p>
+            <mat-radio-group class="flex flex-col" [formControl]="form.controls.send_type">
+                <mat-radio-button [value]="deliveryMethod.email" class="ob-radio-button">
+                    <mat-label>{{'CUSTOMER.TRANSFER.TRANSFER_DIALOG.FORM.DELIVERY_METHOD.TYPE_OPTS.EMAIL' | translate}}</mat-label>
+                </mat-radio-button>
+                <mat-form-field appearance="outline" class="ob-form-field no-grid-spacing">
+                    <input matInput aria-label="mail"
+                        [placeholder]="'CUSTOMER.TRANSFER.TRANSFER_DIALOG.FORM.EMAIL' | translate"
+                        [formControl]="form.controls.email">
+                    <mat-error [ob-form-errors]="form.controls.email" />
+                </mat-form-field>
+                <mat-radio-button [value]="deliveryMethod.download" class="ob-radio-button">
+                    <mat-label>
+                        {{'CUSTOMER.TRANSFER.TRANSFER_DIALOG.FORM.DELIVERY_METHOD.TYPE_OPTS.DOWNLOAD' | translate}}
+                    </mat-label>
+                </mat-radio-button>
+            </mat-radio-group>
+        </div>
+    }
+</form>

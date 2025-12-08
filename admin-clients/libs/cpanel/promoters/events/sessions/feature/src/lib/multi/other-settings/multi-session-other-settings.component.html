@@ -1,0 +1,23 @@
+<app-form-container [disabled]="!form.dirty || $loading()" (cancel)="reload()" (save)="save()">
+    <mat-accordion [multi]="true" [togglePosition]="'before'" [formGroup]="form">
+        @if ($showOrphanSeats) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.SESSION.ORPHAN_SEATS.TITLE' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div fxLayout="row wrap">
+                    <mat-checkbox fxFlex="100%" formControlName="enableOrphanSeatsProtection" color="primary">
+                        {{'EVENTS.SESSION.ENABLE_ORPHAN_SEATS.LABEL' | translate}}
+                    </mat-checkbox>
+                </div>
+            </mat-expansion-panel>
+        }
+    </mat-accordion>
+</app-form-container>
+
+@if ($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,221 @@
+<div [formGroup]="formConditions" fxLayout="column" fxFlex="100%">
+    <div class="conditions-row">
+        <!-- PERMISSIONS -->
+        <div class="conditions-block" fxLayout="column" fxLayoutGap="16px">
+            <h3 class="section-title">{{'PROFESSIONAL_SELLING.PERMISSIONS' | translate}}</h3>
+            <div fxLayout="row wrap" fxLayoutGap="24px">
+                <!-- CAN BUY -->
+                <mat-form-field appearance="outline"
+                    class="ob-form-field field-with-label no-grid-spacing computed-width">
+                    <mat-label>{{'PROFESSIONAL_SELLING.CONDITIONS.CAN_BUY' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="canBuy">
+                        <mat-option [value]="true">
+                            {{'PROFESSIONAL_SELLING.CONDITIONS.ENABLE_BUY' | translate}}
+                        </mat-option>
+                        <mat-option [value]="false">
+                            {{'PROFESSIONAL_SELLING.CONDITIONS.DISABLE_BUY' | translate}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error [ob-form-errors]="formConditions" field="canBuy" />
+                </mat-form-field>
+                <!-- CAN BOOK -->
+                <mat-form-field appearance="outline"
+                    class="ob-form-field field-with-label no-grid-spacing computed-width">
+                    <mat-label>{{'PROFESSIONAL_SELLING.CONDITIONS.CAN_BOOK' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="canBook">
+                        <mat-option [value]="true">
+                            {{'PROFESSIONAL_SELLING.CONDITIONS.ENABLE_BOOK' | translate}}
+                        </mat-option>
+                        <mat-option [value]="false">
+                            {{'PROFESSIONAL_SELLING.CONDITIONS.DISABLE_BOOK' | translate}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error [ob-form-errors]="formConditions" field="canBook" />
+                </mat-form-field>
+                <!-- CAN PUBLISH -->
+                @if( showCanPublish$ | async ) {
+                    <mat-form-field appearance="outline"
+                        class="ob-form-field field-with-label no-grid-spacing computed-width">
+                        <mat-label>{{'PROFESSIONAL_SELLING.CONDITIONS.CAN_PUBLISH' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="canPublish">
+                            <mat-option [value]="true">
+                                {{'PROFESSIONAL_SELLING.CONDITIONS.ENABLE_PUBLISHING' | translate}}
+                            </mat-option>
+                            <mat-option [value]="false">
+                                {{'PROFESSIONAL_SELLING.CONDITIONS.DISABLE_PUBLISHING' | translate}}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error [ob-form-errors]="formConditions" field="canPublish" />
+                    </mat-form-field>
+                }
+                <!-- CAN INVITE -->
+                @if( showCanInvite$ | async ) {
+                    <mat-form-field appearance="outline"
+                        class="ob-form-field field-with-label no-grid-spacing computed-width">
+                        <mat-label>{{'PROFESSIONAL_SELLING.CONDITIONS.CAN_INVITE' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="canInvite">
+                            <mat-option [value]="true">
+                                {{'PROFESSIONAL_SELLING.CONDITIONS.ENABLE_INVITE' | translate}}
+                            </mat-option>
+                            <mat-option [value]="false">
+                                {{'PROFESSIONAL_SELLING.CONDITIONS.DISABLE_INVITE' | translate}}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error [ob-form-errors]="formConditions" field="canInvite" />
+                    </mat-form-field>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="conditions-row">
+        <!-- PAYMENT METHODS -->
+        <div class="conditions-block" fxLayout="column" fxLayoutGap="16px">
+            <h3 class="section-title">{{'PROFESSIONAL_SELLING.PAYMENT_METHODS' | translate}}</h3>
+            <div fxLayout="row" fxLayoutGap="24px">
+                <!-- PAYMENT METHODS -->
+                <mat-form-field appearance="outline"
+                    class="ob-form-field field-with-label computed-width">
+                    <mat-label>{{'PROFESSIONAL_SELLING.CONDITIONS.PAYMENT_METHODS' | translate}}</mat-label>
+                    <mat-select multiple [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="paymentMethods">
+                        @for( type of paymentMethodTypes; track type ) {
+                            <mat-option [value]="type">
+                                {{'PROFESSIONAL_SELLING.CONDITIONS.PAYMENT_METHOD_TYPES.' + type | translate}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="formConditions" field="paymentMethods" />
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+
+    <div class="conditions-row">
+        <!-- BOOKING LIMITS -->
+        <div class="conditions-block" fxLayout="column" fxLayoutGap="10px">
+            <div class="flex flex-row gap-2 items-center">
+                <h3 class="section-title no-margin">{{'PROFESSIONAL_SELLING.BOOKING_LIMITS' | translate}}</h3>
+                <app-help-button [message]="'PROFESSIONAL_SELLING.BOOKING_LIMITS_TOOLTIP' | translate" />
+            </div>
+            <div fxLayout="row wrap" fxLayoutGap="24px">
+                <!-- MAX SEATS -->
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label computed-width">
+                    <mat-label>{{'PROFESSIONAL_SELLING.CONDITIONS.MAX_SEATS' | translate}}</mat-label>
+                    <input matInput type="number" placeholder="0" formControlName="maxSeats">
+                    <mat-error [ob-form-errors]="formConditions" field="maxSeats" />
+                </mat-form-field>
+                <!-- EXPIRATION DAYS -->
+                <div fxFlex="0 1 208px" fxLayout="column" class="radios-container">
+                    <span class="ob-label">
+                        {{'PROFESSIONAL_SELLING.CONDITIONS.BOOKING_EXPIRATION_DAYS' | translate}} *
+                    </span>
+                    <mat-radio-group formControlName="bookingExpirationMode" fxLayout="row wrap">
+                        <mat-radio-button fxFlex="100%" class="ob-radio-button vertical-list radio-option"
+                            [value]="bookingExpirationDaysModes.fromEvent">
+                            {{'PROFESSIONAL_SELLING.CONDITIONS.BOOKING_EXPIRATION_DAYS_FROM_EVENT' | translate}}
+                        </mat-radio-button>
+                        <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="24px" class="radio-option">
+                            <mat-radio-button class="ob-radio-button vertical-list" [value]="bookingExpirationDaysModes.customDays">
+                                {{'PROFESSIONAL_SELLING.CONDITIONS.BOOKING_EXPIRATION_DAYS_CUSTOM_DAYS' | translate}}
+                            </mat-radio-button>
+                            <mat-form-field appearance="outline" fxFlex class="ob-form-field inline-field">
+                                <input matInput type="number" placeholder="0" formControlName="bookingExpirationDays">
+                            </mat-form-field>
+                        </div>
+                    </mat-radio-group>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="conditions-row">
+        <!-- PRICES -->
+        <div class="conditions-block" fxLayout="column" fxLayoutGap="16px">
+            <h3 class="section-title">{{'PROFESSIONAL_SELLING.PRICES' | translate}}</h3>
+            <div fxLayout="column wrap" fxLayoutGap="24px">
+                <!-- CLIENT COMISSION -->
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label computed-width">
+                    <mat-label>{{'PROFESSIONAL_SELLING.CONDITIONS.CLIENT_COMISSION' | translate}}</mat-label>
+                    <app-percentage-input formControlName="clientComission" [placeholder]="(0 | localNumber : '1.2-2')" />
+                    <mat-error [ob-form-errors]="formConditions" field="clientComission" />
+                </mat-form-field>
+                <!-- CLIENT DISCOUNT -->
+                <div fxLayout="column" class="radios-container">
+                    <span class="ob-label">
+                        {{'PROFESSIONAL_SELLING.CONDITIONS.CLIENT_DISCOUNT' | translate}} *
+                    </span>
+                    <mat-radio-group formControlName="clientDiscountMode" fxLayout="column">
+                        <div [fxLayout]="currencies.length > 1 ? 'column' : 'row'" fxLayoutGap="24px" class="radio-option"
+                            [class.inline]="currencies.length <= 1">
+                            <mat-radio-button class="ob-radio-button vertical-list" [value]="clientDiscountModes.fixed">
+                                {{'PROFESSIONAL_SELLING.CONDITIONS.CLIENT_DISCOUNT_FIXED' | translate}}
+                            </mat-radio-button>
+
+                            @if(form.get('conditions.clientDiscountMode').value === 'FIXED') {
+                                <div class="content-scroll nested-content" formGroupName="clientDiscountFixed">
+                                    @if (currencies.length > 1) {
+                                        <table mat-table class="ob-table" [dataSource]="$dataSource()" formArrayName="currencies">
+                                            @for(currency of currencies; track currency) {
+                                                <ng-container [matColumnDef]="currency">
+                                                    <th mat-header-cell *matHeaderCellDef
+                                                        class="default-padding head-cell right price-column">
+                                                        <div fxLayoutAlign="end center">
+                                                            {{currency | localCurrencyPartialTranslation }}
+                                                        </div>
+                                                    </th>
+                                                    <td mat-cell *matCellDef="let value"
+                                                        class="default-padding right price-column editable-cell">
+                                                        <div class="write-value">
+                                                            <mat-form-field appearance="outline" class="ob-form-field"
+                                                                [formGroupName]="$index">
+                                                                @let errorMessage = formConditions.controls.clientDiscountFixed
+                                                                    .controls.currencies.at($index).controls.value
+                                                                    | obErrorMessage$
+                                                                    | async;
+                                                                @if (errorMessage) {
+                                                                    <mat-icon matPrefix [obErrorIcon]="errorMessage">
+                                                                        error_outline
+                                                                    </mat-icon>
+                                                                }
+                                                                <app-currency-input class="table-input" formControlName="value"
+                                                                    currencyFormat="narrow" [currencyCode]="currency"
+                                                                    [placeholder]="0 | localCurrency : currency : 'narrow'" />
+                                                            </mat-form-field>
+                                                        </div>
+                                                    </td>
+                                                </ng-container>
+                                            }
+                                            <!-- eslint-disable-next-line @angular-eslint/template/prefer-self-closing-tags -->
+                                            <tr mat-header-row *matHeaderRowDef="currencies"></tr>
+                                            <!-- eslint-disable-next-line @angular-eslint/template/prefer-self-closing-tags -->
+                                            <tr mat-row *matRowDef="let row; columns: currencies" class="hoverable-row"></tr>
+                                        </table>
+                                    } @else {
+                                        <div>
+                                            <mat-form-field appearance="outline" fxFlex class="ob-form-field inline-field">
+                                                <app-currency-input currencyFormat="narrow" [currencyCode]="currencies[0]"
+                                                    [formControl]="formConditions.controls.clientDiscountFixed.controls.currencies.controls.at(0).controls.value"
+                                                    [placeholder]="0 | localCurrency : currencies[0]: 'narrow'" />
+                                            </mat-form-field>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                        <div fxLayout="row" fxLayoutGap="24px" class="radio-option inline">
+                            <mat-radio-button class="ob-radio-button vertical-list" [value]="clientDiscountModes.percent">
+                                {{'PROFESSIONAL_SELLING.CONDITIONS.CLIENT_DISCOUNT_PERCENTAGE' | translate}}
+                            </mat-radio-button>
+                            @if (form.get('conditions.clientDiscountMode').value === 'PERCENTAGE') {
+                                <mat-form-field appearance="outline" class="ob-form-field inline-field">
+                                    <app-percentage-input formControlName="clientDiscountPercent"
+                                        [placeholder]="(0 | localNumber : '1.2-2')" />
+                                </mat-form-field>
+                            }
+                        </div>
+                    </mat-radio-group>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

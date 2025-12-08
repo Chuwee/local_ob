@@ -1,0 +1,22 @@
+<div fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="start stretch">
+    <div fxLayoutAlign="center">
+        <h4 class="type-title">{{'VENUE_TPL_EDITOR.NEW_SEAT_MATRIX' | translate}}</h4>
+    </div>
+    <div *ngIf="form.controls.continueRows.enabled" [formGroup]="form"
+        fxLayout="row" fxLayoutAlign="start center" class="continue-rows-container">
+        <span fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.CONTINUE_ROWS' | translate">
+            {{'VENUE_TPL_EDITOR.CONTINUE_ROWS' | translate}}
+        </span>
+        <mat-slide-toggle class="ob-slide-toggle" formControlName="continueRows"></mat-slide-toggle>
+    </div>
+    <ng-container *ngIf="!form.value.continueRows else continueRows">
+        <app-venue-tpl-editor-seat-matrix-form-matrix></app-venue-tpl-editor-seat-matrix-form-matrix>
+        <mat-divider class="ob-divider" fxFlex="100%"></mat-divider>
+        <app-venue-tpl-editor-seat-matrix-form-rows></app-venue-tpl-editor-seat-matrix-form-rows>
+        <mat-divider class="ob-divider" fxFlex="100%"></mat-divider>
+        <app-venue-tpl-editor-seat-matrix-form-seats></app-venue-tpl-editor-seat-matrix-form-seats>
+    </ng-container>
+    <ng-template #continueRows>
+        <app-venue-tpl-editor-seat-matrix-form-increase></app-venue-tpl-editor-seat-matrix-form-increase>
+    </ng-template>
+</div>

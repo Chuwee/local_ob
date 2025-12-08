@@ -1,0 +1,50 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title>
+        <div class="flex flex-row items-center justify-between">
+            <h2 class="secondary title">{{'CUSTOMER.FRIENDS_AND_FAMILY.ADD_CUSTOMER_FRIEND' | translate}}</h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()" [disabled]="$isLoading()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <app-wizard-bar [steps]="mapToStepsTitles(steps)" [enableNavigation]="true"
+        (stepClick)="goToStep($event)" />
+    @if ($currentStep() === 0) {
+        <app-add-friend-family-relation [form]="wizardFriendToAddForm" />
+        <!-- TODO: uncomment when implemented in customers project -->
+        <!-- [friendsRelationType]="friendsRelationType" /> -->
+    }
+    @if ($currentStep() === 1) {
+        <app-add-friend-family-selection [form]="wizardFriendToAddForm" />
+    }
+    @if ($currentStep() === 2) {
+        <app-add-friend-family-confirmation [form]="wizardFriendToAddForm" />
+    }
+    <div mat-dialog-actions>
+        <div class="flex flex-row basis-full justify-end">
+            <button type="button" mat-button class="ob-button"
+                [disabled]="$isLoading()" (click)="close()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button mat-stroked-button color="tertiary" type="button" class="ob-button"
+                (click)="previousStep()"
+                [disabled]="$isPreviousDisabled()">
+                <mat-icon>arrow_back</mat-icon>
+                {{'FORMS.ACTIONS.PREVIOUS' | translate}}
+            </button>
+            <button mat-flat-button color="primary" type="button" class="ob-button"
+                (click)="nextStep()"
+                [disabled]="$isNextDisabled()">
+                {{$nextText()}}
+                @if ($currentStep() !== steps.length - 1) {
+                    <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+                }
+            </button>
+        </div>
+    </div>
+</div>
+@if ($isLoading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

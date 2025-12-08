@@ -1,0 +1,101 @@
+<ion-header class="calendar-selector__header">
+    <ion-toolbar>
+        <ion-title class="calendar-selector__title">{{ "CALENDAR-SELECTOR.TITLE" | translate }}</ion-title>
+        <ion-buttons slot="start">
+            <ion-button *ngIf="isSelectingTime" class="calendar-selector__go-back-btn" (click)="goBack()">
+                <ion-icon class="calendar-selector__go-back-icon" name="chevron-back-outline"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-buttons slot="end">
+            <ion-button class="calendar-selector__close-btn" (click)="closeModal()">
+                <ion-icon class="calendar-selector__close-btn-icon" name="close"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+<div #calendarContent class="calendar-selector__content" [style.display]="isSelectingTime ? 'none' : 'block'">
+    <div class="calendar-selector__calendar">
+        <ion-content class="calendar-selector__calendar-scroll-content" [scrollEvents]="true">
+            <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMoreMonths($event, 'top')" position="top">
+                <ion-infinite-scroll-content loadingSpinner="bubbles"></ion-infinite-scroll-content>
+            </ion-infinite-scroll>
+            <ion-list #months (click)="clearChips()">
+                <ion-item class="month-box" *ngFor="let month of calendarMonths; let i = index"
+                    [attr.data-month]="month.original.date | date: 'yyyy-MM'" [attr.id]="'month-' + i">
+                    <div>
+                        <h4 class="calendar-selector__calendar-title">
+                            {{ monthFormat(month.original.date) }}
+                            <ion-icon class="calendar-selector__calendar-title-icon" name="caret-down-outline"></ion-icon>
+                        </h4>
+                        <ion-calendar-week></ion-calendar-week>
+                        <ion-calendar-month [month]="month" (changeEmitter)="onChange($event)" [(ngModel)]="datesTemp">
+                        </ion-calendar-month>
+                    </div>
+                </ion-item>
+            </ion-list>
+
+            <ion-infinite-scroll threshold="25%" (ionInfinite)="loadMoreMonths($event, 'bottom')" position="bottom">
+                <ion-infinite-scroll-content></ion-infinite-scroll-content>
+            </ion-infinite-scroll>
+        </ion-content>
+    </div>
+
+    <div class="calendar-selector__interactions">
+        <div class="calendar-selector__date-info">
+            <div class="date-info">
+                <span class="date-info__title">{{ "CALENDAR-SELECTOR.FROM" | translate }}:</span>
+                <p class="date-info__date">
+                    <span class="date-info__date--bold">
+                        {{ stringDateFrom ? (stringDateFrom | dateTime: dateTimeFormats.shortDate) : 'MM/DD/YYYY' }}
+                    </span>
+                    - {{ stringDateFrom ? (stringDateFrom | dateTime: dateTimeFormats.shortTime) : '00:00' }}
+                </p>
+            </div>
+            <div class="date-info">
+                <span class="date-info__title">{{ "CALENDAR-SELECTOR.TO" | translate }}:</span>
+                <p class="date-info__date">
+                    <span class="date-info__date--bold">
+                        {{ stringDateTo ? (stringDateTo | dateTime: dateTimeFormats.shortDate) : 'MM/DD/YYYY' }}
+                    </span>
+                    - {{ stringDateTo ? (stringDateTo | dateTime: dateTimeFormats.shortTime) : '00:00' }}
+                </p>
+            </div>
+        </div>
+        <div #chipsOfTime class="calendar-selector__date-chips">
+            <ion-chip date-type="yesterday" (click)="onClickChip($event)" class="calendar-selector__date-chip">
+                {{ "CALENDAR-SELECTOR.YESTERDAY" | translate }}
+            </ion-chip>
+            <ion-chip date-type="today" (click)="onClickChip($event)" class="calendar-selector__date-chip">
+                {{ "CALENDAR-SELECTOR.TODAY" | translate }}
+            </ion-chip>
+            <ion-chip date-type="thisWeek" (click)="onClickChip($event)" class="calendar-selector__date-chip">
+                {{ "CALENDAR-SELECTOR.THIS-WEEK" | translate }}
+            </ion-chip>
+            <ion-chip date-type="lastWeek" (click)="onClickChip($event)" class="calendar-selector__date-chip">
+                {{ "CALENDAR-SELECTOR.LAST-WEEK" | translate }}
+            </ion-chip>
+            <ion-chip date-type="thisMonth" (click)="onClickChip($event)" class="calendar-selector__date-chip">
+                {{ "CALENDAR-SELECTOR.THIS-MONTH" | translate }}
+            </ion-chip>
+            <ion-chip date-type="lastMonth" (click)="onClickChip($event)" class="calendar-selector__date-chip">
+                {{ "CALENDAR-SELECTOR.LAST-MONTH" | translate }}
+            </ion-chip>
+            <ion-chip date-type="thisYear" (click)="onClickChip($event)" class="calendar-selector__date-chip">
+                {{ "CALENDAR-SELECTOR.THIS-YEAR" | translate }}
+            </ion-chip>
+            <ion-chip date-type="lastYear" (click)="onClickChip($event)" class="calendar-selector__date-chip">
+                {{ "CALENDAR-SELECTOR.LAST-YEAR" | translate }}
+            </ion-chip>
+        </div>
+        <ion-button data-override-styles="" class="ob-btn secondary size--medium calendar-selector__btn" (click)="openTimePicker()"
+            [disabled]="!selectedTime.timeFrom && !selectedTime.timeTo">
+            {{ "CALENDAR-SELECTOR.TIME-BTN" | translate }}
+        </ion-button>
+        <ion-button data-override-styles="" class="ob-btn primary size--medium calendar-selector__btn" (click)="applySelection()">
+            {{ "CALENDAR-SELECTOR.APPLY-BTN" | translate }}
+        </ion-button>
+    </div>
+</div>
+
+<time-picker *ngIf="isSelectingTime" [selectedTime]="selectedTimePicker" (pickEmitter)="setTime($event)">
+</time-picker>

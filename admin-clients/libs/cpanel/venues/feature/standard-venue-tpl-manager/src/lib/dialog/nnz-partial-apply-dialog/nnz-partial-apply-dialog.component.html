@@ -1,0 +1,78 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxLayoutAlign="start stretch" fxFlex="100%">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="0 1 100%" class="secondary title">{{'VENUE_TPL_MGR.TITLES.NNZ_STATUS_EDITION' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <form [formGroup]="form" fxLayout="row wrap">
+            <mat-form-field fxFlex="33%" appearance="outline" class="ob-form-field mat-form-field-outline-hidden">
+                <mat-label>{{'FORMS.LABELS.SECTOR' | translate}}</mat-label>
+                <input fxHide matInput aria-label="sector" formControlName="sector">
+                <span>{{form.get('sector').value}}</span>
+            </mat-form-field>
+            <mat-form-field fxFlex="33%" appearance="outline" class="ob-form-field mat-form-field-outline-hidden">
+                <mat-label>{{'FORMS.LABELS.ZONE' | translate}}</mat-label>
+                <input fxHide matInput aria-label="zone" formControlName="nnz">
+                <span>{{form.get('nnz').value}}</span>
+            </mat-form-field>
+            <mat-form-field fxFlex="33%" appearance="outline" class="ob-form-field mat-form-field-outline-hidden">
+                <mat-label>{{'FORMS.LABELS.CAPACITY' | translate}}</mat-label>
+                <input fxHide matInput aria-label="zone capacity" formControlName="nnzCapacity">
+                <span>{{form.get('nnzCapacity').value}}</span>
+            </mat-form-field>
+            <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field mat-form-field-outline-hidden">
+                <mat-label>{{'VENUE_TPL_MGR.FORMS.LABELS.TARGET_STATUS' | translate}}</mat-label>
+                <input fxHide matInput aria-label="status" formControlName="targetStatus">
+                <span>{{form.get('targetStatus').value}}</span>
+            </mat-form-field>
+            <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field">
+                <mat-label>{{'VENUE_TPL_MGR.FORMS.LABELS.SOURCE_STATUS' | translate}}</mat-label>
+                <mat-select formControlName="sourceStatus" [placeholder]="'FORMS.ACTIONS.SELECT' | translate">
+                    <mat-option *ngFor="let targetLabel of targetLabels$ | async" [value]="targetLabel">
+                        {{ targetLabel.label.literal || targetLabel.label.literalKey | translate
+                        }}({{targetLabel.count}})
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="form.get('sourceStatus').hasError('required')">
+                    {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                </mat-error>
+            </mat-form-field>
+            <span class="mat-subtitle-2">{{'FORMS.LABELS.APPLY_CHANGES_TO' | translate}}</span>
+            <mat-form-field hidden-outline fxFlex="100%" class="ob-form-field">
+                <input fxHide matInput formControlName="allTickets">
+                <mat-radio-group fxFlex="100%" fxLayout="column" class="ticket-count-radio-group"
+                    formControlName="allTickets">
+                    <mat-radio-button [value]="true" fxFlex="50%">
+                        <mat-label>{{'VENUE_TPL_MGR.FORMS.LABELS.ALL_TICKETS' | translate}}</mat-label>
+                    </mat-radio-button>
+                    <mat-radio-button [value]="false">
+                        <mat-label>{{'VENUE_TPL_MGR.FORMS.LABELS.TICKETS_AMOUNT' | translate}}</mat-label>
+                    </mat-radio-button>
+                </mat-radio-group>
+            </mat-form-field>
+            <mat-form-field fxFlex="30%" appearance="outline" class="ob-form-field count-input">
+                <input matInput formControlName="count" type="number">
+                <mat-error *ngIf="form.get('count').hasError('required')">
+                    {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                </mat-error>
+                <mat-error *ngIf="form.get('count').hasError('min')">
+                    {{'FORMS.ERRORS.LOWER_THAN' | translate : ({ value: form.get('count').getError('min').min }) }}
+                </mat-error>
+                <mat-error *ngIf="form.get('count').hasError('max')">
+                    {{'FORMS.ERRORS.HIGHER_THAN' | translate : ({ value: form.get('count').getError('max').max }) }}
+                </mat-error>
+            </mat-form-field>
+        </form>
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" [disabled]="!form.valid"
+            (click)="commit()">
+            {{'FORMS.ACTIONS.NEXT' | translate}}
+        </button>
+    </div>
+</div>

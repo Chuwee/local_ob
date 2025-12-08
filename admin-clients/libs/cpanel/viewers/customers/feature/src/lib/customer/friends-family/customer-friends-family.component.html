@@ -1,0 +1,193 @@
+<app-form-container layout="main" hideActionBar>
+    @let totalCustomerFriendsMetadata = (totalCustomerFriends$ | async);
+    @let isCustomerManaged = $isCustomerManaged();
+    <div class="list-container flex flex-col gap-4">
+        <div class="flex justify-end">
+            @if ((canLoggedUserWrite$ | async) && !isCustomerManaged && totalCustomerFriendsMetadata !== 0) {
+                <ng-container *ngTemplateOutlet="addFriendButton;" />
+            }
+        </div>
+        <div class="list-container flex flex-col">
+            @if (!isCustomerManaged) {
+                <app-searchable-paginated-selection [placeholder]="'FORMS.SEARCH.CUSTOMER_FRIENDS' | translate"
+                     class="boxed-options" (loadData)="loadCustomerFriendsList($event)" [form]="selected"
+                     [pageSize]="pageSize" [data$]="data$" [metadata$]="metadata$">
+
+                    <div slot="filter" class="badge-container" [class.empty]="totalCustomerFriendsMetadata === 0">
+                        {{selectedFriends}}  / {{ totalCustomerFriendsMetadata }}
+                    </div>
+                    <button slot="filter" type="button" mat-icon-button class="ob-button medium" color="tertiary"
+                        [class.active]="selectedOnly$()" [disabled]="selectedFriends === 0 || (allSelected$ | async)"
+                        [matTooltip]="'CUSTOMER.FRIENDS_AND_FAMILY.SHOW_SELECTED_TOOLTIP' | translate"
+                        (click)="clickShowSelected()">
+                        <mat-icon>visibility</mat-icon>
+                    </button>
+                    @if (canLoggedUserWrite$ | async) {
+                        <div slot="filter" class="filter-container">
+                            <button mat-icon-button color="tertiary" class="ob-button medium"
+                                [disabled]="selectedFriends === 0" [matMenuTriggerFor]="listMenu">
+                                <mat-icon>more_horiz</mat-icon>
+                            </button>
+                            <mat-menu #listMenu="matMenu">
+                                <button mat-menu-item (click)="deleteMultipleCustomerFriends()">
+                                    {{'CUSTOMER.FRIENDS_AND_FAMILY.DELETE' | translate}}
+                                </button>
+                                @for (action of customerFriendsStatusAction; track action) {
+                                    <button mat-menu-item (click)="changeStatusMultipleCustomerFriend(action)">
+                                        {{'CUSTOMER.FRIENDS_AND_FAMILY.' + action | translate}}
+                                    </button>
+                                }
+                            </mat-menu>
+                        </div>
+                    }
+                    <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data" let-selectionChanged="selectionChanged">
+                        <app-selection-table [data]="data" [columns]="$displayedColumns()" [pageForm]="pageForm"
+                            [selectionChanged]="selectionChanged"
+                            [class.some-selected]="selectedFriends > 0 || (allSelected$ | async)">
+                            <ng-template #selectAllTemplate>
+                                <mat-checkbox #allSelected color="primary"
+                                     [disabled]="selectedOnly$() || totalCustomerFriendsMetadata === 0"
+                                     [checked]="selectedFriends === totalCustomerFriendsMetadata
+                                     || selectedOnly$() || (allSelected$ | async)"
+                                     [indeterminate]="selectedFriends > 0
+                                      && selectedFriends < totalCustomerFriendsMetadata && !allSelected.checked"
+                                     (change)="allSelectedClick.emit(allSelected.checked)">
+                                </mat-checkbox>
+                            </ng-template>
+                            <ng-container matColumnDef="name">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    {{'CUSTOMER.CUSTOMER' | translate}}
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row" class="flex flex-col items-start">
+                                <span appEllipsify [matTooltip]="row.name + ' ' + row.surname" matTooltipClass="ob-tooltip-nowrap"
+                                    class="status-cell">{{row.name}} {{row.surname}}</span>
+                                    <span class="status-cell" appEllipsify [matTooltip]="row.email" matTooltipClass="ob-tooltip-nowrap">
+                                    {{row.email}}
+                                </span>
+                                </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="relation">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    {{'CUSTOMER.RELATION' | translate}}
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row">
+                                    {{'CUSTOMER.FRIENDS_AND_FAMILY.RELATION_TYPE_OPTS.' + row.relation | translate}}
+                                </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="customer_types">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    {{'CUSTOMER.CUSTOMER_TYPES' | translate}}
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row">{{row.customer_types_text | translate}}</mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="member_id">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    {{'CUSTOMER.MEMBER_ID' | translate}}
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row">{{row.member_id}}</mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="status">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    {{'CUSTOMER.STATUS' | translate}}
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row" class="status-cell">
+                                    @if (row.customer_status) {
+                                        <span class="status-dot {{ row.customer_status | lowercase }}"></span>
+                                        <span>{{'CUSTOMER.STATUS_OPTS.' + row.customer_status | translate}}</span>
+                                    }
+                                </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="actions">
+                                <mat-header-cell *matHeaderCellDef class="actions-cell head-cell"
+                                                 [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true" />
+                                <mat-cell *matCellDef="let row" class="actions-cell"
+                                          [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                                    <!-- Actions like delete -->
+                                    <div class="action-buttons" (click)="$event.stopPropagation()">
+                                        @if (selectedFriends === 0 && (canLoggedUserWrite$ | async)) {
+                                            <button mat-icon-button color="tertiary" class="ob-button medium"
+                                                [matMenuTriggerFor]="listMenu">
+                                                <mat-icon>more_horiz</mat-icon>
+                                            </button>
+                                            <mat-menu #listMenu="matMenu">
+                                                <button mat-menu-item (click)="deleteCustomerFriend(row)">
+                                                    {{'CUSTOMER.FRIENDS_AND_FAMILY.DELETE' | translate}}
+                                                </button>
+                                                @if (row.customer_status === 'LOCKED') {
+                                                    <button mat-menu-item (click)="changeStatusCustomerFriend(row, 'UNLOCK')">
+                                                        {{'CUSTOMER.FRIENDS_AND_FAMILY.UNLOCK' | translate}}
+                                                    </button>
+                                                } @else {
+                                                    <button mat-menu-item (click)="changeStatusCustomerFriend(row, 'LOCK')">
+                                                        {{'CUSTOMER.FRIENDS_AND_FAMILY.LOCK' | translate}}
+                                                    </button>
+                                                }
+                                                <button mat-menu-item (click)="goToCustomer(row.id)">
+                                                    {{'CUSTOMER.FRIENDS_AND_FAMILY.GO_TO_CUSTOMER' | translate}}
+                                                </button>
+                                            </mat-menu>
+                                        }
+                                    </div>
+                                </mat-cell>
+                            </ng-container>
+                            <ng-template #noResultsTemplate>
+                                <div class="context-notification-container flex">
+                                    @if(filters.q) {
+                                        <app-empty-state-tiny class="flex-[1_1_100%]"
+                                            [title]="'CUSTOMER.FRIENDS_AND_FAMILY.EMPTY_SEARCH_TITLE' | translate"
+                                            [description]="'CUSTOMER.FRIENDS_AND_FAMILY.EMPTY_SEARCH_MESSAGE' | translate">
+                                        </app-empty-state-tiny>
+                                    } @else {
+                                        <app-empty-state-tiny class="flex-[1_1_100%]"
+                                            [title]="'CUSTOMER.FRIENDS_AND_FAMILY.EMPTY_LIST_TITLE' | translate"
+                                            [description]="'CUSTOMER.FRIENDS_AND_FAMILY.EMPTY_LIST_MESSAGE' | translate">
+                                            <ng-container *ngTemplateOutlet="addFriendButton;" />
+                                        </app-empty-state-tiny>
+                                    }
+                                </div>
+                            </ng-template>
+                        </app-selection-table>
+                    </ng-template>
+                </app-searchable-paginated-selection>
+            } @else {
+                <div class="context-notification-container flex-[1_1_100%] flex self-center">
+                    @let customerManagers = $customerManagers();
+                    @if (customerManagers.concatenated !== '') {
+                        <app-context-notification class="ob-context-notification flex-[1_1_100%]" contextType="info">
+                            <span (click)="handleManagerClick($event)"
+                                  [innerHTML]="'CUSTOMER.FRIENDS_AND_FAMILY.CUSTOMER_MANAGED_BY_MULTIPLE_FRIENDS' | translate :
+                                  ({ lastFriend: customerManagers.lastFriend, concatenated: customerManagers.concatenated })">
+                            </span>
+                        </app-context-notification>
+                    }
+                    @else {
+                        <app-context-notification class="ob-context-notification flex-[1_1_100%]" contextType="info">
+                            <span (click)="handleManagerClick($event)"
+                                  [innerHTML]="'CUSTOMER.FRIENDS_AND_FAMILY.CUSTOMER_MANAGED_BY_SINGLE_FRIEND' | translate :
+                                  ({ friend: customerManagers.lastFriend })">
+                            </span>
+                        </app-context-notification>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</app-form-container>
+@if (isLoading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}
+<ng-template #addFriendButton>
+    @let isBtnDisabled = $totalCustomerFriendsData()?.length >= $entityFriends()?.limits?.default;
+    <div [matTooltip]="'CUSTOMER.FRIENDS_AND_FAMILY.ADD_TOOLTIP' | translate" [matTooltipDisabled]="!isBtnDisabled">
+        <button mat-stroked-button color="primary" class="ob-button medium add-button"
+                [disabled]="isBtnDisabled"
+                [attr.aria-label]="'CUSTOMER.FRIENDS_AND_FAMILY.ADD' | translate"
+                (click)="openAddFriendAndFamilyDialog()">
+            <mat-icon>add</mat-icon>
+            {{'CUSTOMER.FRIENDS_AND_FAMILY.ADD' | translate}}
+        </button>
+    </div>
+</ng-template>
+

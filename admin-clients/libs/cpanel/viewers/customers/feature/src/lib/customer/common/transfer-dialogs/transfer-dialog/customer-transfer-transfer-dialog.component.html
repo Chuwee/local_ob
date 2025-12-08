@@ -1,0 +1,49 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="100%" class="secondary title">{{'CUSTOMER.TRANSFER.TRANSFER_DIALOG.TITLE' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" [mat-dialog-close]="false">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutGap="25px">
+        <div fxLayout="row" fxLayoutAlign="start start">
+            <mat-icon class="ob-icon small info with-text">info</mat-icon>
+            <span class="mat-body-2">{{'CUSTOMER.TRANSFER.TRANSFER_DIALOG.INFO' | translate}}</span>
+        </div>
+        <app-customer-transfer-dialog-info [seat]="data.selectedSeat" [session]="data.session" />
+        @if(data.friends?.length && data.transferPolicy === 'FRIENDS_AND_FAMILY') {
+            <div class="flex flex-col gap-2">
+                <span>{{'CUSTOMER.TRANSFER.TRANSFER_DIALOG.FRIENDS_DESCRIPTION' | translate}}</span>
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" [formControl]="friendsSelectorControl">
+                      <mat-option>
+                        <app-select-search #friendsSearch [options$]="friendsList$" requireSelection="true"
+                          [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" />
+                        </mat-option>
+                        @for (friend of friendsSearch.getFilteredOptions$() | async; track friend.id) {
+                          <mat-option [value]="friend">
+                            {{friend.name}} {{ friend.surname }}
+                          </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        } @else {
+            <app-customer-transfer-transfer-dialog-form [form]="form" [emailSubmit]="!!data.emailSubmit" />
+        }
+    </div>
+</div>
+<div mat-dialog-actions fxLayoutAlign="end">
+    <button type="button" mat-button class="ob-button" [mat-dialog-close]="false" [disabled]="isInProgress$ | async">
+        {{'FORMS.ACTIONS.CANCEL' | translate}}
+    </button>
+    <button mat-flat-button color="primary" type="button" class="ob-button" [disabled]="(isInProgress$ | async) || form.invalid"
+        (click)="save()">
+        {{'CUSTOMER.TRANSFER.TRANSFER_DIALOG.TRANSFER' | translate}}
+    </button>
+</div>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

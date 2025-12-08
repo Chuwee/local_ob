@@ -1,0 +1,67 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'EVENTS.TIERS.TRANSLATION_TABLE_DIALOG' | translate}}
+        </h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <form [formGroup]="form" fxLayout="column" *ngIf="(isLoadingOrSaving$ | async) === false else loading">
+        <app-tabs-menu type="language" formGroupName="contents">
+            <ng-container *ngFor="let lang of languageList$ | async">
+                <ng-template appTab lazyLoad [label]="('LANGUAGES.' + lang) | translate">
+                    <div mat-dialog-content fxLayout="column" fxLayoutGap="35px" [formGroupName]="lang"
+                         fxLayoutAlign="start stretch" class="dialog-container">
+                        <div fxFlex="100%" fxLayout="column">
+                            <span class="field-label">
+                                {{'EVENTS.TIERS.TRANSLATION_TABLE_TIER_TITLE_TITLE' | translate}}
+                            </span>
+                            <p class="field-description">
+                                {{'EVENTS.TIERS.TRANSLATION_TABLE_TIER_TITLE_DESCRIPTION' | translate}}
+                            </p>
+                            <mat-form-field appearance="outline" class="ob-form-field">
+                                <input matInput aria-label="name" [placeholder]="tierName" formControlName="name">
+                                <mat-hint class="price-zone-title" fxFlex="1 0 100%">{{priceZoneName}} - {{tierName}}
+                                </mat-hint>
+                            </mat-form-field>
+                        </div>
+                        <div fxFlex="100%" fxLayout="column">
+                            <span class="field-label">
+                                {{'EVENTS.TIERS.TRANSLATION_TABLE_TIER_DESCRIPTION' | translate}}
+                            </span>
+                            <p class="field-description">
+                                {{'EVENTS.TIERS.TRANSLATION_TABLE_TIER_DESCRIPTION_DESCRIPTION' | translate}}
+                            </p>
+                            <mat-form-field appearance="outline" class="ob-form-field no-padding">
+                                <app-rich-text-area aria-label="Description"
+                                    [placeholder]="'EVENTS.COMMUNICATION.CHANNEL.TEXT.LONG_DESCRIPTION.PLACEHOLDER' | translate"
+                                    formControlName="description"></app-rich-text-area>
+                                <mat-error [ob-form-errors]="form" [field]="['contents', lang, 'description']">
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </ng-template>
+            </ng-container>
+        </app-tabs-menu>
+    </form>
+
+    <ng-template #loading>
+        <div fxLayout="column">
+            <div fxFlex="0 0 300px" fxLayoutAlign="center center">
+                <mat-spinner></mat-spinner>
+            </div>
+        </div>
+    </ng-template>
+
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="save()"
+            [disabled]="form && !form.dirty || (isLoadingOrSaving$ | async)">
+            {{'FORMS.ACTIONS.SAVE' | translate}}
+        </button>
+    </div>
+</div>

@@ -1,0 +1,66 @@
+<form [formGroup]="purchaseContentsForm" class="details-container">
+    <div class="section-block" fxLayout="column">
+        <h3 class="section-title">
+            {{'SALE_REQUEST.COMMUNICATION.CHANNEL.IMAGES.PROMOTER_BANNER.TITLE' | translate}}
+        </h3>
+        <div fxFlex="70%" *ngIf="purchaseContentsForm.get('promoterBanner').value as promoterBannerUrl else noPromoterBanner">
+            <img [src]="promoterBannerUrl" class="promoter-image" alt="" />
+        </div>
+        <ng-template #noPromoterBanner>
+            <p class="content-not-defined-message" fxLayout="row" fxLayoutAlign="start center">
+                <mat-icon class="ob-icon small with-text">info</mat-icon>
+                <span>{{'SALE_REQUEST.COMMUNICATION.CHANNEL.IMAGES.PROMOTER_BANNER.IMAGES.NOT_DEFINED' | translate}}</span>
+            </p>
+        </ng-template>
+    </div>
+    <div class="section-block" fxLayout="column">
+        <h3 class="section-title">
+            {{'SALE_REQUEST.COMMUNICATION.CHANNEL.IMAGES.HEADER_BANNER.TITLE' | translate}}
+        </h3>
+        <p class="section-description">
+            {{'SALE_REQUEST.COMMUNICATION.CHANNEL.IMAGES.HEADER_BANNER.INFO' | translate }}
+        </p>
+        <div fxFlex="100%" fxLayout="column">
+            <div fxFlex fxLayout="row">
+                <div fxFlex="65%" fxLayout="column" class="image-uploader">
+                    <app-image-uploader hasAltText [imageRestrictions]="imageRestrictions['headerBanner']"
+                        formControlName="headerBanner" />
+                </div>
+            </div>
+            <div fxFlex fxLayout="row">
+                <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'SALE_REQUEST.COMMUNICATION.CHANNEL.IMAGES.HEADER_BANNER.TARGET_URL' | translate}}</mat-label>
+                    <input matInput
+                        [placeholder]="'SALE_REQUEST.COMMUNICATION.CHANNEL.IMAGES.HEADER_BANNER.TARGET_URL' | translate"
+                        formControlName="headerBannerUrl">
+                    <mat-error [ob-form-errors]="purchaseContentsForm" field="headerBannerUrl" />
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    <div class="section-block" fxLayout="column">
+        <h3 class="section-title">
+            {{'SALE_REQUEST.COMMUNICATION.CHANNEL.IMAGES.BANNER_IMAGE.TITLE' | translate}}
+        </h3>
+        <p class="section-description">
+            {{'SALE_REQUEST.COMMUNICATION.CHANNEL.IMAGES.BANNER_IMAGE.INFO' | translate }}
+        </p>
+        <div fxFlex="100%" fxLayout="column">
+            <div fxFlex fxLayout="row">
+                <div fxFlex="30%" fxLayout="column" class="image-uploader">
+                    <app-image-uploader hasAltText [imageRestrictions]="imageRestrictions['banner']"
+                        formControlName="banner" />
+                </div>
+            </div>
+            <div fxFlex="none" fxLayout="row">
+                <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'SALE_REQUEST.COMMUNICATION.CHANNEL.IMAGES.BANNER.TARGET_URL' | translate}}</mat-label>
+                    <input matInput
+                        [placeholder]="'SALE_REQUEST.COMMUNICATION.CHANNEL.IMAGES.BANNER.TARGET_URL' | translate"
+                        formControlName="bannerUrl">
+                    <mat-error [ob-form-errors]="purchaseContentsForm" field="bannerUrl" />
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+</form>

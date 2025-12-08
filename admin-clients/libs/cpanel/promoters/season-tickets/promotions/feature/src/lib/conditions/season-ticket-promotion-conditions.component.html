@@ -1,0 +1,197 @@
+<app-form-container [disabled]="!(form?.dirty) || $loading()" (cancel)="cancel()" (save)="save()">
+    <form [formGroup]="form" class="flex flex-col">
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'SEASON_TICKET.PROMOTIONS.OPERATIVE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <!-- PROMOTION CUSTOMER-TYPES -->
+             <!-- Commented till back in channels done -->
+             <!-- @if (promotionType === promotionTypes.automatic) {
+                 <app-promotion-customer-types #promoCustomerTypes [customerTypesForm]="form.get('customerTypes')"
+                    [promotion]="$promotion()" />
+             } -->
+            <!-- PROMOTION CHANNELS -->
+            <div [class.atomic-saving-error]="errors.savePromotionChannels">
+                <app-season-ticket-promotion-channels [seasonTicketId]="seasonTicketId" [promotionId]="promotionId"
+                    [channelsForm]="form.get('channels')" />
+                @if (errors.savePromotionChannels) {
+                    <span class="error-description">
+                        {{'SEASON_TICKET.PROMOTIONS.ATOMIC_SAVING_ERROR' | translate}}
+                    </span>
+                }
+            </div>
+            <mat-divider class="ob-divider" />
+            <!-- PROMOTION VALIDITY PERIOD -->
+            <div class="promotion-form-section flex flex-col" formGroupName="validityPeriod">
+                <div class="flex">
+                    <p class="mat-subtitle-2 flex justify-start items-center">
+                        {{'SEASON_TICKET.PROMOTIONS.VALIDITY_PERIOD' | translate}} *
+                        <mat-icon class="ob-help-icon"
+                            [matTooltip]="'SEASON_TICKET.PROMOTIONS.VALIDITY_PERIOD_INFO' | translate">
+                            help_outline
+                        </mat-icon>
+                    </p>
+                </div>
+                <mat-radio-group formControlName="type" class="flex flex-col">
+                    <mat-radio-button class="inline" [value]="validityPeriodTypes.event">
+                        {{'SEASON_TICKET.PROMOTIONS.VALIDITY_PERIOD_ALL' | translate}}
+                    </mat-radio-button>
+                    <mat-radio-button class="inline" [value]="validityPeriodTypes.period">
+                        {{'SEASON_TICKET.PROMOTIONS.VALIDITY_PERIOD_SELECT' | translate}}
+                    </mat-radio-button>
+                </mat-radio-group>
+                @if (form.get('validityPeriod.type').value === validityPeriodTypes.period) {
+                    <div formGroupName="dates" class="dates-selection nested-content flex flex-row flex-wrap">
+                        <div class="flex xl:basis-1/2 basis-full flex-col">
+                            <app-date-time-picker fxFlex="100%" class="date-form-field" [label]="'DATES.START_DATE' | translate"
+                                formControlName="start" />
+                        </div>
+                        <div class="flex xl:basis-1/2 basis-full flex-col">
+                            <app-date-time-picker fxFlex="100%" class="date-form-field" [label]="'DATES.END_DATE' | translate"
+                                formControlName="end" />
+                        </div>
+                        @if (form.get('validityPeriod.dates').touched) {
+                            <mat-error [ob-form-errors]="form" field="validityPeriod.dates" />
+                        }
+                    </div>
+                }
+            </div>
+            <!-- PROMOTION BY RATE TICKETS GROUPS -->
+             @if(promotionType === promotionTypes.automatic) {
+                 <mat-divider class="ob-divider" />
+                 <p class="mat-subtitle-2 flex justify-start items-center">
+                    {{'SEASON_TICKET.PROMOTIONS.USAGE_CONDITIONS_TITLE' | translate}}
+                </p>
+                 <app-promotion-by-rate-tickets-groups [rates]="$rates()" [form]="form.get('rateTicketsGroups')" 
+                    [promotionRateTicketsGroups]="promotionRateTicketsGroups" />
+             }
+        </mat-expansion-panel>
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'SEASON_TICKET.PROMOTIONS.CONDITIONS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <!-- PROMOTION COLLECTIVES -->
+            @if ((promotion$ | async)?.type !== promotionTypes.automatic) {
+                <div class="promotion-form-section flex flex-col" formGroupName="collective"
+                    id="section_season-ticket_promotions_collective">
+                    <p class="mat-subtitle-2 flex justify-start items-center">
+                        {{'SEASON_TICKET.PROMOTIONS.COLLECTIVES.TITLE' | translate}} *
+                        <mat-icon class="ob-help-icon self-center"
+                            [matTooltip]="'SEASON_TICKET.PROMOTIONS.COLLECTIVES.INFO' | translate">
+                            help_outline
+                        </mat-icon>
+                    </p>
+                    <mat-radio-group formControlName="type" class="tax-data-radio-group flex flex-col">
+                        <mat-radio-button [value]="promotionCollectiveScope.none">
+                            {{'SEASON_TICKET.PROMOTIONS.COLLECTIVES.NONE' | translate}}
+                        </mat-radio-button>
+                        <mat-radio-button [value]="promotionCollectiveScope.restricted">
+                            {{'SEASON_TICKET.PROMOTIONS.COLLECTIVES.SPECIFIC' | translate}}
+                        </mat-radio-button>
+                    </mat-radio-group>
+                    @if (form.get('collective.type').value === promotionCollectiveScope.restricted) {
+                        <div class="flex flex-col select-collective-container nested-content">
+                            <div class="flex items-baseline gap-4">
+                                <mat-form-field appearance="outline" class="ob-form-field ob-form-field-outline flex basis-1/2">
+                                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="collectiveId"
+                                        aria-label="collective">
+                                        @for (collective of collectives$ | async; track collective) {
+                                            <mat-option [value]="collective?.id">
+                                                <div appEllipsify [matTooltip]="collective?.name + ' - ' +
+                                                     (('COLLECTIVE.TYPE_OPTS.' + collective?.type) | translate) + ' - ' +
+                                                     (('COLLECTIVE.SUBTYPE_OPTS.' + collective?.validation_method) | translate)">
+                                                    {{collective?.name}} -
+                                                    {{('COLLECTIVE.TYPE_OPTS.' + collective?.type) | translate}} -
+                                                    {{('COLLECTIVE.SUBTYPE_OPTS.' + collective?.validation_method) | translate}}
+                                                </div>
+                                            </mat-option>
+                                        }
+                                    </mat-select>
+                                </mat-form-field>
+                                @if (form.value.collective?.collectiveId) {
+                                    <div class="flex items-baseline">
+                                        <a aria-label="Go to link" class="ob-link flex" target="_blank"
+                                            [routerLink]="['/collectives', form.value.collective.collectiveId, 'general-data']">
+                                            <span>{{'ACTIONS.GO_TO_COLLECTIVE' | translate}}</span>
+                                            <mat-icon class="ob-icon xsmall" iconPositionEnd>launch</mat-icon>
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                            <div class="flex flex-col">
+                                <mat-checkbox color="primary" formControlName="restrictiveSale" class="inline">
+                                    {{'SEASON_TICKET.PROMOTIONS.COLLECTIVE.RESTRICTIVE_SALE' | translate}}
+                                </mat-checkbox>
+                                <mat-checkbox color="primary" formControlName="notBoxOfficeValidation" class="inline">
+                                    {{'SEASON_TICKET.PROMOTIONS.COLLECTIVE.NOT_BOX_OFFICE_VALIDATION' | translate}}
+                                </mat-checkbox>
+                            </div>
+                        </div>
+                    }
+                    <mat-divider class="ob-divider" />
+                </div>
+            }
+            <!-- PROMOTION AUTO IS COMBINABLE -->
+            @if ((promotion$ | async)?.type === promotionTypes.automatic) {
+                <div class="promotion-form-section flex flex-col">
+                    <mat-checkbox color="primary" formControlName="notCombinable" class="inline">
+                        {{'SEASON_TICKET.PROMOTIONS.IS_COMBINABLE' | translate}}
+                    </mat-checkbox>
+                    <mat-divider class="ob-divider" />
+                </div>
+            }
+            <!-- PROMOTION ALTERNATIVE FEES -->
+            <div class="promotion-form-section flex flex-col" id="section_season-ticket_promotions_surcharges">
+                <p class="mat-subtitle-2">{{'SEASON_TICKET.PROMOTIONS.SURCHARGES' | translate}}</p>
+                <mat-checkbox color="primary" formControlName="enableAlternativeChannelSurcharges" class="inline">
+                    {{'SEASON_TICKET.PROMOTIONS.CHANNEL_SURCHARGES' | translate}}
+                </mat-checkbox>
+                <mat-checkbox color="primary" formControlName="enableAlternativePromoterSurcharges" class="inline">
+                    {{'SEASON_TICKET.PROMOTIONS.PROMOTER_SURCHARGES' | translate}}
+                </mat-checkbox>
+                <mat-divider class="ob-divider" />
+            </div>
+            <!-- PROMOTION IN TICKET CONFIG -->
+            <div class="promotion-form-section flex flex-col">
+                <p class="mat-subtitle-2">{{'SEASON_TICKET.PROMOTIONS.TICKET_OPTIONS' | translate}}</p>
+                @if ((promotion$ | async)?.type !== promotionTypes.automatic) {
+                    <mat-checkbox color="primary"
+                        formControlName="showDiscountNameInTicket" class="inline">
+                        {{'SEASON_TICKET.PROMOTIONS.SHOW_DISCOUNT_NAME_TICKET' | translate}}
+                    </mat-checkbox>
+                }
+                <mat-checkbox color="primary" formControlName="showTicketPriceWithoutDiscount" class="inline">
+                    {{'SEASON_TICKET.PROMOTIONS.SHOW_RAW_PRICE_TICKET' | translate}}
+                </mat-checkbox>
+            </div>
+            <mat-divider class="ob-divider" />
+            <!-- PROMOTION ACCESS CONTROL -->
+            <div class="promotion-form-section flex flex-col">
+                <div class="flex">
+                    <p class="mat-subtitle-2 flex justify-start items-center">
+                        {{'SEASON_TICKET.PROMOTIONS.ACCESS_CONTROL' | translate}}
+                        <mat-icon class="ob-help-icon"
+                            [matTooltip]="'SEASON_TICKET.PROMOTIONS.ACCESS_CONTROL_INFO' | translate">
+                            help_outline
+                        </mat-icon>
+                    </p>
+                </div>
+                <mat-checkbox color="primary" formControlName="accessControlRestricted" class="inline">
+                    {{'SEASON_TICKET.PROMOTIONS.ACCESS_CONTROL_TOGGLE' | translate}}
+                </mat-checkbox>
+            </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'SEASON_TICKET.PROMOTIONS.LIMITS_TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <!-- PROMOTION LIMITS -->
+            <app-promotion-limits [form]="form" [promotion$]="promotion$" />
+        </mat-expansion-panel>
+    </form>
+</app-form-container>
+@if ($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

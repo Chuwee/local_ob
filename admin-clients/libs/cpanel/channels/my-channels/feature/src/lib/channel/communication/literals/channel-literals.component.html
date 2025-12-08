@@ -1,0 +1,23 @@
+<app-form-container [formGroup]="form" (cancel)="cancel()" (save)="save()" layout="menu" class="no-padding overflow-y-auto"
+    [disabled]="!form.dirty || (isInProgress$ | async)">
+    <app-literals-table
+        [languages$]="languageList$" [literals$]="literals$" [formGroup]="form" name="literals"
+        [selectedLanguage]="selectedLanguage.getValue()" (changedLanguage)="loadTextContents($event)"
+        [allowHtmlEditor]="isLiteralCreationAllowed$ | async">
+        @if(isLiteralCreationAllowed$ | async) {
+            <div fxFlex="none" fxLayout="row wrap" fxLayoutAlign="end" class="button-container">
+                <button mat-stroked-button type="button" class="ob-button small import-button" [fxShow]="(channel$ | async) | isWebChannel"
+                    (click)="openCreateLiteralDialog()" data-test="addLiteralBtn">
+                    <mat-icon>add</mat-icon>
+                    {{'CHANNELS.LITERALS.ADD_KEY' | translate}}
+                </button>
+            </div>
+        }
+    </app-literals-table>
+</app-form-container>
+
+@if(isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

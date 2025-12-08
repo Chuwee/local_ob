@@ -1,0 +1,99 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'TITLES.NEW_TICKET_TEMPLATE' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <form [formGroup]="form" fxLayout="column" fxLayoutAlign="start stretch">
+            @if (canSelectEntity$ | async) {
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-label>{{'FORMS.LABELS.ENTITY' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate" formControlName="entity"
+                        [compareWith]="compareObjectsById">
+                        <mat-option>
+                            <app-select-search #entitySelectSearch [options$]="entities$"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" requireSelection="true">
+                            </app-select-search>
+                        </mat-option>
+                        @for (entity of entitySelectSearch.getFilteredOptions$() | async; track entity) {
+                            <mat-option [value]="entity">
+                                <div appEllipsify [matTooltip]="entity.name">
+                                    {{entity.name}}
+                                </div>
+                            </mat-option>
+                        }
+                    </mat-select>
+                    @if (form.controls['entity'].hasError('required')) {
+                        <mat-error>
+                            {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                        </mat-error>
+                    }
+                </mat-form-field>
+            }
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                <input matInput aria-label="name" [placeholder]="'FORMS.LABELS.NAME' | translate" formControlName="name">
+                @if (form.hasError('required', 'name')) {
+                    <mat-error>
+                        {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                    </mat-error>
+                }
+                @if (form.hasError('maxlength', 'name')) {
+                    <mat-error>
+                        {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value: maxTicketTemplateNameLength})}}
+                    </mat-error>
+                }
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'TICKET_TEMPLATE.FORMAT' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="format">
+                    @for (format of formats$ | async; track format) {
+                        <mat-option [value]="format">
+                            {{'TICKET_TEMPLATE.FORMAT_OPTS.' + format | translate}}
+                        </mat-option>
+                    }
+                </mat-select>
+                @if (form.hasError('required', 'format')) {
+                    <mat-error>
+                        {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                    </mat-error>
+                }
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'TICKET_TEMPLATE.DESIGN' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="design"
+                    [compareWith]="compareObjectsById">
+                    <mat-option>
+                        <app-select-search #designSelectSearch [options$]="designs$"
+                            [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" requireSelection="true">
+                        </app-select-search>
+                    </mat-option>
+                    @for (design of designSelectSearch.getFilteredOptions$() | async; track design) {
+                        <mat-option [value]="design">
+                            <div appEllipsify [matTooltip]="design.name">
+                                {{design.name}}
+                            </div>
+                        </mat-option>
+                    }
+                </mat-select>
+                @if (form.hasError('required', 'design')) {
+                    <mat-error>
+                        {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                    </mat-error>
+                }
+            </mat-form-field>
+
+        </form>
+    </div>
+    <div mat-dialog-actions fxFlex="auto" fxLayout="row" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="create()"
+            [disabled]="(!form.dirty) || (saving$ | async)">
+            {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>

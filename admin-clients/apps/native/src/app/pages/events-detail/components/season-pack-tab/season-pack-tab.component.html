@@ -1,0 +1,37 @@
+<div class="session-pack__result-block">
+    <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+        <ion-refresher-content />
+    </ion-refresher>
+    @if(!$isLoading() && $totalSessionPacksEvents() === 0){
+        <static-view [viewContent]="{ title: 'SEASON_PACK.STILL_NO_SEASON_PACK_CREATED', description: null, isError: false }" />
+    }@else {
+        <ion-text class="session-pack__result-block-block-title">
+            {{ "EVENTS.EVENTS_LIST_TITLE_SEARCH" | translate }}
+        </ion-text>
+        @if(!$isLoading()){
+            <ion-text class="session-pack__result-block-block-info">
+                <span> {{ "EVENT_DETAIL.SESSION_PACKS.TOTAL-RESULTS" | translate : {number: $totalSessionPacksEvents()} }} </span>
+            </ion-text>
+        }
+        @if(!$isLoading() || ionInfinite){
+            <ion-list class="session-pack__ticket-list">
+                @for(session of foundSessionPacks; track $index){
+                    <ion-item>
+                        <session-card type="session-pack" class="session-pack__ticket-card" [session]="session"
+                            (tap)="goToSessionDetail(session)" />
+                    </ion-item>
+                }
+
+            </ion-list>
+        }@else {
+            <ion-list class="session-pack__ticket-list">
+                <ion-item>
+                    <skeleton-card class="session-pack__ticket-card" />
+                </ion-item>
+            </ion-list>
+        }
+        <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+            <ion-infinite-scroll-content />
+        </ion-infinite-scroll>
+    }
+</div>

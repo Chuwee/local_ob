@@ -1,0 +1,42 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'TITLES.ADD_OPERATOR_TAX' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="dialogRef.close(false)">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <div fxLayout="row">
+            <form [formGroup]="form" fxFlex="0 1 225px" fxLayout="row wrap">
+                <mat-form-field fxFlex="0 1 100%" appearance="outline" class="ob-form-field">
+                    <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                    <input matInput aria-label="name" type="text" [placeholder]="'FORMS.LABELS.NAME' | translate"
+                        formControlName="name">
+                    <mat-error [ob-form-errors]="form" field="name"></mat-error>
+                </mat-form-field>
+                <mat-form-field fxFlex="0 1 96px" appearance="outline" class="ob-form-field tax-value-field">
+                    <mat-label>{{'FORMS.LABELS.VALUE' | translate}}</mat-label>
+                    <input matInput class="value-input" aria-label="value" type="number"
+                        [placeholder]="'FORMS.LABELS.VALUE' | translate" formControlName="value">
+                    <span matSuffix>%</span>
+                    <mat-error [ob-form-errors]="form" field="value"></mat-error>
+                </mat-form-field>
+            </form>
+        </div>
+        <div fxLayout="row">
+            <mat-icon class="ob-icon xsmall warning warning-message-icon">warning</mat-icon>
+            <p fxFlex="0 1 100%">{{'OPERATOR.ADD_TAX_DIALOG_WARNING' | translate}}</p>
+        </div>
+    </div>
+    <div mat-dialog-actions fxFlex="auto" fxLayout="row no wrap" fxLayoutAlign="end">
+        <button mat-button type="button" class="ob-button" (click)="dialogRef.close(false)">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createTax()">
+            {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>
+<div class="spinner-container" *ngIf="reqInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

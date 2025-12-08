@@ -1,0 +1,393 @@
+
+@if((isSessionGenerationError$ | async) !== true) {
+    <div class="status-notifications-container flex justify-center">
+        <div class="status-bar flex justify-between items-center">
+            <div class="event-status">
+                <span class="event-status-label ob-label">
+                    {{'EVENTS.SESSION.EVENT_STATUS' | translate}}:
+                </span>
+                <span class="event-status-value">
+                    {{'EVENTS.STATUS_OPTS.' + eventStatus | translate}}
+                </span>
+            </div>
+            <div class="channel-status">
+                <span class="channel-status-label ob-label">
+                    {{'EVENTS.SESSION.CHANNEL_STATUS' | translate}}:
+                </span>
+                <span class="ob-status-badge" [ngClass]="sessionReleaseStatusInd"
+                    [matTooltip]="'EVENTS.SESSION.RELEASE_STATUS.' + sessionReleaseStatusInd?.toUpperCase() | translate">
+                    {{'EVENTS.SESSION.RELEASE_STATE' | translate}}
+                </span>
+                <span [matTooltip]="'EVENTS.SESSION.SALE_STATUS.' + sessionSaleStatusInd?.toUpperCase() | translate" class="ob-status-badge"
+                    [ngClass]="sessionSaleStatusInd">
+                    {{'EVENTS.SESSION.SALE_STATE' | translate}}
+                </span>
+            </div>
+        </div>
+    </div>
+}
+<app-form-container sidebar [disabled]="!(form?.dirty)" (cancel)="cancelChanges()" (save)="save()">
+    @if(isSessionGenerationError$ | async) {
+        <div class="context-notification-container flex flex-row justify-center items-start">
+            <app-context-notification class="ob-context-notification flex-1" contextType="warn">
+                <span>{{'EVENTS.SESSION_GENERATION_ERROR' | translate}}</span>
+            </app-context-notification>
+        </div>
+    }
+    @if($sessionInContingencyMode()) {
+        <div class="context-notification-container flex flex-row justify-center items-start">
+            <app-context-notification class="ob-context-notification flex-1" contextType="alert">
+                {{'EVENTS.SESSION_CONTINGENCY_MODE' | translate}}
+            </app-context-notification>
+        </div>
+    }
+    @if(hasFortressVenue) {
+        <div class="flex session-planning-info-block">
+            <mat-icon class="ob-icon small info with-text">info</mat-icon>
+            {{'EVENTS.SESSION.FORTRESS.INFO_MESSAGE' | translate}}
+        </div>
+    }
+    <div class="session-form-container" [class.blocked]="isSessionGenerationError$ | async" [formGroup]="generalForm">
+        <!-- SESSION DATA -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.SESSION.DETAILS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="session-form-section">
+                @if(showSmartBookingRelated$ | async) {
+                    <div class="flex flex-col">
+                        <span class="field-label">{{'EVENTS.SESSION.SMART_BOOKING.TITLE' | translate}}</span>
+                        <p>{{'EVENTS.SESSION.SMART_BOOKING.DESCRIPTION' | translate}}</p>
+                        <a class="ob-link icon" [routerLink]="smartBookingSessionRoute$ | async">
+                            {{'EVENTS.SESSION.SMART_BOOKING.SHOW_SESSION' | translate}}
+                        </a>
+                        <mat-divider class="ob-divider w-full" />
+                    </div>
+                }
+                <div class="flex flex-col xl:flex-row">
+                    <!-- NAME -->
+                    <mat-form-field appearance="outline"
+                        class="ob-form-field field-with-label session-form-field xl:flex-1">
+                        <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                        <input formControlName="name" matInput [placeholder]="'FORMS.LABELS.NAME' | translate">
+                        <mat-error [ob-form-errors]="generalForm" field="name" />
+                    </mat-form-field>
+                    <!-- STATUS -->
+                    <mat-form-field appearance="outline"
+                        class="ob-form-field field-with-label session-form-field xl:flex-1">
+                        <mat-label>{{'EVENTS.STATUS' | translate}}</mat-label>
+                        <mat-select formControlName="status" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                            @for (status of sessionStatuses; track $index) {
+                                <mat-option [value]="status">
+                                    {{ ('EVENTS.SESSION.STATUS_OPTS.' + status) | translate }}
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="flex flex-col xl:flex-row">
+                    @if(isAvet$ | async) {
+                        <ng-container>
+                            <!-- AVET COMPETITION -->
+                            <div class="details-non-editable-field session-form-field flex flex-col xl:flex-1">
+                                <span class="field-label">{{'SESSION.MATCH' | translate}}</span>
+                                <span>{{(avetConfig$ | async)?.avet_match.name}}</span>
+                            </div>
+                            <!-- START DATE NON EDITABLE -->
+                            <div class="details-non-editable-field session-form-field flex flex-col xl:flex-1">
+                                <span class="field-label">
+                                    {{'DATES.START_DATE' | translate}}
+                                    @if(avetConfig$ | async) {
+                                        <em class="comment">
+                                            {{(avetConfig$ | async).avet_match.match_date_confirmed ? '' :
+                                            ('(' + ('SESSION.DATE_PENDING_CONFIRMATION' | translate) + ')') }}
+                                        </em>
+                                    }
+                                </span>
+                                <span>
+                                    {{generalForm.get('start_date').value | localDateTime :
+                                    dateTimeFormats.shortDateTime}}
+                                </span>
+                            </div>
+                        </ng-container>
+                    }
+                    @if((isAvet$ | async) !== true && sessionType === sessionTypes.session) {
+                        <ng-container>
+                            <!-- START DATE -->
+                            <app-date-time-picker id="start_date" maxErrors="1" class="session-form-field md:flex-1"
+                                [label]="'DATES.START_DATE' | translate" formControlName="start_date" />
+                            <!-- END DATE -->
+                            <app-date-time-picker id="end_date" maxErrors="1" class="session-form-field md:flex-1"
+                                [label]="'DATES.END_DATE' | translate" formControlName="end_date" />
+                        </ng-container>
+                    }
+                </div>
+                <div class="flex flex-col xl:flex-row">
+                    <!-- AVET RATE & EXTERNAL OPERATIVE -->
+                    @if(isAvet$ | async) {
+                        <div class="session-form-field flex flex-col md:flex-1">
+                            <div class="flex flex-col">
+                                <app-session-rates [form]="generalForm.controls.rates" [rates]="rates$ | async" hideDefault />
+                                <div class="details-non-editable-field session-form-field flex flex-col">
+                                    <span class="field-label">
+                                        {{'SESSION.EXT_OPERATIVE.LABEL' | translate}}
+                                    </span>
+                                    <span>
+                                        {{'SESSION.EXT_OPERATIVE.STATUS' | translate}}:
+                                        {{((avetConfig$ | async)?.avet_external_operative ?
+                                        'SESSION.EXT_OPERATIVE.ENABLED' : 'SESSION.EXT_OPERATIVE.DISABLED') | translate}}
+                                    </span>
+                                </div>
+                                <!-- REFERENCE SESSION -->
+                                <ng-container>
+                                    <ng-container *ngTemplateOutlet="sessionReferenceInput" />
+                                </ng-container>
+                            </div>
+
+                        </div>
+                    }
+                    @if((isAvet$ | async) === false) {
+                        <div class="session-form-field flex flex-col md:flex-1">
+                            <!-- REFERENCE SESSION -->
+                            <ng-container *ngTemplateOutlet="sessionReferenceInput" />
+                            <!-- RATES -->
+                            <app-session-rates [form]="generalForm.controls.rates" [rates]="rates$ | async" />
+                        </div>
+                    }
+                    <div class="session-form-field flex flex-col md:flex-1">
+                        <div class="flex flex-col" formGroupName="taxes">
+                            <!-- TAX -->
+                            <mat-form-field id="settings.ticket.id" appearance="outline" formGroupName="ticket"
+                                class="ob-form-field field-with-label">
+                                <mat-label>{{'EVENTS.SESSION.TICKET_TAXES' | translate}}</mat-label>
+                                <mat-select formControlName="id" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                    @for(tax of taxes$ | async; track $index) {
+                                        <mat-option [value]="tax.id">
+                                            {{tax.name}}
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                            <!-- SURCHARGES TAX -->
+                            <mat-form-field id="settings.charges.id" appearance="outline" formGroupName="charges"
+                                class="ob-form-field field-with-label">
+                                <mat-label>{{'EVENTS.SESSION.SURCHARGES_TAXES' | translate}}</mat-label>
+                                <mat-select formControlName="id" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                    @for(tax of taxes$ | async; track $index) {
+                                        <mat-option [value]="tax.id">
+                                            {{tax.name}}
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-expansion-panel>
+        <!-- OPERATIVE -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.SESSION.OPERATIVE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex flex-col gap-4">
+                <!-- AVAILABLE ACTIVITY TICKET TYPE-->
+                @if(groupsAllowed$ | async) {
+                    <div class="flex flex-col flex-wrap">
+                        <span class="mat-subtitle-2">{{'EVENTS.SESSION.ACTIVITY_TICKET_TYPES' | translate}}</span>
+                        <mat-form-field hidden-outline class="ob-form-field field-with-label">
+                            <input matInput class="hidden" aria-label="activity available ticket types"
+                                formControlName="activity_sale_type">
+                            <mat-radio-group formControlName="activity_sale_type" class="grid gap-5">
+                                <mat-radio-button [value]="activitySaleTypes.individual">
+                                    {{'EVENTS.SESSION.ACTIVITY_TICKET_INDIVIDUAL' | translate}}
+                                </mat-radio-button>
+                                <mat-radio-button [value]="activitySaleTypes.mixed">
+                                    {{'EVENTS.SESSION.ACTIVITY_TICKET_MIXED' | translate}}
+                                </mat-radio-button>
+                                <mat-radio-button [value]="activitySaleTypes.group">
+                                    {{'EVENTS.SESSION.ACTIVITY_TICKET_GROUP' | translate}}
+                                </mat-radio-button>
+                            </mat-radio-group>
+                            <mat-error [ob-form-errors]="generalForm" field="activity_sale_type" />
+                        </mat-form-field>
+                    </div>
+                }
+                @if(!operativeDatesForm.valid && !isTrulyInvalidOperativeDatesForm()) {
+                    <div class="invalid-dates-advice section-block flex flex-row justify-start items-center">
+                        <mat-icon class="ob-icon small neutral with-text">info</mat-icon>
+                        <span>{{'EVENTS.SESSION.INVALID_DATES_ADVICE' | translate}}</span>
+                    </div>
+                }
+                <!-- RELEASE DATE-->
+                <div class="session-form-section flex flex-row flex-wrap" [formGroup]="operativeDatesForm.get('release')">
+                    <div class="session-form-feature-activation flex flex-col md:flex-1 gap-1.5">
+                        <div class="flex flex-row">
+                            <mat-slide-toggle class="ob-slide-toggle" formControlName="enable">
+                                {{'EVENTS.SESSION.CHANNEL_RELEASE' | translate}}
+                            </mat-slide-toggle>
+                        </div>
+                        <mat-divider />
+                    </div>
+                    <p class="field-with-label">
+                        {{'EVENTS.SESSION.CHANNEL_RELEASE_INFO' | translate}}
+                    </p>
+                    <app-date-time-picker id="settings.release.date" maxErrors="1" class="session-form-field md:flex-1"
+                        formControlName="date" [class.informative-error]="!operativeDatesForm.get('release.enable')?.value &&
+                            !operativeDatesForm.get('release.date').hasError('required')"
+                        [label]="'EVENTS.SESSION.CHANNEL_RELEASE' | translate" />
+                </div>
+                <!-- BOOKING DATE -->
+                @if(showBookingSettings$ | async) {
+                    <div id="settings.booking.enable" class="session-form-section flex flex-col flex-wrap"
+                        [formGroup]="operativeDatesForm.get('booking')">
+                        <div class="session-form-feature-activation flex flex-col gap-1.5 md:flex-1">
+                            <div class="flex flex-row">
+                                <mat-slide-toggle class="ob-slide-toggle" formControlName="enable">
+                                    {{'EVENTS.SESSION.BOOKINGS' | translate}}
+                                </mat-slide-toggle>
+                            </div>
+                            <mat-divider />
+                        </div>
+                        <p class="field-with-label">
+                            {{'EVENTS.SESSION.BOOKINGS_INFO' | translate}}
+                        </p>
+                        <!-- START BOOKING DATE -->
+                        <div class="flex flex-row flex-wrap">
+                            <app-date-time-picker id="settings.booking.start_date" maxErrors="1"
+                                class="session-form-field md:flex-1"
+                                [class.informative-error]="!operativeDatesForm.get('booking.enable')?.value &&
+                            !operativeDatesForm.get('booking.start_date').hasError('required')"
+                                [label]="'EVENTS.SESSION.BOOKINGS_START' | translate" formControlName="start_date" />
+                            <!-- END BOOKING DATE -->
+                            <app-date-time-picker id="settings.booking.end_date" maxErrors="1"
+                                class="session-form-field md:flex-1"
+                                [class.informative-error]="!operativeDatesForm.get('booking.enable')?.value &&
+                            !operativeDatesForm.get('booking.end_date').hasError('required')"
+                                [label]="'EVENTS.SESSION.BOOKINGS_END' | translate" formControlName="end_date" />
+                        </div>
+                    </div>
+                }
+                <!-- SALE DATE -->
+                <div id="settings.sale.enable" class="session-form-section flex flex-col flex-wrap"
+                    [formGroup]="operativeDatesForm.get('sale')">
+                    <div class="session-form-feature-activation flex flex-col md:flex-1 gap-1.5">
+                        <div class="flex flex-row">
+                            <mat-slide-toggle class="ob-slide-toggle" formControlName="enable">
+                                {{'EVENTS.SESSION.SALE' | translate}}
+                            </mat-slide-toggle>
+                        </div>
+                        <mat-divider />
+                    </div>
+                    <p class="field-with-label">{{'EVENTS.SESSION.SALE_INFO' | translate}}</p>
+                    <!-- START SALE DATE -->
+                    <div class="flex flex-row flex-wrap">
+                        <app-date-time-picker id="settings.sale.start_date" maxErrors="1" class="session-form-field md:flex-1"
+                            [class.informative-error]="!operativeDatesForm.get('sale.enable')?.value &&
+                            !operativeDatesForm.get('sale.start_date').hasError('required')"
+                            [label]="'EVENTS.SESSION.SALE_START' | translate" formControlName="start_date" />
+                        <!-- END SALE DATE -->
+                        <app-date-time-picker id="settings.sale.end_date" maxErrors="1" class="session-form-field md:flex-1"
+                            [class.informative-error]="!operativeDatesForm.get('sale.enable')?.value &&
+                            !operativeDatesForm.get('sale.end_date').hasError('required')" [label]="'EVENTS.SESSION.SALE_END' | translate"
+                            formControlName="end_date" />
+                    </div>
+                </div>
+                <!-- SECONDARY MARKET SALE DATE -->
+                @if(showSecondaryMarketOperative$ | async) {
+                    <div id="settings.secondary_market_sale.enable" class="session-form-section flex flex-col flex-wrap"
+                        [formGroup]="operativeDatesForm.get('secondary_market_sale')">
+                        <div class="session-form-feature-activation flex flex-col md:flex-1 gap-1.5">
+                            <div class="flex flex-row">
+                                <mat-slide-toggle class="ob-slide-toggle" formControlName="enable">
+                                    {{'EVENTS.SESSION.SECONDARY_MARKET_SALE' | translate}}
+                                </mat-slide-toggle>
+                            </div>
+                            <mat-divider />
+                        </div>
+                        <p class="field-with-label">{{'EVENTS.SESSION.SECONDARY_MARKET_SALE_INFO' | translate}}</p>
+                        <div class="flex flex-row flex-wrap">
+                            <!-- START SECONDARY MARKET SALE DATE -->
+                            <app-date-time-picker id="settings.secondary_market_sale.start_date" maxErrors="1"
+                                class="session-form-field md:flex-1"
+                                [class.informative-error]="!operativeDatesForm.get('secondary_market_sale.enable')?.value &&
+                            !operativeDatesForm.get('secondary_market_sale.start_date').hasError('required')"
+                                [label]="'EVENTS.SESSION.SECONDARY_MARKET_SALE_START' | translate" formControlName="start_date" />
+                            <!-- END SALE DATE -->
+                            <app-date-time-picker id="settings.secondary_market_sale.end_date" maxErrors="1"
+                                class="session-form-field md:flex-1"
+                                [class.informative-error]="!operativeDatesForm.get('secondary_market_sale.enable')?.value &&
+                            !operativeDatesForm.get('secondary_market_sale.end_date').hasError('required')"
+                                [label]="'EVENTS.SESSION.SECONDARY_MARKET_SALE_END' | translate"
+                                formControlName="end_date" />
+                        </div>
+                    </div>
+                }
+            </div>
+        </mat-expansion-panel>
+        <!-- SESSION-PACK LINKED SESSIONS -->
+        @if(sessionType !== sessionTypes.session) {
+            <mat-expansion-panel expanded togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.SESSION.LINKED_SESSIONS' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="session-form-section flex flex-row flex-wrap">
+                    <app-linked-sessions class="flex-1" [currentSession$]="currentSession$" />
+                </div>
+            </mat-expansion-panel>
+        }
+        <ng-template #sessionReferenceInput>
+            <mat-form-field id="reference" appearance="outline" class="ob-form-field field-with-label ">
+                <mat-label>{{'FORMS.LABELS.REFERENCE' | translate}}</mat-label>
+                <input matInput aria-label="reference" [placeholder]="'FORMS.LABELS.REFERENCE' | translate" formControlName="reference">
+                <mat-error [ob-form-errors]="generalForm" field="reference" />
+            </mat-form-field>
+        </ng-template>
+    </div>
+    <div slot="sidebar" class="session-sidebar-container flex flex-col">
+        @if(sessionImageUrl$ | async; as url) {
+            <img [src]="url" class="session-image" alt="Session Main Image" />
+        }
+        @if(currentSession$ | async; as currentSession) {
+            <span class="session-sidebar-label">{{'SESSION.VENUE_TEMPLATE.NAME' | translate}}</span>
+            <span>{{ currentSession?.venue_template?.name }}</span>
+            <span class="session-sidebar-label">{{'SESSION.VENUE.NAME' | translate}}</span>
+            <span>{{ currentSession?.venue_template?.venue?.name }}</span>
+            <span class="session-sidebar-label">{{'SESSION.VENUE_TEMPLATE.SPACE.NAME' | translate}}</span>
+            <span>{{ currentSession?.venue_template?.space?.name }}</span>
+            <span class="session-sidebar-label">{{'SESSION.VENUE.TIMEZONE' | translate}}</span>
+            <span>{{ currentSession?.venue_template?.venue?.timezone }}</span>
+            <span class="session-sidebar-label">{{'SESSION.ID' | translate}}</span>
+            <span>{{ currentSession?.id }}</span>
+            @if(currentSession.external_data) {
+                <mat-divider class="flex-1" />
+                <div class="left-sidebar-subheader flex basis-9">
+                    @if((isAvet$ | async) === true) {
+                        <h3 class="section-title">{{'SESSION.DETAILS_TITLE_AVET' | translate | uppercase}}</h3>
+                    } @else if((isSGA$ | async) === true) {
+                        <h3 class="section-title">{{'EVENTS.SESSION.DETAILS_TITLE_SGA' | translate | uppercase}}</h3>
+                    }
+                </div>
+                <div class="item-details flex flex-col gap-3.5">
+                    @for(external_data of currentSession.external_data | keyvalue; track $index) {
+                        @if(external_data.key !== 'smart_booking_contingency') {
+                            <div class="flex flex-col">
+                                <span class="session-sidebar-label">
+                                    {{'SESSION.' + external_data.key | uppercase | translate}}
+                                </span>
+                                <span>{{external_data.value}}</span>
+                            </div>
+                        }
+
+                    }
+                </div>
+            }
+        }
+    </div>
+    <app-archived-event-mgr slot="actions-bar" [disabled]="form.dirty || (isLoading$ | async)" />
+</app-form-container>
+@if(isLoading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

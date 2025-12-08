@@ -1,0 +1,45 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'PRODUCT.EVENTS.DETAIL.SET_SESSIONS_CONFIG.TITLE' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="start stretch">
+        <p class="ob-label"> {{ 'PRODUCT.EVENTS.DETAIL.SET_SESSIONS_CONFIG.SESSION' | translate }}</p>
+        <span> {{ data.session.start | dateTime : dateTimeFormats.shortDateTime}} | {{data.session.name }} </span>
+        <mat-divider />
+        <div fxLayout="column" fxLayoutGap="16px" class="radio-group-container" [formGroup]="form">
+            <p class="ob-label"> {{ 'PRODUCT.EVENTS.DETAIL.SET_SESSIONS_CONFIG.STOCK' | translate }}</p>
+            <mat-radio-group formControlName="use_custom_stock" fxLayoutGap="16px" fxLayout="column">
+                <mat-radio-button class="ob-radio-button" [value]="false">
+                    {{'PRODUCT.EVENTS.DETAIL.SET_SESSIONS_CONFIG.STOCK_TYPE.GENERAL' | translate}}
+                </mat-radio-button>
+                <div fxLayout="column" fxLayoutGap="16px">
+                    <mat-radio-button class="ob-radio-button" [value]="true">
+                        {{'PRODUCT.EVENTS.DETAIL.SET_SESSIONS_CONFIG.STOCK_TYPE.CUSTOM' | translate}}
+                    </mat-radio-button>
+                    @if(form.controls.use_custom_stock.value) {
+                        <div class="stock-amount nested-content">
+                            <mat-form-field appearance="outline" class="ob-form-field">
+                                <input matInput type="number" aria-label="stock" formControlName="stock"
+                                    placeholder="0">
+                            </mat-form-field>
+                        </div>
+                    }
+                </div>
+                @if (form.controls.use_custom_stock.invalid && form.controls.use_custom_stock.touched) {
+                    <mat-error [ob-form-errors]="form.controls.use_custom_stock" field="type" class="radio-error" />
+                }
+            </mat-radio-group>
+        </div>
+    </div>
+    <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="setSessionsConfig()">
+            {{'FORMS.ACTIONS.SAVE' | translate}}
+        </button>
+    </div>
+</div>

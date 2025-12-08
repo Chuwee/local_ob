@@ -1,0 +1,240 @@
+<div class="dialog-msg-container">
+    <div class="dialog-header-container" fxLayout="row" mat-dialog-title>
+        <h2 fxFlex="100%" fxLayoutAlign="start end" class="secondary title">
+            {{'TITLES.NEW_PACK_ELEMENT' | translate}}
+        </h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div>
+        <app-wizard-bar [steps]="['CHANNELS.PACKS.ELEMENTS.CREATE.STEPS.TYPE',
+            'CHANNELS.PACKS.ELEMENTS.CREATE.STEPS.CONFIG']" />
+    </div>
+    <div mat-dialog-content class="with-wizard-bar" [formGroup]="form">
+        @if(currentStep === 1) {
+            <div class="flex flex-col gap-4">
+                <mat-radio-group [formControl]="form.controls.type" class="flex gap-6">
+                    <mat-radio-button class="ob-radio-card-button flex-1" [value]="creationTypes.session">
+                        <div class="option-title">{{'CHANNELS.PACKS.ELEMENTS.CREATE.SESSION.TITLE' | translate}}</div>
+                        <div>
+                            {{'CHANNELS.PACKS.ELEMENTS.CREATE.SESSION.DESCRIPTION' | translate}}
+                        </div>
+                    </mat-radio-button>
+                    @if(packType === 'AUTOMATIC'){
+                        <mat-radio-button class="ob-radio-card-button flex-1" [value]="creationTypes.product">
+                            <div class="option-title">{{'CHANNELS.PACKS.ELEMENTS.CREATE.PRODUCT.TITLE' | translate}}</div>
+                            <div>
+                                {{'CHANNELS.PACKS.ELEMENTS.CREATE.PRODUCT.DESCRIPTION' | translate}}
+                            </div>
+                        </mat-radio-button>
+                    }
+                </mat-radio-group>
+            </div>
+        } @else if(currentStep === 2) {
+            <!-- Show in channels -->
+            <ng-template #showInChannelsCheck>
+                <span class="ob-label">{{'CHANNELS.PACKS.FORMS.INFOS.DISPLAY_PACK_DETAIL' | translate}}</span>
+                <mat-checkbox color="primary" formControlName="displayItemInChannels">
+                    <mat-label>{{'CHANNELS.PACKS.FORMS.LABELS.DISPLAY_PACK_DETAIL' | translate}}</mat-label>
+                </mat-checkbox>
+            </ng-template>
+
+
+            <div class="flex flex-col gap-4" [formGroupName]="subFormName">
+                @if (form.get('type').value === creationTypes.session) {
+                    <div class="flex flex-col session-selector">
+                        <!-- Events -->
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                            <mat-label>{{'FORMS.LABELS.EVENT' | translate}}</mat-label>
+                            <app-select-server-search [multiple]="false"
+                                [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="event"
+                                [options$]="events$" [moreOptionsAvailable$]="moreEventsAvailable$"
+                                (loadOptions)="loadEvents($event.q)">
+                                <ng-template #optionTemplate let-row>
+                                    {{row.name}}
+                                </ng-template>
+                            </app-select-server-search>
+                        </mat-form-field>
+                        <!-- Sessions -->
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                            <mat-label>{{'FORMS.LABELS.SESSION' | translate}}</mat-label>
+                            <app-select-server-search [multiple]="false"
+                                [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="session"
+                                [options$]="sessions$" [moreOptionsAvailable$]="moreSessionsAvailable$"
+                                (loadOptions)="loadSessions($event.q, $event.nextPage)">
+                                <ng-template #optionTemplate let-row>
+                                    <div>
+                                        {{row.start_date | dateTime : dateTimeFormats.shortDateTime}} -
+                                        @if(row.settings?.smart_booking?.type === 'SMART_BOOKING') {
+                                            <b>{{ 'FORMS.LABELS.SMART_BOOKING_TYPE' | translate }} | </b>
+                                        }
+                                        {{row.name}}
+                                    </div>
+                                </ng-template>
+                            </app-select-server-search>
+                        </mat-form-field>
+                    </div>
+                    @if (packType === 'AUTOMATIC' && form.get('sessionForm.session').value) {
+                        <div class="flex flex-col gap-2">
+                            <span class="field-label">{{'CHANNELS.PACKS.ELEMENTS.CREATE.SESSION.TITLE' | translate}}</span>
+                            <div class="info-msg w-full flex flex-row items-start justify-start">
+                                <mat-icon class="ob-icon xsmall info with-text">info</mat-icon>
+                                <span>{{ 'CHANNELS.PACKS.ELEMENTS.CREATE.SESSION.INFO' +
+                                (hasAutomaticSessionSameVenuTmplAsMainSession ?
+                                '_SAME_MAIN_SESSION' : '_DIFF_MAIN_SESSION') | translate }}</span>
+                            </div>
+                        </div>
+                        @if(!hasAutomaticSessionSameVenuTmplAsMainSession) {
+                            <!-- Price Zone  -->
+                            <div class="table-prices-container">
+                                <table mat-table [dataSource]="sessionSourcePriceTypes$ | async" class="ob-table table-prices">
+                                    <ng-container matColumnDef="source_price_types">
+                                        <th mat-header-cell *matHeaderCellDef
+                                            class="additional-headers-th-row border-right default-padding first-column">
+                                            {{'CHANNELS.PACKS.FORMS.LABELS.PRICES_SOURCE' | translate | uppercase}}
+                                        </th>
+                                        <td mat-cell *matCellDef="let source">
+                                            {{ source.name }}
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="target_price_types">
+                                        <th mat-header-cell *matHeaderCellDef
+                                            class="additional-headers-th-row border-right default-padding second-column">
+                                            {{'CHANNELS.PACKS.FORMS.LABELS.PRICES_TARGET' | translate | uppercase}}
+                                        </th>
+                                        <td mat-cell *matCellDef="let target" class="editable-cell">
+                                            @if(form.controls.sessionForm?.controls.priceTypeMapping?.controls[target.id]) {
+                                                <mat-form-field appearance="outline" class="ob-form-field">
+                                                    <mat-select
+                                                        [formControl]="form.controls.sessionForm.controls.priceTypeMapping.controls[target.id]"
+                                                        [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                                        <mat-option>
+                                                            <app-select-search #priceTypeSelectSearch [options$]="sessionTargetPriceTypes$"
+                                                                searchField="name"
+                                                                requireSelection="true" />
+                                                        </mat-option>
+                                                        @for (target of priceTypeSelectSearch.getFilteredOptions$() | async; track target.id) {
+                                                            <mat-option [value]="target.id">
+                                                                <div appEllipsify [matTooltip]="target?.name">
+                                                                    {{target?.name}}
+                                                                </div>
+                                                            </mat-option>
+                                                        }
+                                                    </mat-select>
+                                                </mat-form-field>
+                                            }
+                                        </td>
+                                    </ng-container>
+                                    <tr mat-header-row *matHeaderRowDef="[ 'source_price_types','target_price_types']; sticky: true"
+                                        class="additional-headers-tr-row dense-row"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: ['source_price_types','target_price_types'];"></tr>
+                                </table>
+                            </div>
+                            <mat-divider class="ob-divider" />
+                        }
+                    }
+                    <!-- Show in channels -->
+                    <ng-container [ngTemplateOutlet]="showInChannelsCheck" />
+                } @else if(form.get('type').value === creationTypes.product) {
+                    <div class="info-msg" fxFlex="100%" fxLayout="row" fxLayoutAlign="start start">
+                        <mat-icon class="ob-icon xsmall info with-text">info</mat-icon>
+                        <span>{{ 'CHANNELS.PACKS.ELEMENTS.CREATE.PRODUCT.INFO' | translate }}</span>
+                    </div>
+                    <!-- Products -->
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                        <mat-label>{{'FORMS.LABELS.PRODUCT' | translate}}</mat-label>
+                        <app-select-server-search [multiple]="false"
+                            [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate" formControlName="product"
+                            [options$]="products$" [moreOptionsAvailable$]="moreProductsAvailable$"
+                            (loadOptions)="loadProducts($event.q, $event.nextPage)" />
+                        <mat-error [ob-form-errors]="form.get('productForm.product')" />
+                    </mat-form-field>
+                    @if(form.get('productForm.product').value) {
+                        @if (packType === 'AUTOMATIC') {
+                            @if (form.get('productForm.product').value.product_type === 'VARIANT') {
+                                <!-- Variants -->
+                                <mat-form-field
+                                    appearance="outline" class="ob-form-field field-with-label">
+                                    <mat-label>{{'FORMS.LABELS.PRODUCT_VARIANT' | translate}}</mat-label>
+                                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="variant">
+                                        <mat-option>
+                                            <app-select-search #productVariantSelectSearch [options$]="productVariants$"
+                                                requireSelection="true"
+                                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" />
+                                        </mat-option>
+                                        @for (variant of productVariantSelectSearch.getFilteredOptions$() | async; track variant.id) {
+                                            <mat-option [value]="variant">
+                                                {{variant.name}}
+                                            </mat-option>
+                                        }
+                                    </mat-select>
+                                    <mat-error [ob-form-errors]="form.get('productForm.variant')" />
+                                </mat-form-field>
+                            }
+                            <!-- Delivery points -->
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                                <mat-label>{{'FORMS.LABELS.DELIVERY_POINTS' | translate}}</mat-label>
+                                <app-select-server-search [multiple]="false"
+                                    [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="deliveryPoint"
+                                    [options$]="productDeliveryPoints$" [moreOptionsAvailable$]="moreDeliveryPointsAvailable$"
+                                    (loadOptions)="loadProductDeliveryPoints($event.q, $event.nextPage)" />
+                                <mat-error [ob-form-errors]="form.get('productForm.deliveryPoint')" />
+                            </mat-form-field>
+                            <!-- BarsCode  -->
+                            <mat-radio-group class="radio-group" formControlName="sharedBarcode">
+                                <mat-label class="ob-label">
+                                    {{'CHANNELS.PACKS.ELEMENTS.CREATE.PRODUCT.BARS_CODE.LABEL' | translate}}
+                                </mat-label>
+                                <mat-radio-button [value]="false" class="ob-radio-button vertical-list">
+                                    <div>{{'CHANNELS.PACKS.ELEMENTS.CREATE.PRODUCT.BARS_CODE.UNIQUE_LABEL' | translate}}</div>
+                                    <div>
+                                        {{'CHANNELS.PACKS.ELEMENTS.CREATE.PRODUCT.BARS_CODE.UNIQUE_DESCRIPTION' | translate}}
+                                    </div>
+                                </mat-radio-button>
+                                <mat-radio-button [value]="true" class="ob-radio-button vertical-list">
+                                    <div>{{'CHANNELS.PACKS.ELEMENTS.CREATE.PRODUCT.BARS_CODE.SHARED_LABEL' | translate}}</div>
+                                    <div>
+                                        <p>{{'CHANNELS.PACKS.ELEMENTS.CREATE.PRODUCT.BARS_CODE.SHARED_DESCRIPTION' | translate}}</p>
+                                    </div>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        }
+                    }
+                    <!-- Show in channels -->
+                    <ng-container [ngTemplateOutlet]="showInChannelsCheck" />
+                }
+            </div>
+        }
+    </div>
+
+    <div mat-dialog-actions fxLayoutAlign="center center">
+        <div fxFlex fxLayoutAlign="end">
+            <div fxLayoutAlign="center start">
+                <button type="button" mat-button class="ob-button" (click)="close()">
+                    {{'FORMS.ACTIONS.CANCEL' | translate}}
+                </button>
+                <button mat-stroked-button color="tertiary" type="button" class="ob-button" (click)="setStep1()"
+                    [disabled]="currentStep === 1">
+                    <mat-icon>arrow_back</mat-icon>
+                    {{'FORMS.ACTIONS.PREVIOUS' | translate}}
+                </button>
+                <button mat-flat-button color="primary" type="button" class="ob-button"
+                    [fxShow]="currentStep === 1"
+                    (click)="setStep2()">
+                    {{'FORMS.ACTIONS.NEXT' | translate}}
+                    <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+                </button>
+                <button #saveBtn mat-flat-button color="primary" type="button" class="ob-button"
+                    [fxShow]="currentStep === 2" [disabled]="$loading()" (click)="save()">
+                    {{'FORMS.ACTIONS.ADD' | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+@if($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

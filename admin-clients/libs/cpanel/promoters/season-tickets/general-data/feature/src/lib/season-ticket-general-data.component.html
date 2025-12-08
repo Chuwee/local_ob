@@ -1,0 +1,39 @@
+<div class="flex basis-full">
+    <div class="subtabs-container flex flex-col basis-[200px]">
+        <mat-button-toggle-group vertical [value]="deepPath$ | async" class="ob-subtab" appLastPathGuardListener
+            [currValue]="deepPath$ | async">
+            <mat-button-toggle routerLink="principal-info" value="principal-info">
+                {{ 'SEASON_TICKET.PRINCIPAL_INFO' | translate }}
+            </mat-button-toggle>
+            <mat-button-toggle routerLink="renewals-config" value="renewals-config">
+                {{ 'SEASON_TICKET.RENEWALS_CONFIG' | translate }}
+            </mat-button-toggle>
+            <mat-button-toggle routerLink="additional-options" value="additional-options">
+                {{ 'SEASON_TICKET.ADDITIONAL_OPTIONS' | translate }}
+            </mat-button-toggle>
+        </mat-button-toggle-group>
+    </div>
+    <div class="flex flex-1 flex-col">
+        @if (isGenerationStatusError$ | async) {
+            <div class="context-notification-container flex flex-1 justify-center items-start">
+                <app-context-notification class="ob-context-notification" contextType="warn">
+                    {{ 'SEASON_TICKET.GENERATION_STATUS_ERROR_INFO' | translate }}
+                </app-context-notification>
+            </div>
+        }
+        @if (isSomeRenewalWithoutSeatAssigned$ | async) {
+            <div class="context-notification-container flex flex-1 justify-center items-start">
+                <app-context-notification class="ob-context-notification flex basis-[70%]" contextType="alert" [iconFxFlexAlign]="'center'">
+                    <div class="flex justify-between items-center">
+                        <span class="flex-1">{{ 'SEASON_TICKET.RENEWALS.RENEWALS_WITHOUT_SEAT_ASSIGNED' | translate }}</span>
+                        <button type="button" mat-stroked-button class="ob-button medium" [attr.aria-label]="'FORMS.ACTIONS.OK' | translate"
+                            (click)="goToRenewals()">
+                            {{ 'FORMS.ACTIONS.ASSIGN' | translate }}
+                        </button>
+                    </div>
+                </app-context-notification>
+            </div>
+        }
+        <router-outlet />
+    </div>
+</div>

@@ -1,0 +1,53 @@
+<div fxLayout="column" fxLayoutAlign="start stretch" [formGroup]="form.get('avet')">
+    <mat-form-field *ngIf="(avetEntities$ | async)?.length !== 1" appearance="outline" class="ob-form-field">
+        <mat-label>{{'EVENTS.TEMPLATE_ENTITY' | translate}}</mat-label>
+        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="entity">
+            <mat-option>
+                <app-select-search #avetEntitySelectSearch requireSelection="true"
+                    [options$]="avetEntities$" searchField="name"
+                    [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" />
+            </mat-option>
+            @for (entity of avetEntitySelectSearch.getFilteredOptions$() | async; track entity.id) {
+                <mat-option [value]="entity">
+                    {{entity.name}}
+                </mat-option>
+            }
+        </mat-select>
+        <mat-error *ngIf="form.get('avet.entity').hasError('required')">
+            {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+        </mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="ob-form-field">
+        <mat-label>{{'EVENTS.SELECT_EVENT_TEMPLATE' | translate}}</mat-label>
+        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="template">
+            @for (template of (avetTemplates$ | async); track template.id) {
+                <mat-option [value]="template">
+                    {{template.name}}
+                </mat-option>
+            }
+        </mat-select>
+        <mat-error [ob-form-errors]="form" field="avet.template" />
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="ob-form-field">
+        <mat-label>{{'EVENTS.AVET_COMPETITION' | translate}}</mat-label>
+        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="competition">
+            @for (competition of avetCompetitions$ | async; track competition?.id) {
+                <mat-option [value]="competition">
+                    {{competition.description}} - {{competition.code}}
+                </mat-option>
+            }
+        </mat-select>
+        <mat-error [ob-form-errors]="form" field="avet.competition" />
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="ob-form-field">
+        <mat-label>{{'EVENTS.AVET_CONNECTION.SELECT' | translate}}</mat-label>
+        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="connection">
+            @for (conn of avetConnections; track $index) {
+                <mat-option [value]="conn">
+                    {{'EVENTS.AVET_CONNECTION.' + conn | translate}}
+                </mat-option>
+            }
+        </mat-select>
+        <mat-error [ob-form-errors]="form" field="avet.connection" />
+    </mat-form-field>
+</div>

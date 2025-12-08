@@ -1,0 +1,48 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title>
+        <span class="flex items-center justify-between">
+            <h2 class="secondary title">{{'ORDER.TAXES_DATA.TITLE' | translate}}</h2>
+
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </span>
+    </div>
+
+    <div mat-dialog-content>
+        <div class="flex flex-col gap-4">
+            <!-- Tickets total taxes -->
+            @if(itemsTaxesTotal >= 0){
+                <app-order-price-row
+                    [value]="itemsTaxesTotal" [ccy]="ccy"
+                    [label]="'ORDER.TAXES_DATA.TICKETS' | translate" />
+            }
+
+            <!-- Products total taxes -->
+            @if(productsTaxesTotal >= 0){
+                <app-order-price-row
+                    [value]="productsTaxesTotal" [ccy]="ccy"
+                    [label]="'ORDER.TAXES_DATA.PRODUCTS' | translate" />
+            }
+
+            <!-- Surcharges total taxes -->
+            <app-order-price-row
+                [value]="surchargesTaxesTotal" [ccy]="ccy"
+                [label]="'ORDER.TAXES_DATA.SURCHARGES' | translate" />
+
+            <!-- total taxes -->
+            <app-order-price-row class="ob-taxes-total"
+                [value]="totalTaxes" [ccy]="ccy"
+                [label]="'ORDER.TAXES_DATA.TOTAL' | translate" />
+        </div>
+    </div>
+
+    <div mat-dialog-actions>
+        <div class="flex flex-row basis-full justify-end">
+            <button mat-flat-button color="primary" type="button" class="ob-button" (click)="close()">
+                {{'FORMS.ACTIONS.AGREED' | translate}}
+            </button>
+        </div>
+    </div>
+
+</div>

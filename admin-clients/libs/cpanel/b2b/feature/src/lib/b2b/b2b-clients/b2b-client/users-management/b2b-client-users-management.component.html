@@ -1,0 +1,87 @@
+<app-form-container layout="main" class="overflow-y-auto" hideActionBar>
+    <div fxLayoutAlign="end">
+        <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+            [attr.aria-label]="'B2B_CLIENTS.USERS_MANAGEMENT.NEW_BTN' | translate"
+            (click)="openCreateOrUpdateB2bClientUserDialog(dialogActions.add)">
+            <mat-icon>add</mat-icon>
+            {{'B2B_CLIENTS.USERS_MANAGEMENT.NEW_BTN' | translate}}
+        </button>
+    </div>
+    <app-search-table #clientUsers [dataSource]="b2bClientUsers$" [metadata]="metadata$" [columns]="columns" [pageSize]="pageSize"
+        (changed)="loadB2bClientUsers($event)" [searchOnInteraction]="false"
+        [placeholder]="'FORMS.SEARCH.B2B_USERS_MANAGEMENT' | translate">
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'FORMS.LABELS.NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="email">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'FORMS.LABELS.CREDENTIAL_RECEPTION_EMAIL' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <div fxFlex="0 0 100%" fxLayoutAlign="start center">
+                    <span fxFlex="0 1 100%" appEllipsify [matTooltip]="row.email">{{row.email}}</span>
+                </div>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="username">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'FORMS.LABELS.ACCESS_EMAIL' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <div fxFlex="0 0 100%" fxLayoutAlign="start center">
+                    <span fxFlex="0 1 100%" appEllipsify [matTooltip]="row.username">{{row.username}}</span>
+                </div>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="creation_date">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'B2B_CLIENTS.CREATION_DATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.creation_date | localDateTime : dateTimeFormats.shortDate}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'B2B_CLIENTS.USER_TYPE_LABEL' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{('B2B_CLIENTS.USER_TYPE.' + row.type | translate)}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="three-actions-cell head-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true" />
+            <mat-cell *matCellDef="let row" class="three-actions-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                <div class="action-buttons" (click)="$event.stopPropagation()">
+                    <button mat-icon-button aria-label="Edit b2b client user" class="ob-button medium"
+                        [matTooltip]="'B2B_CLIENTS.USERS_MANAGEMENT.EDIT_USER' | translate"
+                        (click)="openCreateOrUpdateB2bClientUserDialog(dialogActions.update, row)">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button aria-label="Delete b2b client user" class="ob-button medium"
+                        [matTooltip]="'FORMS.ACTIONS.DELETE' | translate" (click)="openDeleteB2bClientUserDialog(row)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                    <button mat-icon-button aria-label="More actions" class="ob-button medium"
+                        [matMenuTriggerFor]="clientUserMoreActions" [appMoreActionsButton]="true">
+                        <mat-icon>more_horiz</mat-icon>
+                    </button>
+                    <mat-menu #clientUserMoreActions="matMenu">
+                        <button mat-menu-item (click)="openRegeneratePasswordDialog(row)">
+                            {{'ACTIONS.REGENERATE_PASSWORD' | translate}}
+                        </button>
+                        <button mat-menu-item (click)="openViewApiKeyDialog(row)">
+                            {{'USER.API_KEY.TITLE' | translate}}
+                        </button>
+                    </mat-menu>
+                </div>
+            </mat-cell>
+        </ng-container>
+    </app-search-table>
+</app-form-container>
+@if(isInProgress$ | async){
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

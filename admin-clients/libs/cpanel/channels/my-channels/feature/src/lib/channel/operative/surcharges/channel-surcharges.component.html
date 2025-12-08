@@ -1,0 +1,58 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [formGroup]="form"
+    [disabled]="(isInProgress$ | async) || !form.dirty || !$userCanWrite()">
+    <mat-accordion [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.SURCHARGES.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="section-block">
+                <p class="section-description">{{'CHANNELS.SURCHARGES.DESCRIPTION' | translate}}</p>
+            </div>
+            <div class="section-block flex flex-col gap-2">
+                <div class="flex justify-start items-center gap-1">
+                    <mat-checkbox id="promotions-surcharges-enabled" color="primary" [formControl]="enabledPromotionRangesCtrl">
+                        {{'CHANNELS.SURCHARGES.PROMOTION_ENABLE' | translate}}
+                    </mat-checkbox>
+                    <mat-icon class="ob-help-icon" fontIcon="help_outline"
+                        [matTooltip]='"CHANNELS.SURCHARGES.PROMOTION_DESCRIPTION" | translate' />
+                </div>
+                @if ((channel$ | async | channelAfterPromotion)) {
+                    <app-channel-surcharges-settings
+                        [userCanWrite]="$userCanWrite()"
+                        [putChannelRequestCtrl]="putChannelRequestCtrl" [channel]="channel$ | async" />
+                }
+            </div>
+            <div class="section-block">
+                <app-channel-surcharges-generic
+                    [userCanWrite]="$userCanWrite()"
+                    [surchargesRequestCtrl]="surchargesRequestCtrl" [currencySelectedTabBS]="currencySelectedTabBS" />
+            </div>
+            <div class="section-block">
+                <app-channel-surcharges-promotion [userCanWrite]="$userCanWrite()"
+                    [enabledPromotionRangesCtrl]="enabledPromotionRangesCtrl" [surchargesRequestCtrl]="surchargesRequestCtrl"
+                    [currencySelectedTabBS]="currencySelectedTabBS" />
+            </div>
+            @if ((channel$ | async| isWebChannel) === false) {
+                <div class="section-block">
+                    <app-channel-surcharges-invitation [userCanWrite]="$userCanWrite()"
+                        [surchargesRequestCtrl]="surchargesRequestCtrl" [currencySelectedTabBS]="currencySelectedTabBS" />
+                </div>
+            }
+        </mat-expansion-panel>
+
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    {{ 'CHANNELS.SURCHARGES.TITLES.TAXES' | translate }}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-channel-surcharges-taxes [form]="form" [userCanWrite]="$userCanWrite()" />
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

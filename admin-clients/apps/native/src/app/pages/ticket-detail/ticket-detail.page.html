@@ -1,0 +1,421 @@
+<ion-header class="ob-layout__header ticket-detail__header">
+    @if(!$isLoading()){
+        <ion-toolbar>
+            <back-button [breadcrumbs]=" true" viewTitle="{{ 'TICKETS.TICKET-CODE'| translate: {code: ticketCode} }}" />
+            @if(!$isError()){
+                <div class="ticket-detail__header-info">
+                    <div class="ticket-detail__header-price" (click)="openPriceModal()">
+                        <span>
+                            {{ 'TICKETS.TICKET-PRICE'| translate: 
+                                { amount: ticket?.price?.final | localCurrency: ticket?.price?.currency} }}
+                        </span>
+                        <ion-icon name="chevron-down-outline" />
+                    </div>
+                    <div [class]="'ticket-detail__header-validation ticket-detail__header-validation--' + validation.toLowerCase()">
+                        <span>{{ 'TICKETS.TICKET-' + validation| translate }}</span>
+                    </div>
+                </div>
+            }
+            @if(!$isError()){
+                <div class="ticket-detail__header-interactions">
+                    <ion-button class="ob-btn ticket-detail__text-ellipsis secondary ticket-detail__header-btn" (click)="seeTicket()">
+                        <ion-icon class="ticket-detail__header-btn-icon" src="./assets/media/icons/eye.svg" />
+                        <ion-label>{{ 'TICKETS.TICKET-SEE' | translate }}</ion-label>
+                    </ion-button>
+                    <ion-button class="ob-btn ticket-detail__text-ellipsis secondary ticket-detail__header-btn" (click)="showAll()">
+                        <ion-icon class="ticket-detail__header-btn-icon" src="./assets/media/icons/ticket2.svg" />
+                        <ion-label>{{ 'TICKETS.TICKET-SHOW-ALL' | translate }}</ion-label>
+                    </ion-button>
+                </div>
+            }
+        </ion-toolbar>
+    } @else {
+            <ion-toolbar>
+                <back-button [breadcrumbs]=" true" viewTitle="{{ 'TICKETS.TICKET-CODE'| translate: {code: ticketCode} }}" />
+                <div class="ticket-detail__header-info">
+                    <ion-skeleton-text class="skeleton__header-info" [animated]="true" />
+                    <ion-skeleton-text class="skeleton__header-info" [animated]="true" />
+                </div>
+            </ion-toolbar>
+    }
+</ion-header>
+
+<ion-content class="ob-layout__content ticket-detail__content">
+    @if($isError()){
+        <static-view [viewContent]="{    title: 'ERROR-TITLE',description: 'ERROR-DESCRIPTION',isError: true}" (tap)="reTry()"/>
+    } @else {
+        @if(!$isLoading()){
+            <div>
+                <ion-accordion-group mode="ios" class="ob-accordion-group ticket-detail__accordion-group">
+                    <ion-accordion class="ob-accordion ticket-detail__accordion">
+                        <ion-item id="accordion-tickets" class="ob-accordion__title ticket-detail__accordion-title" slot="header"
+                            (click)="toggleActivatedClass($event)">
+                            <ion-label>{{"TICKETS.ACCORDION-TICKET" | translate}}</ion-label>
+                        </ion-item>
+                        <div class="ob-accordion__content ticket-detail__accordion-content" slot="content">
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-EVENT" | translate}}</span>
+                                <span class="ticket-detail__accordion-text--value">{{ticket.ticket.allocation.event.name}}</span>
+                            </div>
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-CODE" | translate}}</span>
+                                <span class="ticket-detail__accordion-text--value">{{formattedCode}}</span>
+                            </div>
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-ADDRESS" | translate}}</span>
+                                <span class="ticket-detail__accordion-text--value">
+                                    {{ticket.ticket.allocation.venue.name}}, {{ticket.ticket.allocation.venue.city}}
+                                </span>
+                            </div>
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-DATE" | translate}}
+                                </span>
+                                <span class="ticket-detail__accordion-text--value">
+                                    {{getFormattedDate(ticket.ticket.allocation.session.date.start)}}
+                                </span>
+                            </div>
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-TYPE" | translate}}
+                                </span>
+                                <span class="ticket-detail__accordion-text--value">
+                                    {{"TICKETS.TICKET-TYPE-"+ ticket.ticket.type | translate}}
+                                </span>
+                            </div>
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-SESSION" | translate}}
+                                </span>
+                                <span class="ticket-detail__accordion-text--value">
+                                    {{ ticket.ticket.allocation.session.name}}
+                                </span>
+                            </div>
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-RATE" | translate}}</span>
+                                <span class="ticket-detail__accordion-text--value">
+                                    {{ticket.ticket.rate.name}}
+                                </span>
+                            </div>
+                            <div class="ticket-detail__accordion-divider"></div>
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-ALLOCATION-TYPE" | translate}}</span>
+                                <span class="ticket-detail__accordion-text--value">
+                                    {{"TICKETS.ACCORDION-TICKET-ALLOCATION-TYPE-" + ticket.ticket.allocation.type | translate}}
+                                </span>
+                            </div>
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-SECTOR" | translate}}</span>
+                                <span class="ticket-detail__accordion-text--value">
+                                    {{ticket.ticket.allocation.sector ? ticket.ticket.allocation.sector?.name : '-'}}
+                                </span>
+                            </div>
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-ACCESIBILITY" | translate}}</span>
+                                <span class="ticket-detail__accordion-text--value">
+                                    {{ ticket.ticket.allocation.accessibility ? ("TICKETS.ACCORDION-TICKET-ACCESIBILITY-" +
+                                    ticket.ticket.allocation.accessibility | translate): '-'}}
+                                </span>
+                            </div>
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-ZONE" | translate}}</span>
+                                <!-- TODO: SEAT NAME??? -->
+                                <span class="ticket-detail__accordion-text--value">
+                                    {{ticket.ticket.allocation.seat ? ticket.ticket.allocation.seat.name : '-'}}
+                                </span>
+                            </div>
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-ALLOCATION" | translate}}</span>
+                                <span class="ticket-detail__accordion-text--value">
+                                    {{ticket.ticket.allocation.seat ? ticket.ticket.allocation.seat.name : '-'}}
+                                </span>
+                            </div>
+                            @if(ticket.ticket.allocation.row?.name){
+                                <div class="ticket-detail__accordion-text-block">
+                                    <span class="ticket-detail__accordion-text--title">
+                                        {{"TICKETS.ACCORDION-TICKET-ROW" | translate}}</span>
+                                    <span class="ticket-detail__accordion-text--value">
+                                        {{ticket.ticket.allocation.row.name}}
+                                    </span>
+                                </div>
+                            }
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-VISIBILITY" | translate}}
+                                </span>
+                                <span class="ticket-detail__accordion-text--value">
+                                    {{ticket.ticket.allocation.visibility ? ("TICKETS.ACCORDION-TICKET-VISIBILITY-" +
+                                    ticket.ticket.allocation.visibility | translate) : '-'}}
+                                </span>
+                            </div>
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-GROUP" | translate}}</span>
+                                <span class="ticket-detail__accordion-text--value">
+                                    {{ticket.ticket.allocation.quota.name}}
+                                </span>
+                            </div>
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-ACCESS" | translate}}</span>
+                                <span class="ticket-detail__accordion-text--value">
+                                    {{ticket.ticket.allocation.access.name}}
+                                </span>
+                            </div>
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-PRICE-ZONE" | translate}}</span>
+                                <span class="ticket-detail__accordion-text--value">
+                                    {{ticket.ticket.allocation.price_type.name}}
+                                </span>
+                            </div>
+                        </div>
+                    </ion-accordion>
+                    <ion-accordion class="ob-accordion ticket-detail__accordion">
+                        <ion-item id="accordion-operations" class="ob-accordion__title ticket-detail__accordion-title" slot="header"
+                            (click)="toggleActivatedClass($event)">
+                            <ion-label>{{"TICKETS.ACCORDION-OPERATION" | translate}}</ion-label>
+                        </ion-item>
+                        <div class="ob-accordion__content ticket-detail__accordion-content" slot="content">
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-CODE" | translate}}</span>
+                                <span class="ticket-detail__accordion-text--value">{{ticket.order.code}}</span>
+                            </div>
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-CHANNEL" | translate}}</span>
+                                <span class="ticket-detail__accordion-text--value">{{ticket.channel.name}}</span>
+                            </div>
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-TYPE" | translate}}</span>
+                                <span class="ticket-detail__accordion-text--value">
+                                    {{"TICKETS.ACCORDION-TICKET-TYPE-" + ticket.order.type | translate }}
+                                </span>
+                            </div>
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-ENTITY" | translate}}</span>
+                                <span class="ticket-detail__accordion-text--value">
+                                    {{ ticket.channel.entity.name}}</span>
+                            </div>
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-DATE" | translate}}</span>
+                                <span class="ticket-detail__accordion-text--value">
+                                    {{getFormattedDate(ticket.order.date) }}
+                                </span>
+                            </div>
+                        </div>
+                    </ion-accordion>
+                    <ion-accordion class="ob-accordion ticket-detail__accordion">
+                        <ion-item id="accordion-customers" class="ob-accordion__title ticket-detail__accordion-title" slot="header"
+                            (click)="toggleActivatedClass($event)">
+                            <ion-label>{{"TICKETS.ACCORDION-CUSTOMER" | translate}}</ion-label>
+                        </ion-item>
+                        <div class="ob-accordion__content ticket-detail__accordion-content" slot="content">
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-TYPE" | translate}}</span>
+                                <span class="ticket-detail__accordion-text--value">{{ticket.client_type}}</span>
+                            </div>
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-EMAIL" | translate}}</span>
+                                <span class="ticket-detail__accordion-text--value">{{ticket.buyer_data.email}}</span>
+                            </div>
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-NAME" | translate}}</span>
+                                <span class="ticket-detail__accordion-text--value">{{ ticket.buyer_data.name}}</span>
+                            </div>
+                            <div class="ticket-detail__accordion-text-block">
+                                <span class="ticket-detail__accordion-text--title">
+                                    {{"TICKETS.ACCORDION-TICKET-SURNAME" | translate}}</span>
+                                <span class="ticket-detail__accordion-text--value">{{ ticket.buyer_data.surname}}</span>
+                            </div>
+                        </div>
+                    </ion-accordion>
+                    @if(ticket.attendant && (ticket.attendant | json) !== ({} | json)){
+                        <ion-accordion class="ob-accordion ticket-detail__accordion">
+                            <ion-item id="accordion-attendant" class="ob-accordion__title ticket-detail__accordion-title" slot="header"
+                                (click)="toggleActivatedClass($event)">
+                                <ion-label>{{"TICKETS.ACCORDION-ATTENDANT" | translate}}</ion-label>
+                            </ion-item>
+                            <div class="ob-accordion__content ticket-detail__accordion-content" slot="content">
+                                @for(item of attendantData; track $index){
+                                    <div class="ticket-detail__accordion-text-block">
+                                        <span class="ticket-detail__accordion-text--title">
+                                            {{"TICKETS.ACCORDION-ATTENDANT-" + item['key'] | translate}}</span>
+                                        <span class="ticket-detail__accordion-text--value">{{item['value']}}</span>
+                                    </div>
+                                }
+                            </div>
+                        </ion-accordion>
+                    }
+                    @if(ticket.ticket.prints){
+                        <ion-accordion class="ob-accordion ticket-detail__accordion">
+                            <ion-item id="accordion-prints" class="ob-accordion__title ticket-detail__accordion-title" slot="header"
+                                (click)="toggleActivatedClass($event)">
+                                <ion-label>{{"TICKETS.ACCORDION-PRINTS" | translate}}</ion-label>
+                            </ion-item>
+                            <div class="ob-accordion__content ticket-detail__accordion-content ticket-detail__accordion-content--list"
+                                slot="content">
+                                <span class="ticket-detail__accordion-text-total">
+                                    {{"TICKETS.ACCORDION-TICKET-TOTAL" | translate : { value: ticket.ticket.total_prints } }}</span>
+                                @for(item of getLastTenItemsFromList(ticket.ticket.prints); track $index){
+                                    <div class="ticket-detail__accordion-list-item">
+                                        <div class="ticket-detail__accordion-text-block ticket-detail__accordion-text-block--list-item">
+                                            <span class="ticket-detail__accordion-text--title">
+                                                {{"TICKETS.ACCORDION-TICKET-DATE" | translate}}</span>
+                                            <span class="ticket-detail__accordion-text--value">{{getFormattedDate(item.date)}}</span>
+                                        </div>
+                                        <div class="ticket-detail__accordion-text-block ticket-detail__accordion-text-block--list-item">
+                                            <span class="ticket-detail__accordion-text--title">
+                                                {{"TICKETS.ACCORDION-TICKET-PRINT-TYPE" | translate}}</span>
+                                            <span class="ticket-detail__accordion-text--value">{{item.type}}</span>
+                                        </div>
+                                        <div class="ticket-detail__accordion-text-block ticket-detail__accordion-text-block--list-item">
+                                            <span class="ticket-detail__accordion-text--title">
+                                                {{"TICKETS.ACCORDION-TICKET-CHANNEL" | translate}}</span>
+                                            <span class="ticket-detail__accordion-text--value">{{ticket.channel.name}}</span>
+                                        </div>
+                                        <div class="ticket-detail__accordion-text-block ticket-detail__accordion-text-block--list-item">
+                                            <span class="ticket-detail__accordion-text--title">
+                                                {{"TICKETS.ACCORDION-TICKET-USER" | translate}}</span>
+                                            <span class="ticket-detail__accordion-text--value">{{item.user?.username}}</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </ion-accordion>
+                    }
+                    @if(ticket.actions_history){
+                        <ion-accordion class="ob-accordion ticket-detail__accordion">
+                            <ion-item id="accordion-action-history" class="ob-accordion__title ticket-detail__accordion-title" slot="header"
+                                (click)="toggleActivatedClass($event)">
+                                <ion-label>{{"TICKETS.ACCORDION-ACTION-HISTORY" | translate}}</ion-label>
+                            </ion-item>
+                            <div class="ob-accordion__content ticket-detail__accordion-content ticket-detail__accordion-content--list"
+                                slot="content">
+                                <span class="ticket-detail__accordion-text-total">
+                                    {{"TICKETS.ACCORDION-TICKET-TOTAL" | translate : { value: ticket.actions_history.length } }}</span>
+                                @for(item of getLastTenItemsFromList(ticket.actions_history); track $index){
+                                    <div class="ticket-detail__accordion-list-item">
+                                        <div class="ticket-detail__accordion-text-block ticket-detail__accordion-text-block--list-item">
+                                            <span class="ticket-detail__accordion-text--title">
+                                                {{"TICKETS.ACCORDION-TICKET-DATE" | translate}}</span>
+                                            <span class="ticket-detail__accordion-text--value">{{getFormattedDate(item.date)}}</span>
+                                        </div>
+                                        @if(item.channel){
+                                            <div class="ticket-detail__accordion-text-block ticket-detail__accordion-text-block--list-item">
+                                                <span class="ticket-detail__accordion-text--title">
+                                                    {{"TICKETS.ACCORDION-TICKET-CHANNEL" | translate}}</span>
+                                                <span class="ticket-detail__accordion-text--value">{{item.channel.name}}</span>
+                                            </div>
+                                        }
+                                        <div class="ticket-detail__accordion-text-block ticket-detail__accordion-text-block--list-item">
+                                            <span class="ticket-detail__accordion-text--title">
+                                                {{"TICKETS.ACCORDION-TICKET-USER" | translate}}</span>
+                                            <span class="ticket-detail__accordion-text--value">{{item.user.name}}</span>
+                                        </div>
+                                        <div class="ticket-detail__accordion-text-block ticket-detail__accordion-text-block--list-item">
+                                            <span class="ticket-detail__accordion-text--title">
+                                                {{"TICKETS.ACCORDION-TICKET-TYPE" | translate}}</span>
+                                            <span class="ticket-detail__accordion-text--value">
+                                                {{"TICKETS.ACCORDION-TICKET-TYPE-" + item.type | translate}}
+                                            </span>
+                                        </div>
+                                    </div>
+                                }
+    
+                            </div>
+                        </ion-accordion>
+                    }
+                    @if(ticket.ticket.validations && ticket.ticket.validations.length > 0){
+                        <ion-accordion class="ob-accordion ticket-detail__accordion">
+                            <ion-item id="accordion-ticket-history" class="ob-accordion__title ticket-detail__accordion-title" slot="header"
+                                (click)="toggleActivatedClass($event)">
+                                <ion-label>{{"TICKETS.ACCORDION-TICKET-HISTORY" | translate}}</ion-label>
+                            </ion-item>
+                            <div class="ob-accordion__content ticket-detail__accordion-content ticket-detail__accordion-content--list"
+                                slot="content">
+                                <span class="ticket-detail__accordion-text-total">
+                                    {{"TICKETS.ACCORDION-TICKET-TOTAL" | translate : { value: ticket.ticket.validations.length } }}
+                                </span>
+                                @for(item of getLastTenItemsFromList(ticket.ticket.validations); track $index){
+                                    <div class="ticket-detail__accordion-list-item">
+                                        <div class="ticket-detail__accordion-text-block ticket-detail__accordion-text-block--list-item">
+                                            <span class="ticket-detail__accordion-text--title">
+                                                {{"TICKETS.ACCORDION-TICKET-STATUS" | translate}}</span>
+                                            <span class="ticket-detail__accordion-text--value">{{item.status}}</span>
+                                        </div>
+                                        <div class="ticket-detail__accordion-text-block ticket-detail__accordion-text-block--list-item">
+                                            <span class="ticket-detail__accordion-text--title">
+                                                {{"TICKETS.ACCORDION-TICKET-DATE" | translate}}</span>
+                                            <span class="ticket-detail__accordion-text--value">{{getFormattedDate(item.date)}}</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </ion-accordion>
+                    }
+                </ion-accordion-group>
+            </div>
+        } @else {
+            <ion-accordion-group mode="ios" class="ob-accordion-group ticket-detail__accordion-group">
+                <ion-accordion class="ob-accordion ticket-detail__accordion">
+                    <ion-item class="ob-accordion__title ticket-detail__accordion-title" slot="header">
+                        <ion-skeleton-text class="skeleton__accordion" [animated]="true" />
+                    </ion-item>
+                </ion-accordion>
+            </ion-accordion-group>
+        }
+    }
+</ion-content>
+
+@if(!$isLoading()){
+    <modal [isOpen]="priceModalOpen" (closeModal)="closePriceModal()" [position]="'top'">
+        <div class="ticket-detail__price-modal">
+            <h3 class="ticket-detail__price-title">
+                {{"TICKETS.MODAL-PRICE-TITLE" | translate}}
+            </h3>
+            <div class="ticket-detail__price-amount">
+                <span> {{"TICKETS.MODAL-BASE" | translate}}</span>
+                <span>{{ticket.price.base | localCurrency: ticket.price.currency}}</span>
+            </div>
+            @if(channelCharges){
+                <div class="ticket-detail__price-amount">
+                    <span> {{"TICKETS.MODAL-CHANNEL" | translate}}</span>
+                    <span>{{channelCharges | localCurrency: ticket.price.currency}}</span>
+                </div>
+            }
+            <div class="ticket-detail__price-amount">
+                <span> {{"TICKETS.MODAL-RECHARGE" | translate}}</span>
+                <span>{{ticket.price.charges.promoter | localCurrency: ticket.price.currency}}</span>
+            </div>
+            @if(ticket.price.delivery){
+                <div class="ticket-detail__price-amount">
+                    <span>
+                        {{"TICKETS.MODAL-DELIVERY" | translate: { value:ticket.price.delivery } }}
+                    </span>
+                </div>
+            }
+            <div class="ticket-detail__price-total">
+                <span> {{"TICKETS.MODAL-PRICE-TITLE" | translate}}</span>
+                <span>{{ticket.price.final | localCurrency: ticket.price.currency}}</span>
+            </div>
+        </div>
+    </modal>
+    
+}

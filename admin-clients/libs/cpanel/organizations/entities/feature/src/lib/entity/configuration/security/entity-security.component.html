@@ -1,0 +1,70 @@
+<app-form-container [formGroup]="form" (cancel)="cancel()" (save)="save()" layout="menu"
+    [disabled]="!form.dirty || $reqInProgress()">
+    <div class="flex flex-col gap-6">
+        <span class="main-title">{{'ENTITY.SECURITY_CONFIG.TITLE' | translate | uppercase}} </span>
+        <div class="flex flex-col gap-2" formGroupName="expiration">
+            <span class="title">{{'ENTITY.SECURITY_CONFIG.EXPIRATION' | translate}} </span>
+            <div class="flex flex-row flex-wrap items-center gap-2">
+                <mat-checkbox formControlName="enabled" color="primary"
+                    class="app-checkbox-wrap-label flex flex-row flex-wrap items-start">
+                    <div>{{'ENTITY.SECURITY_CONFIG.EXPIRATION_DESCRIPTION' | translate}}</div>
+                </mat-checkbox>
+                <mat-form-field appearance="outline" class="ob-form-field basis-24" subscriptSizing="dynamic">
+                    <input matInput type="number" placeholder="0" formControlName="amount" aria-label="amount" />
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="ob-form-field basis-24" subscriptSizing="dynamic">
+                    <mat-select [placeholder]="'FORMS.ACTIONS.SELECT' | translate" formControlName="type">
+                        @for (type of expirationTypes; track type) {
+                            <mat-option [value]="type">
+                                {{ 'ENTITY.SECURITY_CONFIG.' + type | translate }}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-divider />
+        <div class="flex flex-col gap-2">
+            <span class="title">{{'ENTITY.SECURITY_CONFIG.MAX_RETRIES' | translate}} </span>
+            <span>{{'ENTITY.SECURITY_CONFIG.MAX_RETRIES_DESCRIPTION' | translate}} </span>
+            <div class="flex flex-row flex-wrap items-center gap-2">
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label basis-44" subscriptSizing="dynamic">
+                    <mat-label>{{'ENTITY.SECURITY_CONFIG.QUANTITY' | translate}}*</mat-label>
+                    <mat-select [placeholder]="'FORMS.ACTIONS.SELECT' | translate" formControlName="max_retries">
+                        @for (retry of passwordRetries; track retry) {
+                            <mat-option [value]="retry">
+                                {{ retry }}
+                                {{ (retry === 1 ? 'ENTITY.SECURITY_CONFIG.ATTEMPT' : 'ENTITY.SECURITY_CONFIG.ATTEMPTS') | translate }}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-divider />
+        <div class="flex flex-col gap-2" formGroupName="storage">
+            <span class="title">{{'ENTITY.SECURITY_CONFIG.STORAGE' | translate}} </span>
+            <div class="flex flex-row flex-wrap items-center gap-2">
+                <mat-checkbox formControlName="enabled" color="primary"
+                    class="app-checkbox-wrap-label flex flex-row flex-wrap items-start">
+                    <div>{{'ENTITY.SECURITY_CONFIG.STORAGE_DESCRIPTION' | translate}}</div>
+                </mat-checkbox>
+                <mat-form-field appearance="outline" class="ob-form-field basis-44" subscriptSizing="dynamic">
+                    <mat-select [placeholder]="'FORMS.ACTIONS.SELECT' | translate" formControlName="amount">
+                        @for (password of passwordOptions; track password) {
+                            <mat-option [value]="password">
+                                {{ password }}
+                                {{ (password === 1 ? 'ENTITY.SECURITY_CONFIG.PASSWORD' : 'ENTITY.SECURITY_CONFIG.PASSWORDS') | translate }}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+</app-form-container>
+@if ($reqInProgress()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,22 @@
+<app-form-container *ngIf="languages$ | async as languages" [disabled]="!form.dirty || (isLoadingOrSaving$ | async)" (cancel)="reload()"
+    (save)="save()">
+    <app-language-bar slot="outside" [languages]="languages" [selected]="selectedLanguage$ | async" (changed)="changedLanguage($event)"
+        [changeGuard]="canChangeLanguage">
+    </app-language-bar>
+    <app-session-channel-content #channelContent [form]="form" [language$]="selectedLanguage$"
+        [multiple]="true"></app-session-channel-content>
+    <app-session-ticket-content #ticketContent [form]="form" [language$]="selectedLanguage$" [multiple]="true"></app-session-ticket-content>
+    <ng-container *ngIf="passbookEnabled$ | async">
+        <app-session-ticket-passbook #passbookContent [form]="form" [language$]="selectedLanguage$"
+            [multiple]="true"></app-session-ticket-passbook>
+    </ng-container>
+    <div fxFlex="1 1 100%">
+        <div fxFlex="0 0 880px"></div>
+        <mat-divider vertical="true"></mat-divider>
+    </div>
+    <app-archived-event-mgr slot="actions-bar" [disabled]="form.dirty || (isLoadingOrSaving$ | async)"></app-archived-event-mgr>
+</app-form-container>
+
+<div class="spinner-container" *ngIf="isLoadingOrSaving$ | async">
+    <mat-spinner></mat-spinner>
+</div>

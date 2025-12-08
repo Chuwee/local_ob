@@ -1,0 +1,29 @@
+{
+  "name": "native-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/native-e2e/src",
+  "projectType": "application",
+  "tags": [],
+  "implicitDependencies": ["native"],
+  "targets": {
+    "e2e": {
+      "executor": "@nx/cypress:cypress",
+      "options": {
+        "cypressConfig": "apps/native-e2e/cypress.config.ts",
+        "devServerTarget": "native:serve:development",
+        "testingType": "e2e"
+      },
+      "configurations": {
+        "production": {
+          "devServerTarget": "native:serve:production"
+        },
+        "ci": {
+          "devServerTarget": "native:serve-static"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

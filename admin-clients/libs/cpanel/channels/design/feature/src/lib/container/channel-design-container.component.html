@@ -1,0 +1,48 @@
+@let channel = $channel();
+ <!-- { fix indentation } -->
+<div class="flex flex-1 h-full">
+    <div class="subtabs-container flex flex-col">
+        <mat-button-toggle-group appLastPathGuardListener [currValue]="$deepPath()" vertical [value]="$deepPath()"
+            class="ob-subtab" fxFlex="1 0 100%">
+            <mat-button-toggle routerLink="components" value="components">
+                {{ 'CHANNELS.COMPONENTS.TITLE' | translate }}
+            </mat-button-toggle>
+            @if (!(channel | isExternalWhitelabelType)) {
+                <mat-button-toggle routerLink="catalog-config" value="catalog-config">
+                    {{'CHANNELS.CATALOG_CONFIG.TITLE' | translate}}
+                </mat-button-toggle>
+            }
+            @if ((channel | isWebChannel) || (channel | isWebB2bChannel)) {
+                <mat-button-toggle routerLink="venue-config" value="venue-config">
+                    {{'CHANNELS.VENUE_MAP_CONFIG.TITLES.VENUE_MAP' | translate}}
+                </mat-button-toggle>
+            }
+            @if (channel | isWebV4$ | async) {
+                <mat-button-toggle routerLink="event-promotions-config" value="event-promotions-config">
+                    {{'CHANNELS.EVENT_PROMOTIONS_CONFIG.TITLES.EVENT_PROMOTIONS' | translate}}
+                </mat-button-toggle>
+            }
+            @if (((channel | isWebChannel) || (channel | isWebB2bChannel)) && channel | isV4$ | async) {
+                <mat-button-toggle routerLink="payment-config" value="payment-config">
+                    {{'CHANNELS.PAYMENT_CONFIG.TITLES.PAYMENT_CONFIG' | translate}}
+                </mat-button-toggle>
+            }
+            @if (((channel | isWebChannel) || (channel | isWebB2bChannel)) && channel | isV4$ | async) {
+                <mat-button-toggle routerLink="thanks-config" value="thanks-config">
+                    {{'CHANNELS.VENUE_MAP_CONFIG.TITLES.THANK_YOU_PAGE' | translate}}
+                </mat-button-toggle>
+            }
+            <!-- @if (channel | isWebV4$ | async) { TODO: HIDE REVIEWS
+                <mat-button-toggle routerLink="review-config" value="review-config">
+                    {{'CHANNELS.REVIEWS.TITLE' | translate}}
+                </mat-button-toggle>
+            } -->
+            @if (($showCodeEditor())) {
+                <mat-button-toggle routerLink="code-editor" value="code-editor">
+                    {{'CHANNELS.CODE_EDITOR.TITLE' | translate}}
+                </mat-button-toggle>
+            }
+        </mat-button-toggle-group>
+    </div>
+    <router-outlet />
+</div>

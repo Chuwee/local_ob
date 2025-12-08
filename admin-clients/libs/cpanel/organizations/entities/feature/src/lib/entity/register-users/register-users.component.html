@@ -1,0 +1,55 @@
+<div fxFill>
+    <div fxFlex="0 0 200px" fxLayout="column" class="subtabs-container">
+        <mat-button-toggle-group vertical [value]="deepPath$ | async" class="ob-subtab" fxFlex="1 0 100%"
+            appLastPathGuardListener [currValue]="(deepPath$ | async)">
+            @if(isNotSysAdmin$ | async){
+                <ng-container>
+                    <mat-button-toggle routerLink="customer-data" value="customer-data" data-test="customer-data">
+                        {{'ENTITY.GENERAL_DATA.CUSTOMER_DATA' | translate}}
+                    </mat-button-toggle>
+                    @if(allowedSecondayMarket$ | async){
+                        <mat-button-toggle routerLink="payout-data" value="payout-data" data-test="payout-data">
+                            {{'ENTITY.GENERAL_DATA.PAYOUT_DATA' | translate}}
+                        </mat-button-toggle>
+                    }
+                    @if(showLoginConfig$ | async) {
+                        <mat-button-toggle routerLink="login-config" value="login-config"
+                            data-test="login-config">
+                            {{'ENTITY.GENERAL_DATA.CUSTOMER_LOGIN' | translate}}
+                        </mat-button-toggle>
+                    }
+                    <mat-button-toggle routerLink="customer-types" value="customer-types" data-test="customer-types">
+                        {{'ENTITY.GENERAL_DATA.CUSTOMER_TYPES' | translate}}
+                    </mat-button-toggle>
+                    <mat-button-toggle routerLink="entity-contents" value="entity-contents" data-test="entity-contents">
+                        {{'ENTITY.GENERAL_DATA.ENTITY_CONTENTS' | translate}}
+                    </mat-button-toggle>
+                    <mat-expansion-panel [expanded]="true" class="mat-elevation-z0">
+                        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                            <mat-panel-title>{{'ENTITY.GENERAL_DATA.EMAILS_COMMUNICATION.TITLE' | translate}}</mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <!-- <mat-button-toggle routerLink="email-contents/images" value="email-contents/images">
+                            {{'ENTITY.GENERAL_DATA.EMAILS_COMMUNICATION.IMAGES.TITLE' | translate}}
+                        <!-- <mat-button-toggle routerLink="email-contents/new-account" value="email-contents/new-account">
+                            {{'ENTITY.GENERAL_DATA.EMAILS_COMMUNICATION.NEW_ACCOUNT.TITLE' | translate}}
+                        </mat-button-toggle> -->
+                        <mat-button-toggle routerLink="email-contents/change-password" value="email-contents/change-password">
+                            {{'ENTITY.GENERAL_DATA.EMAILS_COMMUNICATION.CHANGE_PASSWORD.TITLE' | translate}}
+                        </mat-button-toggle>
+                    </mat-expansion-panel>
+                    <mat-button-toggle routerLink="loyalty-program" value="loyalty-program"
+                        data-test="loyalty-program">
+                        {{'ENTITY.GENERAL_DATA.LOYALTY_PROGRAM' | translate}}
+                    </mat-button-toggle>
+                    <mat-button-toggle routerLink="friends-family" value="friends-family" data-test="friends-family">
+                        {{'ENTITY.GENERAL_DATA.FRIENDS_AND_FAMILY' | translate}}
+                    </mat-button-toggle>
+                </ng-container>
+            }
+
+        </mat-button-toggle-group>
+    </div>
+    <div fxFlex="0 0" fxLayout="column">
+        <router-outlet />
+    </div>
+</div>

@@ -1,0 +1,37 @@
+<div>
+    <div>
+        <p class="description">
+            {{'CUSTOMER_TYPES_ASSIGNATION.DESCRIPTION' | prefix | translate}}
+        </p>
+    </div>
+</div>
+<div class="form-box flex flex-col gap-2" [formGroup]="customerTypesAssignationForm">
+    <div class="flex flex-row gap-2 items-center">
+        <span>{{ 'CUSTOMER_TYPES_ASSIGNATION.ADD_LABEL' | prefix | translate }}</span>
+        <mat-form-field appearance="outline" class="ob-form-field inline-field flex-[0_1_240px]">
+            <mat-select multiple [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="customerTypesToAdd">
+                @for (ct of $automaticCustomerTypesWithBuy(); track ct.id) {
+                    @if (!customerTypesAssignationForm.controls.customerTypesToRemove.value?.includes(ct.id)) {
+                        <mat-option [value]="ct.id">{{ct.name}}</mat-option>
+                    }
+                }
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div class="flex flex-row gap-2 items-center">
+        <mat-checkbox color="primary" formControlName="customerTypesToRemoveEnabled">
+            <div class="flex flex-row flex-auto gap-2 items-center">
+                <span>{{'CUSTOMER_TYPES_ASSIGNATION.REMOVE_ENABLED' | prefix | translate}}</span>
+            </div>
+        </mat-checkbox>
+        <mat-form-field appearance="outline" class="ob-form-field inline-field flex-[0_0_240px]">
+            <mat-select multiple [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="customerTypesToRemove">
+                @for (ct of $automaticCustomerTypesWithBuy(); track ct.id) {
+                    @if (!customerTypesAssignationForm.controls.customerTypesToAdd.value?.includes(ct.id)) {
+                        <mat-option [value]="ct.id">{{ct.name}}</mat-option>
+                    }
+                }
+            </mat-select>
+        </mat-form-field>
+    </div>
+</div>

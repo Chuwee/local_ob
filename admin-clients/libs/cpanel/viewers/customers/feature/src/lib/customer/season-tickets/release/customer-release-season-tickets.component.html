@@ -1,0 +1,24 @@
+<app-form-container layout="main" hideActionBar>
+    <mat-accordion [multi]="true" [togglePosition]="'before'">
+        <div fxFlex="100%" fxLayout="column" class="customer-season-ticket-list">
+                <div class="flex flex-wrap gap-y-6 justify-between">
+                    <div class="flex flex-col flex-[1_0_50%] gap-2">
+                        <span class="ob-label">{{ 'CUSTOMER.SEASON_TICKETS.REALESE_SEATS.RATE' | translate }}</span>
+                        <span>{{ $selectedSeat()?.ticket.rate.name }}</span>
+                    </div>
+                    <div class="flex flex-col flex-[1_0_50%] gap-2">
+                        <span class="ob-label">{{ 'CUSTOMER.SEASON_TICKETS.REALESE_SEATS.REALESES_NUMBER' | translate }}</span>
+                        <span>{{ $selectedSeat()?.release_data?.total_releases || '-' }}</span>
+                    </div>
+                </div>
+            <app-customer-release-season-tickets-session-list
+                (requestChanged)="requestChangedHandler($event)"
+                [selectedSeat]="$selectedSeat()" />
+        </div>
+    </mat-accordion>
+</app-form-container>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

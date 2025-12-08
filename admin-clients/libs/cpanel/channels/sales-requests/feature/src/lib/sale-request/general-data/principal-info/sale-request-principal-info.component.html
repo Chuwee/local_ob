@@ -1,0 +1,80 @@
+<app-form-container hideActionBar sidebar layout="menu">
+    <mat-accordion multi togglePosition="before" class="sales-request-content">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'SALE_REQUEST.EVENT_DATA' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div id="principalInfo" fxLayout="row wrap">
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                    fxLayout="column">
+                    <span class="field-label">{{'SALE_REQUEST.EVENT_ENTITY_NAME' | translate}}</span>
+                    <span>{{(saleRequest$| async).event.entity.name}}</span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                    fxLayout="column">
+                    <span class="field-label">{{'SALE_REQUEST.EVENT_NAME' | translate}}</span>
+                    <span>{{(saleRequest$| async).event.name}}</span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%" fxLayout="column"
+                    *ngIf="(saleRequest$| async).event.category as category">
+                    <span class="field-label">{{'SALE_REQUEST.EVENT_CATEGORY_NAME' | translate}}</span>
+                    <span *ngIf="category.custom && category.parent">
+                        {{category.parent.description}} - {{category.custom.description}}
+                    </span>
+                    <span *ngIf="category.custom && !category.parent">
+                        <span>{{category.custom.description}}</span>
+                    </span>
+                    <span *ngIf="!category.custom">{{category.description}}</span>
+                </div>
+            </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'SALE_REQUEST.CONTACT_DATA' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div id="contactData" fxLayout="row wrap">
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                    fxLayout="column">
+                    <span class="field-label">{{'SALE_REQUEST.CONTACT_PERSON_NAME' | translate}}</span>
+                    <span>{{(saleRequest$| async).event.contact_person.name}}</span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                    fxLayout="column">
+                    <span class="field-label">{{'SALE_REQUEST.CONTACT_PERSON_SURNAME' | translate}}</span>
+                    <span>{{(saleRequest$| async).event.contact_person.surname}}</span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                    fxLayout="column">
+                    <span class="field-label">{{'SALE_REQUEST.CONTACT_PERSON_EMAIL' | translate}}</span>
+                    <span>{{(saleRequest$| async).event.contact_person.email}}</span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%" fxLayout="column"
+                    *ngIf="(saleRequest$| async).event.contact_person.phone">
+                    <span class="field-label">{{'SALE_REQUEST.CONTACT_PERSON_PHONE' | translate}}</span>
+                    <span>{{(saleRequest$| async).event.contact_person.phone}}</span>
+                </div>
+            </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'SALE_REQUEST.SESSIONS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-sale-request-sessions-list id="sessions" [saleRequestId]="(saleRequest$| async).id">
+            </app-sale-request-sessions-list>
+        </mat-expansion-panel>
+    </mat-accordion>
+    <div slot="sidebar" class="sale-request-sidebar-container">
+        <img *ngIf="imageUrl$ | async as url" [src]="url" class="event-image" alt="" />
+        <div class="sale-request-sidebar-container-data" fxLayout="column">
+            <span class="sale-request-sidebar-label">{{'SALE_REQUEST.NUM_SESSIONS' | translate}}</span>
+            <span>{{(salesRequestsSessionsMetadata$ | async)?.total | localNumber}}</span>
+
+            <span class="sale-request-sidebar-label">{{'EVENTS.ID' | translate}}</span>
+            <span>{{(saleRequest$ | async).event.id}}</span>
+        </div>
+    </div>
+</app-form-container>
+
+<div class="spinner-container" *ngIf="isLoading$ | async">
+    <mat-spinner></mat-spinner>
+</div>

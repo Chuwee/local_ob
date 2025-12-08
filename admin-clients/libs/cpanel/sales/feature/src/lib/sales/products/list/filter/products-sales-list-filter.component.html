@@ -1,0 +1,100 @@
+<form [formGroup]="filtersForm" fxLayout="column" fxLayoutGap="16px">
+    <app-context-notification contextType="info" class="min-padding full">
+        {{'TICKET.POPOVER_FILTER_MSG' | translate}}
+    </app-context-notification>
+    <div fxLayout="column" fxLayoutGap="24px">
+        @if ($areCurrenciesShown()) {
+            <app-filter-currency-list [formControl]="filtersForm.get('currency')" [startDate]="startDate" [endDate]="endDate"
+                [request]="currencyFilterRequest"/>
+        }
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label" fxFlex="120px">
+                {{'FORMS.LABELS.CHANNEL_ENTITY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="540px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <app-select-server-search [formControl]="filtersForm.controls['channelEntity']"
+                        [options$]="channelEntities$" [moreOptionsAvailable$]="moreChannelEntitiesAvailable$"
+                        (loadOptions)="loadFilterChannelEntities($event.q, $event.nextPage)" />
+                </mat-form-field>
+            </div>
+        </div>
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label" fxFlex="120px">
+                {{'FORMS.LABELS.EVENT_ENTITY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="540px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <app-select-server-search [formControl]="filtersForm.controls['eventEntity']"
+                        [options$]="eventEntities$" [moreOptionsAvailable$]="moreEventEntitiesAvailable$"
+                        (loadOptions)="loadFilterEventEntities($event.q, $event.nextPage)" />
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-divider [inset]="true" />
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label" fxFlex="120px">
+                {{'FORMS.LABELS.CHANNEL' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="540px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <app-select-server-search [formControl]="filtersForm.controls['channel']" [multiple]="true"
+                        maxSelectItems="10" [unselectLabel]="'FORMS.ACTIONS.UNSELECT_ALL' | translate"
+                        [options$]="channels$" [moreOptionsAvailable$]="moreChannelsAvailable$"
+                        (loadOptions)="loadFilterChannels($event.q, $event.nextPage)" />
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-divider [inset]="true" />
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label" fxFlex="120px">
+                {{'ORDER.PRODUCTS_DATA.NAME' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="540px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <app-select-server-search [multiple]="true" maxSelectItems="10" [formControl]="filtersForm.controls['product']"
+                        [unselectLabel]="'FORMS.ACTIONS.UNSELECT_ALL' | translate"
+                        [options$]="products$" [moreOptionsAvailable$]="moreProductsAvailable$"
+                        (loadOptions)="loadFilterProducts($event.q, $event.nextPage)" />
+                </mat-form-field>
+            </div>
+        </div>
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label" fxFlex="120px">
+                {{'FORMS.LABELS.STATE' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="540px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select [formControl]="filtersForm.controls['state']" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        @for (state of statesList; track state) {
+                            <mat-option [value]="state">
+                                {{state && (state.name | translate)}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <!-- <div fxLayout="row" class="filter-block">
+            <div class="ob-label" fxFlex="120px">
+                {{'ORDER.PRODUCTS_DATA.VARIANT' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="540px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select #select [multiple]="true" [formControl]="filtersForm.controls.variant"
+                        [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                        <mat-option>
+                            <app-select-search #search searchField="name"
+                                [requireSelection]="false" [options$]="products$"
+                                [placeholderLabel]="'FORMS.SEARCH.NAME' | translate">
+                            </app-select-search>
+                        </mat-option>
+                        <mat-option *ngFor="let option of search.getFilteredOptions$() | async">
+                            {{option | json }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div> -->
+    </div>
+</form>

@@ -1,0 +1,36 @@
+@if(venueTemplate$ | async; as venueTemplate) {
+    <app-form-container-full [sidebarWidth]="standardVenueTemplateComponent.$labelMgrWidth()"
+        [disabled]="(isDirty$ | async) === false || (isInCapacityIncrease$ | async)"
+        (cancel)="cancelChanges()" (save)="saveChanges()">
+        <div fxFlex="0 1 100%">
+            @if(venueTemplate.status === venueTplStatus.inProgress) {
+                <div class="ob-overlay-wrapper" fxLayoutAlign="center center">
+                    <div class="ob-overlay-pane">
+                        <app-context-notification class="ob-context-notification" contextType="info"
+                            fxFlex.gt-sm="600px" fxFlex="80%">
+                            <p>{{'EVENTS.VENUE_TPL_GENERATION_STATUS_IN_PROGRESS' | translate}}</p>
+                            <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                                [attr.aria-label]="('EVENTS.VENUE_TPL_GENERATION_STATUS_IN_PROGRESS' | translate)" />
+                        </app-context-notification>
+                    </div>
+                </div>
+            }
+            <app-std-venue-tpl-mgr #standardVenueTemplateComponent fxFlex="0 1 100%"
+                [isInUse]="isInUse$ | async"
+                [increaseDisabled]="increaseDisabled$ | async"
+                [editorType]="eventVenueTemplateEditorType"
+                [venueTemplate]="venueTemplate"
+                [editorEnabled]="showEditorBtn$ | async"
+                (gotoEditor)="this.gotoEditor()">
+                @if(venueTemplate.type === venueTemplateType.normal) {
+                    <button mat-button type="button" class="ob-button" slot="header"
+                        (click)="openClonePromoterTemplateDialog()">
+                        <mat-icon>save</mat-icon>
+                        {{'EVENTS.VENUE_TPL_PROMOTER_CLONE' | translate}}
+                    </button>
+                }
+            </app-std-venue-tpl-mgr>
+        </div>
+        <app-archived-event-mgr slot="actions-bar" [disabled]="(isDirty$ | async) || (isInCapacityIncrease$ | async)" />
+    </app-form-container-full>
+}

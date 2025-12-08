@@ -1,0 +1,159 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="!form.dirty">
+    <!-- CONTENTS -->
+    <div [formGroup]="form">
+        <mat-expansion-panel expanded togglePosition="before" formGroupName="contents" class="without-body-padding">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'GIFT_CARD.CONTENTS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-tabs-menu #languageTabs fxFlex="0 1 100%" type="language" overrideClasses="no-left-padding"
+                [formGroup]="contentsForm">
+                <ng-container *ngFor="let lang of languages$ | async">
+                    <ng-template appTab [ctrl]="contentsForm.get(lang)" lazyLoad [label]="('LANGUAGES.' + lang) | translate">
+                        <div fxLayout="column" fxFlex="1 1 100%" [formGroupName]="lang">
+                            <div fxFlex="100%" fxLayout="row">
+                                <mat-form-field fxFlex="500px" fxFlex.lt-md="100%" appearance="outline"
+                                    class="ob-form-field field-with-label">
+                                    <mat-label>{{'FORMS.LABELS.TITLE' | translate}}</mat-label>
+                                    <input matInput aria-label="name"
+                                        [placeholder]="'GIFT_CARD.TEXT_CONTENT.NAME.PLACEHOLDER' | translate"
+                                        formControlName="name">
+                                    <mat-error [ob-form-errors]="contentsForm" [field]="[lang, 'name']" />
+                                </mat-form-field>
+                            </div>
+                            <div fxFlex="100%" fxLayout="row">
+                                <div fxFlex="685px" fxFlex.lt-md="100%" fxLayout="column">
+                                    <span class="field-label">
+                                        {{'FORMS.LABELS.DESCRIPTION' | translate}}*
+                                    </span>
+                                    <p>
+                                        {{'GIFT_CARD.TEXT_CONTENT.DESCRIPTION.DESCRIPTION' | translate }}
+                                    </p>
+                                    <mat-form-field appearance="outline" class="ob-form-field no-padding">
+                                        <app-rich-text-area aria-label="Description"
+                                            [placeholder]="'FORMS.TEXT_INPUT_AREA_PLACEHOLDER' | translate"
+                                            formControlName="description" />
+                                        <mat-error [ob-form-errors]="contentsForm" [field]="[lang, 'description']" />
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <!-- IMAGE CONTENTS -->
+                            <div fxFlex="100%" fxLayout="row" class="image-contents-container">
+                                <div fxFlex="650px" fxFlex.lt-md="100%" fxLayout="column">
+                                    <span class="field-label">
+                                        {{'GIFT_CARD.IMAGE_CONTENTS.LABEL' | translate}}*
+                                    </span>
+                                    <p>
+                                        {{'GIFT_CARD.IMAGE_CONTENTS.DESCRIPTION' | translate}}
+                                    </p>
+                                    <div fxLayout="row" fxLayoutGap="10px" formGroupName="images">
+                                        <app-image-uploader hasAltText fxFlex="60%" formControlName="image1"
+                                            [imageRestrictions]="giftCardImgRestrictions" hideLabelText />
+                                        <div fxFlex="40%" fxLayout="column" fxLayoutGap="10px">
+                                            <app-image-uploader hasAltText fxFlex="50%" formControlName="image2"
+                                                [imageRestrictions]="giftCardImgRestrictions" hideLabelText />
+                                            <app-image-uploader hasAltText fxFlex="50%" formControlName="image3"
+                                                [imageRestrictions]="giftCardImgRestrictions" hideLabelText />
+                                        </div>
+                                    </div>
+                                    <span class="field-format">
+                                        {{'UPLOAD_IMAGE.FORMAT' | translate: giftCardImgRestrictions}}
+                                    </span>
+                                    <mat-error [ob-form-errors]="contentsForm" [field]="[lang, 'images']" />
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </ng-container>
+            </app-tabs-menu>
+        </mat-expansion-panel>
+        <mat-expansion-panel expanded togglePosition="before" formGroupName="operativeForm">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'GIFT_CARD.OPERATIVE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="column" fxLayoutGap="20px">
+                <!-- BALANCE CONFIGURATION -->
+                <span class="mat-body-2 config-info">{{'GIFT_CARD.CONFIG_INFO' | translate}}</span>
+                <div *ngIf="giftCardGroupConfig$ | async as config" formGroupName="range" fxLayout="row wrap"
+                    fxLayoutGap="40px">
+                    <!-- MIN VALUE -->
+                    <mat-form-field id="minValue" fxFlex="0 0 140px" appearance="outline"
+                        class="ob-form-field field-with-label inline-field">
+                        <mat-label>{{'FORMS.LABELS.MIN_AMOUNT' | translate}}</mat-label>
+                        <app-currency-input pattern="\d*\.?\d{0,2}" formControlName="minValue"
+                            [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                            [placeholder]="0 | localCurrency:(currency$ | async):'narrow'" />
+                        <mat-error class="range-input-error" [ob-form-errors]="form"
+                            [field]="['operativeForm', 'range', 'minValue']" />
+                    </mat-form-field>
+                    <!-- MAX VALUE -->
+                    <mat-form-field id="maxValue" fxFlex="0 0 140px" appearance="outline"
+                        class="ob-form-field field-with-label inline-field">
+                        <mat-label>{{'FORMS.LABELS.MAX_AMOUNT' | translate}}</mat-label>
+                        <app-currency-input pattern="\d*\.?\d{0,2}" formControlName="maxValue"
+                            [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                            [placeholder]="0 | localCurrency:(currency$ | async):'narrow'" />
+                        <mat-error class="range-input-error" [ob-form-errors]="form"
+                            [field]="['operativeForm', 'range', 'maxValue']" />
+                    </mat-form-field>
+                    <mat-error fxFlex="100%" [ob-form-errors]="form" [field]="['operativeForm', 'range']" />
+                </div>
+                <!-- EXPIRATION CONFIG -->
+                <div *ngIf="giftCardGroup$ | async as group" fxLayout="row wrap" fxLayoutGap="40px">
+                    <div id="expiration" formGroupName="expiration" appearance="outline" class="ob-form-field inline-field"
+                        fxFlex="100%">
+                        <span class="mat-subtitle-2">{{'FORMS.LABELS.EXPIRATION_DATE' | translate}}</span>
+                        <mat-radio-group fxLayout="column" formControlName="type">
+                            <mat-radio-button fxFlexOffset="10px" class="ob-radio-button"
+                                [value]="giftCardGroupDateType.disabled">
+                                {{'GIFT_CARD.EXPIRATION.UNLIMITED' | translate}}
+                            </mat-radio-button>
+                            <div fxFlex="0 0 100%" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
+                                <mat-radio-button class="ob-radio-button" [value]="giftCardGroupDateType.fixed">
+                                    {{'GIFT_CARD.EXPIRATION.FIXED' | translate}}
+                                </mat-radio-button>
+                                <mat-form-field fxLayoutAlign="start center"
+                                    *ngIf="dateType === giftCardGroupDateType.fixed" appearance="outline"
+                                    class="ob-form-field inline-field date-input" fxFlex="190px">
+                                    <input matInput [matDatepicker]="expirationDate" [placeholder]="dateFormat"
+                                        formControlName="date" (focus)="expirationDate.open()">
+                                    <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                                        (click)="$event.stopPropagation(); expirationDate.open();">
+                                        <mat-icon>event</mat-icon>
+                                    </button>
+                                    <mat-datepicker #expirationDate />
+                                </mat-form-field>
+                            </div>
+                            <div formGroupName="relative" fxFlex="100%" fxLayout="row wrap" fxLayoutAlign="start center"
+                                fxLayoutGap="20px">
+                                <mat-radio-button class="ob-radio-button" [value]="giftCardGroupDateType.relative">
+                                    {{'GIFT_CARD.EXPIRATION.RELATIVE' | translate}}
+                                </mat-radio-button>
+                                <ng-container *ngIf="dateType === giftCardGroupDateType.relative">
+                                    <mat-form-field fxFlex="0 1 68px" appearance="outline"
+                                        class="ob-form-field inline-field date-input">
+                                        <input matInput type="number" min="1" aria-label="duration"
+                                            formControlName="timeValue" placeholder="0">
+                                    </mat-form-field>
+                                    <mat-form-field fxFlex="0 1 120px" appearance="outline"
+                                        class="ob-form-field inline-field date-input">
+                                        <mat-select formControlName="timeUnit">
+                                            <mat-option *ngFor="let timeUnit of timeUnitList" [value]="timeUnit">
+                                                {{'GIFT_CARD.EXPIRATION.TIME_UNITS.' + timeUnit | translate}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <span>
+                                        {{'GIFT_CARD.EXPIRATION.AFTER_EMAIL' | translate}}
+                                    </span>
+                                </ng-container>
+                            </div>
+                        </mat-radio-group>
+                    </div>
+                </div>
+            </div>
+        </mat-expansion-panel>
+    </div>
+</app-form-container>
+<div class="spinner-container" *ngIf="reqInProgress$ | async">
+    <mat-spinner />
+</div>

@@ -1,0 +1,60 @@
+<form [formGroup]="destinationChannelForm" class="flex flex-row flex-wrap" id="formDestinationChannel">
+    <div class="flex flex-row flex-wrap sm:gap-6">
+        <div class="mb-12 w-full flex flex-col">
+            <p class="checkbox-description">
+                Check this if this channel is meant to be linked to a destination channel
+            </p>
+            <mat-checkbox
+                color="primary"
+                formControlName="isDestinationChannel">
+                <span class="mat-subtitle-1">Destination Channel</span>
+            </mat-checkbox>
+            <hr>
+        </div>
+
+        @if (destinationChannelForm.controls.isDestinationChannel.value) {
+        <div class="mb-6"></div>
+        <mat-form-field
+            appearance="outline"
+            class="ob-form-field field-with-label field-responsive">
+            <mat-label>Destination Channel Category</mat-label>
+            <mat-select formControlName="destinationChannelType" placeholder="Select category">
+                @for (type of destinationChannelTypes | keyvalue; track type.key) {
+                <mat-option [value]="type.value">
+                    {{type.value | translate}}
+                </mat-option>
+                }
+            </mat-select>
+            <mat-error [ob-form-errors]="destinationChannelForm.controls.destinationChannelType" />
+        </mat-form-field>
+        }
+
+        @if (
+        destinationChannelForm.controls.isDestinationChannel.value
+        ) {
+        <mat-form-field
+            appearance="outline"
+            class="ob-form-field field-with-label field-responsive">
+            <mat-label>Destination Channel Name</mat-label>
+
+            <mat-select formControlName="destinationChannelName" [placeholder]="destinationChannelCurrentName || 'Select channel'">
+                @if (loadingChannels()) {
+                <mat-option disabled>
+                    <mat-progress-spinner diameter="20" mode="indeterminate" />
+                    &nbsp;Loading channels...
+                </mat-option>
+                } @else if (errorChannels()) {
+                <mat-option disabled>
+                    Error loading channels
+                </mat-option>
+                } @else {
+                @for (id of destinationChannelNames(); track id) {
+                <mat-option [value]="id">{{ id }}</mat-option>
+                }
+                }
+            </mat-select>
+            <mat-error [ob-form-errors]="destinationChannelForm.controls.destinationChannelName" />
+        </mat-form-field>
+        }
+    </div>
+</form>

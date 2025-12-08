@@ -1,0 +1,139 @@
+<app-form-container (save)="save()" (cancel)="cancel()" layout="menu"
+    [disabled]="(isLoadingOrSaving$ | async) || (isGenerationStatusReady$ | async) === false || (isSeasonTicketEditable$ | async) === false
+    || !form.dirty">
+  @if (isGenerationStatusInProgress$ | async) {
+    <div class="ob-overlay-wrapper" fxLayoutAlign="center start" slot="overlay">
+      <div class="ob-overlay-pane pane-sticky">
+        <app-context-notification contextType="info" fxFlex="80%" fxFlex.gt-sm="600px"
+          class="ob-context-notification">
+          <p>{{'SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate}}</p>
+          <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+            [attr.aria-label]="('SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate)" />
+          </app-context-notification>
+        </div>
+      </div>
+    }
+    @if ((surcharges$ | async)) {
+      <div fxFlex="0 1 100%" fxLayout="column">
+        <div fxFlex="0 1 100%" fxLayout="column">
+          <div class="section-block">
+            <p class="section-description">{{'SEASON_TICKET.SURCHARGES.DESCRIPTION' | translate}}</p>
+          </div>
+          <div class="section-block" fxLayout="column">
+            <h3 class="section-title">{{'SEASON_TICKET.SURCHARGES.GENERICS' | translate}}</h3>
+            <div class="entity-surcharges-import-btn">
+              <a class="ob-link" (click)="importEntitySurcharges()">
+                {{'SEASON_TICKET.IMPORT_SURCHARGES' | translate}}
+              </a>
+            </div>
+            <app-range-table [form]="form.get(types.generic)" [data]="surcharges.get(types.generic)"
+              [currency]="currency$ | async" [currencyFormat]="'narrow'" type="generic" />
+              <mat-checkbox fxFlex="none" color="primary" id="generic-surcharges-limit" class="surcharges-limit-check"
+                [formControl]="form.get(types.generic+'.limit.enabled')">
+                {{ 'SEASON_TICKET.SURCHARGES.GENERIC_LIMIT_ENABLE' | translate }}
+              </mat-checkbox>
+              <div class="limit-container">
+                <!-- MIN -->
+                <mat-form-field fxFlex="120px" appearance="outline" class="ob-form-field field-with-label min-field">
+                  <mat-label>{{'FORMS.LABELS.MIN' | translate}}</mat-label>
+                  <app-currency-input [formControl]="form.get(types.generic+'.limit.min')"
+                    [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                    [placeholder]="0 | localCurrency:(currency$ | async):'narrow'" />
+                  </mat-form-field>
+                  <!-- MAX -->
+                  <mat-form-field fxFlex="120px" appearance="outline" class="ob-form-field field-with-label max-field">
+                    <mat-label>{{'FORMS.LABELS.MAX' | translate}}</mat-label>
+                    <app-currency-input [formControl]="form.get(types.generic+'.limit.max')"
+                      [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                      [placeholder]="0 | localCurrency:(currency$ | async):'narrow'" />
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="section-block" fxLayout="column">
+                  <!-- INVITATIONS SURCHARGES -->
+                  <h3 class="section-title">{{'SEASON_TICKET.SURCHARGES.INVITATIONS' | translate}}</h3>
+                  <app-range-table [form]="form.get(types.invitation)" [data]="surcharges.get(types.invitation)"
+                    [currency]="currency$ | async" [currencyFormat]="'narrow'" type="invitation" />
+                    <mat-checkbox fxFlex="none" color="primary" id="invitation-surcharges-limit" class="surcharges-limit-check"
+                      [formControl]="form.get(types.invitation+'.limit.enabled')">
+                      {{ 'SEASON_TICKET.SURCHARGES.INVITATION_LIMIT_ENABLE' | translate }}
+                    </mat-checkbox>
+                    <div class="limit-container">
+                      <!-- MIN -->
+                      <mat-form-field fxFlex="120px" appearance="outline" class="ob-form-field field-with-label min-field">
+                        <mat-label>{{'FORMS.LABELS.MIN' | translate}}</mat-label>
+                        <app-currency-input [formControl]="form.get(types.invitation+'.limit.min')"
+                          [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                          [placeholder]="0 | localCurrency:(currency$ | async):'narrow'" />
+                        </mat-form-field>
+                        <!-- MAX -->
+                        <mat-form-field fxFlex="120px" appearance="outline" class="ob-form-field field-with-label max-field">
+                          <mat-label>{{'FORMS.LABELS.MAX' | translate}}</mat-label>
+                          <app-currency-input [formControl]="form.get(types.invitation+'.limit.max')"
+                            [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                            [placeholder]="0 | localCurrency:(currency$ | async):'narrow'" />
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="section-block" fxLayout="column">
+                        <h3 class="section-title">{{'SEASON_TICKET.SURCHARGES.PROMOTIONS' | translate}}</h3>
+                        <app-range-table [form]="form.get(types.promotion)" [data]="surcharges.get(types.promotion)"
+                          [currency]="currency$ | async" [currencyFormat]="'narrow'" type="promotion" />
+                          <mat-checkbox fxFlex="none" color="primary" id="promotion-surcharges-limit" class="surcharges-limit-check"
+                            [formControl]="form.get(types.promotion+'.limit.enabled')">
+                            {{ 'SEASON_TICKET.SURCHARGES.PROMOTION_LIMIT_ENABLE' | translate }}
+                          </mat-checkbox>
+                          <div class="limit-container">
+                            <!-- MIN -->
+                            <mat-form-field fxFlex="120px" appearance="outline" class="ob-form-field field-with-label min-field">
+                              <mat-label>{{'FORMS.LABELS.MIN' | translate}}</mat-label>
+                              <app-currency-input [formControl]="form.get(types.promotion+'.limit.min')"
+                                [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                                [placeholder]="0 | localCurrency:(currency$ | async):'narrow'" />
+                              </mat-form-field>
+                              <!-- MAX -->
+                              <mat-form-field fxFlex="120px" appearance="outline" class="ob-form-field field-with-label max-field">
+                                <mat-label>{{'FORMS.LABELS.MAX' | translate}}</mat-label>
+                                <app-currency-input [formControl]="form.get(types.promotion+'.limit.max')"
+                                  [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                                  [placeholder]="0 | localCurrency:(currency$ | async):'narrow'" />
+                                </mat-form-field>
+                              </div>
+                            </div>
+                            @if (showChangeSeatSurcharges) {
+                              <div class="section-block" fxLayout="column">
+                                <h3 class="section-title">{{'SEASON_TICKET.SURCHARGES.CHANGE_SEAT' | translate}}</h3>
+                                <app-range-table [form]="form.get(types.changeSeat)" [data]="surcharges.get(types.changeSeat)"
+                                  [currency]="currency$ | async" [currencyFormat]="'narrow'" type="change-seat" />
+                                  <div fxLayout="row wrap" fxLayoutAlign="start center" fxLayoutGap="8px">
+                                    <p>{{'SEASON_TICKET.SURCHARGES.FIXED_SURCHARGE.DESCRIPTION' | translate}}</p>
+                                    <mat-form-field fxFlex="120px" appearance="outline" class="ob-form-field min-field">
+                                      <app-currency-input [formControl]="form.get('fixed_surcharge')"
+                                        [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                                        [placeholder]="0 | localCurrency:(currency$ | async):'narrow'" />
+                                        <mat-error [ob-form-errors]="form" field="fixed_surcharge" />
+                                      </mat-form-field>
+                                      <mat-icon [matTooltip]="'SEASON_TICKET.SURCHARGES.FIXED_SURCHARGE.INFO' | translate"
+                                        class="ob-help-icon surcharges-icon">
+                                        help_outline
+                                      </mat-icon>
+                                    </div>
+                                  </div>
+                                }
+                                @if($showSecondaryMarketSurcharges()){
+                                  <div id="secondaryMarket" #secondaryMarket class="section-block" fxLayout="column">
+                                    <h3 class="section-title">{{'SEASON_TICKET.SURCHARGES.SECONDARY_MARKET' | translate}}</h3>
+                                    <app-range-table [form]="form.get(types.secondaryMarket)" [data]="surcharges.get(types.secondaryMarket)"
+                                      [currency]="currency$ | async" [currencyFormat]="'narrow'" type="secondary-market" />
+                                    </div>
+                                  }
+                                </div>
+                              </div>
+                            }
+                          </app-form-container>
+
+                          @if (isLoadingOrSaving$ | async) {
+                            <div class="spinner-container">
+                              <mat-spinner />
+                            </div>
+                          }

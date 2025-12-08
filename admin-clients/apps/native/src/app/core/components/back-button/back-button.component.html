@@ -1,0 +1,18 @@
+<div class="back-button">
+    <ion-breadcrumbs *ngIf="breadcrumbs" class="back-button__breadcrumbs" [mode]="'ios'">
+        <ion-breadcrumb class="back-button__breadcrumb" *ngFor="let breadcrumb of listOfBreadcrumbs">
+            {{ breadcrumb }}
+        </ion-breadcrumb>
+    </ion-breadcrumbs>
+    <div class="back-button__title">
+        <ion-icon name="chevron-back-outline" class="back-button__title-icon" (click)="onTap()"></ion-icon>
+        <ion-text #textContainer *ngIf="viewTitle" class="back-button__title-text" (click)="expandableHandler()">
+            <span #text>{{ viewTitle }}</span>
+            <ion-icon *ngIf="titleIcon.length > 0" class="icon" [src]="titleIcon"></ion-icon>
+        </ion-text>
+        <ng-content></ng-content>
+    </div>
+</div>
+<modal *ngIf="isExpandable" [isOpen]="modalIsOpen" (closeModal)="closeModal()" [position]="'top'">
+    <h3 class="back-button__modal-text">{{viewTitle}}</h3>
+</modal>

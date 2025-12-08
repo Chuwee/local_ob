@@ -1,0 +1,103 @@
+<form [formGroup]="contactFormGroup" fxLayout="row wrap" id="formContactData">
+    <div fxLayout="row wrap" fxLayoutGap.gt-xs="24px">
+        <!-- Contact Address -->
+        <mat-form-field fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.33% - 24px)" appearance="outline"
+            class="ob-form-field field-with-label">
+            <mat-label>{{'PRODUCER.ADDRESS' | translate}}</mat-label>
+            <input matInput aria-label="address" formControlName="address">
+            <mat-error *ngIf="contactFormGroup.hasError('maxlength', 'address')">
+                {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value:
+                producerFieldsRestrictions.producerAdressMaxLength})}}
+            </mat-error>
+        </mat-form-field>
+        <!-- Contact Country -->
+        <mat-form-field formGroupName="country" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.33% - 24px)"
+            appearance="outline" class="ob-form-field field-with-label">
+            <mat-label>{{'PRODUCER.COUNTRY' | translate}}</mat-label>
+            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="code">
+                <mat-option>
+                    <app-select-search #countrySelectSearch [options$]="countries$"
+                        [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" requireSelection="true">
+                    </app-select-search>
+                </mat-option>
+                <mat-option *ngFor="let country of countrySelectSearch.getFilteredOptions$() | async" [value]="country.code">
+                    {{country.name}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <!-- Contact Region (country_subdivision) -->
+        <mat-form-field formGroupName="country_subdivision" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+            fxFlex.gt-sm="0 1 calc(33.33% - 24px)" appearance="outline" class="ob-form-field field-with-label">
+            <mat-label>{{'PRODUCER.COUNTRY_SUBDIVISION' | translate}}</mat-label>
+            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="code">
+                <mat-option>
+                    <app-select-search #regionsSelectSearch [options$]="filteredRegions$"
+                        [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" requireSelection="true">
+                    </app-select-search>
+                </mat-option>
+                <mat-option *ngFor="let region of regionsSelectSearch.getFilteredOptions$() | async" [value]="region.code">
+                    {{region.name}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <!-- City -->
+        <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+            fxFlex.gt-sm="0 1 calc(33.33% - 24px)" appearance="outline">
+            <mat-label>{{'PRODUCER.CITY' | translate}}</mat-label>
+            <input matInput aria-label="city" formControlName="city">
+            <mat-error *ngIf="contactFormGroup.hasError('maxlength', 'city')">
+                {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value:
+                producerFieldsRestrictions.producerCityMaxLength})}}
+            </mat-error>
+        </mat-form-field>
+        <!-- Postal Code -->
+        <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+            fxFlex.gt-sm="0 1 calc(33.33% - 24px)" appearance="outline">
+            <mat-label>{{'PRODUCER.POSTAL_CODE' | translate}}</mat-label>
+            <input matInput aria-label="postal_code" formControlName="postal_code">
+            <mat-error *ngIf="contactFormGroup.hasError('maxlength', 'postal_code')">
+                {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value:
+                producerFieldsRestrictions.producerPostalCodeMaxLength})}}
+            </mat-error>
+            <mat-error *ngIf="contactFormGroup.hasError('pattern', 'postal_code')">
+                {{'FORMS.ERRORS.INVALID_CHARACTERS' | translate}}
+            </mat-error>
+        </mat-form-field>
+        <!-- Contact Name -->
+        <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+            fxFlex.gt-sm="0 1 calc(33.33% - 24px)" appearance="outline">
+            <mat-label>{{'PRODUCER.CONTACT' | translate}}</mat-label>
+            <input matInput aria-label="contact_name" formControlName="name">
+            <mat-error *ngIf="contactFormGroup.hasError('maxlength', 'name')">
+                {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value:
+                producerFieldsRestrictions.producerContactMaxLength})}}
+            </mat-error>
+        </mat-form-field>
+        <!-- Contact Email -->
+        <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+            fxFlex.gt-sm="0 1 calc(33.33% - 24px)" appearance="outline">
+            <mat-label>{{'PRODUCER.CONTACT_EMAIL' | translate}}</mat-label>
+            <input matInput aria-label="contact_email" formControlName="email">
+            <mat-error *ngIf="contactFormGroup.hasError('maxlength', 'email')">
+                {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value:
+                producerFieldsRestrictions.producerEmailMaxLength})}}
+            </mat-error>
+            <mat-error *ngIf="contactFormGroup.hasError('email', 'email')">
+                {{'FORMS.ERRORS.INVALID_CHARACTERS' | translate }}
+            </mat-error>
+        </mat-form-field>
+        <!-- Contact Phone -->
+        <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+            fxFlex.gt-sm="0 1 calc(33.33% - 24px)" appearance="outline">
+            <mat-label>{{'PRODUCER.CONTACT_PHONE' | translate}}</mat-label>
+            <input matInput aria-label="contact_phone" formControlName="phone">
+            <mat-error *ngIf="contactFormGroup.hasError('maxlength', 'phone')">
+                {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value:
+                producerFieldsRestrictions.producerPhoneMaxLength})}}
+            </mat-error>
+            <mat-error *ngIf="contactFormGroup.hasError('pattern', 'phone')">
+                {{'FORMS.ERRORS.INVALID_CHARACTERS' | translate}}
+            </mat-error>
+        </mat-form-field>
+    </div>
+</form>

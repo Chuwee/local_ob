@@ -1,0 +1,25 @@
+<div class="flex-1 flex flex-col">
+    <mat-drawer-container class="flex-1 flex flex-row">
+        <mat-drawer #drawer mode="side" opened class="product-events-list-container">
+            <app-product-events-list />
+        </mat-drawer>
+        <mat-drawer-content class="product-events-container">
+            <div class="ob-sidebar-toggle" (click)="drawer.toggle();" [class.collapsed]="!drawer.opened">
+                <span class="arrow"></span>
+            </div>
+            @if ((isLoading$ | async) === false && !(productEvents$ | async)?.length && !filtersApplied()) {
+                <app-empty-state class="flex-1 flex"
+                    [title]="'PRODUCT.EVENTS.EMPTY_LIST_MESSAGE' | translate"
+                    [description]="'PRODUCT.EVENTS.CREATE_MESSAGE' | translate">
+                    @if (canWrite$ | async) {
+                        <button mat-flat-button class="ob-button" color="primary" (click)="newEvents()">
+                            <mat-icon>add</mat-icon>
+                            {{'PRODUCT.EVENTS.NEW_EVENTS' | translate}}
+                        </button>
+                    }
+                </app-empty-state>
+            }
+            <router-outlet />
+        </mat-drawer-content>
+    </mat-drawer-container>
+</div>

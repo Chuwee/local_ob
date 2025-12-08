@@ -1,0 +1,245 @@
+<div fxFlex="100%" fxLayout="column">
+    @if ($isLoading() || $isLoyaltyPointsLoading()) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+    <div fxFlex="grow" fxLayoutAlign="center" class="season-ticket-sessions">
+        @if (isGenerationStatusInProgress$ | async) {
+            <div class="ob-overlay-wrapper" fxLayoutAlign="center start">
+                <div class="ob-overlay-pane pane-sticky">
+                    <app-context-notification class="ob-context-notification-info" contextType="info" fxFlex.gt-sm="600px"
+                        fxFlex="80%">
+                        <p>{{'SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate}}</p>
+                        <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                            [attr.aria-label]="('SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate)" />
+                    </app-context-notification>
+                </div>
+            </div>
+        }
+        @if (isValidationInProgress$ | async) {
+            <div class="ob-overlay-wrapper" fxLayoutAlign="center start">
+                <div class="ob-overlay-pane pane-sticky">
+                    <app-context-notification class="ob-context-notification-info" contextType="info" fxFlex.gt-sm="600px"
+                        fxFlex="80%">
+                        <p>{{'SEASON_TICKET.VALIDATION_IN_PROGRESS_INFO' | translate}}</p>
+                        <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                            [attr.aria-label]="('SEASON_TICKET.VALIDATION_IN_PROGRESS_INFO' | translate)" />
+                    </app-context-notification>
+                </div>
+            </div>
+        }
+        @if (isSaveChangesInProgress$ | async) {
+            <div class="ob-overlay-wrapper" fxLayoutAlign="center start">
+                <div class="ob-overlay-pane pane-sticky">
+                    <app-context-notification class="ob-context-notification-info" contextType="info" fxFlex.gt-sm="600px"
+                        fxFlex="80%">
+                        <p>{{'SEASON_TICKET.ASSIGNMENT_IN_PROGRESS_INFO' | translate}}</p>
+                        <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                            [attr.aria-label]="('SEASON_TICKET.ASSIGNMENT_IN_PROGRESS_INFO' | translate)" />
+                    </app-context-notification>
+                </div>
+            </div>
+        }
+        @if (!!!(isGenerationStatusInProgress$ | async) && !!!(isStatusSetUp$ | async) && !$isSetUpUnderstood()) {
+            <div class="ob-overlay-wrapper" fxLayoutAlign="center start">
+                <div class="ob-overlay-pane pane-sticky">
+                    <app-context-notification class="ob-context-notification-info" contextType="info"
+                        fxFlex.gt-sm="600px" fxFlex="80%">
+                        <p>{{'SEASON_TICKET.SETUP_SESSIONS_INFO' | translate}}</p>
+                        <div foot fxFlex="100%" fxLayoutAlign="end">
+                            <button type="button" mat-stroked-button class="ob-button medium"
+                                [attr.aria-label]="'FORMS.ACTIONS.OK' | translate"
+                                (click)="$isSetUpUnderstood.set(true)">
+                                {{'FORMS.ACTIONS.OK' | translate}}
+                            </button>
+                        </div>
+                    </app-context-notification>
+                </div>
+            </div>
+        }
+        <div fxLayout="column" fxFlex="0 1 100%" class="list-container">
+            <div class="actions-container" fxLayout="row" fxLayoutAlign="space-between">
+                <div class="sub-actions-container" fxLayoutAlign="start center" fxFlex="40%">
+                    <button mat-stroked-button type="button" class="ob-button medium"
+                        [attr.aria-label]="'SEASON_TICKET.ASSIGN_SESSIONS' | translate"
+                        appEllipsify [matTooltip]="'SEASON_TICKET.ASSIGN_SESSIONS' | translate"
+                        [disabled]="!!!(isValidateSessionsEnabled$ | async) && !!!(isReAssignSessionsEnabled$ | async)"
+                        (click)="assign()">
+                        <mat-icon>add_circle_outline</mat-icon>
+                        {{'SEASON_TICKET.ASSIGN_SESSIONS' | translate}}
+                    </button>
+                    <button mat-stroked-button type="button" class="ob-button medium"
+                        [attr.aria-label]="'SEASON_TICKET.REMOVE_SESSIONS' | translate"
+                        appEllipsify [matTooltip]="'SEASON_TICKET.REMOVE_SESSIONS' | translate"
+                        [disabled]="!!!(isRemoveValidationsEnabled$ | async) && !!!(isUnAssignSessionsEnabled$ | async)"
+                        (click)="remove()">
+                        <mat-icon>delete</mat-icon>
+                        {{'SEASON_TICKET.REMOVE_SESSIONS' | translate}}
+                    </button>
+                </div>
+                <div class="sub-actions-container" fxLayoutAlign="end center" fxFlex="60%">
+                    <div class="search-field" fxFlex>
+                        <app-search-input [placeholder]="'FORMS.SEARCH.SEASON_TICKET_SESSIONS_LIST' | translate"
+                            [canChange$]="canChangeFilters$" />
+                    </div>
+                    <div class="filter-container" fxFlex="none">
+                        <app-popover appFilter [canChange]="canChangeFilters$ | async">
+                            <app-season-ticket-sessions-list-filter #filterContent />
+                        </app-popover>
+                    </div>
+                    <div fxFlex="180px" fxLayoutGap="10px" fxLayoutAlign="flex-end center" fxLayout="row">
+                        @if (seasonTicketSessionsMetadata$ | async; as seasonTicketSessionsMetadata) {
+                            <span class="page-summary"
+                                [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: seasonTicketSessionsMetadata">
+                            </span>
+                        }
+                        <app-paginator [length]="(seasonTicketSessionsMetadata$ | async)?.total"
+                            [pageSize]="seasonTicketSessionsPageSize"
+                            [canChange$]="canChangeFilters$" />
+                    </div>
+                </div>
+            </div>
+            <app-season-ticket-sessions-list-summary />
+            <div class="filters-active-container">
+                <app-chips appFilter [canChange]="canChangeFilters$ | async" />
+            </div>
+            <div fxFlex="auto" class="table-container" fxLayout="column">
+                <form [formGroup]="form">
+                    <mat-table fxFlex class="ob-table" [dataSource]="sessionsList$ | async"
+                        [class.with-data]="(seasonTicketSessionsMetadata$ | async)?.total !== 0" matSort [matSortActive]="initSortCol"
+                        [matSortDirection]="initSortDir" matSortDisableClear
+                        [attr.aria-label]="'TITLES.SEASON_TICKETS_SESSIONS' | translate"
+                        [class.not-touchable]="(isHandsetOrTablet$ | async) !== true">
+                        <ng-container matColumnDef="selection">
+                            <mat-header-cell *matHeaderCellDef class="head-cell with-status-border without-gap" fxFlex="42px"
+                                fxLayoutAlign="center center">
+                                @if (isStatusSetUp$ | async) {
+                                    <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
+                                        [checked]="isMasterToggleChecked$ | async" [indeterminate]="isMasterToggleIndeterminated$ | async"
+                                        [disabled]="((seasonTicketSessionsMetadata$ | async)?.total === 0)" />
+                                }
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row" class="with-status-border without-gap" fxFlex="42px"
+                                fxLayoutAlign="center center"
+                                [class.success]="row.status === seasonTicketSessionStatus.assigned"
+                                [class.alert]="row.is_session_valid || row.is_session_assignment_to_be_unassigned">
+                                @if (row.is_validation_in_progress || row.is_assignment_in_progress || row.is_unassignment_in_progress) {
+                                    <mat-spinner diameter="20" />
+                                }
+                                @if ((isStatusSetUp$ | async) && !row.is_validation_in_progress && !row.is_assignment_in_progress &&
+                                !row.is_unassignment_in_progress) {
+                                    <mat-checkbox color="primary" [checked]="row.is_selected" [disabled]="!row.is_session_row_selectable" />
+                                }
+                            </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="session_name">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header
+                                class="head-cell">{{'SEASON_TICKET.SESSION_NAME' | translate}}
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row">{{row.session_name}}</mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="status">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header
+                                class="head-cell">{{'SEASON_TICKET.SESSION_ASSIGNMENT' | translate}}
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row"
+                                [matTooltip]="!row.is_session_row_selectable ?
+                            ('SEASON_TICKET.' + row.session_assignable.reason | translate) :
+                            ('SEASON_TICKET.' + row.session_not_valid_reason | translate)"
+                                [matTooltipDisabled]="!(row.is_session_not_valid || !row.is_session_row_selectable)">
+                                @if (!row.is_session_validated && row.is_assignable &&
+                                    row.status === seasonTicketSessionStatus.notAssigned) {
+                                    -
+                                }
+                                @if (row.is_session_valid) {
+                                    <mat-icon class="status-icon alert">done</mat-icon>
+                                }
+                                @if (row.status === seasonTicketSessionStatus.assigned) {
+                                    <mat-icon class="status-icon success">done</mat-icon>
+                                }
+                                @if (row.is_session_not_valid) {
+                                    <span class="status-value">
+                                        {{'SEASON_TICKET.NOT_VALID' | translate}}
+                                    </span>
+                                }
+                                @if (!row.is_session_row_selectable) {
+                                    <span class="status-value">
+                                        {{'SEASON_TICKET.NOT_ASSIGNABLE' | translate}}
+                                    </span>
+                                }
+                            </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="session_starting_date">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header
+                                class="head-cell">{{'SEASON_TICKET.SESSION_DATE' | translate}}
+                            </mat-header-cell>
+                            <mat-cell
+                                *matCellDef="let row">{{row.session_starting_date | localDateTime : dateTimeFormats.shortDate}}</mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="event_name">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell"
+                                [class.border-right]="$showLoyaltyPointsSettings()">
+                                {{'SEASON_TICKET.SESSION_EVENT' | translate}}
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row" [class.border-right]="$showLoyaltyPointsSettings()">
+                                {{row.event_name}}
+                            </mat-cell>
+                        </ng-container>
+                        @if ($showLoyaltyPointsSettings()) {
+                            <ng-container matColumnDef="attendance_points">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    <div fxFlex="100%" fxLayoutAlign="end center" fxLayoutGap="5px">
+                                        <span>{{'SEASON_TICKET.ATTENDANCE_POINTS.HEADER' | translate}}</span>
+                                        <mat-icon class="ob-help-icon" [matTooltip]="'SEASON_TICKET.ATTENDANCE_POINTS.INFO' | translate">
+                                            help_outline
+                                        </mat-icon>
+                                    </div>
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row" class="right"
+                                    [class.editable-cell]="(isStatusSetUp$ | async) && row.is_session_row_selectable"
+                                    [class.readonly-cell]="!((isStatusSetUp$ | async) && row.is_session_row_selectable)">
+                                    @if (row.status === seasonTicketSessionStatus.assigned) {
+                                        <div class="write-value" (click)="$event.stopPropagation()" fxFlex="100%">
+                                            <mat-form-field class="ob-form-field" appearance="outline">
+                                                <input matInput type="number" inputmode="numeric" placeholder="0" class="number-input"
+                                                    [formControlName]="row.session_id" min="0">
+                                            </mat-form-field>
+                                        </div>
+                                    }
+                                </mat-cell>
+                            </ng-container>
+                        }
+                        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" />
+                        <mat-row *matRowDef="let row; columns: displayedColumns;" class="hoverable-row"
+                            [class.ob-row-disabled]="!row.is_session_row_selectable"
+                            [class.interactive-row]="(isStatusSetUp$ | async) && row.is_session_row_selectable"
+                            [class.ob-row-selected]="row.is_selected"
+                            (click)="$event.stopPropagation(); toggleRow(row);" />
+                    </mat-table>
+                    @if ((seasonTicketSessionsMetadata$ | async)?.total === 0) {
+                        <div class="context-notification-container" fxFlex="0 50 100%"
+                            fxLayout="row" fxLayoutAlign="center start">
+                            <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px" fxFlex="80%"
+                                fxLayoutAlign="center start">
+                                <p>{{'LIST.EMPTY' | translate}}</p>
+                            </app-context-notification>
+                        </div>
+                    }
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="bottom-actions-bar" fxFlex="0 0 60px" fxLayoutAlign="start">
+        <div class="bottom-action-content" fxFlex="0 1 100%" fxLayoutAlign="end center">
+            <button type="button" mat-button class="ob-button medium"
+                [disabled]="!!!(isCancelChangesEnabled$ | async)" (click)="cancelChanges()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button type="button" mat-flat-button class="ob-button medium" color="primary"
+                [disabled]="(isSaveEnabled$ | async) === false" (click)="save()">
+                {{'FORMS.ACTIONS.UPDATE' | translate}}
+            </button>
+        </div>
+    </div>
+</div>

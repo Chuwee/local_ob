@@ -1,0 +1,72 @@
+<div class="flex flex-col gap-6">
+    <div class="flex flex-col">
+        <h3 class="section-title">{{'PRESALES.REDIRECTION_POLICY.TITLE' | prefix | translate}}</h3>
+        <div class="flex flex-row">
+            <span class="basis-[80%]">
+                {{'PRESALES.REDIRECTION_POLICY.DESCRIPTION' | prefix | translate}}
+            </span>
+        </div>
+    </div>
+    <div class="flex flex-col">
+        <h3 class="section-title">{{'PRESALES.REDIRECTION_POLICY.URL' | prefix | translate}}</h3>
+        <div [formGroup]="form">
+            <mat-radio-group class="flex flex-col" formControlName="mode">
+                <div class="flex flex-col gap-4">
+                    <mat-radio-button [value]="'CATALOG'">
+                        <div>{{'PRESALES.REDIRECTION_POLICY.CATALOG' | prefix | translate}}</div>
+                    </mat-radio-button>
+                    <mat-radio-button [value]="'CUSTOM'">
+                        <div>{{'PRESALES.REDIRECTION_POLICY.GO_TO_URL' | prefix | translate}}</div>
+                    </mat-radio-button>
+                    @let languages = $languages();
+                        @if (form.controls.mode?.value === 'CUSTOM' && languages?.selected.length > 1) {
+                        <div class="flex flex-col gap-4 redirection-container nested-content">
+                            <div class="flex flex-row">
+                                <span class="basis-[60%]">
+                                    {{'PRESALES.REDIRECTION_POLICY.GO_TO_URL_DESCRIPTION' | prefix | translate}}
+                                </span>
+                            </div>
+                            <div class="flex flex-row">
+                                <app-tabs-menu class="basis-[60%]" type="language" overrideClasses="no-left-padding"
+                                    [formGroup]="form.controls.value" #textsTabs>
+                                    @for (lang of languages?.selected; track lang) {
+                                        <ng-template appTab [ctrl]="form.controls.value.get(lang)"
+                                            [label]="('LANGUAGES.' + lang) | translate">
+                                            <div class="flex flex-row gap-2 justify-start items-center">
+                                                <p class="url-label">
+                                                    {{'PRESALES.REDIRECTION_POLICY.URL' | prefix | translate  | uppercase}}
+                                                </p>
+                                                <mat-form-field appearance="outline"
+                                                    class="basis-full ob-form-field value-field">
+                                                    <input matInput [formControlName]="lang"
+                                                        [placeholder]="'PRESALES.REDIRECTION_POLICY.URL_PLACEHOLDER' | prefix | translate">
+                                                </mat-form-field>
+                                            </div>
+                                        </ng-template>
+                                    }
+                                </app-tabs-menu>
+                            </div>
+                        </div>
+                    }
+                    @if (form.controls.mode?.value === 'CUSTOM' && languages?.selected.length === 1) {
+                        <div class="flex flex-row flex-wrap justify-start items-center gap-2 redirection-container nested-content"
+                            [formGroup]="form.controls.value">
+                            <p class="url-label">{{'PRESALES.REDIRECTION_POLICY.URL' | prefix | translate | uppercase}}</p>
+                            <mat-form-field appearance="outline" class="flex basis-[60%] ob-form-field value-field">
+                                <input matInput [formControlName]="(languages?.default)"
+                                    [placeholder]="'PRESALES.REDIRECTION_POLICY.URL_PLACEHOLDER' | prefix | translate">
+                            </mat-form-field>
+                        </div>
+                    }
+                </div>
+            </mat-radio-group>
+        </div>
+    </div>
+    <div class="flex items-center gap-2">
+        <div class="flex items-center">
+            <mat-icon class="ob-icon small info with-text">info</mat-icon>
+            {{'PRESALES.REDIRECTION_POLICY.INFORMATION' | prefix | translate}}
+        </div>
+        <a class="ob-link" (click)="openLiteralsDialog()">{{'PRESALES.REDIRECTION_POLICY.MORE_INFORMATION' | prefix | translate}}</a>
+    </div>
+</div>

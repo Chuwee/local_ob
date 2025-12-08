@@ -1,0 +1,45 @@
+<div fxLayout="row wrap" [formGroup]="virtualQueueFormGroup">
+    <div fxFlex="100%" fxLayout="column">
+        <div fxFlex="28px" fxLayout="row">
+            <mat-slide-toggle class="ob-slide-toggle" formControlName="enableVirtualQueue">
+                {{'EVENTS.SESSION.VIRTUAL_QUEUE.LABEL' | translate}}
+            </mat-slide-toggle>
+        </div>
+        <mat-divider fxFlex="100%" />
+    </div>
+    <div fxFlex="100%" fxLayout="row" class="session-data-container">
+        <p>{{'EVENTS.SESSION.VIRTUAL_QUEUE.DESCRIPTION' | translate}}</p>
+    </div>
+    <div fxFlex="100%" fxLayout="row" class="session-data-container">
+        <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 50px)" appearance="outline"
+            class="ob-form-field field-with-label">
+            <mat-label>{{'EVENTS.SESSION.VIRTUAL_QUEUE.ALIAS' | translate}}</mat-label>
+            <input matInput aria-label="alias" [placeholder]="'EVENTS.SESSION.VIRTUAL_QUEUE.ALIAS' | translate"
+                formControlName="virtualQueueAlias">
+            <mat-error *ngIf="virtualQueueFormGroup.get('virtualQueueAlias').hasError('required')">
+                {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+            </mat-error>
+            <mat-error *ngIf="virtualQueueFormGroup.get('virtualQueueAlias').hasError('maxlength')">
+                {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({
+                value:
+                sessionOtherSettingsRestrictions.virtualQueueMaxLength
+            })}}
+            </mat-error>
+            <mat-error *ngIf="virtualQueueFormGroup.get('virtualQueueAlias').hasError('pattern')">
+                {{'FORMS.ERRORS.INVALID_CHARACTERS' | translate : ({
+                value:
+                sessionOtherSettingsRestrictions.virtualQueuePattern
+            })}}
+            </mat-error>
+        </mat-form-field>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="start center"
+        *ngIf="(isOperator$ | async) && virtualQueueFormGroup.get('virtualQueueToken').value as virtualQueueToken">
+        <span class="copy-label">{{'EVENTS.SESSION.VIRTUAL_QUEUE.TOKEN' | translate}} :</span>
+        <span class="copy-link">{{virtualQueueToken}}</span>
+        <app-copy-text [copyText]="virtualQueueToken"
+            [copyOk]="'EVENTS.SESSION.VIRTUAL_QUEUE.TOKEN.LINK_COPY_OK' | translate"
+            [copyKo]="'EVENTS.SESSION.VIRTUAL_QUEUE.TOKEN.LINK_COPY_KO' | translate"
+            [copyTooltip]="'EVENTS.SESSION.VIRTUAL_QUEUE.TOKEN.COPY_LINK' | translate" />
+    </div>
+</div>

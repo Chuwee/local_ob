@@ -1,0 +1,34 @@
+@if((isLoading$ | async) === false) {
+    <app-language-bar
+        [languages]="$languageList()"
+        [selected]="language$ | async"
+        (changed)="changeLanguage($event)"
+        class="sticky" />
+}
+<app-form-container [hideActionBar]="true" class="no-top-padding">
+    @if (isLoading$ | async) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    } @else {
+        <div class="details-container">
+            <div class="flex flex-1 items-center info-message">
+                <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                {{'PRODUCT.CHANNELS.PREVIEW.INFO_MESSAGE' | translate}}
+            </div>
+            @if ((publishedSessionLinks$ | async) || (unpublishedSessionLinks$ | async)) {
+                <app-link-list [links$]="publishedSessionLinks$" [linksMetadata$]="publishedSessionLinksMetadata$"
+                    [title]="'EVENTS.CHANNEL.CHANNEL.CONTENT.SESSION_LIST'"
+                    [type]="eventChannelSessionsContentLinkType.published" [pageSize]="pageSize"
+                    ($loadMore)="loadSessionsData($event, eventChannelSessionsContentLinkType.published)" />
+                <app-link-list [links$]="unpublishedSessionLinks$" [linksMetadata$]="unpublishedSessionLinksMetadata$"
+                    [title]="'EVENTS.CHANNEL.CHANNEL.CONTENT.UNPUBLISHED_SESSION_LIST'"
+                    [type]="eventChannelSessionsContentLinkType.unpublished" [pageSize]="pageSize"
+                    ($loadMore)="loadSessionsData($event, eventChannelSessionsContentLinkType.unpublished)" />
+            } @else {
+                <app-empty-state fxFlex="100%" [title]="'PRODUCT.CHANNELS.PREVIEW.EMPTY_STATE_TITLE' | translate"
+                    [description]="'PRODUCT.CHANNELS.PREVIEW.EMPTY_STATE_DESCRIPTION' | translate" />
+            }
+        </div>
+    }
+</app-form-container>

@@ -1,0 +1,117 @@
+<div class="list-container" fxFlex="100%" fxLayout="column">
+    <div class="heading-container without-overflow-hidden" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">{{'TITLES.PRODUCTS_DELIVERY_POINTS' | translate}}</h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+            <div class="filter-container" fxFlex="none">
+                <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                    [attr.aria-label]="'DELIVERY_POINT.NEW_BTN' | translate" (click)="openNewDeliveryPointDialog()">
+                    <mat-icon>add</mat-icon>
+                    {{'DELIVERY_POINT.NEW_BTN' | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="heading-container without-overflow-hidden" fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxFlex="70%" fxLayoutGap="20px" fxLayoutAlign="start center">
+            <div class="filter-container" fxFlex="none">
+                <app-popover appFilter>
+                    <app-products-delivery-points-list-filter #filterContent [canSelectEntity$]="canReadMultipleEntities$" />
+                </app-popover>
+            </div>
+            <div class="search-field" fxFlex="100%">
+                <app-search-input [placeholder]="'FORMS.SEARCH.CHANNEL_LIST' | translate" />
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            @if (deliveryPointsMetadata$ | async; as deliveryPointsMetadata) {
+                <p class="page-summary"
+                    [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: deliveryPointsMetadata">
+                </p>
+            }
+            <app-paginator [length]="(deliveryPointsMetadata$ | async)?.total" [pageSize]="productsPageSize" />
+        </div>
+    </div>
+    <div class="heading-container heading-divider">
+        <mat-divider />
+    </div>
+    <div class="heading-container">
+        <app-chips appFilter />
+    </div>
+    @if (deliveryPointsLoading$ | async) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+    <mat-table class="ob-table" [dataSource]="(deliveryPoints$ | async)" [trackBy]="trackByFn"
+        matSort [matSortActive]="initSortCol" [matSortDirection]="initSortDir" matSortDisableClear
+        [attr.aria-label]="'TITLES.PRODUCTS_DELIVERY_POINTS' | translate"
+        [ngClass]="{'not-touchable': (isHandsetOrTablet$ | async) !== true}">
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'DELIVERY_POINT.NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="entity_name">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'DELIVERY_POINT.ENTITY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.entity?.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="country">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'DELIVERY_POINT.COUNTRY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.location?.country?.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="country_subdivision">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'DELIVERY_POINT.COUNTRY_SUBDIVISION' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.location?.country_subdivision.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'DELIVERY_POINT.STATUS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{ 'DELIVERY_POINT.STATUS_OPTS.' + row.status | translate }}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="actions-cell head-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true" />
+            <mat-cell *matCellDef="let row" class="actions-cell" [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                <div class="action-buttons" (click)="$event.stopPropagation()">
+                    <button mat-icon-button class="ob-button medium only-icon"
+                        [matTooltip]="'DELIVERY_POINT.DELETE_BTN' | translate" (click)="openDeleteDeliveryPointDialog(row)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+            </mat-cell>
+        </ng-container>
+        @if (displayedColumns) {
+
+            <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" />
+            <mat-row *matRowDef="let row; columns: displayedColumns;" class="interactive-row"
+                [routerLink]="[row.id]" />
+
+        }
+    </mat-table>
+    @if (((deliveryPointsMetadata$ | async)?.total === 0) && hasAppliedFilters) {
+        <div class="context-notification-container" fxFlex="0 50 100%" fxLayout="row" fxLayoutAlign="center start">
+            <app-context-notification class="ob-context-notification" contextType="info"
+                fxFlex.gt-sm="600px" fxFlex="80%" fxLayoutAlign="center start">
+                <p>{{'LIST.EMPTY' | translate}}</p>
+            </app-context-notification>
+        </div>
+    }
+    @if (((deliveryPointsMetadata$ | async)?.total === 0) && !hasAppliedFilters) {
+
+        <app-empty-state fxFlex="100%"
+            [title]="'DELIVERY_POINT.LIST.EMPTY_LIST_TITLE' | translate"
+            [description]="'DELIVERY_POINT.LIST.EMPTY_LIST_DESCRIPTION' | translate">
+            <button type="button" mat-flat-button class="ob-button medium"
+                color="primary" (click)="openNewDeliveryPointDialog()">
+                <mat-icon>add</mat-icon>
+                {{'DELIVERY_POINT.NEW_BTN' | translate}}
+            </button>
+        </app-empty-state>
+
+    }
+</div>

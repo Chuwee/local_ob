@@ -1,0 +1,52 @@
+@use '@angular/material' as mat;
+@mixin ngx-timepicker-field-override($pallets, $colors) {
+    $primary: mat.m2-get-color-from-palette(map-get($pallets, primary));
+    $ob-black: map-get($colors, ob-black);
+
+    .timepicker-backdrop-overlay,
+    .timepicker-overlay {
+        z-index: 9999 !important;
+    }
+    .timepicker {
+        .timepicker__header {
+            background-color: $primary !important;
+        }
+        .timepicker__body {
+            cursor: pointer;
+        }
+        .clock-face__clock-hand {
+            background-color: $primary !important;
+            &::after {
+                background-color: $primary !important;
+            }
+            &::before {
+                border-color: $primary !important;
+            }
+        }
+        .clock-face__number {
+            > span.active {
+                background-color: $primary !important;
+            }
+        }
+        button:not(.timepicker-dial__item) {
+            color: $primary !important;
+        }
+    }
+    .ngx-material-timepicker-toggle {
+        color: rgba($ob-black, 0.9);
+        padding: 2px 0 0 0 !important;
+        width: 30px;
+        height: 30px;
+        svg {
+            width: 22px;
+            height: 22px;
+        }
+        &:focus {
+            background-color: rgba($ob-black, 0.12); // same as native ".mat-mdc-button .mat-mdc-button-touch-target"
+        }
+        &:disabled {
+            opacity: 0.26;
+            cursor: default;
+        }
+    }
+}

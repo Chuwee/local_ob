@@ -1,0 +1,74 @@
+<button mat-stroked-button color="tertiary" class="ob-button medium" [class.active]="$activeFilters()"
+    [matBadge]="$activeFilters() > 0 ? $activeFilters() : null" [satPopoverAnchor]="filterPopover" (click)="openFilters()">
+    {{'FORMS.OPEN_FILTER_BTN' | translate}}
+    <mat-icon iconPositionEnd>
+        filter_list
+    </mat-icon>
+</button>
+<sat-popover #filterPopover hasBackdrop yAlign="below" xAlign="start" autoFocus="false" restoreFocus="false">
+    <mat-card class="ob-card">
+        <mat-card-content class="form-container">
+            <form [formGroup]="filterForm" class="flex flex-col gap-4">
+                <div class="filter-block flex">
+                    <div class="ob-label flex-[0_0_100px]">
+                        {{'DATES.START_DATE' | translate}}
+                    </div>
+                    <div class="filter-block-input flex-[0_0_140px]">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <input matInput [matDatepicker]="initStartDateDP" [placeholder]="dateFormat"
+                                autocomplete="off" formControlName="initStartDate" (focus)="initStartDateDP.open()"
+                                [max]="filterForm.get('finalStartDate')?.value">
+                            <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                                (click)="$event.stopPropagation(); initStartDateDP.open();">
+                                <mat-icon>event</mat-icon>
+                            </button>
+                            <mat-datepicker #initStartDateDP />
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-[0_0_20px]">
+                        <span class="filter-block-dates-separator block"></span>
+                    </div>
+                    <div class="filter-block-input flex-[0_0_140px]">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <input matInput [matDatepicker]="finalStartDateDP" [placeholder]="dateFormat"
+                                autocomplete="off" formControlName="finalStartDate" (focus)="finalStartDateDP.open()"
+                                [min]="filterForm.get('initStartDate')?.value">
+                            <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                                (click)="$event.stopPropagation(); finalStartDateDP.open();">
+                                <mat-icon>event</mat-icon>
+                            </button>
+                            <mat-datepicker #finalStartDateDP />
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="filter-block flex flex-col gap-2">
+                    <span class="ob-label">{{'DATES.WEEKDAYS' | translate}}</span>
+                    <mat-button-toggle-group class="ob-round-button-group weekdays-selector" multiple="true"
+                        formControlName="weekdays">
+                        @for(day of weekdays; track $index){
+                            <mat-button-toggle [value]="day.key">
+                                {{day.label}}
+                            </mat-button-toggle>
+                        }
+                    </mat-button-toggle-group>
+
+                </div>
+            </form>
+        </mat-card-content>
+        <mat-card-footer class="flex justify-between">
+            <div class="left-actions">
+                <a class="ob-link" #removeLink (click)="clearFilters()">
+                    {{'FORMS.REMOVE_FILTERS_BTN' | translate}}
+                </a>
+            </div>
+            <div class="right-actions">
+                <button (click)="closeFilters()" mat-button class="ob-button small">
+                    {{'FORMS.CLOSE_FILTER_BTN' | translate}}
+                </button>
+                <button (click)="applyFilters()" mat-flat-button color="primary" class="ob-button small" [disabled]="filterForm.invalid">
+                    {{'FORMS.APPLY_FILTER_BTN' | translate}}
+                </button>
+            </div>
+        </mat-card-footer>
+    </mat-card>
+</sat-popover>

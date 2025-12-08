@@ -1,0 +1,68 @@
+<form [formGroup]="channelDataForm" id="formChannelData">
+    <div fxLayout="row wrap" fxLayoutGap.gt-xs="24px" fxLayoutAlign="flex-start">
+        <mat-form-field fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.33% - 24px)" appearance="outline"
+            class="ob-form-field field-with-label">
+            <mat-label>{{'CHANNELS.NAME' | translate}}</mat-label>
+            <input matInput aria-label="name" formControlName="name">
+            <mat-error [ob-form-errors]="channelDataForm" field="name" />
+        </mat-form-field>
+        <mat-form-field fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.33% - 24px)" appearance="outline"
+            class="ob-form-field field-with-label">
+            <mat-label>{{'CHANNELS.STATUS' | translate}}</mat-label>
+            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="status">
+                @for (status of channelStatus | keyvalue; track status) {
+                    <mat-option [value]="status.value">
+                        {{('CHANNELS.STATUS_OPTS.' + status.value) | translate}}
+                    </mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+        <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+            fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+            <span class="field-label">{{'CHANNELS.ENTITY' | translate}}</span>
+            <span>{{channel.entity.name}}</span>
+        </div>
+        @if ((channel | isWebChannel) || (channel | isMembersChannel)) {
+            <div class="details-non-editable-field ob-form-field" fxFlex="100%"
+                fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                <span class="field-label">{{'CHANNELS.URL' | translate}}</span>
+                <span fxLayoutAlign="start center">
+                    {{channel.url}}
+                    <app-copy-text fxFlexOffset="4px" [copyText]="channel.url" />
+                </span>
+            </div>
+        }
+        <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+            fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+            <span class="field-label">{{'CHANNELS.TYPE' | translate}}</span>
+            <span>{{('CHANNELS.TYPE_OPTS.' + channel.type) | translate}}</span>
+        </div>
+        <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+            fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+            <span class="field-label">{{'CHANNELS.ID' | translate}}</span>
+            <span>{{channel.id}}</span>
+        </div>
+        @if ((operatorMode$ | async) && (channel | isWebChannel) && (channel | isV3$ | async)) {
+            <mat-form-field fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.33% - 24px)" appearance="outline"
+                class="ob-form-field field-with-label">
+                <mat-label>{{'CHANNELS.BUILD' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="build">
+                    @for (build of channelBuilds | keyvalue; track build) {
+                        <mat-option [value]="build.value">
+                            {{('CHANNELS.BUILD_OPTS.' + build.value) | translate | lowercase}}
+                        </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        }
+        @if (channel.whitelabel_type === 'EXTERNAL') {
+            <mat-form-field
+                fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.33% - 24px)" appearance="outline"
+                class="ob-form-field field-with-label">
+                <mat-label>{{'CHANNELS.DOMAIN' | translate}}</mat-label>
+                <input matInput aria-label="domain" formControlName="domain">
+                <mat-error [ob-form-errors]="channelDataForm" field="domain" />
+            </mat-form-field>
+        }
+    </div>
+</form>

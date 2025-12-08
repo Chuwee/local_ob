@@ -1,0 +1,130 @@
+<div class="dialog-msg-container" fxLayout="column" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">
+            {{'MEMBER_EXTERNAL.ADVANCED.EDIT_TITLE' | translate}}
+        </h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <form [formGroup]="form" mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <div fxLayout="column" class="configuration">
+            <p>{{'MEMBER_EXTERNAL.ADVANCED.OPERATION_DESCRIPTION.' + data.configuration.operation_name | translate}}</p>
+            <div fxLayout="row wrap" class="non-editable-data-container">
+                <div class="details-non-editable-field" fxLayout="column" fxFlex="50%">
+                    <span class="field-label">{{'MEMBER_EXTERNAL.ADVANCED.OPERATION' | translate}}</span>
+                    <span>{{'MEMBER_EXTERNAL.ADVANCED.OPERATIONS.' + data.configuration.operation_name | translate }}</span>
+                </div>
+                <div class="details-non-editable-field" fxLayout="column" fxFlex="50%">
+                    <span class="field-label">{{'MEMBER_EXTERNAL.ADVANCED.TYPE' | translate}}</span>
+                    <span>{{'MEMBER_EXTERNAL.ADVANCED.TYPES.' + data.configuration.type | translate }}</span>
+                </div>
+            </div>
+            <div fxLayout="row wrap">
+                <mat-form-field fxFlex="80%" appearance="outline" class="ob-form-field inline-field">
+                    <mat-label>{{'MEMBER_EXTERNAL.ADVANCED.IMPLEMENTATION' | translate}}</mat-label>
+                    <mat-select formControlName="implementation" aria-label="implementation"
+                        [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                        <mat-option *ngFor="let implementation of implementations$ | async" [value]="implementation">
+                            {{implementation}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form" field="implementation"></mat-error>
+                </mat-form-field>
+                <p *ngIf="form.get('implementation').value" class="implementation description">
+                    {{('MEMBER_EXTERNAL.ADVANCED.IMPLEMENTATION_DESCRIPTION.'
+                    + form.get('implementation').value) | translate}}
+                </p>
+                <div *ngFor="let field of fields" formGroupName="fields" fxFlex="100%">
+                    <ng-container *ngIf="field.type === 'text' || field.type === 'number'">
+                        <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label no-margin">
+                            <mat-label>{{field.label}}</mat-label>
+                            <input [type]="field.type" matInput [formControlName]="field.id" [attr.aria-label]="field.id"
+                                [placeholder]="(field.placeholder || '')">
+                            <mat-error [ob-form-errors]="form" [field]="[field.id]"></mat-error>
+                        </mat-form-field>
+                    </ng-container>
+                    <ng-container *ngIf="field.type === 'select' || field.type === 'multiselect'">
+                        <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label no-margin">
+                            <mat-label>{{field.label}}</mat-label>
+                            <mat-select [multiple]="field.type === 'multiselect'"
+                                [formControlName]="field.id" [attr.aria-label]="field.id"
+                                [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                <mat-option *ngFor="let option of field.source$ | async" [value]="option.id">
+                                    {{option.id}}: {{option.name}}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error [ob-form-errors]="form" [field]="[field.id]"></mat-error>
+                        </mat-form-field>
+                    </ng-container>
+                    <div *ngIf="field.type === 'map'" fxLayout="column" class="map-field">
+                        <mat-label class="ob-label" fxFlex="100%">{{field.label | translate}}</mat-label>
+                        <div *ngFor="let elem of formArray(field).controls; let index = index; let last = last" fxLayout="row"
+                            [formGroup]="elem">
+                            <mat-form-field fxFlex="45%" appearance="outline" class="ob-form-field inline-field">
+                                <mat-select formControlName="source" *ngIf="(field.source$ | async); else noSource"
+                                    [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                    <mat-option *ngFor="let option of field.source$ | async" [value]="option.id.toString()">
+                                        {{option.id}}: {{option.name}}
+                                    </mat-option>
+                                </mat-select>
+                                <ng-template #noSource>
+                                    <input type="number" matInput formControlName="source">
+                                </ng-template>
+                            </mat-form-field>
+                            <mat-divider fxFlex="5%" fxFlexAlign="center"></mat-divider>
+                            <mat-form-field fxFlex="45%" appearance="outline" class="ob-form-field inline-field">
+                                <mat-select formControlName="target"  *ngIf="(field.target$ | async); else noTarget"
+                                    [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                    <mat-option *ngFor="let option of field.target$ | async" [value]="option.id.toString()">
+                                        {{option.id}}: {{option.name}}
+                                    </mat-option>
+                                </mat-select>
+                                <ng-template #noTarget>
+                                    <input type="number" matInput formControlName="target">
+                                </ng-template>
+                            </mat-form-field>
+                            <button fxFlex="0 0 33px" fxFlexAlign="center"
+                                mat-icon-button class="ob-button small"
+                                [disabled]="last"
+                                (click)="deleteElement(field, index)">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                    <div *ngIf="field.type === 'list' || field.type === 'number-list'" fxLayout="column" class="list-field">
+                        <mat-label class="ob-label" fxFlex="100%">{{field.label | translate}}</mat-label>
+                        <div *ngFor="let elem of formArray(field).controls; let index = index; let last = last" fxLayout="row">
+                            <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field inline-field no-margin">
+                                <input [type]="field.type === 'number-list' ? 'number': 'text'"
+                                    matInput [formControl]="elem" [attr.aria-label]="field.id"
+                                    [placeholder]="(field.placeholder || '') | translate">
+                                <mat-error [ob-form-errors]="elem"></mat-error>
+                            </mat-form-field>
+                            <button fxFlex="0 0 33px" fxFlexAlign="center"
+                                mat-icon-button class="ob-button small"
+                                [disabled]="last"
+                                (click)="deleteElement(field, index)">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </form>
+    <div mat-dialog-actions fxFlex="auto" fxLayout="row no wrap" fxLayoutAlign="end">
+        <button mat-button type="button" class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button [disabled]="loading$ | async" (click)="save()"
+            mat-flat-button color="primary" type="button" class="ob-button">
+            {{'FORMS.ACTIONS.SAVE' | translate }}
+        </button>
+    </div>
+</div>
+
+<div class="spinner-container" *ngIf="loading$ | async">
+    <mat-spinner></mat-spinner>
+</div>

@@ -1,0 +1,24 @@
+<app-tabs-menu *ngIf="languages$ | async" #communicationTabs type="language" overrideClasses="communication-form-section no-left-padding"
+    [formGroup]="form.get('contents')">
+    <ng-container *ngFor="let lang of languages$ | async">
+        <ng-template appTab [ctrl]="form.get(['contents', lang])" [label]="('LANGUAGES.' + lang) | translate">
+            <div fxLayout="row wrap" fxLayoutGap="8px" class="communication-tab-content" [formGroupName]="lang">
+                <!-- CONTENT NAME -->
+                <mat-form-field id="name" class="ob-form-field field-with-label" [class.no-margin]="!description" 
+                    [subscriptSizing]="description ? 'fixed' : 'dynamic'" fxFlex="0 1 calc(100% - 20px)" 
+                    fxFlex.gt-md="50%" appearance="outline">
+                    <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                    <input formControlName="name" matInput [placeholder]="'FORMS.LABELS.NAME' | translate">
+                    <mat-error [ob-form-errors]="form" [field]="['contents', lang, 'name']" />
+                </mat-form-field>
+                <!-- CONTENT DESCRIPTION -->
+                <mat-form-field *ngIf="description" id="description" class="ob-form-field field-with-label no-margin"
+                    fxFlex="0 1 calc(100% - 20px)" fxFlex.gt-md="50%" appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>{{'FORMS.LABELS.DESCRIPTION' | translate }}</mat-label>
+                    <textarea matInput formControlName="description" rows="4"></textarea>
+                    <mat-error [ob-form-errors]="form" [field]="['contents', lang, 'description']" />
+                </mat-form-field>
+            </div>
+        </ng-template>
+    </ng-container>
+</app-tabs-menu>

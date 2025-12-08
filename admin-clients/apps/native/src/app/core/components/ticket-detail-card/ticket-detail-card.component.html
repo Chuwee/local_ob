@@ -1,0 +1,49 @@
+<ion-card data-override-styles class="ob-native-card ticket-detail-card">
+    <ion-card-content class="ticket-detail-card__content">
+        <div class="ticket-detail-card__content-row">
+            <div class="ticket-detail-card__color-bar" [ngClass]="getCssClass"></div>
+            <span class="ticket-detail-card__number-prints">
+                {{ 'TICKETS.TICKET-TOTAL-PRINTS' | translate : {value: ticket.ticket?.total_prints || 0} }}
+            </span>
+        </div>
+        <ion-text class="ticket-detail-card__code"><span>{{ 'TICKETS.TICKET-CODE' | translate : {code: formattedCode} }}</span></ion-text>
+        <div class="ticket-detail-card__content-row ticket-detail-card__content-row--no-wraps">
+            <ng-container *ngIf="ticket.ticket">
+                <div class="ticket-detail-card__text-block">
+                    <span class="ticket-detail-card__text-block-title">{{ 'TICKETS.MODAL-TICKET' | translate }}</span>
+                    <span class="ticket-detail-card__text-block-value">
+                        {{ ticket.ticket.allocation.sector?.name }} - {{ ticket.ticket.allocation.seat?.name }}
+                    </span>
+                </div>
+                <div class="ticket-detail-card__text-block">
+                    <span class="ticket-detail-card__text-block-title">{{ 'TICKETS.MODAL-RATE' | translate }}</span>
+                    <span class="ticket-detail-card__text-block-value">{{ ticket.ticket.rate.name || '-'}} </span>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="ticket.product">
+                <div class="ticket-detail-card__text-block">
+                    <span class="ticket-detail-card__text-block-title">{{ 'TICKETS.MODAL-PRODUCT' | translate }}</span>
+                    <span class="ticket-detail-card__text-block-value">
+                        {{ ticket.product.name }}
+                    </span>
+                </div>
+                <div class="ticket-detail-card__text-block">
+                    <span class="ticket-detail-card__text-block-title">{{ 'TICKETS.MODAL-VARIANT' | translate }}</span>
+                    <span class="ticket-detail-card__text-block-value">
+                        {{ ticket.product.attribute1?.name | variantText: ticket.product.attribute2?.name | translate}}
+                    </span>
+                </div>
+            </ng-container>
+            <div class="ticket-detail-card__text-block">
+                <span class="ticket-detail-card__text-block-title">{{ 'TICKETS.MODAL-PRICE' | translate }}</span>
+                <span class="ticket-detail-card__text-block-value">
+                    {{ ticket.price?.final | localCurrency: ticket.price?.currency }}
+                </span>
+            </div>
+            <div class="ticket-detail-card__text-block">
+                <span class="ticket-detail-card__text-block-title">{{ 'TICKETS.MODAL-STATUS' | translate }}</span>
+                <span class="ticket-detail-card__text-block-value">{{ 'TICKETS.TICKET-STATUS-' + ticket.state | translate }}</span>
+            </div>
+        </div>
+    </ion-card-content>
+</ion-card>

@@ -1,0 +1,208 @@
+<div class="dialog-msg-container flex flex-col">
+    <div mat-dialog-title>
+        <div class="flex flex-row justify-between items-center">
+            <h2 class="secondary title">{{'TITLES.NEW_SEASON_TICKET' | translate}}</h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div class="flex flex-col" mat-dialog-content>
+        <form [formGroup]="form" class="flex flex-col">
+            @if (canSelectEntity$ | async) {
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-label>{{'SEASON_TICKET.ENTITY' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="entityId">
+                        <mat-option>
+                            <app-select-search #entitySelectSearch [options$]="entities$"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" requireSelection="true" />
+                        </mat-option>
+                        @for (entity of entitySelectSearch.getFilteredOptions$() | async; track entity.id) {
+                            <mat-option [value]="entity.id">
+                                <div appEllipsify [matTooltip]="entity.name">
+                                    {{entity.name}}
+                                </div>
+                            </mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form.controls.entityId" />
+                </mat-form-field>
+            }
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'SEASON_TICKET.PRODUCER' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="producerId">
+                    <mat-option>
+                        <app-select-search #producerSelectSearch [options$]="producers$"
+                            [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" requireSelection="true" />
+                    </mat-option>
+                    @for (producer of producerSelectSearch.getFilteredOptions$() | async; track producer.id) {
+                        <mat-option [value]="producer.id">
+                            <div appEllipsify [matTooltip]="producer.name">
+                                {{producer.name}}
+                            </div>
+                        </mat-option>
+                    }
+                </mat-select>
+                <mat-error [ob-form-errors]="form.controls.producerId" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'SEASON_TICKET.NAME' | translate}}</mat-label>
+                <input matInput aria-label="name" [placeholder]="'SEASON_TICKET.NAME' | translate" formControlName="name">
+                <mat-error [ob-form-errors]="form.controls.name" />
+            </mat-form-field>
+            @if ((currencies$ | async)?.length > 1) {
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-label>{{'FORMS.LABELS.CURRENCY' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="currencyCode">
+                        <mat-option>
+                            <app-select-search #currencySelectSearch [options$]="currencies$ | localCurrenciesFullTranslation$"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="description"
+                                requireSelection="true" />
+                        </mat-option>
+                        @for (currency of currencySelectSearch.getFilteredOptions$() | async; track currency.code) {
+                            <mat-option [value]="currency.code">
+                                {{currency.description}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form.controls.currencyCode" />
+                </mat-form-field>
+            }
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-label>{{'SEASON_TICKETS.TAXES.LABEL' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="taxId">
+                        <mat-option>
+                            <app-select-search #taxesSelectSearch [options$]="entityTaxes$"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="description"
+                                requireSelection="true" />
+                        </mat-option>
+                        @for (tax of taxesSelectSearch.getFilteredOptions$() | async; track tax.id) {
+                            <mat-option [value]="tax.id">
+                                {{tax.name}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form.controls.taxId" />
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-label>{{'SEASON_TICKET.CHARGES_TAXES' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="chargesTaxId">
+                        <mat-option>
+                            <app-select-search #chargesTaxesSelectSearch [options$]="entityTaxes$"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="description"
+                                requireSelection="true" />
+                        </mat-option>
+                        @for (chargesTax of chargesTaxesSelectSearch.getFilteredOptions$() | async; track chargesTax.id) {
+                            <mat-option [value]="chargesTax.id">
+                                {{chargesTax.name}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form.controls.chargesTaxId" />
+                </mat-form-field>
+            </div>
+            @if($inventoryProviders(); as inventoryProviders){
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'VENUE_TPLS.INVENTORY' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="inventory">
+                        @for (inventory of inventoryProviders; track inventory) {
+                            <mat-option [value]="inventory">
+                                <div> {{'VENUES.INVENTORY.'+ inventory | translate}}</div>
+                            </mat-option>
+                            <mat-option [value]="'internal'">{{'VENUES.INVENTORY.INTERNAL'| translate}}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            }
+            @if (form.controls.inventory.value === 'SGA'){
+                <app-new-st-sga-fields [form]="form.controls.additionalConfig" [entityId]="form.controls.entityId.value" />
+            } @else {
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-label>{{'SEASON_TICKET.VENUE_TEMPLATES' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="venueConfigId">
+                        <mat-option>
+                            <app-select-search #venueTemplatesSelectSearch [options$]="venueTemplates$"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" requireSelection="true" />
+                        </mat-option>
+                        @for (venueTemplate of venueTemplatesSelectSearch.getFilteredOptions$() | async; track venueTemplate.id) {
+                            <mat-option [value]="venueTemplate.id">
+                                <div appEllipsify [matTooltip]="venueTemplate.name">
+                                    {{venueTemplate.name}}
+                                </div>
+                            </mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form.controls.venueConfigId" />
+                </mat-form-field>
+            }
+
+            @if ($hasFortress()) {
+                <div class="flex new-season-ticket-info-block">
+                    <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                    {{'SEASON_TICKET.FORTRESS.INFO_MESSAGE' | translate}}
+                </div>
+            }
+
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'SEASON_TICKET.CATEGORY' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="categoryId">
+                    <mat-option>
+                        <app-select-search #categorySelectSearch [options$]="categories$"
+                            [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="description"
+                            requireSelection="true" />
+                    </mat-option>
+                    @for (category of categorySelectSearch.getFilteredOptions$() | async; track category.id) {
+                        <mat-option [value]="category.id">
+                            {{ 'ENTITY.CATEGORY_OPTS.'+ category.code | translate }}
+                        </mat-option>
+                    }
+                </mat-select>
+                <mat-error [ob-form-errors]="form.controls.categoryId" />
+            </mat-form-field>
+
+            @if ($hasFortress()) {
+                <div [formGroup]="form.controls.fortressConfig" class="flex flex-col">
+                    <mat-form-field appearance="outline" class="ob-form-field">
+                        <mat-label>{{'PRODUCT.CUSTOM_CATEGORY' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="customCategoryId">
+                            <mat-option>
+                                <app-select-search #subcategorySelectSearch [options$]="entityCategories$"
+                                    [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="description"
+                                    requireSelection="true" />
+                            </mat-option>
+                            @for (subcat of subcategorySelectSearch.getFilteredOptions$() | async; track subcat.id) {
+                                <mat-option [value]="subcat.id">
+                                    <div appEllipsify [matTooltip]="subcat.description">
+                                        {{subcat.description}}
+                                    </div>
+                                </mat-option>
+                            }
+                        </mat-select>
+                        <mat-error [ob-form-errors]="form.controls.fortressConfig.controls.customCategoryId" />
+                    </mat-form-field>
+                    <app-date-time-picker maxErrors="1" class="new-season-ticket-form-field" [label]="'DATES.START_DATE' | translate"
+                        formControlName="startDate" />
+                    <app-date-time-picker maxErrors="1" class="new-season-ticket-form-field" [label]="'DATES.END_DATE' | translate"
+                        formControlName="endDate" />
+                </div>
+            }
+        </form>
+    </div>
+    <div mat-dialog-actions>
+        <div class="flex flex-row basis-full justify-end">
+            <button type="button" mat-button class="ob-button" (click)="close()" [disabled]="(isLoading$ | async)">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createSeasonTicket()"
+                [disabled]="(!form.dirty) || (isLoading$ | async)">
+                {{'FORMS.ACTIONS.CREATE' | translate}}
+            </button>
+        </div>
+    </div>
+</div>
+@if (isLoading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,98 @@
+<form [formGroup]="filtersForm" fxLayout="column" fxLayoutGap="24px">
+    <ng-container *ngIf="canSelectEntity$ | async">
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label" fxFlex="100px">
+                {{'SALES_REQUESTS.CHANNEL_ENTITY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="100%">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <app-select-server-search formControlName="channelEntity" [options$]="channelEntities$"
+                        (loadOptions)="loadFilterByQ(salesRequestsFilterField.channelEntity)($event.q)" />
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-divider [inset]="true" />
+    </ng-container>
+    <div fxLayout="row" fxLayoutAlign="space-between" class="filter-block" fxLayoutGap="20px">
+        <div>
+            <div class="ob-label" fxFlex="100px">
+                {{'SALES_REQUESTS.EVENT_ENTITY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <app-select-server-search formControlName="eventEntity" [options$]="eventEntities$"
+                        (loadOptions)="loadFilterByQ(salesRequestsFilterField.eventEntity)($event.q)" />
+                </mat-form-field>
+            </div>
+        </div>
+        <div>
+            <div fxLayout="row" class="filter-block">
+                <div class="ob-label">
+                    {{'SALES_REQUESTS.CHANNEL' | translate}}
+                </div>
+                <div class="filter-block-input" fxFlex="200px">
+                    <mat-form-field appearance="outline" class="ob-form-field">
+                        <app-select-server-search formControlName="channel" [options$]="channels$"
+                            (loadOptions)="loadFilterByQ(salesRequestsFilterField.channels)($event.q)" />
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+    </div>
+    <mat-divider [inset]="true" />
+    <div formGroupName="status" fxLayout="row" class="filter-block">
+        <div class="ob-label ob-label-checkbox-group inline" fxFlex="100px">
+            {{'SALES_REQUESTS.STATUS.LABEL' | translate}}
+        </div>
+        <div class="filter-block-input" fxLayout="column" fxFlex="300px" fxLayoutGap="20px">
+            <div fxLayout="row" fxLayoutGap="40px">
+                <div fxLayout="column" fxFlex>
+                    <mat-checkbox formControlName="accepted" color="primary" class="app-checkbox-wrap-label">
+                        {{'SALES_REQUESTS.STATUS_OPTS.ACCEPTED' | translate}}
+                    </mat-checkbox>
+                </div>
+                <div fxLayout="column" fxFlex>
+                    <mat-checkbox formControlName="pending" color="primary" class="app-checkbox-wrap-label">
+                        {{'SALES_REQUESTS.STATUS_OPTS.PENDING' | translate}}
+                    </mat-checkbox>
+                </div>
+                <div fxLayout="column" fxFlex>
+                    <mat-checkbox formControlName="rejected" color="primary" class="app-checkbox-wrap-label">
+                        {{'SALES_REQUESTS.STATUS_OPTS.REJECTED' | translate}}
+                    </mat-checkbox>
+                </div>
+            </div>
+        </div>
+    </div>
+    <mat-divider [inset]="true" />
+    <div fxLayout="row" class="filter-block">
+        <div class="ob-label" fxFlex="100px">
+            {{'SALES_REQUESTS.DATE' | translate}}
+        </div>
+        <div class="filter-block-input" fxFlex="180px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="startDateDP" [placeholder]="dateFormat" formControlName="startDate"
+                    (focus)="startDateDP.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                    (click)="$event.stopPropagation(); startDateDP.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #startDateDP />
+            </mat-form-field>
+        </div>
+        <div fxFlex="20px">
+            <span fxFlex class="filter-block-dates-separator"></span>
+        </div>
+        <div class="filter-block-input" fxFlex="180px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="endDateDP" [placeholder]="dateFormat" formControlName="endDate"
+                    (focus)="endDateDP.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                    (click)="$event.stopPropagation(); endDateDP.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #endDateDP />
+            </mat-form-field>
+        </div>
+    </div>
+</form>

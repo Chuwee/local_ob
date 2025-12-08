@@ -1,0 +1,142 @@
+<div class="rates-container">
+    <form [formGroup]="ratesForm">
+        @let eventRates = $vmEventRates() || [];
+        @if(eventRates) {
+            <div class="new-rate-container flex gap-2 items-center">
+                <div class="flex basis-full gap-2">
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label inline-field flex flex-auto"
+                        [matTooltip]="'EVENTS.FORMS.INFOS.RATE_CREATION_DISABLED' | translate"
+                        [matTooltipDisabled]="!$disableDeleteOrCreate()">
+                        <mat-label>{{'EVENTS.RATES_LIST' | translate}}</mat-label>
+                        <input matInput id="new-rate-input" [placeholder]="'EVENTS.WRITE_NEW_RATE' | translate"
+                            [formControl]="newRateNameCtrl" (keyup.enter)="addNewRate($event)">
+                        <mat-error [ob-form-errors]="newRateNameCtrl" />
+                    </mat-form-field>
+                    @if($isRateTypeRequired()) {
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label inline-field flex flex-auto"
+                            [matTooltip]="'EVENTS.FORMS.INFOS.RATE_CREATION_DISABLED' | translate"
+                            [matTooltipDisabled]="!$disableDeleteOrCreate()">
+                            <mat-label>{{'EVENTS.RATE_TYPE' | translate}}</mat-label>
+                            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                [formControl]="newRateTypeCtrl" (keyup.enter)="addNewRate($event)">
+                                @for(externalType of $eventRatesExternalTypes(); track externalType.id) {
+                                    <mat-option [value]="externalType.id">
+                                        {{externalType.name | translate}}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                            <mat-error [ob-form-errors]="newRateTypeCtrl" />
+                        </mat-form-field>
+                    }
+                </div>
+                <div class="new-rate-action">
+                    <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                        [attr.aria-label]="'EVENTS.NEW_RATE_BTN' | translate" (click)="addNewRate($event)"
+                        [disabled]="$disableDeleteOrCreate() || !newRateNameCtrl.value ||
+                        ($isRateTypeRequired() && !newRateTypeCtrl.value)">
+                        <mat-icon>add</mat-icon>
+                        {{'EVENTS.NEW_RATE_BTN' | translate}}
+                    </button>
+                </div>
+            </div>
+            <div class="rates-description">
+                <span>{{ 'EVENTS.RATES_LIST_DESCRIPTION' | translate }}</span>
+            </div>
+            <div class="translate-rates-action flex justify-end">
+                <button mat-button type="button" class="ob-button medium translate-rates-button"
+                    [attr.aria-label]="'EVENTS.TRANSLATE_RATES_BTN' | translate" (click)="openTranslateRatesDialog()"
+                    [disabled]="!eventRates?.length">
+                    <mat-icon>translate</mat-icon>
+                    {{'EVENTS.TRANSLATE_RATES_BTN' | translate}}
+                </button>
+            </div>
+            <table mat-table formArrayName="rateNamesList" class="ob-table" #eventRatesTable
+                [dataSource]="eventRates" cdkDropList [cdkDropListData]="eventRates" (cdkDropListDropped)="onListDrop($event)">
+                <ng-container [matColumnDef]="rateTableHeaders.rateActions" sticky>
+                    @if ($isRateTypeRequired()) {
+                        <th mat-header-cell *matHeaderCellDef class="head-cell default-padding actions-column"></th>
+                    }
+                    <td mat-cell *matCellDef="let rate; let i = $index" class="default-padding actions-column">
+                        <div class="flex items-center">
+                            <mat-icon class="drag-icon">drag_indicator</mat-icon>
+                            <mat-button-toggle aria-label="Set default rate" [checked]="rate.default"
+                                class="ob-icon-button-toggle-simple yellow-icon-appearance ob-button medium only-icon"
+                                [disabled]="rate.default || $disableDeleteOrCreate()" (click)="setDefaultRate(rate)">
+                                <mat-icon [class]="rate.default ? 'selected' : 'not-selected'"
+                                    [matTooltip]="'EVENTS.DEFAULT_RATE' | translate" [matTooltipDisabled]="!rate.default">
+                                    {{rate.default ? 'star' : 'star_border'}}
+                                </mat-icon>
+                            </mat-button-toggle>
+                            <mat-button-toggle aria-label="Set restrictive access" [disabled]="$disableDeleteOrCreate()"
+                                [matTooltip]="(
+                                        rate.restrictive_access ? 'EVENTS.UNSET_RESTRICTIVE' : 'EVENTS.SET_RESTRICTIVE'
+                                    ) | translate"
+                                [matTooltipShowDelay]="300" class="ob-icon-button-toggle-simple ob-button medium only-icon"
+                                [checked]="rate.restrictive_access" (click)="setRestrictiveAccess(rate)">
+                                <mat-icon [class]="rate.restrictive_access ? 'selected' : 'not-selected'">
+                                    new_releases
+                                </mat-icon>
+                            </mat-button-toggle>
+                        </div>
+                    </td>
+                </ng-container>
+                <ng-container [matColumnDef]="rateTableHeaders.rateName" sticky>
+                    @if ($event() | isItalianComplianceEvent) {
+                        <th mat-header-cell *matHeaderCellDef class="head-cell default-padding">
+                            <div class="rate-name-header-padding">
+                                {{'EVENTS.RATE_NAME' | translate}}
+                            </div>
+                        </th>
+                    }
+                    <td mat-cell *matCellDef="let rate; let i = $index" class="default-padding event-rate-name-column">
+                        <div class="flex items-center">
+                            <div class="write-value flex flex-auto">
+                                <mat-form-field appearance="outline" class="ob-form-field inline-field flex-auto">
+                                    <input #rateInput matInput id="rate-input{{i}}" type="text" [formControl]="rate.nameCtrl"
+                                        (blur)="saveName(rateInput, rate)">
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </td>
+                </ng-container>
+                @if ($isRateTypeRequired()) {
+                    <ng-container [matColumnDef]="rateTableHeaders.rateType">
+                        <th mat-header-cell *matHeaderCellDef class="head-cell default-padding event-rate-type-column">
+                            <div class="flex items-center">
+                                {{'EVENTS.RATE_TYPE'| translate}}
+                            </div>
+                        </th>
+                        <td mat-cell *matCellDef="let rate; let i = $index" class="right price-column event-rate-type-column">
+                            <div class="flex items-center">
+                                <span>{{rate.external_rate_type?.code | translate}}</span>
+                            </div>
+                        </td>
+                    </ng-container>
+                }
+                <ng-container [matColumnDef]="rateTableHeaders.deleteRate" sticky>
+                    @if ($isRateTypeRequired()) {
+                        <th mat-header-cell *matHeaderCellDef class="head-cell default-padding delete-rate-column"></th>
+                    }
+                    <td mat-cell *matCellDef="let rate; let i = $index" class="default-padding delete-rate-column">
+                        @if(!$disableDeleteOrCreate() && $hoveredRateId() === rate.id && !rate.default && !ratesForm.invalid) {
+                            <div class="flex justify-end">
+                                <button type="button" mat-icon-button aria-label="Delete rate" class="ob-button medium"
+                                    (click)="deleteRate(rate)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </div>
+                        }
+                    </td>
+                </ng-container>
+                @if ($isRateTypeRequired()) {
+                    <tr mat-header-row *matHeaderRowDef="eventRateTableHeaders(); sticky: true" class="dense-row ob-draggable-row"></tr>
+                }
+                <tr mat-row *matRowDef="let row; columns: eventRateTableHeaders();" class="dense-row ob-draggable-row"
+                    [class.hoverable-row]="!$disableDeleteOrCreate()"
+                    cdkDrag cdkDragBoundary=".mat-table" [cdkDragData]="row"
+                    (mouseenter)="switchHoveredRow(row.id)"
+                    (mouseleave)="switchHoveredRow(null)"></tr>
+            </table>
+        }
+    </form>
+</div>

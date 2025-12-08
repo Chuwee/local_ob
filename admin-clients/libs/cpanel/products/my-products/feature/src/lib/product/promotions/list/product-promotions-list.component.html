@@ -1,0 +1,61 @@
+<div class="left-bar-container">
+    <div fxFlex class="left-bar" fxLayout="column" fxLayoutAlign="justify">
+        <div class="left-sidebar-title" fxLayout="column">
+            <div fxLayout="row" fxLayoutAlign="justify center">
+                <h2 class="title">{{'PRODUCT.PROMOTIONS.TITLE' | translate}}</h2>
+                @if ($canCreate()) {
+                    <button mat-icon-button aria-label="New promotion" type="button" class="ob-button mat-stroked-button xsmall"
+                        (click)="openNewPromotionDialog()" [matTooltip]="'PRODUCT.PROMOTIONS.NEW' | translate">
+                        <mat-icon>add</mat-icon>
+                    </button>
+                }
+            </div>
+            <div fxFlex>
+                <p class="results-count" [innerHTML]="('RESULTS.TOTAL' | translate) + ': ' + $totalPromotions()">
+                </p>
+            </div>
+        </div>
+        <div fxFlex="36px" class="left-sidebar-header" fxLayoutAlign="end center">
+            @if ($canCreate()) {
+                <button mat-icon-button aria-label="Delete promotion" class="ob-button small" (click)="openDeletePromotionDialog()"
+                    [disabled]="!$selectedPromotionId() || !$promotionList()?.length"
+                    [matTooltip]="'PRODUCT.PROMOTIONS.DELETE' | translate">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            }
+        </div>
+        <div fxLayout="column" fxFlex class="list-container">
+            <mat-selection-list (selectionChange)="selectionChangeHandler($event.options[0]?.value)"
+                class="ob-lateral-select-list" appLastPathGuardListener disableRipple [multiple]="false">
+                @for (item of $promotionList(); track item.id) {
+                    <mat-list-option #option [value]="item.id"
+                        [selected]="item.id === $selectedPromotionId()" [disabled]="option.selected" class="with-badge"
+                        [id]="'promotion-list-option-' + item.id">
+                        <div fxFlex="0 0 100%">
+                            <div fxFlex fxLayout="column" fxLayoutAlign="start stretch" class="item-data">
+                                <span class="list-item-title" appEllipsify [matTooltip]="item.name"
+                                    [matTooltipShowDelay]="500">
+                                    {{item.name}}
+                                </span>
+                            </div>
+                            <div class="badge-container" fxLayoutAlign="center center" fxLayoutGap="5px">
+                                <span class="small-badge ob-status-badge" [ngClass]="item.status.toLowerCase()"
+                                    [matTooltip]="('PRODUCT.PROMOTIONS.TYPE_OPTS.' + item.type.toUpperCase() | translate) + ' - ' +
+                                        ('PRODUCT.PROMOTIONS.STATUS_OPTS.' + item.status.toUpperCase() | translate)"
+                                    [matTooltipShowDelay]="800">
+                                    {{('PRODUCT.PROMOTIONS.TYPE_OPTS.' + item.type.toUpperCase() |
+                                translate).substring(0,1)}}
+                                </span>
+                            </div>
+                        </div>
+                    </mat-list-option>
+                }
+            </mat-selection-list>
+        </div>
+    </div>
+    @if ($loadingList()) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+</div>

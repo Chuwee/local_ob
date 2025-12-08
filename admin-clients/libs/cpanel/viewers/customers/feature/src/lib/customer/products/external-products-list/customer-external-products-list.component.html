@@ -1,0 +1,48 @@
+<div class="list-container" fxFlex="0 1 100%" fxLayout="column">
+    <!-- Table -->
+    <div fxLayout="row" fxFlex="0 1 50px" fxLayoutAlign="flex-end center">
+        <mat-paginator hidePageSize fxFlex="0 0 auto" class="with-range-label transparent" />
+    </div>
+    <mat-table class="ob-table" [dataSource]="paginatedProducts$ | async" [attr.aria-label]="'CUSTOMER.PRODUCTS' | translate"
+        [class.not-touchable]="(isHandsetOrTablet$ | async) !== true">
+        <ng-container matColumnDef="event_name">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'CUSTOMER.PRODUCT_EVENT' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.event?.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'CUSTOMER.PRODUCT_TYPE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{'CUSTOMER.PRODUCT_TYPE_OPTS.' + row.event?.type | translate}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="seat">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'CUSTOMER.PRODUCT_SEAT' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" fxLayout="column" fxLayoutAlign="start">
+                <span class="status-cell">{{getLocationInfo(row)}}</span>
+                <span class="status-cell">{{row.price_zone_name}}</span>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="rate">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'CUSTOMER.PRODUCT_RATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                {{row.rate_name}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="purchase_date">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'CUSTOMER.PRODUCT_PURCHASE_DATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                {{row.purchase_date ? (row.purchase_date | localDateTime : dateTimeFormats.shortDate) : '-'}}
+            </mat-cell>
+        </ng-container>
+        <ng-container *matNoDataRow>
+            <app-empty-state-tiny [title]="'CUSTOMER.EMPTY_TITLE.EXTERNAL_PURCHASES' | translate" />
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns" class="dense-row" />
+        <mat-row *matRowDef="let row; columns: displayedColumns;" class="dense-row" />>
+    </mat-table>
+</div>

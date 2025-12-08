@@ -1,0 +1,22 @@
+<h2 class="section-title parent">{{'BI.REPORTS.TITLES.SEARCH_RESULTS' | translate}}</h2>
+@if (biReportsSearch$ | async; as biReportsSearch) {
+    @for (category of biReportsSearch; track $index) {
+        <div class="section-block">
+            <h3 class="section-title">{{category.name}}</h3>
+            @for (report of category.reports; track report.id) {
+                <app-report-list-element [biReport]="report" />
+            }
+            @if (!$last) {
+                <mat-divider class="ob-divider" />
+            }
+        </div>
+    }
+    <div>
+        @if (biReportsSearch && biReportsSearch.length === 0) {
+            <app-context-notification contextType="info" fxFlex.gt-sm="600px"
+                fxFlex="80%" fxLayoutAlign="center start">
+                <p>{{'LIST.EMPTY' | translate}}</p>
+            </app-context-notification>
+        }
+    </div>
+}

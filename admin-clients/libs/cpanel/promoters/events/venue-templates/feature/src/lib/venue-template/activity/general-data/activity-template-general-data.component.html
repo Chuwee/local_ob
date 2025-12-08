@@ -1,0 +1,80 @@
+@let isSga = $isSga();
+@if(isSga) {
+    <!-- UPDATE SGA INVENTORY -->
+    <div class="flex flex-col">
+        <div class="flex flex-row justify-end items-center gap-2 actions-container">
+            <button mat-stroked-button type="button" class="ob-button small import-button"
+                (click)="updateSgaMembershipInventory()">
+                <mat-icon>cached</mat-icon>
+                {{'EVENTS.UPDATE_SGA_INVENTORY' | translate}}
+            </button>
+            <mat-icon class="ob-help-icon" [matTooltip]="'EVENTS.UPDATE_SGA_INVENTORY_INFO' | translate">
+                help_outline
+            </mat-icon>
+        </div>
+        <mat-divider class="ob-form-divider" />
+    </div>
+}
+<app-form-container class="flex flex-col" layout="main" [disabled]="!form.dirty || (reqInProgress$ | async)"
+    (cancel)="cancel()" (save)="save()">
+    <div [formGroup]="form">
+        <!-- TEMPLATE PRINCIPAL INFO -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'VENUE_TPLS.PRINCIPAL_INFO' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-activity-venue-template-main-data [form]="mainForm" [isEventTemplate]="true" />
+        </mat-expansion-panel>
+        <!-- PRICE TYPES AND QUOTAS -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{
+                    (isSga ? 'VENUE_TPLS.ACTIVITY_MEMBERSHIP_TYPE_QUOTAS'
+                    : 'VENUE_TPLS.ACTIVITY_TICKET_TYPE_QUOTAS') | translate
+                    }}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="row wrap">
+                <!-- PRICE TYPES, OR TICKET TYPES -->
+                <app-tabs-menu type="navigation" fxFlex="100%" fxFlex.gt-sm="50%" class="template-form-section">
+                    <ng-template appTab
+                        [label]="isSga ? ('VENUE_TPLS.MEMBERSHIP_TYPES' | translate) : ('VENUE_TPLS.TICKET_TYPES' | translate)">
+                        <app-activity-venue-template-price-types [isReadOnly]="$isSmartBooking() || isSga" [isSga]="isSga" />
+                    </ng-template>
+                    <ng-template appTab lazyLoad [label]="'EVENTS.PRICEZONE.TITLE_DESCRIPTION_TRANSLATE_TABLE' | translate">
+                        <app-price-type-translations [form]="translationsForm" [languages$]="languages$"
+                            [venueTplId]="$venueTemplate()?.id" />
+                    </ng-template>
+                </app-tabs-menu>
+                <app-tabs-menu type="navigation" fxFlex="100%" fxFlex.gt-sm="50%" class="template-form-section">
+                    <ng-template appTab [label]="'VENUE_TPLS.QUOTAS' | translate">
+                        <app-activity-venue-template-quotas [isReadOnly]="$isSmartBooking()" />
+                    </ng-template>
+                </app-tabs-menu>
+            </div>
+        </mat-expansion-panel>
+        <!-- LIMITS -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{
+                    (isSga ? 'VENUE_TPLS.ACTIVITY_MEMBERSHIP_TYPE_CAPACITIES'
+                    : 'VENUE_TPLS.ACTIVITY_CAPACITIES') | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="template-form-section" fxLayout="column" fxLayoutAlign="start stretch">
+                @if(!!!$isSmartBooking()) {
+                    <p class="limits-description">{{
+                        (isSga ? 'VENUE_TPLS.ACTIVITY_MEMBERSHIP_TYPE_CAPACITIES_INFO'
+                        : 'VENUE_TPLS.ACTIVITY_CAPACITIES_INFO') | translate}}</p>
+                }
+                <app-activity-venue-template-limits [form]="limitsForm" [venueTemplate]="$venueTemplate()"
+                    [isSmartBooking]="$isSmartBooking()" [showVisibility]="$isSmartBooking()" [isSga]="isSga" />
+            </div>
+        </mat-expansion-panel>
+    </div>
+    <app-archived-event-mgr slot="actions-bar" [disabled]="form.dirty || (reqInProgress$ | async)" />
+</app-form-container>
+@if(reqInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

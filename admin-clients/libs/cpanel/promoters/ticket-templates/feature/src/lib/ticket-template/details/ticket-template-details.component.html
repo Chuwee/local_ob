@@ -1,0 +1,33 @@
+@if ( $ticketTemplate()) {
+    <div class="details-container flex flex-1 basis-full flex-col">
+        <div class="heading-container flex flex-row items-center justify-start">
+            <app-go-back defaultPath="/ticket-templates"></app-go-back>
+            <h1 class="secondary mat-headline-3">
+                {{ $ticketTemplate().name }}
+            </h1>
+        </div>
+        <div class="main-content flex basis-full flex-col">
+            <div class="top-actions">
+                <app-nav-tabs-menu type="tabMenu" [elements]="[
+                 {
+              label: 'TICKET_TEMPLATE.GENERAL_DATA',
+              param: 'general-data'
+            },
+            {
+              label: 'TICKET_TEMPLATE.IMAGES.TITLE',
+              param: 'images',
+              disabled: !$isContentTabsEnabled(),
+              show: !$isHardTicketTemplate()
+            },
+            {
+              label: 'TICKET_TEMPLATE.LITERALS',
+              param: 'literals',
+              disabled: !$isContentTabsEnabled()
+            }
+            ]">
+                </app-nav-tabs-menu>
+            </div>
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+}

@@ -1,0 +1,255 @@
+@mixin styles() {
+    $grey: var(--ob-theme-color-grey);
+    $grey-light-10: var(--ob-theme-color-grey-light-10);
+    $tertiary-color: var(--ob-theme-color-tertiary);
+    $black: var(--ob-theme-color-black);
+    $warn-color: var(--ob-theme-color-warn);
+    $disabled: var(--ob-theme-color-disabled);
+
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+
+        // prevents unnecessary scrollbar when dialogs appear
+        &.cdk-global-scrollblock {
+            overflow-y: auto
+        }
+    }
+
+    .mat-typography {
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            margin: 0;
+
+            &.section-title {
+                margin: 0 0 16px;
+            }
+        }
+
+        h3.section-title {
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        p {
+            margin: 0 0 16px;
+            max-width: 760px;
+        }
+    }
+
+    a {
+        text-decoration: none;
+        color: var(--ob-theme-color-primary);
+    }
+
+    // chrome accessibility outline override
+    :focus {
+        outline: none;
+    }
+
+    .primary {
+        color: var(--ob-theme-color-primary);
+    }
+
+    .secondary {
+        color: var(--ob-theme-color-secondary);
+    }
+
+    .warn {
+        color: $warn-color;
+    }
+
+    .ob-error-message {
+        color: $warn-color;
+        font: var(--ob-theme-font-tiny);
+    }
+
+    .ob-link {
+        font: var(--ob-theme-font-body-1);
+        cursor: pointer;
+        color: $tertiary-color;
+
+        &:hover:not([disabled]):not(.disabled) {
+            text-decoration: underline;
+        }
+
+        &[disabled],
+        &.disabled {
+            color: $disabled;
+
+            &:hover {
+                cursor: default;
+            }
+        }
+
+        &.icon::after {
+            font-family: 'Material Icons';
+            content: 'launch';
+            position: relative;
+            bottom: -2px;
+            margin-left: 4px;
+        }
+    }
+
+    .ob-label {
+        font: var(--ob-theme-font-body-2);
+
+        &.disabled {
+            color: $disabled;
+        }
+    }
+
+    .ob-summary-value {
+        .label {
+            font: var(--ob-theme-font-caption);
+            font-weight: bold;
+            line-height: 20px;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        .value {
+            font: var(--ob-theme-font-body-1);
+            margin: 0;
+        }
+
+        .grey {
+            color: $grey;
+        }
+    }
+
+    .field-label {
+        // fake label designed for use with fake field or with a field
+        // separated with something as an intermediate description f.ex.
+        width: 100%;
+        padding-bottom: 8px;
+        font: var(--ob-theme-font-body-2);
+        color: $black;
+
+        &.inline-field {
+            width: unset;
+            padding-bottom: 4px;
+            margin-right: 4px;
+        }
+
+        &.title {
+            margin-top: 8px;
+        }
+
+        &.no-margin {
+            margin-top: 0;
+        }
+
+        &.section {
+            margin-top: 32px;
+        }
+    }
+
+    .status-notifications-container {
+        padding: 8px 42px 8px 24px;
+        border-bottom: 1px solid $grey-light-10;
+    }
+
+    .highlighted-box {
+        font: var(--ob-theme-font-body-1);
+        line-height: 19px;
+        border-radius: 4px;
+        border: 1px solid $grey;
+        background-color: $grey-light-10;
+        padding: 1px 10px 0 10px;
+
+        &.transparent {
+            background-color: unset;
+            color: $grey;
+        }
+    }
+
+    // list-range-elems and list-total-elems are set in literal properties file
+    .list-range-elems {}
+
+    .list-total-elems {
+        font-weight: bold;
+    }
+
+    .ob-text-ellipsis {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .uppercase {
+        text-transform: uppercase;
+    }
+
+    router-outlet+* {
+        display: flex;
+        flex: 100%;
+        flex-grow: 0;
+        flex-shrink: 1;
+        flex-direction: column;
+    }
+
+    //Hide Arrows From Input Number
+    .input-number-no-arrows {
+        /* Firefox */
+        -moz-appearance: textfield;
+
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            /* Chrome, Safari, Edge, Opera */
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    }
+
+    // se debe usar en todos los bloques con section-title+contenido 'no-colapsables'
+    // (es el bloque que sustituye el mat-expansion-panel-body cuando no tenemos acordeón)
+    .section-block:not(:last-child) {
+        margin-bottom: 32px;
+    }
+
+    .image-uploader {
+        margin-bottom: 16px;
+    }
+
+    .field-format {
+        font: var(--ob-theme-font-tiny);
+        line-height: 18px;
+        color: $grey;
+        margin-top: 8px;
+    }
+
+    .content-not-defined-message {
+        color: $grey;
+    }
+
+    .mat-tiny {
+        font: var(--ob-theme-font-tiny);
+    }
+
+    .popover-anchor {
+
+        @media screen and (max-width: 599.98px) and (orientation: portrait),
+        screen and (max-width: 959.98px) and (orientation: landscape) {
+            top: 0 !important;
+            left: 0 !important;
+        }
+    }
+    .content-scroll {
+        overflow: auto;
+    }
+
+    input[hidden] {
+        display: none !important;
+    }
+
+
+    .full-width .cdk-virtual-scroll-content-wrapper {
+        width: 100%;
+    }
+}

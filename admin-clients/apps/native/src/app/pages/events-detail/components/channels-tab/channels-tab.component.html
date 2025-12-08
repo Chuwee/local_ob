@@ -1,0 +1,19 @@
+@if(!$isLoading() && totalResults === 0){
+    <static-view [viewContent]="{title: 'CHANNELS.STILL_NO_CHANNEL_LINKED', description: null, isError: false}"/>
+}@else {
+    <ion-list class="channels-tab__list">
+        @if($isLoading()){
+            <ion-item>
+                <skeleton-card />
+            </ion-item>
+        }@else {         
+            @for(channel of cumulativeChannels; track $index){
+                <ion-item class="channels-tab__list-item">
+                    <channel-event-card [eventId]="event.id" [channel]="channel" (tap)="goToDetail($event)" />
+                </ion-item> 
+            }    
+        }
+    </ion-list>
+}
+
+

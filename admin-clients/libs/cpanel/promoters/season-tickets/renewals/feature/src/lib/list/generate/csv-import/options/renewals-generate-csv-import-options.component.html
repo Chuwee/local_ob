@@ -1,0 +1,33 @@
+<div mat-dialog-content class="with-wizard-bar">
+    <div class="optional-fields-container">
+        <form [formGroup]="$optionsFormGroup()" class="flex flex-col justify-start items-stretch">
+            <div>
+                <p>{{'SEASON_TICKETS.GENERATE_RENEWALS.CHANNEL_INFO' | translate}}</p>
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'SEASON_TICKETS.GENERATE_RENEWALS.CHANNEL' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" [formControlName]="$channelControlName()"
+                                [compareWith]="compareById">
+                        <mat-option>
+                            <app-select-search #channelsSelectSearch [options$]="channels$"
+                                               [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name"
+                                               requireSelection="true" />
+                        </mat-option>
+                        @for (channel of channelsSelectSearch.getFilteredOptions$() | async; track channel.id) {
+                            <mat-option
+                                [value]="channel">
+                                {{channel.name}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="$optionsFormGroup()" field="channel" />
+                </mat-form-field>
+
+            </div>
+        </form>
+    </div>
+</div>
+@if (isLoading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,677 @@
+<div fxLayout="column" fxLayoutAlign="start stretch" class="buyers-sidebar">
+    <div fxFlex="54px" fxLayoutAlign="center center" class="sidebar-title">
+        <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+            [attr.aria-label]="'BUYERS.QUERIES.SAVE' | translate" (click)="saveQuery()">
+            <mat-icon>save</mat-icon>
+            {{'BUYERS.QUERIES.SAVE' | translate}}
+        </button>
+    </div>
+    <div fxFlex fxLayout="column" fxLayoutAlign="start stretch" class="sidebar-filter-content" [formGroup]="form">
+        <app-buyers-query-list />
+        <div class="filter-content" fxLayout="column">
+            <h4 class="filter-content-title">{{'BUYERS.PERSONAL_DATA' | translate | uppercase}}</h4>
+            <!-- NAME -->
+            <div fxLayout="column" fxLayoutAlign="start stretch" [formGroupName]="bfe.name.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'FORMS.LABELS.NAME' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="name filter enabled" matInput>
+                </mat-form-field>
+                <div fxFlex fxLayoutAlign="stretch center" [fxShow]="form.get([bfe.name.param, 'isActive']).value" class="nested-field">
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field">
+                        <input matInput type="text" [formControlName]="valueParam" [placeholder]="'FORMS.LABELS.NAME' | translate">
+                    </mat-form-field>
+                </div>
+            </div>
+            <!-- SURNAME -->
+            <div fxLayout="column" fxLayoutAlign="start stretch" [formGroupName]="bfe.surname.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'FORMS.LABELS.SURNAME' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="surname filter enabled" matInput>
+                </mat-form-field>
+                <div fxLayoutAlign="stretch center" [fxShow]="form.get([bfe.surname.param, 'isActive']).value" class="nested-field">
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field">
+                        <input matInput type="text" [formControlName]="valueParam" [placeholder]="'FORMS.LABELS.SURNAME' | translate">
+                    </mat-form-field>
+                </div>
+            </div>
+            <!-- AGE -->
+            <div fxLayout="column" fxLayoutAlign="start stretch" [formGroupName]="bfe.age.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'FORMS.LABELS.AGE' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="age filter enabled" matInput>
+                </mat-form-field>
+                <div fxLayoutAlign="stretch center" [fxShow]="form.get([bfe.age.param, 'isActive']).value" class="nested-field">
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field" [formGroupName]="bfe.age.from.param">
+                        <input matInput type="number" [formControlName]="valueParam" [placeholder]="'FORMS.FROM' | translate"
+                            class="number-input">
+                    </mat-form-field>
+                    <mat-divider fxFlex="10px" />
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field" [formGroupName]="bfe.age.to.param">
+                        <input matInput type="number" [formControlName]="valueParam" [placeholder]="'FORMS.TO' | translate"
+                            class="number-input">
+                    </mat-form-field>
+                </div>
+            </div>
+            <!-- GENDER -->
+            <div fxLayout="column" [formGroupName]="bfe.gender.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'FORMS.LABELS.GENDER' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="channel filter enabled" matInput>
+                </mat-form-field>
+                <mat-form-field [fxShow]="form.get([bfe.gender.param, 'isActive']).value" appearance="outline"
+                    class="ob-form-field inline-field nested-field">
+                    <mat-select [formControlName]="valueParam" [placeholder]="'FORMS.ACTIONS.SELECT' | translate">
+                        <mat-option *ngFor="let item of genders" [value]="item">
+                            {{'ENUMS.GENDER_OPTS.' + item | translate}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <!-- COUNTRY -->
+            <div fxLayout="column" [formGroupName]="bfe.country.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'FORMS.LABELS.COUNTRY' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="channel filter enabled" matInput>
+                </mat-form-field>
+                <mat-form-field [fxShow]="form.get([bfe.country.param, 'isActive']).value" appearance="outline"
+                    class="ob-form-field inline-field nested-field">
+                    <mat-select [formControlName]="valueParam" [placeholder]="'FORMS.ACTIONS.SELECT' | translate">
+                        <mat-option *ngFor="let item of (countries$ | async)" [value]="item.code">
+                            {{item.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <!-- COUNTRY_SUBDIVISION -->
+            <div [fxShow]="(countrySubdivisions$ | async)?.length" class="nested-field" fxLayout="column"
+                [formGroupName]="bfe.countrySubdivision.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'FORMS.LABELS.COUNTRY_SUBDIVISION' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="channel filter enabled" matInput>
+                </mat-form-field>
+                <mat-form-field [fxShow]="form.get([bfe.countrySubdivision.param, 'isActive']).value" appearance="outline"
+                    class="ob-form-field inline-field nested-field">
+                    <mat-select [formControlName]="valueParam" multiple [placeholder]="((countrySubdivisions$ | async)?.length ?
+                        'FORMS.ACTIONS.SELECT' : 'FORMS.SELECT.NO_RESULTS' ) | translate">
+                        <mat-option *ngFor="let item of (countrySubdivisions$ | async)" [value]="item.code">
+                            {{item.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <!-- PHONE -->
+            <div fxLayout="column" fxLayoutAlign="start stretch" [formGroupName]="bfe.phone.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'FORMS.LABELS.PHONE' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="phone filter enabled" matInput>
+                </mat-form-field>
+                <div fxLayoutAlign="stretch center" [fxShow]="form.get([bfe.phone.param, 'isActive']).value" class="nested-field">
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field">
+                        <input matInput type="text" [formControlName]="valueParam" [placeholder]="'FORMS.LABELS.PHONE' | translate">
+                    </mat-form-field>
+                </div>
+            </div>
+            <!-- EMAIL -->
+            <div fxLayout="column" fxLayoutAlign="start stretch" [formGroupName]="bfe.email.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'FORMS.LABELS.EMAIL' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="email filter enabled" matInput>
+                </mat-form-field>
+                <div fxLayoutAlign="stretch center" [fxShow]="form.get([bfe.email.param, 'isActive']).value" class="nested-field">
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field">
+                        <input matInput type="text" [formControlName]="valueParam" [placeholder]="'FORMS.LABELS.EMAIL' | translate">
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <div class="filter-content" fxLayout="column">
+            <h4 class="filter-content-title">{{'BUYERS.COMMUNICATION_DATA' | translate | uppercase}}</h4>
+            <!-- ALLOW COMMERCIAL MAILING -->
+            <div fxLayout="column" [formGroupName]="bfe.allowComercialMailing.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'BUYERS.ALLOW_COMMERCIAL_MAILING' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="channel filter enabled" matInput>
+                </mat-form-field>
+                <mat-form-field [fxShow]="form.get([bfe.allowComercialMailing.param, 'isActive']).value" hidden-outline
+                    class="ob-form-field inline-field nested-field">
+                    <input matInput fxHide>
+                    <mat-radio-group [formControlName]="valueParam" fxLayout="column" fxLayoutGap="8px">
+                        <mat-radio-button [value]="true">
+                            {{'BUYERS.ACCEPTED_COMUNICATIONS' | translate}}
+                        </mat-radio-button>
+                        <mat-radio-button [value]="false">
+                            {{'BUYERS.NOT_ACCEPTED_COMUNICATIONS' | translate}}
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </mat-form-field>
+            </div>
+            <!-- TYPE -->
+            <div fxLayout="column" [formGroupName]="bfe.type.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'BUYERS.REGISTRATION' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="channel filter enabled" matInput>
+                </mat-form-field>
+                <mat-form-field [fxShow]="form.get([bfe.type.param, 'isActive']).value" hidden-outline
+                    class="ob-form-field inline-field nested-field">
+                    <input matInput fxHide>
+                    <mat-radio-group [formControlName]="valueParam" fxLayout="column" fxLayoutGap="8px">
+                        <mat-radio-button [value]="buyerType.registered">
+                            {{'BUYERS.REGISTERED' | translate}}
+                        </mat-radio-button>
+                        <mat-radio-button [value]="buyerType.guest">
+                            {{'BUYERS.NOT_REGISTERED' | translate}}
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </mat-form-field>
+            </div>
+            <!-- SUBSCRIPTION LISTS -->
+            <div fxLayout="column" [formGroupName]="bfe.subscriptionLists.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'BUYERS.SUBSCRIPTION_LISTS' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="subscription list filter enabled" matInput>
+                </mat-form-field>
+                <mat-form-field [fxShow]="form.get([bfe.subscriptionLists.param, 'isActive']).value" appearance="outline"
+                    class="ob-form-field inline-field nested-field">
+                    <mat-select [formControlName]="valueParam" multiple [placeholder]="((subscriptionLists$ | async)?.length ?
+                        'FORMS.ACTIONS.SELECT' : 'FORMS.SELECT.NO_RESULTS' ) | translate">
+                        <mat-option *ngFor="let item of (subscriptionLists$ | async)" [value]="item.id">
+                            <div appEllipsify [matTooltip]="item.name">
+                                {{item.name}}
+                            </div>
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <!-- COLLECTIVES -->
+            <div fxLayout="column" [formGroupName]="bfe.collectives.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'BUYERS.COLLETIVES' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="collectives filter enabled" matInput>
+                </mat-form-field>
+                <mat-form-field [fxShow]="form.get([bfe.collectives.param, 'isActive']).value" appearance="outline"
+                    class="ob-form-field inline-field nested-field">
+                    <mat-select [formControlName]="valueParam" multiple [placeholder]="((collectivesList$ | async)?.length ?
+                        'FORMS.ACTIONS.SELECT' : 'FORMS.SELECT.NO_RESULTS' ) | translate">
+                        <mat-option *ngFor="let item of (collectivesList$ | async)" [value]="item.id">
+                            <div appEllipsify [matTooltip]="item.name">
+                                {{item.name}}
+                            </div>
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <!-- CHANNELS -->
+            <div fxLayout="column" [formGroupName]="bfe.channels.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'BUYERS.CHANNELS' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="channel filter enabled" matInput>
+                </mat-form-field>
+                <mat-form-field [fxShow]="form.get([bfe.channels.param, 'isActive']).value" appearance="outline"
+                    class="ob-form-field inline-field nested-field">
+                    <mat-select [formControlName]="valueParam" multiple
+                        [placeholder]="((channelsList$ | async)?.length ? 'FORMS.ACTIONS.SELECT' : 'FORMS.SELECT.NO_RESULTS' ) | translate">
+                        <mat-option *ngFor="let item of (channelsList$ | async)" [value]="item.id">
+                            <div appEllipsify [matTooltip]="item.name">
+                                {{item.name}}
+                            </div>
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="filter-content" fxLayout="column">
+            <h4 class="filter-content-title">{{'BUYERS.BUSINESS_DATA' | translate | uppercase}}</h4>
+            <!-- ORDER DATE -->
+            <div fxLayout="column" fxLayoutAlign="start stretch" [formGroupName]="bfe.orderDate.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'BUYERS.TRANSACTION_DATE' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="order date filter enabled" matInput>
+                </mat-form-field>
+                <div fxLayoutAlign="stretch center" [fxShow]="form.get([bfe.orderDate.param, 'isActive']).value" class="nested-field">
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                        [formGroupName]="bfe.orderDate.from.param">
+                        <input matInput [matDatepicker]="orderDateFrom" [placeholder]="'FORMS.FROM' | translate"
+                            [formControlName]="valueParam" (focus)="orderDateFrom.open()">
+                        <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                            (click)="$event.stopPropagation(); orderDateFrom.open();">
+                            <mat-icon>event</mat-icon>
+                        </button>
+                        <mat-datepicker #orderDateFrom />
+                    </mat-form-field>
+                    <mat-divider fxFlex="10px" />
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field" [formGroupName]="bfe.orderDate.to.param">
+                        <input matInput [matDatepicker]="orderDateTo" [placeholder]="'FORMS.TO' | translate" [formControlName]="valueParam"
+                            (focus)="orderDateTo.open()">
+                        <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                            (click)="$event.stopPropagation(); orderDateTo.open();">
+                            <mat-icon>event</mat-icon>
+                        </button>
+                        <mat-datepicker #orderDateTo />
+                    </mat-form-field>
+                </div>
+            </div>
+            <!-- FIRST ORDER DATE -->
+            <div fxLayout="column" fxLayoutAlign="start stretch" [formGroupName]="bfe.firstOrderDate.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'BUYERS.FIRST_TRANSACTION' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="order date filter enabled" matInput>
+                </mat-form-field>
+                <div fxLayoutAlign="stretch center" [fxShow]="form.get([bfe.firstOrderDate.param, isActiveParam]).value"
+                    class="nested-field">
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                        [formGroupName]="bfe.firstOrderDate.from.param">
+                        <input matInput [matDatepicker]="firstOrderDateFrom" [placeholder]="'FORMS.FROM' | translate"
+                            [formControlName]="valueParam" (focus)="firstOrderDateFrom.open()">
+                        <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                            (click)="$event.stopPropagation(); firstOrderDateFrom.open();">
+                            <mat-icon>event</mat-icon>
+                        </button>
+                        <mat-datepicker #firstOrderDateFrom />
+                    </mat-form-field>
+                    <mat-divider fxFlex="10px" />
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                        [formGroupName]="bfe.firstOrderDate.to.param">
+                        <input matInput [matDatepicker]="firstOrderDateTo" [placeholder]="'FORMS.TO' | translate"
+                            [formControlName]="valueParam" (focus)="firstOrderDateTo.open()">
+                        <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                            (click)="$event.stopPropagation(); firstOrderDateTo.open();">
+                            <mat-icon>event</mat-icon>
+                        </button>
+                        <mat-datepicker #firstOrderDateTo />
+                    </mat-form-field>
+                </div>
+            </div>
+            <!-- DATES WITHOUT ORDERS -->
+            <div fxLayout="column" fxLayoutAlign="start stretch" [formGroupName]="bfe.withoutOrdersDate.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'BUYERS.WITHOUT_TRANSACTIONS' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="order date filter enabled" matInput>
+                </mat-form-field>
+                <div [fxShow]="form.get([bfe.withoutOrdersDate.param, isActiveParam]).value" class="nested-field"
+                    fxLayoutAlign="stretch center">
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                        [formGroupName]="bfe.withoutOrdersDate.from.param">
+                        <input matInput [matDatepicker]="withoutOrdersDateFrom" [placeholder]="'FORMS.FROM' | translate"
+                            [formControlName]="valueParam" (focus)="withoutOrdersDateFrom.open()">
+                        <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                            (click)="$event.stopPropagation(); withoutOrdersDateFrom.open();">
+                            <mat-icon>event</mat-icon>
+                        </button>
+                        <mat-datepicker #withoutOrdersDateFrom />
+                    </mat-form-field>
+                    <mat-divider fxFlex="10px" />
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                        [formGroupName]="bfe.withoutOrdersDate.to.param">
+                        <input matInput [matDatepicker]="withoutOrdersDateTo" [placeholder]="'FORMS.TO' | translate"
+                            [formControlName]="valueParam" (focus)="withoutOrdersDateTo.open()">
+                        <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                            (click)="$event.stopPropagation(); withoutOrdersDateTo.open();">
+                            <mat-icon>event</mat-icon>
+                        </button>
+                        <mat-datepicker #withoutOrdersDateTo />
+                    </mat-form-field>
+                </div>
+            </div>
+            <!-- ORDERS COUNTS -->
+            <div fxLayout="column" fxLayoutAlign="start stretch" [formGroupName]="bfe.ordersPurchased.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'BUYERS.ORDER_COUNT' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="order date filter enabled" matInput>
+                </mat-form-field>
+                <div fxLayoutAlign="stretch center" class="nested-field"
+                    [fxShow]="form.get([bfe.ordersPurchased.param, isActiveParam]).value">
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                        [formGroupName]="bfe.ordersPurchased.from.param">
+                        <input matInput type="number" [formControlName]="valueParam" [placeholder]="'FORMS.FROM' | translate"
+                            class="number-input">
+                    </mat-form-field>
+                    <mat-divider fxFlex="10px" />
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                        [formGroupName]="bfe.ordersPurchased.to.param">
+                        <input matInput type="number" [formControlName]="valueParam" [placeholder]="'FORMS.TO' | translate"
+                            class="number-input">
+                    </mat-form-field>
+                </div>
+            </div>
+            <!-- TICKETS COUNTS -->
+            <div fxLayout="column" fxLayoutAlign="start stretch" [formGroupName]="bfe.itemsPurchased.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'BUYERS.ORDER_TICKETS_COUNT' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="order date filter enabled" matInput>
+                </mat-form-field>
+                <div [fxShow]="form.get([bfe.itemsPurchased.param, isActiveParam]).value" class="nested-field"
+                    fxLayoutAlign="stretch center">
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                        [formGroupName]="bfe.itemsPurchased.from.param">
+                        <input matInput type="number" [formControlName]="valueParam" [placeholder]="'FORMS.FROM' | translate"
+                            class="number-input">
+                    </mat-form-field>
+                    <mat-divider fxFlex="10px" />
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                        [formGroupName]="bfe.itemsPurchased.to.param">
+                        <input matInput type="number" [formControlName]="valueParam" [placeholder]="'FORMS.TO' | translate"
+                            class="number-input">
+                    </mat-form-field>
+                </div>
+            </div>
+            <!-- TICKETS REFUND -->
+            <div fxLayout="column" fxLayoutAlign="start stretch" [formGroupName]="bfe.itemsRefunded.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'BUYERS.ORDERS_REFUND_COUNT' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="order date filter enabled" matInput>
+                </mat-form-field>
+                <div [fxShow]="form.get([bfe.itemsRefunded.param, isActiveParam]).value" class="nested-field"
+                    fxLayoutAlign="stretch center">
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                        [formGroupName]="bfe.itemsRefunded.from.param">
+                        <input matInput type="number" [formControlName]="valueParam" [placeholder]="'FORMS.FROM' | translate"
+                            class="number-input">
+                    </mat-form-field>
+                    <mat-divider fxFlex="10px" />
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                        [formGroupName]="bfe.itemsRefunded.to.param">
+                        <input matInput type="number" [formControlName]="valueParam" [placeholder]="'FORMS.TO' | translate"
+                            class="number-input">
+                    </mat-form-field>
+                </div>
+            </div>
+            <!-- PRESALE DAYS -->
+            <div fxLayout="column" fxLayoutAlign="start stretch" [formGroupName]="bfe.presaleDays.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'BUYERS.PRESALE_DAYS' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="presale days filter enabled" matInput>
+                </mat-form-field>
+                <div fxLayoutAlign="stretch center" [fxShow]="form.get([bfe.presaleDays.param, isActiveParam]).value" class="nested-field">
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                        [formGroupName]="bfe.presaleDays.from.param">
+                        <input matInput type="number" [formControlName]="valueParam" [placeholder]="'FORMS.FROM' | translate"
+                            class="number-input">
+                    </mat-form-field>
+                    <mat-divider fxFlex="10px" />
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                        [formGroupName]="bfe.presaleDays.to.param">
+                        <input matInput type="number" [formControlName]="valueParam" [placeholder]="'FORMS.TO' | translate"
+                            class="number-input">
+                    </mat-form-field>
+                </div>
+            </div>
+            <!-- GLOBAL BUYER ORDERS VALUE -->
+            <div fxLayout="column" fxLayoutAlign="start stretch" [formGroupName]="bfe.ordersPurchasedPrice.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'BUYERS.ORDERS_PRICE' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="order date filter enabled" matInput>
+                </mat-form-field>
+                <div [fxShow]="form.get([bfe.ordersPurchasedPrice.param, isActiveParam]).value" class="nested-field"
+                    fxLayoutAlign="stretch center">
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                        [formGroupName]="bfe.ordersPurchasedPrice.from.param">
+                        <app-currency-input [formControlName]="valueParam" [placeholder]="0 | localCurrency : userCurrency" />
+                    </mat-form-field>
+                    <mat-divider fxFlex="10px" />
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                        [formGroupName]="bfe.ordersPurchasedPrice.to.param">
+                        <app-currency-input fxFlex [formControlName]="valueParam" [placeholder]="0 | localCurrency : userCurrency" />
+                    </mat-form-field>
+                </div>
+            </div>
+            <!-- REFUND VALUE -->
+            <div fxLayout="column" fxLayoutAlign="start stretch" [formGroupName]="bfe.ordersRefundedPrice.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'BUYERS.REFUND_PRICE' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="order date filter enabled" matInput>
+                </mat-form-field>
+                <div [fxShow]="form.get([bfe.ordersRefundedPrice.param, isActiveParam]).value" class="nested-field"
+                    fxLayoutAlign="stretch center">
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                        [formGroupName]="bfe.ordersRefundedPrice.from.param">
+                        <app-currency-input [formControlName]="valueParam" [placeholder]="0 | localCurrency : userCurrency" />
+                    </mat-form-field>
+                    <mat-divider fxFlex="10px" />
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                        [formGroupName]="bfe.ordersRefundedPrice.to.param">
+                        <app-currency-input [formControlName]="valueParam" [placeholder]="0 | localCurrency : userCurrency" />
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <div class="filter-content" fxLayout="column">
+            <h4 class="filter-content-title">{{'ORDER.TICKETS' | translate | uppercase}}</h4>
+            <!-- TICKET DATA -->
+            <div fxLayout="column" fxLayoutAlign="start stretch" [formGroupName]="bfe.ticketData.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'BUYERS.ORDER_TICKET_DATA' | translate}}
+                    </mat-checkbox>
+                    <input matInput fxHide>
+                </mat-form-field>
+                <mat-form-field [fxShow]="form.get([bfe.ticketData.param, isActiveParam]).value" hidden-outline
+                    class="ob-form-field nested-field inline-field">
+                    <input matInput fxHide>
+                    <mat-radio-group [formControlName]="valueParam" fxLayoutGap="8px" fxLayout="column" class="ticket-data-group">
+                        <!-- EVENT -->
+                        <mat-radio-button [value]="bfe.ticketData.opts.event">
+                            {{'BUYERS.EVENT' | translate}}
+                        </mat-radio-button>
+                        <div fxLayoutAlign="stretch center" class="nested-field ticket-data-event-container"
+                            *ngIf="form.get([bfe.ticketData.param, valueParam]).value === bfe.ticketData.opts.event">
+                            <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field inline-field">
+                                <mat-select [formControl]="form.get([bfe.ticketData.param, bfe.ticketData.events.param, valueParam])"
+                                    multiple [placeholder]="((eventsList$ | async)?.length ?
+                                    'FORMS.ACTIONS.SELECT' : 'FORMS.SELECT.NO_RESULTS' ) | translate">
+                                    <mat-option *ngFor="let item of (eventsList$ | async)" [value]="item.id">
+                                        <div appEllipsify [matTooltip]="item.name">
+                                            {{item.name}}
+                                        </div>
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <!-- EVENT & SESSION -->
+                        <mat-radio-button [value]="bfe.ticketData.opts.eventAndSessions">
+                            {{'BUYERS.SESSION' | translate}}
+                        </mat-radio-button>
+                        <div fxLayout="row wrap" fxLayoutAlign="stretch center" class="nested-field ticket-data-session-container"
+                            *ngIf="form.get([bfe.ticketData.param, valueParam]).value === bfe.ticketData.opts.eventAndSessions">
+                            <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field">
+                                <mat-label>{{'FORMS.LABELS.EVENT' | translate}}</mat-label>
+                                <mat-select [formControl]="form.get([bfe.ticketData.param, bfe.ticketData.events.param, valueParam])"
+                                    [placeholder]="((eventsList$ | async)?.length ?
+                                    'FORMS.ACTIONS.SELECT' : 'FORMS.SELECT.NO_RESULTS' ) | translate">
+                                    <mat-option *ngFor="let item of (eventsList$ | async)" [value]="item.id">
+                                        <div appEllipsify [matTooltip]="item.name">
+                                            {{item.name}}
+                                        </div>
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field inline-field"
+                                [formGroupName]="bfe.ticketData.sessions.param">
+                                <mat-label>{{'FORMS.LABELS.SESSION' | translate}}</mat-label>
+                                <mat-select [formControlName]="valueParam" multiple [placeholder]="((sessionsList$ | async)?.length ?
+                                    'FORMS.ACTIONS.SELECT' : 'FORMS.SELECT.NO_RESULTS' ) | translate">
+                                    <mat-option *ngFor="let item of (sessionsList$ | async)" [value]="item.id">
+                                        <div appEllipsify
+                                            [matTooltip]="(item.start_date | dateTime : dateTimeFormats.shortDateTime) + ' - ' + item.name">
+                                            {{(item.start_date | dateTime : dateTimeFormats.shortDateTime) + ' - ' + item.name}}
+                                        </div>
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <!-- EVENT & PROMOTION -->
+                        <mat-radio-button [value]="bfe.ticketData.opts.eventAndPromos">
+                            {{'BUYERS.PROMOTION' | translate}}
+                        </mat-radio-button>
+                        <div fxLayout="row wrap" fxLayoutAlign="stretch center" class="nested-field ticket-data-promo-container"
+                            *ngIf="form.get([bfe.ticketData.param, valueParam]).value === bfe.ticketData.opts.eventAndPromos">
+                            <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field">
+                                <mat-label>{{'FORMS.LABELS.EVENT' | translate}}</mat-label>
+                                <mat-select [formControl]="form.get([bfe.ticketData.param, bfe.ticketData.events.param, valueParam])"
+                                    [placeholder]="((eventsList$ | async)?.length ?
+                                    'FORMS.ACTIONS.SELECT' : 'FORMS.SELECT.NO_RESULTS' ) | translate">
+                                    <mat-option *ngFor="let item of (eventsList$ | async)" [value]="item.id">
+                                        <div appEllipsify [matTooltip]="item.name">
+                                            {{item.name}}
+                                        </div>
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field inline-field"
+                                [formGroupName]="bfe.ticketData.promotions.param">
+                                <mat-label>{{'FORMS.LABELS.PROMOTION' | translate}}</mat-label>
+                                <mat-select [formControlName]="valueParam" multiple [placeholder]="((promotionsList$ | async)?.length ?
+                                    'FORMS.ACTIONS.SELECT' : 'FORMS.SELECT.NO_RESULTS' ) | translate">
+                                    <mat-option *ngFor="let item of (promotionsList$ | async)" [value]="item.id">
+                                        <div appEllipsify [matTooltip]="item.name">
+                                            {{item.name}}
+                                        </div>
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <!-- SESSION DATE -->
+                        <mat-radio-button [value]="bfe.ticketData.opts.sessionDates">
+                            {{'BUYERS.SESSION_DATE' | translate}}
+                        </mat-radio-button>
+                        <div fxLayout="row wrap" class="nested-field ticket-data-session-date-container"
+                            [fxShow]="form.get([bfe.ticketData.param, valueParam]).value === bfe.ticketData.opts.sessionDates">
+                            <mat-form-field fxFlex="150px" appearance="outline" class="ob-form-field inline-field"
+                                [formGroupName]="bfe.ticketData.sessionDatesFrom.param">
+                                <input matInput [matDatepicker]="sessionsDateFrom" [placeholder]="'FORMS.FROM' | translate"
+                                    [formControlName]="valueParam" (focus)="sessionsDateFrom.open()">
+                                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                                    (click)="$event.stopPropagation(); sessionsDateFrom.open();">
+                                    <mat-icon>event</mat-icon>
+                                </button>
+                                <mat-datepicker #sessionsDateFrom />
+                            </mat-form-field>
+                            <mat-form-field fxFlex="150px" appearance="outline" class="ob-form-field inline-field"
+                                [formGroupName]="bfe.ticketData.sessionDatesTo.param">
+                                <input matInput [matDatepicker]="sessionsDateTo" [placeholder]="'FORMS.TO' | translate"
+                                    [formControlName]="valueParam" (focus)="sessionsDateTo.open()">
+                                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                                    (click)="$event.stopPropagation(); sessionsDateTo.open();">
+                                    <mat-icon>event</mat-icon>
+                                </button>
+                                <mat-datepicker #sessionsDateTo />
+                            </mat-form-field>
+                        </div>
+                    </mat-radio-group>
+                </mat-form-field>
+            </div>
+            <!-- AVG TICKET PRICE  -->
+            <div fxLayout="column" fxLayoutAlign="start stretch" [formGroupName]="bfe.orderItemAvgPrice.param">
+                <mat-form-field fxFlex hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'BUYERS.ORDER_TICKET_AVG_PRICE' | translate}}
+                    </mat-checkbox>
+                    <input fxHide matInput>
+                </mat-form-field>
+                <div [fxShow]="form.get([bfe.orderItemAvgPrice.param, isActiveParam]).value" class="nested-field"
+                    fxLayoutAlign="stretch center">
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                        [formGroupName]="bfe.orderItemAvgPrice.from.param">
+                        <app-currency-input [formControlName]="valueParam" [placeholder]="0 | localCurrency : userCurrency" />
+                    </mat-form-field>
+                    <mat-divider fxFlex="10px" />
+                    <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                        [formGroupName]="bfe.orderItemAvgPrice.to.param">
+                        <app-currency-input [formControlName]="valueParam" [placeholder]="0 | localCurrency : userCurrency" />
+                    </mat-form-field>
+                </div>
+            </div>
+            <!-- TICKET PRICE -->
+            <div fxLayout="column" fxLayoutAlign="start stretch" [formGroupName]="bfe.orderItemValue.param">
+                <mat-form-field hidden-outline class="ob-form-field inline-field">
+                    <mat-checkbox color="primary" [formControlName]="isActiveParam">
+                        {{'BUYERS.ORDER_TICKET_VALUE' | translate}}
+                    </mat-checkbox>
+                    <input fxHide aria-label="order date filter enabled" matInput>
+                </mat-form-field>
+                <mat-form-field [fxShow]="form.get([bfe.orderItemValue.param, isActiveParam]).value" hidden-outline
+                    class="ob-form-field inline-field nested-field">
+                    <input matInput fxHide>
+                    <mat-radio-group [formControlName]="valueParam" fxLayout="column" fxLayoutGap="8px">
+                        <mat-radio-button [value]="bfe.orderItemValue.opts.ticket">
+                            {{'BUYERS.BASE_TICKET_PRICE' | translate}}
+                        </mat-radio-button>
+                        <div fxLayoutAlign="stretch center" class="nested-field"
+                            [fxShow]="form.get([bfe.orderItemValue.param, valueParam]).value === bfe.orderItemValue.opts.ticket">
+                            <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                                [formGroupName]="bfe.orderItemValue.basePriceFrom.param">
+                                <app-currency-input [formControlName]="valueParam" [placeholder]="0 | localCurrency : userCurrency" />
+                            </mat-form-field>
+                            <mat-divider fxFlex="10px" />
+                            <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                                [formGroupName]="bfe.orderItemValue.basePriceTo.param">
+                                <app-currency-input [formControlName]="valueParam" [placeholder]="0 | localCurrency : userCurrency" />
+                            </mat-form-field>
+                        </div>
+                        <mat-radio-button [value]="bfe.orderItemValue.opts.order">
+                            {{'BUYERS.ORDER_TICKET_PRICE' | translate}}
+                        </mat-radio-button>
+                        <div fxLayoutAlign="stretch center" class="nested-field"
+                            [fxShow]="form.get([bfe.orderItemValue.param, valueParam]).value === bfe.orderItemValue.opts.order">
+                            <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                                [formGroupName]="bfe.orderItemValue.finalPriceFrom.param">
+                                <app-currency-input [formControlName]="valueParam" [placeholder]="0 | localCurrency : userCurrency" />
+                            </mat-form-field>
+                            <mat-divider fxFlex="10px" />
+                            <mat-form-field fxFlex appearance="outline" class="ob-form-field inline-field"
+                                [formGroupName]="bfe.orderItemValue.finalPriceTo.param">
+                                <app-currency-input [formControlName]="valueParam" [placeholder]="0 | localCurrency : userCurrency" />
+                            </mat-form-field>
+                        </div>
+                        <mat-radio-button [value]="bfe.orderItemValue.opts.invitations">
+                            {{'BUYERS.INVITATION' | translate}}
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+</div>

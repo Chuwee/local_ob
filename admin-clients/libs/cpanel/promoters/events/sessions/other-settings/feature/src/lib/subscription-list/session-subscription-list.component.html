@@ -1,0 +1,23 @@
+<div fxLayout="row wrap" [formGroup]="subscriptionListFormGroup">
+    <mat-radio-group formControlName="subscriptionListScope" fxFlex="100%" fxLayout="column">
+        <mat-radio-button [value]="sessionSubscriptionListScope.event" class="ob-radio-button vertical-list">
+            {{'EVENTS.SESSION.SUBSCRIPTION_LISTS.EVENT' | translate}}
+        </mat-radio-button>
+        <mat-radio-button [value]="sessionSubscriptionListScope.session" class="ob-radio-button vertical-list">
+            {{'EVENTS.SESSION.SUBSCRIPTION_LISTS.SESSION' | translate}}
+        </mat-radio-button>
+    </mat-radio-group>
+    <div fxFlex="100%" fxLayout="row" class="session-data-container"
+        [fxShow]="subscriptionListFormGroup.get('subscriptionListScope').value === sessionSubscriptionListScope.session">
+        <mat-form-field appearance="outline" class="ob-form-field ob-form-field-outline nested-content" fxFlex="0 1 50%">
+            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="subscriptionListId"
+                aria-label="producer">
+                <mat-option *ngFor="let subscription of entitySubscriptionLists$ | async" [value]="subscription?.id">
+                    <div appEllipsify [matTooltip]="subscription?.name">
+                        {{subscription?.name}}
+                    </div>
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+</div>

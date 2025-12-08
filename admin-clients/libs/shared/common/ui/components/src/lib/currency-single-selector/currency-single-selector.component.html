@@ -1,0 +1,33 @@
+<div class="currency-selector flex flex-row flex-wrap">
+    @switch (selectionTypeBS | async) {
+        @case (selectionType.radio) {
+            <mat-radio-group class="flex flex-col" [formControl]="currencyCtrl">
+                @for (currency of currencies$ | async; track currency.code) {
+                    <mat-radio-button class="ob-radio-button vertical-list" [value]="currency.code">
+                        {{ currency.code | localCurrencyFullTranslation }}
+                    </mat-radio-button>
+                }
+                <mat-error [ob-form-errors]="currencyCtrl" />
+            </mat-radio-group>
+        }
+        @case (selectionType.dropdown) {
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label flex-1 sm:basis-64 sm:flex-initial">
+                <mat-label>{{'FORMS.LABELS.CURRENCY' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                    [formControl]="currencyCtrl">
+                    <mat-option>
+                        <app-select-search #currencySelectSearch [options$]="currencies$ | localCurrenciesFullTranslation$"
+                            [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="description"
+                            requireSelection="true" />
+                    </mat-option>
+                    @for (currency of currencySelectSearch.getFilteredOptions$() | async; track currency.code) {
+                        <mat-option [value]="currency.code">
+                            {{currency.description}}
+                        </mat-option>
+                    }
+                </mat-select>
+                <mat-error [ob-form-errors]="currencyCtrl" />
+            </mat-form-field>
+        }
+    }
+</div>

@@ -1,0 +1,31 @@
+<div class="flex flex-1">
+    <div class="subtabs-container flex flex-col basis-[200px] shrink-0">
+        <mat-button-toggle-group vertical [value]="deepPath$ | async" appLastPathGuardListener
+            [currValue]="(deepPath$ | async)" class="flex flex-1 ob-subtab">
+            <!-- TODO: Remove isTestTaxes when  taxes end -->
+            @let event = event$ | async;
+            @if(event && isTestTaxes){
+                <mat-button-toggle routerLink="taxes" value="taxes">
+                    {{'EVENTS.TAXES.TITLE' | translate}}
+                </mat-button-toggle>
+            }
+            @if(event?.additional_config?.inventory_provider === 'SGA' && event.type !== eventType.activity){
+                <mat-button-toggle routerLink="sga-products" value="sga-products">
+                    {{'EVENTS.SGA_PRODUCTS.TITLE' | translate}}
+                </mat-button-toggle>
+            }
+            @if(!event?.settings?.use_tiered_pricing){
+                <mat-button-toggle routerLink="rates" value="rates">
+                    {{'EVENTS.RATES' | translate}}
+                </mat-button-toggle>
+            }
+            <mat-button-toggle routerLink="price-types" value="price-types">
+                {{'EVENTS.PRICE_TYPES.TITLE' | translate}}
+            </mat-button-toggle>
+            <mat-button-toggle routerLink="surcharges" value="surcharges">
+                {{'EVENTS.SURCHARGES.TITLE' | translate}}
+            </mat-button-toggle>
+        </mat-button-toggle-group>
+    </div>
+    <router-outlet />
+</div>

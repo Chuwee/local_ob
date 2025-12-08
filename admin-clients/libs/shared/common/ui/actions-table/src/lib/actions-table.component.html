@@ -1,0 +1,51 @@
+<mat-table class="ob-table not-touchable" [dataSource]="data" #table (contentChanged)="isContentChanging.emit(false)">
+
+    <ng-container *ngIf="columns.includes('name')" matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{ title || ('FORMS.LABELS.NAME' | translate) }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row;">{{ row.name }}</mat-cell>
+    </ng-container>
+
+    <ng-container *ngIf="columns.includes('actions') && (numberOfActions > 1 && useContextMenu)" matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef class="actions-cell head-cell" fxFlex="0 0 50px"></mat-header-cell>
+        <mat-cell *matCellDef="let row" class="actions-cell" fxFlex="0 0 50px">
+            <div (click)="$event.stopPropagation()">
+                <button mat-stroked-button color="tertiary" [matMenuTriggerFor]="actionsListMenu"
+                    [ngClass]="(menuTrigger.menuOpen) ? 'active' : ''" #menuTrigger="matMenuTrigger"
+                    class="action-buttons ob-button medium only-icon">
+                    <mat-icon>more_horiz</mat-icon>
+                </button>
+                <mat-menu #actionsListMenu="matMenu" xPosition="before" (close)="menuTrigger">
+                    <button mat-menu-item *ngFor="let action of actions | keyvalue"
+                        [fxShow]="!action.value.enabled || action.value.enabled(row)"
+                        [attr.aria-label]="action.value.label || action.key" (click)="actionClicked(action.key, row)">
+                        <mat-icon>{{action.value.icon}}</mat-icon>{{action.value.label}}
+                    </button>
+                </mat-menu>
+            </div>
+        </mat-cell>
+    </ng-container>
+
+    <ng-container *ngIf="columns.includes('actions') && (numberOfActions === 1 || !useContextMenu)" matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef class="actions-cell head-cell"></mat-header-cell>
+        <mat-cell *matCellDef="let row" class="actions-cell" fxLayoutAlign="end">
+            <div class="action-buttons" (click)="$event.stopPropagation()">
+                <button *ngFor="let action of actions | keyvalue" mat-icon-button
+                    [attr.aria-label]="action.value.label || action.key"
+                    class="ob-button medium" (click)="actionClicked(action.key, row)">
+                    <mat-icon>{{action.value.icon}}</mat-icon>
+                </button>
+            </div>
+        </mat-cell>
+    </ng-container>
+
+    <ng-content></ng-content>
+
+    <ng-container *matNoDataRow>
+        <ng-content select="[empty-list-block]"></ng-content>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="columns" class="dense-row"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: columns;" class="dense-row hoverable-row"></mat-row>
+</mat-table>

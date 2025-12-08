@@ -1,0 +1,23 @@
+<h3 class="section-title">{{'CHANNELS.COMMISSIONS.GENERICS' | translate}}</h3>
+
+<!--    TODO(MULTICURRENCY): delete ngIf else when the multicurrency functionality is finished-->
+@if (isMultiCurrency$ | async) {
+    @if ((channelCurrencies$ | async)?.length > 1) {
+        <app-tabs-menu type="navigation" (changeEmitter)="$currencySelectedTabBS().next($event.key)">
+            @for (currency of channelCurrencies$ | async; track currency.id) {
+                <ng-template appTab [label]="currency.code | localCurrencyPartialTranslation" [key]="currency.code">
+                    <app-channel-commissions-generic-ranges [userCanWrite]="$userCanWrite()" [currencyCode]="currency.code"
+                        [commissionsRequestCtrl]="$commissionsRequestCtrl()" [errorCtrl]="errorCtrl"
+                        [data]="multiCurrencyData$ | rangeCurrencyInput:currency.code | async" />
+                </ng-template>
+            }
+        </app-tabs-menu>
+    } @else if ((channelCurrencies$ | async)?.length === 1) {
+        <app-channel-commissions-generic-ranges [userCanWrite]="$userCanWrite()"
+            [currencyCode]="(channelCurrencies$ | async)[0].code"
+            [commissionsRequestCtrl]="$commissionsRequestCtrl()" [errorCtrl]="errorCtrl"
+            [data]="multiCurrencyData$ | rangeCurrencyInput:(channelCurrencies$ | async)[0].code | async" />
+    }
+} @else {
+    <app-range-table [disabled]="!$userCanWrite()" [form]="genericForm" [data]="(data$ | async)" type="generic" />
+}

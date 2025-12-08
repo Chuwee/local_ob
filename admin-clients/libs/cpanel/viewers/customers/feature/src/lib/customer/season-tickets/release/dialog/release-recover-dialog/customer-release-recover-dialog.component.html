@@ -1,0 +1,26 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="100%" class="secondary title">{{'CUSTOMER.RELEASE.' + data.action + '_DIALOG.TITLE' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" [mat-dialog-close]="false">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutGap="25px">
+        <span class="mat-body-2">{{'CUSTOMER.RELEASE.' + data.action + '_DIALOG.INFO' | translate}}</span>
+        <app-customer-release-dialog-info [seat]="data.selectedSeat" [session]="data.session" />
+    </div>
+</div>
+<div mat-dialog-actions fxLayoutAlign="end">
+    <button type="button" mat-button class="ob-button" [mat-dialog-close]="false" [disabled]="isInProgress$ | async">
+        {{'FORMS.ACTIONS.CANCEL' | translate}}
+    </button>
+    <button mat-flat-button color="primary" type="button" class="ob-button" [disabled]="isInProgress$ | async"
+        (click)="submit()">
+        {{'CUSTOMER.RELEASE.' + data.action + '_DIALOG.' + data.action | translate}}
+    </button>
+</div>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

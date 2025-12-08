@@ -1,0 +1,35 @@
+<div fxFlex="0 0 100%" fxLayout="column" fxLayoutAlign="stretch stretch" class="channel-container">
+    <div class="ob-overlay-wrapper" fxLayoutAlign="center start" *ngIf="isGenerationStatusInProgress$ | async">
+        <div class="ob-overlay-pane">
+            <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px"
+                fxFlex="80%">
+                <p>{{'SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate}}</p>
+                <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                    [attr.aria-label]="('SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate)">
+                </mat-progress-bar>
+            </app-context-notification>
+        </div>
+    </div>
+    <mat-drawer-container fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="stretch">
+        <mat-drawer #drawer mode="side" opened fxFlex="0 0 {{sidebarWidth$ | async}}">
+            <app-season-ticket-channels-list></app-season-ticket-channels-list>
+        </mat-drawer>
+        <mat-drawer-content fxFlex="0 1 100%" fxLayout="column" class="channel-editor-container">
+            <div class="ob-sidebar-toggle" (click)="drawer.toggle();" [ngClass]="{'collapsed': !drawer.opened}">
+                <span class="arrow"></span>
+            </div>
+            <router-outlet *ngIf="(isGenerationStatusReady$ | async) && (seasonTicketChannelListMetadata$ | async)?.total !== 0">
+            </router-outlet>
+            <div class="context-notification-container" *ngIf="(seasonTicketChannelListMetadata$ | async)?.total === 0"
+                fxFlex="100%" fxLayout="row" fxLayoutAlign="center start">
+                <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px"
+                    fxFlex="80%" fxLayoutAlign="center start">
+                    <p class="empty-list-msg">{{'LIST.EMPTY' | translate}}</p>
+                </app-context-notification>
+            </div>
+            <div class="spinner-container" *ngIf="(isLoading$ | async)">
+                <mat-spinner></mat-spinner>
+            </div>
+        </mat-drawer-content>
+    </mat-drawer-container>
+</div>

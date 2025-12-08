@@ -1,0 +1,76 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="100%" class="secondary title">{{'MATCHINGS.TITLES.LAUNCH_MATCHER_TITLE' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content>
+        <div class="form-container" fxLayout="column" fxLayoutGap="32px">
+            <p>{{'MATCHINGS.FORMS.INFOS.LAUNCH_MATCHER_DESC' | translate}}</p>
+            <div fxLayout="column" fxLayoutGap="8px">
+                <div fxLayout="row" fxLayoutGap="16px" class="add-country-container">
+                    <div fxFlex fxLayout="column">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <input matInput [placeholder]="'MATCHINGS.INFOS.COUNTRY' | translate"
+                                [formControl]="form.controls.countryInput" (keyup.enter)="addChip('countries')">
+                        </mat-form-field>
+                        <mat-error *ngIf="!form.controls.countryInput.valid" class="mat-error">
+                            {{'MATCHINGS.INFOS.LAUNCH_MATCHER_COUNTRY_FORMAT_ERROR' | translate}}
+                        </mat-error>
+                    </div>
+                    <button mat-stroked-button color="primary" type="button"
+                        class="ob-button medium add-button" (click)="addChip('countries')"
+                        [disabled]="form.controls.countryInput.invalid || form.value.countryInput.length === 0">
+                        {{'MATCHINGS.ACTIONS.LAUNCH_MATCHER_ADD_COUNTRY' | translate}}
+                    </button>
+                </div>
+                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px" class="badge-with-text-container">
+                    <div class="badge-container" [class.empty]="(countriesChips$ | async)?.length === 0">
+                        {{(countriesChips$ | async).length}}
+                    </div>
+                    <span class="elements-text">{{'MATCHINGS.INFOS.LAUNCH_MATCHER_COUNTRIES_ADDED' | translate}}:</span>
+                </div>
+                <app-chips [chips$]="countriesChips$"
+                    class="ellipsified-chips without-max-height" overrideClasses="handset"
+                    (removeEmitter)="removeChip($event, 'countries')">
+                </app-chips>
+            </div>
+            <div fxLayout="column" fxLayoutGap="8px">
+                <div fxFlex="row" fxLayoutGap="16px" class="add-taxonomy-container">
+                    <div fxFlex fxLayout="column">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <input matInput [placeholder]="'MATCHINGS.INFOS.TAXONOMY' | translate"
+                                [formControl]="form.controls.taxonomyInput" (keyup.enter)="addChip('taxonomies')">
+                        </mat-form-field>
+                    </div>
+                    <button mat-stroked-button color="primary" type="button"
+                        class="ob-button medium add-button" (click)="addChip('taxonomies')"
+                        [disabled]="form.value.taxonomyInput.length === 0">
+                        {{'MATCHINGS.ACTIONS.LAUNCH_MATCHER_ADD_TAXONOMY' | translate}}
+                    </button>
+                </div>
+                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px" class="badge-with-text-container">
+                    <div class="badge-container" [class.empty]="(taxonomiesChips$ | async)?.length === 0">
+                        {{(taxonomiesChips$ | async).length}}
+                    </div>
+                    <span class="elements-text">{{'MATCHINGS.INFOS.LAUNCH_MATCHER_TAXONOMIES_ADDED' | translate}}:</span>
+                </div>
+                <app-chips [chips$]="taxonomiesChips$"
+                    class="ellipsified-chips without-max-height" overrideClasses="handset"
+                    (removeEmitter)="removeChip($event, 'taxonomies')">
+                </app-chips>
+            </div>
+        </div>
+    </div>
+    <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button"
+            [disabled]="form.value.countries.length === 0 && form.value.taxonomies.length === 0"
+            (click)="launchMatcher()">
+            {{'MATCHINGS.ACTIONS.LAUNCH_MATCHER' | translate}}
+        </button>
+    </div>
+</div>

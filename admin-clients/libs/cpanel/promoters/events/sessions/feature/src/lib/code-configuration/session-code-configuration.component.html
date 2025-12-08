@@ -1,0 +1,70 @@
+<app-form-container (cancel)="refresh()" (save)="save()" [disabled]="!form.dirty || (isLoadingOrSaving$ | async)">
+    <form [formGroup]="form">
+        <p>{{'EVENTS.SESSION.CONF_CODES_DESCRIPTION' | translate}}</p>
+        <div fxLayout="row wrap" fxLayoutAlign="start start" fxLayoutGap="20px">
+            <div fxLayout="column" fxFlex="240px">
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'EVENTS.SESSION.PERSON_TYPE' | translate}}</mat-label>
+                    <mat-select formControlName="personType" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                        <mat-option>
+                            <app-select-search #personTypeSelectSearch [options$]="personTypeOptions$" searchField="name">
+                            </app-select-search>
+                        </mat-option>
+                        <mat-option *ngFor="let code of personTypeSelectSearch.getFilteredOptions$() | async" [value]="code">
+                            <div>
+                                {{code}}
+                            </div>
+                        </mat-option>
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form" field="personType"></mat-error>
+                </mat-form-field>
+            </div>
+            <div fxLayout="column" fxFlex="240px">
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'EVENTS.SESSION.VARIABLE_CODE' | translate}}</mat-label>
+                    <mat-select formControlName="variableCode" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                        <mat-option>
+                            <app-select-search #variableCodeSelectSearch [options$]="variableCodeOptions$" searchField="name">
+                            </app-select-search>
+                        </mat-option>
+                        <mat-option *ngFor="let code of variableCodeSelectSearch.getFilteredOptions$() | async" [value]="code">
+                            <div>
+                                {{code}}
+                            </div>
+                        </mat-option>
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form" field="variableCode"></mat-error>
+                </mat-form-field>
+            </div>
+            <div fxLayout="column" fxFlex="240px">
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'EVENTS.SESSION.USES' | translate}}</mat-label>
+                    <input matInput type="number" aria-label="uses" placeholder="0" formControlName="uses">
+                    <mat-error [ob-form-errors]="form" field="uses"></mat-error>
+                </mat-form-field>
+            </div>
+            <div fxLayout="column" fxFlex="240px">
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'EVENTS.SESSION.DAYS' | translate}}</mat-label>
+                    <input matInput type="number" aria-label="days" placeholder="0" formControlName="days">
+                    <mat-error [ob-form-errors]="form" field="days"></mat-error>
+                </mat-form-field>
+            </div>
+            <div fxLayout="column" fxFlex="240px">
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'EVENTS.SESSION.PASS_TYPE' | translate}}</mat-label>
+                    <mat-select formControlName="passType" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                        <mat-option *ngFor="let passType of barcodesPassTypes" [value]="passType">
+                            {{('EVENTS.SESSION.PASS_TYPE_OPTS.' + passType) | translate}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form" field="passType"></mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+    </form>
+    <app-archived-event-mgr slot="actions-bar" [disabled]="form.dirty || (isLoadingOrSaving$ | async)"></app-archived-event-mgr>
+</app-form-container>
+<div *ngIf="isLoadingOrSaving$ | async" class="spinner-container">
+    <mat-spinner></mat-spinner>
+</div>

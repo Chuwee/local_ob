@@ -1,0 +1,177 @@
+@if ($seasonTicket(); as seasonTicket) {
+    <div class="status-notifications-container flex items-center">
+        <mat-slide-toggle (change)="handleStatusChange($event.checked)" class="ob-slide-toggle" color="primary"
+            [formControl]="allowReleaseSeatForm.controls.allow_release_seat">
+            {{ 'SEASON_TICKET.RELEASE_SEAT.ENABLED'| translate }}
+        </mat-slide-toggle>
+    </div>
+    <app-form-container (save)="save()" (cancel)="refresh()" layout="menu"
+        [disabled]="!form.dirty || (isGenerationStatusReady$ | async) === false">
+        @if (isGenerationStatusInProgress$ | async) {
+            <div class="ob-overlay-wrapper" slot="overlay">
+                <div class="ob-overlay-pane pane-sticky">
+                    <app-context-notification class="ob-context-notification basis-5/6" contextType="info">
+                        <p>{{'SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate}}</p>
+                        <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                            [attr.aria-label]="('SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate)" />
+                    </app-context-notification>
+                </div>
+            </div>
+        }
+        <span class="flex items-center section-block">
+            <mat-icon class="ob-icon xsmall info with-text">info</mat-icon>
+            <span>{{ 'SEASON_TICKET.RELEASE_SEAT.QUOTAS_INFO' | translate }}</span>
+        </span>
+        <mat-accordion [multi]="true" [togglePosition]="'before'" [formGroup]="form">
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'SEASON_TICKET.RELEASE_SEAT.FREE_SEATING_LIMITS' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <div class="flex flex-col gap-2 section-block">
+                    <div class="flex flex-col">
+                        <div class="flex flex-wrap items-center">
+                            <mat-checkbox formControlName="enable_release_delay" color="primary">
+                                {{'SEASON_TICKET.RELEASE_SEAT.RELEASE_DELAY_ENABLED' | translate}}
+                            </mat-checkbox>
+                        </div>
+                        @if (form.controls.enable_release_delay.value) {
+                            <mat-radio-group class="flex flex-col gap-4 release-delay" formControlName="release_delay_type">
+                                <mat-radio-button class="ob-radio-button align" [value]="'FROM'">
+                                    <div class="flex flex-row items-baseline" [formGroup]="form.controls.release_delay">
+                                        <label>{{'SEASON_TICKET.RELEASE_SEAT.MIN_RELEASE_DELAY_PREFIX' | translate}}</label>
+                                        <mat-form-field class="ob-form-field inline-field value-field release-delay-input"
+                                            appearance="outline">
+                                            <input matInput type="number" formControlName="from" min="1" step="1">
+                                        </mat-form-field>
+                                        <label>{{'SEASON_TICKET.RELEASE_SEAT.MIN_RELEASE_DELAY_SUFFIX' | translate}}</label>
+                                    </div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button align" [value]="'TO'">
+                                    <div class="flex flex-row items-baseline" [formGroup]="form.controls.release_delay">
+                                        <label>{{'SEASON_TICKET.RELEASE_SEAT.MAX_RELEASE_DELAY_PREFIX' | translate}}</label>
+                                        <mat-form-field class="ob-form-field inline-field value-field release-delay-input"
+                                            appearance="outline">
+                                            <input matInput type="number" formControlName="to" min="1" step="1">
+                                        </mat-form-field>
+                                        <label>{{'SEASON_TICKET.RELEASE_SEAT.MAX_RELEASE_DELAY_SUFFIX' | translate}}</label>
+                                    </div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button align" [value]="'RANGE'">
+                                    <div class="flex flex-row items-baseline" [formGroup]="form.controls.release_delay.controls.range">
+                                        <label>{{'SEASON_TICKET.RELEASE_SEAT.MIN_RELEASE_DELAY_PREFIX' | translate}}</label>
+                                        <mat-form-field class="ob-form-field inline-field value-field release-delay-input"
+                                            appearance="outline">
+                                            <input matInput type="number" formControlName="min_delay_time" min="1" step="1">
+                                        </mat-form-field>
+                                        <label>{{'SEASON_TICKET.RELEASE_SEAT.RELEASE_DELAY_RANGE_PREFIX' | translate}}</label>
+                                        <mat-form-field class="ob-form-field inline-field value-field release-delay-input"
+                                            appearance="outline">
+                                            <input matInput type="number" formControlName="max_delay_time" min="1" step="1">
+                                        </mat-form-field>
+                                        <label>{{'SEASON_TICKET.RELEASE_SEAT.RELEASE_DELAY_RANGE_SUFFIX' | translate }}</label>
+                                    </div>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                            <mat-error class="release-delay-range-error"
+                                [ob-form-errors]="form.controls.release_delay" [field]="['range']" />
+                        }
+                    </div>
+
+                    <div class="flex items-baseline gap-1">
+                        <mat-checkbox formControlName="enable_recover_delay" color="primary" />
+                        <div class="flex flex-row items-baseline basis-full">
+                            <label>{{'SEASON_TICKET.RELEASE_SEAT.RECOVER_MAX_DELAY_TIME.PREFIX_LABEL' | translate}}</label>
+                            <mat-form-field class="ob-form-field inline-field value-field basis-24" appearance="outline">
+                                <input matInput type="number" formControlName="recover_max_delay_time" min="1" step="1">
+                            </mat-form-field>
+                            <label>{{'SEASON_TICKET.RELEASE_SEAT.RECOVER_MAX_DELAY_TIME.SUFIX_LABEL' | translate }}</label>
+                        </div>
+                    </div>
+                </div>
+
+                <mat-divider class="ob-divider" />
+                <div class="flex flex-wrap items-center">
+                    <mat-checkbox formControlName="enable_max_releases" color="primary">
+                        {{'SEASON_TICKET.RELEASE_SEAT.ENABLE_MAX_RELEASES' | translate}}
+                    </mat-checkbox>
+                    <mat-form-field class="ob-form-field inline-field value-field basis-24" appearance="outline">
+                        <input matInput type="number" inputmode="numeric" placeholder="1"
+                            formControlName="max_releases" min="1" step="1">
+                        <mat-error [ob-form-errors]="form" field="max_releases" />
+                    </mat-form-field>
+                </div>
+            </mat-expansion-panel>
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'SEASON_TICKET.RELEASE_SEAT.BALANCE_CONFIG' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <div class="flex flex-col">
+                    <span class="field-label">{{'SEASON_TICKET.RELEASE_SEAT.CUSTOMER_PERCENTAGE.TITLE' | translate}}</span>
+                    <p>{{'SEASON_TICKET.RELEASE_SEAT.CUSTOMER_PERCENTAGE.DESCRIPTION' | translate}}</p>
+                    <div class="flex flex-wrap items-baseline">
+                        <label>{{'SEASON_TICKET.RELEASE_SEAT.CUSTOMER_PERCENTAGE.PREFIX_LABEL' | translate}}</label>
+                        <mat-form-field class="ob-form-field inline-field value-field basis-24" appearance="outline">
+                            <app-percentage-input formControlName="customer_percentage"
+                                placeholder="{{0 | localNumber : '1.2-2'}}" />
+                            <mat-error class="under_error" [ob-form-errors]="form.controls.customer_percentage" />
+                        </mat-form-field>
+                        <label>{{'SEASON_TICKET.RELEASE_SEAT.CUSTOMER_PERCENTAGE.SUFIX_LABEL' | translate }}</label>
+                    </div>
+                </div>
+
+                <mat-divider class="ob-divider" />
+
+                <div class="flex flex-col gap-2">
+                    <span class="field-label">{{'SEASON_TICKET.RELEASE_SEAT.MAX_CUSTOMER_EARNINGS.TITLE' | translate}}</span>
+                    <div class="flex flex-wrap align-center">
+                        <mat-checkbox formControlName="earnings_limit_enabled" color="primary">
+                            {{'SEASON_TICKET.RELEASE_SEAT.MAX_CUSTOMER_EARNINGS.ENABLED' | translate}}
+                        </mat-checkbox>
+                        <mat-icon [matTooltip]="'SEASON_TICKET.RELEASE_SEAT.MAX_CUSTOMER_EARNINGS.ENABLED_INFO' | translate"
+                            class="ob-help-icon">
+                            help_outline
+                        </mat-icon>
+                    </div>
+                    @if (form.controls.earnings_limit_enabled.value) {
+                        <div class="max-customer-earnings-percentage flex flex-col gap-2">
+                            <span class="flex items-center">
+                                <mat-icon class="ob-icon xsmall info with-text">info</mat-icon>
+                                <span>{{ 'SEASON_TICKET.RELEASE_SEAT.MAX_CUSTOMER_EARNINGS.INFO' | translate }}</span>
+                            </span>
+                            <div class="flex">
+                                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                                    <mat-label>
+                                        {{'SEASON_TICKET.RELEASE_SEAT.MAX_CUSTOMER_EARNINGS.PERCENTAGE_LABEL' | translate}}
+                                    </mat-label>
+                                    <app-percentage-input formControlName="earnings_limit"
+                                        placeholder="{{0 | localNumber : '1.2-2'}}" />
+                                    <mat-error class="under_error" [ob-form-errors]="form.controls.earnings_limit" />
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </mat-expansion-panel>
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'SEASON_TICKET.RELEASE_SEAT.EXCLUDED_SESSIONS_CONFIG' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <p>{{'SEASON_TICKET.RELEASE_SEAT.EXCLUDED_SESSIONS_CONFIG_DESCRIPTION' | translate}}</p>
+                <app-excluded-sessions-config [seasonTicketId]="seasonTicket.id" [excludedSessionsIds]="$excludedSessions()"
+                    [emptyTitle]="'SEASON_TICKET.RELEASE_SEAT.EXCLUDED_SESSIONS_EMPTY_TITLE'"
+                    [emptyDescription]="'SEASON_TICKET.RELEASE_SEAT.EXCLUDED_SESSIONS_EMPTY_DESCRIPTION'"
+                    (saveExcludedSessions)="saveExcludedSessions($event)"/>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </app-form-container>
+    @if (isLoadingOrSaving$ | async) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+}

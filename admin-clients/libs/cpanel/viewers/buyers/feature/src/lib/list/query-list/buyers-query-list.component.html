@@ -1,0 +1,37 @@
+<mat-accordion displayMode="flat" class="ob-accordion-list" *ngIf="(queries$ | async) as queries">
+    <mat-expansion-panel class="exclude-body-padding queries-panel" *ngIf="queries.length > 0">
+        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+            <mat-panel-title>
+                <h3 class="queries-title">{{'BUYERS.QUERIES.MY_QUERIES' | translate}}</h3>
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-selection-list multiple="false" fxFlex="0 0 100%" fxLayout="column" (selectionChange)="loadQuery($event)">
+            <mat-list-option *ngFor="let query of queries; index as i" [value]="query.id"
+                [selected]="(selectedQuery$ | async)?.id === query.id" class="query-option with-badge">
+                <div fxFlex fxLayout="row" fxLayoutAlign="start center">
+                    <span fxFlex class="mat-body-2 ob-text-ellipsis"
+                        [matTooltip]="query.query_name + '\n' + (query.query_description || '')">
+                        {{query.query_name}}
+                    </span>
+                    <div fxLayout="row" class="query-actions-container">
+                        <button mat-icon-button aria-label="edit" fxFlex="0 0 26px"
+                            matTooltip="{{'BUYERS.QUERIES.EDIT' | translate}}"
+                            class="ob-button xsmall action-label-button" (click)="editQuery($event, query)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button aria-label="copy" fxFlex="0 0 26px"
+                            matTooltip="{{'BUYERS.QUERIES.CLONE' | translate}}"
+                            class="ob-button xsmall action-label-button" (click)="cloneQuery($event, query)">
+                            <mat-icon>content_copy</mat-icon>
+                        </button>
+                        <button mat-icon-button aria-label="delete" fxFlex="0 0 26px"
+                            matTooltip="{{'BUYERS.QUERIES.DELETE' | translate}}"
+                            class="ob-button xsmall action-label-button" (click)="deleteQuery($event, query)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+                </div>
+            </mat-list-option>
+        </mat-selection-list>
+    </mat-expansion-panel>
+</mat-accordion>

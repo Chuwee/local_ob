@@ -1,0 +1,48 @@
+<div fxFill>
+    <div fxFlex="0 0 200px" fxLayout="column" class="subtabs-container">
+        <mat-button-toggle-group vertical="true" [value]="deepPath$ | async" class="ob-subtab" appLastPathGuardListener
+            [currValue]="(deepPath$ | async)" fxFlex="1 0 100%">
+            <mat-button-toggle id="subtab_event_general-data_principal-info" routerLink="principal-info" value="principal-info">
+                {{'EVENTS.PRINCIPAL_INFO' | translate}}
+            </mat-button-toggle>
+            <mat-button-toggle id="subtab_event_general-data_attendants" routerLink="attendants" value="attendants">
+                {{'EVENTS.ATTENDANTS_CONFIG' | translate}}
+            </mat-button-toggle>
+            @if (isAvetWSEvent$ | async) {
+                <mat-button-toggle id="subtab_event_general-data_restrictions" routerLink="restrictions" value="restrictions">
+                    {{'EVENTS.TITLES.RESTRICTIONS' | translate}}
+                </mat-button-toggle>
+            }
+            @if (hasAttributes$ | async) {
+                <mat-button-toggle id="subtab_event_general-data_attributes" routerLink="attributes" value="attributes">
+                    {{'EVENTS.ATTRIBUTES' | translate}}
+                </mat-button-toggle>
+            }
+            @if (showVendorFeatures$ | async) {
+                <mat-button-toggle id="subtab_event_general-data_vendor-features" routerLink="vendor-features" value="vendor-features">
+                    {{'EVENTS.VENDOR_FEATURES' | translate}}
+                </mat-button-toggle>
+            }
+           <mat-button-toggle id="subtab_event_general-data_change_service_configuration"
+                routerLink="change-seat-conf" value="change-seat-conf">
+                <div class="flex items-center">
+                    {{'EVENTS.TITLES.RELOCATIONS_CONFIGURATION' | translate}}
+                    <app-badge badge="INFORMATION_BADGE.NEW_FEATURE" badgeClass="fuchsia" />
+                </div>
+            </mat-button-toggle>
+            <mat-button-toggle id="subtab_event_general-data_transfer-tickets" routerLink="transfer-tickets" value="transfer-tickets">
+                {{'EVENTS.TRANSFER_SEATS.TITLE' | translate}}
+            </mat-button-toggle>
+            <mat-button-toggle id="subtab_event_general-data_additional-options" routerLink="additional-options" value="additional-options">
+                {{'EVENTS.ADDITIONAL_OPTIONS' | translate}}
+            </mat-button-toggle>
+            @if (enableCodeConfiguration$ | async) {
+                <mat-button-toggle id="subtab_event_general-data_code-configuration"
+                    routerLink="code-configuration" value="code-configuration">
+                    {{'EVENTS.CONF_CODES' | translate}}
+                </mat-button-toggle>
+            }
+        </mat-button-toggle-group>
+    </div>
+    <router-outlet />
+</div>

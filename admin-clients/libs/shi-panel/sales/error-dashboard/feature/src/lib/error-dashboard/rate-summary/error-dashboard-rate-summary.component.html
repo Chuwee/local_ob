@@ -1,0 +1,15 @@
+<app-error-dashboard-summary
+    [value]="$errorResponsibles().length > 1 ? $totalErrorRate() : $responsibleOverallErrorRates()[0].totalErrorRate"
+    [previousValue]="$errorResponsibles().length > 1 ? $previousTotalErrorRate() : $responsibleOverallErrorRates()[0].totalPrevErrorRate"
+    [valueSuffix]="'%'" />
+<div class="error-rate-overalls">
+    @if ($errorResponsibles().length > 1) {
+        @for(e of $responsibleOverallErrorRates(); track e) {
+            <app-information-pill
+                [title]="'ERROR_DASHBOARD.FORM.INFOS.'+e.responsible+'_ERROR_RATES'"
+                [value]="e.totalErrorRate"
+                [previousValue]="e.totalPrevErrorRate"
+                [valueSuffix]="'%'" />
+        }
+    }
+</div>

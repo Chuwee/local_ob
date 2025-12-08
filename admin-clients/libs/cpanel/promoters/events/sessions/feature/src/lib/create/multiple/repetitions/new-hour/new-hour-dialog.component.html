@@ -1,0 +1,55 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'TITLES.NEW_HOUR' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <form [formGroup]="form" fxLayout="column" fxLayoutAlign="start stretch">
+            <div fxFlex>
+                <mat-radio-group fxLayout="column" formControlName="addHourMode" class="hour-mode">
+                    <mat-radio-button class="ob-radio-button inline" [value]="addSessionsHourMode.fixed">
+                        <div>{{'EVENTS.SESSION.HOUR' | translate}}</div>
+                    </mat-radio-button>
+                    <mat-radio-button class="ob-radio-button inline" [value]="addSessionsHourMode.interval">
+                        <div>{{'EVENTS.SESSION.INTERVAL' | translate}}</div>
+                    </mat-radio-button>
+                </mat-radio-group>
+                <div fxFlex fxLayout="row">
+                    <app-time-picker formControlName="fixedTime" />
+                </div>
+            </div>
+            <div fxFlex="100%" fxLayout="column" formGroupName="interval" class="nested-content">
+                <div fxFlex="100%" fxLayout="row">
+                    <app-time-picker formControlName="startTime" [label]="'DATES.START_HOUR' | translate"
+                        class="start-hour" />
+                    <app-time-picker formControlName="endTime" [label]="'DATES.END_HOUR' | translate" class="end-hour" />
+                </div>
+                <div fxFlex="100%" fxLayout="row">
+                    <span class="every-label"
+                        [class.disabled]="form.get('addHourMode').value !== addSessionsHourMode.interval">
+                        {{'EVENTS.SESSION.EVERY' | translate}}
+                    </span>
+                    <mat-form-field fxFlex="0 1 68px" appearance="outline" class="ob-form-field interval-time-duration">
+                        <input matInput type="number" aria-label="duration" formControlName="minuteInterval"
+                            placeholder="0">
+                    </mat-form-field>
+                    <span class="minutes-label"
+                        [class.disabled]="form.get('addHourMode').value !== addSessionsHourMode.interval">
+                        {{('EVENTS.SESSION.TIME_UNITS.MINUTES' | translate)?.toLowerCase()}}
+                    </span>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end">
+        <button mat-button type="button" class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button type="button" color="primary" class="ob-button" [disabled]="!form.valid"
+            (click)="addHour()">
+            {{'FORMS.ACTIONS.ADD' | translate}}
+        </button>
+    </div>
+</div>

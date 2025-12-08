@@ -1,0 +1,41 @@
+<div fxFill *ngIf="saleRequest$ | async as saleRequest">
+    <div fxFlex="0 0 200px" fxLayout="column" class="subtabs-container">
+        <mat-button-toggle-group vertical [value]="deepPath$ | async" class="ob-subtab" appLastPathGuardListener
+            [currValue]="(deepPath$ | async)" fxFlex="1 0 100%">
+            <mat-button-toggle routerLink="surcharges" value="surcharges">
+                {{'SALE_REQUEST.SURCHARGES.TITLE' | translate}}
+            </mat-button-toggle>
+            <mat-button-toggle routerLink="commissions" value="commissions">
+                {{'SALE_REQUEST.COMMISSIONS.TITLE' | translate}}
+            </mat-button-toggle>
+            <mat-button-toggle routerLink="delivery-conditions" value="delivery-conditions"
+                *ngIf="channelWebTypes.includes(saleRequest?.channel?.type)">
+                {{'SALE_REQUEST.DELIVERY_CONDITIONS.TITLE' | translate}}
+            </mat-button-toggle>
+            <mat-button-toggle routerLink="additional-conditions" value="additional-conditions"
+                *ngIf="channelVoucherWebTypes.includes(saleRequest?.channel?.type)">
+                {{'SALE_REQUEST.ADDITIONAL_CONDITIONS.TITLE' | translate}}
+            </mat-button-toggle>
+            <mat-button-toggle routerLink="payment-methods" value="payment-methods"
+                *ngIf="!channelTypesNotPayments.includes(saleRequest?.channel?.type)">
+                {{'SALE_REQUEST.PAYMENT_METHODS.TITLE' | translate}}
+            </mat-button-toggle>
+            <mat-button-toggle routerLink="configuration" value="configuration">
+                {{'SALE_REQUEST.CONFIGURATION.TITLE' | translate}}
+            </mat-button-toggle>
+        </mat-button-toggle-group>
+    </div>
+    <div class="flex flex-col basis-full">
+        <div class="flex justify-end items-center sale-request-status">
+            <app-status-select class="basis-64" [element]="saleRequest" statusType="SALES_REQUESTS"
+                [label]="'SALES_REQUESTS.STATUS.LABEL'" [statusList]="salesRequestsStatus" [updateStatus]="updateStatus"
+                [hiddenStatusList]="[salesRequestsStatus.pending]">
+                <ng-template #optionTemplate let-row>
+                    {{'SALES_REQUESTS.STATUS_OPTS.' + row | translate}}
+                </ng-template>
+            </app-status-select>
+        </div>
+        <mat-divider />
+        <router-outlet />
+    </div>
+</div>

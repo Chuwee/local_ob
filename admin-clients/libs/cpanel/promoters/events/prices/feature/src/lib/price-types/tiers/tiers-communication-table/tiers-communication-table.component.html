@@ -1,0 +1,55 @@
+<div class="communication-tiers-table-container">
+    <table mat-table class="ob-table not-touchable" *ngIf="eventTiers$ | async as eventTiers" [dataSource]="eventTiers">
+
+        <!-- PRICE ZONE GROUP -->
+
+        <ng-container matColumnDef="price_zone">
+            <th mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'EVENTS.TIERS.TABLE_PRICE_ZONE' | translate}}
+            </th>
+            <td mat-cell *matCellDef="let row; let i = index" class="price-zone-column"
+                [class.last-pricezone-tier]="row.price_type.id !== eventTiers[i+1]?.price_type.id">
+                <div fxLayout="column" *ngIf="row.price_type.id !== eventTiers[i-1]?.price_type.id">
+                    <p class="price-zone-name">{{row.price_type.name}}</p>
+                    <p class="price-zone-capacity">{{'EVENTS.TIERS.TABLE_CAPACITY' | translate}}:
+                        {{row.price_type.capacity}}</p>
+                </div>
+            </td>
+        </ng-container>
+
+        <!-- TIERS -->
+
+        <ng-container matColumnDef="tiers_name">
+            <th mat-header-cell *matHeaderCellDef class="head-cell" fxFlex="1 1 100%">
+                {{'EVENTS.TIERS.TABLE_TIERS_NAME' | translate}}
+            </th>
+            <td mat-cell *matCellDef="let row" fxFlex="1 1 100%" fxLayout="row" fxLayoutAlign="start center">
+                <div class="active-tier-container">
+                    <div class="active-tier" [class.active]="row.active">
+                    </div>
+                </div>
+                {{row.name}}
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="actions-cell head-cell" fxFlex="0 0 60px"></th>
+            <td mat-cell *matCellDef="let row" class="actions-cell" fxFlex="0 0 60px" fxLayoutAlign="end center">
+                <div class="action-buttons" (click)="$event.stopPropagation()">
+                    <button mat-icon-button aria-label="Edit translation" class="ob-button medium"
+                        (click)="openTranslationsDialog(row)" [matTooltip]="'EVENTS.TIERS.EDIT_TRANSLATION_DIALOG' | translate">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                </div>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="tableHead" class="dense-row"></tr>
+        <tr mat-row *matRowDef="let row; columns: tableHead;" class="dense-row hoverable-row">
+        </tr>
+    </table>
+</div>
+
+<div class="spinner-container" *ngIf="isInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

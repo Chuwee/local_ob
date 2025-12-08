@@ -1,0 +1,47 @@
+<div fxLayout="column" class="dialog-grid-form" [formGroup]="form">
+    <div fxLayout="row wrap" class="info-container">
+        <p fxFlex="0 0 100%">{{'CSV.IMPORT.HEADER_MAPPING_INFO' | translate}}</p>
+    </div>
+    <div fxLayout="column" fxFlex="0 1 100%" class="list-container">
+        <div fxFlex class="table-container" fxLayout="column" formArrayName="headersMapping">
+            <mat-table class="ob-table" [dataSource]="rows$ | async"
+                [attr.aria-label]="'CSV.IMPORT.HEADER_MAPPING_TABLE' | translate">
+                <ng-container matColumnDef="expected">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'CSV.IMPORT.EXPECTED_HEADER' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{row.expectedHeader}}<span *ngIf="row.required">*</span></mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="parsed">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'CSV.IMPORT.PARSED_HEADER' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row; let i = index;" class="editable-cell"
+                        (click)="$event.stopPropagation()" fxLayout="row" fxLayoutAlign="start center">
+                        <mat-form-field appearance="outline" class="ob-form-field ob-form-field-outline"
+                            [class.with-error]="mappingFormArray.get(i.toString()).errors && mappingFormArray.get(i.toString()).touched">
+                            <mat-select [placeholder]="'CSV.IMPORT.SELECT_HEADER' | translate" [formControlName]="i"
+                                (click)="clickHandler()">
+                                <mat-option>
+                                    <app-select-search #headerSelectSearch [options$]="parsedHeaders$"
+                                        [placeholderLabel]="'CSV.IMPORT.SELECT_HEADER' | translate" searchField="name">
+                                    </app-select-search>
+                                </mat-option>
+                                <mat-option
+                                    *ngFor="let header of headerSelectSearch.getFilteredOptions$() | async; let headerIndex = index"
+                                    [value]="getMappingValue(headerIndex)">
+                                    {{header}} <span *ngIf="headerIndex !== 0">{{'CSV.IMPORT.PARSED_COLUMN' | translate:
+                                        {value: headerIndex - 1} }}</span>
+                                </mat-option>
+                            </mat-select>
+                            <mat-error [ob-form-errors]="mappingFormArray" [field]="i.toString()"></mat-error>
+                        </mat-form-field>
+                    </mat-cell>
+                </ng-container>
+                <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="dense-row"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: displayedColumns; let index = index"
+                    class="interactive-row dense-row"></mat-row>
+            </mat-table>
+        </div>
+    </div>
+</div>

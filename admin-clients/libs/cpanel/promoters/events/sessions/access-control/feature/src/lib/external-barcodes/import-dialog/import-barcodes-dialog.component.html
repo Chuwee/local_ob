@@ -1,0 +1,41 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="100%" class="secondary title">{{'FORMS.ACTIONS.IMPORT' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" [disabled]="isLoading$ | async" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <app-wizard-bar [steps]="mapToStepsTitles(steps)" [enableNavigation]="true"
+        (stepClick)="goToStep($event)" />
+    @if ((currentStep$ | async) === 0) {
+        <app-import-barcodes-selection [selectionFormGroup]="selectionFormGroup" [selectionControlName]="selectionControlName"
+            (isLoading$)="selectionLoadingHandler($event)" />
+    }
+    @if ((currentStep$ | async) === 1) {
+        <app-import-barcodes-header-match [headerMatchFormGroup]="headerMatchFormGroup" [headerMatchControlName]="headerMatchControlName"
+            (isLoading$)="headerMatchLoadingHandler($event)" />
+    }
+    <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button"
+            [disabled]="isLoading$ | async" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-stroked-button color="tertiary" type="button" class="ob-button"
+            (click)="previousStep()"
+            [disabled]="(isPreviousDisabled$ | async)">
+            <mat-icon>arrow_back</mat-icon>
+            {{'FORMS.ACTIONS.PREVIOUS' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button"
+            (click)="nextStep()"
+            [disabled]="(isNextDisabled$ | async)">
+            {{nextText$ | async}}
+            <mat-icon iconPositionEnd [fxHide]="(currentStep$ | async) === steps.length - 1">arrow_forward</mat-icon>
+        </button>
+    </div>
+</div>
+@if (isLoading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,58 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'TITLES.CURRENCIES.MODIFY_CURRENCY' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <div fxLayout="row wrap" class="display-currency">
+            <!-- Name -->
+            <div fxFlex="calc(50% - 32px)" class="display-currency-box details-non-editable-field" fxLayout="column">
+                <span class="display-currency-label">{{'CURRENCIES.MODIFY_CURRENCY.FROM' | translate}}</span>
+                <span appEllipsify [matTooltip]="('CURRENCY.CURRENCY_OPTS.'+currency.source | translate)"
+                    matTooltipClass="ob-tooltip-nowrap">
+                    <span class="strong">{{ currency.source }} </span>
+                    <span> - {{ currency.source | localCurrencySymbol }}
+                        ({{'CURRENCY.CURRENCY_OPTS.'+currency.source | translate}})</span>
+                </span>
+            </div>
+            <span fxFlex.gt-xs="48px" class="display-currency-arrow">
+                <mat-icon>arrow_forward</mat-icon>
+            </span>
+            <div fxFlex="calc(50% - 32px)" class="display-currency-box details-non-editable-field" fxLayout="column">
+                <span class="display-currency-label">{{'CURRENCIES.MODIFY_CURRENCY.TO' | translate}} </span>
+                <span appEllipsify [matTooltip]="('CURRENCY.CURRENCY_OPTS.'+currency.target | translate)"
+                    matTooltipClass="ob-tooltip-nowrap">
+                    <span class="strong">{{ currency.target }}</span>
+                    <span> - {{ currency.target | localCurrencySymbol }}
+                        ({{'CURRENCY.CURRENCY_OPTS.'+currency.target | translate}})</span>
+                </span>
+            </div>
+        </div>
+        <form [formGroup]="form" fxLayout="row wrap">
+            <mat-form-field appearance="outline" class="ob-form-field" fxFlex="0 1 calc(50% - 26px)">
+                <mat-label>{{'CURRENCIES.EXCHANGE_RATE' | translate}}</mat-label>
+                <input type="number" matInput aria-label="rate" [placeholder]="'0.00'"
+                    formControlName="rate">
+                <mat-error [ob-form-errors]="form" field="rate" />
+            </mat-form-field>
+        </form>
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button mat-button type="button" class="ob-button" [disabled]="isInProgress$ | async" (click)="close(null)">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button"
+            [disabled]="(isInProgress$ | async) || !!!(canModify$ | async)"
+            (click)="updateCurrency()">
+            {{'FORMS.ACTIONS.UPDATE' | translate}}
+        </button>
+    </div>
+</div>
+
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

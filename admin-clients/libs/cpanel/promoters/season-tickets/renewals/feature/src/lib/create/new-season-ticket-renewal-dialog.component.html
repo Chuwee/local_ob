@@ -1,0 +1,54 @@
+<div class="dialog-msg-container" fxLayout="column">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="100%" class="secondary title">{{'SEASON_TICKET.RENEWALS.IMPORT_DIALOG_TITLE' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small"
+            [disabled]="isLoading$ | async" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <app-wizard-bar [steps]="mapToStepsTitles(steps)" [enableNavigation]="true" (stepClick)="goToStep($event)"></app-wizard-bar>
+    <app-season-ticket-renewal-candidate *ngIf="(currentStep$ | async) === 0" [hasPreviousRenewals]="hasPreviousRenewals"
+        [candidateFormGroup]="candidateFormGroup" [candidateTypeControlName]="candidateTypeControlName"
+        [internalCandidateControlName]="internalCandidateControlName" [externalCandidateControlName]="externalCandidateControlName"
+        (isLoading)="candidateLoadingHandler($event)">
+    </app-season-ticket-renewal-candidate>
+    <div mat-dialog-content class="dialog-grid-form with-wizard-bar" fxLayout="column" fxLayoutGap="24px"
+        *ngIf="(currentStep$ | async) === 1">
+        <app-season-ticket-renewal-rates [candidateFormGroup]="candidateFormGroup" [candidateTypeControlName]="candidateTypeControlName"
+            [ratesFormGroup]="ratesFormGroup" [internalRatesControlName]="internalRatesControlName"
+            [externalRatesControlName]="externalRatesControlName" (isLoading)="ratesLoadingHandler($event)">
+        </app-season-ticket-renewal-rates>
+        <div fxFlex [formGroup]="ratesFormGroup" fxLayout="column" fxLayoutAlign="start start">
+            <h3 class="section-title">{{'SEASON_TICKET.RENEWALS.IMPORT_DIALOG_BALANCE_SECTION' | translate }}</h3>
+            <mat-radio-group fxLayout="column" formControlName="includeBalance">
+                <mat-radio-button class="ob-radio-button vertical-list" [value]="true">
+                    <div>{{'SEASON_TICKET.RENEWALS.IMPORT_DIALOG_BALANCE' | translate}}</div>
+                </mat-radio-button>
+                <mat-radio-button class="ob-radio-button vertical-list" [value]="false">
+                    <div>{{'SEASON_TICKET.RENEWALS.IMPORT_DIALOG_NO_BALANCE' | translate}}</div>
+                </mat-radio-button>
+            </mat-radio-group>
+        </div>
+    </div>
+    <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button"
+            [disabled]="isLoading$ | async" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-stroked-button color="tertiary" type="button" class="ob-button"
+            (click)="previousStep()"
+            [disabled]="(isPreviousDisabled$ | async)">
+            <mat-icon>arrow_back</mat-icon>
+            {{'FORMS.ACTIONS.PREVIOUS' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button"
+            (click)="nextStep()"
+            [disabled]="(isNextDisabled$ | async)">
+            {{nextText$ | async}}
+            <mat-icon iconPositionEnd [fxHide]="(currentStep$ | async) === steps.length - 1">arrow_forward</mat-icon>
+        </button>
+    </div>
+</div>
+<div class="spinner-container" *ngIf="isLoading$ | async">
+    <mat-spinner></mat-spinner>
+</div>

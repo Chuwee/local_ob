@@ -1,0 +1,126 @@
+<div class="accordion-container" [class.accordion-container-disabled]="$disabled()">
+    <mat-accordion displayMode="flat" class="ob-accordion-list">
+        @for (labelGroup of $labelGroups(); track labelGroup.id) {
+            <mat-expansion-panel id="labelGroup-{{labelGroup.id}}" [disabled]="$disabled()"
+                class="mat-elevation-z0 exclude-body-padding without-panel-spacing label-expansion"
+                [expanded]="$visibleSeats() && labelGroup === $selectedLabelGroup()"
+                (opened)="setSelectedLabelGroup(labelGroup)">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        <div class="header-container flex flex-row items-center">
+                            <span class="mat-subtitle-2 flex-1"
+                                appEllipsify [matTooltip]="labelGroup.custom ? labelGroup.customName : (labelGroup.literalKey | translate)">
+                                {{ labelGroup.custom ? labelGroup.customName : (labelGroup.literalKey | translate) }}
+                            </span>
+                            @if (labelGroup.editableGroup) {
+                                <button mat-icon-button aria-label="edit"
+                                    class="label-group-header-button ob-button mat-stroked-button xsmall"
+                                    (click)="$event.stopPropagation(); openEditLabelGroupDialog(labelGroup);">
+                                    <mat-icon>edit</mat-icon>
+                                </button>
+                            }
+                            @if (labelGroup.deletableGroup) {
+                                <button mat-icon-button aria-label="delete"
+                                    class="label-group-header-button ob-button mat-stroked-button xsmall"
+                                    (click)="$event.stopPropagation(); deleteLabelGroup(labelGroup);">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            }
+                            @if (labelGroup.sortable) {
+                                <button mat-icon-button aria-label="sorted"
+                                    [matTooltip]="(labelGroup.sorted ?
+                                    'VENUE_TPLS.SORT_BY_DATE_TOOLTIP' : 'VENUE_TPLS.SORT_BY_ALPHA_TOOLTIP') | translate"
+                                    class="label-group-header-button ob-button mat-stroked-button xsmall"
+                                    (click)="$event.stopPropagation(); changeSorting(labelGroup)">
+                                    <mat-icon>{{ labelGroup.sorted ? 'sort' : 'sort_by_alpha' }}</mat-icon>
+                                </button>
+                            }
+                            @if (labelGroup.addable) {
+                                <button mat-icon-button aria-label="add"
+                                    class="label-group-header-button ob-button mat-stroked-button xsmall"
+                                    (click)="$event.stopPropagation(); openNewLabelDialog(labelGroup);">
+                                    <mat-icon>add</mat-icon>
+                                </button>
+                            }
+                            @if (isSomeFilterInLabelGroup(labelGroup)) {
+                                <mat-icon class="header-filtered-icon">filter_list</mat-icon>
+                            }
+                        </div>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="template-label-list flex flex-col">
+                    @for (label of labelGroup.labels; track label.id) {
+                        <button id="label-{{label.id}}" type="button"
+                            class="template-label-button flex basis-[40px] items-center" matRipple [matRippleDisabled]="label.disabled"
+                            [disabled]="label.disabled" [class.active-label]="!label.disabled"
+                            (click)="selectLabel(label)" [style.min-width]="'0'" [matTooltip]="label.tooltip | translate">
+                            @if (label.safeIcon) {
+                                <svg class="label-icon flex basis-[18px]">
+                                    <circle cx="9" cy="9" r="9" [attr.fill]="label.color" />
+                                    <g class="icon-group" [innerHTML]="label.safeIcon" />
+                                </svg>
+                            } @else {
+                                <span class="template-label-color flex basis-[10px]"
+                                    [ngStyle]="{'background-color':label.color}">
+                                </span>
+                            }
+                            <span class="mat-caption template-label-label flex-1"
+                                [matTooltip]="label.literal | translate" appEllipsify>
+                                {{ label.literal | translate }}
+                            </span>
+                            @if (label.count !== undefined) {
+                                <span class="mat-caption template-label-count flex-none">
+                                    {{ label.count | localNumber }}
+                                </span>
+                            }
+                            @if (label.editable) {
+                                <button mat-icon-button
+                                    class="ob-mdc-button x-small action-label-button flex basis-[26px]"
+                                    (click)="$event.stopPropagation(); openEditLabelDialog(labelGroup, label)"
+                                    aria-label="edit">
+                                    <mat-icon>edit</mat-icon>
+                                </button>
+                            }
+                            @if (label.deletable) {
+                                <button mat-icon-button
+                                    class="ob-mdc-button x-small action-label-button flex basis-[26px]"
+                                    aria-label="delete" (click)="$event.stopPropagation(); deleteLabel(label)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            }
+                            <mat-divider vertical="true" class="action-label-button-divider" />
+                            <mat-button-toggle class="ob-icon-button-toggle x-small action-label-button flex basis-[26px]"
+                                [checked]="label.filtering" (click)="$event.stopPropagation(); filterLabel(label)">
+                                <mat-icon>filter_list</mat-icon>
+                            </mat-button-toggle>
+                        </button>
+
+                    }
+                </div>
+            </mat-expansion-panel>
+        }
+        @let addLabelGroupBtnDisabled = $addLabelGroupBtnDisabled();
+        <div class="add-label-group-container flex items-center"
+            [matTooltip]="'VENUE_TPLS.ADD_GROUP_BTN_DISABLED_TOOLTIP' | translate"
+            [matTooltipDisabled]="!addLabelGroupBtnDisabled" [class.disabled]="addLabelGroupBtnDisabled"
+            (click)="openNewLabelGroupDialog()">
+            <button mat-icon-button type="button" [disabled]="addLabelGroupBtnDisabled"
+                class="ob-button mat-stroked-button xsmall" aria-label="add label group">
+                <mat-icon>add</mat-icon>
+            </button>
+            <span>{{ 'VENUE_TPLS.ADD_LABEL_GROUP' | translate }}</span>
+        </div>
+    </mat-accordion>
+    @if (!$loaded() || $loading()) {
+        <div class="loading-state-container flex items-center justify-center">
+            @if ($loading() || $venueTemplateInProgress()) {
+                <mat-spinner />
+            }
+            @if(!$loading() && !$venueTemplateInProgress()) {
+                <div class="error-icon flex items-center justify-center">
+                    <mat-icon>cancel</mat-icon>
+                </div>
+            }
+        </div>
+    }
+</div>

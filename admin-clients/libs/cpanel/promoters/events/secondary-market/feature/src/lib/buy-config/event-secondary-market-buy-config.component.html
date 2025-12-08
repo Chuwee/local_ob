@@ -1,0 +1,63 @@
+<app-form-container [formGroup]="form" (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="!form.dirty">
+    <mat-accordion [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'SECONDARY_MARKET.SURCHARGES' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="section-block">
+                <p class="section-description">
+                    {{'SECONDARY_MARKET.SURCHARGES_DESCRIPTION' | translate }}
+                    <a aria-label="Go to surcharges" class="ob-link icon linkout" (click)="goToSurcharges()">
+                        <span>{{'SECONDARY_MARKET.GO_TO_SURCHARGES' | translate}}</span>
+                    </a>
+                </p>
+
+            </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'SECONDARY_MARKET.QUOTA_LIMIT_TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex flex-col gap-2">
+                <mat-checkbox color="primary" formControlName="customer_limits_enabled">
+                    {{'SECONDARY_MARKET.QUOTA_LIMIT_ENABLED' | translate}}
+                </mat-checkbox>
+                @if(form.controls.customer_limits_enabled.value) {
+                    <div class="flex flex-col nested" formGroupName="customer_limits">
+                        <div class="flex">
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label flex-[0_1_96px]">
+                                <mat-label>{{'SECONDARY_MARKET.QUOTA_LIMIT_LABEL' | translate}}</mat-label>
+                                <input matInput formControlName="limit"
+                                    type="number" inputmode="numeric" min="1" step="1" placeholder="0">
+                                <mat-error [ob-form-errors]="form" field="customer_limits.limit" />
+                            </mat-form-field>
+                        </div>
+                        @let customerTypes = $customerTypes();
+                        @if(customerTypes?.length) {
+                            <div class="flex flex-col gap-2">
+                                <span>{{ 'SECONDARY_MARKET.QUOTA_LIMIT_EXCLUDED_CUSTOMER_TYPES' | translate }}</span>
+                                <div class="flex">
+                                    <mat-form-field appearance="outline" class="ob-form-field select-field flex-[0_0_400px]">
+                                        <mat-select multiple [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                            formControlName="excluded_customer_types">
+                                            @for (ct of customerTypes; track ct?.code) {
+                                                <mat-option [value]="ct.code">{{ct.name}}</mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+
+@if($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

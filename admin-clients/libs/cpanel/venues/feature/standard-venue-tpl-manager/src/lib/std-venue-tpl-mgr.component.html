@@ -1,0 +1,118 @@
+@if (venueTemplate$ | async; as venueTemplate) {
+    @let isRelocating = isRelocating$ | async; <!-- {} -->
+    <div fxFlex="0 1 100%" fxLayout="row" [class.relocating]="isRelocating">
+        <div [fxHide]="$showContextError()" fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="start stretch">
+            <div fxFlex="40px" fxLayout="row" fxLayoutAlign="left center" class="venue-tpl-header-container">
+                <button mat-icon-button aria-label="Refresh" class="ob-button small" [fxHide]="isInCapIncr$ | async"
+                    (click)="cancelChanges(true)">
+                    <mat-icon>autorenew</mat-icon>
+                </button>
+                @if ($editorType() === venueTemplateEditorType.sessionTemplate) {
+                    <button mat-icon-button aria-label="Export selection" class="ob-button small"
+                        [matTooltip]="'VENUE_TPL_MGR.ACTIONS.EXPORT_SELECTION' | translate"
+                        (click)="exportCapacity()">
+                        <mat-icon>file_upload</mat-icon>
+                    </button>
+                }
+                <mat-divider [fxHide]="(isInCapIncr$ | async) || headerContainer?.childElementCount === 0" vertical="true" />
+                <div fxFlex>
+                    <div #headerContainer [fxHide]="isInCapIncr$ | async">
+                        <ng-content select="[slot='header']" />
+                    </div>
+                </div>
+                @if (venueTemplate?.type === normalVenueTemplateType && !venueTemplate.graphic && $isInUse()) {
+                    <div fxLayout="row" [matTooltip]="($increaseDisabled() ?
+                    'VENUE_TPLS.FORMS.INFOS.INCREASE_DISABLED_BY_EVENT_STATUS' : '') | translate">
+                        <div [class.capacity-increase-button-selected]="isInCapIncr$ | async">
+                            <button mat-stroked-button type="button" class="ob-mdc-button small"
+                                [ngClass]="{'light-button disabled-button': isInCapIncr$ | async}"
+                                (click)="enterCapacityIncreaseState()"
+                                [disabled]="(isDirty$ | async) || $increaseDisabled() || (isInCapIncr$ | async)">
+                                <mat-icon>person_add</mat-icon>
+                                {{'VENUE_TPLS.ACTIONS.INCREASE_CAPACITY' | translate}}
+                            </button>
+                        </div>
+                    </div>
+                }
+                @if ($isNumbered() && $canRelocate() && venueTemplate?.type === normalVenueTemplateType) {
+                    <div [class.relocation-button]="isRelocating">
+                        <button mat-stroked-button type="button" class="ob-mdc-button small"
+                            [ngClass]="{'light-button disabled-button': isRelocating}"
+                            (click)="onStartRelocation()"
+                            [disabled]="(loading$ | async) || isRelocating">
+                            <div class="flex align-center justify-center gap-[8px]">
+                                {{'VENUE_TPLS.ACTIONS.RELOCATION' | translate}}
+                            </div>
+                        </button>
+                    </div>
+                }
+                @if (editorEnabled() && venueTemplate?.graphic) {
+                    <div>
+                        <button mat-stroked-button aria-label="Edit template" class="ob-button small"
+                            [disabled]="(isDirty$ | async)" (click)="gotoEditor.emit()">
+                            {{'VENUE_TPL_MGR.ACTIONS.EDIT_TPL' | translate}}
+                        </button>
+                    </div>
+                }
+            </div>
+            <div fxFlex="0 1 100%" fxLayout="row" class="hide-overflow">
+                <div fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="start stretch"
+                    [class.capacity-increase-container]="isInCapIncr$ | async">
+                    @if(!$showContextError()) {
+                        <app-std-venue-tpl-mgr-summary [editorType]="$editorType()" />
+                    }
+                    <div fxFlex="0 1 100%" fxLayout="row">
+                        <div [fxHide]="$showContextError()" fxFlex="0 1 100%">
+                            @if (venueTemplate?.graphic) {
+                                <app-venue-template-view fxFlex="0 1 100%"
+                                    [fxShow]="(currentView$ | async) === venueTemplateEditorView.graphic"
+                                    [venueTemplate]="venueTemplate" [permanentSelection]="isRelocating" />
+                            }
+                            @if (!venueTemplate?.graphic) {
+                                <app-template-image fxFlex="0 1 100%" [editorType]="$editorType()"
+                                    [fxShow]="(currentView$ | async) === venueTemplateEditorView.graphic" />
+                            }
+                            <app-venue-template-tree fxFlex="0 1 100%"
+                                [editorType]="$editorType()" [venueTemplate]="venueTemplate" [session]="$session()" [isInUse]="$isInUse()"
+                                [fxShow]="(currentView$ | async) === venueTemplateEditorView.tree" (cancelChanges)="cancelChanges()" />
+                            <div class="view-toggle-button-container">
+                                <mat-button-toggle-group class="view-toggle-button-group ob-flat-button-group medium"
+                                    [disabled]="isInCapIncr$ | async" [value]="(currentView$ | async)" (change)="changeView($event)">
+                                    <mat-button-toggle [value]="venueTemplateEditorView.graphic">
+                                        <mat-icon svgIcon="graphic-view" />
+                                    </mat-button-toggle>
+                                    <mat-button-toggle [value]="venueTemplateEditorView.tree">
+                                        <mat-icon svgIcon="tree-view" />
+                                    </mat-button-toggle>
+                                </mat-button-toggle-group>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @if (isRelocating) {
+                    @defer {
+                        <app-venue-template-relocation-mgr fxFlex.sm="0 0 300px" fxFlex="0 0 480px" fxLayout="column"
+                            [relocateSeatsInfo]="$relocateSeatsInfo()" />
+                    }
+                }
+            </div>
+            @if (isRelocating) {
+                @defer {
+                    <app-venue-template-relocation-button-bar id="relocationButtonBarComponent"
+                        [selectedDestinationSeats]="relocationSeats$ | async" (stopRelocation)="cancelChanges(true)" />
+                }
+            }
+        </div>
+        <app-venue-template-label-mgr class="venue-labels-list" fxFlex="0 0 {{$labelMgrWidth()}}"
+            [visibleSeats]="$hasVisibleSeats()" [disabled]="isInCapIncr$ | async" [fxHide]="hideLabelMgr$ | async"
+            [loading]="loading$ | async" [editorType]="$editorType()" [venueTemplate]="venueTemplate"
+            [unrestrictedPack]="$unrestrictedPack()" [linkedSessions]="$linkedSessions()" [session]="$session()" />
+        @if ($showContextError()) {
+            <div fxFlex="100%" fxLayout="row" fxLayoutAlign="center start" class="context-notification-container">
+                <app-context-notification class="ob-context-notification" contextType="warn" fxFlex>
+                    <span>{{'VENUES.VENUE_TPL_GENERATION_ERROR' | translate}}</span>
+                </app-context-notification>
+            </div>
+        }
+    </div>
+}

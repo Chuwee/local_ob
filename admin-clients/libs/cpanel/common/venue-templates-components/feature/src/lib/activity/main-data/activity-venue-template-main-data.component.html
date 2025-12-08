@@ -1,0 +1,40 @@
+<div fxLayout="row wrap" [formGroup]="form">
+    <!-- NAME -->
+    <mat-form-field fxFlex="100%" fxFlex.gt-sm="50%" appearance="outline" class="ob-form-field field-with-label template-form-field">
+        <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+        <input formControlName="name" matInput aria-label="id" [placeholder]="'FORMS.LABELS.NAME' | translate">
+        <mat-error [ob-form-errors]="form" field="name" />
+    </mat-form-field>
+    <!-- ID -->
+    <mat-form-field fxFlex="100%" fxFlex.gt-sm="50%" appearance="outline"
+        class="ob-form-field field-with-label mat-form-field-outline-hidden template-form-field">
+        <mat-label>{{'VENUE_TPLS.ID' | translate}}</mat-label>
+        <input formControlName="id" matInput aria-label="id" [placeholder]="'VENUE_TPLS.ID' | translate" readonly>
+    </mat-form-field>
+    <!-- VENUE -->
+    <mat-form-field fxFlex="100%" fxFlex.gt-sm="50%" appearance="outline" class="ob-form-field field-with-label template-form-field">
+        <mat-label>{{'FORMS.LABELS.VENUE' | translate}}</mat-label>
+        <mat-select formControlName="venueId" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+            @for (venue of venues$ | async; track venue.id) {
+                <mat-option [value]="venue.id">
+                    <div appEllipsify [matTooltip]="venue.name">
+                        {{venue.name}}
+                    </div>
+                </mat-option>
+            }
+        </mat-select>
+        <mat-error [ob-form-errors]="form" field="venueId" />
+    </mat-form-field>
+    <!-- SPACE -->
+    <mat-form-field fxFlex="100%" fxFlex.gt-sm="50%" appearance="outline" class="ob-form-field field-with-label template-form-field">
+        <mat-label>{{'FORMS.LABELS.SPACE' | translate}}</mat-label>
+        <mat-select formControlName="spaceId" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+            @for (space of (venue$ | async)?.spaces; track space.id) {
+                <mat-option [value]="space.id">
+                    <div appEllipsify [matTooltip]="space.name">{{space.name}}</div>
+                </mat-option>
+            }
+        </mat-select>
+        <mat-error [ob-form-errors]="form" field="spaceId" />
+    </mat-form-field>
+</div>

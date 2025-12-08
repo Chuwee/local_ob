@@ -1,0 +1,26 @@
+<app-form-container layout="menu" [disabled]="$isLoading() || !$redirectionPolicy()?.form.dirty" (cancel)="cancel()" (save)="save()">
+    <div class="flex flex-col list-container detail gap-8">
+        <div class="flex flex-col">
+            <h3 class="section-title">{{ 'SEASON_TICKET.PRESALES.TITLE' | translate }}</h3>
+            <p class="description">{{'SEASON_TICKET.PRESALES.DESCRIPTION' | translate }}</p>
+            <div class="flex flex-row justify-start items-center presale-warning">
+                <mat-icon class="ob-icon small warning with-text">warning</mat-icon>
+                {{'SEASON_TICKET.PRESALES.WARNING' | translate}}
+            </div>
+
+        </div>
+
+        <app-presales-list [isAvetEvent]="false" [isSmartBooking]="false"
+            [onlyCustomersValidation]="!externalInventoryProvider"
+            [externalInventoryProvider]="externalInventoryProvider"
+            (presalesFormChanged)="$presaleDetailsElements.set($event)" />
+
+        <app-presale-redirection-policy />
+    </div>
+</app-form-container>
+
+@if($isLoading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

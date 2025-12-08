@@ -1,0 +1,210 @@
+@if ($seasonTicket(); as seasonTicket) {
+    <div class="status-notifications-container flex items-center">
+        <mat-slide-toggle (change)="handleStatusChange($event.checked)" class="ob-slide-toggle" color="primary"
+            [formControl]="allowTransferForm.controls.allow_transfer">
+            {{ 'SEASON_TICKET.TRANSFER_SEAT.ENABLED'| translate }}
+        </mat-slide-toggle>
+    </div>
+    <app-form-container (save)="save()" (cancel)="refresh()" layout="menu"
+        [disabled]="!form.dirty || (isGenerationStatusReady$ | async) === false">
+        @if (isGenerationStatusInProgress$ | async) {
+            <div class="ob-overlay-wrapper" slot="overlay">
+                <div class="ob-overlay-pane pane-sticky">
+                    <app-context-notification class="ob-context-notification basis-5/6" contextType="info">
+                        <p>{{'SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate}}</p>
+                        <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                                          [attr.aria-label]="('SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate)" />
+                    </app-context-notification>
+                </div>
+            </div>
+        }
+        <mat-accordion [multi]="true" [togglePosition]="'before'" [formGroup]="form">
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'SEASON_TICKET.TRANSFER_SEAT.MAX_TRANSFERS_RECOVERS_DELAY' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <div class="flex flex-col">
+                    <div class="flex flex-col gap-2 section-block">
+                        <div class="flex flex-col">
+                            <div class="flex flex-wrap items-center">
+                                <mat-checkbox formControlName="enable_transfer_delay" color="primary">
+                                    {{'SEASON_TICKET.TRANSFER_SEAT.TRANSFER_DELAY_ENABLED' | translate}}
+                                </mat-checkbox>
+                            </div>
+                            @if (form.controls.enable_transfer_delay.value) {
+                                <mat-radio-group class="flex flex-col gap-4 transfer-delay" formControlName="transfer_delay_type">
+                                    <mat-radio-button class="ob-radio-button align" [value]="'FROM'">
+                                        <div class="flex flex-row items-baseline" [formGroup]="form.controls.transfer_delay">
+                                            <label>{{'SEASON_TICKET.TRANSFER_SEAT.MIN_TRANSFER_DELAY_PREFIX' | translate}}</label>
+                                            <mat-form-field class="ob-form-field inline-field value-field transfer-delay-input"
+                                                            appearance="outline">
+                                                <input matInput type="number" formControlName="from" min="1" step="1">
+                                            </mat-form-field>
+                                            <label>{{'SEASON_TICKET.TRANSFER_SEAT.MIN_TRANSFER_DELAY_SUFFIX' | translate}}</label>
+                                        </div>
+                                    </mat-radio-button>
+                                    <mat-radio-button class="ob-radio-button align" [value]="'TO'">
+                                        <div class="flex flex-row items-baseline" [formGroup]="form.controls.transfer_delay">
+                                            <label>{{'SEASON_TICKET.TRANSFER_SEAT.MAX_TRANSFER_DELAY_PREFIX' | translate}}</label>
+                                            <mat-form-field class="ob-form-field inline-field value-field transfer-delay-input"
+                                                            appearance="outline">
+                                                <input matInput type="number" formControlName="to" min="1" step="1">
+                                            </mat-form-field>
+                                            <label>{{'SEASON_TICKET.TRANSFER_SEAT.MAX_TRANSFER_DELAY_SUFFIX' | translate}}</label>
+                                        </div>
+                                    </mat-radio-button>
+                                    <mat-radio-button class="ob-radio-button align" [value]="'RANGE'">
+                                        <div class="flex flex-row items-baseline"
+                                            [formGroup]="form.controls.transfer_delay.controls.range">
+                                            <label>{{'SEASON_TICKET.TRANSFER_SEAT.MIN_TRANSFER_DELAY_PREFIX' | translate}}</label>
+                                            <mat-form-field class="ob-form-field inline-field value-field transfer-delay-input"
+                                                            appearance="outline">
+                                                <input matInput type="number" formControlName="min_delay_time" min="1" step="1">
+                                            </mat-form-field>
+                                            <label>{{'SEASON_TICKET.TRANSFER_SEAT.TRANSFER_DELAY_RANGE_PREFIX' | translate}}</label>
+                                            <mat-form-field class="ob-form-field inline-field value-field transfer-delay-input"
+                                                            appearance="outline">
+                                                <input matInput type="number" formControlName="max_delay_time" min="1" step="1">
+                                            </mat-form-field>
+                                            <label>{{'SEASON_TICKET.TRANSFER_SEAT.TRANSFER_DELAY_RANGE_SUFFIX' | translate }}</label>
+                                        </div>
+                                    </mat-radio-button>
+                                </mat-radio-group>
+                                <mat-error class="transfer-delay-range-error"
+                                    [ob-form-errors]="form.controls.transfer_delay" [field]="['range']" />
+                            }
+                        </div>
+                        <div class="flex items-baseline gap-1">
+                            <mat-checkbox formControlName="enable_recovery_delay" color="primary" />
+                            <div class="flex flex-wrap items-baseline section-block">
+                                <label>{{'SEASON_TICKET.TRANSFER_SEAT.MAX_RECOVER_DELAY' | translate}}</label>
+                                <mat-form-field class="ob-form-field field-with-label value-field basis-24"
+                                    appearance="outline">
+                                    <input matInput type="number" formControlName="recovery_ticket_max_delay_time" min="1" step="1">
+                                </mat-form-field>
+                                <label>{{'SEASON_TICKET.TRANSFER_SEAT.PREV_HOURS' | translate }}</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <mat-divider />
+
+                    <div class="flex flex-wrap items-center section-block">
+                        <mat-checkbox formControlName="enable_max_ticket_transfers" color="primary">
+                            {{'SEASON_TICKET.TRANSFER_SEAT.MAX_LIMIT_TRANSFERS_CHECK' | translate}}
+                        </mat-checkbox>
+                        <mat-form-field class="ob-form-field inline-field value-field basis-24" appearance="outline">
+                            <input matInput type="number" inputmode="numeric" placeholder="0"
+                                   formControlName="max_ticket_transfers" min="1" step="1">
+                            <mat-error class="under_error" [ob-form-errors]="form.controls.max_ticket_transfers" />
+                        </mat-form-field>
+                    </div>
+
+                    @if ($showFriendsSettings()) {
+                        <mat-divider />
+                        <div class="flex align-center section-block">
+                            <mat-checkbox formControlName="enable_friends_family" color="primary">
+                                {{'SEASON_TICKET.TRANSFER_SEAT.LIMIT_FRIENDS_FAMILY' | translate}}
+                            </mat-checkbox>
+                        </div>
+                    }
+                    <!-- Bulk config -->
+                    @if($entityCustomerTypes()?.length) {
+                        <mat-divider />
+                        <div class="flex flex-col gap-2 section-block">
+                            <mat-checkbox formControlName="enable_bulk" color="primary">
+                                {{'SEASON_TICKET.TRANSFER_SEAT.ENABLE_BULK' | translate}}
+                            </mat-checkbox>
+                            @if (form.controls.enable_bulk.value) {
+                                <div class="bulk-customer-types flex flex-col gap-2">
+                                    <div class="flex flex-1 items-center">
+                                        <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                                        {{'SEASON_TICKET.TRANSFER_SEAT.BULK_ENABLED_INFO' | translate}}
+                                    </div>
+                                    <mat-form-field appearance="outline" class="ob-form-field">
+                                        <mat-select multiple formControlName="bulk_customer_types" aria-label="entity customer types"
+                                            [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                            @for (entityCustomerType of $entityCustomerTypes(); track entityCustomerType.id) {
+                                                <mat-option [value]="entityCustomerType.id">
+                                                    {{entityCustomerType.name}}
+                                                </mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                </div>
+            </mat-expansion-panel>
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'SEASON_TICKET.TRANSFER_SEAT.EXCLUDED_SESSIONS_CONFIG_TITLE' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <p>{{'SEASON_TICKET.TRANSFER_SEAT.EXCLUDED_SESSIONS_CONFIG_DESCRIPTION' | translate}}</p>
+                <app-excluded-sessions-config [seasonTicketId]="seasonTicket.id" [excludedSessionsIds]="$excludedSessions()"
+                    [emptyTitle]="'SEASON_TICKET.TRANSFER_SEAT.EXCLUDED_SESSIONS_EMPTY_TITLE'"
+                    [emptyDescription]="'SEASON_TICKET.TRANSFER_SEAT.EXCLUDED_SESSIONS_EMPTY_DESCRIPTION'"
+                    (saveExcludedSessions)="saveExcludedSessions($event)"/>
+            </mat-expansion-panel>
+            @if ($showLoyaltyPointsSettings()) {
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'SEASON_TICKET.TRANSFER_SEAT.ASSIGN_POINTS_SESSION.TITLE' | translate}}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="flex flex-col section-block" [formGroup]="loyaltyForm">
+                        <p>{{'SEASON_TICKET.TRANSFER_SEAT.ASSIGN_POINTS_SESSION.DESCRIPTION' | translate}}</p>
+                        <app-search-table [dataSource]="seasonTicketListData$" [metadata]="seasonTicketListMetaData$"
+                            [columns]="columns" [pageSize]="pageSize" (changed)="loadSeasonTicketList($event)"
+                            [placeholder]="'SEASON_TICKET.TRANSFER_SEAT.ASSIGN_POINTS_SESSION.SEARCH_PLACEHOLDER' | translate"
+                            emptyListTitle="SEASON_TICKET.TRANSFER_SEAT.ASSIGN_POINTS_SESSION.EMPTY_LIST_TITLE"
+                            emptyListDescription="SEASON_TICKET.TRANSFER_SEAT.ASSIGN_POINTS_SESSION.EMPTY_LIST_DESCRIPTION"
+                            [searchOnInteraction]="false">
+                            <ng-container matColumnDef="session">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    {{'FORMS.LABELS.SESSION' | translate}}
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row">{{row.session_name}}</mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="date">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    {{'FORMS.LABELS.DATE' | translate}}
+                                </mat-header-cell>
+                                <mat-cell
+                                    *matCellDef="let row">{{row.session_starting_date | localDateTime}}</mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="event">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    {{'FORMS.LABELS.EVENT' | translate}}
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row">{{row.event_name}}</mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="points">
+                                <mat-header-cell *matHeaderCellDef class="head-cell input-column right">
+                                    {{'FORMS.LABELS.LOYALTY_POINTS' | translate}}
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row" [class.editable-cell]="isSeasonTicketEditable$ | async" class="right">
+                                    <mat-form-field class="ob-form-field flex basis-24" appearance="outline">
+                                        <input matInput type="number" inputmode="numeric" placeholder="0" class="number-input"
+                                               [formControlName]="row.session_id" min="0"
+                                               [readonly]="(isSeasonTicketEditable$ | async) === false">
+                                    </mat-form-field>
+                                </mat-cell>
+                            </ng-container>
+                        </app-search-table>
+                    </div>
+                </mat-expansion-panel>
+            }
+        </mat-accordion>
+    </app-form-container>
+}
+@if (isLoadingOrSaving$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

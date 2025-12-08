@@ -1,0 +1,63 @@
+<div fxLayout="column" fxLayoutGap="16px" [formGroup]="form">
+    <div fxLayout="row wrap" fxLayoutAlign="start center">
+        <mat-checkbox color="primary" class="list-checkbox" formControlName="enabled">
+            {{'MEMBER_EXTERNAL.DATES_FILTER_CONFIGS.LIMIT_PORTAL_ACCESS_ALLOWED' | translate }}
+        </mat-checkbox>
+    </div>
+    <div [fxShow]="form.controls['enabled'].value" fxLayout="column" fxLayoutGap="16px"
+        class="dates-filter-container">
+        <div fxLayout="row" fxFlex="100%" fxLayoutAlign="end center" fxLayoutGap="16px">
+            <button (click)="open()" color="primary"
+                mat-stroked-button type="button" class="ob-button medium edit-button">
+                <mat-icon>add</mat-icon>
+                {{'MEMBER_EXTERNAL.DATES_FILTER_CONFIGS.LIMIT_PORTAL_ACCESS_BUTTON' | translate}}
+            </button>
+            <div class="filter-container" fxFlex="none">
+                <button mat-stroked-button color="tertiary" class="ob-button medium only-icon" [matMenuTriggerFor]="literalsListMenu">
+                    <mat-icon>more_horiz</mat-icon>
+                </button>
+                <mat-menu #literalsListMenu="matMenu">
+                    <button mat-menu-item (click)="importPeriodsDates()">
+                        {{'MEMBER_EXTERNAL.DATES_FILTER_CONFIGS.UPLOAD_CSV_BTN' | translate}}
+                    </button>
+                    <button mat-menu-item (click)="openDeleteList()" [disabled]="(datesFilter$ | async).length === 0">
+                        {{'MEMBER_EXTERNAL.DATES_FILTER_CONFIGS.DELETE_LIST_BTN' | translate}}
+                    </button>
+                </mat-menu>
+            </div>
+        </div>
+        <app-search-table [dataSource]="datesFilter$" [columns]="columns" [pageSize]="8" [filter]="filterUser"
+            [emptyListTitle]="'MEMBER_EXTERNAL.' + period + '_CONFIGS.LIMIT_PORTAL_ACCESS_EMPTY_LIST_TITLE'"
+            [emptyListDescription]="'MEMBER_EXTERNAL.' + period + '_CONFIGS.LIMIT_PORTAL_ACCESS_EMPTY_LIST_DESCRIPTION'">
+            <ng-container matColumnDef="id">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'MEMBER_EXTERNAL.DATES_FILTER_CONFIGS.LIMIT_PORTAL_ACCESS_ID' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">{{row.user}}</mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="date">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'MEMBER_EXTERNAL.DATES_FILTER_CONFIGS.LIMIT_PORTAL_ACCESS_DATE' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">{{row.date | dateTime }} - {{row.date | dateTime : dateTimeFormats.shortTime }}</mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="actions">
+                <mat-header-cell *matHeaderCellDef class="actions-cell head-cell"
+                    [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true" />
+                <mat-cell *matCellDef="let row" class="actions-cells" [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                    <div class="action-buttons">
+                        <button mat-icon-button [matTooltip]="'FORMS.ACTIONS.DELETE' | translate"
+                            aria-label="Edit Period" class="ob-button small" (click)="openDeleteRow(row)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+                </mat-cell>
+            </ng-container>
+        </app-search-table>
+
+        <div fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="start center" class="section-block">
+            <label> {{'MEMBER_EXTERNAL.DATES_FILTER_CONFIGS.DEFAULT_ACCESS' | translate}}</label>
+            <app-date-time-picker fxFlex="50%" class="date-form-field" formControlName="default_access" [required]="true" />
+        </div>
+    </div>
+</div>

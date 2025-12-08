@@ -1,0 +1,121 @@
+<div class="list-container" fxFlex="0 1 100%" fxLayout="column">
+    <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">{{'TITLES.MY_PACKS' | translate}}</h1>
+        </div>
+        <div class="actions-container" fxLayout="row wrap" fxLayoutAlign="end">
+            @if(canCreate$ | async) {
+                <div class="filter-container">
+                    <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                        [attr.aria-label]="'PACK.NEW_BTN' | translate" (click)="openNewPackDialog()">
+                        <mat-icon>add</mat-icon>
+                        {{'PACK.NEW_BTN' | translate}}
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="heading-container" fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxFlex="70%" fxLayoutGap="20px" fxLayoutAlign="start center">
+             <div class="filter-container" fxFlex="none">
+                <app-popover appFilter>
+                    <app-packs-list-filter #filterContent [canSelectEntity]="canSelectEntity$ | async" />
+                </app-popover>
+            </div>
+             <div class="search-field" fxFlex="100%">
+                <app-search-input [placeholder]="'FORMS.SEARCH.PACK_LIST' | translate" />
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            @if(packsMetadata$ | async; as packsMetadata) {
+                <p class="page-summary" [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: packsMetadata"></p>
+            }
+            <app-paginator [length]="(packsMetadata$ | async)?.total" [pageSize]="packsPageSize" />
+        </div>
+    </div>
+    <div class="heading-container heading-divider">
+        <mat-divider />
+    </div>
+    <div class="heading-container">
+        <app-chips appFilter />
+    </div>
+    @if(packsLoading$ | async) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+    <mat-table class="ob-table" [dataSource]="packs$ | async" [trackBy]="trackByFn"
+        matSort [matSortActive]="initSortCol" [matSortDirection]="initSortDir" matSortDisableClear
+        [attr.aria-label]="'TITLES.MY_PACKS' | translate"
+        [class.not-touchable]="(isHandsetOrTablet$ | async) !== true">
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'FORMS.LABELS.NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="entity">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'FORMS.LABELS.ENTITY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.entity && row.entity.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'PACK.STATUS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span [class]="['status-dot', row.active ? 'active' : 'inactive']"></span>
+                <span>{{'PACK.STATUS_OPTS.' + (row.active ? 'ACTIVE' : 'INACTIVE') | translate}}</span> </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="pack_type">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'PACK.PACK_TYPE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.type | titlecase }}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="two-actions-cell head-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true" />
+            <mat-cell *matCellDef="let row" class="two-actions-cell" [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                <div fxLayout="row" class="action-buttons" (click)="$event.stopPropagation()">
+                    <!-- TODO: Clone not ready in backend yet -->
+                    <!-- <button mat-icon-button aria-label="Copy Pack"
+                        [matTooltip]="'PACK.COPY_BTN' | translate"
+                        class="ob-button medium" (click)="openClonePack(row)">
+                        <mat-icon>content_copy</mat-icon>
+                    </button> -->
+                    <button mat-icon-button aria-label="Delete Pack"
+                        [matTooltip]="'PACK.DELETE_BTN' | translate"
+                        class="ob-button medium" (click)="openDeletePackDialog(row)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+            </mat-cell>
+        </ng-container>
+        @if(displayedColumns$ | async; as displayedColumns) {
+            <ng-container>
+                <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" />
+                <mat-row *matRowDef="let row; columns: displayedColumns;" class="interactive-row"
+                    [routerLink]="[row.id, 'general-data']" />
+            </ng-container>
+        }
+    </mat-table>
+    @if (((packsMetadata$ | async)?.total === 0) && hasAppliedFilters) {
+        <div class="context-notification-container" fxFlex="100%" fxLayout="row" fxLayoutAlign="center start">
+            <app-context-notification class="ob-context-notification" contextType="info"
+                fxFlex.gt-sm="600px" fxFlex="80%" fxLayoutAlign="center start">
+                <p>{{'LIST.EMPTY' | translate}}</p>
+            </app-context-notification>
+        </div>
+    }
+    @if (((packsMetadata$ | async)?.total === 0) && !hasAppliedFilters) {
+        @if (canCreate$ | async) {
+            <app-empty-state fxFlex="100%"
+                [title]="'PACK.EMPTY_LIST_TITLE' | translate"
+                [description]="'PACK.EMPTY_LIST_DESCRIPTION' | translate">
+                <button type="button" mat-flat-button class="ob-button medium"
+                    color="primary" (click)="openNewPackDialog()">
+                    <mat-icon>add</mat-icon>
+                    {{'PACK.NEW_BTN' | translate}}
+                </button>
+            </app-empty-state>
+        }
+    }
+</div>

@@ -1,0 +1,44 @@
+<div fxLayout="row" fxLayoutAlign="space-between">
+    <h3 class="section-title">
+        {{'VENUE_TPLS.ELEMENT_INFO.TAG.TITLE' | translate}}
+    </h3>
+    <span class="ob-link" (click)="deleteContentComponent()">
+        {{ 'VENUE_TPLS.ELEMENT_INFO.DELETE_CONTENT' | translate }}
+    </span>
+</div>
+<app-tabs-menu [formGroup]="langFormGroup" type="language" overrideClasses="no-left-padding" #textsTabs>
+    @for (lang of languages; track lang) {
+
+        <ng-template appTab [ctrl]="langFormGroup.get(lang)" lazyLoad [label]="('LANGUAGES.' + lang) | translate">
+            <div fxLayout="row" fxLayoutGap="20px">
+                <mat-form-field fxFlex="35%" appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'VENUE_TPLS.ELEMENT_INFO.TAG.LABEL' | translate}}</mat-label>
+                    <input #input matInput aria-label="label" [placeholder]="'VENUE_TPLS.ELEMENT_INFO.TAG.LABEL' | translate"
+                        [formControlName]="lang">
+                    <mat-error [ob-form-errors]="langFormGroup" [field]="lang" />
+                </mat-form-field>
+                <div fxFlex="30%" fxLayout="column" fxLayoutAlign="start start">
+                    <span class="ob-label">{{'VENUE_TPLS.ELEMENT_INFO.TAG.TAG_PREVIEW' | translate}}</span>
+                    <span class="channels-badge" [style.backgroundColor]="backgroundColor.value"
+                        [style.color]="textColor.value">
+                        {{input.value || ('VENUE_TPLS.ELEMENT_INFO.TAG.TAG_PREVIEW_PLACEHOOLDER' | translate)}}
+                    </span>
+                </div>
+            </div>
+
+
+        </ng-template>
+
+    }
+</app-tabs-menu>
+
+<div fxLayout="row" fxLayoutGap="20px">
+    <mat-form-field appearance="outline" fxFlex="90px" class="ob-form-field field-with-label min-padding">
+        <mat-label>{{'VENUE_TPLS.ELEMENT_INFO.TAG.BACKGROUND_COLOR_TAG' | translate}}</mat-label>
+        <app-color-picker [formControl]="backgroundColor" />
+    </mat-form-field>
+    <mat-form-field appearance="outline" fxFlex="90px" class="ob-form-field field-with-label min-padding">
+        <mat-label>{{'VENUE_TPLS.ELEMENT_INFO.TAG.TEXT_COLOR_TAG' | translate}}</mat-label>
+        <app-color-picker [formControl]="textColor" />
+    </mat-form-field>
+</div>

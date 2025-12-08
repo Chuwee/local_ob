@@ -1,0 +1,53 @@
+<mat-button-toggle-group [class.active]="popover.isOpen()" [satPopoverAnchor]="popover" class="ob-popover-button-group medium"
+    fxLayout="row" fxLayoutAlign="flex-start center">
+    @if (buttonIconStart) {
+        <mat-button-toggle class="icon-button only-icon" (click)="popover.toggle()" fxFlex="none"
+            [disableRipple]="disableRipple">
+            <mat-icon class="icon-start">{{buttonIconStart}}</mat-icon>
+        </mat-button-toggle>
+    }
+    <mat-button-toggle class="text-button" [class.text-button-range]="isTextButtonRange" (click)="popover.toggle()" fxFlex="auto"
+        [disableRipple]="disableRipple">
+        @if (textButtonTemplateRef) {
+            <ng-container [ngTemplateOutlet]="textButtonTemplateRef" />
+        } @else {
+            {{buttonText | translate | uppercase}}
+            @if (buttonIconEnd) {
+                <mat-icon>{{buttonIconEnd}}</mat-icon>
+            }
+        }
+    </mat-button-toggle>
+    @if (removeButton) {
+        <mat-button-toggle (click)="onRemoveBtnClick()"
+            [matTooltip]="removeButtonTooltipText | translate" matTooltipClass="ob-tooltip-nowrap"
+            [disabled]="isOnRemoveBtnClickEnabled === false" [matTooltipDisabled]="isOnRemoveBtnClickEnabled === false"
+            [disableRipple]="disableRipple" fxFlex="none">
+            <mat-icon>close</mat-icon>
+        </mat-button-toggle>
+    }
+</mat-button-toggle-group>
+
+<sat-popover #popover hasBackdrop yAlign="below" autoFocus="false" restoreFocus="false"
+    (opened)="setOpened(true)" (closed)="setOpened(false)" panelClass="popover-anchor">
+    <mat-card appPopover [popover]="popover" class="ob-card" [class.content-padding-none]="contentNoPadding">
+        <mat-card-content class="form-container">
+            <ng-content />
+        </mat-card-content>
+        <mat-card-footer class="footer-container">
+            <div class="left-actions" [class.left-actions-hidden]="hideRemoveBtn">
+                <a class="ob-link" #removeLink (click)="onRemoveBtnClick()"
+                    [attr.disabled]="isOnRemoveBtnClickEnabled === false ? true : null">
+                    {{removeButtonText | translate}}
+                </a>
+            </div>
+            <div class="right-actions">
+                <button (click)="onCloseBtnClick()" mat-button class="ob-button small">
+                    {{'FORMS.CLOSE_FILTER_BTN' | translate}}
+                </button>
+                <button (click)="onApplyBtnClick()" mat-flat-button color="primary" class="ob-button small">
+                    {{'FORMS.APPLY_FILTER_BTN' | translate}}
+                </button>
+            </div>
+        </mat-card-footer>
+    </mat-card>
+</sat-popover>

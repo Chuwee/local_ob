@@ -1,0 +1,32 @@
+<div class="pie-charts-container">
+    <app-tabs-menu type="navigation">
+        @for(config of $pieChartConfigs(); track config; let i = $index) {
+            <ng-container>
+                <ng-template appTab [label]="$totalOverallByResponsible()[i]?.responsible">
+                    <ng-container *ngTemplateOutlet="pieChartTemplate; context: { $implicit: config }" />
+                </ng-template>
+            </ng-container>
+        }
+    </app-tabs-menu>
+</div>
+
+<ng-template #pieChartTemplate let-config>
+    <div class="pie-chart-with-legend">
+        <div class="legend">
+            @for(label of config.data.labels; track label; let i = $index) {
+                <div class="legend-item">
+                    <div class="info">
+                        <div class="square" [style.background-color]="pieChartColors[i]"></div>
+                        <div class="label">{{label}}</div>
+                    </div>
+                    <div class="count">{{config.data.datasets[0].data[i]}}</div>
+                </div>
+            }
+        </div>
+        <div class="pie-chart">
+            <div class="chart-container">
+                <ob-chart [config]="config" [height]="'250px'" />
+            </div>
+        </div>
+    </div>
+</ng-template>

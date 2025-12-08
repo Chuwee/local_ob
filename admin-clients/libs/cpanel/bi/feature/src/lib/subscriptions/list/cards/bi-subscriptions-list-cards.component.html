@@ -1,0 +1,29 @@
+@if (subscriptions.length > 0) {
+    <div fxLayout="column" fxLayoutGap="8px" class="card-container">
+        @for (subscription of subscriptions; track subscription.id) {
+            <div class="ob-card">
+                <div class="card-content" fxLayout="row" fxLayoutAlign="space-between flex-start">
+                    <div fxLayout="column">
+                        <span class="card-header">{{ subscription.name }}</span>
+                        <span class="card-title">{{ subscription.report }}</span>
+                        <div class="card-footer">
+                            <span class="card-subtitle" appEllipsify>{{ subscription.scheduled }}</span>
+                        </div>
+                    </div>
+                    <button mat-icon-button color="tertiary" class="ob-button medium"
+                        [matMenuTriggerFor]="actionsMenu" data-test="actionsBtn">
+                        <mat-icon>more_horiz</mat-icon>
+                    </button>
+                </div>
+                <mat-menu #actionsMenu="matMenu">
+                    <button mat-menu-item (click)="deleteEmitter.emit(subscription)">
+                        {{'BI.SUBSCRIPTIONS.ACTIONS.DELETE_BI_SUBSCRIPTION' | translate}}
+                    </button>
+                    <button mat-menu-item (click)="sendSubscriptionEmitter.emit(subscription)">
+                        {{'BI.SUBSCRIPTIONS.ACTIONS.SEND_BI_SUBSCRIPTION' | translate}}
+                    </button>
+                </mat-menu>
+            </div>
+        }
+    </div>
+}

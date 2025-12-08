@@ -1,0 +1,30 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'PRODUCT.VARIANTS.EDIT_PRICE.TITLE' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <p>{{ 'PRODUCT.VARIANTS.EDIT_PRICE.DESCRIPTION' | translate }}</p>
+        <mat-form-field appearance="outline" class="ob-form-field">
+            <mat-label>{{'PRODUCT.VARIANTS.VARIANT_PRICE' | translate}}</mat-label>
+            <app-currency-input class="table-input" [currencyCode]="currency" [placeholder]="0 | localCurrency : currency : 'narrow'"
+                (click)="$event.stopPropagation()" [formControl]="form.controls.price" [currencyFormat]="'narrow'" />
+            <mat-error [ob-form-errors]="form.controls.price" />
+        </mat-form-field>
+    </div>
+    <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="savePrice()">
+            {{'FORMS.ACTIONS.EDIT' | translate}}
+        </button>
+    </div>
+</div>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

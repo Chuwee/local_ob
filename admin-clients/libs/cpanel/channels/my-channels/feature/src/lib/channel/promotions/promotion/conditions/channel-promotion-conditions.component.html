@@ -1,0 +1,231 @@
+<app-form-container [disabled]="!(form?.dirty) || (reqInProgress$ | async)" (cancel)="cancel()" (save)="save()">
+    @if(promotion$ | async; as promotion){
+        <form [formGroup]="form">
+            <mat-expansion-panel expanded togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'CHANNELS.PROMOTIONS.CONDITIONS' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <!-- PROMOTION COLLECTIVES -->
+                @if(promotion.type !== promotionTypes.automatic ) {
+                    <div fxLayout="column" class="promotion-form-section">
+                        <span class="mat-subtitle-2" fxLayoutAlign="start center">
+                            {{'CHANNELS.PROMOTIONS.COLLECTIVES.TITLE' | translate}} *
+                            <app-help-button [message]="'CHANNELS.PROMOTIONS.COLLECTIVES.INFO' | translate" />
+                        </span>
+                        @if((collectives$ | async) == null || (collectives$ | async)?.length > 0){
+                            <div class="flex items-baseline gap-4">
+                                <mat-form-field appearance="outline" class="ob-form-field" fxFlex="50%">
+                                    <app-select-server-search formControlName="collective" [enableTracing]="true"
+                                        [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                        [options$]="collectives$"
+                                        (loadOptions)="loadCollectives($event.q)">
+                                        <ng-template #optionTemplate let-row>
+                                            <span appEllipsify [matTooltip]="(row?.name) + ' - ' +
+                                    (('COLLECTIVE.TYPE_OPTS.' + row?.type) | translate) + ' - ' +
+                                    (('COLLECTIVE.SUBTYPE_OPTS.' + row?.validation_method) | translate)">
+                                                {{row?.name}} -
+                                                {{('COLLECTIVE.TYPE_OPTS.' + row?.type) | translate}} -
+                                                {{('COLLECTIVE.SUBTYPE_OPTS.' + row?.validation_method) | translate}}
+                                            </span>
+                                        </ng-template>
+                                    </app-select-server-search>
+                                    <mat-error [ob-form-errors]="form" field="collective" />
+                                </mat-form-field>
+                                @if (form.value.collective?.id) {
+                                    <div class="flex items-baseline">
+                                        <a aria-label="Go to link" class="ob-link flex gap-1" target="_blank"
+                                            [routerLink]="['/collectives', form.value.collective.id, 'general-data']">
+                                            <span>{{'ACTIONS.GO_TO_COLLECTIVE' | translate}}</span>
+                                            <mat-icon class="ob-icon xsmall" iconPositionEnd>launch</mat-icon>
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        @if((collectives$ | async)?.length === 0){
+                            <p> {{'CHANNELS.PROMOTIONS.COLLECTIVES.LIST_EMPTY' | translate}} </p>
+                        }
+                        <mat-divider class="ob-divider" />
+                    </div>
+                }
+                <!-- PROMOTION AUTO IS COMBINABLE -->
+                @if(promotion.type === promotionTypes.automatic){
+                    <div fxLayout="column" class="promotion-form-section">
+                        <mat-checkbox color="primary" class="inline" formControlName="not_combinable">
+                            {{'CHANNELS.PROMOTIONS.IS_NOT_COMBINABLE' | translate}}
+                        </mat-checkbox>
+                        <mat-divider class="ob-divider" />
+                    </div>
+                }
+                <!-- PROMOTION VALIDITY PERIOD -->
+                <div fxLayout="column" class="promotion-form-section" formGroupName="alternative_surcharges">
+                    <p class="mat-subtitle-2" fxLayoutAlign="start center">
+                        {{'CHANNELS.PROMOTIONS.VALIDITY_PERIOD_SURCHARGES.TITLE' | translate}}
+                    </p>
+                    <mat-checkbox color="primary" formControlName="use_alternative_surcharges" class="inline">
+                        {{'CHANNELS.PROMOTIONS.VALIDITY_PERIOD_SURCHARGES.ALTERNATIVE_CHANNEL' | translate}}
+                    </mat-checkbox>
+                    <mat-checkbox color="primary" formControlName="use_alternative_promoter_surcharges" class="inline with-warning">
+                        {{'CHANNELS.PROMOTIONS.VALIDITY_PERIOD_SURCHARGES.ALTERNATIVE_PROMOTER' | translate}}
+                    </mat-checkbox>
+                    @if(form.value.alternative_surcharges?.use_alternative_promoter_surcharges){
+                        <p class="field-info"
+                            fxLayoutAlign=" center">
+                            <mat-icon class="ob-icon small warning with-text">warning</mat-icon>
+                            {{'CHANNELS.PROMOTIONS.VALIDITY_PERIOD_SURCHARGES.ALTERNATIVE_PROMOTER_WARNING' | translate}}
+                        </p>
+                    }
+                    <mat-divider class="ob-divider" />
+                </div>
+                <div fxLayout="column" class="promotion-form-section" formGroupName="validity_period">
+                    <p class="mat-subtitle-2" fxLayoutAlign="start center">
+                        {{'CHANNELS.PROMOTIONS.VALIDITY_PERIOD' | translate}} *
+                        <app-help-button [message]="'CHANNELS.PROMOTIONS.VALIDITY_PERIOD_INFO' | translate" />
+                    </p>
+                    <mat-radio-group formControlName="type" fxLayout="column">
+                        <mat-radio-button class="inline" [value]="validityPeriodTypes.channel">
+                            {{'CHANNELS.PROMOTIONS.VALIDITY_PERIOD_ALL' | translate}}
+                        </mat-radio-button>
+                        <mat-radio-button class="inline" [value]="validityPeriodTypes.period">
+                            {{'CHANNELS.PROMOTIONS.VALIDITY_PERIOD_SELECT' | translate}}
+                        </mat-radio-button>
+                    </mat-radio-group>
+                    @if(form.get('validity_period.type').value === validityPeriodTypes.period){
+                        <div fxLayout="row wrap" class="dates-selection nested-content">
+                            <div fxFlex="100%" fxFlex.gt-md="50%" fxLayout="column">
+                                <app-date-time-picker fxFlex="100%" class="date-form-field" [label]="'DATES.START_DATE' | translate"
+                                    formControlName="start_date" />
+                            </div>
+                            <div fxFlex="100%" fxFlex.gt-md="50%" fxLayout="column">
+                                <app-date-time-picker fxFlex="100%" class="date-form-field" [label]="'DATES.END_DATE' | translate"
+                                    formControlName="end_date" />
+                            </div>
+                            @if(form.get('validity_period').touched) {
+                                <mat-error [ob-form-errors]="form" field="validity_period" />
+                            }
+                        </div>
+                    }
+                </div>
+                @if ($isSecondaryMarketActive()) {
+                    <mat-divider class="ob-divider" />
+                    <!-- PROMOTION SECONDARY MARKET  -->
+                    <div class="promotion-form-section flex flex-col">
+                        <div class="flex">
+                            <p class="mat-subtitle-2 flex justify-start items-center">
+                                {{'CHANNELS.PROMOTIONS.SECONDARY_MARKET.TITLE' | translate}}
+                            </p>
+                        </div>
+                        <mat-checkbox color="primary" formControlName="block_secondary_market_sale" class="inline">
+                            <span class="flex items-center">
+                                {{'CHANNELS.PROMOTIONS.SECONDARY_MARKET.BLOCK_SALE' | translate}}
+                                <mat-icon class="ob-help-icon"
+                                    [matTooltip]="'CHANNELS.PROMOTIONS.SECONDARY_MARKET.BLOCK_SALE_INFO' | translate">
+                                    help_outline
+                                </mat-icon>
+                            </span>
+                        </mat-checkbox>
+                    </div>
+                }
+            </mat-expansion-panel>
+            <mat-expansion-panel expanded togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'CHANNELS.PROMOTIONS.OPERATIVE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <!-- PROMOTION LIMITS -->
+                <div fxLayout="column" fxLayoutGap="16px" class="promotion-form-section" formGroupName="usage_limits">
+                    <p class="mat-subtitle-2">{{'CHANNELS.PROMOTIONS.LIMITS' | translate}}</p>
+                    @if(promotion.subtype !== 'PACK') {
+                        <div fxLayoutGap="12px" [fxLayout]="(hasMoreThanOneCurrencyBS | async) ? 'column' : 'row'"
+                            formGroupName="amount_min">
+                            <mat-checkbox color="primary" formControlName="enabled" class="inline">
+                                {{'CHANNELS.PROMOTIONS.AMOUNT_MIN' | translate}}
+                            </mat-checkbox>
+                            @if(currencies$ | async; as currencies) {
+                                @if(form.get('usage_limits.amount_min.enabled').value) {
+                                    @if((hasMoreThanOneCurrencyBS | async) === false){
+                                        <mat-form-field appearance="outline" fxFlex="150px"
+                                            class="ob-form-field inline-field value-field">
+                                            <app-currency-input formControlName="amount" [currencyCode]="channelOneCurrency"
+                                                currencyFormat="narrow"
+                                                [placeholder]="0 | localCurrency : channelOneCurrency : 'narrow'" />
+                                        </mat-form-field>
+                                    }
+                                    <div class="content-scroll">
+                                        @if(hasMoreThanOneCurrencyBS | async) {
+                                            <table mat-table class="ob-table" [dataSource]="$dataSource()">
+                                                @for (currency of currencies; track currency) {
+                                                    <ng-container [matColumnDef]="currency" formArrayName="values">
+                                                        <th mat-header-cell *matHeaderCellDef
+                                                            class="default-padding head-cell right price-column">
+                                                            <div fxLayoutAlign="end center">
+                                                                {{currency | localCurrencyPartialTranslation }}
+                                                            </div>
+                                                        </th>
+                                                        <td mat-cell *matCellDef="let amount"
+                                                            class="default-padding right price-column editable-cell">
+                                                            <div class="write-value">
+                                                                <mat-form-field appearance="outline" class="ob-form-field">
+                                                                    @let errorMessage = form.get(['usage_limits', 'amount_min', 'values', $index, 'amount']) | obErrorMessage$ | async;
+                                                                        @if (errorMessage) {
+                                                                        <mat-icon matPrefix [obErrorIcon]="errorMessage">
+                                                                            error_outline
+                                                                        </mat-icon>
+                                                                    }
+                                                                    <app-currency-input class="table-input"
+                                                                        [formControl]="form.get(['usage_limits', 'amount_min', 'values', $index, 'amount'])"
+                                                                        currencyFormat="narrow"
+                                                                        [placeholder]="0 | localCurrency : currency"
+                                                                        [currencyCode]="currency" />
+                                                                </mat-form-field>
+                                                            </div>
+                                                        </td>
+                                                    </ng-container>
+                                                }
+                                                @if(currencies) {
+                                                    <!-- eslint-disable-next-line @angular-eslint/template/prefer-self-closing-tags -->
+                                                    <tr mat-header-row *matHeaderRowDef="currencies"></tr>
+                                                    <!-- eslint-disable-next-line @angular-eslint/template/prefer-self-closing-tags -->
+                                                    <tr mat-row *matRowDef="let row; columns: currencies" class="hoverable-row"></tr>
+                                                }
+                                            </table>
+                                        }
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <div fxLayout="row" formGroupName="purchase_min">
+                            <mat-checkbox color="primary" formControlName="enabled" class="inline">
+                                {{'CHANNELS.PROMOTIONS.PURCHASE_MIN' | translate}}
+                            </mat-checkbox>
+                            @if(form.get('usage_limits.purchase_min.enabled').value){
+                                <div fxLayoutAlign="start center">
+                                    <mat-form-field appearance="outline" fxFlex="100px" class="ob-form-field inline-field value-field">
+                                        <input matInput type="number" formControlName="limit" placeholder="0">
+                                    </mat-form-field>
+                                </div>
+                            }
+                        </div>
+                    }
+                    <div fxLayout="row" formGroupName="promotion_max">
+                        <mat-checkbox color="primary" formControlName="enabled" class="inline">
+                            {{'CHANNELS.PROMOTIONS.PROMOTION_MAX' | translate}}
+                        </mat-checkbox>
+                        @if(form.get('usage_limits.promotion_max.enabled').value) {
+                            <div fxLayoutAlign="start center">
+                                <mat-form-field appearance="outline" fxFlex="100px" class="ob-form-field inline-field value-field">
+                                    <input matInput type="number" formControlName="limit" placeholder="0">
+                                </mat-form-field>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </mat-expansion-panel>
+        </form>
+    }
+</app-form-container>
+
+@if(reqInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

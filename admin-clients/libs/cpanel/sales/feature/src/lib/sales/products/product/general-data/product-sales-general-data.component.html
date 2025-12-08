@@ -1,0 +1,228 @@
+@if((ticketDetail$ | async); as ticketDetail) {
+    <div class="ticket-general-data-container" fxLayout="column" fxFlex="100%">
+        <div class="actions-bar" fxLayout="column">
+            <div fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="center">
+                <div fxFlex="0 1 1175px" fxLayout="row" fxLayoutGap="8px">
+                    <div fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="25px">
+                        <div fxFlex="0 1 100%" fxLayoutAlign="start center">
+                            @if(ticketDetail.action?.print){
+                                <button mat-button type="button" class="ob-button small"
+                                    [attr.aria-label]="'ACTIONS.SEE_TICKET.BTN' | translate"
+                                    (click)="showTicket(ticketDetail.order.code, ticketDetail.id)">
+                                    <mat-icon>remove_red_eye</mat-icon>
+                                    {{'ACTIONS.SEE_TICKET.BTN' | translate}}
+                                </button>
+                            }
+                            @if(ticketDetail.action?.print){
+                                <button mat-button type="button" class="ob-button small"
+                                    [attr.aria-label]="'ACTIONS.SEE_ALL_TICKETS.BTN' | translate" (click)="showTickets(ticketDetail)">
+                                    <mat-icon>confirmation_number</mat-icon>
+                                    {{'ACTIONS.SEE_ALL_TICKETS.BTN' | translate}}
+                                </button>
+                            }
+                        </div>
+                        @if(isSkipGeneration$ | async){
+                            <div fxFlex="0 0 auto" fxLayoutAlign="end center" class="skip-generation-container">
+                                <span class="ob-label skip-generation-label">
+                                    {{'TICKET_DELIVERY.DISABLED.TITLE' | translate}}
+                                </span>
+                                <mat-icon fxFlexAlign="center" class="ob-help-icon" [matTooltip]="'TICKET_DELIVERY.DISABLED.INFO' | translate">
+                                    help_outline
+                                </mat-icon>
+                            </div>
+                        }
+                        @if((stateHistory$ | async); as stateHistory){
+                            <mat-form-field fxFlex="50%" fxFlex.gt-sm="30%" appearance="outline"
+                                class="ob-form-field inline-field thin-select-field">
+                                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" [value]="stateHistory[0]">
+                                    @for(state of stateHistory; track $index){
+                                        <mat-option [value]="state">
+                                            {{'TICKET.STATE_OPTS.' + state.state | translate}} {{state.date | dateTime:
+                                            dateTimeFormats.shortDateTime}}
+                                        </mat-option>
+                                    }
+
+                                </mat-select>
+                            </mat-form-field>
+                        }
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        <app-form-container [hideActionBar]="true" layout="main" class="no-top-padding overflow-y-auto">
+            <div fxLayout="column">
+                <div class="main-content" fxLayout="row wrap" fxLayoutAlign="space-between start">
+                    <div fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="stretch">
+                        <div fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="center stretch">
+                            <mat-accordion class="details-form-container" fxFlex="0 1 845px" [multi]="true" togglePosition="before">
+                                @if (ticketDetail.pack) {
+                                    <div fxLayout="row" fxLayoutAlign="start center" class="pack-info">
+                                        <mat-icon class="ob-icon xsmall info with-text">info</mat-icon>
+                                        <span>{{'PRODUCT.PACK.INFO' | translate}}</span>
+                                    </div>
+                                }
+
+                                <mat-expansion-panel [expanded]="true">
+                                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                        <mat-panel-title>{{'TICKET.PRODUCT_DATA' | translate}}</mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <div fxLayout="row wrap" fxLayoutGap="24px">
+                                        <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                                            fxFlex.gt-md="0 1 calc(33.3% - 24px)" fxLayout="column">
+                                            <span class="field-label">{{'FORMS.LABELS.PRODUCT' | translate}}</span>
+                                            <span>{{ticketDetail.product.name}}</span>
+                                        </div>
+                                        @if(ticketDetail.product.attribute1){
+                                            <div class="details-non-editable-field" fxFlex="100%"
+                                                fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-md="0 1 calc(33.3% - 24px)" fxLayout="column">
+                                                <span class="field-label">{{ ticketDetail.product.attribute1?.name }}</span>
+                                                <span>
+                                                    {{ ticketDetail.product.attribute1?.value?.name }}
+                                                </span>
+                                            </div>
+                                        }
+                                        @if(ticketDetail.product.attribute2){
+                                            <div class="details-non-editable-field" fxFlex="100%"
+                                                fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-md="0 1 calc(33.3% - 24px)" fxLayout="column">
+                                                <span class="field-label">{{ticketDetail.product.attribute2?.name}}</span>
+                                                <span>
+                                                    {{ ticketDetail.product.attribute2?.value?.name }}
+                                                </span>
+                                            </div>
+                                        }
+                                        @if(!ticketDetail.product.attribute1){
+                                            <div class="details-non-editable-field" fxFlex="100%"
+                                                fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-md="0 1 calc(33.3% - 24px)" fxLayout="column">
+                                                <span class="field-label">{{'FORMS.LABELS.VARIANT' | translate}}</span>
+                                                <span>
+                                                    {{'ORDER.PRODUCTS_DATA.VARIANT_UNIQUE' | translate }}
+                                                </span>
+                                            </div>
+                                        }
+                                        <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                                            fxFlex.gt-md="0 1 calc(33.3% - 24px)" fxLayout="column">
+                                            <span class="field-label">{{'FORMS.LABELS.BARCODE' | translate}}</span>
+                                            <span>{{ticketDetail.product.barcode | obfuscateString : undefined}}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </mat-expansion-panel>
+                                <mat-expansion-panel [expanded]="true">
+                                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                        <mat-panel-title>{{'TICKET.ORDER_DATA' | translate}}</mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <div fxLayout="row wrap" fxLayoutGap="24px">
+                                        <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                                            fxFlex.gt-md="0 1 calc(33.3% - 24px)" fxLayout="column">
+                                            <span class="field-label">{{'FORMS.LABELS.CODE' | translate}}</span>
+                                            <span>{{ticketDetail.order.code}}</span>
+                                        </div>
+                                        <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                                            fxFlex.gt-md="0 1 calc(33.3% - 24px)" fxLayout="column">
+                                            <span class="field-label">{{'FORMS.LABELS.TYPE' | translate}}</span>
+                                            <span>{{('ENUMS.TYPE_OPTS.' + ticketDetail.order.type) | translate}}</span>
+                                        </div>
+                                        <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                                            fxFlex.gt-md="0 1 calc(33.3% - 24px)" fxLayout="column">
+                                            <span class="field-label">{{'FORMS.LABELS.DATE' | translate}}</span>
+                                            <span>
+                                                {{ticketDetail.order.date | localDateTime : dateTimeFormats.shortDateTime}}
+                                            </span>
+                                        </div>
+                                        <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                                            fxFlex.gt-md="0 1 calc(33.3% - 24px)" fxLayout="column">
+                                            <span class="field-label">{{'FORMS.LABELS.CHANNEL' | translate}}</span>
+                                            <span>{{ticketDetail.channel.name}}</span>
+                                        </div>
+                                        <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                                            fxFlex.gt-md="0 1 calc(33.3% - 24px)" fxLayout="column">
+                                            <span class="field-label">{{'FORMS.LABELS.ENTITY' | translate}}</span>
+                                            <span>{{ticketDetail.channel.entity.name}}</span>
+                                        </div>
+                                    </div>
+                                </mat-expansion-panel>
+                                <mat-expansion-panel [expanded]="true">
+                                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                        <mat-panel-title>{{'TICKET.BUYER_DATA' | translate}}</mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <div fxLayout="row wrap" fxLayoutGap="24px">
+                                        <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                                            fxFlex.gt-md="0 1 calc(33.3% - 24px)" fxLayout="column">
+                                            <span class="field-label">{{'FORMS.LABELS.TYPE' | translate}}</span>
+                                            <span>{{ticketDetail.client_type}}</span>
+                                        </div>
+                                        @if(ticketDetail.buyer_data.name){
+                                            <div class="details-non-editable-field" fxFlex="100%"
+                                                fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-md="0 1 calc(33.3% - 24px)"
+                                                fxLayout="column">
+                                                <span class="field-label">{{'FORMS.LABELS.NAME' | translate}}</span>
+                                                <span>{{ticketDetail.buyer_data.name}}</span>
+                                            </div>
+                                        }
+                                        @if(ticketDetail.buyer_data.surname){
+                                            <div class="details-non-editable-field" fxFlex="100%"
+                                                fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-md="0 1 calc(33.3% - 24px)"
+                                                fxLayout="column">
+                                                <span class="field-label">{{'FORMS.LABELS.SURNAME' | translate}}</span>
+                                                <span>{{ticketDetail.buyer_data.surname}}</span>
+                                            </div>
+                                        }
+                                        @if(ticketDetail.buyer_data.email){
+                                            <div class="details-non-editable-field" fxFlex="100%"
+                                                fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-md="0 1 calc(33.3% - 24px)"
+                                                fxLayout="column">
+                                                <span class="field-label">{{'FORMS.LABELS.EMAIL' | translate}}</span>
+                                                <span>{{ticketDetail.buyer_data.email}}</span>
+                                            </div>
+                                        }
+                                        @if(ticketDetail.buyer_data.phone){
+                                            <div class="details-non-editable-field" fxFlex="100%"
+                                                fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-md="0 1 calc(33.3% - 24px)"
+                                                fxLayout="column">
+                                                <span class="field-label">{{'FORMS.LABELS.PHONE' | translate}}</span>
+                                                <span>{{ticketDetail.buyer_data.phone}}</span>
+                                            </div>
+                                        }
+                                    </div>
+                                </mat-expansion-panel>
+                                @if(ticketDetail.product.validations){
+                                    <mat-expansion-panel [expanded]="true">
+                                        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                            <mat-panel-title>{{'TICKET.VALIDATIONS.TITLE' | translate}}</mat-panel-title>
+                                        </mat-expansion-panel-header>
+                                        <app-ticket-validation [ticketDetail]="ticketDetail" class="ticket-panel-content" />
+                                    </mat-expansion-panel>
+                                }
+                                @if((isOperatorUser$ | async) && (actionHistory$ | async)?.length){
+                                    <mat-expansion-panel [expanded]="true">
+                                        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                            <mat-panel-title>{{'TICKET.ACTIONS_HISTORY.ALL.TITLE' | translate}}</mat-panel-title>
+                                        </mat-expansion-panel-header>
+                                        <app-ticket-actions-history class="ticket-panel-content"
+                                            [total]="ticketDetail.actions_history.length"
+                                            [actions$]="actionHistory$" />
+                                    </mat-expansion-panel>
+                                }
+                            </mat-accordion>
+                            <mat-divider vertical="true" fxFlexAlign="stretch" />
+                            @if(ticketDetail.price){
+                                <div class="ob-summary sidebar-container" fxFlex="0 1 340px" fxLayout="column">
+                                    <app-product-sales-price [ticketDetail]="ticketDetail" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </app-form-container>
+    </div>
+}
+
+
+
+@if (loading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

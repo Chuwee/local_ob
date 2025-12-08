@@ -1,0 +1,123 @@
+<form [formGroup]="filtersForm" fxLayout="column" fxLayoutGap="24px">
+    @if (canSelectEntity$ | async) {
+
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label" fxFlex="120px">
+                {{'PRODUCT.ENTITY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="300px">
+                <mat-form-field appearance="outline" class="ob-form-field entity-select">
+                    <mat-select formControlName="entity" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate">
+                        <mat-option>
+                            <app-select-search #entitySelectSearch [options$]="entities$" searchField="name" />
+                        </mat-option>
+                        @for (entity of entitySelectSearch.getFilteredOptions$() | async; track entity) {
+                            <mat-option [value]="entity">
+                                <div appEllipsify [matTooltip]="entity ? entity.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)">
+                                    {{entity ? entity.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                                </div>
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        @if ((currencies$ | async)?.length > 1) {
+
+            <div fxLayout="row" class="filter-block">
+                <div class="ob-label" fxFlex="120px">
+                    {{'FORMS.LABELS.CURRENCY' | translate}}
+                </div>
+                <div class="filter-block-input" fxFlex="300px">
+                    <mat-form-field appearance="outline" class="ob-form-field status-select">
+                        <mat-select formControlName="currency" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate"
+                            [compareWith]="compareWith">
+                            <mat-option>
+                                <app-select-search #currencySelectSearch [options$]="currencies$ | localCurrenciesFullTranslation$"
+                                    [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="description" />
+                            </mat-option>
+                            @for (
+                                currency of currencySelectSearch.getFilteredOptions$() | async | currencyFilterItemValues; track currency
+                            ) {
+                                <mat-option
+                                    [value]="currency">
+                                    {{currency.description ?? ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+
+        }
+        <mat-divider [inset]="true" />
+
+    }
+    <div fxLayout="row" class="filter-block">
+        <div class="ob-label" fxFlex="120px">
+            {{'PRODUCT.STATUS' | translate}}
+        </div>
+        <div class="filter-block-input" fxFlex="300px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-select formControlName="status" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                    @for (status of statusOptions; track status) {
+                        <mat-option [value]="status">
+                            <div appEllipsify>
+                                {{ 'PRODUCT.STATUS_OPTS.' + status | translate }}
+                            </div>
+                        </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+    <div fxLayout="row" fxLayoutGap="16px">
+        <div formGroupName="stock" fxLayout="row" class="filter-block">
+            <div class="ob-label ob-label-checkbox-group inline" fxFlex="120px">
+                {{'PRODUCT.STOCK_TYPE.LABEL' | translate}}
+            </div>
+            <div class="filter-block-input" fxLayout="column" fxFlex="300px">
+                <div fxLayout="column" fxLayoutGap="16px">
+                    <div fxLayout="column" fxFlex>
+                        <mat-checkbox formControlName="bounded" color="primary" class="app-checkbox-wrap-label">
+                            {{'PRODUCT.STOCK_TYPE_OPTS.BOUNDED' | translate}}
+                        </mat-checkbox>
+                    </div>
+                    <div fxLayout="column" fxFlex>
+                        <mat-checkbox formControlName="unbounded" color="primary" class="app-checkbox-wrap-label">
+                            {{'PRODUCT.STOCK_TYPE_OPTS.UNBOUNDED' | translate}}
+                        </mat-checkbox>
+                    </div>
+                    <div fxLayout="column" fxFlex>
+                        <mat-checkbox formControlName="session_bounded" color="primary" class="app-checkbox-wrap-label">
+                            {{'PRODUCT.STOCK_TYPE_OPTS.SESSION_BOUNDED' | translate}}
+                        </mat-checkbox>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <mat-divider [inset]="true" />
+    <div fxLayout="row" fxLayoutGap="16px">
+        <div formGroupName="type" fxLayout="row" class="filter-block">
+            <div class="ob-label ob-label-checkbox-group inline" fxFlex="120px">
+                {{'PRODUCT.TYPE' | translate}}
+            </div>
+            <div class="filter-block-input" fxLayout="column">
+                <div fxLayout="column" fxLayoutGap="16px">
+                    <div fxLayout="column" fxFlex>
+                        <mat-checkbox formControlName="simple" color="primary" class="app-checkbox-wrap-label">
+                            {{'PRODUCT.TYPE_OPTS.SIMPLE' | translate}}
+                        </mat-checkbox>
+                    </div>
+                    <div fxLayout="column" fxFlex>
+                        <mat-checkbox formControlName="variant" color="primary" class="app-checkbox-wrap-label">
+                            {{'PRODUCT.TYPE_OPTS.VARIANT' | translate}}
+                        </mat-checkbox>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</form>

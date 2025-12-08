@@ -1,0 +1,87 @@
+<div class="left-bar-container">
+    <div fxFlex class="left-bar" fxLayout="column" fxLayoutAlign="justify">
+        <div class="left-sidebar-title" fxLayout="column">
+            <div fxLayout="row" fxLayoutAlign="justify center">
+                <h2 class="title">{{'EVENTS.SESSION_PACKS' | translate}}</h2>
+                <button mat-icon-button aria-label="New session pack" type="button" [disabled]="isLoadingList$ | async"
+                    class="ob-button mat-stroked-button xsmall" (click)="openNewSessionPackDialog()"
+                    [matTooltip]="'EVENTS.CREATE_SESSION_PACK_BTN' | translate">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+            <div fxFlex>
+                <p class="results-count">
+                    <span>
+                        {{'RESULTS.TOTAL' | translate}}
+                    </span>
+                    <span>{{(totalSessions$ | async) ?? 0}}</span>
+                </p>
+            </div>
+        </div>
+        <div fxFlex="36px" class="left-sidebar-header" fxLayoutAlign="end center">
+            <button mat-icon-button aria-label="Delete session pack" class="ob-button small"
+                (click)="openDeleteSessionPackDialog()"
+                [disabled]="(isLoadingList$ | async) || (totalSessions$ | async) === 0"
+                [matTooltip]="'EVENTS.SESSION_PACK.DELETE' | translate">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </div>
+        <div fxLayout="column" fxFlex class="list-container"
+            *ngIf="{ sessionList: (sessionsList$ | async), currentSession: (currentSession$ | async) } as sessionData">
+            <mat-selection-list (selectionChange)="selectionChangeHandler($event.options[0]?.value)"
+                class="ob-lateral-select-list" appLastPathGuardListener disableRipple
+                [currValue]="sessionData.currentSession?.id.toString()" [multiple]="false">
+                <mat-list-option class="with-badge" #option *ngFor="let sessionWrapper of sessionData.sessionList"
+                    [value]="sessionWrapper.session.id"
+                    [selected]="sessionWrapper.session.id === sessionData.currentSession?.id"
+                    [id]="'session-packs-option-' + sessionWrapper.session.id">
+                    <div fxLayoutAlign="space-between center">
+                        <div fxFlex="calc(100% - 48px)" fxLayout="column" fxLayoutAlign="center"
+                            class="session-main-info">
+                            <span class="list-item-title" appEllipsify [matTooltip]="sessionWrapper.session.name">
+                                {{sessionWrapper.session.name}}
+                            </span>
+                            <span class="list-item-subtitle" appEllipsify [matTooltip]="sessionWrapper.session.venue_template?.venue?.name">
+                                {{sessionWrapper.session.venue_template?.venue?.name}}
+                            </span>
+                            <span class="list-item-subtitle">
+                                {{sessionWrapper.session.start_date | localDateTime : dateTimeFormats.shortDateWithWeek}}
+                            </span>
+                        </div>
+                        <div class="status-container">
+                            <mat-icon *ngIf="sessionWrapper.isActiveFromInProgress" class="icon-active">
+                                check
+                            </mat-icon>
+                            <mat-icon *ngIf="sessionWrapper.session.generation_status === sessionGenerationStatus.error"
+                                class="icon-error">
+                                error_outline
+                            </mat-icon>
+                            <mat-spinner *ngIf="sessionWrapper.session.generation_status === sessionGenerationStatus.inProgress ||
+                                sessionWrapper.session.generation_status === sessionGenerationStatus.pending ||
+                                sessionWrapper.session.updating_capacity "
+                                class="icon-in-progress" diameter="25">
+                            </mat-spinner>
+                        </div>
+                        <div class="badge-container" fxLayout="column">
+                            <span class="ob-status-badge small-badge"
+                                [ngClass]="getReleaseStatusIndicator(option.selected ?
+                                    sessionData.currentSession : sessionWrapper.session)">
+                                {{('EVENTS.SESSION.RELEASE_STATE' | translate).substring(0, 1)}}
+                            </span>
+                            <span class="ob-status-badge small-badge"
+                                [ngClass]="getReleaseStatusIndicator(option.selected ?
+                                    sessionData.currentSession : sessionWrapper.session)">
+                                {{('EVENTS.SESSION.SALE_STATE' | translate).substring(0, 1)}}
+                            </span>
+                        </div>
+                    </div>
+                </mat-list-option>
+            </mat-selection-list>
+        </div>
+    </div>
+    <div *ngIf="isLoadingList$ | async" class="loading-state-container" fxLayoutAlign="center center">
+        <div class="loading-state-background" fxLayout="row" fxLayoutAlign="center center">
+            <mat-spinner></mat-spinner>
+        </div>
+    </div>
+</div>

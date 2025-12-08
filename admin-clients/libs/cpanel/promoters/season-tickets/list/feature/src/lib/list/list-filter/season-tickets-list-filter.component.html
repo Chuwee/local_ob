@@ -1,0 +1,105 @@
+<form [formGroup]="filtersForm" fxLayout="column" fxLayoutGap="24px">
+    <ng-container *ngIf="canSelectEntity$ | async">
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label">
+                {{'SEASON_TICKET.ENTITY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="550px">
+                <mat-form-field appearance="outline" class="ob-form-field entity-select">
+                    <mat-select formControlName="entity" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate">
+                        <mat-option>
+                            <app-select-search #entitySelectSearch [options$]="entities$" searchField="name">
+                            </app-select-search>
+                        </mat-option>
+                        <mat-option *ngFor="let entity of entitySelectSearch.getFilteredOptions$() | async" [value]="entity">
+                            {{entity ? entity.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="(currencies$ | async) as currencies">
+        <div *ngIf="currencies.length > 1" fxLayout="row" class="filter-block">
+            <div class="ob-label">
+                {{'FORMS.LABELS.CURRENCY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field status-select">
+                    <mat-select formControlName="currency" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate"
+                        [compareWith]="compareWith">
+                        <mat-option>
+                            <app-select-search #currencySelectSearch [options$]="currencies$ | localCurrenciesFullTranslation$"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="description">
+                            </app-select-search>
+                        </mat-option>
+                        <mat-option
+                            *ngFor="let currency of currencySelectSearch.getFilteredOptions$() | async | currencyFilterItemValues"
+                            [value]="currency">
+                            {{currency.description ?? ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </ng-container>
+    <mat-divider [inset]="true"></mat-divider>
+    <div fxLayout="row" fxLayoutAlign="space-between" fxLayoutGap="50px" class="filter-block">
+        <div>
+            <div class="ob-label">
+                {{'SEASON_TICKET.PRODUCER' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field producer-select">
+                    <mat-select formControlName="producer" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option>
+                            <app-select-search #producerSelectSearch [options$]="producers$" searchField="name">
+                            </app-select-search>
+                        </mat-option>
+                        <mat-option *ngFor="let producer of producerSelectSearch.getFilteredOptions$() | async" [value]="producer">
+                            <div appEllipsify [matTooltip]="producer ? producer.name : ('FORMS.SELECT.ALL_ELEMENTS_MALE' | translate)">
+                                {{producer ? producer.name : ('FORMS.SELECT.ALL_ELEMENTS_MALE' | translate)}}
+                            </div>
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div>
+            <div class="ob-label">
+                {{'SEASON_TICKET.VENUE' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field venue-select">
+                    <mat-select formControlName="venue" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option>
+                            <app-select-search #venueSelectSearch [options$]="venues$" searchField="name">
+                            </app-select-search>
+                        </mat-option>
+                        <mat-option *ngFor="let venue of venueSelectSearch.getFilteredOptions$() | async" [value]="venue">
+                            <div appEllipsify [matTooltip]="venue ? venue.name : ('FORMS.SELECT.ALL_ELEMENTS_MALE' | translate)">
+                                {{venue ? venue.name : ('FORMS.SELECT.ALL_ELEMENTS_MALE' | translate)}}
+                            </div>
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="space-between" class="filter-block">
+        <div>
+            <div class="ob-label">
+                {{'SEASON_TICKET.STATUS' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field status-select">
+                    <mat-select formControlName="status" multiple [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option *ngFor="let status of statusList" [value]="status">
+                            {{status && (status.name | translate)}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+</form>

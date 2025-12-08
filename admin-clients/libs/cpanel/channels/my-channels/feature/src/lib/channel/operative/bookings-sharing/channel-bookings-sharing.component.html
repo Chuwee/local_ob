@@ -1,0 +1,107 @@
+<app-form-container (cancel)="cancel()" [disabled]="$inProgress() || !form.dirty || !form.valid" (save)="save()" layout="menu"
+    class="overflow-y-auto">
+    <mat-accordion multi [togglePosition]="'before'">
+        @if(!$channel()?.settings?.v4_config_enabled){
+            <mat-expansion-panel expanded>
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{'CHANNELS.BOOKINGS_SHARING.TITLES.SHARED_MANAGEMENT' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div [formGroup]="form">
+                    <p class="mat-body-2">
+                        {{'CHANNELS.BOOKINGS_SHARING.FORMS.INFOS.SHARED_MANAGEMENT' | translate}}
+                    </p>
+                    <mat-checkbox color="primary" formControlName="allow_booking_sharing">
+                        {{'CHANNELS.BOOKINGS_SHARING.FORMS.LABELS.SHARED_MANAGEMENT'| translate}}
+                    </mat-checkbox>
+                </div>
+            </mat-expansion-panel>
+        }
+        @if($channel()?.settings?.v4_config_enabled){
+            <mat-expansion-panel expanded>
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{'CHANNELS.BOOKINGS_SHARING.TITLES.BOOKING_CHECKOUT' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div [formGroup]="formBookingCheckout">
+                    <p class="mat-body-2">
+                        {{'CHANNELS.BOOKINGS_SHARING.FORMS.INFOS.BOOKING_CHECKOUT' | translate}}
+                    </p>
+                    <div class="flex flex-col gap-4">
+                        @let paymentMethods = paymentMethods$ | async;
+                        <!-- {} -->
+                        @if(!paymentMethods?.length && !$inProgress()){
+                            <div>
+                                <div class="flex items-center">
+                                    <mat-icon class="ob-icon info with-text">info</mat-icon>
+                                    <span>{{'CHANNELS.BOOKINGS_SHARING.FORMS.INFOS.BOOKING_CHECKOUT_PAYMENT_METHODS_REQUIRED' | translate}}
+                                    </span>
+                                </div>
+                                <a class="ob-link icon payment-methods-link" target="_blank" [href]="$paymentMethodsUrl()">
+                                    {{ "CHANNELS.BOOKINGS_SHARING.FORMS.LINKS.BOOKING_CHECKOUT_PAYMENT_METHODS_REQUIRED" | translate }}
+                                </a>
+                            </div>
+
+                        }
+                        <mat-checkbox color="primary" formControlName="enabled">
+                            {{'CHANNELS.BOOKINGS_SHARING.FORMS.LABELS.BOOKING_CHECKOUT'| translate}}
+                        </mat-checkbox>
+                        @if(formBookingCheckout.value.enabled){
+                            <div class="nested-content">
+                                <p>{{'CHANNELS.BOOKINGS_SHARING.FORMS.INFOS.BOOKING_CHECKOUT_CHANNEL' | translate}}</p>
+                                <mat-form-field appearance="outline" class="ob-form-field channel-select">
+                                    <app-select-server-search [multiple]="false"
+                                        [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                        [formControl]="formControlChannel" [loading$]="channelsLoading$"
+                                        [options$]="channels$" [moreOptionsAvailable$]="moreChannelsAvailable$"
+                                        (loadOptions)="loadChannels($event.q, $event.nextPage)" />
+                                </mat-form-field>
+                                <p>{{'CHANNELS.BOOKINGS_SHARING.BOOKING_CHECKOUT_PAYMENT_METHODS' | translate}}</p>
+                                @if(paymentMethods.length > 0){
+                                    <app-options-table
+                                        class="payment-methods-table"
+                                        [activeRequired]="true" [data]="paymentMethods$" [disabled]="$inProgress()"
+                                        [form]="formPaymentMethods" [columns]="$gatewaysColumns()">
+                                        <ng-container matColumnDef="method">
+                                            <mat-header-cell *matHeaderCellDef class="head-cell method">
+                                                {{ 'CHANNELS.PAYMENT_METHODS.PAYMENT_METHOD' | translate }}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row; index as i" class="method">
+                                                {{ row.gateway_sid }}
+                                            </mat-cell>
+                                        </ng-container>
+                                        <ng-container matColumnDef="name">
+                                            <mat-header-cell *matHeaderCellDef class="head-cell name">
+                                                {{ 'CHANNELS.PAYMENT_METHODS.NAME' | translate }}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row; index as i" class="name">
+                                                {{ row.name }}
+                                            </mat-cell>
+                                        </ng-container>
+                                        <ng-container matColumnDef="currencies">
+                                            <mat-header-cell *matHeaderCellDef class="head-cell currencies">
+                                                {{ 'CHANNELS.PAYMENT_METHODS.CURRENCIES' | translate }}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row; index as i" class="currencies">
+                                                {{ row.currencies }}
+                                            </mat-cell>
+                                        </ng-container>
+                                    </app-options-table>
+                                }
+
+                            </div>
+                        }
+                    </div>
+                </div>
+            </mat-expansion-panel>
+        }
+    </mat-accordion>
+</app-form-container>
+
+@if ($inProgress()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,60 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'CHANNELS.IMPORT_CONTENTS.TITLE' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <form [formGroup]="form" fxLayout="column" fxLayoutAlign="start stretch">
+            <mat-form-field *ngIf="operatorMode$ | async" appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.ENTITY' | translate}}</mat-label>
+                <app-select-server-search [multiple]="false"
+                    [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate" formControlName="entity"
+                    [options$]="entities$" [moreOptionsAvailable$]="moreEntitiesAvailable$"
+                    (loadOptions)="loadEntities($event.q, $event.nextPage)">
+                </app-select-server-search>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.CHANNEL' | translate}}</mat-label>
+                <app-select-server-search [multiple]="false" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                    formControlName="originChannel" [options$]="channels$"
+                    [moreOptionsAvailable$]="moreChannelsAvailable$"
+                    (loadOptions)="loadChannels($event.q, $event.nextPage)">
+                </app-select-server-search>
+                <mat-error [ob-form-errors]="form" field="originChannel"></mat-error>
+            </mat-form-field>
+            <div class="ob-label ob-label-checkbox-group">
+                {{'CHANNELS.IMPORT_CONTENTS.IMPORT_GROUPS_LABEL' | translate}} *
+            </div>
+            <div fxLayout="column" formGroupName="importGroups"
+                [class.one-required-error]="form.hasError('atLeastOneRequired', 'importGroups')">
+                <mat-checkbox *ngIf="literalsImport" formControlName="literals" color="primary" class="app-checkbox-wrap-label">
+                    {{'CHANNELS.IMPORT_CONTENTS.GROUP_OPTS.TEXTS' | translate}}
+                </mat-checkbox>
+                <mat-checkbox formControlName="comElements" color="primary" class="app-checkbox-wrap-label">
+                    {{'CHANNELS.IMPORT_CONTENTS.GROUP_OPTS.COMMUNICATION_ELEMENTS' | translate}}
+                </mat-checkbox>
+                <mat-checkbox formControlName="tickets" color="primary" class="app-checkbox-wrap-label">
+                    {{'CHANNELS.IMPORT_CONTENTS.GROUP_OPTS.TICKETS' | translate}}
+                </mat-checkbox>
+                <mat-checkbox formControlName="graphicElements" color="primary" class="app-checkbox-wrap-label">
+                    {{'CHANNELS.IMPORT_CONTENTS.GROUP_OPTS.GRAPHIC_CONTENTS' | translate}}
+                </mat-checkbox>
+            </div>
+            <mat-error class="one-required-error-msg" *ngIf="form.touched" [ob-form-errors]="form"
+                field="importGroups"></mat-error>
+        </form>
+    </div>
+    <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="importContents()">
+            {{'FORMS.ACTIONS.IMPORT' | translate}}
+        </button>
+    </div>
+</div>
+<div class="spinner-container" *ngIf="isReqInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

@@ -1,0 +1,65 @@
+<app-form-container [disabled]="!(form?.dirty) || (reqInProgress$ | async)" (cancel)="cancel()" (save)="save()">
+    <form [formGroup]="form" *ngIf="promotion">
+        <!-- EVENTS -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.PROMOTIONS.EVENTS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div [class.atomic-saving-error]="errors['savePromotionEvents']">
+                <app-channel-promotion-events [channelId]="channel.id" [entityId]="channel.entity.id"
+                    [promotionId]="promotion.id" [form]="form.get('events')">
+                </app-channel-promotion-events>
+                <span *ngIf="errors['savePromotionEvents']" class="error-description">
+                    {{'CHANNELS.PROMOTIONS.ATOMIC_SAVING_ERROR' | translate}}
+                </span>
+            </div>
+        </mat-expansion-panel>
+        <!-- SESSIONS -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.PROMOTIONS.SESSIONS.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div [class.atomic-saving-error]="errors['savePromotionSessions']">
+                <app-channel-promotion-sessions [channelId]="channel.id" [entityId]="channel.entity.id"
+                    [promotionId]="promotion.id" [form]="form">
+                </app-channel-promotion-sessions>
+                <span *ngIf="errors['savePromotionSessions']" class="error-description">
+                    {{'CHANNELS.PROMOTIONS.ATOMIC_SAVING_ERROR' | translate}}
+                </span>
+            </div>
+        </mat-expansion-panel>
+        <!-- PRICE TYPES -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.PROMOTIONS.PRICE_TYPES.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div [class.atomic-saving-error]="errors['savePromotionPriceTypes']">
+                <app-channel-promotion-price-types [channelId]="channel.id" [entityId]="channel.entity.id"
+                    [promotionId]="promotion.id" [form]="form">
+                </app-channel-promotion-price-types>
+                <span *ngIf="errors['savePromotionPriceTypes']" class="error-description">
+                    {{'CHANNELS.PROMOTIONS.ATOMIC_SAVING_ERROR' | translate}}
+                </span>
+            </div>
+        </mat-expansion-panel>
+
+        <!-- PACKS -->
+        <ng-container *ngIf="!(channel | isExternalWhitelabelType)">
+            <mat-expansion-panel expanded togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'CHANNELS.PROMOTIONS.PACK' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div [class.atomic-saving-error]="errors['savePacks']">
+                    <app-channel-promotion-packs [form]="form.get('packs')">
+                    </app-channel-promotion-packs>
+                    <span *ngIf="errors['savePacks']" class="error-description">
+                        {{'CHANNELS.PROMOTIONS.ATOMIC_SAVING_ERROR' | translate}}
+                    </span>
+                </div>
+            </mat-expansion-panel>
+        </ng-container>
+    </form>
+</app-form-container>
+<div class="spinner-container" *ngIf="reqInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

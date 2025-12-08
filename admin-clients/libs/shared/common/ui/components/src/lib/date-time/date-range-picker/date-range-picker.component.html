@@ -1,0 +1,46 @@
+<div class="date-range-picker">
+    <div class="date-range-picker-status">
+        <div class="date-range-picker-status-item">
+            <div>{{'DATES.DATE_FROM' | translate}}:</div>
+            <div class="date-range-picker-value">
+                <strong>{{selectedDate?.start | dateTime : dateTimeFormats.shortDate}}</strong>
+                {{selectedDate?.start && timeFrom || ''}}
+            </div>
+        </div>
+        <div class="date-range-picker-status-item">
+            <div *ngIf="selectedDate?.end">{{'DATES.DATE_TO' | translate}}:</div>
+            <div class="date-range-picker-value">
+                <strong>{{selectedDate?.end | dateTime : dateTimeFormats.shortDate}}</strong>
+                {{selectedDate?.end && timeTo || ''}}
+            </div>
+        </div>
+    </div>
+    <mat-divider class="date-range-picker-big-divider" />
+    <div class="date-range-picker-controls">
+        <div class="date-range-picker-shortcuts">
+            <button *ngFor="let shortcut of shortcuts"
+                [class.selected-shortcut]="selectedShortcut === shortcut.id"
+                mat-stroked-button type="button" class="ob-button medium not-uppercase" color="tertiary"
+                [attr.aria-label]="'ORDER.REMOVE_DATES_FILTER' | translate"
+                (click)="useShortcut(shortcut.id)">
+                {{shortcut.label | translate}}
+            </button>
+        </div>
+        <div class="date-range-picker-calendar">
+            <mat-calendar #matCalendar1 class="ob-calendar" [selected]="selectedDate" [minDate]="$minDate()" [maxDate]="$maxDate()"
+                (selectedChange)="selectDate($event)" />
+            <div class="date-range-picker-time-pickers" fxLayout="row" fxLayoutGap="10px">
+                <label [for]="timePickerFrom" fxFlexAlign="center" class="mat-subtitle-2">{{'FORMS.FROM' | translate}}</label>
+                <ngx-timepicker-field #timePickerFrom defaultTime="00:00" [format]="24" />
+            </div>
+        </div>
+        <div class="date-range-picker-calendar">
+            <mat-calendar #matCalendar2 class="ob-calendar" [selected]="selectedDate" [minDate]="$minDate()" [maxDate]="$maxDate()"
+                (selectedChange)="selectDate($event)" />
+            <div class="date-range-picker-time-pickers" fxLayout="row" fxLayoutGap="10px">
+                <label [for]="timePickerTo" fxFlexAlign="center" class="mat-subtitle-2">{{'FORMS.TO' | translate}}</label>
+                <ngx-timepicker-field #timePickerTo defaultTime="23:59" [format]="24" />
+            </div>
+        </div>
+    </div>
+</div>

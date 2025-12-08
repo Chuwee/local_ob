@@ -1,0 +1,48 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="100%" class="secondary title">{{'RANGES.DELETE' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <div fxLayout="row wrap">
+            {{'RANGES.DELETE_RANGE' | translate}}
+        </div>
+        <div class="selected-range flex flex-row align-center">
+            {{ data.range }}&nbsp;
+            @if (data.range.endsWith('- ')) {
+                <mat-icon>all_inclusive</mat-icon>
+            }
+        </div>
+        <div fxFlex="0 0 16px" fxLayout="row wrap"></div>
+        @if (data.nextRange && data.previousRange) {
+            {{'RANGES.RESIZE_QUESTION' | translate }}
+            <div fxFlex="0 0 16px" fxLayout="row wrap"></div>
+            <mat-radio-group [formControl]="form" class="flex flex-col gap-5">
+                <mat-radio-button class="ob-radio-button" [value]="resizeRangeResult.resizePrevious">
+                    {{ data.previousRange }}
+                </mat-radio-button>
+                <mat-radio-button class="ob-radio-button" [value]="resizeRangeResult.resizeNext">
+                    <div fxLayout="row wrap" fxLayoutAlign="start center">
+                        {{ data.nextRange }}&nbsp;
+                        @if (data.nextRange.endsWith('- ')) {
+                            <mat-icon>all_inclusive</mat-icon>
+                        }
+                    </div>
+                </mat-radio-button>
+            </mat-radio-group>
+        } @else {
+            {{'RANGES.DELETE_QUESTION' | translate}}
+        }
+    </div>
+
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="submit()">
+            {{'FORMS.ACTIONS.DELETE' | translate}}
+        </button>
+    </div>
+</div>

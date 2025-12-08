@@ -1,0 +1,103 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="!form.dirty">
+    <div class="enable-friends-family-container flex justify-end" slot="outside">
+        @if ($isFriendsAndFamilyButtonEnabled()) {
+            <button type="button" mat-stroked-button class="ob-button medium" color="primary" (click)="enableFriendsAndFamily()">
+                {{'ENTITY.FRIENDS_AND_FAMILY.ENABLE_BUTTON' | translate}}
+            </button>
+        } @else {
+            <button type="button" mat-button class="ob-button medium" disabled>
+                <mat-icon>check</mat-icon>
+                {{'ENTITY.FRIENDS_AND_FAMILY.DISABLE_BUTTON' | translate}}
+            </button>
+        }
+    </div>
+    <mat-accordion [multi]="true" [togglePosition]="'before'" [formGroup]="form">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'ENTITY.FRIENDS_AND_FAMILY.RELATIONS.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div>
+                <span>{{'ENTITY.FRIENDS_AND_FAMILY.RELATIONS.DESCRIPTION' | translate}}</span>
+                <mat-radio-group class="flex flex-col" formControlName="friends_relation_mode">
+                    <mat-radio-button class="ob-radio-button vertical-list" [value]="'BIDIRECTIONAL'">
+                        <div class="flex flex-col">
+                            <div class="option-title">{{'ENTITY.FRIENDS_AND_FAMILY.RELATIONS.MODE.BIDIRECTIONAL' | translate}}</div>
+                            <div>{{'ENTITY.FRIENDS_AND_FAMILY.RELATIONS.MODE.BIDIRECTIONAL_INFO' | translate}}</div>
+                        </div>
+                    </mat-radio-button>
+                    <mat-radio-button class="ob-radio-button vertical-list" [value]="'UNIDIRECTIONAL'">
+                        <div class="flex flex-col">
+                            <div class="option-title">{{'ENTITY.FRIENDS_AND_FAMILY.RELATIONS.MODE.UNIDIRECTIONAL' | translate}}</div>
+                            <div>{{'ENTITY.FRIENDS_AND_FAMILY.RELATIONS.MODE.UNIDIRECTIONAL_INFO' | translate}}</div>
+                        </div>
+                    </mat-radio-button>
+                </mat-radio-group>
+            </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'ENTITY.FRIENDS_AND_FAMILY.LIMITS_TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div>
+                <span>{{'ENTITY.FRIENDS_AND_FAMILY.LIMITS_DESCRIPTION' | translate}}</span>
+                @if ($customerTypes()) {
+                    <mat-radio-group formControlName="limits" class="flex flex-col gap-4">
+                        <mat-radio-button class="ob-radio-button align" [value]="'ALL_SAME'">
+                            <div class="flex flex-row items-baseline">
+                                <label>{{'ENTITY.FRIENDS_AND_FAMILY.LIMITS_ALL_SAME_PREFIX' | translate}}</label>
+                                <mat-form-field class="ob-form-field value-field default-limit" appearance="outline">
+                                    <input matInput type="number" formControlName="default">
+                                    <mat-error [ob-form-errors]="form.controls.default" />
+                                </mat-form-field>
+                                <label>{{'ENTITY.FRIENDS_AND_FAMILY.LIMITS_ALL_SAME_SUFIX' | translate }}</label>
+                            </div>
+                        </mat-radio-button>
+                        <mat-radio-button class="ob-radio-button align" [value]="'NOT_SAME'">
+                            <div>{{'ENTITY.FRIENDS_AND_FAMILY.LIMITS_NOT_SAME' | translate}}</div>
+                        </mat-radio-button>
+                        @if (form.controls.limits.value === 'NOT_SAME') {
+                            <div class="flex flex-col friends-table nested-content">
+                                <mat-table class="ob-table" [dataSource]="$customerTypes()">
+                                    <ng-container matColumnDef="customer_type">
+                                        <mat-header-cell *matHeaderCellDef class="head-cell">
+                                            {{ 'ENTITY.FRIENDS_AND_FAMILY.CUSTOMER_TYPE' | translate }}
+                                        </mat-header-cell>
+                                        <mat-cell *matCellDef="let row">{{ row.name }}</mat-cell>
+                                    </ng-container>
+                                    <ng-container matColumnDef="amount">
+                                        <mat-header-cell *matHeaderCellDef class="head-cell input-column right">
+                                            {{'ENTITY.FRIENDS_AND_FAMILY.CUSTOMER_TYPE_AMOUNT' | translate}}
+                                        </mat-header-cell>
+                                        <mat-cell *matCellDef="let row" class="right editable-cell">
+                                            <mat-form-field class="ob-form-field customer-amount" appearance="outline"
+                                                [formGroup]="form.controls.exceptions">
+                                                <input matInput type="number" inputmode="numeric" placeholder="1" class="number-input"
+                                                    [formControlName]="row.id" min="1" />
+                                            </mat-form-field>
+                                        </mat-cell>
+                                    </ng-container>
+                                    <mat-header-row *matHeaderRowDef="columns" class="dense-row" />
+                                    <mat-row *matRowDef="let row; columns: columns;" class="dense-row" />
+                                </mat-table>
+                            </div>
+                        }
+                    </mat-radio-group>
+                } @else {
+                    <div class="flex flex-row items-baseline">
+                        <label>{{'ENTITY.FRIENDS_AND_FAMILY.LIMITS_ALL_SAME_PREFIX' | translate}}</label>
+                        <mat-form-field class="ob-form-field value-field" appearance="outline">
+                            <input matInput type="number" formControlName="default">
+                            <mat-error [ob-form-errors]="form.controls.default" />
+                        </mat-form-field>
+                        <label>{{'ENTITY.FRIENDS_AND_FAMILY.LIMITS_ALL_SAME_SUFIX' | translate }}</label>
+                    </div>
+                }
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+@if($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

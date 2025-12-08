@@ -1,0 +1,40 @@
+<div class="restrictions-container flex flex-col gap-4">
+    @if($rateRestrictions()?.length) {
+        <div class="flex justify-end">
+            <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                [attr.aria-label]="'RATES_RESTRICTIONS.NEW_BTN' | prefix | translate"
+                [disabled]="!$restrictionsCreationAllowed()" (click)="openNewRateRestrictionsDialog()">
+                <mat-icon>add</mat-icon>
+                {{'RATES_RESTRICTIONS.NEW_BTN' | prefix | translate}}
+            </button>
+        </div>
+        <mat-accordion [multi]="true" [togglePosition]="'before'">
+            @for(rateRestrictions of $rateRestrictions(); track rateRestrictions.rate.id) {
+                <mat-expansion-panel [id]="'rate-restriction-expansion-' + rateRestrictions.rate.id"
+                    class="ob-expansion-card" [expanded]="openedId === rateRestrictions.rate.id"
+                    (opened)="openedId = rateRestrictions.rate.id" (closed)="openedId = null">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title class="justify-between">
+                            <span>{{rateRestrictions.rate.name}}</span>
+                            <mat-icon (click)="deleteRateRestrictions($event, rateRestrictions.rate)">delete</mat-icon>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <app-rate-restrictions-detail [contextId]="$contextId()" [rateRestrictions]="rateRestrictions" [rates]="$rates()"
+                        [groupedVenueTemplatePriceTypes]="$groupedVenueTemplatePriceTypes()" [channelsList]="$channelsList()"
+                        [customerTypes]="$customerTypes()" [showPeriodRestrictions]="$showPeriodRestrictions()" />
+                </mat-expansion-panel>
+            }
+        </mat-accordion>
+    } @else {
+        <app-empty-state
+            [hideImage]="true"
+            [title]="'RATES_RESTRICTIONS.EMPTY_LIST_MESSAGE.TITLE' | prefix | translate"
+            [description]="'RATES_RESTRICTIONS.EMPTY_LIST_MESSAGE.DESCRIPTION' | prefix | translate">
+            <button mat-stroked-button class="ob-button" color="primary" [disabled]="!$restrictionsCreationAllowed()"
+                (click)="openNewRateRestrictionsDialog()">
+                <mat-icon>add</mat-icon>
+                {{'RATES_RESTRICTIONS.NEW_BTN' | prefix | translate}}
+            </button>
+        </app-empty-state>
+    }
+</div>

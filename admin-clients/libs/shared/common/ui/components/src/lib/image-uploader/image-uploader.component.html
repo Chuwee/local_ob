@@ -1,0 +1,54 @@
+<div class="ob-image-uploader-main" [class.invalid]="ngControl?.control?.invalid">
+    <input #fileUpload type="file" id="fileUpload" accept="image/*" [hidden]="true" />
+    @let selected = $selected();
+    @let imageRestrictions = $imageRestrictions();
+    @let previewerScaleFactor = $previewerScaleFactor();
+
+    @if ($file(); as file) {
+        <div class="ob-image-preview-container" [attr.disabled]="disabled ? true : null"
+            [class.selected]="selected">
+            <img class="ob-image-image" width="100%" [alt]="file.name" [src]="resolvePath()"
+                [ngStyle]="{'max-width': (imageRestrictions.width*previewerScaleFactor)+'px',
+            'aspect-ratio': imageRestrictions.width / imageRestrictions.height }"
+                (error)="setImageError('imageLoadError')" />
+            <div class="ob-image-toolbar flex justify-center items-center">
+                <button mat-icon-button class="ob-button medium" (click)="preview()">
+                    <mat-icon class="image-toolbar-icon">zoom_out_map</mat-icon>
+                </button>
+                @if (!file.contentType.includes('svg') && !file.contentType.includes('ico')) {
+                    <button mat-icon-button class="ob-button medium" (click)="edit()">
+                        <mat-icon class="image-toolbar-icon">edit</mat-icon>
+                    </button>
+                }
+                <button mat-icon-button class="ob-button medium" (click)="openDelete()">
+                    <mat-icon class="image-toolbar-icon">delete</mat-icon>
+                </button>
+            </div>
+        </div>
+    }
+    @else {
+        <div class="ob-image-uploader-container" [attr.disabled]="disabled ? true : null"
+            [class.selected]="selected">
+            <img class="ob-image-image" width="100%" [src]="$placeholder() || $defaultPlaceholder()" alt="empty-image"
+                [ngStyle]="{'aspect-ratio': imageRestrictions.width / imageRestrictions.height,
+            'max-width': (imageRestrictions.width*previewerScaleFactor)+'px'}"
+                (click)="onClick()" />
+            <mat-icon class="upload-image-icon">add_a_photo</mat-icon>
+        </div>
+    }
+    @if (!hideLabelText) {
+        <div class="ob-image-uploader-legend flex">
+            <p class="flex-[0_1_100%]">
+                {{($label() ?? 'UPLOAD_IMAGE.FORMAT') | translate: imageRestrictions}}
+            </p>
+            <mat-icon class="ob-help-icon" [matTooltip]="$iconTooltip() | translate">
+                help_outline
+            </mat-icon>
+        </div>
+    }
+</div>
+@if (ngControl.control?.hasError('imageLoadError')) {
+    <mat-error>
+        {{'FORMS.ERRORS.IMAGE_LOAD_ERROR' | translate}}
+    </mat-error>
+}

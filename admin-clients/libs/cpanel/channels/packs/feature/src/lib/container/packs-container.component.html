@@ -1,0 +1,24 @@
+<div fxFlex="0 0 100%" fxLayout="column" fxLayoutAlign="stretch stretch">
+    <mat-drawer-container fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="start stretch">
+        <mat-drawer #drawer mode="side" fxFlex="0 0 280px" opened>
+            <app-packs-list></app-packs-list>
+        </mat-drawer>
+        <mat-drawer-content class="pack-details-container" fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="stretch stretch">
+            <div class="ob-sidebar-toggle" (click)="sidebarToggle(drawer)" [ngClass]="{'collapsed': !drawer.opened}">
+                <span class="arrow"></span>
+            </div>
+            <router-outlet *ngIf="(listComponent?.totalPacks$| async) !== 0"></router-outlet>
+            <app-empty-state [fxShow]="(listComponent?.totalPacks$ | async) === 0" fxFlex="100%"
+                [title]="'CHANNELS.PACKS.EMPTY_LIST_MESSAGE' | translate"
+                [description]="'CHANNELS.PACKS.NEW_PACK_MESSAGE' | translate">
+                <button mat-flat-button class="ob-button" color="primary" (click)="listComponent.openNewPackDialog()">
+                    <mat-icon>add</mat-icon>
+                    {{'CHANNELS.PACKS.CREATE_BTN' | translate}}
+                </button>
+            </app-empty-state>
+            <div class="spinner-container" *ngIf="isLoading$ | async">
+                <mat-spinner></mat-spinner>
+            </div>
+        </mat-drawer-content>
+    </mat-drawer-container>
+</div>

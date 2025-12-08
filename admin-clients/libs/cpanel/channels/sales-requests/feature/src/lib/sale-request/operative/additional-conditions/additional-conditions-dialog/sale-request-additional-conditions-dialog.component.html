@@ -1,0 +1,52 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">
+            {{(isEditCondition ? 'CHANNELS.OPTIONS.EDIT_CONDITION' : 'CHANNELS.OPTIONS.NEW_CONDITION') | translate}}
+        </h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <form [formGroup]="form" fxLayout="column">
+        <div class="condition-name-container" fxLayout="column">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'CHANNELS.OPTIONS.ADDITIONAL_CONDITION_NAME'| translate}}</mat-label>
+                <input matInput [placeholder]="'CHANNELS.OPTIONS.ADDITIONAL_CONDITION_NAME'| translate"
+                    formControlName="name">
+                <mat-error [ob-form-errors]="form" field="name" />
+            </mat-form-field>
+        </div>
+        <app-tabs-menu type="language" #channelTextsTabs formGroupName="texts">
+            <ng-container *ngFor="let lang of languageList$ | async">
+                <ng-template appTab [ctrl]="form.get(['texts', lang])" lazyLoad [label]="('LANGUAGES.' + lang) | translate">
+                    <div mat-dialog-content fxLayout="column" fxLayoutGap="35px" fxLayoutAlign="start stretch"
+                         class="dialog-container">
+                        <div fxFlex="100%" fxLayout="column">
+                            <mat-form-field appearance="outline" class="ob-form-field no-padding">
+                                <mat-label>
+                                    {{'CHANNELS.OPTIONS.ADDITIONAL_CONDITION_CHANNEL_TEXT'| translate}}
+                                </mat-label>
+                                <app-rich-text-area [formControlName]="lang" />
+                                <mat-error [ob-form-errors]="form" [field]="['texts', lang]" />
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </ng-template>
+            </ng-container>
+        </app-tabs-menu>
+    </form>
+
+    <div class="spinner-container" *ngIf="isSaving$ | async">
+        <mat-spinner />
+    </div>
+
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="save()"
+            [disabled]="form && !form.dirty || (isSaving$ | async)">
+            {{'FORMS.ACTIONS.SAVE' | translate}}
+        </button>
+    </div>
+</div>

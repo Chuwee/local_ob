@@ -1,0 +1,74 @@
+<div class="limits-component-content">
+    <div class="limits-table-container">
+        @if (ready$ | async) {
+            <table mat-table id="limitsTable" aria-label="template limits" class="ob-table dense-table" [formGroup]="form"
+                [dataSource]="priceTypesRows$ | async">
+                @for (quota of (quotas$ | async); track quota.id) {
+                    <ng-container [matColumnDef]="quota.name" [sticky]="quota.default">
+                        <th [id]="quota.name" *matHeaderCellDef class="head-cell quota-header"
+                            [class.default-quota-header]="quota.default" sticky>
+                            @if(!quota.default) {
+                                <p [matTooltip]="quota.name">
+                                    {{quota.name}}
+                                </p>
+                            } @else {
+                                <div class="flex flex-row justify-between items-center">
+                                    @let label = isSga ? 'VENUE_TPLS.MEMBERSHIP_TYPES' : 'VENUE_TPLS.TICKET_TYPES';
+                                    <!-- {correct indentation} -->
+                                    <p [matTooltip]="label | translate">
+                                        {{label | translate}}
+                                    </p>
+                                    <p class="base-group-header" [matTooltip]="'VENUE_TPLS.BASE_GROUP' | translate">
+                                        {{'VENUE_TPLS.BASE_GROUP' | translate}}
+                                    </p>
+                                </div>
+                            }
+                        </th>
+                        <td mat-cell *matCellDef="let row; index as r" class="cell-container"
+                            [class.editable-cell]="!(isSga && quota.default)"
+                            [class.global-price-type-row]="r === 0 && !isSmartBooking">
+                            <div class="flex flex-col cell-content" formGroupName="priceType_{{row.id}}">
+                                <div class="flex flex-row justify-end items-center">
+                                    @if (quota.default) {
+                                        <p class="flex-1 ticket-type-label" appEllipsify [matTooltip]="row.name">
+                                            {{row.name}}
+                                        </p>
+                                    }
+                                    <mat-form-field appearance="outline" class="ob-form-field ob-form-field-short flex basis-[80px]">
+                                        <input #limitInput matInput type="number" aria-label="ticket type capacity"
+                                            class="mat-input-element limit-input" formControlName="quota_{{quota.id}}"
+                                            [placeholder]="row.placeholders[quota.id]" (focusin)="limitInput.select()"
+                                            (keyup.enter)="limitInput.blur(); limitInput.focus()"
+                                            [disabled]="isSga && quota.default">
+                                    </mat-form-field>
+                                    @if(!quota.default && r !== 0 && showVisibility) {
+                                        <mat-button-toggle aria-label="Set visible/not visible group"
+                                            class="ob-icon-button-toggle-simple ob-button small only-icon"
+                                            [checked]="isOnSale(row.id, quota.id)"
+                                            [disabled]="isOnSale(row.id, quota.id) === null
+                                                || (form.disabled && !isSmartBooking)"
+                                            [matTooltipDisabled]="isOnSale(row.id, quota.id) === null
+                                                || (form.disabled && !isSmartBooking)"
+                                            [matTooltip]="'VENUE_TPLS.REMOVE_GROUP_FROM_SALE' | translate"
+                                            (click)="$event.stopPropagation(); removeFromSale(row.id, quota.id)">
+                                            <mat-icon>visibility</mat-icon>
+                                        </mat-button-toggle>
+                                    }
+                                </div>
+                                @if (row.occupancy) {
+                                    <span class="occupancy-label">
+                                        ({{row.occupancy[quota.id]}} {{'VENUE_TPLS.OCCUPIED_ABR' | translate}})
+                                    </span>
+                                }
+                            </div>
+                        </td>
+                    </ng-container>
+                    }
+                    <!-- eslint-disable-next-line @angular-eslint/template/prefer-self-closing-tags -->
+                    <tr mat-header-row *matHeaderRowDef="columnNames; sticky: true" class="dense-row"></tr>
+                    <!-- eslint-disable-next-line @angular-eslint/template/prefer-self-closing-tags -->
+                    <tr mat-row *matRowDef="let row; columns: columnNames;" class="hoverable-row dense-row"></tr>
+            </table>
+            }
+    </div>
+</div>

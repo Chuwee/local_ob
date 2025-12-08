@@ -1,0 +1,20 @@
+<div class="flex-1 flex flex-col">
+    <mat-drawer-container class="flex-1 flex flex-row">
+        <mat-drawer #drawer mode="side" class="policies-list-container" opened>
+            <app-policies-list />
+        </mat-drawer>
+        <mat-drawer-content class="policies-container">
+            @if($policiesList()?.length) {
+                <router-outlet/>
+            } @else {
+                <app-empty-state class="flex basis-full" [title]="'INSURERS.POLICIES.EMPTY_LIST_TITLE' | translate" 
+                    [description]="'INSURERS.POLICIES.EMPTY_LIST.DESCRIPTION' | translate">
+                    <button mat-flat-button class="ob-button" color="primary" (click)="openNewPolicyDialog()">
+                        <mat-icon>add</mat-icon>
+                        {{'TITLES.NEW_POLICY' | translate}}
+                    </button>
+                </app-empty-state>
+            }
+        </mat-drawer-content>
+    </mat-drawer-container>
+</div>

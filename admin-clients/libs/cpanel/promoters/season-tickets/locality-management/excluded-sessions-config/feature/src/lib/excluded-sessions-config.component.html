@@ -1,0 +1,108 @@
+@let totalSessions = $totalSessionListMetadata()?.total;
+@let selectedSessions = sessionForm.value.length;
+@let filteredSelectedSessions = $filteredSelectedSessions();
+@let allSelected = $allSelected();
+@let isSelectedOnlyMode = $isSelectedOnlyMode();
+@let isHandsetOrTablet = $isHandsetOrTablet();
+@let loading = sessionsLoading$ | async;
+<div class="flex flex-col gap-2">
+    @if (totalSessions === 0 && !$hasFilters() && !loading) {
+        <app-empty-state-tiny class="flex-[1_1_100%]"
+            [title]="$emptyTitle() | translate" [description]="$emptyDescription() | translate"/>
+    } @else {
+        <app-searchable-paginated-selection #selection [placeholder]="'FORMS.SEARCH.SESSIONS' | translate"
+            (loadData)="filterChangeHandler($event)" [form]="sessionForm" [data$]="data$" [metadata$]="metadata$"
+            [loading$]="sessionsLoading$" [pageSize]="pageSize">
+            <div slot="filter" class="badge-container" [class.disabled]="selectedSessions === 0">
+                {{ selectedSessions }} / {{totalSessions || 0}}
+            </div>
+            <button slot="filter" type="button" mat-icon-button class="show-selected-only-button ob-button" color="tertiary"
+                [class.active]="isSelectedOnlyMode" [disabled]="sessionForm.value.length === 0"
+                [matTooltip]="'SEASON_TICKET.RELEASE_SEAT.EXCLUDED_SESSIONS.SHOW_SELECTED_TOOLTIP' | translate"
+                (click)="$isSelectedOnlyMode.set(!isSelectedOnlyMode)">
+                <mat-icon>visibility</mat-icon>
+            </button>
+            <div slot="filter" class="flex gap-2">
+                <button mat-stroked-button class="ob-button medium" (click)="block()"
+                    [disabled]="disableActions || filteredSelectedSessions.unblocked.length === 0">
+                    {{'SEASON_TICKET.EXCLUDED_SESSIONS.BLOCK_ACTION' | translate}}
+                </button>
+                <button mat-stroked-button class="ob-button medium" (click)="unblock()"
+                    [disabled]="disableActions || filteredSelectedSessions.blocked.length === 0">
+                    {{'SEASON_TICKET.EXCLUDED_SESSIONS.UNBLOCK_ACTION' | translate}}
+                </button>
+            </div>
+            <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data" let-selectionChanged="selectionChanged">
+                <app-selection-table [data]="data" [columns]="sessionsColumns" [pageForm]="pageForm"
+                    [selectionChanged]="selectionChanged" [class.some-selected]="selectedSessions > 0 || allSelected">
+                    <ng-template #selectAllTemplate>
+                        <mat-checkbox color="primary"
+                            [disabled]="isSelectedOnlyMode || totalSessions === 0"
+                            [checked]="(selectedSessions !== 0 && selectedSessions === totalSessions) || isSelectedOnlyMode || allSelected"
+                            [indeterminate]="selectedSessions > 0 && selectedSessions < totalSessions"
+                            (change)="$allSelected.set(!allSelected)" />
+                    </ng-template>
+                    <ng-container [matColumnDef]="sessionsColumns[1]">
+                        <mat-header-cell *matHeaderCellDef class="head-cell">
+                            {{'SEASON_TICKET.EXCLUDED_SESSIONS.SESSION_NAME' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row">{{row?.session_name}}</mat-cell>
+                    </ng-container>
+                    <ng-container [matColumnDef]="sessionsColumns[2]">
+                        <mat-header-cell *matHeaderCellDef class="head-cell">
+                            {{'SEASON_TICKET.EXCLUDED_SESSIONS.SESSION_DATE' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row" class="flex gap-2">
+                            <span>{{row?.session_starting_date | dateTime: dateTimeFormats.shortDate}}</span>
+                            <span>{{row?.session_starting_date | dateTime: dateTimeFormats.shortTime}}</span>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container [matColumnDef]="sessionsColumns[3]">
+                        <mat-header-cell *matHeaderCellDef class="head-cell">
+                            {{'SEASON_TICKET.EXCLUDED_SESSIONS.EVENT_NAME' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row">{{row?.event_name}}</mat-cell>
+                    </ng-container>
+                    <ng-container [matColumnDef]="sessionsColumns[4]">
+                        <mat-header-cell *matHeaderCellDef class="head-cell">
+                            {{'SEASON_TICKET.EXCLUDED_SESSIONS.STATUS' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            @if (row?.blocked) {
+                                <span class="status-dot blocked"></span>
+                                <span>{{'SEASON_TICKET.EXCLUDED_SESSIONS.BLOCKED' | translate}}</span>
+                            }
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container [matColumnDef]="sessionsColumns[5]">
+                        <mat-header-cell *matHeaderCellDef class="actions-cell head-cell"
+                            [class.float-actions-cell]="isHandsetOrTablet !== true" />
+                        <mat-cell *matCellDef="let row" class="actions-cell" [class.float-actions-cell]="isHandsetOrTablet !== true">
+                            <div class="action-buttons" (click)="$event.stopPropagation()">
+                                <button mat-icon-button color="tertiary" class="ob-button medium" [matMenuTriggerFor]="listMenu">
+                                    <mat-icon>more_horiz</mat-icon>
+                                </button>
+                                <mat-menu #listMenu="matMenu">
+                                    @if (row.blocked) {
+                                        <button mat-menu-item (click)="unblock(row)">
+                                            {{'SEASON_TICKET.EXCLUDED_SESSIONS.UNBLOCK_ACTION' | translate}}
+                                        </button>
+                                    } @else {
+                                        <button mat-menu-item (click)="block(row)">
+                                            {{'SEASON_TICKET.EXCLUDED_SESSIONS.BLOCK_ACTION' | translate}}
+                                        </button>
+                                    }
+                                </mat-menu>
+                            </div>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-template #noResultsTemplate>
+                        <div class="context-notification-container flex">
+                            <app-empty-state-tiny class="flex-[1_1_100%]" [title]="'FORMS.SELECT.NO_RESULTS' | translate"/>
+                        </div>
+                    </ng-template>
+                </app-selection-table>
+            </ng-template>
+        </app-searchable-paginated-selection>
+    }
+</div>

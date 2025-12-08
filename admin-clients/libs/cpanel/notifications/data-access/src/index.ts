@@ -1,0 +1,22 @@
+export { NotificationsService } from './lib/notifications.service';
+
+export * from './lib/models/get-notifications-request.model';
+export * from './lib/models/get-notifications-response.model';
+export * from './lib/models/get-recipients-request.model';
+export * from './lib/models/get-total-recipients-request.model';
+export * from './lib/models/get-total-recipients-response.model';
+export * from './lib/models/notification-channels.model';
+export * from './lib/models/notification-content-type.model';
+export * from './lib/models/notification-content.model';
+export * from './lib/models/notification-detail.model';
+export * from './lib/models/notification-emails.model';
+export * from './lib/models/notification-fields-restrictions.enum';
+export * from './lib/models/notification-recipients.model';
+export * from './lib/models/notification-sessions.model';
+export * from './lib/models/notification-status.enum';
+export * from './lib/models/notification-summary.model';
+export * from './lib/models/post-notification.model';
+export * from './lib/models/put-notification-sessions.model';
+export * from './lib/models/put-notification.model';
+export * from './lib/models/recipients-export-data';
+export * from './lib/constants/notifications-aggregated-data';

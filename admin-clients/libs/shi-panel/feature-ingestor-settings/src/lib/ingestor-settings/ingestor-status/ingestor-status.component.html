@@ -1,0 +1,32 @@
+<app-form-container layout="main" [formGroup]="form" (cancel)="cancel()" (save)="save()"
+    [disabled]="!form.dirty || $isInProgress() || !$hasWritePermissions()" class="overflow-y-auto">
+    <!-- User status -->
+    <div slot="top-content" class="status-notifications-container">
+        <mat-slide-toggle [formControl]="form.controls.enabled" class="turn-on-ingestor" color="primary">
+            {{ 'INGESTOR_STATUS.FORMS.LABELS.TURN_ON_INGESTOR'| translate }}
+        </mat-slide-toggle>
+    </div>
+    <p> {{'INGESTOR_STATUS.TITLES.SOURCES_DESCRIPTION' | translate}} </p>
+    @for (source of ingestorSourcesList; track source) {
+        <mat-checkbox color="primary" [class.indented-checkbox]="ingestorSourcesDependingDefault.includes(source)"
+            [checked]="form.value.ingestor_sources?.includes(source) || form.value.schedule_load_type?.includes(source)"
+            [disabled]="
+                    (!form.value.enabled || !$hasWritePermissions()) ||
+                    (!form.value.ingestor_sources.includes('DEFAULT') && ingestorSourcesDependingDefault.includes(source))
+                "
+            [value]="source"
+            (change)="onCheckboxChange($event, source)">
+            <b>{{'INGESTOR_STATUS.SOURCE_' + source.toUpperCase() | translate}}</b>
+            <p>
+                {{'INGESTOR_STATUS.SOURCE_DESCRIPTIONS_' + source.toUpperCase() | translate}}
+                {{'INGESTOR_STATUS.SOURCE_EXTRA_DESCRIPTIONS_' + source.toUpperCase() | translate}}
+            </p>
+        </mat-checkbox>
+    }
+</app-form-container>
+
+@if ($isInProgress()){
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,70 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" class="overflow-y-auto"
+                    [disabled]="!form.dirty || (isInProgress$ | async)">
+    <app-language-bar [languages]="languageList$ | async" [selected]="selectedLanguage$ | async" slot="outside"
+                      [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)">
+    </app-language-bar>
+    <form [formGroup]="form" fxLayout="row wrap">
+        <p fxFlex="100%" class="mat-body-2 section-description">
+            {{ 'CHANNELS.EMAILS_COMMUNICATION.REALLOCATION_CONFIRM.DESCRIPTION' | translate }}
+        </p>
+        <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label">
+            <mat-label>{{'CHANNELS.EMAILS_COMMUNICATION.REALLOCATION_CONFIRM.SUBJECT' | translate}}</mat-label>
+            <input matInput aria-label="subject"
+                   [placeholder]="'CHANNELS.EMAILS_COMMUNICATION.REALLOCATION_CONFIRM.SUBJECT' | translate"
+                   formControlName="subject">
+        </mat-form-field>
+        <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field no-padding field-with-label">
+            <mat-label>{{'CHANNELS.EMAILS_COMMUNICATION.REALLOCATION_CONFIRM.HEADER' | translate}}</mat-label>
+            <app-rich-text-area [autoresize]="{min: 100, max: 500}" formControlName="header"
+                                [autocompleterItems]="placeholdersMap['header']" class="vertical-stretch">
+            </app-rich-text-area>
+        </mat-form-field>
+        <p fxFlex="100%" class="mat-subtitle-2">
+            {{ 'CHANNELS.EMAILS_COMMUNICATION.REALLOCATION_CONFIRM.DELIVERY_METHOD' | translate }}
+        </p>
+        <p fxFlex="100%" class="mat-body-2">
+            {{ 'CHANNELS.EMAILS_COMMUNICATION.REALLOCATION_CONFIRM.DELIVERY_METHOD_DESC' | translate }}
+        </p>
+        <app-tabs-menu fxFlex="100%" type="language" formGroupName="deliveryMethods" overrideClasses="vertical">
+            <ng-template appTab lazyLoad [label]="'CHANNELS.EMAILS_COMMUNICATION.REALLOCATION_CONFIRM.MAIL_SENDING' | translate">
+                <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field no-padding">
+                    <app-rich-text-area formControlName="mailSending" [autocompleterItems]="placeholdersMap['mailSending']" class="vertical-stretch">
+                    </app-rich-text-area>
+                </mat-form-field>
+            </ng-template>
+            <ng-template appTab lazyLoad [label]="'CHANNELS.EMAILS_COMMUNICATION.REALLOCATION_CONFIRM.VENUE_PICKUP' | translate">
+                <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field no-padding">
+                    <app-rich-text-area formControlName="venuePickUp" [autocompleterItems]="placeholdersMap['venuePickUp']" class="vertical-stretch">
+                    </app-rich-text-area>
+                </mat-form-field>
+            </ng-template>
+            <ng-template appTab lazyLoad [label]="'CHANNELS.EMAILS_COMMUNICATION.REALLOCATION_CONFIRM.MOBILE_SENDING' | translate">
+                <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field no-padding">
+                    <app-rich-text-area formControlName="mobileSending" [autocompleterItems]="placeholdersMap['mobileSending']" class="vertical-stretch">
+                    </app-rich-text-area>
+                </mat-form-field>
+            </ng-template>
+            <ng-template appTab lazyLoad [label]="'CHANNELS.EMAILS_COMMUNICATION.REALLOCATION_CONFIRM.WHATSAPP' | translate">
+                <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field no-padding">
+                    <app-rich-text-area formControlName="whatsapp" [autocompleterItems]="placeholdersMap['whatsapp']" class="vertical-stretch">
+                    </app-rich-text-area>
+                </mat-form-field>
+            </ng-template>
+        </app-tabs-menu>
+        <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field no-padding field-with-label">
+            <mat-label>{{'CHANNELS.EMAILS_COMMUNICATION.REALLOCATION_CONFIRM.DOWNLOAD_TICKETS' | translate}}</mat-label>
+            <app-rich-text-area [autoresize]="{min: 100, max: 200}" formControlName="downloadTickets"
+                                [autocompleterItems]="placeholdersMap['downloadTickets']" class="vertical-stretch">
+            </app-rich-text-area>
+        </mat-form-field>
+        <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field no-padding field-with-label">
+            <mat-label>{{'CHANNELS.EMAILS_COMMUNICATION.REALLOCATION_CONFIRM.FOOTER' | translate}}</mat-label>
+            <app-rich-text-area [autoresize]="{min: 100, max: 800}" formControlName="footer"
+                                [autocompleterItems]="placeholdersMap['footer']" class="vertical-stretch">
+            </app-rich-text-area>
+        </mat-form-field>
+    </form>
+</app-form-container>
+<div class="spinner-container" *ngIf="isInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

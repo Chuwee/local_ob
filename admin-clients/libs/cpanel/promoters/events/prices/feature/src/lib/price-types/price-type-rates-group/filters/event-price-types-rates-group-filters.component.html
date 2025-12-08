@@ -1,0 +1,78 @@
+<div class="flex-1">
+    <div class="flex flex-col gap-5" [formGroup]="filtersForm">
+        <mat-slide-toggle class="ob-slide-toggle" formControlName="showPastSessions">
+            {{'EVENTS.PRICE_TYPES.SHOW_PAST_SESSIONS' | translate}}
+        </mat-slide-toggle>
+        <div class="actions-container filter-container flex items-center gap-6" [class.justify-between]="!$isSgaMembership()">
+            @if (!$isSga()) {
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label flex basis-1/3">
+                    <mat-label>{{'EVENTS.PRICE_TYPES.VENUE_TEMPLATE' | translate}}</mat-label>
+                    <mat-select formControlName="venue" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate"
+                        [compareWith]="compareWith">
+                        <mat-option>
+                            <app-select-search #venueTplSelectSearch [options$]="venueTpls$" searchField="name" requireSelection="true" />
+                        </mat-option>
+                        @for (venue of venueTplSelectSearch.getFilteredOptions$() | async; track venue.id) {
+                            <mat-option [value]="venue">
+                                <div appEllipsify [matTooltip]="venue ? venue.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)">
+                                    {{venue ? venue.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                                </div>
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            }
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label flex basis-1/3">
+                <mat-label>{{'EVENTS.PRICE_TYPES.SESSIONS' | translate}}</mat-label>
+                <mat-select formControlName="session" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate"
+                    [compareWith]="compareWith">
+                    <mat-option>
+                        <app-select-search #sessionSelectSearch [options$]="sessions$" searchField="name" requireSelection="true" />
+                    </mat-option>
+                    @for (session of sessionSelectSearch.getFilteredOptions$() | async; track session.id) {
+                        <mat-option [value]="session">
+                            <div appEllipsify [matTooltip]="session ? session.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)">
+                                {{session ? session.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                            </div>
+                        </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            @if ($isSgaEvent()) {
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label flex basis-1/3">
+                    <mat-label>{{'EVENTS.PRICE_TYPES.PRODUCT' | translate}}</mat-label>
+                    <mat-select formControlName="product" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate"
+                        [compareWith]="compareWith">
+                        <mat-option>
+                            <app-select-search #productSelectSearch [options$]="products$" searchField="name" requireSelection="true" />
+                        </mat-option>
+                        @for (product of productSelectSearch.getFilteredOptions$() | async; track product.id) {
+                            <mat-option [value]="product">
+                                <div appEllipsify
+                                    [matTooltip]="product ? product.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)">
+                                    {{product ? product.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                                </div>
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            }
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label flex basis-1/3">
+                <mat-label>{{'EVENTS.PRICE_TYPES.RATES' | translate}}</mat-label>
+                <mat-select formControlName="rateGroup" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate"
+                    [compareWith]="compareWith">
+                    <mat-option>
+                        <app-select-search #rateSelectSearch [options$]="ratesGroup$" searchField="name" />
+                    </mat-option>
+                    @for (rate of rateSelectSearch.getFilteredOptions$() | async; track rate?.id) {
+                        <mat-option [value]="rate">
+                            <div appEllipsify [matTooltip]="rate ? rate.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)">
+                                {{rate ? rate.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                            </div>
+                        </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+</div>

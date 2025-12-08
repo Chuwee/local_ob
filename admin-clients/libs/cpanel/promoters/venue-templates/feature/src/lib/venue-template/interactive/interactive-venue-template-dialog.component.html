@@ -1,0 +1,64 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'TITLES.INTERACTIVE_VENUES' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column">
+        <form [formGroup]="form" fxLayout="column">
+            <div fxFlex fxLayout="row wrap">
+                <div fxFlex="100%" fxLayout="column" class="interactive-venues-enabled">
+                    <mat-divider fxFlex="100%" />
+                    <div fxFlex="40px" fxLayout="row" fxLayoutAlign="start center" class="interactive-activation">
+                        <mat-slide-toggle class="ob-slide-toggle ob-form-field" (change)="checkFieldsEnabled()" formControlName="enabled">
+                            {{'FORMS.LABELS.INTERACTIVE_VENUES' | translate}}
+                        </mat-slide-toggle>
+                    </div>
+                    <mat-divider fxFlex="100%" />
+                </div>
+                <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field">
+                    <mat-label>{{'FORMS.LABELS.MULTIMEDIA_CONTENT_CODE' | translate}}</mat-label>
+                    <input matInput aria-label="multimedia_content_code"
+                        [placeholder]="'FORMS.LABELS.MULTIMEDIA_CONTENT_CODE_PLACEHOLDER' | translate"
+                        formControlName="multimedia_content_code">
+                    <mat-error [ob-form-errors]="form" field="multimedia_content_code" />
+                </mat-form-field>
+                <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field">
+                    <mat-label>{{'FORMS.LABELS.EXTERNAL_MINIMAP_ID' | translate}}</mat-label>
+                    <input matInput aria-label="external_minimap_id"
+                        [placeholder]="'FORMS.LABELS.EXTERNAL_MINIMAP_ID_PLACEHOLDER' | translate" formControlName="external_minimap_id">
+                </mat-form-field>
+                <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label no-grid-spacing">
+                    <mat-label>{{'VENUE_TPLS.INTERACTIVE_VENUES.PLUGINS_SELECT' | translate}}</mat-label>
+                    <mat-select formControlName="external_plugin_ids"
+                        [placeholder]="'VENUE_TPLS.INTERACTIVE_VENUES.SELECT_PLUGINS' | translate"
+                        multiple>
+                        @for (plugin of plugins; track plugin.id) {
+                            <mat-option [value]="plugin.id">
+                                {{plugin.name}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+                <mat-divider fxFlex="100%" />
+                <div fxFlex="100%" fxLayoutAlign="center center" class="export-button-container">
+                    <button mat-stroked-button color="tertiary" class="ob-button medium"
+                        (click)="openExportInteractiveVenueTemplateFileDialog()">
+                        <mat-icon>file_download</mat-icon>
+                        {{'VENUE_TPLS.EXPORT_INTERACTIVE_TPL_FILE_BTN' | translate | uppercase}}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" [disabled]="!form.dirty"
+            (click)="updateVenueTemplateInteractive()">
+            {{'FORMS.ACTIONS.UPDATE' | translate}}
+        </button>
+    </div>
+</div>

@@ -1,0 +1,91 @@
+<span class="header-pill pill">{{(data?.source?.type === channelSuggestionType.event) ? ('CHANNELS.CROSS_SELLING.EVENT' | translate)
+    : ('CHANNELS.CROSS_SELLING.SESSION' | translate)}}</span>
+@if (data?.source?.type === channelSuggestionType.session) {
+    <div class="event-info-container">
+        <span fxFlex="0 1 100%" fxLayout="row" class="cart-elements-names">
+            <span>
+                {{data.source.start_date | dateTime : dateTimeFormats.shortDateTimeWithWeek}}
+            </span>
+            <span class="parent-name" appEllipsify [matTooltip]="data.source.parent_name">&nbsp;- {{data.source.parent_name}}&nbsp;</span>
+        </span>
+    </div>
+}
+<mat-divider class="content-divider" />
+<div class="cross-selling-suggestions-container">
+    <div fxLayout="column" fxLayoutGap="16px" fxFlex="100%">
+        <div fxLayoutAlign="end start">
+            <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button add-suggestion-button"
+                (click)="openNewCrossSellingItemDialogWithoutSteps()" [disabled]="(crossSellingTargets$ | async).length === pageSize"
+                [matTooltip]="'CHANNELS.CROSS_SELLING.MAX_SUGGESTIONS_TOOLTIP' | translate"
+                [matTooltipDisabled]="(crossSellingTargets$ | async).length < pageSize">
+                <mat-icon>add</mat-icon>
+                {{'CHANNELS.CROSS_SELLING.ADD_SUGGESTION_BTN' | translate}}
+            </button>
+        </div>
+        <div fxFlex="1 0 0 100%" fxLayout="column" class="mat-list-container">
+            <mat-list class="ob-list" fxFlex="100%" fxLayout="column" fxLayoutAlign="space-between stretch">
+                <div fxLayout="column">
+                    <div class="list-header">
+                        <span>{{'CHANNELS.CROSS_SELLING.SUGGESTION_COLUMN' | translate}}</span>
+                    </div>
+                    <div class="list-items-container">
+                        @for (row of (crossSellingTargets$ | async); track row.id) {
+                            <mat-list-item [class.hoverable-item]="true"
+                                [class.desktop-list-actions]="isDesktop$ | async">
+                                <div fxFlex fxLayoutAlign="space-between center" class="o-hidden-column">
+                                    <div class="table-row o-hidden-column">
+                                        <span fxFlex fxLayoutAlign="start center">
+                                            <span class="pill">
+                                                {{(row.type === channelSuggestionType.event) ? ('CHANNELS.CROSS_SELLING.EVENT' | translate)
+                                            : ('CHANNELS.CROSS_SELLING.SESSION' | translate)}}
+                                            </span>
+                                        </span>
+                                        @if (row.parent_name) {
+                                            <div fxFlex="0 1 100%"
+                                                fxLayoutAlign="start stretch" fxLayout="column" class="o-hidden-column">
+                                                <span appEllipsify class="o-hidden-text-row" [matTooltip]="row.name">{{row.name}}</span>
+                                                <span appEllipsify class="o-hidden-text-row"
+                                                    [matTooltip]="(row.start_date | dateTime : dateFormat) + ' - ' + row.parent_name">
+                                                    {{row.start_date | dateTime : dateTimeFormats.shortDateTimeWithWeek }}
+                                                    <span class="parent-name">- {{row.parent_name}}</span>
+                                                </span>
+                                            </div>
+                                        }
+                                        @if (!row.parent_name) {
+                                            <span fxFlex="0 1 100%" fxLayout="column">
+                                                <span appEllipsify class="o-hidden-text-row" [matTooltip]="row.name">{{row.name}}</span>
+                                            </span>
+                                        }
+                                    </div>
+                                    <div class="action-buttons" (click)="$event.stopPropagation()">
+                                        <button mat-icon-button aria-label="Delete suggestion" class="ob-button medium"
+                                            [matTooltip]="'CHANNELS.CROSS_SELLING.DELETE_SUGGESTION_BTN' | translate"
+                                            (click)="openDeleteSuggestionDialog(row)">
+                                            <mat-icon>delete</mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            </mat-list-item>
+                        }
+                    </div>
+                </div>
+            </mat-list>
+            @if ((crossSellingTargets$ | async).length === 0) {
+                <div>
+                    <app-empty-state-tiny fxFlex [title]="'FORMS.SELECT.NO_RESULTS' | translate" />
+                </div>
+            }
+        </div>
+        @if (data.source?.type === channelSuggestionType.session) {
+            <span fxLayoutAlign="start end">
+                <mat-icon class="ob-icon xsmall info with-text">info</mat-icon>
+                <span>{{ 'CHANNELS.CROSS_SELLING.SUGGESTION_INFO' | translate }}</span>
+            </span>
+        }
+        @if (isLoading$ | async) {
+            <div class="spinner-container">
+                <mat-spinner />
+            </div>
+        }
+    </div>
+</div>

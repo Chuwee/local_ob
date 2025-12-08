@@ -1,0 +1,63 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="main" class="overflow-y-auto"
+    [formGroup]="form" [disabled]="!form.dirty || (isLoadingOrSaving$ | async)">
+    <app-language-bar [languages]="languages$ | async" [selected]="selectedLanguage$ | async" slot="outside"
+        [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)" />
+    <div class="details-container flex flex-col grow">
+        <div class="section-block">
+            <h3 class="section-title">
+                {{'CHANNELS.EMAILS_COMMUNICATION.IMAGES.HEADER_BANNER.TITLE' | translate}}
+            </h3>
+            <p class="section-description">
+                {{'CHANNELS.EMAILS_COMMUNICATION.IMAGES.HEADER_BANNER.INFO' | translate }}
+            </p>
+            <div class="flex flex-col">
+                <div class="flex">
+                    <div class="image-uploader basis-[65%]">
+                        <app-image-uploader [imageRestrictions]="imageRestrictions['headerBanner']"
+                            formControlName="headerBanner" />
+                    </div>
+                </div>
+                <div class="flex">
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label basis-1/2">
+                        <mat-label>{{'CHANNELS.EMAILS_COMMUNICATION.IMAGES.HEADER_BANNER.TARGET_URL' | translate}}</mat-label>
+                        <input matInput
+                            [placeholder]="'CHANNELS.EMAILS_COMMUNICATION.IMAGES.HEADER_BANNER.TARGET_URL' | translate"
+                            formControlName="headerBannerUrl">
+                        <mat-error [ob-form-errors]="form" field="headerBannerUrl" />
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <div class="section-block">
+            <h3 class="section-title">
+                {{'CHANNELS.EMAILS_COMMUNICATION.IMAGES.BANNER_IMAGE.TITLE' | translate}}
+            </h3>
+            <p class="section-description">
+                {{'CHANNELS.EMAILS_COMMUNICATION.IMAGES.BANNER_IMAGE.INFO' | translate }}
+            </p>
+            <div class="flex flex-col">
+                <div class="flex">
+                    <div class="image-uploader basis-[30%]">
+                        <app-image-uploader [imageRestrictions]="imageRestrictions['banner']"
+                            formControlName="banner" />
+                    </div>
+                </div>
+                <div class="flex">
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label basis-1/2">
+                        <mat-label>{{'CHANNELS.EMAILS_COMMUNICATION.IMAGES.BANNER.TARGET_URL' | translate}}</mat-label>
+                        <input matInput
+                            [placeholder]="'CHANNELS.EMAILS_COMMUNICATION.IMAGES.BANNER.TARGET_URL' | translate"
+                            formControlName="bannerUrl">
+                        <mat-error [ob-form-errors]="form" field="bannerUrl" />
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+    </div>
+</app-form-container>
+
+@if (isLoadingOrSaving$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

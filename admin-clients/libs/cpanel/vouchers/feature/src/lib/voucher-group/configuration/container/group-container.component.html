@@ -1,0 +1,58 @@
+<div fxFill *ngIf="(voucherGroup$ | async) as voucherGroup">
+    <div fxFlex="0 0 200px" fxLayout="column" class="subtabs-container">
+        <mat-button-toggle-group vertical [value]="deepPath$ | async" class="ob-subtab" appLastPathGuardListener
+            [currValue]="(deepPath$ | async)" fxFlex="1 0 100%">
+            <mat-button-toggle routerLink="principal-info" value="principal-info">
+                {{'VOUCHER_GROUP.PRINCIPAL_INFO' | translate}}
+            </mat-button-toggle>
+            <mat-button-toggle routerLink="redeem" value="redeem">
+                {{'GIFT_CARD.REDEEM' | translate}}
+            </mat-button-toggle>
+            <mat-button-toggle *ngIf="voucherGroup.type === voucherGroupType.giftCard" routerLink="sale" value="sale">
+                {{'GIFT_CARD.SALE' | translate}}
+            </mat-button-toggle>
+            <mat-button-toggle *ngIf="voucherGroup.type === voucherGroupType.giftCard" routerLink="email" value="email">
+                {{'GIFT_CARD.EMAIL' | translate}}
+            </mat-button-toggle>
+        </mat-button-toggle-group>
+    </div>
+    <div fxFlex="1 1 100%" fxLayout="column">
+        <div fxLayout="column" class="status-notifications-container">
+            <div fxLayoutAlign="start center">
+                <div fxFlex="0 1 1004px" fxLayoutAlign="space-between">
+                    <div class="voucher-group-activation" [class.disabled]="statusCtrl.disabled"
+                        [matTooltip]="'VOUCHER_GROUP.DISABLED_ACTIVATION_DESC' | translate"
+                        [matTooltipDisabled]="statusCtrl.enabled">
+                        <mat-slide-toggle class="ob-slide-toggle ob-label" [formControl]="statusCtrl"
+                            (change)="saveVoucherGroupStatus($event.checked)">
+                            {{(statusCtrl.value ?
+                            'VOUCHER_GROUP.DEACTIVATE_GROUP' :
+                            'VOUCHER_GROUP.ACTIVATE_GROUP') | translate}}
+                        </mat-slide-toggle>
+                    </div>
+                    <div class="voucher-type">
+                        <span class="voucher-group-type-label ob-label">{{'FORMS.LABELS.TYPE' | translate}}: </span>
+                        <span>
+                            {{'VOUCHER_GROUP.TYPE_OPTS.' + voucherGroup.type | translate}}
+                            {{groupType === voucherGroupType.manual ? (' / ' +
+                            ('VOUCHER_GROUP.VALIDATION_METHOD_OPTS.' + voucherGroup.validation_method | translate))
+                            : ''}}
+                        </span>
+                    </div>
+                    <div class="voucher-group-status">
+                        <span class="voucher-group-status-label ob-label">
+                            {{'VOUCHER_GROUP.STATUS' | translate}}:
+                        </span>
+                        <span class="ob-status-badge" [ngClass]="voucherGroup.status.toLowerCase()">
+                            {{('VOUCHER_GROUP.STATUS_OPTS.' + voucherGroup.status) | translate}}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <router-outlet />
+    </div>
+</div>
+<div class="spinner-container" *ngIf="reqInProgress$ | async">
+    <mat-spinner />
+</div>

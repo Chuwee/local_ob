@@ -1,0 +1,205 @@
+<form [formGroup]="filtersForm" fxLayout="column" fxLayoutGap="24px">
+    @if (canSelectEntity$ | async) {
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label">
+                {{'EVENTS.ENTITY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="550px">
+                <mat-form-field appearance="outline" class="ob-form-field entity-select">
+                    <mat-select formControlName="entity" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate"
+                        [compareWith]="compareWith">
+                        <mat-option>
+                            <app-select-search #entities [options$]="entities$" searchField="name" />
+                        </mat-option>
+                        @for (entity of entities.getFilteredOptions$() | async; track entity?.id) {
+                            <mat-option [value]="entity">
+                                {{entity ? entity.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-divider [inset]="true" />
+    }
+    <div fxLayout="row" fxLayoutAlign="space-between" fxLayoutGap="50px" class="filter-block">
+        <div>
+            <div class="ob-label">
+                {{'EVENTS.PRODUCER' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field producer-select">
+                    <mat-select formControlName="producer" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate"
+                        [compareWith]="compareWith">
+                        <mat-option>
+                            <app-select-search #producers [options$]="producers$" searchField="name" />
+                        </mat-option>
+                        @for (producer of producers.getFilteredOptions$() | async; track producer?.id) {
+                            <mat-option [value]="producer">
+                                <div appEllipsify [matTooltip]="producer ? producer.name : ('FORMS.SELECT.ALL_ELEMENTS_MALE' | translate)">
+                                    {{producer ? producer.name : ('FORMS.SELECT.ALL_ELEMENTS_MALE' | translate)}}
+                                </div>
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div>
+            <div class="ob-label">
+                {{'EVENTS.VENUE' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field venue-select">
+                    <app-select-server-search formControlName="venue" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate"
+                        [options$]="venues$" (loadOptions)="loadVenues($event)" [moreOptionsAvailable$]="moreVenuesAvailable$" />
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="space-between" class="filter-block">
+        <div>
+            <div class="ob-label">
+                {{'EVENTS.STATUS' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field status-select">
+                    <mat-select formControlName="status" multiple [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        @for (status of statusList; track $index) {
+                            <mat-option [value]="status">
+                                {{status && (status.name | translate)}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div>
+            <div class="ob-label">
+                {{'EVENTS.TYPE' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field type-select">
+                    <mat-select formControlName="type" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option [value]="null">
+                            {{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}
+                        </mat-option>
+                        @for (type of types; track $index) {
+                            <mat-option [value]="type">
+                                {{type && (type.name | translate)}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    <mat-divider [inset]="true" />
+    <div fxLayout="row" fxLayoutAlign="space-between" class="filter-block">
+        <div>
+            <div class="ob-label">
+                {{'EVENTS.COUNTRY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field country-select">
+                    <mat-select formControlName="country" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate"
+                        [compareWith]="compareWith">
+                        <mat-option>
+                            <app-select-search #countrySelectSearch [options$]="countries$" searchField="name" />
+                        </mat-option>
+                        @for (country of countrySelectSearch.getFilteredOptions$() | async; track $index) {
+                            <mat-option [value]="country">
+                                {{country ? (country.name | translate) : ('FORMS.SELECT.ALL_ELEMENTS_MALE' | translate)}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div>
+            <div class="ob-label">
+                {{'EVENTS.CITY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field city-select">
+                    <mat-select formControlName="city" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate"
+                        [compareWith]="compareByName">
+                        <mat-option>
+                            <app-select-search #citySelectSearch [options$]="cities$" searchField="name" />
+                        </mat-option>
+                        @for (city of citySelectSearch.getFilteredOptions$() | async; track $index) {
+                            <mat-option [value]="city">
+                                {{city ? city.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    @if ((currencies$ | async)?.length > 1) {
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label">
+                {{'FORMS.LABELS.CURRENCY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field status-select">
+                    <mat-select formControlName="currency" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate"
+                        [compareWith]="compareWith">
+                        <mat-option>
+                            <app-select-search #currencySelectSearch [options$]="currencies$ | localCurrenciesFullTranslation$"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="description" />
+                        </mat-option>
+                        @for (
+                            currency of currencySelectSearch.getFilteredOptions$() | async | currencyFilterItemValues;
+                            track currency.code)
+                        {
+                            <mat-option [value]="currency">
+                                {{currency.description ?? ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    }
+    <mat-divider [inset]="true" />
+    <div fxLayout="row" class="filter-block">
+        <div class="ob-label">
+            {{'EVENTS.DATE' | translate}}
+        </div>
+        <div class="filter-block-input" fxFlex="180px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="startDateDP" [placeholder]="dateFormat" formControlName="startDate"
+                    (focus)="startDateDP.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                    (click)="$event.stopPropagation(); startDateDP.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #startDateDP />
+            </mat-form-field>
+        </div>
+        <div fxFlex="20px">
+            <span fxFlex class="filter-block-dates-separator"></span>
+        </div>
+        <div class="filter-block-input" fxFlex="180px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="endDateDP" [placeholder]="dateFormat" formControlName="endDate"
+                    (focus)="endDateDP.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                    (click)="$event.stopPropagation(); endDateDP.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #endDateDP />
+            </mat-form-field>
+        </div>
+    </div>
+    <mat-divider [inset]="true" />
+    <div fxLayout="row" class="filter-block">
+        <div class="filter-block-input show-archived-filter-container" fxFlexOffset="100px">
+            <mat-checkbox color="primary" formControlName="showArchived">
+                {{'EVENTS.SHOW_ARCHIVED_EVENTS' | translate}}
+            </mat-checkbox>
+        </div>
+    </div>
+</form>

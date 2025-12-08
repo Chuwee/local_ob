@@ -1,0 +1,55 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <form (ngSubmit)="submit()" [formGroup]="form" fxLayout="column">
+        <div mat-dialog-title fxLayout="row" class="refund-order-dialog-title">
+            <h2 fxFlex="100%" class="secondary title">{{'ORDER.REIMBURSEMENT.RETRY_TITLE' | translate}}</h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+        <div mat-dialog-content>
+            <div class="form-container" fxLayout="column">
+                <mat-radio-group formControlName="type" fxFlex="100%" fxLayout="row wrap" fxLayout.lt-md="column"
+                    fxLayoutGap="20px" fxLayoutAlign="center" class="reimbursement-type-options">
+                    <mat-radio-button fxFlex="0 1 calc(50% - 10px)" fxFlex.lt-md="100%" class="ob-radio-card-button"
+                        [value]="types.default" [disabled]="disableDefault">
+                        <div class="option-title">{{'ORDER.REIMBURSEMENT.AUTOMATIC' | translate}}</div>
+                        <div>
+                            {{'ORDER.REIMBURSEMENT.INFO_AUTOMATIC' | translate}}
+                        </div>
+                    </mat-radio-button>
+                    <mat-radio-button fxFlex="0 1 calc(50% - 10px)" fxFlex.lt-md="100%" class="ob-radio-card-button"
+                        *ngIf="manualFormSchema" [value]="types.manual">
+                        <div class="option-title">{{'ORDER.REIMBURSEMENT.MANUAL' | translate}}</div>
+                        <div>
+                            {{'ORDER.REIMBURSEMENT.INFO_MANUAL' | translate}}
+                        </div>
+                    </mat-radio-button>
+                </mat-radio-group>
+            </div>
+            <div fxLayout="column" class="manual-form-container" *ngIf="manualForm.enabled">
+                <div fxFlex="100%" fxLayout="row wrap" [formGroup]="manualForm">
+                    <mat-form-field *ngFor="let fieldSchema of manualFormSchema" [fxFlex]="fieldSchema.fieldSize"
+                        appearance="outline" class="ob-form-field">
+                        <mat-label>{{fieldSchema.label | translate}}</mat-label>
+                        <input matInput [placeholder]="fieldSchema.label | translate"
+                            formControlName="{{fieldSchema.name}}" autocomplete="off">
+                        <mat-error *ngIf="manualForm.controls[fieldSchema.name].hasError('required')">
+                            {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                        </mat-error>
+                        <mat-error *ngIf="manualForm.controls[fieldSchema.name].hasError('pattern')">
+                            {{'FORMS.ERRORS.INVALID_CHARACTERS' | translate}}
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <div mat-dialog-actions fxLayoutAlign="end">
+            <button type="button" mat-button class="ob-button" (click)="close()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button mat-flat-button color="primary" type="submit" class="ob-button">
+                {{'ORDER.REIMBURSEMENT.SUBMIT' | translate}}
+            </button>
+        </div>
+    </form>
+</div>

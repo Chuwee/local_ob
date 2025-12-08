@@ -1,0 +1,57 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" class="no-padding"
+    [disabled]="!form.dirty || $isLoading()" [formGroup]="form">
+    <app-language-bar [languages]="$languageList()" [selected]="$language()" slot="outside"
+        [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)" />
+    <div class="details-container">
+        <div class="section-block">
+            <p class="ob-label">{{'SALE_REQUEST.COMMUNICATION.PAYMENT_METHODS_BENEFITS.PAGE_TITLE' | translate}}</p>
+            <p>
+                <mat-checkbox color="primary" formControlName="visible" (change)="enableBenefitsCommunicationElement($event?.checked)">
+                    <mat-label class="ob-label">
+                        {{ 'SALE_REQUEST.COMMUNICATION.PAYMENT_METHODS_BENEFITS.FORMS.LABELS.ENABLE_TAGS' | translate }} </mat-label>
+                    <div> {{ 'SALE_REQUEST.COMMUNICATION.PAYMENT_METHODS_BENEFITS.FORMS.INFOS.ENABLE_TAGS' | translate }} </div>
+                </mat-checkbox>
+            </p>
+            <div class="flex gap-6 flex-col">
+                <span class="tag">
+                    {{'SALE_REQUEST.COMMUNICATION.PAYMENT_METHODS_BENEFITS.TITLES.TAG' | translate}}
+                </span>
+                <div class="flex flex-col">
+                    <div class="flex flex-row gap-4">
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label flex-35%">
+                            <mat-label>{{'FORMS.LABELS.TAG_NAME' | translate}}</mat-label>
+                            <input #input matInput aria-label="label" formControlName="label"
+                                [placeholder]="'FORMS.PLACEHOLDER.TAG_NAME' | translate">
+                            <mat-error [ob-form-errors]="form" field="label" />
+                        </mat-form-field>
+                        <div class="flex flex-col flex-start">
+                            <span
+                                class="ob-label">{{'FORMS.LABELS.TAG_PREVIEW' | translate}}</span>
+                            <span class="channels-badge flex align-center items-center gap-2"
+                                [style.backgroundColor]="this.form.get('backgroundColor').value"
+                                [style.color]="this.form.get('textColor').value">
+                                <mat-icon>credit_card</mat-icon>
+                                <span>{{input.value || ('FORMS.PLACEHOLDER.TAG_NAME' | translate)}}</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex flex-row gap-4">
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label min-padding flex-90px">
+                            <mat-label>{{'FORMS.LABELS.BACKGROUND_COLOR' | translate}}</mat-label>
+                            <app-color-picker formControlName="backgroundColor" />
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label min-padding flex-90px">
+                            <mat-label>{{'FORMS.LABELS.TEXT_COLOR' | translate}}</mat-label>
+                            <app-color-picker formControlName="textColor" />
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</app-form-container>
+@if ($isLoading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

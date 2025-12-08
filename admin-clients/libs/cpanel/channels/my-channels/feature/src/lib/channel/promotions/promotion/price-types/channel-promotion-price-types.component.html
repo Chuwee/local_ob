@@ -1,0 +1,74 @@
+<div fxLayout="column" class="promotion-form-section" [formGroup]="priceTypesForm">
+    <p class="mat-subtitle-2">{{'CHANNELS.PROMOTIONS.PRICE_TYPES_DESCRIPTION' | translate}} *</p>
+    <mat-radio-group formControlName="type" fxLayout="column">
+        <mat-radio-button class="inline" [value]="scope.all">
+            {{'CHANNELS.PROMOTIONS.PRICE_TYPES_OPTS.ALL' | translate}}
+        </mat-radio-button>
+        <mat-radio-button #restrictedRadio class="inline" [value]="scope.restricted" [disabled]="isSelectionDisabled"
+            [matTooltip]="'CHANNELS.PROMOTIONS.PRICE_TYPES_EMPTY_LIST' | translate"
+            [matTooltipDisabled]="!restrictedRadio.disabled || (salesRequestsloading$ | async)"
+            matTooltipPosition="below" matTooltipClass="no-margin">
+            {{'CHANNELS.PROMOTIONS.PRICE_TYPES_OPTS.SELECT' | translate}}
+        </mat-radio-button>
+    </mat-radio-group>
+    <div fxFlex [fxShow]="priceTypesForm.get('type').value === scope.restricted && !isSelectionDisabled"
+        class="nested-content">
+        <div class="promotion-price-types-container" fxLayout="row"
+            [class.field-error]="priceTypesForm.hasError('required', 'selected') && priceTypesForm.get('selected').touched">
+            <div fxFlex="0 0 250px" fxLayout="column">
+                <app-selector-list class="event-selector" fxFlex="none" [externalOptions$]="events$" [loadBy]="loadEvents"
+                    [formControl]="eventSelectForm" [listTitle]="'TITLES.EVENTS' | translate"
+                    [searchInputPlaceholder]="'FORMS.SEARCH.EVENT' | translate">
+                    <ng-template #optionTemplate let-row>
+                        <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between">
+                            <span fxLayoutAlign="start center">{{row.name}}</span>
+                            <span *ngIf="getSelectedPriceTypesInEvent(row)" fxFlex="none" class="badge-option">
+                                {{getSelectedPriceTypesInEvent(row)}}
+                            </span>
+                        </div>
+                    </ng-template>
+                </app-selector-list>
+            </div>
+            <app-searchable-paginated-selection #selection fxFlex="1 1"
+                [placeholder]="'FORMS.SEARCH.PRICE_TYPES' | translate" (loadData)="filterChangeHandler($event)"
+                [form]="priceTypesForm.get('selected')" [pageSize]="pageSize" [data$]="priceTypes$"
+                [metadata$]="metadata$" [loading$]="salesRequestsloading$">
+                <button slot="filter" type="button" mat-flat-button class="show-selected-only-button ob-button"
+                    color="tertiary" [class.active]="selectedOnly$ | async"
+                    [matTooltip]="'CHANNELS.PROMOTIONS.SHOW_SELECTED_TOOLTIP' | translate"
+                    (click)="showSelectedOnlyClick.emit()">
+                    <mat-icon>visibility</mat-icon>
+                    {{'CHANNELS.PROMOTIONS.SHOW_SELECTED' | translate}}
+                </button>
+                <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data"
+                    let-selectionChanged="selectionChanged">
+                    <app-selection-list [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged"
+                        class="small-rows">
+                        <div slot="subheader" class="list-header">
+                            <div fxLayoutAlign="space-between" fxFlex="0 1 100%">
+                                <div>
+                                    <mat-checkbox color="primary" [disabled]="(selectedOnly$ | async)"
+                                        [checked]="getSelectedPriceTypesInEvent() === (totalPriceTypes$ | async) || (selectedOnly$ | async)"
+                                        [indeterminate]="getSelectedPriceTypesInEvent() > 0 && getSelectedPriceTypesInEvent() < (totalPriceTypes$ | async)"
+                                        (change)="selectAll($event)" />
+                                    <span>{{'FORMS.LABELS.PRICE_TYPE' | translate}} - {{selectedEventName}}</span>
+                                </div>
+                                <span>{{'SESSION.VENUE_TEMPLATE.NAME' | translate}}</span>
+                            </div>
+                        </div>
+                        <ng-template #optionTemplate let-row>
+                            <div fxLayoutAlign="space-between">
+                                <span>{{row.name}}</span>
+                                <span>{{row.venue_template.name}}</span>
+                            </div>
+                        </ng-template>
+                    </app-selection-list>
+                </ng-template>
+            </app-searchable-paginated-selection>
+        </div>
+        <span *ngIf="priceTypesForm.hasError('required', 'selected') && priceTypesForm.get('selected').touched"
+            class="error-description">
+            {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+        </span>
+    </div>
+</div>

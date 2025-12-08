@@ -1,0 +1,191 @@
+@let details = $ticket();
+@let ticket = details.ticket;
+@let allocation = ticket.allocation;
+@let session = allocation.session;
+@let isAvet = allocation.event?.type === eventType.avet;
+
+<!-- {fix indentations} -->
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="flex flex-col details-non-editable-field">
+        <span class="field-label">{{'FORMS.LABELS.EVENT' | translate}}</span>
+        <span>{{allocation.event.name}}</span>
+    </div>
+    <div class="flex flex-col details-non-editable-field">
+        <span class="field-label">{{'FORMS.LABELS.DATE' | translate}}</span>
+        <span>{{session.date.start | localDateTime : dateTimeFormats.shortDateTime}}</span>
+    </div>
+    <div class="flex flex-col details-non-editable-field">
+        <span class="field-label">{{'FORMS.LABELS.SESSION' | translate}}</span>
+        <span>{{session.name}}</span>
+    </div>
+    <div class="flex flex-col details-non-editable-field">
+        <span class="field-label">{{'FORMS.LABELS.BARCODE' | translate}}</span>
+        <span>
+            {{ticket.barcode?.code | obfuscateString : (isAvet ? obfuscatePattern.between : undefined)}}
+        </span>
+    </div>
+    <div class="flex flex-col details-non-editable-field">
+        <span class="field-label">{{'FORMS.LABELS.TYPE' | translate}}</span>
+        <span>{{'TICKET.TYPE.' + ticket.type | translate}}</span>
+    </div>
+    @if (ticket.rate?.name) {
+        <div class="flex flex-col details-non-editable-field">
+            <span class="field-label">{{'FORMS.LABELS.RATE' | translate}}</span>
+            <span>{{ticket.rate.name}}</span>
+        </div>
+    }
+    <div class="flex flex-col details-non-editable-field">
+        <span class="field-label">{{'FORMS.LABELS.ADDRESS' | translate}}</span>
+        <span>{{$address()}}</span>
+    </div>
+    @if (ticket.sales?.discount?.name) {
+        <div class="flex flex-col details-non-editable-field">
+            <span class="field-label">{{'FORMS.LABELS.SALES_DISCOUNT_NAME' | translate}}</span>
+            <span>{{ticket.sales.discount.name}}</span>
+        </div>
+    }
+    @if (ticket.sales?.discount?.activator?.code) {
+        <div class="flex flex-col details-non-editable-field">
+            <span class="field-label">{{'FORMS.LABELS.SALES_DISCOUNT_ACTIVATOR_CODE' | translate}}</span>
+            <span>{{ticket.sales.discount.activator.code}}</span>
+        </div>
+    }
+    @if (ticket.sales?.discount?.activator?.collective?.name) {
+        <div class="flex flex-col details-non-editable-field">
+            <span class="field-label">{{'FORMS.LABELS.SALES_DISCOUNT_COLLECTIVE_NAME' | translate}}</span>
+            <span>{{ticket.sales.discount.activator.collective.name}}</span>
+        </div>
+    }
+    @if (ticket.sales?.promotion?.name) {
+        <div class="flex flex-col details-non-editable-field">
+            <span class="field-label">{{'FORMS.LABELS.SALES_PROMOTION_NAME' | translate}}</span>
+            <span>{{ticket.sales.promotion.name}}</span>
+        </div>
+    }
+    @if (ticket.sales?.promotion?.activator?.code) {
+        <div class="flex flex-col details-non-editable-field">
+            <span class="field-label">{{'FORMS.LABELS.SALES_PROMOTION_ACTIVATOR_CODE' | translate}}</span>
+            <span>{{ticket.sales.promotion.activator.code}}</span>
+        </div>
+    }
+    @if (ticket.sales?.promotion?.activator?.collective?.name) {
+        <div class="flex flex-col details-non-editable-field">
+            <span class="field-label">{{'FORMS.LABELS.SALES_PROMOTION_COLLECTIVE_NAME' | translate}}</span>
+            <span>{{ticket.sales.promotion.activator.collective.name}}</span>
+        </div>
+    }
+    @if (ticket.sales?.automatic?.name) {
+        <div class="flex flex-col details-non-editable-field">
+            <span class="field-label">{{'FORMS.LABELS.SALES_AUTO_NAME' | translate}}</span>
+            <span>{{ticket.sales.automatic.name}}</span>
+        </div>
+    }
+</div>
+
+<mat-divider />
+
+@if (ticket.allocation) {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ticket-details-ticket-seat">
+        <div class="flex flex-col details-non-editable-field">
+            <span class="field-label">{{'FORMS.LABELS.SEAT_TYPE' | translate}}</span>
+            <span>{{'TICKET.SEAT_TYPE.' + allocation.type | translate}}</span>
+        </div>
+        @if (allocation.not_numbered_area?.name) {
+            <div class="flex flex-col details-non-editable-field">
+                <span class="field-label">{{'FORMS.LABELS.ZONE' | translate}}</span>
+                <span>{{allocation.not_numbered_area.name}}</span>
+            </div>
+        }
+        @if (allocation.quota?.name) {
+            <div class="flex flex-col details-non-editable-field">
+                <span class="field-label">{{'FORMS.LABELS.SALES_GROUP' | translate}}</span>
+                <span>{{allocation.quota.name}}</span>
+            </div>
+        }
+        @if (allocation.sector?.name) {
+            <div class="flex flex-col details-non-editable-field">
+                <span class="field-label">{{'FORMS.LABELS.SECTOR' | translate}}</span>
+                <span>{{allocation.sector.name}}</span>
+            </div>
+        }
+        @if (allocation.row) {
+            <div class="flex flex-col details-non-editable-field">
+                <span class="field-label">{{'FORMS.LABELS.ROW' | translate}}</span>
+                <span>{{allocation.row.name}}</span>
+            </div>
+        }
+        @if (allocation.seat) {
+            <div class="flex flex-col details-non-editable-field">
+                <span class="field-label">{{'FORMS.LABELS.SEAT' | translate}}</span>
+                <span>{{allocation.seat.name}}</span>
+            </div>
+        }
+        @if (allocation.access?.name) {
+            <div class="flex flex-col details-non-editable-field">
+                <span class="field-label">{{'FORMS.LABELS.ACCESS' | translate}}</span>
+                <span>{{allocation.access.name}}</span>
+            </div>
+        }
+        @if (allocation.accessibility) {
+            <div class="flex flex-col details-non-editable-field">
+                <span class="field-label">{{'FORMS.LABELS.ACCESSIBILITY' | translate}}</span>
+                <span>{{'TICKET.ACCESSIBILITY.' + allocation.accessibility | translate}}</span>
+            </div>
+        }
+        @if (allocation.visibility) {
+            <div class="flex flex-col details-non-editable-field">
+                <span class="field-label">{{'FORMS.LABELS.VISIBILITY' | translate}}</span>
+                <span>{{'TICKET.VISIBILITY.' + allocation.visibility | translate}}</span>
+            </div>
+        }
+        @if (allocation.price_type?.name) {
+            <div class="flex flex-col details-non-editable-field">
+                <span class="field-label">{{'FORMS.LABELS.PRICE_TYPE' | translate}}</span>
+                <span>{{allocation.price_type.name}}</span>
+            </div>
+        }
+        @if (ticket.external_properties?.session_smartbooking) {
+            <div class="flex flex-col details-non-editable-field">
+                <span class="field-label">{{'FORMS.LABELS.EXTERNAL_PROPERTIES' | translate}}</span>
+                <span>{{'FORMS.LABELS.EXTERNAL_PROPERTIES_OPTS.SMARTBOOKING' | translate}}</span>
+            </div>
+        }
+    </div>
+}
+
+@if (details.origin_market === 'SECONDARY' || details.secondary_market?.purchase_order) {
+    <mat-divider />
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ticket-details-secondary-market">
+        <div class="flex flex-col details-non-editable-field">
+            <span class="field-label">{{'FORMS.LABELS.ORIGIN_MARKET' | translate}}</span>
+            <span>{{('TICKET.ORIGIN_MARKET_OPTS.' + (details.origin_market ?? 'PRIMARY')).toUpperCase() | translate}}</span>
+        </div>
+        @if (details.secondary_market?.original_order) {
+            <div class="flex flex-col details-non-editable-field">
+                <span class="field-label">{{'FORMS.LABELS.ORIGINAL_ORDER' | translate}}</span>
+                <span class="ob-link" (click)="goToOriginalItemRoute()">{{details.secondary_market.original_order}}</span>
+            </div>
+        }
+        @if (details.secondary_market?.purchase_order) {
+            <div class="flex flex-col details-non-editable-field">
+                <span class="field-label">{{'FORMS.LABELS.PURCHASE_ORDER' | translate}}</span>
+                <span class="ob-link" (click)="goToPurchasedItemRoute()">{{details.secondary_market.purchase_order}}</span>
+            </div>
+        }
+    </div>
+}
+@if($isRelocated()){
+    <mat-divider />
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ticket-details-secondary-market">
+        <div class="flex flex-col details-non-editable-field">
+            <span class="field-label">
+                {{'TICKETS.RELOCATIONS.FORMS.LABELS.RELOCATED_SEAT' | translate}}
+            </span>
+            <span class="ob-link" (click)="openRelocationHistory()">
+                {{'TICKETS.RELOCATIONS.ACTIONS.OPEN_RELOCATION_HISTORY' | translate}}
+            </span>
+        </div>
+    </div>
+}

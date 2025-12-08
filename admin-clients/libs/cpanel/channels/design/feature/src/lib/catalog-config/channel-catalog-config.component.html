@@ -1,0 +1,190 @@
+<app-form-container [formGroup]="form" (cancel)="cancel()" (save)="save()" layout="menu"
+    [disabled]="(isInProgress$ | async) || !form.dirty">
+    <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+        @if ($channel() | isWebV4$ | async) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        {{'CHANNELS.CATALOG_CONFIG.CAROUSEL.TITLE' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div fxLayout="column">
+                    <p class="section-description">
+                        {{'CHANNELS.CATALOG_CONFIG.CAROUSEL.DESCRIPTION' | translate: { max: maxCarouselEvents } }}
+                    </p>
+                    @if ((carouselChannelEvents$ | async)?.length) {
+                        <div fxLayout="row" fxFlex="100%" fxLayoutAlign="end center">
+                            @if ((carouselChannelEvents$ | async); as events) {
+                                <button (click)="openAddCarouselEventsDialog(events)"
+                                    mat-stroked-button type="button" class="ob-button medium edit-button"
+                                    color="primary">
+                                    <mat-icon>edit</mat-icon>
+                                    {{'CHANNELS.CATALOG_CONFIG.CAROUSEL.ACTION' | translate}}
+                                </button>
+                            }
+                        </div>
+                    }
+                    <mat-list fxFlex="100%" cdkDropList #orderedCarouselEventsList class="ob-list small-rows"
+                        [cdkDropListData]="carouselChannelEvents$ | async"
+                        (cdkDropListDropped)="dropItemCarousel($event)">
+                        @for (chEvent of carouselChannelEvents$ | async; track chEvent.id) {
+                            <mat-list-item cdkDrag cdkDragLockAxis="y"
+                                [class.hidden]="chEvent.filtered" class="with-position" role="listitem">
+                                <span class="ob-round-badge badge-list-position">
+                                    {{chEvent.catalog.carousel_position + 1}}
+                                </span>
+                                <mat-icon class="drag-icon">
+                                    drag_indicator
+                                </mat-icon>
+                                <div fxFlex fxLayoutAlign="space-between center">
+                                    <span class="event-name">{{chEvent.event.name}}</span>
+                                    <div fxLayoutAlign="end center">
+                                        <span class="event-dates">
+                                            {{chEvent.event.start_date | dateTime : dateTimeFormats.shortDate}}
+                                            &nbsp;-&nbsp;
+                                            {{chEvent.event.end_date | dateTime : dateTimeFormats.shortDate}}
+                                        </span>
+                                    </div>
+                                </div>
+                            </mat-list-item>
+                        }
+                    </mat-list>
+                    @if (!(carouselChannelEvents$ | async)?.length && (isInProgress$ | async) === false) {
+                        <app-empty-state-tiny
+                            [title]="'CATALOG_CONFIG.CAROUSEL.EMPTY_EVENTS.TITLE' | translate"
+                            [description]="'CATALOG_CONFIG.CAROUSEL.EMPTY_EVENTS.DESCRIPTION' | translate: { max: maxCarouselEvents }"
+                            [emptyBorder]="true">
+                            <button (click)="openAddCarouselEventsDialog()" mat-stroked-button type="button" class="ob-button medium"
+                                color="primary">
+                                <mat-icon>add</mat-icon>
+                                {{'CATALOG_CONFIG.CAROUSEL.EMPTY_EVENTS.ACTION' | translate}}
+                            </button>
+                        </app-empty-state-tiny>
+                    }
+                </div>
+            </mat-expansion-panel>
+        }
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>
+                    {{'CHANNELS.CATALOG_CONFIG.LIST.TITLE' | translate}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxFlex fxLayout="column" class="channel-events-list-container">
+                <h3 class="section-title">
+                    {{'CHANNELS.CATALOG_CONFIG.ORDERED_EVENTS_TITLE' | translate}}
+                </h3>
+                @if ((totalEvents$ | async) > 10) {
+                    <div class="filter-container">
+                        <app-search-input fxFlex="0 1 510px" [placeholder]="'FORMS.SEARCH.IN_LIST' | translate"
+                            (valueChanged)="searchChannelEventsChanged.next($event)" />
+                    </div>
+                }
+
+                <p class="section-description">{{'CHANNELS.CATALOG_CONFIG.ORDERED_EVENTS_DESC' | translate}}</p>
+                <mat-list cdkDropList #orderedEventsList class="ob-list small-rows"
+                    [cdkDropListData]=" orderedChannelEvents$ | async"
+                    [cdkDropListConnectedTo]="[unorderedList]" (cdkDropListDropped)="dropItem($event)">
+                    @for (chEvent of orderedChannelEvents$ | async; track chEvent.id) {
+                        <mat-list-item cdkDrag cdkDragLockAxis="y"
+                            [class.hidden]="chEvent.filtered" class="with-position" role="listitem">
+                            <span class="ob-round-badge badge-list-position">
+                                {{chEvent.catalog.position + 1}}
+                            </span>
+                            <mat-icon class="drag-icon">
+                                drag_indicator
+                            </mat-icon>
+                            <div fxFlex fxLayoutAlign="space-between center">
+                                <span class="event-name">{{chEvent.event.name}}</span>
+                                <div fxLayoutAlign="end center">
+                                    <span class="event-dates">
+                                        {{chEvent.event.start_date | dateTime : dateTimeFormats.shortDate}}
+                                        &nbsp;-&nbsp;
+                                        {{chEvent.event.end_date | dateTime : dateTimeFormats.shortDate}}
+                                    </span>
+                                </div>
+                            </div>
+                        </mat-list-item>
+                    }
+                </mat-list>
+                @if (!(orderedChannelEvents$ | async)?.length && (isInProgress$ | async) === false) {
+                    <app-empty-state-tiny
+                        [title]="'CHANNELS.CATALOG_CONFIG.EMPTY_ORDERED_EVENTS_TITLE' | translate"
+                        [description]="'CHANNELS.CATALOG_CONFIG.EMPTY_ORDERED_EVENTS_DESC' | translate"
+                        [emptyBorder]="true" />
+                }
+
+                <div class="unordered-events-container">
+                    <div class="unordered-section">{{'CHANNELS.CATALOG_CONFIG.UNORDERED_EVENTS_DESC' | translate}}
+                    </div>
+                    <button mat-stroked-button color="tertiary" type="button" class="ob-button medium add-button"
+                        [disabled]="!unorderedEventsSelect.selectedOptions.selected.length"
+                        (click)="moveToOrderedEvents(unorderedEventsSelect.selectedOptions.selected)">
+                        <mat-icon>arrow_upward</mat-icon>
+                        {{'CHANNELS.CATALOG_CONFIG.MOVE_TO_ORDEDED_BTN' | translate}}
+                    </button>
+                    <mat-selection-list cdkDropList #unorderedEventsSelect #unorderedList="cdkDropList"
+                        [cdkDropListData]="unorderedChannelEvents$ | async" (cdkDropListDropped)="dropItem($event)"
+                        class="ob-list small-rows">
+                        @for (chEvent of unorderedChannelEvents$ | async; track chEvent.id) {
+                            <mat-list-option [class.hidden]="chEvent.filtered"
+                                [value]="chEvent" color="primary" checkboxPosition="before">
+                                <div fxLayoutAlign="space-between center">
+                                    <span class="event-name">{{chEvent.event.name}}</span>
+                                    <div fxLayoutAlign="end center">
+                                        <span class="event-dates">
+                                            {{chEvent.event.start_date | dateTime : dateTimeFormats.shortDate}}
+                                            &nbsp;-&nbsp;
+                                            {{chEvent.event.end_date | dateTime : dateTimeFormats.shortDate}}
+                                        </span>
+                                        <mat-button-toggle aria-label="Set visible/not visible event"
+                                            class="ob-icon-button-toggle-simple ob-button small only-icon"
+                                            [checked]="isVisibleEvent(chEvent.event.id)"
+                                            [matTooltip]="'CHANNELS.CATALOG_CONFIG.EVENT_VISIBILITY_INFO' | translate"
+                                            (click)="$event.stopPropagation(); setVisibleEvent(chEvent.event.id)">
+                                            <mat-icon>visibility</mat-icon>
+                                        </mat-button-toggle>
+                                    </div>
+                                </div>
+                            </mat-list-option>
+                        }
+                        @if (!(unorderedChannelEvents$ | async)?.length && (isInProgress$ | async) === false) {
+                            <app-empty-state-tiny
+                                [title]="'CHANNELS.CATALOG_CONFIG.EMPTY_CATALOG' | translate"
+                                [emptyBorder]="true" />
+                        }
+                    </mat-selection-list>
+                </div>
+            </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>
+                    {{'CHANNELS.CATALOG_CONFIG.CATEGORIES.TITLE' | translate}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="ob-form-field flex flex-col gap-4">
+                @if ($channel() | isWebB2bChannel) {
+                    <div class="gap-4 flex flex-col">
+                        <mat-checkbox color="primary" formControlName="chCategoriesEnabled">
+                            <mat-label class="ob-label"> {{ 'CHANNELS.CATALOG_CONFIG.CATEGORIES.LABEL' | translate }} </mat-label>
+                            <div> {{ 'CHANNELS.CATALOG_CONFIG.CATEGORIES.DESCRIPTION' | translate }} </div>
+                        </mat-checkbox>
+                    </div>
+                }
+                <div class="gap-4 flex flex-col">
+                    <mat-checkbox color="primary" formControlName="chPacksEventsEnabled">
+                        <mat-label class="ob-label"> {{ 'CHANNELS.CATALOG_CONFIG.PACKS_AND_EVENTS.LABEL' | translate }} </mat-label>
+                        <div> {{ 'CHANNELS.CATALOG_CONFIG.PACKS_AND_EVENTS.DESCRIPTION' | translate }} </div>
+                    </mat-checkbox>
+                </div>
+                <mat-error [ob-form-errors]="form" />
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

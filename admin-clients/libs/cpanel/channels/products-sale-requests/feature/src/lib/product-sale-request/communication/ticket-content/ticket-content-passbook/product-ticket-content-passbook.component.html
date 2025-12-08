@@ -1,0 +1,86 @@
+<div class="details-container passbook flex flex-col basis-[880px]">
+    <div class="flex basis-full flex-col">
+        <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+            <mat-expansion-panel [expanded]="true" (expandedChange)="passbookContentExpanded = $event">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{'PRODUCT.COMMUNICATION.PASSBOOK.TITLE' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <form id="passbookContent" [formGroup]="passbookContentForm" class="flex-col">
+                    @let passbook = passbookContentForm.controls;
+                    <div class="section-block flex flex-col">
+                        <h3 class="section-title">
+                            {{'PRODUCT.COMMUNICATION.PASSBOOK.FRONT_CONTENT' | translate}}
+                        </h3>
+                        <div class="flex flex-row basis-full">
+                            <div class="basis-12">
+                                <span class="ob-round-badge badge-passbook">1</span>
+                            </div>
+                            <div class="flex flex-col basis-full">
+                                <span class="field-label">{{'PRODUCT.COMMUNICATION.PASSBOOK.NAME.LABEL' | translate}}</span>
+                                @if(passbook[textType.name].value){
+                                    <span class="field-description">{{passbook[textType.name].value}}</span>
+                                }@else {
+                                  <span class="content-not-defined-message">
+                                    {{('PRODUCT.COMMUNICATION.NOT_DEFINED.NAME' | translate)}}</span>
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-block flex-col">
+                        <h3 class="section-title">
+                            {{'PRODUCT.COMMUNICATION.PASSBOOK.BACK_CONTENT' | translate}}
+                        </h3>
+                        <div class="flex flex-row basis-full">
+                            <div class="basis-12">
+                                <span class="ob-round-badge badge-passbook">2</span>
+                            </div>
+                            <div class="flex flex-col basis-full md:basis-[436px]">
+                                <span class="field-label">
+                                    {{'PRODUCT.COMMUNICATION.PASSBOOK.DELIVERY.LABEL' | translate}}
+                                </span>
+                                @if(passbook[textType.delivery].value){
+                                    <span class="field-description">{{passbook[textType.delivery].value}}</span>
+                                }@else {
+                                  <span class="content-not-defined-message">
+                                    {{('PRODUCT.COMMUNICATION.NOT_DEFINED.DELIVERY' | translate)}}</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-block flex-col">
+                        <h3 class="section-title">
+                            {{'PRODUCT.COMMUNICATION.PASSBOOK.PRINCIPAL_IMAGE.TITLE' | translate}}
+                        </h3>
+                        <div class="flex flex-row basis-full">
+                            <div class="basis-12">
+                                <span class="ob-round-badge badge-passbook">3</span>
+                            </div>
+                            <div class="image-uploader flex flex-col basis-1/3">
+                                @if(passbook[imageType]?.value){
+                                    <app-image-uploader [imageRestrictions]="imageRestrictions['passbookThumbnailMain']"
+                                        [formControlName]="imageType" hideLabelText/>
+                                }@else{
+                                    <span class="content-not-defined-message">
+                                        {{'SALE_REQUEST.COMMUNICATION.TICKET.IMAGE.BODY.NOT_DEFINED' | translate}}</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+</div>
+<mat-divider vertical="true" />
+<div class="ticket-template-legend legend-passbook flex-col basis-[160px] grow-0 shrink-0 place-content-start"
+    [class.hidden]="!passbookContentExpanded">
+    <img src="assets/ticket-passbook/passbook-template-product-front.svg" [alt]="'PRODUCT.COMMUNICATION.PASSBOOK.TITLE' | translate">
+    <img src="assets/ticket-passbook/passbook-template-product-back.svg" [alt]="'PRODUCT.COMMUNICATION.PASSBOOK.TITLE' | translate">
+    <div class="legend-title">{{'EVENTS.TEMPLATE' | translate}}</div>
+    <div class="legend-value">{{'PRODUCT.TEMPLATE.PASSBOOK' | translate}}</div>
+    <div class="legend-title">{{'EVENTS.PASSBOOK.INFO_PLANTILLA' | translate}}</div>
+    <div class="legend-value">{{'EVENTS.PASSBOOK.INFO_PLANTILLA_TEXT' | translate}}</div>
+</div>

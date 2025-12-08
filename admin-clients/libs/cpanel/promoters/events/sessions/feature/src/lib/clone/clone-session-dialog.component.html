@@ -1,0 +1,77 @@
+<div class="flex flex-col basis-full dialog-msg-container">
+    <div mat-dialog-title>
+        <div class="flex self-start flex-auto">
+            <h2 class="flex basis-full grow shrink secondary title">{{'TITLES.CLONE_SESSION' | translate}}</h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content>
+        <form [formGroup]="form" class="flex flex-col">
+            @if (hasFortressVenue) {
+                <div class="flex clone-session-info-block">
+                    <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                    {{'EVENTS.SESSION.FORTRESS.INFO_MESSAGE' | translate}}
+                </div>
+            }
+            <!-- NAME -->
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                <input matInput aria-label="name" required [placeholder]="'FORMS.LABELS.NAME' | translate" formControlName="name">
+                @if (form.get('name').hasError('required')) {
+                    <mat-error>
+                        {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                    </mat-error>
+                }
+            </mat-form-field>
+            <div class="flex">
+                <!-- START DATE -->
+                <app-date-time-picker maxErrors="1" class="clone-session-form-field grow shrink" required
+                    [label]="'DATES.START_DATE' | translate" formControlName="startDate" />
+                <!-- END DATE -->
+                @if (hasFortressVenue) {
+                    <app-date-time-picker maxErrors="1" class="clone-session-form-field grow shrink" required
+                        [label]="'DATES.END_DATE' | translate" formControlName="endDate" />
+                }
+            </div>
+            <!-- REFERENCE -->
+            @if (hasFortressVenue) {
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-label>{{'FORMS.LABELS.REFERENCE' | translate}}</mat-label>
+                    <input matInput aria-label="reference"
+                        [placeholder]="'FORMS.LABELS.REFERENCE' | translate"
+                        formControlName="reference">
+                    <mat-error [ob-form-errors]="form" [field]="'reference'" />
+                </mat-form-field>
+            }
+            <!-- LINKED SESSION PACK TARGET -->
+            @if (isSessionPackLinked) {
+                <mat-form-field appearance="outline" class="ob-form-field session-pack-seats-target-select">
+                    <mat-label>{{'EVENTS.SESSION.SESSION_PACK_SEATS_TARGET' | translate}}</mat-label>
+                    <mat-select formControlName="sessionPackSeatsTarget">
+                        <mat-option [value]="seatStatus.free">
+                            {{'ENUMS.SEAT_STATUS.FREE' | translate}}
+                        </mat-option>
+                        @for (blockingReason of venueTplBlockingReasons$ | async; track blockingReason) {
+                            <mat-option [value]="blockingReason">
+                                {{blockingReason && blockingReason.name}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            }
+        </form>
+    </div>
+    <div mat-dialog-actions>
+        <div class="flex flex-1 justify-end">
+            <button type=" button" mat-button class="ob-button" (click)="close()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button mat-flat-button color="primary" type="button" class="ob-button"
+                [disabled]="reqInProgress$ | async" (click)="cloneSession()">
+                {{'FORMS.ACTIONS.CREATE' | translate}}
+            </button>
+        </div>
+    </div>
+</div>

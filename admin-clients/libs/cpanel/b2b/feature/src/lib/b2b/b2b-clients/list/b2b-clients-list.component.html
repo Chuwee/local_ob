@@ -1,0 +1,133 @@
+<div class="list-container" fxFlex="0 1 100%" fxLayout="column">
+    <div class="heading-container without-overflow-hidden"
+        fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">
+                {{'TITLES.B2B_CLIENTS' | translate}}
+            </h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end" [fxShow]="(isEntitySelected$ | async)">
+            <div class="filter-container" fxFlex="none" fxLayoutGap="10px">
+                <app-entity-filter-button #entityFilterButton
+                    [fxShow]="(canReadMultipleEntities$ | async)"
+                    [getEntitiesRequest]="getB2bEntitiesRequest">
+                </app-entity-filter-button>
+                <button *ngIf="(isB2bUserCreationAllowed$ | async)" mat-stroked-button color="primary"
+                    type="button" class="ob-button medium add-button" [attr.aria-label]="'B2B_CLIENTS.NEW_BTN' | translate"
+                    (click)="openNewB2bClientDialog()">
+                    <mat-icon>add</mat-icon>
+                    {{'B2B_CLIENTS.NEW_BTN' | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+    <div [fxShow]="isEntitySelected$ | async"
+        class="heading-container without-overflow-hidden"
+        fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxFlex="50%" fxLayoutGap="20px" fxLayoutAlign="start center">
+            <div class="search-field" fxFlex="100%">
+                <app-search-input [placeholder]="'FORMS.SEARCH.B2B_CLIENTS' | translate"></app-search-input>
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            <p *ngIf="b2bClientsMetadata$ | async as b2bClientsMetadata" class="page-summary"
+                [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: b2bClientsMetadata">
+            </p>
+            <app-paginator [length]="(b2bClientsMetadata$ | async)?.total" [pageSize]="b2bClientsPageSize"></app-paginator>
+        </div>
+    </div>
+    <div class="heading-container heading-divider">
+        <mat-divider></mat-divider>
+    </div>
+    <div class="spinner-container" *ngIf="loadingData$ | async">
+        <mat-spinner></mat-spinner>
+    </div>
+    <app-empty-state [fxShow]="(canReadMultipleEntities$ | async ) && (isEntitySelected$ | async) === false" fxFlex="100%"
+        [title]="'LIST.ENTITY_REQUIRED_TITLE' | translate"
+        [description]="'LIST.ENTITY_REQUIRED_DESCRIPTION' | translate">
+        <button type="button" mat-flat-button class="ob-button medium" color="primary"
+            (click)="entityFilterButton.openEntitySelectionDialog()">
+            {{'ACTIONS.SELECT_ENTITY' | translate}}
+        </button>
+    </app-empty-state>
+    <mat-table [fxShow]="isEntitySelected$ | async"
+        class="ob-table" [dataSource]="b2bClients$ | async" [trackBy]="trackByFn"
+        matSort [matSortActive]="initSortCol" [matSortDirection]="initSortDir" matSortDisableClear
+        [class.not-touchable]="(isHandsetOrTablet$ | async) !== true"
+        [attr.aria-label]="'TITLES.B2B_CLIENTS' | translate">
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'B2B_CLIENTS.NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="category_type">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'B2B_CLIENTS.TYPE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{('B2B_CLIENTS.CATEGORY_TYPES.' + row.category_type | translate)}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="business_name">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'B2B_CLIENTS.BUSINESS_NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.business_name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="tax_id">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'B2B_CLIENTS.TAX_ID' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.tax_id}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="creation_date">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'B2B_CLIENTS.CREATION_DATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.creation_date | localDateTime : dateTimeFormats.shortDate}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="country">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'B2B_CLIENTS.COUNTRY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.country.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="country_subdivision">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'B2B_CLIENTS.COUNTRY_SUBDIVISION' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                {{row.country_subdivision.code !== 'NOT_DEF' ? row.country_subdivision.name : ''}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="actions-cell head-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="actions-cell" [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                <div class="action-buttons" (click)="$event.stopPropagation()">
+                    <button mat-icon-button aria-label="Delete b2b client" class="ob-button medium"
+                        (click)="openDeleteB2bClientDialog(row)" [matTooltip]="'FORMS.ACTIONS.DELETE' | translate">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+            </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;" class="interactive-row"
+            [routerLink]="[row.id, 'general-data']" [queryParams]="entityIdQueryParam$ | async"></mat-row>
+    </mat-table>
+    <ng-container
+        *ngIf="(b2bClientsMetadata$ | async)?.total === 0 && (loadingData$ | async) === false && isEntitySelected$ | async">
+        <app-empty-state *ngIf="!hasSearchFilterApplied; else listEmpty" fxFlex="100%"
+            [title]="'B2B_CLIENTS.EMPTY_B2B_CLIENTS_LIST_TITLE' | translate"
+            [description]="'B2B_CLIENTS.EMPTY_B2B_CLIENTS_LIST_DESCRIPTION' | translate">
+            <div *ngIf="isB2bUserCreationAllowed$ | async" fxLayout="row" fxLayoutGap="10px">
+                <button mat-flat-button class="ob-button" color="primary" (click)="openNewB2bClientDialog()">
+                    <mat-icon>add</mat-icon>
+                    {{'B2B_CLIENTS.NEW_BTN' | translate}}
+                </button>
+            </div>
+        </app-empty-state>
+        <ng-template #listEmpty>
+            <div class="context-notification-container" fxFlex="0 50 100%" fxLayout="row" fxLayoutAlign="center start">
+                <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px"
+                    fxFlex="80%" fxLayoutAlign="center start">
+                    <p>{{'LIST.EMPTY' | translate}}</p>
+                </app-context-notification>
+            </div>
+        </ng-template>
+    </ng-container>
+</div>

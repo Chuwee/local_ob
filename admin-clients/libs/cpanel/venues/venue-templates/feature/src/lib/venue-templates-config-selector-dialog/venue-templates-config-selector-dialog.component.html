@@ -1,0 +1,82 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="100%" class="secondary title">{{'VENUE_TEMPLATES.IMPORT_CONTENTS_TITLE' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" [formGroup]="form">
+        <div fxLayout="column" fxLayoutGap="20px" fxFlex="100%" class="match-radio-group">
+            <p class="mat-subtitle-2">{{'VENUE_TEMPLATES.IMPORT_CONTENTS.MATCHING' | translate }}</p>
+            <mat-radio-group fxLayout="column" fxLayoutGap="16px" formControlName="match">
+                <mat-radio-button value="BY_CODE">
+                    {{'VENUE_TEMPLATES.IMPORT_CONTENTS.MATCHING_OPTIONS.CODE' | translate}}
+                </mat-radio-button>
+                <mat-radio-button value="BY_NAME">
+                    {{'VENUE_TEMPLATES.IMPORT_CONTENTS.MATCHING_OPTIONS.NAME' | translate}}
+                </mat-radio-button>
+            </mat-radio-group>
+        </div>
+        <mat-form-field *ngIf="operatorMode$ | async" appearance="outline" class="ob-form-field field-with-label">
+            <mat-label>{{'FORMS.LABELS.ENTITY' | translate}}</mat-label>
+            <mat-select [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate" formControlName="entity">
+                <mat-option>
+                    <app-select-search #entitySelectSearch [options$]="entities$" requireSelection="true"
+                        [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name">
+                    </app-select-search>
+                </mat-option>
+                <mat-option *ngFor="let entity of entitySelectSearch.getFilteredOptions$() | async" [value]="entity.id">
+                    {{entity.name}}
+                </mat-option>
+            </mat-select>
+            <mat-error [ob-form-errors]="form" field="entity">
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+            <mat-label>{{'FORMS.LABELS.EVENT' | translate}}</mat-label>
+            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="event">
+
+                <mat-option>
+                    <app-select-search #eventSelectSearch [options$]="events$" requireSelection="true"
+                        [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name">
+                    </app-select-search>
+                </mat-option>
+                <mat-option [value]="null">
+                    {{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}
+                </mat-option>
+                <mat-option *ngFor="let event of eventSelectSearch.getFilteredOptions$() | async" [value]="event.id">
+                    {{event.name}}
+                </mat-option>
+            </mat-select>
+            <mat-error [ob-form-errors]="form" field="event">
+            </mat-error>
+
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+            <mat-label>{{'VENUE_TEMPLATES.IMPORT_CONTENTS.VENUE_TEMPLATE' | translate}}</mat-label>
+            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="venueTpl">
+                <mat-option>
+                    <app-select-search #venueSelectSearch [options$]="venueTemplates$" requireSelection="true"
+                        [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name">
+                    </app-select-search>
+                </mat-option>
+                <mat-option *ngFor="let venue of venueSelectSearch.getFilteredOptions$() | async" [value]="venue.id">
+                    {{venue?.id}} - {{venue?.name}}
+                </mat-option>
+            </mat-select>
+            <mat-error [ob-form-errors]="form" field="venueTpl">
+            </mat-error>
+        </mat-form-field>
+    </div>
+    <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" [disabled]="!form?.valid" (click)="importConfig()">
+            {{'FORMS.ACTIONS.IMPORT' | translate}}
+        </button>
+    </div>
+</div>
+<div class="spinner-container" *ngIf="isLoading$ | async">
+    <mat-spinner></mat-spinner>
+</div>

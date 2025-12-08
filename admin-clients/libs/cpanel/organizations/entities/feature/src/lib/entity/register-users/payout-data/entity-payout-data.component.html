@@ -1,0 +1,20 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu"
+    [disabled]="($isInProgress()) || !payoutForm.dirty">
+    <h3 class="section-title">{{'ENTITY.PAYOUT_DATA.TITLE' | translate}}</h3>
+    <p class="flex flex-col">
+        <span>{{'ENTITY.PAYOUT_DATA.DESCRIPTION.SECONDARY_MARKET' | translate}}</span>
+        <span>{{'ENTITY.PAYOUT_DATA.DESCRIPTION.USER_AREA' | translate}}</span>
+    </p>
+    @if(entity$ | async; as entity){
+        <div class="section-block flex flex-col" [formGroup]="payoutForm">
+            <div>
+                <app-forms [form]="payoutForm" [formFields]="payoutForm$ | async" />
+            </div>
+        </div>
+    }
+</app-form-container>
+@if ($isInProgress()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,79 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title>
+        <div fxFlex="0 1 100%">
+            <h2 class="secondary title">{{'TICKETS.RELOCATIONS.TITLES.RELOCATION_HISTORY' | translate}}</h2>
+            <span class="mat-body-2">
+                {{'FORMS.LABELS.TOTAL' | translate}}: {{(relocationHistory$ | async)?.length}}
+            </span>
+        </div>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column">
+        <app-vertical-timeline fxFlex="100%" [timelineElements]="timeLineElements$ | async">
+            <ng-template #timelineElement let-element>
+                @if (getElementDetails(element.id, timeLineElementDetails$ | async); as detail) {
+                    <div fxLayout="row">
+                        <div fxFlex="0 1 50%" fxLayout="column">
+                            @if (detail.source.currentTicket) {
+                                <h3 class="ticket-state-label uppercase" [class.current-ticket-state-label]="detail.source.currentTicket">
+                                    {{'TICKETS.RELOCATIONS.FORMS.LABELS.CURRENT_TICKET' | translate | uppercase}}
+                                </h3>
+                            } @else {
+                                <h3 class="ticket-state-label">
+                                    {{'TICKETS.RELOCATIONS.FORMS.LABELS.NEW_TICKET' | translate | uppercase}}
+                                </h3>
+                            }
+                            <div fxLayout="row">
+                                <span class="field-value">{{detail.source.sector.name}}</span>
+                            </div>
+                            <div fxLayout="row">
+                                <span class="field-label inline-field">{{'FORMS.LABELS.ROW' | translate}}:</span>
+                                <span class="field-value">{{detail.source.row.name}}</span>
+                            </div>
+                            <div fxLayout="row">
+                                <span class="field-label inline-field">{{'FORMS.LABELS.SEAT' | translate}}:</span>
+                                <span class="field-value">{{detail.source.seat.name}}</span>
+                            </div>
+                            @if (detail.source.priceType) {
+                                <div fxLayout="row">
+                                    <span class="field-label inline-field">{{'FORMS.LABELS.PRICE_TYPE' | translate}}:</span>
+                                    <span class="field-value">{{detail.source.priceType.name}}</span>
+                                </div>
+                            }
+                        </div>
+                        <div fxFlex="0 1 50%" fxLayout="column">
+                            <h3 class="ticket-state-label">
+                                {{'TICKETS.RELOCATIONS.FORMS.LABELS.OLD_TICKET' | translate | uppercase}}
+                            </h3>
+                            <div fxLayout="row">
+                                <span class="field-value">{{detail.target.sector.name}}</span>
+                            </div>
+                            <div fxLayout="row">
+                                <span class="field-label inline-field">{{'FORMS.LABELS.ROW' | translate}}:</span>
+                                <span class="field-value">{{detail.target.row.name}}</span>
+                            </div>
+                            <div fxLayout="row">
+                                <span class="field-label inline-field">{{'FORMS.LABELS.SEAT' | translate}}:</span>
+                                <span>{{detail.target.seat.name}}</span>
+                            </div>
+                            @if (detail.target.priceType) {
+                                <div fxLayout="row">
+                                    <span class="field-label inline-field">{{'FORMS.LABELS.PRICE_TYPE' | translate}}:</span>
+                                    <span class="field-value">{{detail.target.priceType.name}}</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </ng-template>
+        </app-vertical-timeline>
+    </div>
+</div>
+
+@if (loading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner/>
+    </div>
+}

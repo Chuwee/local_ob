@@ -1,0 +1,116 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu"
+    [disabled]="(isInProgress$ | async) || !form.dirty">
+    <mat-expansion-panel expanded togglePosition="before">
+        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+            <mat-panel-title>{{'CHANNELS.BOOKING.WEB_CHANNEL' | translate}}
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div>
+            <p>{{'CHANNELS.BOOKING.PERMISSION' | translate}}</p>
+            <form id="form" [formGroup]="form" class="flex flex-col gap-4">
+                <mat-checkbox formControlName="allow_booking" color="primary">
+                    <mat-label>{{'CHANNELS.BOOKING.ALLOW_BOOKING' | translate}}</mat-label>
+                </mat-checkbox>
+
+                @if (form.get('allow_booking').value) {
+                    <div class="booking-permission-container flex flex-col gap-4">
+                        <div class="flex flex-col">
+                            <mat-checkbox formControlName="allow_customer_assignation" color="primary">
+                                <mat-label><b>{{'CHANNELS.BOOKING.ALLOW_CUSTOMERS_BOOKING' | translate}}</b></mat-label>
+                            </mat-checkbox>
+                            <div class="booking-customers-allowed-container flex flex-col gap-4">
+                                <span>{{ 'CHANNELS.BOOKING.ALLOW_CUSTOMERS_BOOKING_DESCRIPTION' | translate }}</span>
+                                @if (form.get('allow_customer_assignation').value) {
+                                    <div class="flex flex-col">
+                                        <mat-checkbox formControlName="allow_presale_restrictions" color="primary">
+                                            <mat-label><b>{{'CHANNELS.BOOKING.ALLOW_PRESALE_RESTRICTIONS' | translate}}</b></mat-label>
+                                        </mat-checkbox>
+                                        <div class="booking-customers-allowed-container">
+                                            <span>{{ 'CHANNELS.BOOKING.ALLOW_PRESALE_RESTRICTIONS_DESCRIPTION' | translate }}</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="flex flex-col">
+                            <mat-checkbox formControlName="allow_booking_checkout" color="primary">
+                                <mat-label><b>{{'CHANNELS.BOOKING.ALLOW_BOOKING_CHECKOUT' | translate}}</b></mat-label>
+                            </mat-checkbox>
+                            @if (form.get('allow_booking_checkout').value) {
+                                <div class="booking-checkout-container">
+                                    <p>{{'CHANNELS.BOOKING.ALLOW_BOOKING_CHECKOUT_DESCRIPTION' | translate }}</p>
+                                    <p>{{'CHANNELS.BOOKING.CHECKOUT_DOMAIN_DESCRIPTIONS' | translate}}</p>
+                                    <div>
+                                        <div class="flex">
+                                            <mat-form-field appearance="outline"
+                                                class="ob-form-field field-with-label flex-[0_0_450px]">
+                                                <mat-label>{{'CHANNELS.BOOKING.CHECKOUT_DOMAIN' | translate}}</mat-label>
+                                                <input matInput aria-label="booking checkout domain"
+                                                    [placeholder]="'CHANNELS.BOOKING.CHECKOUT_DOMAIN' | translate"
+                                                    formControlName="booking_checkout_domain">
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                    <p>{{'CHANNELS.BOOKING.CHECKOUT_PAYMENTS_METHODS_DESCRIPTIONS' | translate}}</p>
+                                    <div class="flex flex-col">
+                                        <div class="flex items-center justify-start gap-4">
+                                            <mat-form-field appearance="outline"
+                                                class="ob-form-field field-with-label flex-[0_0_450px]">
+                                                <mat-label>{{'CHANNELS.BOOKING.CHECKOUT_TYPE' | translate}}</mat-label>
+                                                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                                    formControlName="booking_checkout_payment_method_selected">
+                                                    @for (payment of (paymentMethods$ | async); track payment.name) {
+                                                        <mat-option
+                                                            [value]="payment">
+                                                            {{ payment.name }}
+                                                        </mat-option>
+                                                    }
+                                                </mat-select>
+                                            </mat-form-field>
+
+                                            <button mat-stroked-button class="ob-button medium add-payment-btn" color="primary"
+                                                (click)="addPaymentMethod()">
+                                                <mat-icon>add</mat-icon>
+                                                {{'CHANNELS.BOOKING.ADD_PAYMENT_METHOD' | translate}}
+                                            </button>
+                                        </div>
+                                        @if (paymentMethodsTable) {
+                                            <mat-table class="ob-table" [dataSource]="paymentMethodsTable">
+                                                <ng-container [matColumnDef]="tableHead[0]">
+                                                    <mat-cell *matCellDef="let row;">
+                                                        <span>{{row.name}}</span>
+                                                    </mat-cell>
+                                                </ng-container>
+                                                <ng-container [matColumnDef]="tableHead[1]">
+                                                    <mat-cell *matCellDef="let row" class="actions-buttons">
+                                                        <div (click)="$event.stopPropagation()">
+                                                            <button
+                                                                matTooltip="{{'CHANNELS.PAYMENT_METHODS.DELETE_TITLE' | translate}}"
+                                                                mat-icon-button aria-label="Delete payment method"
+                                                                class="ob-button medium"
+                                                                (click)="deletePaymentMethod(row)">
+                                                                <mat-icon>delete</mat-icon>
+                                                            </button>
+                                                        </div>
+                                                    </mat-cell>
+                                                </ng-container>
+                                                <mat-row *matRowDef="let row; columns: tableHead;"
+                                                    class="interactive-row hoverable-row" />
+                                            </mat-table>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </form>
+        </div>
+    </mat-expansion-panel>
+</app-form-container>
+@if(isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+
+}

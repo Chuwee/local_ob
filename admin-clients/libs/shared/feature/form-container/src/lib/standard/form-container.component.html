@@ -1,0 +1,37 @@
+<div fxFlex="0 1 100%" fxLayout="column" [ngClass]="{'with-sidebar': $sidebar()}">
+    <ng-content select="[slot='outside']" />
+    <div class="form-details-area">
+        <div class="details-form-container" [fxLayoutAlign]="$layoutAlign()">
+            <ng-content select="[slot='overlay']" />
+            <div fxFlex="0 1 {{$maxWidth()}}" fxLayout="column">
+                <ng-content select="[slot='top-content']" />
+                <div fxLayout="column" class="main-content">
+                    <ng-content />
+                </div>
+            </div>
+            @if ($sidebar()) {
+                <mat-divider vertical="true" fxFlexAlign="stretch" />
+                <div fxFlex="0 1 {{$sidebarWidth()}}" fxLayout="column" class="sidebar">
+                    <ng-content select="[slot='sidebar']" />
+                </div>
+            }
+        </div>
+    </div>
+    @if (!$hideActionBar()) {
+        <div class="bottom-actions-bar" [fxLayoutAlign]="$layoutAlign()">
+            <div class="bottom-action-content" [ngClass]="$layout()">
+                <div class="bottom-action">
+                    <ng-content select="[slot='actions-bar']" />
+                </div>
+                <button type="button" mat-button class="ob-button medium"
+                    [disabled]="$cancelDisabled()" (click)="discard()">
+                    {{$cancelButtonText() | translate}}
+                </button>
+                <button type="button" mat-flat-button class="ob-button medium" color="primary"
+                    [disabled]="$saveDisabled()" (click)="save.emit()">
+                    {{$saveButtonText() | translate}}
+                </button>
+            </div>
+        </div>
+    }
+</div>

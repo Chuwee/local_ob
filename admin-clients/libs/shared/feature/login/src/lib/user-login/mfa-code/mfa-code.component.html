@@ -1,0 +1,24 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="mfa-code-tab flex flex-col gap-4 justify-center">
+    <div class="flex flex-col gap-2">
+        <span class="mfa-code-title">{{'LOGIN.MFA.TITLE' | translate}}</span>
+        <span>{{'LOGIN.MFA.INFO' | translate}}</span>
+    </div>
+    <div class="flex flex-col">
+        <mat-form-field class="ob-form-field field-with-label" appearance="outline">
+            <mat-label>{{'FORMS.LABELS.CODE' | translate}}</mat-label>
+            <input matInput aria-label="code" formControlName="mfaCode" />
+            <mat-error [ob-form-errors]="form" field="mfaCode" />
+        </mat-form-field>
+        <span (click)="resendCode()" class="ob-link">{{'LOGIN.MFA.RESEND.BTN' | translate}}</span>
+    </div>
+    <div class="flex flex-row justify-start items-center gap-4">
+        <button mat-flat-button class="ob-button medium" color="primary" type="submit" [disabled]="loading$ | async">
+            {{'FORMS.ACTIONS.VALIDATE' | translate}}
+        </button>
+        @if (loading$ | async) {
+            <div class="spinner-wrapper">
+                <mat-spinner [diameter]="25" />
+            </div>
+        }
+    </div>
+</form>

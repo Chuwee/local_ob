@@ -1,0 +1,13 @@
+<svg #weightsSvg *ngIf="viewBox$ | async as viewBox" xmlns="http://www.w3.org/2000/svg" class="weights-svg" [attr.viewBox]="viewBox">
+    <!--    Uncomment this to check svg color extraction -->
+    <!--    (click)="testClickCoords($event)">-->
+    <rect class="background-overlay" [attr.width]="viewBox[2]" [attr.height]="viewBox[3]"></rect>
+    <ng-template #noConf>
+        <g [innerHTML]="paintedSeats$ | async"></g>
+    </ng-template>
+    <ng-container *ngIf="configuration$ | async as config else noConf">
+        <g *ngIf="!config.type || config.type === configurationTypes.snake" [innerHTML]="paintedSeats$ | async"></g>
+        <g *ngIf="config.type === configurationTypes.linear" appEditorWeightsSetupLinear (preCommitWeights)="preCommitWeights()"></g>
+        <g *ngIf="config.type === configurationTypes.radial" appEditorWeightsSetupRadial (preCommitWeights)="preCommitWeights()"></g>
+    </ng-container>
+</svg>

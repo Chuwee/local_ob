@@ -1,0 +1,80 @@
+<div class="details-container pdf flex flex-col basis-[880px]">
+    <div class="flex basis-full flex-col">
+        <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+            <mat-expansion-panel [expanded]="true" (expandedChange)="pdfContentExpanded = $event">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{'PRODUCT.COMMUNICATION.TICKET_PDF.TITLE' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <form id="pdfContent" [formGroup]="pdfContentForm" class="flex-col">
+                    @let pdf = pdfContentForm.controls;
+                    <div class="section-block flex flex-col">
+                        <h3 class="section-title">{{'PRODUCT.COMMUNICATION.TICKET_PDF.CONTENT' | translate}}</h3>
+                        <div class="flex flex-col gap-2">
+                            <div class="flex flex-row basis-full">
+                                <div class="basis-12">
+                                    <span class="ob-round-badge badge-pdf">1</span>
+                                </div>
+                                <div class="flex flex-col basis-full">
+                                    <span class="field-label">{{'PRODUCT.COMMUNICATION.TICKET_PDF.NAME.LABEL' | translate}}</span>
+                                    @if(pdf[textType.name].value){
+                                        <span class="field-description">{{ pdf[textType.name].value}}</span>
+                                    }@else {
+                                        <span class="content-not-defined-message">
+                                            {{('PRODUCT.COMMUNICATION.NOT_DEFINED.NAME' | translate)}}</span>    
+                                    }
+                                </div>
+                            </div>
+                            <div class="flex flex-row basis-full">
+                                <div class="basis-12">
+                                    <span class="ob-round-badge badge-pdf">2</span>
+                                </div>
+                                <div class="flex flex-col basis-full md:basis-[436px]">
+                                    <span class="field-label">{{'PRODUCT.COMMUNICATION.TICKET_PDF.DELIVERY.LABEL' | translate}}</span>
+                                    @if(pdf[textType.delivery].value){
+                                        <span class="field-description">{{ pdf[textType.delivery].value}}</span>
+                                    }@else {
+                                        <span class="content-not-defined-message">
+                                            {{('PRODUCT.COMMUNICATION.NOT_DEFINED.DELIVERY' | translate)}}</span>    
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="section-block flex-col">
+                        <h3 class="section-title">
+                            {{'PRODUCT.COMMUNICATION.TICKET_PDF.MAIN_IMAGE.TITLE' | translate}}
+                        </h3>
+                        <div class="flex flex-row basis-full">
+                            <div class="basis-12">
+                                <span class="ob-round-badge badge-pdf">3</span>
+                            </div>
+                            <div class="image-uploader flex flex-col basis-1/3">
+                                @if(pdf[imageType]?.value){
+                                    <app-image-uploader [imageRestrictions]="imageRestrictions['pdfBody']"
+                                        [formControlName]="imageType" hideLabelText/>
+                                }@else {
+                                    <span class="content-not-defined-message">
+                                        {{'SALE_REQUEST.COMMUNICATION.TICKET.IMAGE.BODY.NOT_DEFINED' | translate}}</span>
+                                }  
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+</div>
+<mat-divider vertical="true" />
+<div class="ticket-template-legend legend-pdf flex-col basis-[160px] grow-0 shrink-0 place-content-start"
+    [class.hidden]="!pdfContentExpanded">
+    <img src="assets/ticket-template/pdf-template-product.svg" [alt]="'PRODUCT.COMMUNICATION.TICKET_PDF.TITLE' | translate">
+    <div class="legend-title">{{'EVENTS.TEMPLATE' | translate}}</div>
+    <div class="legend-value">{{'PRODUCT.TEMPLATE.TICKET_PDF' | translate}}</div>
+    <div class="legend-title">{{'TICKET_TEMPLATE.PRINTER' | translate}}</div>
+    <div class="legend-value">{{'PRODUCT.TEMPLATE.PRINTER' | translate}}</div>
+    <div class="legend-title">{{'TICKET_TEMPLATE.PAPER_TYPE' | translate}}</div>
+    <div class="legend-value">{{'PRODUCT.TEMPLATE.PAPER' | translate}}</div>
+</div>

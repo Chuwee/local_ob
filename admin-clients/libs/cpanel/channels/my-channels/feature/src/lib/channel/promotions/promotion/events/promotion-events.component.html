@@ -1,0 +1,65 @@
+<div fxLayout="column" class="promotion-form-section" [formGroup]="form">
+    <p class="mat-subtitle-2">{{'CHANNELS.PROMOTIONS.EVENTS_DESCRIPTION' | translate}} *</p>
+    <mat-radio-group formControlName="type" fxLayout="column">
+        <mat-radio-button class="inline" [value]="scope.all">
+            {{'CHANNELS.PROMOTIONS.EVENTS_OPTS.ALL' | translate}}
+        </mat-radio-button>
+        <mat-radio-button #restrictedRadio class="inline" [value]="scope.restricted"
+            [disabled]="(hasSelectableEvents$ | async) !== true"
+            [matTooltip]="'CHANNELS.PROMOTIONS.EVENTS_EMPTY_LIST' | translate"
+            [matTooltipDisabled]="!restrictedRadio.disabled || (salesRequestsloading$ | async)"
+            matTooltipPosition="below" matTooltipClass="no-margin">
+            {{'CHANNELS.PROMOTIONS.EVENTS_OPTS.SELECT' | translate}}
+        </mat-radio-button>
+    </mat-radio-group>
+    <div fxFlex>
+        <div [fxShow]="form.get('type').value === scope.restricted" class="promotion-events-container nested-content"
+            [class.field-error]="form.hasError('required', 'selected') && form.get('selected').touched">
+            <app-searchable-paginated-selection #selection [placeholder]="'FORMS.SEARCH.EVENT' | translate"
+                (loadData)="loadSalesRequests($event)" [form]="form.get('selected')" [pageSize]="pageSize"
+                [data$]="eventList$" [metadata$]="metadata$" [loading$]="salesRequestsloading$">
+                <div slot="filter" class="badge-container">
+                    {{selectedEvents}} / {{(totalEvents$ | async)}}
+                </div>
+                <button slot="filter" type="button" mat-flat-button class="show-selected-only-button ob-button"
+                    color="tertiary" [class.active]="selectedOnlyEvents$ | async"
+                    [matTooltip]="'CHANNELS.PROMOTIONS.SHOW_SELECTED_TOOLTIP' | translate"
+                    (click)="showSelectedOnlyClick.emit()">
+                    <mat-icon>visibility</mat-icon>
+                    {{'CHANNELS.PROMOTIONS.SHOW_SELECTED' | translate}}
+                </button>
+                <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data"
+                    let-selectionChanged="selectionChanged">
+                    <app-selection-list [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged"
+                        class="small-rows">
+                        <div slot="subheader" class="list-header">
+                            <div fxLayoutAlign="space-between" fxFlex="0 1 100%">
+                                <div>
+                                    <mat-checkbox color="primary" [disabled]="(selectedOnlyEvents$ | async)"
+                                        [checked]="selectedEvents > 0 && selectedEvents === (totalFilteredEvents$ | async) || (selectedOnlyEvents$ | async)"
+                                        [indeterminate]="selectedEvents > 0 && selectedEvents !== (totalFilteredEvents$ | async) && (selectedOnlyEvents$ | async) === false"
+                                        (change)="selectAll($event)" />
+                                    <span>{{'FORMS.LABELS.EVENT' | translate}}</span>
+                                </div>
+                                <div fxFlex="0 1 200px">
+                                    <span>{{'DATES.START_DATE' | translate}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <ng-template #optionTemplate let-row>
+                            <div fxLayoutAlign="space-between">
+                                <span>{{row.name}}</span>
+                                <div fxFlex="0 1 200px">
+                                    <span>{{row.start_date | dateTime : dateTimeFormats.shortDateTimeWithWeek }}</span>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </app-selection-list>
+                </ng-template>
+            </app-searchable-paginated-selection>
+        </div>
+        <span *ngIf="form.hasError('required', 'selected') && form.get('selected').touched" class="error-description">
+            {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+        </span>
+    </div>
+</div>

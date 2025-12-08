@@ -1,0 +1,114 @@
+<div class="details-container" fxLayout="column" fxFlex="0 1 880px">
+    <div fxFlex="0 1 100%" fxLayout="column">
+        <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+            <mat-expansion-panel (expandedChange)="pdfContentExpanded = $event" expanded>
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{'CHANNELS.PACKS.TICKET_PDF.TITLE' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <form id="pdfContent" [formGroup]="pdfContentForm" fxLayout="column">
+                    <div class="section-block" fxLayout="column">
+                        <h3 class="section-title">{{'CHANNELS.CONTENTS' | translate}}</h3>
+                        <div fxFlex="100%" fxLayout="row">
+                            <div fxFlex="47px">
+                                <span class="ob-round-badge badge-pdf">1</span>
+                            </div>
+                            <mat-form-field fxFlex="436px" fxFlex.lt-md="100%" appearance="outline"
+                                class="ob-form-field field-with-label">
+                                <mat-label>{{'CHANNELS.PACKS.TICKETS.TITLE_LABEL' | translate}}
+                                </mat-label>
+                                <input matInput aria-label="title"
+                                    [placeholder]="'CHANNELS.PACKS.TICKETS.TITLE_PLACEHOLDER' | translate"
+                                    [formControlName]="textType.title">
+                                <mat-error [ob-form-errors]="pdfContentForm" [field]="textType.title" />
+                            </mat-form-field>
+                        </div>
+                        <div fxFlex="100%" fxLayout="row">
+                            <div fxFlex="47px">
+                                <span class="ob-round-badge badge-pdf">2</span>
+                            </div>
+                            <mat-form-field fxFlex="436px" fxFlex.lt-md="100%" appearance="outline"
+                                class="ob-form-field field-with-label">
+                                <mat-label>
+                                    {{'EVENTS.COMMUNICATION.CHANNEL.TEXT.SUBTITLE.LABEL' | translate}}
+                                </mat-label>
+                                <input matInput aria-label="subtitle"
+                                    [placeholder]="'CHANNELS.PACKS.TICKETS.SUBTITLE_PLACEHOLDER' | translate"
+                                    [formControlName]="textType.subtitle">
+                                <mat-error [ob-form-errors]="pdfContentForm" [field]="textType.subtitle" />
+                            </mat-form-field>
+                        </div>
+                        <div fxFlex="100%" fxLayout="row">
+                            <div fxFlex="47px">
+                                <span class="ob-round-badge badge-pdf">3</span>
+                            </div>
+                            <div fxFlex="436px" fxFlex.lt-lg="100%" fxLayout="column">
+                                <span class="field-label">
+                                    {{'EVENTS.COMMUNICATION.OTHER_DATA.LABEL' | translate}}
+                                </span>
+                                <p class="field-description">
+                                    {{'EVENTS.COMMUNICATION.OTHER_DATA_INFO' | translate }}
+                                </p>
+                                <mat-form-field appearance="outline" class="ob-form-field">
+                                    <textarea matInput aria-label="Additional Data"
+                                        [placeholder]="'CHANNELS.PACKS.TICKETS.OTHER_DATA_PLACEHOLDER' | translate"
+                                        [formControlName]="textType.additionalData"></textarea>
+                                    <mat-error [ob-form-errors]="pdfContentForm" [field]="textType.additionalData" />
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-block" fxLayout="column">
+                        <h3 class="section-title">{{'EVENTS.COMMUNICATION.MAIN_IMAGE.TITLE' | translate}}</h3>
+                        <div fxFlex="100%" fxLayout="row">
+                            <div fxFlex="47px">
+                                <span class="ob-round-badge badge-pdf">4</span>
+                            </div>
+                            <div fxFlex="30%" fxLayout="column" class="image-uploader">
+                                <app-image-uploader [imageRestrictions]="imageRestrictions['pdfBody']"
+                                    [formControlName]="imageType.body" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-block" fxLayout="column">
+                        <h3 class="section-title">{{'EVENTS.COMMUNICATION.BANNERS.TITLE' | translate}}</h3>
+                        <div fxFlex="100%" fxLayout="row wrap">
+                            <div fxFlex="50%" fxLayout="row">
+                                <div fxFlex="47px">
+                                    <span class="ob-round-badge badge-pdf">5</span>
+                                </div>
+                                <div fxFlex="70%" fxLayout="column" class="image-uploader">
+                                    <span class="field-label">
+                                        {{'EVENTS.COMMUNICATION.IMAGE.MAIN' | translate}}
+                                    </span>
+                                    <app-image-uploader [imageRestrictions]="imageRestrictions['pdfBannerMain']"
+                                        [formControlName]="imageType.bannerMain" />
+                                </div>
+                            </div>
+                            <div fxFlex="50%" fxLayout="row">
+                                <div fxFlex="47px">
+                                    <span class="ob-round-badge badge-pdf">6</span>
+                                </div>
+                                <div fxFlex="80%" fxLayout="column" class="image-uploader">
+                                    <span class="field-label">
+                                        {{'EVENTS.COMMUNICATION.IMAGE.SECONDARY' | translate}}
+                                    </span>
+                                    <app-image-uploader [imageRestrictions]="imageRestrictions['pdfBannerSecondary']"
+                                        [formControlName]="imageType.bannerSecondary" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+</div>
+<mat-divider vertical="true" fxFlexAlign="stretch" />
+<div fxFlex="0 0 200px">
+    <div class="ticket-template-legend legend-pdf" [fxHide]="!pdfContentExpanded" fxLayout="column"
+        fxLayoutAlign="start start">
+        <img src="assets/ticket-template/pdf-ticket-template.svg" [alt]="'EVENTS.COMMUNICATION.TICKET_PDF' | translate">
+    </div>
+</div>

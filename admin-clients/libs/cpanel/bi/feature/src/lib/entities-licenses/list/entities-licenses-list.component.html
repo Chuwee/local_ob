@@ -1,0 +1,69 @@
+<div class="details-container" fxFlex="0 1 100%" fxLayout="column">
+    <div class="heading-container" fxLayoutAlign="start center">
+        <h1 class="secondary mat-headline-3">
+            {{'TITLES.ENTITIES_LICENSES' | translate}}
+        </h1>
+    </div>
+    <div class="main-content" fxFlex="0 1 100%" fxLayout="column">
+        <div class="list-container" fxFlex="0 1 100%" fxLayout="column">
+            <div class="heading-container heading-aggregated">
+                <app-aggregated-data [aggregatedData]="entitiesLicensesAggData$ | async" [aggregationMetrics]="aggDataEntitiesLicenses"
+                    [mainMetricLabel]="'BI_REPORTS.ASSIGNED_LIMIT'" />
+            </div>
+            <app-form-container [formGroup]="form" (cancel)="cancel()" (save)="save()" layout="main" [disabled]="!form.dirty">
+                <app-searchable-paginated-selection #selection [placeholder]="'FORMS.SEARCH.IN_LIST' | translate"
+                    (loadData)="loadList($event)" [pageSize]="pageSize" [data$]="entities$" [form]="entitiesForm"
+                    [metadata$]="entitiesMetadata$" [loading$]="reqInProgress$" [saveChangesWarn]="true">
+                    <ng-template #selectionTemplate let-data="data">
+                        <app-selection-table [data]="data" [columns]="columns" [selectionDisabled]="true">
+                            <ng-container [matColumnDef]="columns[0]">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    {{'FORMS.LABELS.ENTITY' | translate}}
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row">{{row.name}}</mat-cell>
+                            </ng-container>
+                            <ng-container [matColumnDef]="columns[1]">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    {{'FORMS.LABELS.OPERATOR' | translate}}
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row">{{row.operator?.name}}</mat-cell>
+                            </ng-container>
+                            <ng-container [matColumnDef]="columns[2]">
+                                <mat-header-cell *matHeaderCellDef class="head-cell input-column">
+                                    <div fxFlex="100%" fxLayoutAlign="start center" fxLayoutGap="5px">
+                                        <span>{{'BI_REPORTS.BASIC_USERS.TITLE' | translate}}</span>
+                                        <mat-icon class="ob-help-icon" [matTooltip]="'BI_REPORTS.BASIC_USERS.INFO' | translate">
+                                            help_outline
+                                        </mat-icon>
+                                    </div>
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row" class="editable-cell">
+                                    <mat-form-field appearance="outline" class="ob-form-field">
+                                        <input matInput [placeholder]="0" [formControl]="entitiesForm.get([row.id, 'basic'])">
+                                    </mat-form-field>
+                                </mat-cell>
+                            </ng-container>
+                            <ng-container [matColumnDef]="columns[3]">
+                                <mat-header-cell *matHeaderCellDef class="head-cell input-column">
+                                    <div fxFlex="100%" fxLayoutAlign="start center" fxLayoutGap="5px">
+                                        <span>{{'BI_REPORTS.ADVANCED_USERS.TITLE' | translate}}</span>
+                                        <mat-icon class="ob-help-icon" [matTooltip]="'BI_REPORTS.ADVANCED_USERS.INFO' | translate">
+                                            help_outline
+                                        </mat-icon>
+                                    </div>
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row" class="editable-cell">
+                                    <mat-form-field appearance="outline" class="ob-form-field">
+                                        <input matInput [placeholder]="0" [formControl]="entitiesForm.get([row.id, 'advanced'])">
+                                    </mat-form-field>
+                                </mat-cell>
+                            </ng-container>
+                        </app-selection-table>
+                    </ng-template>
+
+                </app-searchable-paginated-selection>
+            </app-form-container>
+        </div>
+
+    </div>
+</div>

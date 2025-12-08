@@ -1,0 +1,248 @@
+@use '@angular/material' as mat;
+@mixin sidenav-override($palettes, $colors, $typography) {
+    $primary: map-get($palettes, primary);
+    $menu-bg: map-get($palettes, menu);
+    $menu-text: map-get($colors, ob-grey);
+    $ob-bg-1: map-get($colors, ob-bg-1);
+    $grey-light-20: map-get($colors, ob-grey-light-20);
+    $white: map-get($colors, ob-white);
+
+    app-expanded-menu, app-collapsed-menu {
+        height: 100%;
+        display: block;
+    }
+
+    .mat-drawer {
+        background-color: $ob-bg-1;
+        &-side {
+            border-right: solid 1px $grey-light-20;
+        }
+    }
+
+    .ob-sidenav-container {
+        height: 100%;
+
+        &.initial-transition {
+            &.mat-drawer-transition .mat-drawer-content {
+                transition: none;
+            }
+        }
+
+        .ob-sidenav {
+            color: $menu-text;
+            background-color: mat.m2-get-color-from-palette($menu-bg);
+
+            &.expanded {
+                // It has its correspondent value in the menu-mode.directive.ts
+                width: 255px;
+                overflow-x: hidden;
+                border-right-color: transparent;
+            }
+            &.rail {
+                overflow: hidden;
+                transition-duration: 400ms;
+                transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+                transition-property: transform, width;
+                &.collapsed {
+                    // It has its correspondent value in the menu-mode.directive.ts
+                    width: 64px;
+                    transform: translate(0, 0) !important;
+                    visibility: visible;
+                    &.mat-drawer-opened {
+                        transform: translate3d(0, 0, 0) !important;
+                    }
+                }
+            }
+            &.mat-drawer-opened .reports div {
+                padding-left: 20px;
+                padding-right: 20px;
+
+                .mat-mdc-button {
+                    .mat-icon {
+                        padding-right: 15px;
+                    }
+                }
+            }
+            .content-scroll {
+                overflow: auto;
+            }
+            mat-accordion {
+                .mat-expansion-panel {
+                    &:first-of-type,
+                    &:last-of-type {
+                        border-radius: 0;
+                    }
+                }
+            }
+            .mat-drawer-inner-container {
+                -ms-overflow-style: none; /* for Internet Explorer, Edge */
+                scrollbar-width: none; /* for Firefox */
+                overflow-y: scroll !important;
+                display: block !important;
+                &::-webkit-scrollbar {
+                    display: none; /* for Chrome, Safari, and Opera */
+                }
+            }
+            .list .list-item {
+                color: inherit;
+                font-family: Montserrat;
+                font-size: 14px;
+                line-height: 24px;
+                font-weight: bold;
+                display: flex;
+                flex-wrap: 10px;
+                gap: 10px;
+                &.active-link {
+                    color: $white;
+                    pointer-events: none;
+                }
+            }
+            .nav-list {
+                padding-top: 0;
+                .list-item {
+                    height: 56px;
+                    font-weight: bold;
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-content: center;
+                    .popover-menu-btn {
+                        width: 100%;
+                        height: 100%;
+                        border-radius: 0;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 0;
+                        --mat-mdc-button-persistent-ripple-color: #0000;
+                        .mat-icon svg {
+                            fill: inherit;
+                        }
+                        .list-title {
+                            max-width: 85%;
+                            font-weight: 500;
+                            font-size: 10px;
+                            line-height: 16px;
+                            font-family: Montserrat;
+                        }
+                    }
+                    &:hover {
+                        color: mat.m2-get-color-from-palette($primary);
+                        background-color: rgba($white, 0.15);
+                    }
+                    &.active-menu {
+                        color: mat.m2-get-color-from-palette($primary);
+                        .mat-icon svg {
+                            fill: mat.m2-get-color-from-palette($primary);
+                        }
+                    }
+                }
+            }
+            .mat-expansion-panel {
+                background: inherit;
+                color: inherit;
+                border-radius: 0;
+                white-space: nowrap;
+                &:not([class*='mat-elevation-z']) {
+                    box-shadow: none;
+                }
+                .mat-expansion-panel-header-title,
+                .mat-expansion-panel-header-description,
+                .mat-expansion-indicator::after {
+                    color: inherit;
+                }
+                &:not(.mat-expanded) {
+                    .mat-expansion-panel-header:not(
+                            [aria-disabled="true"]
+                        ):hover {
+                        color: mat.m2-get-color-from-palette($primary);
+                        background-color: rgba($white, 0.15);
+                    }
+                }
+                &.mat-expanded {
+                    background-color: mat.m2-get-color-from-palette(
+                        $menu-bg,
+                        darker
+                    );
+                }
+                .mat-expansion-panel-header {
+                    padding: 0 20px;
+                    font-weight: bold;
+                    .mat-icon svg {
+                        fill: inherit;
+                    }
+                    &.active-menu{
+                        color: mat.m2-get-color-from-palette($primary);
+                        .mat-icon svg {
+                            fill: mat.m2-get-color-from-palette($primary);
+                        }
+                    }
+                    .mat-expansion-indicator {
+                        transition: padding-top 200ms ease-out;
+                        padding-bottom: 6px;
+                    }
+                }
+                .mat-expansion-panel-body {
+                    padding: 0 0 16px;
+                }
+                .nav-list {
+                    .list-item {
+                        @include mat.m2-typography-level($typography, body-1);
+                        height: 32px;
+                        font-weight: normal;
+                        padding-left: 54px;
+                        color: inherit;
+                        &:hover {
+                            color: $white;
+                        }
+                        &.active-link {
+                            color: $white;
+                            pointer-events: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .sidenav-popover-menu {
+        background-color: mat.m2-get-color-from-palette($menu-bg, darker);
+        border-radius: 4px;
+        margin-left: 20px;
+        min-width: 195px;
+        .menu-title {
+            font-weight: 700;
+            color: mat.m2-get-color-from-palette($primary);
+            padding: 1rem 1.5rem;
+        }
+        .mat-divider {
+            border-color: $menu-text;
+            opacity: 0.4;
+            margin: 0 0 0 1.5rem;
+        }
+        .nav-list {
+            padding: 12px 0;
+            .nav-list {
+                display: flex;
+                flex-direction: column;
+                padding: 1rem 1.5rem;
+            }
+            .list-item {
+                @include mat.m2-typography-level($typography, body-1);
+                height: 2rem;
+                color: $menu-text;
+                padding: 0 1.5rem;
+                display: flex;
+                flex-wrap: wrap;
+                align-content: center;
+                &:hover {
+                    color: $white;
+                    background-color: rgba($white, 0.15);
+                }
+                &.active-link {
+                    color: $white;
+                    pointer-events: none;
+                }
+            }
+        }
+    }
+}

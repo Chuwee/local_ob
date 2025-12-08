@@ -1,0 +1,59 @@
+<div fxLayout="column" class="internal-barcodes-container" fxLayoutGap="20px">
+    <p>{{'EVENTS.SESSION.WHITE_LIST.EXPORT.DESCRIPTION' | translate}}</p>
+    <mat-divider class="ob-form-divider"></mat-divider>
+    <div fxLayoutAlign="space-between center">
+        <span class="mat-subtitle-2 total-barcodes">
+            {{'EVENTS.SESSION.WHITE_LIST.IMPORT.TOTAL' | translate : { total: (totalBarcodes$ | async) ?? '-' } }}
+        </span>
+        <button mat-stroked-button color="tertiary" class="ob-button small"
+            (click)="openExportWhitelistDialog()" [disabled]="isExportOrImportLoading$ | async">
+            <mat-icon>file_download</mat-icon>
+            {{'EVENTS.SESSION.WHITE_LIST.EXPORT.BUTTON' | translate}}
+        </button>
+    </div>
+    <app-search-table [dataSource]="barcodes$" [metadata]="metadata$" [columns]="columns" [pageSize]="pageSize"
+        (changed)="loadBarcodes($event)" [searchOnInteraction]="false"
+        [placeholder]="'EVENTS.SESSION.WHITE_LIST.SEARCH_PLACEHOLDER' | translate">
+        <ng-container matColumnDef="barcode">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'FORMS.LABELS.BARCODE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.barcode | obfuscateString}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="row">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'FORMS.LABELS.ROW' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.seat_data.row?.name ? row.seat_data.row?.name : '-'}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="seat">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'FORMS.LABELS.SEAT' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.seat_data.seat?.name ? row.seat_data.seat?.name : '-'}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="locator">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'FORMS.LABELS.LOCATOR' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.locator ? row.locator : '-'}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'FORMS.LABELS.STATUS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" fxLayoutAlign="start">
+                <div *ngIf="!!row.status else noValidations" fxLayout="row" fxLayoutAlign="start center">
+                    <span class="status-dot" [ngClass]="[barcodeValidated(row) ? 'active' : 'blocked']"></span>
+                    <span>
+                        {{('EVENTS.SESSION.WHITE_LIST.STATUS_OPTS.' + (barcodeValidated(row) ? 'VALIDATED' : 'NOT_VALIDATED')) | translate}}
+                    </span>
+                </div>
+                <ng-template #noValidations>-</ng-template>
+            </mat-cell>
+        </ng-container>
+    </app-search-table>
+</div>
+<div class="spinner-container" *ngIf="reqInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

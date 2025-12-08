@@ -1,0 +1,46 @@
+<div class="template-form-section" fxLayout="column" fxLayoutGap="24px">
+    @if (!isReadOnly) {
+        <p class="quotas-description">{{'VENUE_TPLS.QUOTAS_INFO' | translate}}</p>
+        <div class="inline-field-with-button">
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label inline-field" fxFlex="auto">
+                <mat-label>{{'VENUE_TPLS.YOUR_QUOTAS' | translate}}</mat-label>
+                <input aria-label="new quota" matInput id="new-quota-input"
+                    [formControl]="newQuotaForm" (keyup.enter)="addNewQuota()">
+                @if (newQuotaForm.invalid) {
+                    <mat-error>{{'FORMS.ERRORS.REPEATED_ELEMENT' | translate}}</mat-error>
+                }
+            </mat-form-field>
+            <div class="add-button-container" fxFlex="none">
+                <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                    [matTooltip]="'VENUE_TPLS.NEW_QUOTA' | translate" [attr.aria-label]="'VENUE_TPLS.NEW_QUOTA' | translate"
+                    (click)="addNewQuota()"
+                    [disabled]="newQuotaForm.disabled || newQuotaForm.invalid || !newQuotaForm.value">
+                    <mat-icon>add</mat-icon>
+                    {{'FORMS.ACTIONS.ADD' | translate}}
+                </button>
+            </div>
+        </div>
+    }
+    @if (quotas$ | async; as quotas) {
+        <mat-list class="ob-list" [class.disabled]="quotasForm.disabled"
+            [class.read-only]="isReadOnly" role="list">
+            @for (quota of quotas; track quota.id) {
+                <mat-list-item class="editable-item" role="listitem">
+                    <div fxFlex class="write-value">
+                        <input #quotaInput aria-label="rename quota" id="quota-input{{$index}}" type="text"
+                            [formControl]="getArrayFormControl(quotasForm, $index)" class="rate-input"
+                            (keyup.enter)="quotaInput.blur()">
+                    </div>
+                    @if (!quotasForm.disabled && !quota.default) {
+                        <div class="delete-action">
+                            <button type="button" mat-icon-button aria-label="Delete quota" class="ob-button medium"
+                                (click)="deleteQuota(quota)">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </div>
+                    }
+                </mat-list-item>
+            }
+        </mat-list>
+    }
+</div>

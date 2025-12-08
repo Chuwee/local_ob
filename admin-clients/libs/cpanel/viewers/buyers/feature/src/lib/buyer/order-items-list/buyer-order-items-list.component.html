@@ -1,0 +1,100 @@
+    <!-- PRODUCTS-->
+    <div class="list-container flex flex-col gap-[10px] flex-[0_1_100%]">
+        <div class="flex-[0_0_auto] flex justify-end items-center">
+            <div class="flex justify-end items-center gap-[10px]">
+                <!-- Pagination -->
+                 @if((orderItemListMetadata$ | async); as metadata){
+                    @if(metadata?.total > PAGE_SIZE){ 
+                        <div class="flex flex-row justify-end items-center gap-3">
+                            <span class="page-summary" [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: metadata"></span>
+                            <mat-paginator [pageSize]="PAGE_SIZE" [pageIndex]="metadata?.offset/metadata?.limit"
+                                    hidePageSize (page)="loadData($event)" [length]="metadata?.total" />
+                        </div>
+                    }
+                 }
+            </div>
+        </div>
+        <!-- Table -->
+        <mat-table class="ob-table" [dataSource]="orderItemList$ | async" [attr.aria-label]="'CUSTOMER.PRODUCTS' | translate"
+            [class.not-touchable]="(isHandsetOrTablet$ | async) !== true" matSortDisableClear matSort [matSortDirection]="initSortDir"
+            [matSortActive]="initSortCol">
+            <ng-container matColumnDef="orderCode">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'BUYERS.ORDER_CODE' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">{{row.order.code}}</mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="orderDate">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'BUYERS.ORDER_DATE' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">{{row.order.date | dateTime : dataTimeFormat}}</mat-cell>
+            </ng-container>
+            @if($productType() === 'SEAT'){
+                <ng-container matColumnDef="event_name">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'CUSTOMER.PRODUCT_EVENT' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{row.ticket?.allocation?.event?.name}}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="session_name">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'CUSTOMER.PRODUCT_SESSION' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{(row?.ticket?.allocation?.session?.date?.start | dateTime :
+                        dataTimeFormat) +
+                    ' - ' + row?.ticket?.allocation?.session?.name}}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="type">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'CUSTOMER.PRODUCT_TYPE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{row.ticket?.type}}</mat-cell>
+                </ng-container>
+            } @else if($productType() === 'PRODUCT'){
+                <ng-container matColumnDef="product_name">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header="product_name" class="head-cell">
+                        {{'CUSTOMER.PRODUCT_NAME' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{row.product?.product_name}}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="variant">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header="variant" class="head-cell">
+                        {{'CUSTOMER.PRODUCT_VARIANT' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{row.product?.variant_name || '-'}}</mat-cell>
+                </ng-container>
+            }
+            <ng-container matColumnDef="base_price">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'CUSTOMER.PRODUCT_BASE_PRICE' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">{{row.price?.base | localCurrency:( row.price?.currency):'narrow'}}</mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="final_price">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'CUSTOMER.PRODUCT_FINAL_PRICE' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">{{row.price?.final | localCurrency:( row.price?.currency):'narrow' }}</mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="status">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    <span>{{'CUSTOMER.PRODUCT_STATUS' | translate}}</span>
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row" class="status-cell">
+                    @if(row.state){
+                        <ng-container>
+                            <span [ngClass]="['status-dot', row?.state.toLowerCase()]"></span>
+                            <span>{{'ENUMS.TYPE_OPTS.' + row?.state | translate}}</span>
+                        </ng-container>
+                    }
+                </mat-cell>
+            </ng-container>
+            <ng-container *matNoDataRow>
+                <app-empty-state-tiny [title]="'BUYERS.EMPTY_TITLE.'+ $productType() | translate" />
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" />
+            <mat-row *matRowDef="let row; columns: displayedColumns;" class="interactive-row"
+                [routerLink]="[$productType() === 'SEAT' ? '/tickets' : '/products-sales', row.order.code + '-' + row.id]" />
+        </mat-table>
+    </div>

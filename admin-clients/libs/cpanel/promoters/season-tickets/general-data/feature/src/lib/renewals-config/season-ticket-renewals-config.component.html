@@ -1,0 +1,193 @@
+<app-form-container (cancel)="cancel()" (save)="save()" [disabled]="!form.dirty" layout="menu" [formGroup]="form">
+    <mat-accordion [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{ 'SEASON_TICKET.GENERAL_DATA.RENEWALS' | translate }}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="ob-form-field">
+                <p class="flex flex-row justify-start">
+                    <mat-icon class="ob-icon xsmall warning with-text">warning</mat-icon>
+                    {{ 'SEASON_TICKET.GENERAL_DATA.RENEWALS_WARNING' | translate }}
+                </p>
+                <form class="flex flex-wrap justify-between">
+                    <mat-checkbox [formControl]="form.controls.allow_renewal" color="primary">
+                        <mat-label>{{ 'SEASON_TICKET.GENERAL_DATA.RENEWALS_INFO' | translate }} </mat-label>
+                    </mat-checkbox>
+                </form>
+            </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{ 'SEASON_TICKET.GENERAL_DATA.AUTOMATIC_RENEWAL.TILE' | translate }}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="ob-form-field">
+                <p class="section-description">{{'SEASON_TICKET.GENERAL_DATA.AUTOMATIC_RENEWAL.INFO' | translate}}</p>
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-col gap-2">
+                        @let seasonTicket = $seasonTicket();
+                        @if (!seasonTicket.settings?.operative?.renewal?.automatic) {
+                            <span class="flex flex-row justify-start">
+                                <mat-icon class="ob-icon xsmall warning with-text">warning</mat-icon>
+                                <span>{{ 'SEASON_TICKET.GENERAL_DATA.AUTOMATIC_RENEWAL.WARNING' | translate }}</span>
+                            </span>
+                        }
+                        @if ($isFriendsAndFamilyEnabled()) {
+                            <span class="flex flex-row justify-start">
+                                <mat-icon class="ob-icon xsmall info with-text">info</mat-icon>
+                                <span>{{ 'SEASON_TICKET.GENERAL_DATA.AUTOMATIC_RENEWAL.FRIENDS_INFO' | translate }}</span>
+                            </span>
+                        }
+                    </div>
+                    <div class="flex flex-col">
+                        <div class="flex flex-row gap-6">
+                            <div class="flex flex-col renewal-type-selector">
+                                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                                    <mat-label>{{ 'SEASON_TICKETS.GENERAL_DATA.AUTOMATIC_RENEWAL.TYPE_LABEL' | translate }}</mat-label>
+                                    <mat-select formControlName="renewal_type" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                        @for (type of renewalTypes; track type) {
+                                            <mat-option [value]="type">
+                                                {{'SEASON_TICKETS.GENERAL_DATA.AUTOMATIC_RENEWAL.TYPE_OPTS.' + type | translate}}
+                                            </mat-option>
+                                        }
+                                    </mat-select>
+                                    <mat-error [ob-form-errors]="form" field="renewal_type" />
+                                </mat-form-field>
+                            </div>
+                            <div class="automatic-renewal-button">
+                                @if (seasonTicket.settings?.operative?.renewal?.automatic) {
+                                    <button type="button" mat-button class="ob-button medium" disabled>
+                                        <mat-icon>check</mat-icon>
+                                        {{'SEASON_TICKET.GENERAL_DATA.AUTOMATIC_RENEWAL.DISABLE_BUTTON' | translate}}
+                                    </button>
+                                } @else {
+                                    <button type="button" mat-stroked-button class="ob-button medium"
+                                        (click)="enableAutomaticRenewal()" [disabled]="isActivateButtonDisabled">
+                                        {{'SEASON_TICKET.GENERAL_DATA.AUTOMATIC_RENEWAL.ENABLE_BUTTON' | translate}}
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                        @if (form.controls.renewal_type.value !== null) {
+                            <div class="flex flex-col renewal-type-content gap-4">
+                                <div class="flex flex-col gap-2">
+                                    <div>
+                                        <p class="section-description">
+                                            {{'SEASON_TICKETS.GENERAL_DATA.AUTOMATIC_RENEWAL.' + form.controls.renewal_type.value
+                                            + '_DESCRIPTION' | translate}}
+                                        </p>
+                                        <span class="ob-label">
+                                            {{'SEASON_TICKETS.GENERAL_DATA.AUTOMATIC_RENEWAL.TITLE' | translate}}
+                                            <span [class.mat-error]="form.controls.automatic_mandatory.touched
+                                                && form.controls.automatic_mandatory.errors?.['required']">*</span>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <mat-radio-group formControlName="automatic_mandatory">
+                                            <mat-radio-button class="ob-radio-button vertical-list" [value]="false">
+                                                <div class="flex flex-col">
+                                                    <span class="ob-label">
+                                                        {{'SEASON_TICKETS.GENERAL_DATA.AUTOMATIC_RENEWAL.OPTIONAL' | translate}}
+                                                    </span>
+                                                    <div class="flex">
+                                                        <span class="flex-[0_0_760px]">
+                                                            {{'SEASON_TICKETS.GENERAL_DATA.AUTOMATIC_RENEWAL.OPTIONAL_DESCRIPTION' | translate }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </mat-radio-button>
+                                            <mat-radio-button class="ob-radio-button vertical-list" [value]="true">
+                                                <div class="flex flex-col">
+                                                    <span class="ob-label">
+                                                        {{'SEASON_TICKETS.GENERAL_DATA.AUTOMATIC_RENEWAL.MANDATORY' | translate}}
+                                                    </span>
+                                                    <div class="flex">
+                                                        <span class="flex-[0_0_760px]">
+                                                            {{'SEASON_TICKETS.GENERAL_DATA.AUTOMATIC_RENEWAL.MANDATORY_DESCRIPTION' | translate }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </mat-radio-button>
+                                            @let errorMessage = form.controls.automatic_mandatory | obErrorMessage$ | async;
+                                        @if (errorMessage) {
+                                                <span class="ob-error-message flex gap-1">
+                                                    <mat-icon class="ob-icon xxsmall">error</mat-icon>
+                                                    {{errorMessage}}
+                                                </span>
+                                            }
+                                        </mat-radio-group>
+                                        @if (form.controls.renewal_type.value === 'CSV_IMPORT') {
+                                            <div class="flex flex-col">
+                                                <mat-divider class="ob-divider" />
+                                                <mat-checkbox formControlName="group_by_reference" color="primary">
+                                                    <mat-label class="mat-body-strong">
+                                                        {{ 'SEASON_TICKETS.GENERAL_DATA.AUTOMATIC_RENEWAL.GROUP_BY_REFERENCE_LABEL' | translate }}
+                                                    </mat-label>
+                                                </mat-checkbox>
+                                                <span class="nested-content">
+                                                    {{'SEASON_TICKETS.GENERAL_DATA.AUTOMATIC_RENEWAL.GROUP_BY_REFERENCE_DESCRIPTION' | translate}}
+                                                </span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                @if (form.controls.renewal_type.value === 'XML_SEPA') {
+                                    <div>
+                                        <mat-divider class="ob-form-divider" />
+                                        <div class="flex flex-col basis-full">
+                                            <div class="flex flex-col gap-2">
+                                                <span class="mat-body-strong">
+                                                    {{'SEASON_TICKET.GENERAL_DATA.AUTOMATIC_RENEWAL.BANK_ACCOUNT_TITLE' | translate}}
+                                                </span>
+                                                <span class="section-description">
+                                                    {{'SEASON_TICKET.GENERAL_DATA.AUTOMATIC_RENEWAL.BANK_ACCOUNT_DESCRIPTION' | translate}}
+                                                </span>
+                                                <div class="flex">
+                                                    <mat-form-field appearance="outline" subscriptSizing="dynamic"
+                                                        class="ob-form-field field-with-label flex-[0_0_400px]">
+                                                        <mat-label>
+                                                            {{ 'SEASON_TICKET.GENERAL_DATA.AUTOMATIC_RENEWAL.BANK_ACCOUNT_LABEL' | translate }}
+                                                        </mat-label>
+                                                        <mat-select formControlName="bank_account_id"
+                                                            [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                                            @for (bankAccount of $bankAccounts(); track bankAccount.id) {
+                                                                <mat-option [value]="bankAccount.id">
+                                                                    {{bankAccount.name}}
+                                                                </mat-option>
+                                                            }
+                                                        </mat-select>
+                                                        <mat-error [ob-form-errors]="form" field="bank_account_id" />
+                                                    </mat-form-field>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <mat-divider class="ob-form-divider" />
+                                        <div class="flex flex-col gap-2">
+                                            <span class="mat-body-strong">
+                                                {{'SEASON_TICKETS.GENERAL_DATA.AUTOMATIC_RENEWAL.PAYMENT_DETAILS_TITLE' | translate}}
+                                            </span>
+                                            <p class="section-description">
+                                                {{'SEASON_TICKETS.GENERAL_DATA.AUTOMATIC_RENEWAL.PAYMENT_DETAILS_DESCRIPTION' | translate}}
+                                            </p>
+                                            <div class="table-container" [formGroup]="form.controls.automaticRenewalsForm">
+                                                <app-forms [form]="form.controls.automaticRenewalsForm"
+                                                    [formFields]="seasonTicketForms$ | async" hideUneditable/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+
+@if ($isLoadingOrSaving()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

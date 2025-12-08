@@ -1,0 +1,136 @@
+<div *ngIf="isAvet" fxFlex="100%" fxLayout="column" [formGroup]="bookingFormGroup">
+    <mat-checkbox fxFlex="100%" formControlName="enable" color="primary" class="booking-config-check">
+        {{'EVENTS.ENABLE_BOOKING' | translate}}
+    </mat-checkbox>
+</div>
+<div *ngIf="!isAvet" fxFlex="100%" fxLayout="column" [formGroup]="bookingFormGroup">
+    <p>{{'EVENTS.BOOKING_DESCRIPTION' | translate}}</p>
+    <mat-checkbox fxFlex="100%" formControlName="enable" color="primary" class="booking-config-check">
+        {{'EVENTS.ENABLE_BOOKING' | translate}}
+    </mat-checkbox>
+    <!-- BOOKING BY TERM -->
+    <p>{{'EVENTS.BOOKING_BY_TERM' | translate}}</p>
+    <div fxLayout="row wrap" fxFlex class="edition-block">
+        <mat-radio-group fxLayout="column" formControlName="expirationType" class="booking-term-mode">
+            <mat-radio-button class="ob-radio-button inline" [value]="typeOrderExpire.never">
+                <div>{{'EVENTS.BOOKING_WITHOUT_TERM' | translate}}</div>
+            </mat-radio-button>
+            <mat-radio-button class="ob-radio-button inline" [value]="typeOrderExpire.afterPurchase">
+                <div>{{'EVENTS.BOOKING_WITH_TERM' | translate}}</div>
+            </mat-radio-button>
+        </mat-radio-group>
+        <div fxFlex fxLayout="row wrap">
+            <div fxFlex="100%" fxLayout="row wrap" formGroupName="bookingOrder" class="booking-term-block">
+                <mat-form-field fxFlex="0 1 68px" appearance="outline" class="ob-form-field booking-term-duration">
+                    <input matInput type="number" aria-label="duration" formControlName="duration" placeholder="0">
+                </mat-form-field>
+                <mat-form-field fxFlex="0 1 120px" appearance="outline" class="ob-form-field booking-term-time-unit">
+                    <mat-select formControlName="timeUnit">
+                        <mat-option [value]="eventRelativeTimeUnits.day">
+                            {{'EVENTS.TIME_UNITS.' + eventRelativeTimeUnits.day | translate}}
+                        </mat-option>
+                        <mat-option [value]="eventRelativeTimeUnits.week">
+                            {{'EVENTS.TIME_UNITS.' + eventRelativeTimeUnits.week | translate}}
+                        </mat-option>
+                        <mat-option [value]="eventRelativeTimeUnits.month">
+                            {{'EVENTS.TIME_UNITS.' + eventRelativeTimeUnits.month | translate}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <span [class.disabled]="bookingFormGroup.get('expirationType').value !== typeOrderExpire.afterPurchase
+                            || !bookingFormGroup.get('enable').value" class="booking-term-at-label">
+                    {{'EVENTS.BOOKING_AT_TIME' | translate}}
+                </span>
+                <mat-form-field fxFlex="0 1 68px" appearance="outline" class="ob-form-field booking-term-time">
+                    <input matInput type="number" aria-label="time" formControlName="time" placeholder="0">
+                    <mat-error *ngIf="bookingFormGroup.hasError('min', 'bookingOrder.time')">
+                        {{'FORMS.ERRORS.LOWER_THAN' | translate : ({value:
+                        bookingFormGroup.get('bookingOrder.time').getError('min').min})}}
+                    </mat-error>
+                    <mat-error *ngIf="bookingFormGroup.hasError('max', 'bookingOrder.time')">
+                        {{'FORMS.ERRORS.HIGHER_THAN' | translate : ({value:
+                        bookingFormGroup.get('bookingOrder.time').getError('max').max})}}
+                    </mat-error>
+                </mat-form-field>
+                <span [class.disabled]="bookingFormGroup.get('expirationType').value === typeOrderExpire.afterPurchase
+                        || !bookingFormGroup.get('enable').value" class="booking-hours-label">
+                    {{'EVENTS.BOOKING_HOURS' | translate}}
+                </span>
+            </div>
+        </div>
+    </div>
+    <!-- BOOKING BY SESSION DATE -->
+    <p>{{'EVENTS.BOOKING_BY_DATE' | translate}}</p>
+    <div fxLayout="row wrap" fxFlex class="edition-block">
+        <mat-radio-group fxFlex="100%" fxLayout="row wrap" formControlName="deadlineExpiration" class="booking-date-mode">
+            <mat-radio-button fxFlex="100%" class="ob-radio-button inline" [value]="typeDeadlineExpiration.never">
+                {{'EVENTS.BOOKING_WITHOUT_DATE' | translate}}
+            </mat-radio-button>
+            <div fxFlex="100%" formGroupName="relativeDate" fxLayout="row wrap" class="booking-relative-date-block">
+                <mat-radio-button class="ob-radio-button inline" [value]="typeDeadlineExpiration.session">
+                </mat-radio-button>
+                <mat-form-field fxFlex="0 1 68px" appearance="outline" class="ob-form-field booking-date-duration">
+                    <input matInput type="number" aria-label="duration" formControlName="duration" placeholder="0">
+                </mat-form-field>
+                <mat-form-field fxFlex="0 1 120px" appearance="outline" class="ob-form-field booking-date-time-unit">
+                    <mat-select formControlName="timeUnit">
+                        <mat-option [value]="eventRelativeTimeUnits.hour">
+                            {{'EVENTS.TIME_UNITS.' + eventRelativeTimeUnits.hour | translate}}
+                        </mat-option>
+                        <mat-option [value]="eventRelativeTimeUnits.day">
+                            {{'EVENTS.TIME_UNITS.' + eventRelativeTimeUnits.day | translate}}
+                        </mat-option>
+                        <mat-option [value]="eventRelativeTimeUnits.week">
+                            {{'EVENTS.TIME_UNITS.' + eventRelativeTimeUnits.week | translate}}
+                        </mat-option>
+                        <mat-option [value]="eventRelativeTimeUnits.month">
+                            {{'EVENTS.TIME_UNITS.' + eventRelativeTimeUnits.month | translate}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field fxFlex="0 1 120px" appearance="outline" class="ob-form-field booking-date-before-after">
+                    <mat-select formControlName="beforeAfter">
+                        <mat-option [value]="eventBeforeAfter.before">
+                            {{'EVENTS.' + eventBeforeAfter.before | translate}}
+                        </mat-option>
+                        <mat-option [value]="eventBeforeAfter.after">
+                            {{'EVENTS.' + eventBeforeAfter.after | translate}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <span [class.disabled]="bookingFormGroup.get('deadlineExpiration').value === typeDeadlineExpiration.date
+                    || !bookingFormGroup.get('enable').value" class="before-after-booking-date-label">
+                    {{'EVENTS.BEFORE_AFTER_SESSION' | translate}}
+                </span>
+                <div [fxShow]="bookingFormGroup.get('relativeDate.timeUnit').value !== eventRelativeTimeUnits.hour">
+                    <span [class.disabled]="bookingFormGroup.get('deadlineExpiration').value === typeDeadlineExpiration.date
+                            || !bookingFormGroup.get('enable').value" class="booking-term-at-label">
+                        {{'EVENTS.BOOKING_AT_TIME' | translate}}
+                    </span>
+                    <mat-form-field fxFlex="0 1 68px" appearance="outline" class="ob-form-field booking-relative-date-time">
+                        <input matInput type="number" aria-label="time" formControlName="time" placeholder="0">
+                        <mat-error *ngIf="bookingFormGroup.hasError('min', 'relativeDate.time')">
+                            {{'FORMS.ERRORS.LOWER_THAN' | translate : ({value:
+                            bookingFormGroup.get('relativeDate.time').getError('min').min})}}
+                        </mat-error>
+                        <mat-error *ngIf="bookingFormGroup.hasError('max', 'relativeDate.time')">
+                            {{'FORMS.ERRORS.HIGHER_THAN' | translate : ({value:
+                            bookingFormGroup.get('relativeDate.time').getError('max').max})}}
+                        </mat-error>
+                    </mat-form-field>
+                    <span [class.disabled]="bookingFormGroup.get('deadlineExpiration').value === typeDeadlineExpiration.date
+                            || !bookingFormGroup.get('enable').value" class="booking-hours-label">
+                        {{'EVENTS.BOOKING_HOURS' | translate}}
+                    </span>
+                </div>
+            </div>
+            <div fxFlex="100%" class="booking-concrete-date-block">
+                <mat-radio-button class="ob-radio-button inline" [value]="typeDeadlineExpiration.date">
+                    {{'EVENTS.BOOKING_DATE_LIMIT' | translate}}
+                </mat-radio-button>
+                <app-date-time-picker fxFlex="100%" class="concrete-date-field" formControlName="concreteDate">
+                </app-date-time-picker>
+            </div>
+        </mat-radio-group>
+    </div>
+</div>

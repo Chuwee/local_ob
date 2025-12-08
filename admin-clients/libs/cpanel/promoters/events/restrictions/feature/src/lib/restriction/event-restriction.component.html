@@ -1,0 +1,60 @@
+<form [formGroup]="form" class="form-box">
+    <div fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxLayout="column">
+            <span class="mat-subtitle-2">{{ 'EVENTS.RESTRICION_TYPE.' + restriction.type | translate }}</span>
+            <span>{{ '('+ ('FORMS.INFOS.ALL_FIELDS_REQUIRED' | translate) + ')' }}</span>
+        </div>
+        <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="16px">
+            <mat-slide-toggle #toggle class="ob-slide-toggle" color="primary" formControlName="activated"
+                (change)="activate($event.checked)"
+                [matTooltip]="'EVENTS.FORMS.INFOS.ENABLE_RESTRICTION_DISABLED_INFO' | translate"
+                [matTooltipDisabled]="!toggle.disabled">
+                {{'EVENTS.ACTIONS.ENABLE' | translate }}
+            </mat-slide-toggle>
+            <button mat-stroked-button color="tertiary" class="ob-button medium" (click)="edit()" [disabled]="restriction.editing">
+                {{'EVENTS.ACTIONS.EDIT' | translate}}
+            </button>
+        </div>
+    </div>
+    <mat-divider class="ob-divider"></mat-divider>
+    <!-- COMMON FORM FIELD FOR ALL RESTRICTIONS -->
+    <div class="restriction-sectors" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+        <mat-label [fxFlex]="restriction.type === 'SESSION_START_TIME' ? '0 0 210px' : '0 0 270px'">
+            {{'EVENTS.RESTRICTIONS_FIELDS.SECTORS' | translate}}
+        </mat-label>
+        <mat-form-field fxFlex="1 1 100%" class="ob-form-field inline-field" appearance="outline">
+            <mat-select #select multiple aria-label="sectors" formControlName="venue_template_sectors"
+                [placeholder]="'EVENTS.RESTRICTIONS_FIELDS.PLACEHOLDER.SECTORS' | translate">
+                <mat-option>
+                    <app-select-search #search searchField="name" [requireSelection]="true" [options$]="sectors$"
+                        [placeholderLabel]="'FORMS.SEARCH.NAME' | translate">
+                    </app-select-search>
+                </mat-option>
+                <div class="mat-option" (click)="selectAll(select)">
+                    <span class="mat-option-text">
+                        {{ (allSelected(select) ? 'FORMS.ACTIONS.SELECT_ALL' : 'FORMS.ACTIONS.UNSELECT_ALL') | translate }}
+                    </span>
+                </div>
+                <mat-option *ngFor="let sector of search.getFilteredOptions$() | async" [value]="sector?.id">
+                    {{sector?.name}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <app-event-restriction-fields [form]="form" [restriction]="restriction"></app-event-restriction-fields>
+</form>
+<div fxLayoutAlign="start center" fxLayoutGap="8px" *ngIf="restriction.editing && ((form.valueChanges | async) || true)">
+    <div fxFlex="1 1 auto" fxLayoutAlign=" center">
+        <mat-icon class="ob-icon small info with-text">info</mat-icon>
+        {{'EVENTS.FORMS.INFOS.EDITION_MODE_ACTIVE' | translate}}
+    </div>
+    <button type="button" mat-button class="ob-button medium" (click)="cancel()">
+        {{'FORMS.ACTIONS.CANCEL' | translate}}
+    </button>
+    <button type="button" mat-flat-button class="ob-button medium" color="primary" (click)="save()" [disabled]="!form.dirty || !form.valid">
+        {{'FORMS.ACTIONS.UPDATE' | translate}}
+    </button>
+</div>
+<div class="spinner-container" *ngIf="(loading$ | async)?.[restriction.sid] === true">
+    <mat-spinner></mat-spinner>
+</div>

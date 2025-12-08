@@ -1,0 +1,458 @@
+<div mat-dialog-content class="flex flex-col items-stretch base-session-container with-wizard-bar">
+    <form [formGroup]="form">
+        <mat-accordion class="details-form-container" multi [togglePosition]="'before'" [formGroup]="form">
+            <!-- BASE DATA -->
+            <mat-expansion-panel class="ob-dialog-panel" expanded togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.SESSION.BASE_DATA' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-create-session-base-data [eventId]="eventId" [lastSessionId]="lastSessionId" [form]="form.get('base')"
+                    [creationType]="sessionCreationType.multiple" [refreshChanges$]="refreshChanges$" />
+            </mat-expansion-panel>
+            <!-- RELEASE -->
+            <mat-expansion-panel class="ob-dialog-panel" expanded togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.SESSION.CHANNEL_RELEASE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div formGroupName="release" class="flex release-block">
+                    <mat-radio-group formControlName="dateMode" class="flex flex-col release-date-mode">
+                        <mat-radio-button class="ob-radio-button inline" [value]="sessionsCreationDateMode.fixed">
+                            <div>{{'EVENTS.SESSION.FIXED_DATE' | translate}}</div>
+                        </mat-radio-button>
+                        <mat-radio-button class="ob-radio-button inline" [value]="sessionsCreationDateMode.relative">
+                            <div>{{'EVENTS.SESSION.RELATIVE_DATE' | translate}}</div>
+                        </mat-radio-button>
+                    </mat-radio-group>
+                    <div class="flex basis-full grow shrink flex-col">
+                        <app-date-time-picker class="basis-full grow shrink session-form-field " formControlName="date" />
+                        <div formGroupName="relativeDate" class="basis-full grow shrink flex items-baseline">
+                            <mat-form-field appearance="outline" class="flex-[0_1_68px] ob-form-field relative-date-duration">
+                                <input matInput type="number" aria-label="duration" formControlName="duration" placeholder="0">
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" class="flex-[0_1_120px] ob-form-field relative-date-time-unit">
+                                <mat-select formControlName="timeUnit">
+                                    @for (timeUnit of timeUnitList; track timeUnit) {
+                                        <mat-option [value]="timeUnit">
+                                            <div appEllipsify [matTooltip]="'EVENTS.SESSION.TIME_UNITS.' + timeUnit | translate">
+                                                {{'EVENTS.SESSION.TIME_UNITS.' + timeUnit | translate}}
+                                            </div>
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                            <span class="before-session-label"
+                                [class.disabled]="form.get('release.dateMode').value !== sessionsCreationDateMode.relative">
+                                {{'EVENTS.SESSION.BEFORE_SESSION' | translate}}
+                            </span>
+                            <mat-checkbox color="primary" formControlName="addTime" class="relative-date-add-time inline">
+                                {{'EVENTS.SESSION.ADD_TIME' | translate}}
+                            </mat-checkbox>
+                            <app-time-picker formControlName="fixedTime" />
+                        </div>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+            <!-- BOOKINGS -->
+            @if (bookingsEnabled) {
+                <mat-expansion-panel class="ob-dialog-panel" expanded togglePosition="before">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'EVENTS.SESSION.BOOKINGS' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div formGroupName="bookings" class="flex bookings-block">
+                        <div formGroupName="start" class="flex-1 flex flex-wrap">
+                            <div class="basis-full dates-block-label">
+                                {{'DATES.START_DATE' | translate | uppercase}}
+                            </div>
+                            <mat-radio-group formControlName="dateMode" class="flex flex-col bookings-date-mode">
+                                <mat-radio-button class="ob-radio-button inline" [value]="sessionsCreationDateMode.fixed">
+                                    <div>{{'EVENTS.SESSION.FIXED_DATE_ABBR' | translate}}</div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button inline" [value]="sessionsCreationDateMode.relative">
+                                    <div>{{'EVENTS.SESSION.RELATIVE_DATE_ABBR' | translate}}</div>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                            <div class="flex-1 flex flex-wrap">
+                                <app-date-time-picker class="basis-full grow shrink session-form-field option-field"
+                                    formControlName="date" />
+                                <div class="flex-1 flex flex-col" formGroupName="relativeDate">
+                                    <div class="flex-1 flex">
+                                        <mat-form-field appearance="outline" class="flex-[0_1_68px] ob-form-field relative-date-duration">
+                                            <input matInput type="number" aria-label="duration" formControlName="duration" placeholder="0">
+                                        </mat-form-field>
+                                        <mat-form-field appearance="outline" class="flex-[0_1_120px] ob-form-field relative-date-time-unit">
+                                            <mat-select formControlName="timeUnit">
+                                                @for (timeUnit of timeUnitList; track timeUnit) {
+                                                    <mat-option [value]="timeUnit">
+                                                        <div appEllipsify
+                                                            [matTooltip]="'EVENTS.SESSION.TIME_UNITS.' + timeUnit | translate">
+                                                            {{'EVENTS.SESSION.TIME_UNITS.' + timeUnit | translate}}
+                                                        </div>
+                                                    </mat-option>
+                                                }
+                                            </mat-select>
+                                        </mat-form-field>
+                                        <span class="before-session-label"
+                                            [class.disabled]="form.get('bookings.start.dateMode').value !== sessionsCreationDateMode.relative">
+                                            {{'EVENTS.SESSION.BEFORE_SESSION' | translate}}
+                                        </span>
+                                    </div>
+                                    <div class="flex-1 flex ">
+                                        <mat-checkbox color="primary" formControlName="addTime" class="relative-date-add-time inline">
+                                            {{'EVENTS.SESSION.ADD_TIME' | translate}}
+                                        </mat-checkbox>
+                                        <app-time-picker formControlName="fixedTime" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div formGroupName="end" class="flex-1 flex flex-wrap">
+                            <div class="basis-full dates-block-label">
+                                {{'DATES.END_DATE' | translate | uppercase}}
+                            </div>
+                            <mat-radio-group formControlName="dateMode" class="flex flex-col bookings-date-mode">
+                                <mat-radio-button class="ob-radio-button inline" [value]="sessionsCreationDateMode.fixed">
+                                    <div>{{'EVENTS.SESSION.FIXED_DATE_ABBR' | translate}}</div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button inline" [value]="sessionsCreationDateMode.relative">
+                                    <div>{{'EVENTS.SESSION.RELATIVE_DATE_ABBR' | translate}}</div>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                            <div class="flex-1 flex flex-wrap">
+                                <app-date-time-picker class="basis-full grow shrink session-form-field option-field"
+                                    formControlName="date" />
+                                <div formGroupName="relativeDate" class="flex-1 flex flex-col">
+                                    <div class="flex-1 flex">
+                                        <mat-form-field appearance="outline" class="flex-[0_1_68px] ob-form-field relative-date-duration">
+                                            <input matInput type="number" aria-label="duration" formControlName="duration" placeholder="0">
+                                        </mat-form-field>
+                                        <mat-form-field appearance="outline"
+                                            class="flex-[0_1_120px] ob-form-field relative-date-time-unit">
+                                            <mat-select formControlName="timeUnit">
+                                                @for (timeUnit of timeUnitList; track timeUnit) {
+                                                    <mat-option [value]="timeUnit">
+                                                        <div appEllipsify
+                                                            [matTooltip]="'EVENTS.SESSION.TIME_UNITS.' + timeUnit | translate">
+                                                            {{'EVENTS.SESSION.TIME_UNITS.' + timeUnit | translate}}
+                                                        </div>
+                                                    </mat-option>
+                                                }
+                                            </mat-select>
+                                        </mat-form-field>
+                                        <mat-form-field appearance="outline" class="flex-[0_1_120px] ob-form-field relative-date-time-unit">
+                                            <mat-select formControlName="relativeTimeMoment">
+                                                @for (moment of relativeTimeMomentList; track moment) {
+                                                    <mat-option [value]="moment">
+                                                        <div appEllipsify [matTooltip]="'EVENTS.SESSION.' + moment | translate">
+                                                            {{'EVENTS.SESSION.' + moment | translate}}
+                                                        </div>
+                                                    </mat-option>
+                                                }
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="flex-1 flex ">
+                                        <mat-checkbox color="primary" formControlName="addTime" class="relative-date-add-time inline">
+                                            {{'EVENTS.SESSION.ADD_TIME' | translate}}
+                                        </mat-checkbox>
+                                        <app-time-picker formControlName="fixedTime" />
+                                    </div>
+                                    @let ctrl = form.get('bookings.end.relativeDate');
+                                    @if (ctrl.touched && ctrl.hasError('bookingsEndDateLaterThanSalesEndDate')) {
+                                        <mat-error>
+                                            {{'EVENTS.SESSION.BOOKINGS_END_DATE_AFTER_SALES_END_DATE_ERROR' | translate}}
+                                        </mat-error>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </mat-expansion-panel>
+            }
+            <!-- SALES -->
+            <mat-expansion-panel class="ob-dialog-panel" expanded togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.SESSION.SALE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div formGroupName="sales" class="flex sales-block">
+                    <div class="flex-1 flex flex-wrap" formGroupName="start">
+                        <div class="basis-full dates-block-label">
+                            {{'DATES.START_DATE' | translate | uppercase}}
+                        </div>
+                        <mat-radio-group formControlName="dateMode" class="flex flex-col sales-date-mode">
+                            <mat-radio-button class="ob-radio-button inline" [value]="sessionsCreationDateMode.fixed">
+                                <div>{{'EVENTS.SESSION.FIXED_DATE_ABBR' | translate}}</div>
+                            </mat-radio-button>
+                            <mat-radio-button class="ob-radio-button inline" [value]="sessionsCreationDateMode.relative">
+                                <div>{{'EVENTS.SESSION.RELATIVE_DATE_ABBR' | translate}}</div>
+                            </mat-radio-button>
+                        </mat-radio-group>
+                        <div class="flex-1 flex flex-wrap">
+                            <app-date-time-picker class="basis-full grow shrink session-form-field option-field" formControlName="date" />
+                            <div class="flex flex-1 flex-col gap-6 grow shrink basis-full" formGroupName="relativeDate">
+                                <div class="flex-1 flex">
+                                    <mat-form-field appearance="outline" class="flex-[0_1_68px] ob-form-field relative-date-duration">
+                                        <input matInput type="number" aria-label="duration" formControlName="duration" placeholder="0">
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" class="flex-[0_1_120px] ob-form-field relative-date-time-unit">
+                                        <mat-select formControlName="timeUnit">
+                                            @for (timeUnit of timeUnitList; track timeUnit) {
+                                                <mat-option [value]="timeUnit">
+                                                    <div appEllipsify [matTooltip]="'EVENTS.SESSION.TIME_UNITS.' + timeUnit | translate">
+                                                        {{'EVENTS.SESSION.TIME_UNITS.' + timeUnit | translate}}
+                                                    </div>
+                                                </mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <span class="before-session-label"
+                                        [class.disabled]="form.get('sales.start.dateMode').value !== sessionsCreationDateMode.relative">
+                                        {{'EVENTS.SESSION.BEFORE_SESSION' | translate}}
+                                    </span>
+                                </div>
+                                <div class="flex-1 flex ">
+                                    <mat-checkbox color="primary" formControlName="addTime" class="relative-date-add-time inline">
+                                        {{'EVENTS.SESSION.ADD_TIME' | translate}}
+                                    </mat-checkbox>
+                                    <app-time-picker formControlName="fixedTime" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div formGroupName="end" class="flex-1 flex flex-wrap">
+                        <div class="basis-full dates-block-label">
+                            {{'DATES.END_DATE' | translate | uppercase}}
+                        </div>
+                        <mat-radio-group formControlName="dateMode" class="flex flex-col sales-date-mode">
+                            <mat-radio-button class="ob-radio-button inline" [value]="sessionsCreationDateMode.fixed">
+                                <div>{{'EVENTS.SESSION.FIXED_DATE_ABBR' | translate}}</div>
+                            </mat-radio-button>
+                            <mat-radio-button class="ob-radio-button inline" [value]="sessionsCreationDateMode.relative">
+                                <div>{{'EVENTS.SESSION.RELATIVE_DATE_ABBR' | translate}}</div>
+                            </mat-radio-button>
+                        </mat-radio-group>
+                        <div class="flex flex-1 flex-wrap">
+                            <app-date-time-picker class="basis-full grow shrink session-form-field option-field" formControlName="date" />
+                            <div class="flex flex-1 flex-col gap-6" formGroupName="relativeDate">
+                                <div class="flex-1 flex">
+                                    <mat-form-field appearance="outline" class="flex-[0_1_68px] ob-form-field relative-date-duration">
+                                        <input matInput type="number" aria-label="duration" formControlName="duration" placeholder="0">
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" class="flex-[0_1_120px] ob-form-field relative-date-time-unit">
+                                        <mat-select formControlName="timeUnit">
+                                            @for (timeUnit of timeUnitList; track timeUnit) {
+                                                <mat-option [value]="timeUnit">
+                                                    <div appEllipsify [matTooltip]="'EVENTS.SESSION.TIME_UNITS.' + timeUnit | translate">
+                                                        {{'EVENTS.SESSION.TIME_UNITS.' + timeUnit | translate}}
+                                                    </div>
+                                                </mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" class="flex-[0_1_120px] ob-form-field relative-date-time-unit">
+                                        <mat-select formControlName="relativeTimeMoment">
+                                            @for (moment of relativeTimeMomentList; track moment) {
+                                                <mat-option [value]="moment">
+                                                    <div appEllipsify [matTooltip]="'EVENTS.SESSION.' + moment | translate">
+                                                        {{'EVENTS.SESSION.' + moment | translate}}
+                                                    </div>
+                                                </mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                                <div class="flex-1 flex ">
+                                    <mat-checkbox color="primary" formControlName="addTime" class="relative-date-add-time inline">
+                                        {{'EVENTS.SESSION.ADD_TIME' | translate}}
+                                    </mat-checkbox>
+                                    <app-time-picker formControlName="fixedTime" />
+                                </div>
+                                @if (form.get('sales.end.relativeDate').touched &&
+                                    form.get('sales.end.relativeDate').hasError('bookingsEndDateLaterThanSalesEndDate')) {
+                                    <mat-error>
+                                        {{'EVENTS.SESSION.SALES_END_DATE_BEFORE_BOOKINGS_END_DATE_ERROR' | translate}}
+                                    </mat-error>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+            <!-- LOYALTY POINTS -->
+            @if (loyaltyPointsEnabled) {
+                <mat-expansion-panel class="ob-dialog-panel" expanded togglePosition="before">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'EVENTS.SESSION.LOYALTY_POINTS' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="flex-1 flex flex-col" [formGroup]="form.controls['loyaltyPointGainConfig']">
+                        <p>{{'EVENTS.SESSION.LOYALTY_POINTS_INFO' | translate}}</p>
+                        <mat-radio-group class="flex flex-col" formControlName="type">
+                            <mat-radio-button class="ob-radio-button vertical-list" [value]="sessionLoyaltyPointsGainType.sessionPurchased">
+                                <div class="flex flex-col">
+                                    <div class="option-title">{{'EVENTS.SESSION.LOYALTY_POINTS_SESSION_PURCHASED' | translate}}</div>
+                                    <div>{{'EVENTS.SESSION.LOYALTY_POINTS_SESSION_PURCHASED_INFO' | translate}}</div>
+                                </div>
+                            </mat-radio-button>
+                            @if (form.controls['loyaltyPointGainConfig'].value.type === sessionLoyaltyPointsGainType.sessionPurchased) {
+                                <div class="flex-1 flex nested-content">
+                                    <mat-form-field appearance="outline"
+                                        class="flex-[1_1_140px] ob-form-field field-with-label amount-field">
+                                        <mat-label>{{'EVENTS.SESSION.LOYALTY_POINTS_AMOUNT' | translate}}</mat-label>
+                                        <input matInput type="number" placeholder="0" formControlName="amount">
+                                        <mat-error [ob-form-errors]="form.controls['loyaltyPointGainConfig']"
+                                            [field]="'amount'" />
+                                    </mat-form-field>
+                                </div>
+                            }
+                            <mat-radio-button class="ob-radio-button vertical-list" [value]="sessionLoyaltyPointsGainType.ticketPurchased">
+                                <div class="flex flex-col">
+                                    <div class="option-title">{{'EVENTS.SESSION.LOYALTY_POINTS_TICKET_PURCHASED' | translate}}</div>
+                                    <div>{{'EVENTS.SESSION.LOYALTY_POINTS_TICKET_PURCHASED_INFO' | translate}}</div>
+                                </div>
+                            </mat-radio-button>
+                            @if (form.controls['loyaltyPointGainConfig'].value.type === sessionLoyaltyPointsGainType.ticketPurchased) {
+                                <div class="flex-1 flex nested-content">
+                                    <mat-form-field appearance="outline"
+                                        class="flex-[1_1_140px] ob-form-field field-with-label amount-field">
+                                        <mat-label>{{'EVENTS.SESSION.LOYALTY_POINTS_AMOUNT' | translate}}</mat-label>
+                                        <input matInput type="number" placeholder="0" formControlName="amount">
+                                        <mat-error [ob-form-errors]="form.controls['loyaltyPointGainConfig']"
+                                            [field]="'amount'" />
+                                    </mat-form-field>
+                                </div>
+                            }
+                        </mat-radio-group>
+                    </div>
+                </mat-expansion-panel>
+            }
+            <!-- SECONDARY MARKET SALES -->
+            @if (secondaryMarketSaleEnabled) {
+                <mat-expansion-panel class="ob-dialog-panel flex flex-col" expanded togglePosition="before">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'EVENTS.SESSION.SECONDARY_MARKET' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="flex flex-col">
+                        <mat-checkbox class="activate-secondary-market" color="primary" formControlName="secondary_market_sale_enabled">
+                            {{'EVENTS.SESSION.ACTIVATE_SECONDARY_MARKET_DATES' | translate}}
+                        </mat-checkbox>
+                        <div [class.hidden]="!(showSecondaryMarketSaleDates$ | async)"
+                            formGroupName="secondary_market_sale" class="basis-full grow shrink flex secondary-market-block">
+                            <div class="flex flex-1 flex-wrap" formGroupName="start">
+                                <div class="basis-full dates-block-label">
+                                    {{'DATES.START_DATE' | translate | uppercase}}
+                                </div>
+                                <mat-radio-group formControlName="dateMode" class="flex flex-col secondary-market-sale-date-mode">
+                                    <mat-radio-button class="ob-radio-button inline" [value]="sessionsCreationDateMode.fixed">
+                                        <div>{{'EVENTS.SESSION.FIXED_DATE_ABBR' | translate}}</div>
+                                    </mat-radio-button>
+                                    <mat-radio-button class="ob-radio-button inline" [value]="sessionsCreationDateMode.relative">
+                                        <div>{{'EVENTS.SESSION.RELATIVE_DATE_ABBR' | translate}}</div>
+                                    </mat-radio-button>
+                                </mat-radio-group>
+                                <div class="flex flex-wrap flex-1">
+                                    <app-date-time-picker class="basis-full grow shrink session-form-field option-field"
+                                        formControlName="date" />
+                                    <div class="flex-1 flex flex-col" formGroupName="relativeDate">
+                                        <div class="flex-1 flex">
+                                            <mat-form-field appearance="outline"
+                                                class="flex-[0_1_68px] ob-form-field relative-date-duration">
+                                                <input matInput type="number" aria-label="duration" formControlName="duration"
+                                                    placeholder="0">
+                                            </mat-form-field>
+                                            <mat-form-field appearance="outline"
+                                                class="flex-[0_1_120px] ob-form-field relative-date-time-unit">
+                                                <mat-select formControlName="timeUnit">
+                                                    @for (timeUnit of timeUnitList; track timeUnit) {
+                                                        <mat-option [value]="timeUnit">
+                                                            <div appEllipsify
+                                                                [matTooltip]="'EVENTS.SESSION.TIME_UNITS.' + timeUnit | translate">
+                                                                {{'EVENTS.SESSION.TIME_UNITS.' + timeUnit | translate}}
+                                                            </div>
+                                                        </mat-option>
+                                                    }
+                                                </mat-select>
+                                            </mat-form-field>
+                                            <span class="before-session-label"
+                                                [class.disabled]="form.get('secondary_market_sale.start.dateMode').value !== sessionsCreationDateMode.relative">
+                                                {{'EVENTS.SESSION.BEFORE_SESSION' | translate}}
+                                            </span>
+                                        </div>
+                                        <div class="flex-1 flex ">
+                                            <mat-checkbox color="primary" formControlName="addTime" class="relative-date-add-time inline">
+                                                {{'EVENTS.SESSION.ADD_TIME' | translate}}
+                                            </mat-checkbox>
+                                            <app-time-picker formControlName="fixedTime" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-1 flex flex-wrap" formGroupName="end">
+                                <div class="basis-full dates-block-label">
+                                    {{'DATES.END_DATE' | translate | uppercase}}
+                                </div>
+                                <mat-radio-group formControlName="dateMode" class="flex flex-col secondary-market-sale-date-mode">
+                                    <mat-radio-button class="ob-radio-button inline" [value]="sessionsCreationDateMode.fixed">
+                                        <div>{{'EVENTS.SESSION.FIXED_DATE_ABBR' | translate}}</div>
+                                    </mat-radio-button>
+                                    <mat-radio-button class="ob-radio-button inline" [value]="sessionsCreationDateMode.relative">
+                                        <div>{{'EVENTS.SESSION.RELATIVE_DATE_ABBR' | translate}}</div>
+                                    </mat-radio-button>
+                                </mat-radio-group>
+                                <div class="flex flex-1 flex-wrap">
+                                    <app-date-time-picker class="basis-full grow shrink session-form-field option-field"
+                                        formControlName="date" />
+                                    <div class="flex flex-1 flex-col" formGroupName="relativeDate">
+                                        <div class="flex-1 flex">
+                                            <mat-form-field appearance="outline"
+                                                class="flex-[0_1_68px] ob-form-field relative-date-duration">
+                                                <input matInput type="number" aria-label="duration" formControlName="duration"
+                                                    placeholder="0">
+                                            </mat-form-field>
+                                            <mat-form-field appearance="outline"
+                                                class="flex-[0_1_120px] ob-form-field relative-date-time-unit">
+                                                <mat-select formControlName="timeUnit">
+                                                    @for (timeUnit of timeUnitList; track timeUnit) {
+                                                        <mat-option [value]="timeUnit">
+                                                            <div appEllipsify
+                                                                [matTooltip]="'EVENTS.SESSION.TIME_UNITS.' + timeUnit | translate">
+                                                                {{'EVENTS.SESSION.TIME_UNITS.' + timeUnit | translate}}
+                                                            </div>
+                                                        </mat-option>
+                                                    }
+                                                </mat-select>
+                                            </mat-form-field>
+                                            <mat-form-field appearance="outline"
+                                                class="flex-[0_1_120px] ob-form-field relative-date-time-unit">
+                                                <mat-select formControlName="relativeTimeMoment">
+                                                    @for (moment of relativeTimeMomentList; track moment) {
+                                                        <mat-option [value]="moment">
+                                                            <div appEllipsify [matTooltip]="'EVENTS.SESSION.' + moment | translate">
+                                                                {{'EVENTS.SESSION.' + moment | translate}}
+                                                            </div>
+                                                        </mat-option>
+                                                    }
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="flex-1 flex ">
+                                            <mat-checkbox color="primary" formControlName="addTime" class="relative-date-add-time inline">
+                                                {{'EVENTS.SESSION.ADD_TIME' | translate}}
+                                            </mat-checkbox>
+                                            <app-time-picker formControlName="fixedTime" />
+                                        </div>
+                                        @if (form.get('secondary_market_sale.end.relativeDate').touched &&
+                                        form.get('secondary_market_sale.end.relativeDate')
+                                            .hasError('secondaryMarketSaleEndDateLaterThanSalesEndDate')) {
+                                            <mat-error>
+                                                {{'EVENTS.SESSION.secondary_market_sale_END_DATE_AFTER_SALES_END_DATE_ERROR' | translate}}
+                                            </mat-error>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </mat-expansion-panel>
+            }
+        </mat-accordion>
+    </form>
+</div>

@@ -1,0 +1,52 @@
+<div fxFlex="0 1 100%" fxLayout="column">
+    <div class="heading-container only-title" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">
+                {{'TITLES.ENTITY_B2B_CONDITIONS' | translate}}
+            </h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+            <div class="filter-container" fxFlex="none" fxLayoutGap="10px">
+                <app-entity-filter-button #entityFilterButton
+                    [fxShow]="(canReadMultipleEntities$ | async) && (isEntitySelected$ | async)"
+                    [getEntitiesRequest]="getB2bEntitiesRequest" />
+            </div>
+        </div>
+    </div>
+    <div class="details-container" fxFlex="100%" fxLayout="column">
+        <app-empty-state [fxShow]="(canReadMultipleEntities$ | async ) &&
+        ((isEntitySelected$ | async) === false || (isEntitySelected$ | async) === null)" fxFlex="100%"
+            [title]="'LIST.ENTITY_REQUIRED_TITLE' | translate"
+            [description]="'LIST.ENTITY_REQUIRED_DESCRIPTION' | translate">
+            <button type="button" mat-flat-button class="ob-button medium" color="primary"
+                (click)="entityFilterButton.openEntitySelectionDialog()">
+                {{'ACTIONS.SELECT_ENTITY' | translate}}
+            </button>
+        </app-empty-state>
+        <div [fxShow]="(canReadMultipleEntities$ | async) === false || (entity$ | async)"
+            class="main-content" fxFlex="0 1 100%" fxLayout="column">
+            <app-form-container layout="main" class="overflow-y-auto"
+                [disabled]="!form.dirty || (isInProgress$ | async)" (cancel)="cancel()" (save)="save()">
+                <div fxLayout="column" fxLayoutGap="24px" fxLayoutAlign="start start">
+                    <button mat-stroked-button color="tertiary" class="ob-button small"
+                        [disabled]="(noEntityConditionsFound$ | async) || (isInProgress$ | async)"
+                        (click)="deleteEntityConditions()">
+                        <mat-icon>delete</mat-icon>
+                        {{'PROFESSIONAL_SELLING.DELETE_ENTITY_B2B_CONDITIONS' | translate}}
+                    </button>
+                    <p fxLayout="row" fxLayoutAlign="start center">
+                        <mat-icon class="ob-icon small neutral with-text">info</mat-icon>
+                        <span>{{'PROFESSIONAL_SELLING.NO_ENTITY_CONDITIONS_ADVICE' | translate}}</span>
+                    </p>
+                    <app-b2b-conditions-form [form]="form" [getConditions$]="getConditions$" [currencies]="$currencies()" />
+                </div>
+            </app-form-container>
+        </div>
+    </div>
+</div>
+
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

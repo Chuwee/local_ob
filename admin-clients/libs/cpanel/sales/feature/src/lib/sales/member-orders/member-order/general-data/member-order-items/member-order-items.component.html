@@ -1,0 +1,191 @@
+@if (!isNewMember) {
+    <span class="tickets-count">
+        {{'MEMBER_ORDER.TOTAL' | translate: {count: order.items.length} }}
+    </span>
+}
+
+<mat-table class="ob-table order-detail-table" [dataSource]="order.items">
+    <!-- EXPAND TOGGLE -->
+    @if (!isNewMember) {
+        <ng-container matColumnDef="expand">
+            <mat-header-cell *matHeaderCellDef class="expand-action-column" />
+            <mat-cell *matCellDef="let row;">
+                <button mat-icon-button aria-label="Expand" class="ob-button medium">
+                    <mat-icon>keyboard_arrow_down</mat-icon>
+                </button>
+            </mat-cell>
+        </ng-container>
+    }
+    <!-- CARD COLUMN -->
+    @if (!isNewMember) {
+        <ng-container matColumnDef="allocation">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'MEMBER_ORDER.ITEM.SEAT' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                @if (row.allocation.zone.name || row.allocation.row.name || row.allocation.seat.name) {
+                    {{row.allocation.zone.name}}<br>
+                    {{'FORMS.LABELS.ROW' | translate}}: {{row.allocation.row.name}} -
+                    {{'FORMS.LABELS.SEAT' | translate}}: {{row.allocation.seat.name}}
+                } @else if (row.allocation.external_properties.avet_zone_id || row.allocation.external_properties.avet_seat_id) {
+                    {{'FORMS.LABELS.EXTERNAL_ZONE_ID' | translate}}: {{row.allocation.external_properties.avet_zone_id}} -
+                    {{'FORMS.LABELS.EXTERNAL_SEAT_ID' | translate}}: {{row.allocation.external_properties.avet_seat_id}}
+                } @else {
+                    {{'MEMBER_ORDER.NO_ALLOCATION_DATA' | translate}}
+                }
+            </mat-cell>
+        </ng-container>
+    }
+    <!-- NAME COLUMN -->
+    <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{'MEMBER_ORDER.ITEM.NAME' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+            {{row.member.name}}
+            {{row.member.surname}}
+        </mat-cell>
+    </ng-container>
+    <!-- PRICE COLUMN -->
+    <ng-container matColumnDef="price">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{'MEMBER_ORDER.ITEM.PRICE' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+            {{(isNewMember ? row.membership?.price.base : row.allocation.price.final) | localCurrency: order.price.currency}}
+        </mat-cell>
+    </ng-container>
+    <!-- CHARGES COLUMN -->
+    @if (isNewMember) {
+        <ng-container matColumnDef="charges">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'MEMBER_ORDER.ITEM.CHARGES' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                {{row.membership?.price.charges | localCurrency: order.price.currency}}
+            </mat-cell>
+        </ng-container>
+    }
+    <!-- STATUS COLUMN -->
+    <ng-container matColumnDef="status">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{'MEMBER_ORDER.ITEM.STATUS' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+            <span [matTooltip]="'MEMBER_ORDER.ITEM.STATUS_OPTS.' + row.state| translate" appEllipsify>
+                {{'MEMBER_ORDER.ITEM.STATUS_OPTS.' + row.state | translate}}
+            </span>
+        </mat-cell>
+    </ng-container>
+    <!-- ROW DEFINITIONS -->
+    <mat-header-row *matHeaderRowDef="columns" />
+    @if (!isNewMember) {
+        <mat-row *matRowDef="let row; columns: columns;" class="interactive-row" [appTableDetailRow]="row" [appTableDetailRowTpl]="tpl" />
+    } @else {
+        <mat-row *matRowDef="let row; columns: columns;" />
+    }
+</mat-table>
+
+<ng-template #tpl let-item>
+    <div [@expand] class="detail-row">
+        <div class="detail-container" fxLayout="row wrap">
+            @if (item.previous_allocation) {
+                <div class="details-non-editable-field detailed" fxFlex="100%" fxFlex.gt-xs="50%" fxLayout="column">
+                    <span class="field-label">{{'MEMBER_ORDER.ITEM.OLD_SEAT' | translate}}</span>
+                    <ng-template *ngTemplateOutlet="location; context: {$implicit: item.previous_allocation}" />
+                </div>
+            }
+            @if (item.allocation?.external_event) {
+                @if (item.allocation.external_event.name) {
+                    <div class="details-non-editable-field detailed" fxFlex="100%" fxFlex.gt-xs="50%" fxLayout="column">
+                        <span class="field-label">{{'MEMBER_ORDER.ITEM.EXTERNAL_EVENT_NAME' | translate}}</span>
+                        <span>{{item.allocation.external_event.name}}</span>
+                    </div>
+                }
+                @if (item.allocation.external_event.date) {
+                    <div class="details-non-editable-field detailed" fxFlex="100%" fxFlex.gt-xs="50%" fxLayout="column">
+                        <span class="field-label">{{'MEMBER_ORDER.ITEM.EXTERNAL_EVENT_DATE' | translate}}</span>
+                        <span>{{item.allocation.external_event.date | dateTime : dateTimeFormats.shortDateTime}}</span>
+                    </div>
+                }
+            }
+            @if (item.allocation) {
+                <div class="details-non-editable-field detailed" fxFlex="100%" fxFlex.gt-xs="50%" fxLayout="column">
+                    <span class="field-label">{{'MEMBER_ORDER.ITEM.CURRENT_SEAT' | translate}}</span>
+                    <ng-template *ngTemplateOutlet="location; context: {$implicit: item.allocation}" />
+                </div>
+            }
+            @if (item.season) {
+                <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-xs="50%" fxLayout="column">
+                    <span class="field-label">{{'MEMBER_ORDER.ITEM.SEASON' | translate}}</span>
+                    <span>{{item.season}}</span>
+                </div>
+            }
+            @if (item.role) {
+                <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-xs="50%" fxLayout="column">
+                    <span class="field-label">{{'MEMBER_ORDER.ITEM.TYPE' | translate}}</span>
+                    <span>{{item.role.name || item.role.id}}</span>
+                </div>
+            }
+            @if (item.subscription) {
+                <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-xs="50%" fxLayout="column">
+                    <span class="field-label">{{'MEMBER_ORDER.ITEM.MODE' | translate}}</span>
+                    <span>{{item.subscription.name || item.subscription.code}}</span>
+                </div>
+            }
+            @if (item.additional_information?.membership_total_price) {
+                <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-xs="50%" fxLayout="column">
+                    <span class="field-label">{{'MEMBER_ORDER.ITEM.TOTAL' | translate}}</span>
+                    <span>{{item.additional_information.membership_total_price | localCurrency: order.price.currency}}</span>
+                </div>
+            }
+            @if (item.previous_allocation) {
+                <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-xs="50%" fxLayout="column">
+                    <span class="field-label">{{'MEMBER_ORDER.ITEM.PREVIOUS_PAID' | translate}}</span>
+                    <span>{{item.previous_allocation.price.final | localCurrency: order.price.currency}}</span>
+                </div>
+            }
+            @if (item.allocation.price.base) {
+                <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-xs="50%" fxLayout="column">
+                    <span class="field-label">{{'MEMBER_ORDER.ITEM.BASE' | translate}}</span>
+                    <span>{{item.allocation.price.base | localCurrency: order.price.currency}}</span>
+                </div>
+            }
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #location let-location>
+    @if (location.zone.name || location.row.name || location.seat.name) {
+        <span class="zone">
+            <strong>{{'FORMS.LABELS.ZONE' | translate}}:</strong>
+            {{location.zone.name}}
+        </span>
+        <span class="row">
+            <strong>{{'FORMS.LABELS.ROW' | translate}}:</strong>
+            {{location.row.name}}
+        </span>
+        <span class="seat">
+            <strong>{{'FORMS.LABELS.SEAT' | translate}}:</strong>
+            {{location.seat.name}}
+        </span>
+    } @else if (location.external_properties.avet_zone_id || location.external_properties.avet_seat_id) {
+        <span class="external_zone">
+            <strong>{{'FORMS.LABELS.EXTERNAL_ZONE_ID' | translate}}:</strong>
+            {{location.external_properties.avet_zone_id}}
+        </span>
+        <span class="row">
+            <strong>{{'FORMS.LABELS.EXTERNAL_SEAT_ID' | translate}}:</strong>
+            {{location.external_properties.avet_seat_id}}
+        </span>
+    } @else {
+        {{'MEMBER_ORDER.NO_ALLOCATION_DATA' | translate}}
+    }
+
+    @if (location.periodicity) {
+        <span class="periodicity">
+            <strong>{{'MEMBER_ORDER.ITEM.PERIDICITY' | translate}}: </strong>
+            {{location.periodicity.name || location.periodicity.id}}
+        </span>
+    }
+</ng-template>

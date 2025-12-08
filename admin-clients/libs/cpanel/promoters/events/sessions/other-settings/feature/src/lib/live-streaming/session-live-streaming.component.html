@@ -1,0 +1,31 @@
+<div fxLayout="row wrap" [formGroup]="liveStreamingFormGroup">
+    <!-- ENABLE -->
+    <div fxFlex="100%" fxLayout="column" class="enable-option-container">
+        <div fxFlex="28px" fxLayoutGap="8px" fxLayout="row">
+            <mat-slide-toggle class="ob-slide-toggle" formControlName="enable">
+                {{'EVENTS.SESSION.LIVE_STREAMING_ENABLE' | translate}}
+            </mat-slide-toggle>
+        </div>
+        <mat-divider fxFlex="100%"></mat-divider>
+    </div>
+    <!-- VENDOR -->
+    <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 50px)" appearance="outline"
+        class="ob-form-field field-with-label">
+        <mat-label>{{'EVENTS.SESSION.LIVE_STREAMING_VENDOR' | translate}}</mat-label>
+        <mat-select formControlName="vendor" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+            <mat-option *ngFor="let vendor of entityVendors$ | async" [value]="vendor">
+                <div appEllipsify [matTooltip]="vendor.toString()">
+                    {{vendor.toString()}}
+                </div>
+            </mat-option>
+        </mat-select>
+        <mat-error [ob-form-errors]="liveStreamingFormGroup" field="vendor"></mat-error>
+    </mat-form-field>
+    <!-- VALUE -->
+    <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(75% - 50px)" appearance="outline"
+        class="ob-form-field field-with-label">
+        <mat-label>{{'EVENTS.SESSION.LIVE_STREAMING_VALUE' | translate}}</mat-label>
+        <input formControlName="value" matInput [placeholder]="'EVENTS.SESSION.LIVE_STREAMING_VALUE' | translate">
+        <mat-error [ob-form-errors]="liveStreamingFormGroup" field="value"></mat-error>
+    </mat-form-field>
+</div>

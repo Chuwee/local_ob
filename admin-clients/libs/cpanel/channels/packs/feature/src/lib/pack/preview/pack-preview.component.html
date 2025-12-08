@@ -1,0 +1,35 @@
+<app-form-container [hideActionBar]="true">
+    <app-language-bar
+        [languages]="$languageList()"
+        [selected]="language$ | async"
+        (changed)="changeLanguage($event)"
+        class="sticky" />
+    <div class="details-container flex flex-col gap-2">
+        @if ((packDetailPreviewLink$ | async); as links) {
+            <div class="actions-bar flex flex-row justify-start items-center">
+                <div class="flex flex-row justify-start items-center">
+                    <span class="copy-label">{{'CHANNELS.PACKS.PREVIEW.EVENT_LINK_LABEL' | translate}}</span>
+                    <span class="copy-link">{{ links[0]?.detail_link }}</span>
+                    <app-copy-text [copyText]="links[0]?.detail_link"
+                        [copyOk]="'CHANNELS.PACKS.PREVIEW.LINK_COPY_OK' | translate"
+                        [copyKo]="'CHANNELS.PACKS.PREVIEW.LINK_COPY_KO' | translate"
+                        [copyTooltip]="'CHANNELS.PACKS.PREVIEW.COPY_LINK' | translate" />
+                </div>
+                <div class="go-link">
+                    <a mat-button aria-label="Go to link" class="ob-button medium" target="_blank"
+                        [href]="links[0]?.detail_link">
+                        <span>{{'CHANNELS.PACKS.PREVIEW.GO_TO_LINK' | translate}}</span>
+                        <mat-icon iconPositionEnd>launch</mat-icon>
+                    </a>
+                </div>
+            </div>
+            <app-link-list [links$]="packDetailPreviewLink$" [title]="'CHANNELS.PACKS.PREVIEW.PACK'"/>
+        }
+    </div>
+</app-form-container>
+
+@if ($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

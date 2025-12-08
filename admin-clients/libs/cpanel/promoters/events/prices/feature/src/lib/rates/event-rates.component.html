@@ -1,0 +1,28 @@
+<app-form-container [hideActionBar]="true" layout="menu">
+    @let event = $event();
+    <div class="flex">
+    @if(!event?.settings.use_tiered_pricing && !(event | isAvetEvent)) {
+        @if(event | isSgaEvent) {
+            <app-event-sga-rates-group-list class="flex-[0_1_680px]" />
+        } @else {
+            <app-tabs-menu type="navigation" class="flex-[0_1_680px]">
+                <ng-template appTab [label]="'EVENTS.RATES' | translate">
+                    <app-event-rates-list />
+                </ng-template>
+                <ng-template appTab [label]="'EVENTS.RATES_RESTRICTIONS.TITLE' | translate">
+                    <app-restricted-rates-list [contextId]="$event()?.id" [entityId]="$event()?.entity?.id"
+                        [rates]="$eventRates()" [venueTemplates]="$event()?.venue_templates" />
+                </ng-template>
+            </app-tabs-menu>
+        }
+    }
+    @if((event | isAvetEvent)) {
+        <app-event-rates-group-list class="flex-[0_1_680px]" />
+    }
+    </div>
+</app-form-container>
+@if($isInProgress()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

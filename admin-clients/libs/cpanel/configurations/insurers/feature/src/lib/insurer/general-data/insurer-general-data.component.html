@@ -1,0 +1,105 @@
+@let insurer = $insurer();
+<app-form-container layout="main" class="overflow-y-auto" [formGroup]="form" [disabled]="!form.dirty || form.invalid || $isInProgress()"
+    (cancel)="cancel()" (save)="save()">
+    <mat-accordion multi [togglePosition]="'before'">
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>
+                    {{'INSURERS.FORMS.MAIN_INFO' | translate}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            @if (insurer) {
+                <div class="flex flex-row flex-wrap sm:gap-[40px]">
+                    <div class="ob-form-field flex flex-col basis-full
+                        sm:flex-[0_1_calc(50%-40px)] md:flex-[0_1_calc(33.3%-40px)]">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <mat-label>{{'INSURERS.FORMS.LABELS.NAME' | translate}}</mat-label>
+                            <input matInput type="text" formControlName="name"> 
+                        </mat-form-field>
+                    </div>
+                    <div class="ob-form-field flex flex-col basis-full
+                        sm:flex-[0_1_calc(50%-40px)] md:flex-[0_1_calc(33.3%-40px)]">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <mat-label>{{'INSURERS.FORMS.LABELS.TAX_NAME' | translate}}</mat-label>
+                            <input matInput type="text" formControlName="tax_name"> 
+                        </mat-form-field>
+                        
+                    </div>
+                    <div class="ob-form-field flex flex-col basis-full
+                        sm:flex-[0_1_calc(50%-40px)] md:flex-[0_1_calc(33.3%-40px)]">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <mat-label>{{'FORMS.LABELS.CIF' | translate}}</mat-label>
+                            <input matInput type="text" formControlName="tax_id"> 
+                        </mat-form-field>
+                    </div>
+                    <div class="ob-form-field flex flex-col basis-full
+                        sm:flex-[0_1_calc(50%-40px)] md:flex-[0_1_calc(33.3%-40px)]">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <mat-label>{{'INSURERS.FORMS.LABELS.EMAIL' | translate}}</mat-label>
+                            <input matInput type="text" formControlName="contact_email">
+                            <mat-error [ob-form-errors]="form" field="contact_email" />
+                        </mat-form-field>
+                        
+                    </div>
+                    <div class="ob-form-field flex flex-col basis-full
+                        sm:flex-[0_1_calc(50%-40px)] md:flex-[0_1_calc(33.3%-40px)]">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <mat-label>{{'INSURERS.FORMS.LABELS.PHONE' | translate}}</mat-label>
+                            <input matInput type="text" formControlName="phone">
+                            <mat-error [ob-form-errors]="form" field="phone" />
+                        </mat-form-field>                        
+                    </div>
+                    <div class="details-non-editable-field ob-form-field flex flex-col basis-full
+                        sm:flex-[0_1_calc(50%-40px)] md:flex-[0_1_calc(33.3%-40px)]">
+                        <span class="field-label">{{'INSURERS.FORMS.LABELS.OPERATOR' | translate}}</span>
+                        <span>{{ insurer.operator?.name }}</span>
+                    </div>
+                    <div class="ob-form-field flex flex-col basis-full
+                        sm:flex-[0_1_calc(50%-40px)] md:flex-[0_1_calc(33.3%-40px)]">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <mat-label>{{'INSURERS.FORMS.LABELS.ADDRESS' | translate}}</mat-label>
+                            <input matInput type="text" formControlName="address">
+                        </mat-form-field>
+
+                    </div>
+                    <div class="ob-form-field flex flex-col basis-full
+                        sm:flex-[0_1_calc(50%-40px)] md:flex-[0_1_calc(33.3%-40px)]">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <mat-label class="field-label">{{'INSURERS.FORMS.LABELS.ZIP_CODE' | translate}}</mat-label>
+                            <input matInput type="number" formControlName="zip_code">
+                            <mat-error [ob-form-errors]="form" field="zip_code" />
+                        </mat-form-field>
+                    </div>
+                    <div class="details-non-editable-field ob-form-field flex flex-col basis-full
+                        sm:flex-[0_1_calc(50%-40px)] md:flex-[0_1_calc(33.3%-40px)]">
+                        <span class="field-label">{{'INSURERS.FORMS.LABELS.INSURER_ID' | translate}}</span>
+                        <span>{{ insurer.id }}</span>
+                    </div>
+                </div>
+            }
+        </mat-expansion-panel>
+        <mat-expansion-panel expanded>
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{'INSURERS.FORMS.NOTES' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="flex flex-row flex-wrap sm:gap-[40px]">
+                    <div class="ob-form-field flex flex-col basis-full sm:flex-[0_1_calc(50%-40px)] md:flex-[0_1_calc(33.3%-40px)] 
+                        gap-[10px]">
+                        <span>{{'INSURERS.FORMS.NOTES_DESCRIPTION' | translate}}</span>
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <input matInput type="text" formControlName="description">
+                        </mat-form-field>
+                        <span class="field-format">{{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value: 100})}}</span>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+            
+    </mat-accordion>
+</app-form-container>
+@if ($isInProgress()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

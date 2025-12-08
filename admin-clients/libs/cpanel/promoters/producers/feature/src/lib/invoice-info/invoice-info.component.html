@@ -1,0 +1,56 @@
+<p class="description">{{ $literalKeys().invoiceDescription | translate }}</p>
+<form id="invoiceData" [formGroup]="invoiceDataForm">
+    @if ($isMultiProducer()) {
+        <mat-radio-group class="invoice-radio-group flex flex-col gap-4"
+            [formControl]="invoiceDataForm.controls.useProducerFiscalDataCtrl">
+            @if (invoiceData$ | async; as invoiceData) {
+                <mat-radio-button [value]="false">
+                    <mat-label>{{ $literalKeys().organizatorData | translate }}</mat-label>
+                </mat-radio-button>
+                @if (invoiceDataForm.value.useProducerFiscalDataCtrl === false) {
+                    <ng-container *ngTemplateOutlet="invoiceInfoTemplate; context: { $implicit: invoiceData }" />
+                }
+
+                <mat-radio-button [value]="true">
+                    <mat-label>{{ $literalKeys().producerData | translate }}</mat-label>
+                </mat-radio-button>
+                @if (invoiceDataForm.value.useProducerFiscalDataCtrl === true) {
+                    <ng-container *ngTemplateOutlet="invoiceInfoTemplate; context: { $implicit: invoiceData }" />
+                }
+            }
+        </mat-radio-group>
+    }
+</form>
+
+<ng-template #invoiceInfoTemplate let-invoiceData>
+    <div class="invoice-info" [class.normalize-margin]="$isMultiProducer() !== true">
+        <mat-list>
+            <mat-list-item>{{ $literalKeys().nif | translate }}: {{ invoiceData.nif }}</mat-list-item>
+            <mat-list-item>{{ $literalKeys().socialReason | translate }}: {{ invoiceData.social_reason }}</mat-list-item>
+            <mat-list-item>{{ $literalKeys().address | translate }}: {{ invoiceData.contact?.address }}</mat-list-item>
+        </mat-list>
+
+        @if ($showInvoiceSequences()) {
+            @if (invoiceSequences$ | async; as sequences) {
+                <div class="invoice-sequence">
+                    <p>{{ $literalKeys().invoiceSequenceDescription | translate }}</p>
+                    <div>
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label inner-field invoice-sequence-field">
+                            <mat-label>{{ $literalKeys().invoiceSequenceLabel | translate }}</mat-label>
+                            <mat-select #invoiceSelector [placeholder]="'FORMS.SELECT.NONE' | translate"
+                                [formControl]="invoiceDataForm.controls.simplifiedInvoicePrefixCtrl">
+                                @for (seq of sequences; track seq.id) {
+                                    <mat-option [value]="seq.id">
+                                        <div appEllipsify [matTooltip]="seq.prefix + 'XXXXXXXX'">
+                                            {{seq.prefix + 'XXXXXXXX'}}
+                                        </div>
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</ng-template>

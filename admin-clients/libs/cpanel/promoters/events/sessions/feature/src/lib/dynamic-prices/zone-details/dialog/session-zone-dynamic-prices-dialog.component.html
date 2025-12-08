@@ -1,0 +1,124 @@
+<div class="dialog-msg-container flex flex-col flex-wrap">
+    <div mat-dialog-title>
+        <div class="flex flex-row items-center">
+            <h2 class="secondary title basis-full">
+                {{(data.vmZoneDynamicPriceToEdit ?
+                'EVENTS.SESSION.DYNAMIC_PRICES.TITLES.EDIT_ZONE_DYNAMIC_PRICE':
+                'EVENTS.SESSION.DYNAMIC_PRICES.TITLES.CREATE_ZONE_DYNAMIC_PRICE') | translate}}
+            </h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="dialogRef.close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content [formGroup]="form">
+        <div class="flex flex-col gap-8">
+            <div class="flex flex-col">
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label basis-full">
+                    <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                    <input matInput aria-label="name" [placeholder]="'FORMS.LABELS.NAME' | translate" [formControl]="form.controls.name">
+                    <mat-error [ob-form-errors]="form.controls.name" />
+                </mat-form-field>
+                <app-tabs-menu type="language" overrideClasses="no-left-padding" #translationTabs
+                    [selectedIndex]="$defaultLanguageIndex()">
+                    @for (language of $languages(); track $index) {
+                        <ng-template appTab [label]="('LANGUAGES.' + language) | translate"
+                            [ctrl]="form.controls.translations.controls.namesCtrl.controls[language]">
+                            <div class="flex flex-col">
+                                <mat-form-field appearance="outline" class="ob-form-field field-with-label no-grid-spacing">
+                                    <mat-label>
+                                        {{'FORMS.LABELS.NAME' | translate }} {{( 'LANGUAGES.' + language ) | translate}}
+                                    </mat-label>
+                                    <input matInput autocomplete="off" type="text"
+                                        [formControl]="form.controls.translations.controls.namesCtrl.controls[language]">
+                                    <mat-error [ob-form-errors]="form.controls.translations.controls.namesCtrl.controls[language]" />
+                                </mat-form-field>
+                            </div>
+                        </ng-template>
+                    }
+                </app-tabs-menu>
+            </div>
+            <div class="flex flex-col">
+                <span class="mat-subtitle-2">{{ 'EVENTS.SESSION.DYNAMIC_PRICES.FORMS.LABELS.SELECT_CONDITION_TYPE' | translate }}</span>
+                <div class="flex flex-col gap-4">
+                    <mat-checkbox color="primary" class="inline" [formControl]="form.controls.conditions.controls.capacityEnabled">
+                        {{'FORMS.LABELS.CAPACITY' | translate}}
+                    </mat-checkbox>
+                    <!-- use class hidden to show error messages in mat-error in case capacity is disabled and afterward enabled-->
+                    <div [class.hidden]="!form.controls.conditions.controls.capacityEnabled.value">
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                            <mat-label>{{'FORMS.LABELS.CAPACITY' | translate}}</mat-label>
+                            <input matInput type="number" step="1" aria-label="capacity" [placeholder]="'FORMS.LABELS.CAPACITY' | translate"
+                                [formControl]="form.controls.capacity.controls.absoluteCapacity">
+                            <mat-error [ob-form-errors]="form.controls.capacity.controls.absoluteCapacity" />
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-4">
+                    <mat-checkbox color="primary" class="inline" [formControl]="form.controls.conditions.controls.dateEnabled">
+                        {{'FORMS.LABELS.DATE' | translate}}
+                    </mat-checkbox>
+                    <!-- use class hidden to show error messages in mat-error in case date is disabled and afterward enabled-->
+                    <app-date-time-picker maxErrors="1" [class.hidden]="!form.controls.conditions.controls.dateEnabled.value"
+                        [label]="'DATES.START_DATE' | translate" [formControl]="form.controls.date.controls.absoluteDate" />
+                </div>
+                @let conditionsErrorMessage = form.controls.conditions
+                    | obErrorMessage$
+                    | async;
+                @if (conditionsErrorMessage) {
+                    <span class="ob-error-message">{{conditionsErrorMessage}}</span>
+                }
+            </div>
+            <div class="flex flex-col gap-2">
+                <span class="mat-subtitle-2">{{ 'EVENTS.SESSION.DYNAMIC_PRICES.FORMS.LABELS.PRICES_BY_RATE' | translate }}</span>
+                <div class="basis-full">
+                    <table mat-table class="ob-table" [dataSource]="$rates()">
+                        <ng-container [matColumnDef]="displayedColumns[0]">
+                            <th mat-header-cell *matHeaderCellDef class="default-padding head-cell">
+                                {{'FORMS.LABELS.RATE' | translate}}
+                            </th>
+                            <td mat-cell *matCellDef="let row;" class="default-padding">
+                                {{row.name}}
+                            </td>
+                        </ng-container>
+                        <ng-container [matColumnDef]="displayedColumns[1]">
+                            <th mat-header-cell *matHeaderCellDef class="head-cell price-column">
+                                {{'FORMS.LABELS.PRICE' | translate}}
+                            </th>
+                            <td mat-cell *matCellDef="let row;" class="right price-column editable-cell">
+                                <div class="write-value">
+                                    <mat-form-field appearance="outline" class="ob-form-field">
+                                        @let errorMessage = form.controls.ratesPrices.controls[row.id]
+                                            | obErrorMessage$
+                                            | async;
+                                        @if (errorMessage) {
+                                            <mat-icon matPrefix [obErrorIcon]="errorMessage">
+                                                error_outline
+                                            </mat-icon>
+                                        }
+                                        <app-currency-input class="table-input"
+                                            [formControl]="form.controls.ratesPrices.controls[row.id]"
+                                            currencyFormat="narrow" [currencyCode]="$event().currency_code"
+                                            [placeholder]="0 | localCurrency : $event().currency_code : 'narrow'" />
+                                    </mat-form-field>
+                                </div>
+                            </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns" class="dense-row" ></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="hoverable-row dense-row"></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div mat-dialog-actions>
+        <div class="flex flex-row flex-nowrap justify-end basis-full">
+            <button mat-button type="button" class="ob-button" (click)="dialogRef.close()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button mat-flat-button color="primary" type="button" class="ob-button" (click)="save()">
+                {{(data.vmZoneDynamicPriceToEdit ? 'FORMS.ACTIONS.EDIT': 'FORMS.ACTIONS.CREATE') | translate}}
+            </button>
+        </div>
+    </div>
+</div>

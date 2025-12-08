@@ -1,0 +1,105 @@
+<app-form-container (cancel)="cancel()" (save)="save()" [disabled]="$loadingOrSaving() || (!form.dirty || !form.valid)"
+    [formGroup]="form" class="overflow-y-auto">
+
+    <p class="body-1 description">{{'EVENTS.CHANNEL.PROFESSIONAL_SELLING.DESCRIPTION' | translate}}</p>
+
+    <mat-radio-group #type="matRadioGroup" formControlName="type" class="quota-assignation-type-container">
+        <mat-radio-button [value]="quotaAssignationsTypes.all" class="ob-radio-button vertical-list">
+            <mat-label>{{'EVENTS.CHANNEL.PROFESSIONAL_SELLING.ASSIGNATION_TYPES.ALL' | translate}}</mat-label>
+        </mat-radio-button>
+        <mat-radio-button [value]="quotaAssignationsTypes.specific" class="ob-radio-button vertical-list">
+            <mat-label>{{'EVENTS.CHANNEL.PROFESSIONAL_SELLING.ASSIGNATION_TYPES.SPECIFIC' | translate}}</mat-label>
+        </mat-radio-button>
+    </mat-radio-group>
+    @if ({ quotas: (data$ | async), clients: (filteredPagedClients$ | async) }; as vm) {
+        <div class="quota-selection nested-content">
+            @if (type.value === quotaAssignationsTypes.specific) {
+                <app-searchable-paginated-selection
+                    [data$]="filteredPagedClients$" [metadata$]="metadata$" [pageSize]="pageSize"
+                    (loadData)="filterChangeHandler($event)" [hideSearch]="true">
+
+                    <app-professional-selling-filters slot="filter" [clients$]="clients$" [quotas$]="idNameQuotas$" [form]="filters" />
+
+                    <ng-template #selectionTemplate let-data="data">
+                        <div class="assignations-table-container">
+                            <table mat-table class="ob-table assignations-table not-touchable" [dataSource]="data" formGroupName="clients">
+
+                                <ng-container matColumnDef="client" sticky>
+                                    <th mat-header-cell *matHeaderCellDef class="head-cell border-right">
+                                        {{'PROFESSIONAL_SELLING.CLIENTS' | translate}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let client" class="border-right">
+                                        <ng-container *ngIf="(client.totals$ | async) || {selected: '-', total: '-'} as metadata">
+                                            <mat-checkbox class="app-checkbox-wrap-label" color="primary" disableRipple
+                                                [indeterminate]="metadata.indeterminate"
+                                                [checked]="metadata.checked"
+                                                (change)="onClientCheckboxClick($event.checked, client.id)">
+                                                {{client.name}}
+                                            </mat-checkbox>
+                                            <span class="ob-badge more-info">
+                                                {{metadata.selected + '/' + metadata.total}}
+                                            </span>
+                                        </ng-container>
+                                    </td>
+                                    <td mat-footer-cell *matFooterCellDef>
+                                        {{'EVENTS.CHANNEL.PROFESSIONAL_SELLING.TOTAL_ASSIGNED' | translate}}
+                                    </td>
+                                </ng-container>
+
+                                @for (quota of vm.quotas; track quota.id) {
+                                    <ng-container
+                                        [matColumnDef]="quota?.id.toString()">
+                                        <ng-container *ngIf="(quota.totals$ | async) || {selected: '-', total: '-'} as metadata">
+                                            <th mat-header-cell *matHeaderCellDef class="head-cell checkbox-column vertical">
+                                                <mat-checkbox color="primary" disableRipple
+                                                    [indeterminate]="metadata.indeterminate"
+                                                    [checked]="metadata.checked"
+                                                    (change)="onQuotaCheckboxClick($event.checked, quota.id)"
+                                                    [attr.title]="quota.description">
+                                                    {{quota.description}}
+                                                </mat-checkbox>
+                                            </th>
+                                            <td mat-cell *matCellDef="let client" [formArrayName]="client.id.toString()"
+                                                class="checkbox-column">
+                                                <mat-checkbox color="primary" disableRipple
+                                                    [formControlName]="$index"
+                                                    (change)="onCheckboxClick($event.checked, client.id, quota.id)"
+                                                    [attr.title]="client.name + ' / ' +  quota.description" />
+                                            </td>
+                                            <td mat-footer-cell *matFooterCellDef class="checkbox-column">
+                                                {{' ' + metadata.selected + '/' + metadata.total + ' '}}
+                                            </td>
+                                        </ng-container>
+                                    </ng-container>
+                                }
+
+                                <tr mat-header-row *matHeaderRowDef="columns$ | async; sticky: true" class="dense-row">
+                                    <!-- content  -->
+                                </tr>
+                                <tr mat-row *matRowDef="let row; columns: columns$ | async" class="dense-row">
+                                    <!-- content  -->
+                                </tr>
+                                <tr mat-footer-row *matFooterRowDef="columns$ | async; sticky: true" class="dense-row">
+                                    <!-- content  -->
+                                </tr>
+                            </table>
+                        </div>
+                    </ng-template>
+
+                </app-searchable-paginated-selection>
+            }
+
+        </div>
+    }
+
+    @if (context === 'EVENT') {
+        <app-archived-event-mgr slot="actions-bar" [disabled]="form.dirty" />
+    }
+
+</app-form-container>
+
+@if ($loadingOrSaving()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,67 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">
+            {{'CHANNELS.LITERALS.NEW_LITERAL_TITLE' | translate}}
+        </h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content>
+        <form [formGroup]="form" fxLayout="column">
+            <p>
+                {{'CHANNELS.LITERALS.NEW_LITERAL_INFO' | translate}}
+            </p>
+            <div class="key-container" fxLayout="column">
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.NEW_LITERAL_KEY'| translate}}</mat-label>
+                    <textarea matInput rows="2" style="max-height: 60px; min-height: 22px;"
+                        formControlName="key"
+                        [placeholder]="'CHANNELS.LITERALS.NEW_LITERAL_KEY_PLACEHOLDER' | translate">
+                    </textarea>
+                    <mat-error [ob-form-errors]="form" field="key" />
+                </mat-form-field>
+            </div>
+            <app-tabs-menu type="language" overrideClasses="no-left-padding" formGroupName="values">
+                @for (lang of languages; track $index) {
+                    <ng-template lazyLoad appTab [label]="('LANGUAGES.' + lang) | translate">
+                        @if (editor === editors.string) {
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label" fxFlex="100%">
+                                <mat-label>{{'FORMS.LABELS.NEW_LITERAL_VALUE'| translate}}</mat-label>
+                                <textarea matInput rows="6"
+                                    [placeholder]="'CHANNELS.LITERALS.NEW_LITERAL_VALUE_PLACEHOLDER' | translate"
+                                    [formControlName]="lang">
+                            </textarea>
+                            </mat-form-field>
+                        }
+                        @if (editor === editors.html) {
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label no-padding"
+                                fxFlex="100%">
+                                <mat-label>{{'FORMS.LABELS.NEW_LITERAL_VALUE'| translate}}</mat-label>
+                                <app-rich-text-area [formControlName]="lang" class="vertical-stretch" />
+                            </mat-form-field>
+                        }
+                    </ng-template>
+                }
+            </app-tabs-menu>
+            @if (showHtmlEditor) {
+                <section fxLayoutAlign="start center" fxLayoutGap="8px">
+                    <mat-slide-toggle class="ob-slide-toggle" color="primary" (change)="toggleHtml($event)">
+                        {{'CHANNELS.LITERALS.TOGGLE_HTML'| translate}}
+                    </mat-slide-toggle>
+                    <app-help-button [message]="'CHANNELS.LITERALS.TOGGLE_HTML_INFO' | translate" />
+                </section>
+            }
+        </form>
+    </div>
+
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="save()"
+            [disabled]="form && !form.dirty">
+            {{'FORMS.ACTIONS.SAVE' | translate}}
+        </button>
+    </div>
+</div>

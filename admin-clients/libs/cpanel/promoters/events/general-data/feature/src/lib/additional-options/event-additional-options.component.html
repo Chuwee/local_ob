@@ -1,0 +1,192 @@
+<app-form-container [disabled]="!form.dirty" layout="menu" [formGroup]="form" (cancel)="cancel()" (save)="saveEvent()">
+    <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.SPECIAL_CONFIGS_TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <form class="flex flex-wrap" formGroupName="specialConfigs">
+                <div class="event-form-section flex flex-col basis-full">
+                    <p>{{'EVENTS.FESTIVAL_DESCRIPTION' | translate}}</p>
+                    <mat-checkbox formControlName="enableFestival" color="primary">
+                        {{'EVENTS.FESTIVAL_CHECK_LABEL' | translate}}
+                    </mat-checkbox>
+                </div>
+                <div class="event-form-section flex flex-col basis-full">
+                    <p>{{'EVENTS.ALLOW_VENUE_DASHBOARDS_DESCRIPTION' | translate}}</p>
+                    <mat-checkbox formControlName="allow_venue_reports" color="primary">
+                        {{'EVENTS.ALLOW_VENUE_DASHBOARDS_LABEL' | translate}}
+                    </mat-checkbox>
+                </div>
+                @if (isActivity) {
+                    <div class="event-form-section flex flex-col basis-full">
+                        <p>{{'EVENTS.ALLOW_GROUPS_DESCRIPTION' | translate}}</p>
+                        <mat-checkbox formControlName="allowGroups" color="primary">
+                            {{'EVENTS.ALLOW_GROUPS' | translate}}
+                        </mat-checkbox>
+                    </div>
+                }
+            </form>
+        </mat-expansion-panel>
+        @if (!isActivity && !$isAvetEvent()) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.SESSION_PACK_TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <form formGroupName="sessionPack" class="session-pack-form flex flex-wrap">
+                    <div class="event-form-section flex flex-col basis-full">
+                        <p>{{'EVENTS.SESSION_PACK_DESCRIPTION' | translate}}</p>
+                        <mat-checkbox formControlName="enabled" color="primary">
+                            {{'EVENTS.SESSION_PACK_ENABLED' | translate}}
+                        </mat-checkbox>
+                        <mat-radio-group class="flex flex-col" formControlName="type">
+                            <mat-radio-button [value]="eventSessionPackConf.restricted">
+                                {{'FORMS.OPTIONS.RESTRICTED' | translate}}
+                            </mat-radio-button>
+                            <mat-radio-button [value]="eventSessionPackConf.unrestricted">
+                                {{'FORMS.OPTIONS.UNRESTRICTED' | translate}}
+                            </mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+                </form>
+            </mat-expansion-panel>
+        }
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.BOOKING' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-event-booking [form]="form" />
+        </mat-expansion-panel>
+        @if ($isAvetEvent() && isAvetApim$ | async) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'TITLES.EXTERNAL_DIGITAL_TICKET' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <form formGroupName="event_external_config" class="external-config-form flex flex-wrap">
+                    <div class="event-form-section flex flex-col gap-4 basis-full">
+                        <span>{{'EVENTS.EXTERNAL.DIGITAL_TICKET.DESCRIPTION' | translate}}</span>
+                        <mat-radio-group class="flex flex-col gap-4" formControlName="useEventConfig">
+                            <div class="flex gap-4 items-center">
+                                <mat-radio-button class="ob-radio-button" [value]="false">
+                                    {{'EVENTS.EXTERNAL.DIGITAL_TICKET.CONFIG.USE_ENTITY' | translate}}
+                                </mat-radio-button>
+                                <a class="ob-link icon" [routerLink]="linkToEntityWalletConfig" target="_blank">
+                                    {{'ACTIONS.GO_TO_CONFIGURATION' | translate}}
+                                </a>
+                            </div>
+                            <mat-radio-button class="ob-radio-button" [value]="true">
+                                {{'EVENTS.EXTERNAL.DIGITAL_TICKET.CONFIG.USE_EVENT' | translate}}
+                            </mat-radio-button>
+                        </mat-radio-group>
+                        @if (form.controls.event_external_config.controls.useEventConfig.value) {
+                            <mat-radio-group formControlName="digital_ticket_mode"
+                                class="nested-content flex flex-col basis-full gap-4">
+                                <mat-radio-button class="ob-radio-button" [value]="digitalTicketModes[2]">
+                                    <div class="flex flex-col">
+                                        <span class="ob-label">
+                                            {{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.WALLET_NFC.LABEL' | translate}}
+                                        </span>
+                                        <span>{{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.WALLET_NFC.DESC' | translate}}</span>
+                                    </div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button" [value]="digitalTicketModes[3]">
+                                    <div class="flex flex-col">
+                                        <span class="ob-label">
+                                            {{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.WALLET.LABEL' | translate}}
+                                        </span>
+                                        <span>{{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.WALLET.DESC'| translate}}</span>
+                                    </div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button" [value]="digitalTicketModes[1]">
+                                    <div class="flex flex-col">
+                                        <span class="ob-label">
+                                            {{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.PASSBOOK.LABEL' | translate}}
+                                        </span>
+                                        <span>{{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.PASSBOOK.DESC'| translate}}</span>
+                                    </div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button" [value]="digitalTicketModes[0]">
+                                    <div class="flex flex-col">
+                                        <span class="ob-label">
+                                            {{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.DISABLED.LABEL' | translate}}
+                                        </span>
+                                        <span>{{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.DISABLED.DESC' | translate}}</span>
+                                    </div>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        }
+                        <span class="flex items-center justify-start">
+                            <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                            <span>{{'EVENTS.EXTERNAL.DIGITAL_TICKET.INFO' | translate}}</span>
+                        </span>
+                    </div>
+                </form>
+            </mat-expansion-panel>
+        }
+        @if (!isActivity && !$isAvetEvent()) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.TIERS.TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <form id="tiers-form" class="flex flex-wrap" formGroupName="tiers">
+                    <div class="event-form-section flex flex-col basis-full">
+                        <p>{{'EVENTS.TIERS.DESCRIPTION' | translate}}</p>
+                        <p>{{'EVENTS.TIERS.INFO' | translate}}</p>
+                        <mat-checkbox formControlName="enableTiers" color="primary">
+                            {{'EVENTS.TIERS.ACTIVATE' | translate}}
+                        </mat-checkbox>
+                    </div>
+                </form>
+            </mat-expansion-panel>
+        }
+        @if (isInteractiveVenueEnabled | async) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.INTERACTIVE_VENUE.TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-event-interactive-venue [form]="form" />
+            </mat-expansion-panel>
+        }
+        @if (isAccommodationsVisible$ | async) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.ACCOMMODATIONS.TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-event-accommodations [form]="form" />
+            </mat-expansion-panel>
+        }
+        @if ($attendantVerificationRequired()) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.TITLES.ATTENDANT_VERIFICATION' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <form id="attendant-verification-form" class="flex flex-wrap" formGroupName="attendant_verification">
+                    <div class="event-form-section flex flex-col basis-full">
+                        <mat-checkbox formControlName="attendant_verification_required" color="primary">
+                            {{('EVENTS.FORMS.LABELS.ACTIVATE_ATTENDANT_VERIFICATION.OPTS_' + $verificator()) | translate }}
+                        </mat-checkbox>
+                    </div>
+                </form>
+            </mat-expansion-panel>
+        }
+
+        @if ($isOtpSmsVerificationEnabled()) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.TITLES.PHONE_VERIFICATION' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <form id="phone-verification-form" class="flex flex-wrap" formGroupName="phone_verification">
+                    <div class="event-form-section flex flex-col basis-full">
+                        <mat-checkbox formControlName="phone_verification_required" color="primary">
+                            {{'EVENTS.FORMS.LABELS.ACTIVATE_PHONE_VERIFICATION' | translate}}
+                        </mat-checkbox>
+                    </div>
+                </form>
+            </mat-expansion-panel>
+        }
+
+    </mat-accordion>
+    <app-archived-event-mgr slot="actions-bar" [disabled]="form.dirty || (isLoadingOrSaving$ | async)" />
+</app-form-container>
+@if (isLoadingOrSaving$ | async) {
+    <div class="spinner-container"><mat-spinner /></div>
+}

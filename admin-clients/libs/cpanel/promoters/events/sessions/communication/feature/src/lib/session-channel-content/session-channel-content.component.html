@@ -1,0 +1,84 @@
+<div fxLayout="column" fxFlex="0 0 852px" class="details-container">
+    <mat-accordion [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.SESSION.COMMUNICATION.WEB_CONTENTS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <form id="SessionChannelContent" [formGroup]="channelContentForm" fxLayout="column">
+                @if (multiple) {
+                    <span class="multiple-warning">
+                        {{'EVENTS.SESSION.COMMUNICATION.MULTIPLE_WARNING' | translate}}
+                    </span>
+                }
+                <div fxFlex="100%" fxLayout="row" formGroupName="texts">
+                    <mat-form-field fxFlex="685px" fxFlex.lt-md="100%" appearance="outline"
+                        class="ob-form-field field-with-label">
+                        <mat-label>{{'EVENTS.SESSION.COMMUNICATION.TITLE' | translate}}</mat-label>
+                        <input matInput aria-label="title" [placeholder]="sessionName" formControlName="title">
+                        <mat-error [ob-form-errors]="channelContentForm" field="texts.title" />
+                    </mat-form-field>
+                </div>
+                <div fxFlex="100%" fxLayout="row" formGroupName="texts">
+                    <mat-form-field fxFlex="685px" appearance="outline"
+                        class="ob-form-field field-with-label no-padding">
+                        <mat-label>{{'EVENTS.SESSION.COMMUNICATION.DESCRIPTION' | translate}}</mat-label>
+                        <app-rich-text-area aria-label="Session Description"
+                            [placeholder]="'EVENTS.SESSION.COMMUNICATION.DESCRIPTION_PLACEHOLDER' | translate"
+                            formControlName="description" />
+                        <mat-error [ob-form-errors]="channelContentForm" field="texts.description" />
+                    </mat-form-field>
+                </div>
+                @if (multiple) {
+                    <div class="section-block" fxFlex="100%" fxLayout="row" formGroupName="images">
+                        <mat-checkbox color="primary" formControlName="setDefault" class="set-default">
+                            {{'EVENTS.SESSION.COMMUNICATION.MULTIPLE_DEFAULT_IMAGE' | translate}}
+                        </mat-checkbox>
+                    </div>
+                }
+                <div class="section-block" fxFlex="100%" fxLayout="row" [class.disabled]="imagesForm.get('setDefault')?.value">
+                    <div fxFlex="100" fxLayout="column" formGroupName="images">
+                        <span class="field-label">
+                            {{'EVENTS.SESSION.COMMUNICATION.SLIDER_IMAGE' | translate}}
+                        </span>
+                        <p class="field-description">
+                            {{'EVENTS.SESSION.COMMUNICATION.SLIDER_IMAGE_DESCRIPTION' | translate}}
+                        </p>
+                        <div fxLayout="row" formArrayName="landscape">
+                            <app-image-uploader hasAltText fxFlex="calc(50% + 20px)" formControlName="0"
+                                [imageRestrictions]="sliderImageRestrictions" hideLabelText
+                                [allowPngConversion]="$allowPngConversion()" />
+                            <div fxFlex="50%" fxLayout="row wrap">
+                                <app-image-uploader hasAltText fxFlex="50%" formControlName="1"
+                                    [imageRestrictions]="sliderImageRestrictions" hideLabelText
+                                    [allowPngConversion]="$allowPngConversion()" />
+                                <app-image-uploader hasAltText fxFlex="50%" formControlName="2"
+                                    [imageRestrictions]="sliderImageRestrictions" hideLabelText
+                                    [allowPngConversion]="$allowPngConversion()" />
+                                <app-image-uploader hasAltText fxFlex="50%" formControlName="3"
+                                    [imageRestrictions]="sliderImageRestrictions" hideLabelText
+                                    [allowPngConversion]="$allowPngConversion()" />
+                                <app-image-uploader hasAltText fxFlex="50%" formControlName="4"
+                                    [imageRestrictions]="sliderImageRestrictions" hideLabelText
+                                    [allowPngConversion]="$allowPngConversion()" />
+                            </div>
+                        </div>
+                        <span class="field-format">{{'UPLOAD_IMAGE.FORMAT' | translate: sliderImageRestrictions}}</span>
+                    </div>
+                </div>
+                <div class="section-block" fxFlex="100%" fxLayout="row" [class.disabled]="imagesForm.get('setDefault')?.value">
+                    <div fxFlex="685px" fxFlex.lt-lg="100%" fxLayout="column" formGroupName="images">
+                        <span class="field-label">
+                            {{'EVENTS.SESSION.COMMUNICATION.CHANNEL_IMAGE' | translate}}
+                        </span>
+                        <p class="field-description">
+                            {{'EVENTS.SESSION.COMMUNICATION.CHANNEL_IMAGE_DESCRIPTION' |translate}}
+                        </p>
+                        <app-image-uploader hasAltText [style.max-width]="'120px'" [imageRestrictions]="mainImageRestrictions"
+                            formControlName="main" />
+                    </div>
+                </div>
+            </form>
+        </mat-expansion-panel>
+    </mat-accordion>
+</div>
+<mat-divider vertical="true" />

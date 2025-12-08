@@ -1,0 +1,145 @@
+<app-form-container-full [sidebarWidth]="standardVenueTemplateComponent?.$labelMgrWidth()"
+    [disabled]="isDirty$ === undefined || (isDirty$ | async) === false" (cancel)="cancelChanges()" (save)="saveChanges()">
+    <mat-drawer-container class="left-bar-container" fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="stretch">
+        <mat-drawer #drawer mode="side" opened fxFlex="0 0 {{sidebarWidth$ | async}}" class="left-bar detail-bar">
+            @if(venueTemplate$ | async; as template) {
+                <div fxLayout="column" fxLayoutAlign="start stretch">
+                    <div class="left-sidebar-title" fxFlex="0 0 68px">
+                        <h2 class="title">{{'EVENTS.TEMPLATE' | translate}}</h2>
+                        <div fxLayoutAlign="end end">
+                            <button mat-icon-button aria-label="Edit template" class="ob-button small"
+                                [matTooltip]="'EVENTS.EDIT_TPL_BTN' | translate" [disabled]="isDirty$ | async"
+                                (click)="openEditTemplateDialog(template)">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                    <div fxFlex="36px" class="left-sidebar-subheader">
+                        <h3 class="section-title">{{'VENUE_TPLS.DETAILS_TITLE' | translate | uppercase}}</h3>
+                    </div>
+                    <div class="item-details" fxLayout="column" fxLayoutGap="14px">
+                        <div>
+                            <div class="mat-subtitle-2">{{template.name}}</div>
+                            <div class="value">{{template.venue?.name}}</div>
+                            <div class="value">
+                                {{template.venue?.city + ' (' + ('COUNTRIES.' + template.venue?.country | translate) + ')'}}
+                            </div>
+                        </div>
+                        <div>
+                            <div fxFlex fxLayout="column">
+                                <span class="label primary">{{'VENUE_TPLS.ID' | translate}}</span>
+                                <span class="value">{{template.id}}</span>
+                            </div>
+                            <mat-divider vertical class="detail-bar-divider" />
+                            <div fxFlex fxLayout="column">
+                                <span class="label primary">{{'FORMS.LABELS.OWNER' | translate}}</span>
+                                <span class="value">{{template.entity?.name}}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div fxFlex fxLayout="column">
+                                <span class="label primary">{{'VENUES.MAX_CAPACITY' | translate}}</span>
+                                <span class="value">{{template.venue?.capacity}}</span>
+                            </div>
+                            <mat-divider vertical class="detail-bar-divider" />
+                            <div fxFlex fxLayout="column">
+                                <span class="label primary">{{'FORMS.LABELS.TYPE' | translate}}</span>
+                                <span class="value">{{'EVENTS.TYPE_OPTS.' + template.type | translate}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    @if(template.external_data) {
+                        <mat-divider class="divider-external-data" />
+                        <div fxFlex="36px" class="left-sidebar-subheader">
+                            <h3 class="section-title">{{'VENUE_TPLS.DETAILS_TITLE_AVET' | translate | uppercase}}</h3>
+                        </div>
+                        <div class="item-details" fxLayout="column" fxLayoutGap="14px">
+                            @for(external_data of template.external_data | keyvalue; track external_data.key) {
+                                <div fxFlex fxLayout="column">
+                                    <span class="label primary">{{'VENUE_TPLS.' + external_data.key | uppercase | translate}}</span>
+                                    <span class="value">{{external_data.value}}</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                    @if(venueTemplateInteractive$ | async; as interactiveOptions) {
+                        <mat-divider />
+                        <div fxFlex="36px" class="left-sidebar-subheader" fxLayoutAlign="space-between center">
+                            <h3 class="section-title">{{'VENUE_TPLS.INTERACTIVE_TPL_TITLE' | translate | uppercase}}</h3>
+                            @if(isOperatorUser$ | async) {
+                                <button mat-icon-button aria-label="Interactive tpl" class="ob-button small"
+                                    (click)="openInteractiveVenuesTemplateDialog(template.id, interactiveOptions)"
+                                    [matTooltip]="'VENUE_TPLS.OPEN_INTERACTIVE_OPTIONS' | translate">
+                                    <mat-icon>settings</mat-icon>
+                                </button>
+                            }
+                        </div>
+                        <div class="item-details" fxLayout="column" fxLayoutGap="14px">
+                            <div fxLayoutGap="10px">
+                                <span class="ob-label">{{'FORMS.LABELS.INTERACTIVE_VENUES' | translate}}:</span>
+                                <span class="value">{{(interactiveOptions.enabled ?
+                                'VENUE_TPLS.INTERACTIVE_VENUE_ACTIVE' : 'VENUE_TPLS.INTERACTIVE_VENUE_INACTIVE') | translate}}
+                                </span>
+                            </div>
+                            <div fxLayout="column">
+                                <span class="label primary">{{'FORMS.LABELS.MULTIMEDIA_CONTENT_CODE' | translate}}</span>
+                                <span class="value">
+                                    {{interactiveOptions?.multimedia_content_code ? interactiveOptions?.multimedia_content_code : '-'}}
+                                </span>
+                            </div>
+                            <div fxLayout="column">
+                                <span class="label primary">{{'FORMS.LABELS.EXTERNAL_MINIMAP_ID' | translate}}</span>
+                                <span class="value">
+                                    {{interactiveOptions?.external_minimap_id ? interactiveOptions?.external_minimap_id : '-'}}
+                                </span>
+                            </div>
+                            @if(interactiveOptions?.external_plugins) {
+                                <div class="external-plugins" fxLayout="column" fxLayoutGap="14px">
+                                    @for(externalPlugin of interactiveOptions?.external_plugins; track externalPlugin.id) {
+                                        <div fxFlex fxLayout="row" fxLayoutGap="10px">
+                                            @if(externalPlugin.enabled) {
+                                                <span class="ob-label">
+                                                    {{'VENUE_TPLS.INTERACTIVE_PLUGIN' | translate : { value: externalPlugin.name } }}:
+                                                </span>
+                                                <span class="value">{{(externalPlugin.enabled
+                                                    ? 'VENUE_TPLS.INTERACTIVE_PLUGIN_ACTIVE'
+                                                    : 'VENUE_TPLS.INTERACTIVE_PLUGIN_INACTIVE') | translate}}
+                                                </span>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </mat-drawer>
+        <mat-drawer-content fxFlex="0 1 100%" fxLayout="column">
+            <div class="ob-sidebar-toggle" (click)="sidebarToggle(drawer)" [class.collapsed]="!drawer.opened">
+                <span class="arrow"></span>
+            </div>
+            @if((venueTemplateStatus$ | async) !== venueTemplateStatus.inProgress) {
+                <div fxFlex="0 1 100%">
+                    @if(venueTemplate$ | async; as venueTemplate) {
+                        <app-std-venue-tpl-mgr fxFlex="0 1 100%"
+                            [editorType]="venueTemplateEditorType.promoterTemplate" [venueTemplate]="venueTemplate"
+                            [editorEnabled]="showEditorBtn$ | async" (gotoEditor)="gotoEditor()" />
+                    }
+                </div>
+            }
+            @if((venueTemplateStatus$ | async) !== venueTemplateStatus.active) {
+                <div class="ob-overlay-wrapper" fxLayoutAlign="center center">
+                    <div class="ob-overlay-pane pane-center">
+                        <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px"
+                            fxFlex="80%">
+                            <p>{{'VENUE_TPLS.DUPLICATION_IN_PROGRESS' | translate}}</p>
+                            <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                                [attr.aria-label]="('VENUE_TPLS.DUPLICATION_IN_PROGRESS' | translate)" />
+                        </app-context-notification>
+                    </div>
+                </div>
+            }
+        </mat-drawer-content>
+    </mat-drawer-container>
+</app-form-container-full>

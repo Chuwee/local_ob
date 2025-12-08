@@ -1,0 +1,32 @@
+<div fxLayout="row wrap" class="translations-container">
+    <mat-form-field *ngIf="(priceTypes$ | async)" fxFlex="0 1 75%" appearance="outline" class="ob-form-field field-with-label">
+        <mat-label>{{'VENUE_TPLS.TICKET_TYPES' | translate}}</mat-label>
+        <mat-select [formControl]="priceTypeControl">
+            <mat-option *ngFor="let priceType of priceTypes$ | async" [value]="priceType.id">
+                {{priceType.name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    <app-tabs-menu *ngIf="currentFormGroup" [formGroup]="currentFormGroup" type="language" overrideClasses="no-left-padding"
+        fxFlex="0 1 100%">
+        <ng-container *ngFor="let lang of languages$ | async">
+            <ng-template appTab lazyLoad [label]="('LANGUAGES.' + lang) | translate">
+                <div fxLayout="row wrap" [formGroupName]="lang">
+                    <mat-form-field fxFlex="100%" fxFlex.gt-md="75%" appearance="outline" class="ob-form-field field-with-label">
+                        <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                        <input matInput aria-label="name" formControlName="name"
+                            [placeholder]="currentPriceType ? currentPriceType.name : ('FORMS.LABELS.NAME' | translate)">
+                        <mat-error [ob-form-errors]="currentFormGroup" [field]="[lang, 'name']"></mat-error>
+                    </mat-form-field>
+                    <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field no-padding field-with-label">
+                        <mat-label>{{'FORMS.LABELS.DESCRIPTION' | translate}}</mat-label>
+                        <app-rich-text-area [autoresize]="{min: 180, max: 300}" aria-label="description"
+                            [placeholder]="'FORMS.LABELS.DESCRIPTION' | translate" formControlName="description">
+                        </app-rich-text-area>
+                        <mat-error [ob-form-errors]="currentFormGroup" [field]="[lang, 'description']"></mat-error>
+                    </mat-form-field>
+                </div>
+            </ng-template>
+        </ng-container>
+    </app-tabs-menu>
+</div>

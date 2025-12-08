@@ -1,0 +1,42 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu"
+    [disabled]="(canWrite$ | async) !== true || !form.dirty || (isLoadingOrSaving$ | async)">
+    <div class="flex flex-col">
+        <div class="flex w-full">
+            <mat-form-field class="ob-form-field field-with-label grow-0 shrink-0 basis-[120px]" appearance="outline"
+            [matTooltip]="'PRODUCT.VARIANT.DISABLED_TOOLTIP' | translate"
+            [ngClass]="{'cursor-not-allowed': form.get('price').disabled}"
+            [matTooltipDisabled]="form.get('price').enabled"
+            [matTooltipPositionAtOrigin]="true">
+                <mat-label>{{'PRODUCT.PRICE' | translate}}</mat-label>
+                <app-currency-input class="currency-input" [formControl]="form.get('price')"
+                    [ngClass]="{'disabled': $product().product_state === productStates.active}" pattern="\d*\.?\d{0,2}"
+                    [currencyCode]="$currency()" [currencyFormat]="'narrow'"
+                    [placeholder]="0 | localCurrency : $currency() : 'narrow'" />
+                <mat-error [ob-form-errors]="form.get('price')" />
+            </mat-form-field>
+        </div>
+        <div class="flex w-full">
+            <mat-form-field class="ob-form-field field-with-label grow-0 shrink-0 basis-[170px]" appearance="outline">
+                <mat-label>{{'PRODUCT.SKU' | translate}}</mat-label>
+                <input matInput aria-label="sku" [placeholder]="'PRODUCT.SKU' | translate"
+                    [formControl]="form.get('sku')">
+                <mat-error [ob-form-errors]="form.get('sku')" />
+            </mat-form-field>
+        </div>
+        @if($product().stock_type !== productStockTypes.unbounded) {
+            <div class="flex w-full">
+                <mat-form-field class="ob-form-field field-with-label grow-0 shrink-0 basis-[120px]" appearance="outline"
+                [ngClass]="{'cursor-not-allowed': form.get('stock').disabled}"
+                [matTooltip]="'PRODUCT.VARIANT.DISABLED_STOCK_TOOLTIP' | translate"
+                [matTooltipDisabled]="form.get('stock').enabled"
+                [matTooltipPositionAtOrigin]="true">
+                    <mat-label>{{'PRODUCT.STOCK' | translate}}</mat-label>
+                    <input matInput type="number" aria-label="name" [placeholder]="'PRODUCT.STOCK' | translate"
+                        [ngClass]="{'disabled': $product().product_state === productStates.active}"
+                        [formControl]="form.get('stock')">
+                    <mat-error [ob-form-errors]="form.get('stock')" />
+                </mat-form-field>
+            </div>
+        }
+    </div>
+</app-form-container>

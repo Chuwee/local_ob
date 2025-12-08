@@ -1,0 +1,649 @@
+@let customer = $customer();
+<!--{}-->
+<div class="status-notifications-container flex justify-center">
+    <div class="customer-status flex justify-end items-center gap-2 basis-full">
+        <label class="ob-label">{{'CUSTOMER.STATUS' | translate}}:</label>
+        @if (customer) {
+            <div>
+                <span class="status-dot {{ customer.status | lowercase }}"></span>
+                <span>{{ 'CUSTOMER.STATUS_OPTS.' + customer.status | translate }}</span>
+            </div>
+        }
+    </div>
+</div>
+<app-form-container (save)="save()" (cancel)="cancel()" layout="main"
+    [hideActionBar]="(canLoggedUserWrite$ | async) === null || (canLoggedUserWrite$ | async) === false"
+    [disabled]="isSaveCancelDisabled$ | async" sidebar>
+    <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+        @let adminCustomerFields = $adminCustomerFieldNames();
+        @let uneditableFields = $uneditableFields();
+        <!-- CUSTOMER DATA -->
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CUSTOMER.CUSTOMER_DATA' | translate}}</mat-panel-title>
+        </mat-expansion-panel-header>
+        @if (generalInfoForm){
+            @if (customer) {
+                <form [formGroup]="generalInfoForm" fxLayout="row wrap" fxLayoutAlign="space-between">
+                    <!-- Title -->
+                    @if (adminCustomerFields.includes('title')) {
+                        @if (canLoggedUserWrite$ | async) {
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label"
+                                fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 5px)">
+                                <mat-label>{{'CUSTOMER.TITLE' | translate}}</mat-label>
+                                <mat-select formControlName="title" aria-label="title"
+                                    [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                    @for (title of customerTitle; track title) {
+                                        <mat-option [value]="title">
+                                            {{('CUSTOMER.TITLE_OPTS.' + title) | translate}}
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        } @else {
+                            <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                                fxLayout="column" aria-label="title">
+                                <span class="field-label">{{'CUSTOMER.TITLE' | translate}}</span>
+                                <span>{{customer.title}}</span>
+                            </div>
+                        }
+                    }
+                    <!-- Name -->
+                    @if ((canLoggedUserWrite$ | async) && !uneditableFields?.includes('name')) {
+                        <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" fxFlex.gt-sm="0 1 50%"
+                            appearance="outline">
+                            <mat-label>{{'CUSTOMER.NAME' | translate}}</mat-label>
+                            <input matInput aria-label="name" [placeholder]="'CUSTOMER.NAME' | translate"
+                                formControlName="name">
+                            <mat-error [ob-form-errors]="generalInfoForm" field="name" />
+                        </mat-form-field>
+                    } @else {
+                        <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                            fxLayout="column" aria-label="name">
+                            <span class="field-label">{{'CUSTOMER.NAME' | translate}}</span>
+                            <span>{{customer.name}}</span>
+                        </div>
+                    }
+                    <!-- Surname -->
+                    @if((canLoggedUserWrite$ | async) && !uneditableFields?.includes('surname')) {
+                        <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" fxFlex.gt-sm="0 1 50%"
+                            appearance="outline">
+                            <mat-label>{{'CUSTOMER.SURNAME' | translate}}</mat-label>
+                            <input matInput aria-label="surname" [placeholder]="'CUSTOMER.SURNAME' | translate"
+                                formControlName="surname">
+                            <mat-error [ob-form-errors]="generalInfoForm" field="surname" />
+                        </mat-form-field>
+                    } @else {
+                        <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                            fxLayout="column" aria-label="surname">
+                            <span class="field-label">{{'CUSTOMER.SURNAME' | translate}}</span>
+                            <span>{{customer.surname}}</span>
+                        </div>
+                    }
+                    <!-- Email -->
+                    @if((canLoggedUserWrite$ | async) && !isGoogleEmail(customer) && !uneditableFields?.includes('email')) {
+                        <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" fxFlex.gt-sm="0 1 50%"
+                            appearance="outline">
+                            <mat-label>{{'CUSTOMER.EMAIL' | translate}}</mat-label>
+                            <input matInput aria-label="email" [placeholder]="'CUSTOMER.EMAIL' | translate"
+                                formControlName="email">
+                            <mat-error [ob-form-errors]="generalInfoForm" field="email" />
+                        </mat-form-field>
+                    } @else {
+                        <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                            fxLayout="column" aria-label="email">
+                            <span class="field-label">{{'CUSTOMER.EMAIL' | translate}}</span>
+                            <span class="flex items-center gap-2">
+                                @if(isGoogleEmail(customer)){
+                                    <mat-icon class="ob-google-icon" svgIcon="google-logo" />
+                                }
+                                <span>{{customer.email}}</span>
+                            </span>
+                        </div>
+                    }
+                    <!-- Phone -->
+                    @if (adminCustomerFields.includes('phone') && !adminCustomerFields.includes('int_phone')) {
+                        @if((canLoggedUserWrite$ | async) && !uneditableFields?.includes('phone')) {
+                            <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" fxFlex.gt-sm="0 1 50%"
+                                appearance="outline">
+                                <mat-label>{{'CUSTOMER.PHONE' | translate}}</mat-label>
+                                <input matInput aria-label="phone" [placeholder]="'CUSTOMER.PHONE' | translate"
+                                    formControlName="phone">
+                                <mat-error [ob-form-errors]="generalInfoForm" field="phone" />
+                            </mat-form-field>
+                        } @else {
+                            <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                                fxLayout="column" aria-label="phone">
+                                <span class="field-label">{{'CUSTOMER.PHONE' | translate}}</span>
+                                <span>{{customer.phone}}</span>
+                            </div>
+                        }
+                    }
+                    <!-- Phone 2 -->
+                    @if (adminCustomerFields.includes('phone_2')) {
+                        @if((canLoggedUserWrite$ | async) && !uneditableFields?.includes('phone_2')) {
+                            <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" fxFlex.gt-sm="0 1 50%"
+                                appearance="outline">
+                                <mat-label>{{'CUSTOMER.PHONE_2' | translate}}</mat-label>
+                                <input matInput aria-label="phone_2" [placeholder]="'CUSTOMER.PHONE_2' | translate"
+                                    formControlName="phone_2">
+                                <mat-error [ob-form-errors]="generalInfoForm" field="phone_2" />
+                            </mat-form-field>
+                        } @else {
+                            <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                                fxLayout="column" aria-label="phone_2">
+                                <span class="field-label">{{'CUSTOMER.PHONE_2' | translate}}</span>
+                                <span>{{customer.phone_2}}</span>
+                            </div>
+                        }
+                    }
+                    <!-- Int Phone -->
+                    @if (adminCustomerFields.includes('int_phone')) {
+                        @if((canLoggedUserWrite$ | async) && !uneditableFields?.includes('int_phone')) {
+                            <div [class]="'flex flex-row items-start'" fxFlex="100%" fxFlex.gt-sm="0 1 50%" formGroupName="int_phone">
+                                <!-- Prefix -->
+                                <mat-form-field class="ob-form-field field-with-label"
+                                    fxFlex="40%" subscriptSizing="dynamic"
+                                    appearance="outline">
+                                    <mat-label>{{'CUSTOMER.PREFIX_PHONE' | translate}}</mat-label>
+                                    <mat-select class="custom-dropdown" formControlName="phone_prefix"
+                                        [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                        @let selectPrefix = generalInfoForm.controls.int_phone.controls['phone_prefix'].value;
+                                            @if(selectPrefix){
+                                            <mat-select-trigger>
+                                                <i [innerHTML]="internationalPhoneCountry()"></i>&nbsp;&nbsp;
+                                                {{'(+' + selectPrefix + ')' }}
+                                            </mat-select-trigger>
+                                        }
+                                        <mat-option>
+                                            <app-select-search #prefixPhoneSelectSearch [options$]="prefixList$"
+                                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                                searchField="label" />
+                                        </mat-option>
+                                        @for (listPhone of prefixPhoneSelectSearch.getFilteredOptions$() | async; track listPhone) {
+                                            <mat-option [value]="listPhone?.value">
+                                                {{listPhone ? listPhone?.label:''}}
+                                            </mat-option>
+                                        }
+                                    </mat-select>
+                                    <mat-error [ob-form-errors]="generalInfoForm.controls.int_phone" field="phone_prefix" />
+                                </mat-form-field>
+                                <!-- Phone -->
+                                <mat-form-field class="ob-form-field field-with-label" fxFlex="60%"
+                                    appearance="outline">
+                                    <mat-label>{{'CUSTOMER.PHONE' | translate}}</mat-label>
+                                    <input matInput aria-label="phone" [placeholder]="'CUSTOMER.PHONE' | translate"
+                                        formControlName="phone">
+                                    <mat-error [ob-form-errors]="generalInfoForm.controls.int_phone" field="phone" />
+                                </mat-form-field>
+                            </div>
+                        } @else {
+                            @if(customer.int_phone){
+                                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                                    fxLayout="column" aria-label="phone">
+                                    <span class="field-label">{{'CUSTOMER.INT_PHONE' | translate}}</span>
+                                    <span>{{'+(' + customer.int_phone?.phone_prefix + ') ' + customer.int_phone?.phone}}</span>
+                                </div>
+                            }
+                        }
+                    }
+                    <!-- Id Card -->
+                    @if (adminCustomerFields.includes('identification')) {
+                        @if ((canLoggedUserWrite$ | async) && !uneditableFields?.includes('identification')) {
+                            <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" fxFlex.gt-sm="0 1 50%"
+                                appearance="outline">
+                                <mat-label>{{'CUSTOMER.ID_CARD' | translate}}</mat-label>
+                                <input matInput aria-label="id card" [placeholder]="'CUSTOMER.ID_CARD' | translate"
+                                    formControlName="identification">
+                            </mat-form-field>
+                        } @else {
+                            <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                                fxLayout="column" aria-label="id card">
+                                <span class="field-label">{{'CUSTOMER.ID_CARD' | translate}}</span>
+                                <span>{{customer.id_card}}</span>
+                            </div>
+                        }
+                    }
+                    <!-- Birthday -->
+                    @if (adminCustomerFields.includes('birthday')) {
+                        @if ((canLoggedUserWrite$ | async) && !uneditableFields?.includes('birthday')) {
+                            <div class="flex items-start birthday-field-wrapper gap-5 sm:flex-[0_1_calc(50%-40px)]">
+                                <mat-form-field class="ob-form-field field-with-label flex-1" appearance="outline">
+                                    <mat-label>{{'CUSTOMER.BIRTHDAY' | translate}}</mat-label>
+                                    <input matInput [matDatepicker]="birthdayDP" [placeholder]="dateFormat"
+                                        formControlName="birthday" (focus)="birthdayDP.open()" aria-label="birthday">
+                                    <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                                        (click)="$event.stopPropagation(); birthdayDP.open();">
+                                        <mat-icon>event</mat-icon>
+                                    </button>
+                                    <mat-datepicker #birthdayDP />
+                                </mat-form-field>
+                                @if($customerAge()){
+                                    <div class="flex flex-col flex-1">
+                                        <span class="field-label">{{'CUSTOMER.AGE' | translate}}</span>
+                                        <span>{{$customerAge()}}</span>
+                                    </div>
+                                }
+                            </div>
+
+                        } @else {
+                            <div class="flex flex-1 sm:flex-[0_1_50%]">
+                                <div class="details-non-editable-field ob-form-field flex flex-1 flex-col" aria-label="birthday">
+                                    <span class="field-label">{{'CUSTOMER.BIRTHDAY' | translate}}</span>
+                                    <span>{{customer.birthday | localDateTime : dateTimeFormats.shortDate}}</span>
+                                </div>
+                                <div class="details-non-editable-field ob-form-field flex flex-1 flex-col" aria-label="age">
+                                    <span class="field-label">{{'CUSTOMER.AGE' | translate}}</span>
+                                    <span>{{$customerAge()}}</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    <!-- Gender -->
+                    @if (adminCustomerFields.includes('gender')) {
+                        @if ((canLoggedUserWrite$ | async) && !uneditableFields?.includes('gender')) {
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label" fxFlex="100%"
+                                fxFlex.gt-sm="0 1 50%">
+                                <mat-label>{{'CUSTOMER.GENDER' | translate}}</mat-label>
+                                <mat-select formControlName="gender" aria-label="gender"
+                                    [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                    <mat-option
+                                        [value]="customerGenderEnum.none">{{'FORMS.SELECT.PLACE_HOLDER' | translate}}</mat-option>
+                                    @for (gender of customerGenderValues; track gender) {
+                                        <mat-option [value]="gender">{{('CUSTOMER.GENDER_OPTS.' + gender) | translate}}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        } @else {
+                            <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                                fxLayout="column" aria-label="gender">
+                                <span class="field-label">{{'CUSTOMER.GENDER' | translate}}</span>
+                                <span>
+                                    {{customer.gender ? (('CUSTOMER.GENDER_OPTS.' + customer.gender) | translate) : ''}}
+                                </span>
+                            </div>
+                        }
+                    }
+                    <!-- Language -->
+                    @if (adminCustomerFields.includes('language')) {
+                        @if ((canLoggedUserWrite$ | async) && !uneditableFields?.includes('language')) {
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label" fxFlex="100%"
+                                fxFlex.gt-sm="0 1 50%">
+                                <mat-label>{{'CUSTOMER.LANGUAGE' | translate}}</mat-label>
+                                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="language"
+                                    aria-label="language">
+                                    @for(languageCode of languageCodes$ | async; track languageCode) {
+                                        <mat-option
+                                            [value]="languageCode">{{ ('LANGUAGES.' + languageCode ) | translate }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        } @else {
+                            <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                                fxLayout="column" aria-label="language">
+                                <span class="field-label">{{'CUSTOMER.LANGUAGE' | translate}}</span>
+                                <span>{{('LANGUAGES.' + customer.language ) | translate }}</span>
+                            </div>
+                        }
+                    }
+                    <!-- Member Id -->
+                    @if ((canLoggedUserWrite$ | async) && $entityMemberIdGeneration() === 'DEFAULT') {
+                        <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" formGroupName="member_data"
+                            fxFlex.gt-sm="0 1 50%" appearance="outline">
+                            <mat-label>{{'CUSTOMER.MEMBER_ID' | translate}}</mat-label>
+                            <input matInput aria-label="member id" [placeholder]="'CUSTOMER.MEMBER_ID' | translate"
+                                formControlName="id">
+                            <mat-error [ob-form-errors]="memberDataFormGroup" field="id" />
+                        </mat-form-field>
+                    } @else {
+                        <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                            fxLayout="column" aria-label="member id">
+                            <span class="field-label">{{'CUSTOMER.MEMBER_ID' | translate}}</span>
+                            <span>{{customer.member_data?.id}}</span>
+                        </div>
+                    }
+                    <!-- EXTERNAL_IDS -->
+                    @if (customer?.auth_providers) {
+                        <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                            fxLayout="column" aria-label="external_ids">
+                            <span class="field-label">{{'CUSTOMER.EXTERNAL_IDS' | translate}}</span>
+                            @for (authProvider of customer.auth_providers; track authProvider) {
+                                <div class="flex">
+                                    <span>{{ authProvider.id }} - {{ authProvider.customer_id }}</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                    @if(customer?.membership_start_date) {
+                        <div class="flex flex-col details-non-editable-field ob-form-field flex-1"
+                            aria-label="membership start date">
+                            <span class="field-label">{{'CUSTOMER.MEMBERSHIP_START_DATE' | translate}}</span>
+                            <span>{{customer.membership_start_date | localDateTime : dateTimeFormats.shortDate}}</span>
+                        </div>
+                    }
+                    <!-- Customer Types -->
+                    @if($entityCustomerTypes()?.length) {
+                        <mat-divider fxFlex="100%" class="ob-form-divider" />
+                        <div class="flex flex-col flex-auto">
+                            @if (canLoggedUserWrite$ | async) {
+                                <div class="flex">
+                                    <mat-form-field appearance="outline"
+                                        class="ob-form-field field-with-label inline-field label-with-icon"
+                                        fxFlex="100%" fxFlex.gt-sm="0 1 50%">
+                                        <mat-label class="field-label members-id-field">
+                                            {{'CUSTOMER.ENTITY_CUSTOMER_TYPES' | translate}}
+                                            <mat-icon class="ob-help-icon detail-help-icon"
+                                                [matTooltip]="'CUSTOMER.ENTITY_CUSTOMER_TYPES_INFO' | translate">
+                                                help_outline
+                                            </mat-icon>
+                                        </mat-label>
+                                        <mat-select multiple formControlName="customer_types" aria-label="entity customer types"
+                                            [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                            <!-- AUTOMATIC -->
+                                            @if($entityCustomerTypesAutomatic().length){
+                                                <mat-optgroup [label]="'CUSTOMER.GROUP_AUTOMATIC' | translate">
+                                                    @for (
+                                                        entityCustomerType of $entityCustomerTypesAutomatic();
+                                                        track entityCustomerType.id
+                                                    ) {
+                                                        <mat-option [value]="entityCustomerType.id">
+                                                            {{entityCustomerType.name}}
+                                                        </mat-option>
+                                                    }
+                                                </mat-optgroup>
+                                            }
+                                            <!-- MANUAL -->
+                                            @if($entityCustomerTypesManual().length){
+                                                <mat-optgroup [label]="'CUSTOMER.GROUP_MANUAL' | translate">
+                                                    @for (entityCustomerType of $entityCustomerTypesManual(); track entityCustomerType.id) {
+                                                        <mat-option [value]="entityCustomerType.id">
+                                                            {{entityCustomerType.name}}
+                                                        </mat-option>
+                                                    }
+                                                </mat-optgroup>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                            } @else {
+                                @if($entityCustomerTypesNames()) {
+                                    <div class="details-non-editable-field ob-form-field" fxFlex="100%"
+                                        fxFlex.gt-sm="50%" fxLayout="column" aria-label="entity customer types">
+                                        <span class="field-label">{{'CUSTOMER.ENTITY_CUSTOMER_TYPES' | translate}}</span>
+                                        <span>{{$entityCustomerTypesNames()}}</span>
+                                    </div>
+                                }
+                            }
+                            @if ($customerTypesHistoric()?.length) {
+                                <span class="ob-link ct-historic-link"
+                                    (click)="openCustomerTypesHistoricDialog()">{{ 'CUSTOMER.GO_TO_CTS_HISTORIC' | translate }}</span>
+                            }
+                        </div>
+                        <mat-divider fxFlex="100%" class="ob-form-divider ct-field-divider" />
+                    }
+
+                    <!-- Entity Name -->
+                    <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                        fxLayout="column" aria-label="entity name">
+                        <span class="field-label">{{'CUSTOMER.ENTITY_NAME' | translate}}</span>
+                        <span>{{customer.entity.name}}</span>
+                    </div>
+                    <!-- Sign up date -->
+                    <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                        fxLayout="column" aria-label="sign up date">
+                        <span class="field-label">{{'CUSTOMER.SIGN_UP_DATE' | translate}}</span>
+                        <span>{{customer.dates.sign_up_date | localDateTime : dateTimeFormats.shortDate}}</span>
+                    </div>
+                    <!-- Last import date -->
+                    @if (customer.dates?.last_import_date) {
+                        <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                            fxLayout="column" aria-label="last import date">
+                            <span class="field-label">{{'CUSTOMER.LAST_IMPORT_DATE' | translate}}</span>
+                            <span>{{customer.dates.last_import_date | localDateTime : dateTimeFormats.shortDate}}</span>
+                        </div>
+                    }
+                    @if ($canImpersonate()) {
+                        <mat-divider fxFlex="100%" class="ob-form-divider" />
+                        <div class="details-non-editable-field ob-form-field flex flex-col gap-2" aria-label="customer private area">
+                            <div class="flex flex-col">
+                                <span class="field-label">{{'CUSTOMER.PRIVATE_AREA.TITLE' | translate}}</span>
+                                <span>{{'CUSTOMER.PRIVATE_AREA.DESCRIPTION' | translate}}</span>
+                            </div>
+                            <div class="flex items center">
+                                <mat-icon class="ob-icon small neutral with-text">info</mat-icon>
+                                <span>{{'CUSTOMER.PRIVATE_AREA.INFO' | translate }}</span>
+                            </div>
+                            <a aria-label="Go to link" class="ob-link flex items-center gap-1" (click)="goToPrivateArea()">
+                                <span>{{'CUSTOMER.PRIVATE_AREA.LINK' | translate}}</span>
+                                <mat-icon class="ob-icon xsmall" iconPositionEnd>launch</mat-icon>
+                            </a>
+                        </div>
+                    }
+                </form>
+            }
+        }
+        </mat-expansion-panel>
+        <!-- MEMBERS ID -->
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CUSTOMER.MEMBERS_IDS.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            @if(customer) {
+                <form [formGroup]="generalInfoForm.controls['member_data']">
+                    <mat-checkbox #membersIdActive color="primary" formControlName="allow_product_client_ids" class="inline">
+                        {{ 'CUSTOMER.MEMBERS_ID.ACTIVE_CHECKBOX'| translate }}
+                    </mat-checkbox>
+                    @if(membersIdActive.checked) {
+                        <div class="details-form-container" fxLayout="column">
+                            <mat-table class="ob-table" [dataSource]="membersIdsList">
+                                <ng-container matColumnDef="event">
+                                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                                        {{ 'CUSTOMER.MEMBERS_ID.TABLE.EVENT' | translate }}
+                                    </mat-header-cell>
+                                    <mat-cell *matCellDef="let row;">
+                                        {{ row.event.name }}
+                                    </mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="type">
+                                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                                        {{ 'CUSTOMER.MEMBERS_ID.TABLE.TYPE' | translate }}
+                                    </mat-header-cell>
+                                    <mat-cell *matCellDef="let row;">
+                                        {{ row.event.type }}
+                                    </mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="member_id">
+                                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                                        {{ 'CUSTOMER.MEMBERS_ID.TABLE.MEMBER_ID' | translate }}
+                                    </mat-header-cell>
+                                    <mat-cell *matCellDef="let row" class="editable-cell">
+                                        <mat-form-field appearance="outline" class="ob-form-field"
+                                            formGroupName="product_client_ids">
+                                            <div class="members-id-field">
+                                                <input matInput type="text" [formControlName]="row.event.id"
+                                                    [placeholder]="'CUSTOMER.MEMBERS_ID.TABLE.INPUT_PLACEHOLDER' | translate">
+                                                @if(
+                                                    memberDataFormGroup.controls['product_client_ids']
+                                                        .get(row.event.id.toString()).invalid &&
+                                                    memberDataFormGroup.controls['product_client_ids']
+                                                        .get(row.event.id.toString()).touched
+                                                ) {
+                                                    <mat-icon matSuffix class="warn" matTooltipClass="ob-tooltip-error"
+                                                        [matTooltip]="
+                                                            memberDataFormGroup.controls['product_client_ids']
+                                                                .get(row.event.id.toString()) | translateFormError | async
+                                                        ">
+                                                        error_outline
+                                                    </mat-icon>
+                                                }
+                                            </div>
+                                        </mat-form-field>
+                                    </mat-cell>
+                                </ng-container>
+                                <mat-header-row
+                                    *matHeaderRowDef="['event', 'type', 'member_id']; sticky: true" />
+                                <mat-row *matRowDef="let row; columns: ['event', 'type', 'member_id'];" />
+                            </mat-table>
+                            @if(!membersIdsList) {
+                                <app-empty-state-tiny fxFlex="100%"
+                                    [title]="'CUSTOMER.MEMBERS_ID.EMPTY_LIST_MESSAGE.TITLE' | translate"
+                                    [description]="'CUSTOMER.MEMBERS_ID.EMPTY_LIST_MESSAGE.DESCRIPTION' | translate"
+                                    [emptyBorder]="true" />
+                            }
+                        </div>
+                    }
+                </form>
+            }
+        </mat-expansion-panel>
+        <!-- ADDRESS DATA -->
+        @if (adminCustomerFields.includes('country') || adminCustomerFields.includes('postal_code')
+            || adminCustomerFields.includes('province_code') || adminCustomerFields.includes('city')
+            || adminCustomerFields.includes('address') || adminCustomerFields.includes('address_2')) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'CUSTOMER.ADDRESS_DATA' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                @if (addressInfoForm) {
+                    @if(customer) {
+                        <form [formGroup]="addressInfoForm" fxLayout="row wrap" fxLayoutAlign="space-between">
+                            <!-- Country -->
+                            @if (adminCustomerFields.includes('country')) {
+                                @if((canLoggedUserWrite$ | async) && !uneditableFields?.includes('country')) {
+                                    <mat-form-field appearance="outline" class="ob-form-field field-with-label" fxFlex="100%"
+                                        fxFlex.gt-sm="0 1 50%">
+                                        <mat-label>{{'CUSTOMER.COUNTRY' | translate}}</mat-label>
+                                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                            formControlName="country"
+                                            aria-label="country">
+                                            <mat-option>
+                                                <app-select-search #countrySelectSearch [options$]="countries$"
+                                                    [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" />
+                                            </mat-option>
+                                            @for (country of countrySelectSearch.getFilteredOptions$() | async; track country) {
+                                                <mat-option [value]="country?.code">{{country ? country.name : ''}}</mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                } @else {
+                                    <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                                        fxLayout="column" aria-label="country">
+                                        <span class="field-label">{{'CUSTOMER.COUNTRY' | translate}}</span>
+                                        <span>{{(customerCountryReadOnly$ | async)}}</span>
+                                    </div>
+                                }
+                            }
+                            <!-- Postal Code -->
+                            @if (adminCustomerFields.includes('postal_code')) {
+                                @if((canLoggedUserWrite$ | async) && !uneditableFields?.includes('postal_code')) {
+                                    <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" fxFlex.gt-sm="0 1 50%"
+                                        appearance="outline">
+                                        <mat-label>{{'CUSTOMER.POSTAL_CODE' | translate}}</mat-label>
+                                        <input matInput aria-label="postal code" [placeholder]="'CUSTOMER.POSTAL_CODE' | translate"
+                                            formControlName="postal_code">
+                                        <mat-error [ob-form-errors]="addressInfoForm" field="postal_code" />
+                                    </mat-form-field>
+                                } @else {
+                                    <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                                        fxLayout="column" aria-label="postal code">
+                                        <span class="field-label">{{'CUSTOMER.POSTAL_CODE' | translate}}</span>
+                                        <span>{{customer.location.postal_code}}</span>
+                                    </div>
+                                }
+                            }
+                            <!-- Country Subdivision -->
+                            @if (adminCustomerFields.includes('province_code')) {
+                                @if ((canLoggedUserWrite$ | async) && !uneditableFields?.includes('province_code')) {
+                                    <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" fxFlex.gt-sm="0 1 50%"
+                                        appearance="outline">
+                                        <mat-label>{{'FORMS.LABELS.COUNTRY_SUBDIVISION' | translate}}</mat-label>
+                                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                            formControlName="province_code" aria-label="province">
+                                            <mat-option>
+                                                <app-select-search #provincesSelectSearch [options$]="provinces$"
+                                                    [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" />
+                                            </mat-option>
+                                            @for(province of provincesSelectSearch.getFilteredOptions$() | async; track province) {
+                                                <mat-option [value]="province?.code">{{province ? province.name: ''}}</mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                } @else {
+                                    <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                                        fxLayout="column" aria-label="province">
+                                        <span class="field-label">{{'CUSTOMER.PROVINCE' | translate}}</span>
+                                        <span>{{customerProvinceReadOnly$ | async}}</span>
+                                    </div>
+                                }
+                            }
+                            <!-- City -->
+                            @if (adminCustomerFields.includes('city')) {
+                                @if ((canLoggedUserWrite$ | async) && !uneditableFields?.includes('city')) {
+                                    <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" fxFlex.gt-sm="0 1 50%"
+                                        appearance="outline">
+                                        <mat-label>{{'CUSTOMER.CITY' | translate}}</mat-label>
+                                        <input matInput aria-label="city" [placeholder]="'CUSTOMER.CITY' | translate"
+                                            formControlName="city">
+                                        <mat-error [ob-form-errors]="addressInfoForm" field="city" />
+                                    </mat-form-field>
+
+                                } @else {
+                                    <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                                        fxLayout="column" aria-label="city">
+                                        <span class="field-label">{{'CUSTOMER.CITY' | translate}}</span>
+                                        <span>{{customer.location.city}}</span>
+                                    </div>
+                                }
+                            }
+                            <!-- ADDRESS -->
+                            @if (adminCustomerFields.includes('address')) {
+                                @if((canLoggedUserWrite$ | async) && !uneditableFields?.includes('address')) {
+                                    <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" fxFlex.gt-sm="0 1 50%"
+                                        appearance="outline">
+                                        <mat-label>{{'CUSTOMER.ADDRESS' | translate}}</mat-label>
+                                        <input matInput aria-label="address" [placeholder]="'CUSTOMER.ADDRESS' | translate"
+                                            formControlName="address">
+                                        <mat-error [ob-form-errors]="addressInfoForm" field="address" />
+                                    </mat-form-field>
+                                } @else {
+                                    <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                                        fxLayout="column" aria-label="address">
+                                        <span class="field-label">{{'CUSTOMER.ADDRESS' | translate}}</span>
+                                        <span>{{customer.location.address}}</span>
+                                    </div>
+                                }
+                            }
+                            <!-- ADDRESS 2 -->
+                            @if (adminCustomerFields.includes('address_2')) {
+                                @if((canLoggedUserWrite$ | async) && !uneditableFields?.includes('address_2')) {
+                                    <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" fxFlex.gt-sm="0 1 50%"
+                                        appearance="outline">
+                                        <mat-label>{{'CUSTOMER.ADDRESS_2' | translate}}</mat-label>
+                                        <input matInput aria-label="address_2" [placeholder]="'CUSTOMER.ADDRESS_2' | translate"
+                                            [formControl]="generalInfoForm.controls.address_2">
+                                        <mat-error [ob-form-errors]="generalInfoForm" field="address_2" />
+                                    </mat-form-field>
+                                } @else {
+                                    <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                                        fxLayout="column" aria-label="address">
+                                        <span class="field-label">{{'CUSTOMER.ADDRESS_2' | translate}}</span>
+                                        <span>{{customer.address_2}}</span>
+                                    </div>
+                                }
+                            }
+                        </form>
+                    }
+                }
+            </mat-expansion-panel>
+        }
+    </mat-accordion>
+    @if(customer) {
+        <ng-container slot="sidebar">
+            <app-customer-general-data-sidebar #customerSidebarContent [form]="form" [customer]="customer" />
+        </ng-container>
+    }
+</app-form-container>
+@if(isLoadingOrSaving$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

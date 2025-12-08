@@ -1,0 +1,41 @@
+<div fxFill>
+    <div fxFlex="0 0 200px" fxLayout="column" class="subtabs-container">
+        <mat-button-toggle-group vertical [value]="deepPath$ | async" class="ob-subtab" fxFlex="1 0 100%"
+            appLastPathGuardListener [currValue]="(deepPath$ | async)">
+            <mat-button-toggle routerLink="principal-info" value="principal-info" data-test="principal-info">
+                {{'ENTITY.GENERAL_DATA.PRINCIPAL_INFO' | translate}}
+            </mat-button-toggle>
+            @if (isNotSysAdmin$ | async) {
+                <mat-button-toggle routerLink="contact" value="contact" data-test="contact">
+                    {{'ENTITY.GENERAL_DATA.CONTACT' | translate}}
+                </mat-button-toggle>
+                @if (isNotEntityAdmin$ | async) {
+                    <mat-button-toggle routerLink="invoice-data" value="invoice-data" data-test="invoice-data">
+                        {{'ENTITY.GENERAL_DATA.INVOICE_DATA' | translate}}
+                    </mat-button-toggle>
+                }
+                @if ((showManagementOptions$ | async) && (isNotEntityAdmin$ | async)) {
+                    <mat-button-toggle routerLink="surcharges" value="surcharges" data-test="surcharges">
+                        {{'ENTITY.GENERAL_DATA.SURCHARGES' | translate}}
+                    </mat-button-toggle>
+                }
+                @if (showManagedEntities$ | async) {
+                    <mat-button-toggle routerLink="managed-entities" value="managed-entities">
+                        {{'ENTITY.GENERAL_DATA.MANAGED_ENTITIES' | translate}}
+                    </mat-button-toggle>
+                }
+                @if ((showManagementOptions$ | async) && (isNotEntityAdmin$ | async)) {
+                    <mat-button-toggle routerLink="cookies" value="cookies" data-test="cookies">
+                        {{'ENTITY.GENERAL_DATA.COOKIES' | translate}}
+                    </mat-button-toggle>
+                }
+                <mat-button-toggle routerLink="bank-accounts" value="bank-accounts" data-test="bank-accounts">
+                    {{'ENTITY.GENERAL_DATA.BANK_ACCOUNTS' | translate}}
+                </mat-button-toggle>
+            }
+        </mat-button-toggle-group>
+    </div>
+    <div fxFlex="0 0" fxLayout="column">
+        <router-outlet />
+    </div>
+</div>

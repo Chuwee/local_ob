@@ -1,0 +1,294 @@
+<mat-table class="ob-table order-detail-table" [dataSource]="$sessionData().tickets">
+    <!-- EXPAND COLUMN -->
+    <ng-container matColumnDef="expand">
+        <mat-header-cell *matHeaderCellDef class="expand-action-column" />
+        <mat-cell *matCellDef="let row" fxLayoutAlign="center center"
+            (click)="$event.stopPropagation(); !$isSeatReallocationOrder() ? toggleSubitems(row) : toggleChangeSeatSubitems(row)">
+            @if (row.expandable) {
+                <mat-icon class="icon-toggle">
+                    {{!row.expanded ? 'expand_more' : 'expand_less'}}
+                </mat-icon>
+            }
+        </mat-cell>
+    </ng-container>
+    <!-- SELECTION COLUMN -->
+    <ng-container matColumnDef="selection">
+        @let withAdvanceSelector = ticketsColumns.includes('expand') && !$isSeatReallocationOrder() && !$hasSeasonTicket();
+        <!-- {SELECT HEADER} -->
+        <mat-header-cell *matHeaderCellDef class="head-cell"
+            [class.with-checkbox]="$sessionData().refundAllowed && $isAllowedPartialRefund()"
+            [class.with-advance-selector]="withAdvanceSelector">
+            @if ($sessionData().refundAllowed && $isAllowedPartialRefund()) {
+                <mat-checkbox #superCheckbox color="primary"
+                    [checked]="areAllTicketsSelected()"
+                    [indeterminate]="areSomeTicketsSelected()"
+                    (change)="toggleAllTickets($event.checked)" />
+            }
+            @if (withAdvanceSelector) {
+                <app-ticket-table-advance-selector [items]="$sessions()" (applySelection)="selectSubitemsBySessionId($event)" />
+            }
+        </mat-header-cell>
+        <!-- SELECT CELL -->
+        <mat-cell *matCellDef="let row" [class.with-checkbox]="$sessionData().refundAllowed && $isAllowedPartialRefund()"
+            (click)="$event.stopPropagation();" [class.with-advance-selector]="withAdvanceSelector">
+            @if ($sessionData().refundAllowed && $isAllowedPartialRefund() && !row.isSubitemOfSeasonTicket) {
+                <mat-checkbox color="primary"
+                    [disabled]="!(row.item.action?.refund || row.item.action?.partial_refund) && isLockedItem(row)"
+                    [indeterminate]="areSomeSubitemsSelected(row) && !isTicketSelected(row)"
+                    [checked]="isTicketSelected(row)"
+                    (change)="toggleTicket(row)" />
+            }
+        </mat-cell>
+    </ng-container>
+    <!-- TICKET COLUMN -->
+    <ng-container matColumnDef="ticket">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{'ORDER.TICKETS_DATA.NAME' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+            {{row.text}}
+            @if (row.item.session) {
+                <span class="session-date">
+                    {{(row.item.session.date | localDateTime : dateTimeFormats.shortDateTimeWithWeek) || '-'}}
+                </span>
+            }
+        </mat-cell>
+    </ng-container>
+    <!-- BARCODE COLUMN -->
+    <ng-container matColumnDef="barcode">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{'ORDER.TICKETS_DATA.BARCODE' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+            <span>{{(row.item?.ticket?.barcode?.code | obfuscateString :
+                row.item?.ticket?.allocation?.event.type === eventType.avet ? obfuscatePattern.between : undefined) || '-'}}
+            </span>
+        </mat-cell>
+    </ng-container>
+    <!-- RATE COLUMN -->
+    <ng-container matColumnDef="rate">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{'ORDER.TICKETS_DATA.RATE' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+            <span [matTooltip]="row.item.ticket?.rate?.name" appEllipsify>{{row.item.ticket?.rate?.name || '-'}}</span>
+        </mat-cell>
+    </ng-container>
+    <!-- PRICE COLUMN -->
+    <ng-container matColumnDef="price">
+        <mat-header-cell *matHeaderCellDef class="head-cell right">
+            {{'ORDER.TICKETS_DATA.PRICE' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row" class="right">
+            {{row.item.price?.final | localCurrency: row.item.price?.currency}}
+        </mat-cell>
+    </ng-container>
+    <!-- PRINTS COLUMN -->
+    <ng-container matColumnDef="print">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            <span [matTooltip]="'ORDER.TICKETS_DATA.PRINT' | translate" appEllipsify>
+                {{'ORDER.TICKETS_DATA.PRINT' | translate}}
+            </span>
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+            {{row.item.ticket?.total_prints || '-'}}
+        </mat-cell>
+    </ng-container>
+    <!-- VALIDATION COLUMN -->
+    <ng-container matColumnDef="validation">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            <span [matTooltip]="'ORDER.TICKETS_DATA.VALIDATED' | translate" appEllipsify>
+                {{'ORDER.TICKETS_DATA.VALIDATED' | translate}}
+            </span>
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+            @if ($canHaveValidations() && !row.parentId) {
+                <mat-icon
+                    [class.mat-warn]="isTicketNotValidated(row)">lens</mat-icon>
+            } @else {
+                -
+            }
+        </mat-cell>
+    </ng-container>
+    <!-- STATUS COLUMN -->
+    <ng-container matColumnDef="status">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{'ORDER.TICKETS_DATA.STATUS' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+            @let state = $ticketInfoMap().get(row.item.id)?.stateKey;
+            <span>{{'ORDER.TICKETS_DATA.STATUS_OPTS.' + state | translate}}</span>
+        </mat-cell>
+    </ng-container>
+    <!-- MARKET COLUMN -->
+    <ng-container matColumnDef="market">
+        <mat-header-cell *matHeaderCellDef class="head-cell" />
+        <mat-cell *matCellDef="let row" class="width100">
+            @if(row.item.origin_market === 'SECONDARY'){
+                <span class="ob-status-badge small-badge disabled"
+                    [matTooltip]="'ORDER.TICKETS_DATA.SECONDARY_MARKET_TOOLTIP' | translate">
+                    {{'TICKET.SECONDARY_ORIGIN_MARKET_BADGE' | translate}}
+                </span>
+            }
+        </mat-cell>
+    </ng-container>
+    <!-- RELOCATION COLUMN -->
+    <ng-container matColumnDef="relocation">
+        <mat-header-cell *matHeaderCellDef class="head-cell" />
+        <mat-cell *matCellDef="let row">
+            @if($relocatedItems().has(row.item.id)){
+                <span class="ob-status-badge small-badge disabled"
+                    [matTooltip]="'ORDER.TICKETS_DATA.RELOCATION_TOOLTIP' | translate">
+                    {{'TICKET.RELOCATION_BADGE' | translate}}
+                </span>
+            }
+        </mat-cell>
+    </ng-container>
+    <!-- INVITATION COLUMN -->
+    <ng-container matColumnDef="invitation">
+        <mat-header-cell *matHeaderCellDef class="head-cell" />
+        <mat-cell *matCellDef="let row">
+            @if (row.item.ticket?.type === invitation) {
+                <mat-icon class="invitation"
+                    [matTooltip]="'FORMS.LABELS.INVITATION' | translate">
+                    local_activity
+                </mat-icon>
+            }
+        </mat-cell>
+    </ng-container>
+    <!-- ACTION ICONS COLUMN -->
+    <ng-container matColumnDef="icons">
+        <mat-header-cell *matHeaderCellDef class="head-cell" />
+        <mat-cell *matCellDef="let row" (click)="$event.stopPropagation();">
+            @let navEntries = $ticketInfoMap().get(row.item.id)?.navEntries || [];
+            @if (navEntries.length > 0) {
+                <button mat-stroked-button color="tertiary" class="ob-button small only-icon"
+                    [class.active]="menuTrigger.menuOpen" #menuTrigger="matMenuTrigger"
+                    [matTooltip]="'FORMS.ACTIONS.MORE' | translate" [matMenuTriggerFor]="actionsMenu">
+                    <mat-icon>more_horiz</mat-icon>
+                </button>
+            }
+            <mat-menu #actionsMenu="matMenu" xPosition="before">
+                @for (entry of navEntries; track $index) {
+                    <a mat-menu-item [href]="entry.url" target="_blank">
+                        @if (entry.type === 'order') {
+                            {{ entry.translationKey | translate: { orderCode: entry.orderCode } }}
+                        } @else {
+                            {{ entry.translationKey | translate }}
+                        }
+                    </a>
+                }
+            </mat-menu>
+        </mat-cell>
+    </ng-container>
+    <!-- ROW DEFINITIONS -->
+    <mat-header-row *matHeaderRowDef="ticketsColumns; sticky: true" class="dense-row" />
+    @if (!$isSeatReallocationOrder()) {
+        <mat-row *matRowDef="let row; columns: ticketsColumns;"
+            [class.interactive-row]="!row.parentId"
+            [class.last-subitem]="isLastSubitem(row)"
+            [class.ob-row-selected]="isTicketSelected(row)"
+            [class.expandable-row]="row.expandable"
+            (click)="goToTicket($event, row)"
+            [fxShow]="!row.hidden"
+            class="dense-row" />
+    } @else {
+        <mat-row *matRowDef="let row; columns: ticketsColumns;" class="dense-row"
+            [appTableDetailRow]="row" [appTableDetailRowTpl]="tpl" [allToggleableRow]="false"
+            [class.interactive-row]="!row.parentId"
+            [class.ob-row-selected]="isTicketSelected(row)"
+            [class.expandable-row]="true"
+            (click)="goToTicket($event, row)"
+            [change]="!row.expanded" />
+    }
+</mat-table>
+<ng-template #tpl let-ticket>
+    <div [@expand] class="detail-row">
+        @if (ticket.item; as item) {
+            <div class="detail-container" fxLayout="row wrap">
+                @if (item.ticket.previous_allocation?.sector) {
+                    <div class="details-non-editable-field detailed" fxFlex="100%"
+                        fxFlex.gt-xs="50%" fxLayout="column">
+                        <span class="field-label">{{'MEMBER_ORDER.ITEM.OLD_SEAT' | translate}}</span>
+                        <div class="details-non-editable-field info-container" fxFlex="100%" fxFlex.gt-xs="25%" fxLayout="column">
+                            <ng-template *ngTemplateOutlet="location; context: {$implicit: item.ticket.previous_allocation}" />
+                            <span class="rate">
+                                <strong>{{'FORMS.LABELS.RATE' | translate}}:</strong>
+                                {{item.ticket.rate?.name}}
+                            </span>
+                        </div>
+                        @if (item?.ticket.previous_allocation?.price) {
+                            <div fxLayout="column">
+                                <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-xs="50%" fxLayout="column">
+                                    <span class="field-label">{{'MEMBER_ORDER.ITEM.OLD_PRICE_BASE' | translate }}</span>
+                                    <span>
+                                        {{item.ticket.previous_allocation.price.base ?? 0 | localCurrency:
+                            item.ticket.previous_allocation.price.currency}}
+                                    </span>
+                                </div>
+                                <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-xs="50%" fxLayout="column">
+                                    <span class="field-label">{{'MEMBER_ORDER.ITEM.OLD_SURCHARGES' | translate }}</span>
+                                    <span>
+                                        {{item?.ticket.previous_allocation?.price?.total_charges ?? 0 |
+                            localCurrency: item?.ticket.previous_allocation?.price?.currency}}
+                                    </span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                @if (item.ticket.allocation) {
+                    <div class="details-non-editable-field detailed no-grid-spacing" fxFlex="100%"
+                        fxFlex.gt-xs="50%" fxLayout="column">
+                        <span class="field-label">{{'MEMBER_ORDER.ITEM.CURRENT_SEAT' | translate}}</span>
+                        <div class="details-non-editable-field info-container" fxFlex="100%" fxFlex.gt-xs="50%" fxLayout="column">
+                            <ng-template *ngTemplateOutlet="location; context: {$implicit: item.ticket.allocation}" />
+                            <span class="rate">
+                                <strong>{{'FORMS.LABELS.RATE' | translate}}:</strong>
+                                {{item.ticket.rate?.name}}
+                            </span>
+                        </div>
+                        @if (item?.price) {
+                            <div fxLayout="column">
+                                <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-xs="50%" fxLayout="column">
+                                    <span class="field-label">{{'MEMBER_ORDER.ITEM.BASE' | translate }}</span>
+                                    <span>{{item.price.base ?? 0 | localCurrency: item.price.currency}}</span>
+                                </div>
+                                <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-xs="50%" fxLayout="column">
+                                    <span class="field-label">{{'MEMBER_ORDER.ITEM.SURCHARGES' | translate }}</span>
+                                    <span>{{item.price.total_charges ?? 0 | localCurrency: item.price.currency}}</span>
+                                </div>
+                                <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-xs="50%" fxLayout="column">
+                                    <span class="field-label">{{'MEMBER_ORDER.ITEM.REALLOCATION' | translate }}</span>
+                                    <span>{{item.price.reallocation_refund ?? 0 | localCurrency: item.price.currency}}</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</ng-template>
+<ng-template #location let-location>
+    @if (location.sector?.name || location.row?.name || location.not_numbered_area?.name) {
+        <span class="sector">
+            {{location.sector?.name}}
+        </span>
+        @if (location.not_numbered_area) {
+            <span class="zone">
+                <strong>{{'FORMS.LABELS.ZONE' | translate}}:</strong>
+                {{location.not_numbered_area?.name}}
+            </span>
+        } @else {
+            <span class="row">
+                <strong>{{'FORMS.LABELS.ROW' | translate}}:</strong>
+                {{location.row?.name}}
+            </span>
+            <span class="seat">
+                <strong>{{'FORMS.LABELS.SEAT' | translate}}:</strong>
+                {{location.seat?.name}}
+            </span>
+        }
+    }
+</ng-template>

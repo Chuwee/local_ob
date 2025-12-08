@@ -1,0 +1,45 @@
+<div [formGroup]="form" class="edition-block flex flex-col gap-6"
+    [class.field-error]="form.controls.collectives.hasError('atLeastOneRequired') && form.controls.collectives.touched">
+    <div class="flex flex-col gap-2">
+        <app-searchable-paginated-selection class="ob-large-list" #selection
+            [placeholder]="'FORMS.SEARCH_COLLECTIVES' | translate" [pageSize]="pageSize" [data$]="collectivesList$"
+            [form]="form.controls.collectives" (loadData)="loadPagedCollectives($event)"
+            [metadata$]="collectivesMetadata$">
+            <div slot="filter" class="badge-container" [class.empty]="!(collectivesMetadata$ | async)?.total">
+                {{form.controls.collectives?.value?.length}} / {{(totalCollectives$ | async) || 0}}
+            </div>
+            <button slot="filter" type="button" mat-icon-button class="show-selected-only-button ob-button" color="tertiary"
+                [class.active]="selectedOnly$ | async" [disabled]="form.controls.collectives?.value?.length === 0"
+                [matTooltip]="'LOGIN_CONFIG.REGISTRY.SHOW_SELECTED_TOOLTIP' | translate"
+                (click)="changeSelectedOnly()">
+                <mat-icon>visibility</mat-icon>
+            </button>
+            <ng-template #selectionTemplate let-data="data" let-pageForm="pageForm" let-selectionChanged="selectionChanged">
+                <app-selection-list [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged"
+                    class="small-rows">
+                    <ng-template #optionTemplate let-row>
+                        <span>{{row.name}}</span>
+                    </ng-template>
+                </app-selection-list>
+            </ng-template>
+        </app-searchable-paginated-selection>
+        @if (form.controls.collectives.hasError('atLeastOneRequired') && form.controls.collectives.touched) {
+            <span class="error-description">
+                {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+            </span>
+        }
+    </div>
+    <div class="flex flex-col" [formGroup]="form.controls.memberLimit">
+        <mat-checkbox formControlName="enableLimit" color="primary">
+            {{'LOGIN_CONFIG.MEMBER_LIMIT.ENABLE' | translate}}
+        </mat-checkbox>
+        <div class="limit flex items-center">
+            <mat-label>
+                {{'LOGIN_CONFIG.MEMBER_LIMIT.DESCRIPTION' | translate}}
+            </mat-label>
+            <mat-form-field appearance="outline" class="ob-form-field inline-field value-field limit-field">
+                <input matInput type="number" formControlName="limit" placeholder="0">
+            </mat-form-field>
+        </div>
+    </div>
+</div>

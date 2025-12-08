@@ -1,0 +1,21 @@
+<app-form-container layout="menu" [formGroup]="reviewForm" [disabled]="$loading() || !reviewForm.dirty || !reviewForm.valid"
+    (save)="save()" (cancel)="cancel()">
+    <div class="review-config-header flex justify-start gap-2" slot="outside">
+        <mat-slide-toggle class="ob-slide-toggle" formControlName="enable">
+            {{'CHANNELS.REVIEWS.FORMS.ENABLE_LABEL' | translate}}
+        </mat-slide-toggle>
+        <mat-icon class="ob-help-icon" fontIcon="help_outline"
+            [matTooltip]='"CHANNELS.REVIEWS.FORMS.ENABLE_INFO" | translate' />
+    </div>
+    <mat-divider slot="outside" />
+    <p class="reviews-description">{{'CHANNELS.REVIEWS.DESCRIPTION' | translate}}</p>
+    <app-tabs-menu type="navigation" [dynamicHeight]="true">
+        <ng-template appTab lazyLoad [label]='"CHANNELS.REVIEWS.CONFIG.TITLE" | translate'>
+            <ob-channel-review-config [configForm]="reviewForm.get('config')" [channelId]="$channelId()"
+                [enabled]="reviewForm.get('enable')?.value" />
+        </ng-template>
+        <ng-template appTab lazyLoad [label]='"CHANNELS.REVIEWS.LIST.TITLE" | translate'>
+            <ob-channel-review-list />
+        </ng-template>
+    </app-tabs-menu>
+</app-form-container>

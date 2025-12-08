@@ -1,0 +1,27 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <img fxFlex alt="Onebox" class="logo-ob-image" src="assets/icons/icon-72x72.png" />
+        <h2 fxFlex="100%" fxFlexAlign="center" class="title">{{'DOWNLOAD_APP.TITLES.DOWNLOAD_DIALOG' | translate}}</h2>
+    </div>
+    <div mat-dialog-content>
+        <div class="content" fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="4px">
+            <div fxLayout="row" fxLayoutAlign="start center">
+                <mat-icon class="ob-icon xsmall with-text">check_circle</mat-icon>
+                <span>{{'DOWNLOAD_APP.INFO_1' | translate}}</span>
+            </div>
+            <div fxLayout="row" fxLayoutAlign="start center">
+                <mat-icon class="ob-icon xsmall with-text">check_circle</mat-icon>
+                <span>{{'DOWNLOAD_APP.INFO_2' | translate}}</span>
+            </div>
+        </div>
+    </div>
+    <div mat-dialog-actions>
+        <button mat-stroked-button type="button" class="ob-button" (click)="close()">
+            {{(matDialogData.hasRedirectQueryParam$ | async) ? (matDialogData.redirectText | translate) : ('DOWNLOAD_APP.ACTIONS.REJECT_INSTALL' | translate)}}
+        </button>
+        <a mat-flat-button [href]="storeUrl" class="ob-button mat-primary" target="_blank">
+            {{'DOWNLOAD_APP.ACTIONS.ACCEPT_INSTALL' | translate}}</a>
+        <a *ngIf="(matDialogData.hasRedirectQueryParam$ | async)" class="ob-link" (click)="goToDefaultRoute()">
+            {{'DOWNLOAD_APP.ACTIONS.NAVIGATE_TO_DEFAULT' | translate}}</a>
+    </div>
+</div>

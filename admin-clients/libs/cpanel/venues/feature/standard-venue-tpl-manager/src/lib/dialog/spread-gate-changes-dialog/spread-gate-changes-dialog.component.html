@@ -1,0 +1,42 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">
+            {{'VENUE_TPL_MGR.TITLES.SPREAD_GATE_CHANGES' | translate}}
+        </h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <p *ngIf="seats && nnzLocations">
+            {{'VENUE_TPL_MGR.DIALOGS.SPREAD_GATE_CHANGES.SEATS_AND_NNZ' | translate: { seats, nnzLocations } }}
+        </p>
+        <p *ngIf="seats && !nnzLocations">
+            {{'VENUE_TPL_MGR.DIALOGS.SPREAD_GATE_CHANGES.ONLY_SEATS' | translate: { seats } }}
+        </p>
+        <p *ngIf="!seats && nnzLocations">
+            {{'VENUE_TPL_MGR.DIALOGS.SPREAD_GATE_CHANGES.ONLY_NNZ' | translate: { nnzLocations } }}
+        </p>
+        <form [formGroup]="form" fxLayout="column" fxLayoutAlign="start stretch">
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>
+                    {{'VENUE_TPL_MGR.DIALOGS.SPREAD_GATE_CHANGES.STRATEGY_LABEL' | translate}}
+                </mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="strategy">
+                    <mat-option *ngFor="let type of gateUpdateTypes" [value]="type">
+                        {{('VENUE_TPL_MGR.ENUMS.GATE_UPDATE_TYPE.' + type | translate)}}
+                    </mat-option>
+                </mat-select>
+                <mat-error [ob-form-errors]="form" field="strategy"></mat-error>
+            </mat-form-field>
+        </form>
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" [disabled]="form.invalid" (click)="selectMode()">
+            {{'FORMS.ACTIONS.SELECT' | translate}}
+        </button>
+    </div>
+</div>

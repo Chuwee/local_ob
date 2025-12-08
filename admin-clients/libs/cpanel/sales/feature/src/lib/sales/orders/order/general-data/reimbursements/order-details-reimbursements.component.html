@@ -1,0 +1,156 @@
+<div fxLayout="row wrap" class="reimbursements-container">
+    <table mat-table [dataSource]="reimbursementInfo" multiTemplateDataRows class="ob-table order-detail-table">
+        <ng-container matColumnDef="expand" *ngIf="canBeExpanded">
+            <th mat-header-cell *matHeaderCellDef class="head-cell"></th>
+            <td mat-cell *matCellDef="let row;">
+                <button mat-icon-button aria-label="Expand reimbursement" class="ob-button medium only-icon"
+                    *ngIf="!!row.gateway_additional_info"
+                    (click)="expandedReimbursement = expandedReimbursement === row ? null : row">
+                    <mat-icon>
+                        {{ expandedReimbursement === row ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
+                    </mat-icon>
+                </button>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'ORDER.REIMBURSEMENTS.DATE' | translate}}
+            </th>
+            <td mat-cell *matCellDef="let row">
+                {{row.date | dateTime : dateTimeFormats.shortDateTime}}
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'ORDER.REIMBURSEMENTS.STATUS' | translate}}
+            </th>
+            <td mat-cell *matCellDef="let row">
+                <span [ngClass]="['status-dot', row.status.toLowerCase()]"></span>
+                {{'ORDER.REIMBURSEMENTS.STATUS_OPTS.' + row.status | translate}}
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="gateway">
+            <th mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'ORDER.REIMBURSEMENTS.GATEWAY' | translate}}
+            </th>
+            <td mat-cell *matCellDef="let row">
+                <span *ngIf="canBeExpanded">{{row.action?.channel?.name}}</span>
+                <span *ngIf="!canBeExpanded">{{gateway}}</span>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="code">
+            <th mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'ORDER.REIMBURSEMENTS.CODE' | translate}}
+            </th>
+            <td mat-cell *matCellDef="let row">
+                <div *ngIf="!canBeExpanded else transactionId" appEllipsify [matTooltip]="row.transaction_id"
+                    matTooltipClass="ob-tooltip-nowrap">
+                    {{row.transaction_id}}
+                </div>
+                <ng-template #transactionId>
+                    <div *ngIf="row.gateway_additional_info?.pgp_refund_transaction_id as transactionId" appEllipsify
+                        [matTooltip]="transactionId" matTooltipClass="ob-tooltip-nowrap">
+                        {{transactionId}}
+                    </div>
+                </ng-template>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="message">
+            <th mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'ORDER.REIMBURSEMENTS.MESSAGE' | translate}}
+            </th>
+            <td mat-cell *matCellDef="let row" [matTooltip]="row.message" matTooltipClass="ob-tooltip-nowrap">
+                <span>{{row.message}}</span>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef class="head-cell right">
+                {{'ORDER.REIMBURSEMENTS.AMOUNT' | translate}}
+            </th>
+            <td mat-cell *matCellDef="let row" class="right">
+                {{row.amount | localCurrency: currency}}
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef class="head-cell"></th>
+            <td mat-cell *matCellDef="let row">
+                <button mat-icon-button aria-label="Expand row" class="ob-button medium" *ngIf="row.retry"
+                    (click)="openRetryReimbursementDialog(row)">
+                    <mat-icon>autorenew</mat-icon>
+                </button>
+            </td>
+        </ng-container>
+
+        <!-- Expanded Reimbursement Column -->
+        <ng-container matColumnDef="expandedReimbursement" *ngIf="canBeExpanded">
+            <td mat-cell *matCellDef="let reimbursement" [attr.colspan]="reimbursementsColumns.length">
+                <div class="reimbursement-detail" fxLayout="column"
+                    [@reimbursementExpand]="reimbursement === expandedReimbursement ? 'expanded' : 'collapsed'">
+                    <div class="reimbursement-detail-container">
+                        <div>
+                            <div class="details-non-editable-field" fxLayout="column" fxFlex="100%"
+                                fxFlex.gt-xs="33.33%" *ngIf="reimbursement.action?.additional_info?.external_user_id">
+                                <span class="field-label">{{'ORDER.REIMBURSEMENTS.EXTERNAL_USER_ID' | translate}}</span>
+                                <span>{{reimbursement.action?.additional_info?.external_user_id}}</span>
+                            </div>
+                            <div class="details-non-editable-field" fxLayout="column" fxFlex="100%"
+                                fxFlex.gt-xs="33.33%"
+                                *ngIf="!reimbursement.action?.additional_info?.external_user_id && reimbursement.action?.user.id">
+                                <span class="field-label">{{'ORDER.REIMBURSEMENTS.EXTERNAL_USER_ID' | translate}}</span>
+                                <span>{{reimbursement.action?.user.id}}</span>
+                            </div>
+                            <div class="details-non-editable-field" fxLayout="column" fxFlex="100%"
+                                fxFlex.gt-xs="33.33%" *ngIf="reimbursement.action?.additional_info?.external_username">
+                                <span class="field-label">{{'ORDER.REIMBURSEMENTS.EXTERNAL_USER_NAME' |
+                                    translate}}</span>
+                                <span>{{reimbursement.action?.additional_info?.external_username}}</span>
+                            </div>
+                            <div class="details-non-editable-field" fxLayout="column" fxFlex="100%"
+                                fxFlex.gt-xs="33.33%"
+                                *ngIf="reimbursement.action?.additional_info?.external_center_code">
+                                <span class="field-label">{{'ORDER.REIMBURSEMENTS.EXTERNAL_CENTER_CODE' |
+                                    translate}}</span>
+                                <span>{{reimbursement.action?.additional_info?.external_center_code}}</span>
+                            </div>
+                            <div class="details-non-editable-field" fxLayout="column" fxFlex="100%"
+                                fxFlex.gt-xs="33.33%"
+                                *ngIf="reimbursement.action?.additional_info?.external_company_code">
+                                <span class="field-label">{{'ORDER.REIMBURSEMENTS.EXTERNAL_COMPANY_CODE' |
+                                    translate}}</span>
+                                <span>{{reimbursement.action?.additional_info?.external_company_code}}</span>
+                            </div>
+                        </div>
+                        <div *ngIf="reimbursement.gateway_additional_info?.pgp_payments?.length">
+                            <div class="details-non-editable-field" fxLayout="column" fxFlex="100%"
+                                fxFlex.gt-xs="33.33%">
+                                <span class="field-label">{{'ORDER.REIMBURSEMENTS.EXTERNAL_PAYMENT_TYPE' |
+                                    translate}}</span>
+                                {{reimbursement.gateway_additional_info?.pgp_payments[0].paymentType}}
+                            </div>
+                            <div class="details-non-editable-field" fxLayout="column" fxFlex="100%"
+                                fxFlex.gt-xs="33.33%">
+                                <span class="field-label">{{'ORDER.REIMBURSEMENTS.EXTERNAL_PAYMENT_DESCRIPTION' |
+                                    translate}}</span>
+                                <span>{{reimbursement.gateway_additional_info?.pgp_payments[0].description}}</span>
+                            </div>
+                            <div class="details-non-editable-field" fxLayout="column" fxFlex="100%"
+                                fxFlex.gt-xs="33.33%">
+                                <span class="field-label">{{'ORDER.REIMBURSEMENTS.EXTERNAL_PAYMENT_AMOUNT' |
+                                    translate}}</span>
+                                <span>{{reimbursement.gateway_additional_info?.pgp_payments[0].amount/100 |
+                                    localCurrency: currency}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="reimbursementsColumns"></tr>
+        <tr mat-row *matRowDef="let reimbursement; columns: reimbursementsColumns;" class="reimbursement-row"
+            [class.reimbursement-row-expanded]="expandedReimbursement === reimbursement"></tr>
+        <tr mat-row *matRowDef="let reimbursement; columns: canBeExpanded ? ['expandedReimbursement'] : []"
+            class="reimbursement-detail-row"
+            [class.reimbursement-detail-row-expanded]="expandedReimbursement === reimbursement"></tr>
+    </table>
+</div>

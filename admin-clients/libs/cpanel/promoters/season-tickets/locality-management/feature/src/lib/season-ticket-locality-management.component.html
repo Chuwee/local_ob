@@ -1,0 +1,37 @@
+<div fxFill>
+    <div fxFlex="0 0 200px" fxLayout="column" class="subtabs-container">
+        <mat-button-toggle-group vertical [value]="deepPath$ | async" class="ob-subtab" appLastPathGuardListener
+            [currValue]="(deepPath$ | async)" fxFlex="1 0 100%">
+            <mat-button-toggle routerLink="change-seats" value="change-seats">
+                {{'SEASON_TICKET.CHANGE_SEAT.TITLE' | translate}}
+            </mat-button-toggle>
+            <mat-button-toggle routerLink="transfer-seats" value="transfer-seats">
+                {{'SEASON_TICKET.TRANSFER_SEAT.TITLE' | translate}}
+            </mat-button-toggle>
+            <mat-accordion [togglePosition]="'after'" displayMode="flat">
+                <mat-expansion-panel [expanded]="true" class="mat-elevation-z0">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'SEASON_TICKET.RELEASE_SEAT.TITLE' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <mat-button-toggle routerLink="release-seats/config" value="release-seats/config">
+                        {{'SEASON_TICKET.RELEASE_SEAT.CONFIG.TITLE' | translate}}
+                    </mat-button-toggle>
+                    <mat-button-toggle routerLink="release-seats/released-list" value="release-seats/released-list"
+                        [disabled]="!$allowReleaseSeat()" [matTooltipDisabled]="$allowReleaseSeat()"
+                        [matTooltip]="'SEASON_TICKET.RELEASE_SEAT.RELEASED_LIST.DISABLED_TITLE_TOOLTIP' | translate">
+                        {{'SEASON_TICKET.RELEASE_SEAT.RELEASED_LIST.TITLE' | translate}}
+                    </mat-button-toggle>
+                </mat-expansion-panel>
+            </mat-accordion>
+            @if($showSecondaryMarket()){
+                <mat-button-toggle routerLink="secondary-market" value="secondary-market">
+                    {{'SEASON_TICKET.SECONDARY_MARKET.TITLE' | translate}}
+                </mat-button-toggle>
+            }
+            <mat-button-toggle routerLink="ticket-redemption" value="ticket-redemption">
+                {{'SEASON_TICKET.TICKET_REDEMPTION.TITLE' | translate}}
+            </mat-button-toggle>
+        </mat-button-toggle-group>
+    </div>
+    <router-outlet />
+</div>

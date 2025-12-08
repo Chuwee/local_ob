@@ -1,0 +1,36 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title class="!flex">
+        @if (channelGatewayConfig) {
+            <h2 class="secondary title basis-full">{{'CHANNELS.PAYMENT_METHODS.EDIT_TITLE' | translate}}</h2>
+        } @else {
+            <h2 class="secondary title basis-full">{{'CHANNELS.PAYMENT_METHODS.NEW_TITLE' | translate}}</h2>
+        }
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <app-channel-gateway-dialog-steps [steps]="steps" [form]="form" #dialogSteps
+        (stepEmitter)="stepHandler($event)"
+        (closeEmitter)="close()" (saveEmitter)="save()">
+        @switch (dialogSteps.active$ | async) {
+            @case (0) {
+                <app-channel-gateway-config-selection [form]="form"
+                    [gatewayRequestCtrl]="steps[0].requestCtrl" [channelGatewayConfig]="channelGatewayConfig" />
+            }
+            @case (1) {
+                <app-channel-gateway-config-surcharges [form]="form"
+                    [requestCurrencies]="steps[0].requestCtrl.value.request.currency_codes"
+                    [gatewayRequestCtrl]="steps[1].requestCtrl" [channelGatewayConfig]="channelGatewayConfig" />
+            }
+            @case (2) {
+                <app-channel-gateway-config-description [form]="form"
+                    [gatewayRequestCtrl]="steps[2].requestCtrl" [channelGatewayConfig]="channelGatewayConfig" />
+            }
+        }
+    </app-channel-gateway-dialog-steps>
+</div>
+@if ($isInProgress()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,67 @@
+<div class="list-container">
+    <div class="heading-container">
+        <div>
+            <h1 class="secondary mat-headline-3">
+                {{'TITLES.SALES_ERROR_DASHBOARD' | translate}}
+            </h1>
+        </div>
+        <div class="actions-container">
+            <div class="filter-container">
+                <button mat-icon-button class="ob-button medium" aria-label="refresh" (click)="refresh()">
+                    <mat-icon>autorenew</mat-icon>
+                </button>
+            </div>
+            <div class="filter-container">
+                <button mat-stroked-button color="tertiary" class="ob-button medium only-icon" (click)="openExportErrorRateDialog()"
+                    [disabled]="$isExportLoading()" [matTooltip]="'SALES.OPEN_EXPORT_SALES_LIST_DIALOG'  | translate">
+                    <mat-icon>file_download</mat-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="heading-container filters">
+        <div class="filters-container">
+            <div class="filter-container">
+                <app-popover-date-range-picker-filter [matTooltip]="'SALES.SALES_LIST_FILTER.SALE_DATE' | translate"
+                    [hideRemoveFiltersBtn]="true" [disableNoDate]="true" [maxDateRangeAmount]="1" [maxDateRangeType]="'year'" />
+            </div>
+
+            <div class="filter-container">
+                <app-popover appFilter>
+                    <app-error-dashboard-filter #filterContent />
+                </app-popover>
+            </div>
+        </div>
+    </div>
+    <div class="heading-container">
+        <app-chips appFilter />
+    </div>
+    <div class="main-content" [class.hidden]="$isLoading()">
+        <app-float-card cardTitle="ERROR_DASHBOARD.TITLES.ERROR_RATE" cardIcon="report">
+            <div class="line-chart">
+                @if ($isLoading() === false) {
+                    <app-error-dashboard-rate-summary [errorResponsibles]="$errorResponsibles()" />
+                }
+                <app-error-dashboard-group-by-period-filter class="self-end" />
+                @if ($isLoading() === false) {
+                    <app-error-dashboard-rate-chart [errorResponsibles]="$errorResponsibles()" />
+                }
+            </div>
+        </app-float-card>
+        @if ($isLoading() === false) {
+            <app-float-card cardTitle="ERROR_DASHBOARD.TITLES.SALES_WITH_ERROR" cardIcon="trending_up">
+                <app-error-dashboard-sales-summary [errorResponsibles]="$errorResponsibles() " />
+            </app-float-card>
+        }
+        @if (this.$errorDashboardData()?.overall.total_errors !== 0 && $isLoading() === false) {
+            <app-float-card cardTitle="ERROR_DASHBOARD.TITLES.ERROR_CAUSE" cardIcon="'quiz'">
+                <app-error-dashboard-cause-chart [errorResponsibles]="$errorResponsibles()" />
+            </app-float-card>
+        }
+    </div>
+    @if ($isLoading()) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+</div>

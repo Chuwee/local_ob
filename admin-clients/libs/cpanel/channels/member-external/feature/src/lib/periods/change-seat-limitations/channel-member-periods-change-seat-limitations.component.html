@@ -1,0 +1,23 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="(loading$ | async) || !form.dirty"
+    [formGroup]="form">
+
+    <div fxLayout="row wrap" fxLayoutAlign="start center">
+        <mat-checkbox formControlName="enable_max_change_seat" color="primary">
+            {{'CHANNELS.MEMBERS_CONFIG.CHANGE_SEAT.MAX_LIMIT_CHANGES_CHECK' | translate}}
+        </mat-checkbox>
+        <mat-form-field fxFlex="124px" class="ob-form-field inline-field value-field" appearance="outline">
+            <input matInput type="number" inputmode="numeric" placeholder="0" formControlName="max_change_seat" step="1">
+            <mat-error [ob-form-errors]="form" field="max_change_seat"></mat-error>
+        </mat-form-field>
+    </div>
+    <div fxLayout="row wrap" fxLayoutAlign="start center" class="section-block">
+        <mat-checkbox color="primary" formControlName="show_change_seat_counter"
+            class="app-checkbox-wrap-label change-seat-checkbox">
+            {{'CHANNELS.MEMBERS_CONFIG.CHANGE_SEAT.ENABLE_CHANGE_SEAT' | translate }}
+        </mat-checkbox>
+    </div>
+    <div fxLayoutAlign="start center" fxLayoutGap="5px">
+        <a class="ob-link" (click)="resetChangeSeatCounter()">{{'CHANNELS.MEMBERS_CONFIG.CHANGE_SEAT.RESET' | translate}}</a>
+        <app-help-button [message]="'CHANNELS.MEMBERS_CONFIG.CHANGE_SEAT.RESET_INFO' | translate"></app-help-button>
+    </div>
+</app-form-container>

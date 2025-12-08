@@ -1,0 +1,59 @@
+<div class="left-bar-container">
+    <div fxFlex class="left-bar" fxLayout="column" fxLayoutAlign="justify">
+        <div class="left-sidebar-title" fxLayout="column">
+            <div fxFlex="50px">
+                <div fxFlex class="results-count" fxLayoutAlign=" center">
+                    <span>{{('RESULTS.TOTAL' | translate) + ': '}}</span>
+                    <span *ngIf="(toursListMetadata$ | async) as metadata">{{metadata ? metadata.total : '-' }}</span>
+                </div>
+                <div fxLayoutAlign="end center">
+                    <app-tours-list-filter></app-tours-list-filter>
+                </div>
+            </div>
+        </div>
+        <div fxFlex="36px" class="left-sidebar-header" *ngIf="canLoggedUserWrite$ | async" fxLayoutAlign="end center">
+            <button mat-icon-button aria-label="New Tour" type="button" [disabled]="reqInProgress$ | async"
+                class="ob-button small" (click)="openNewTourDialog()"
+                [matTooltip]="'TOUR.NEW_BTN' | translate">
+                <mat-icon>add</mat-icon>
+            </button>
+            <button mat-icon-button aria-label="Delete Tour" class="ob-button small"
+                (click)="openDeleteToursDialog()" [disabled]="(tour$ | async) === null"
+                [matTooltip]="'TOUR.DELETE' | translate">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </div>
+        <div fxLayout="column" fxFlex class="list-container">
+            <mat-selection-list (selectionChange)="selectionChangeHandler($event.options[0]?.value)"
+                class="ob-lateral-select-list" appLastPathGuardListener disableRipple [currValue]="(tour$ | async)?.id"
+                [multiple]="false">
+                @for (item of (toursList$ | async); track item.id) {
+                    <mat-list-option #option class="with-badge" [value]="item.id"
+                        [selected]="item.id === selectedTourId" [disabled]="option.selected"
+                        [id]="'tour-list-option-' + item.id">
+                        <div fxFlex="0 0 100%">
+                            <div fxFlex="1 1 calc(100% - 35px)" fxLayout="column">
+                                <span class="list-item-title" appEllipsify [matTooltip]="item.name"
+                                    [matTooltipShowDelay]="500">{{item.name}}</span>
+                                <span class="list-item-subtitle" appEllipsify [matTooltip]="item.entity.name"
+                                    [matTooltipShowDelay]="500">{{item.entity.name}}</span>
+                            </div>
+                            <div class="badge-container" fxLayout="column" fxLayoutAlign="center center">
+                                <span [matTooltipShowDelay]="800"
+                                    [matTooltip]="('TOUR.STATUS_OPTS.' + item.status.toUpperCase() | translate)"
+                                    class="ob-status-badge small-badge" [ngClass]="item.status.toLowerCase()">
+                                    {{('TOUR.STATUS_OPTS.' + item.status.toUpperCase() | translate).substring(0,1)}}
+                                </span>
+                            </div>
+                        </div>
+                    </mat-list-option>
+                }
+            </mat-selection-list>
+        </div>
+    </div>
+    <div *ngIf="reqInProgress$ | async" class="loading-state-container" fxLayoutAlign="center center">
+        <div class="loading-state-background" fxLayout="row" fxLayoutAlign="center center">
+            <mat-spinner *ngIf="reqInProgress$ | async"></mat-spinner>
+        </div>
+    </div>
+</div>

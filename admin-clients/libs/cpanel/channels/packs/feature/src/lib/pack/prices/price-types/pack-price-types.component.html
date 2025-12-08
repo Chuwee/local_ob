@@ -1,0 +1,48 @@
+<div fxLayout="column" class="pack-form-section" [formGroup]="priceTypesForm">
+    <p class="section-description" fxLayoutAlign="start center">
+        {{'CHANNELS.PACKS.PRICE_ZONES_DESCRIPTION' | translate}}
+    </p>
+    <mat-radio-group formControlName="selection_type" fxLayout="column">
+        <mat-radio-button class="ob-radio-button vertical-list" [value]="packPriceTypesScope.all">
+            {{'CHANNELS.PACKS.PRICE_ZONE_OPTS.ALL' | translate}}
+        </mat-radio-button>
+        <mat-radio-button #restrictedRadio class="ob-radio-button vertical-list" [value]="packPriceTypesScope.restricted"
+            [disabled]="!((priceTypes$ | async)?.length > 0)"
+            [matTooltip]="'CHANNELS.PACKS.PRICE_ZONE_EMPTY_LIST' | translate"
+            [matTooltipDisabled]="!restrictedRadio.disabled || (loading$ | async)" matTooltipPosition="below"
+            matTooltipClass="no-margin">
+            {{'CHANNELS.PACKS.PRICE_ZONE_OPTS.SELECT' | translate}}
+        </mat-radio-button>
+    </mat-radio-group>
+    <div>
+        @if(priceTypesForm.controls.selection_type.value === packPriceTypesScope.restricted) {
+            <div class="pack-price-types-container nested-content">
+                @if(priceTypes$ | async; as priceTypes) {
+                    <div fxLayout="row" class="price-types-list-container"
+                        [class.field-error]="priceTypesForm.hasError('required', 'price_type_ids')
+                            && priceTypesForm.controls.price_type_ids.touched">
+                        @if(priceTypes.length) {
+                            <mat-selection-list class="ob-list price-types-list" formControlName="price_type_ids">
+                                <div matSubheader>
+                                    {{$venueTpl().name}}
+                                </div>
+                                @for(priceType of priceTypes; track $index) {
+                                    <div>
+                                        <mat-list-option color="primary" [value]="priceType.id" checkboxPosition="before">
+                                            {{priceType.name}}
+                                        </mat-list-option>
+                                    </div>
+                                }
+                            </mat-selection-list>
+                        }
+                    </div>
+                }
+                @if(priceTypesForm.hasError('required', 'price_type_ids') && priceTypesForm.controls.price_type_ids.touched) {
+                    <span class="error-description">
+                        {{'CHANNELS.PACKS.PRICE_ZONES_ERROR' | translate}}
+                    </span>
+                }
+            </div>
+        }
+    </div>
+</div>

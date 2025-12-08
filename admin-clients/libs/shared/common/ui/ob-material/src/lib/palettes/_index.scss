@@ -1,0 +1,36 @@
+@use "sass:map";
+@use "@angular/material" as mat;
+
+/**
+ * Palette names generated with http://chir.ag/projects/name-that-color/
+ *
+ * All palettes visualization available in
+ * http://mcg.mbitson.com/#!?keppel=%233ba0a8&bluemarguerite=%23625ac5&internationalorange=%23ff5209&emerald=%2343d05b&dodgerblue=%2309b7ff&yellowsea=%23ffaa09&charade=%23272a33&themename=obpalettes
+ */
+@forward "./keppel.palette"; // primary
+@forward "./blue-margeritte.palette"; // accent
+@forward "./international-orange.palette"; // error
+@forward "./emerald.palette"; // success
+@forward "./yellow-sea.palette"; // alert
+@forward "./dodger-blue.palette"; // info
+@forward "./charade.palette"; // menu
+
+@function ob-foreground($colors) {
+    @return map.merge(
+        mat.$m2-light-theme-foreground-palette,
+        (
+            "text": map.get($colors, ob-black),
+        )
+    );
+}
+
+@function ob-background($colors) {
+    @return map.merge(
+        mat.$m2-light-theme-background-palette,
+        (
+            "background": map.get($colors, ob-bg-1),
+            "unselected-chip": map.get($colors, ob-white),
+            "card": map.get($colors, ob-white),
+        )
+    );
+}

@@ -1,0 +1,104 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">
+            {{('VENUE_TPLS.PRICE_TYPES.RESTRICTIONS.RESTRICT' | translate : priceType)}}
+        </h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <form mat-dialog-content [formGroup]="form" fxLayout="column">
+        <p class="description">{{'VENUE_TPLS.PRICE_TYPES.RESTRICTIONS.ZONES_DESCRIPTION' | translate : priceType}}</p>
+        <div fxLayout="row wrap" formGroupName="required_price_type_ids" class="price-zones-selection">
+            @for (priceType of priceTypes; track priceType.id) {
+                <div fxLayout="column" fxFlex="0 1 50%">
+                    <mat-checkbox [formControlName]="priceType.id" color="primary" fxLayoutAlign="start center">
+                        {{ priceType.name }}
+                    </mat-checkbox>
+                </div>
+            }
+            @if(form.get('required_price_type_ids').touched) {
+                <mat-error fxFlex="100%" [ob-form-errors]="form"
+                    field="required_price_type_ids" />
+            }
+        </div>
+        <p class="description">{{'VENUE_TPLS.PRICE_TYPES.RESTRICTIONS.TYPE_DESCRIPTION' | translate : priceType}}</p>
+        <mat-radio-group formControlName="type" #type>
+            <mat-radio-button class="ob-radio-button wrap-label" value="required_tickets_number">
+                <mat-label>
+                    {{'VENUE_TPLS.PRICE_TYPES.RESTRICTIONS.REQUIRED_TICKETS_NUMBER.OPTION' | translate : priceType}}
+                </mat-label>
+            </mat-radio-button>
+            <div class="option-section nested-content">
+                <p [innerHTML]="'VENUE_TPLS.PRICE_TYPES.RESTRICTIONS.REQUIRED_TICKETS_NUMBER.DESCRIPTION'
+                    | translate : ({name: priceType.name, selected: selectedZones ? '[' + selectedZones + ']' : ''})">
+                </p>
+                <div fxLayout="row" class="option-settings"
+                    [fxShow]="form.get('type').value === 'required_tickets_number'">
+                    <mat-form-field fxFlex="0 1 calc(37% - 30px)" appearance="outline"
+                        class="ob-form-field field-with-label">
+                        <mat-label>{{'VENUE_TPLS.PRICE_TYPES.RESTRICTIONS.REQUIRED_TICKETS_NUMBER.LABEL'| translate}}
+                        </mat-label>
+                        <input matInput type="number" placeholder="0" autocomplete="off"
+                            formControlName="required_tickets_number">
+                        <mat-error [ob-form-errors]="form" field="required_tickets_number" />
+                    </mat-form-field>
+                    <div fxFlex="0 1 60px" fxLayoutAlign="center center">
+                        <mat-icon>arrow_forward</mat-icon>
+                    </div>
+                    <div fxFlex="0 1 calc(37% - 30px)" fxLayoutAlign=" center">
+                        <span class="helper-text">
+                            {{'VENUE_TPLS.PRICE_TYPES.RESTRICTIONS.REQUIRED_TICKETS_NUMBER.HELPER'| translate :
+                            priceType}}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <mat-radio-button class="ob-radio-button wrap-label" value="locked_tickets_number">
+                <mat-label>
+                    {{'VENUE_TPLS.PRICE_TYPES.RESTRICTIONS.LOCKED_TICKETS_NUMBER.OPTION' | translate :
+                    priceType}}
+                </mat-label>
+            </mat-radio-button>
+            <div class="option-section nested-content">
+                <p [innerHTML]="'VENUE_TPLS.PRICE_TYPES.RESTRICTIONS.LOCKED_TICKETS_NUMBER.DESCRIPTION'
+                     | translate : ({name: priceType.name, selected: selectedZones ? '[' + selectedZones + ']' : ''})">
+                </p>
+                <div fxLayout="row" class="option-settings"
+                    [fxShow]="form.get('type').value === 'locked_tickets_number'">
+                    <div fxFlex="0 1 calc(37% - 30px)" fxLayoutAlign=" center">
+                        <span class="helper-text"
+                            [innerHTML]="'VENUE_TPLS.PRICE_TYPES.RESTRICTIONS.LOCKED_TICKETS_NUMBER.HELPER'| translate : priceType">
+                        </span>
+                    </div>
+                    <div fxFlex="0 1 60px" fxLayoutAlign="center center">
+                        <mat-icon>arrow_forward</mat-icon>
+                    </div>
+                    <mat-form-field fxFlex="0 1 calc(37% - 30px)" appearance="outline"
+                        class="ob-form-field field-with-label">
+                        <mat-label>
+                            {{'VENUE_TPLS.PRICE_TYPES.RESTRICTIONS.LOCKED_TICKETS_NUMBER.LABEL'| translate}}
+                        </mat-label>
+                        <input matInput type="number" placeholder="0" autocomplete="off"
+                            formControlName="locked_tickets_number">
+                        <mat-error [ob-form-errors]="form" field="locked_tickets_number" />
+                    </mat-form-field>
+                </div>
+            </div>
+        </mat-radio-group>
+    </form>
+    @if (isLoadingOrSaving$ | async) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="save()"
+            [disabled]="form && !form.dirty || (isLoadingOrSaving$ | async)">
+            {{'FORMS.ACTIONS.SAVE' | translate}}
+        </button>
+    </div>
+</div>

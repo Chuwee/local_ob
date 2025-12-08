@@ -1,0 +1,47 @@
+<app-search-table [dataSource]="sessions$" [metadata]="metadata$" [columns]="columns" pageSize="10"
+    [placeholder]="'EVENTS.CHANNEL.SQUARE_SESSION_IMAGES.SEARCH' | translate"
+    [emptyListTitle]="'EVENTS.CHANNEL.SQUARE_SESSION_IMAGES.NO_SESSIONS' | translate">
+    <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{ 'EVENTS.CHANNEL.SQUARE_SESSION_IMAGES.SESSION' | translate }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">{{row.name}}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="start_date">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{ 'EVENTS.CHANNEL.SQUARE_SESSION_IMAGES.DATE' | translate }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">{{ row.start_date | date: 'dd/MM/yyyy' }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="image_origin">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{ 'EVENTS.CHANNEL.SQUARE_SESSION_IMAGES.ORIGIN' | translate }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+            <span [class.with-images-tag]="row.image_origin === 'SESSION'">
+                {{ 'EVENTS.CHANNEL.SQUARE_SESSION_IMAGES.' + row.image_origin | translate }}
+            </span>
+        </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef class="two-actions-cell head-cell" [class.float-actions-cell]="!$isHandsetOrTablet()" />
+        <mat-cell *matCellDef="let row; index as i" class="two-actions-cell" [class.float-actions-cell]="!$isHandsetOrTablet()">
+            <div class="action-buttons" (click)="$event.stopPropagation()">
+                <button mat-icon-button matTooltip="{{'EVENTS.CHANNEL.SQUARE_SESSION_IMAGES.EDIT' | translate}}"
+                    aria-label="Edit element info" class="ob-button medium" (click)="uploadOrEditSessionImages(row)">
+                    <mat-icon>edit</mat-icon>
+                </button>
+                @if (row.image_origin === 'SESSION') {
+                    <button mat-icon-button aria-label="Open menu" class="ob-button medium" [matMenuTriggerFor]="resetMenu">
+                        <mat-icon>more_horiz</mat-icon>
+                    </button>
+                    <mat-menu #resetMenu="matMenu" xPosition="before" yPosition="below">
+                        <button mat-menu-item (click)="resetImagesForSession(row)">
+                            {{ 'EVENTS.CHANNEL.SQUARE_SESSION_IMAGES.RESET' | translate }}
+                        </button>
+                    </mat-menu>
+                }
+            </div>
+        </mat-cell>
+    </ng-container>
+</app-search-table>

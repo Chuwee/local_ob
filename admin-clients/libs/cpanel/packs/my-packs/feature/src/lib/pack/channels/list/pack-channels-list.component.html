@@ -1,0 +1,57 @@
+<div class="left-bar-container">
+    <div class="left-bar flex flex-col justify-start items-stretch">
+        <div class="left-sidebar-title flex flex-col">
+            <div class="flex flex-row justify-start items-center">
+                <h2 class="title">{{'PACK.CHANNELS_TITLE' | translate}}</h2>
+                @if (canWrite$ | async) {
+                    <button mat-icon-button aria-label="new-space" type="button"
+                        class="ob-button mat-stroked-button xsmall" (click)="openAddChannelsDialog()">
+                        <mat-icon>add</mat-icon>
+                    </button>
+                }
+            </div>
+            <div class="flex">
+                <span class="results-count"
+                    [innerHTML]="('RESULTS.TOTAL' | translate) + ': ' + (packChannels$ | async)?.length || 0"></span>
+            </div>
+        </div>
+        <div class="flex flex-36px left-sidebar-header justify-end items-center">
+            @if (canWrite$ | async) {
+                <button mat-icon-button aria-label="delete-space" class="ob-button small"
+                    (click)="openDeleteChannelDialog()" [disabled]="(packChannels$ | async)?.length === 0">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            }
+        </div>
+        <div class="list-container flex flex-col">
+            <mat-selection-list class="ob-lateral-select-list" appLastPathGuardListener disableRipple [multiple]="false"
+                [currValue]="$selectedPackChannelId()" (selectionChange)="selectionChangeHandler($event.options[0]?.value)">
+                @for (item of (packChannels$ | async); track item.channel.id) {
+                    <mat-list-option [value]="item.channel.id"
+                        [selected]="item.channel.id === $selectedPackChannelId()" [id]="'channels-list-option-' + item.channel.id">
+                        <div class="item-data flex flex-row justify-between items-center">
+                            <span class="list-item-title" appEllipsify [matTooltip]="item.channel.name">
+                                {{item.channel.name}}
+                            </span>
+                            <div class="badge-container">
+                                <span class="small-badge ob-status-badge"
+                                    [ngClass]="getSaleStatusIndicator(item.status.request)"
+                                    [matTooltipShowDelay]="500"
+                                    [matTooltip]="'PACK.CHANNEL.REQUEST_STATUS.' + item.status.request | translate">
+                                    {{('PACK.CHANNEL.REQUEST_STATUS.' + item.status.request | translate).substring(0,1)}}
+                                </span>
+                            </div>
+                        </div>
+                    </mat-list-option>
+                }
+            </mat-selection-list>
+        </div>
+    </div>
+    @if (isLoading$ | async) {
+        <div class="loading-state-container" fxLayoutAlign="center center">
+            <div class="loading-state-background" fxLayout="row" fxLayoutAlign="center center">
+                <mat-spinner />
+            </div>
+        </div>
+    }
+</div>

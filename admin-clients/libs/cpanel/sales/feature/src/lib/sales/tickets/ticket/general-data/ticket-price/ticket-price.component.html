@@ -1,0 +1,145 @@
+<h2 class="summary-section-title">
+    {{'TICKET.PRICE_DATA.TITLE' | translate}}
+</h2>
+
+@let ticket = $ticket();
+@let price = ticket.price;
+@let ccy = price?.currency;
+<!-- {fixes indentation} -->
+
+<div>
+    <div class="summary-price-row flex">
+        <div class="flex-1 flex flex-col mat-body-strong">
+            {{'TICKET.PRICE_DATA.BASE' | translate}}
+        </div>
+        <div class="flex-none flex flex-col mat-body-strong">
+            {{price?.base | localCurrency: ccy}}
+        </div>
+    </div>
+    @if (price?.sales?.automatic; as automatic) {
+        <div class="summary-price-row flex">
+            <div class="flex-1 flex flex-col">
+                {{'TICKET.PRICE_DATA.PROMOTION.AUTOMATIC' | translate}}
+            </div>
+            <div class="flex-none flex flex-col">
+                {{automatic | absoluteAmount | localCurrency: ccy | amountPrefix: automatic:'subtraction'}}
+            </div>
+        </div>
+    }
+    @if (price?.sales?.promotion; as promotion) {
+        <div class="summary-price-row flex">
+            <div class="flex-1 flex flex-col">
+                {{'TICKET.PRICE_DATA.PROMOTION.MANUAL' | translate}}
+            </div>
+            <div class="flex-none flex flex-col">
+                {{promotion | absoluteAmount | localCurrency: ccy | amountPrefix: promotion:'subtraction'}}
+            </div>
+        </div>
+    }
+    @if (price?.sales?.discount; as discount) {
+        <div class="summary-price-row flex">
+            <div class="flex-1 flex flex-col">
+                {{'TICKET.PRICE_DATA.PROMOTION.DISCOUNT' | translate}}
+            </div>
+            <div class="flex-none flex flex-col">
+                {{discount | absoluteAmount | localCurrency: ccy | amountPrefix: discount:'subtraction'}}
+            </div>
+        </div>
+    }
+    @if (price?.sales?.order_automatic; as orderAutomatic) {
+        <div class="summary-price-row flex">
+            <div class="flex-1 flex flex-col">
+                {{'ORDER.PRICE_DATA.PROMOTION.ORDER_AUTOMATIC' | translate}}
+            </div>
+            <div class="flex-none flex flex-col">
+                {{orderAutomatic | absoluteAmount | localCurrency: ccy | amountPrefix: orderAutomatic:'subtraction'}}
+            </div>
+        </div>
+    }
+    @if (price?.sales?.order_collective; as orderCollective) {
+        <div class="summary-price-row flex">
+            <div class="flex-1 flex flex-col">
+                {{'ORDER.PRICE_DATA.PROMOTION.ORDER_COLLECTIVE' | translate}}
+            </div>
+            <div class="flex-none flex flex-col">
+                {{orderCollective | absoluteAmount | localCurrency: ccy | amountPrefix: orderCollective:'subtraction'}}
+            </div>
+        </div>
+    }
+    @if (!(price?.charges?.channel === 0 && price?.charges?.secondary_market_channel !== undefined)) {
+        <div class="summary-price-row flex">
+            <div class="flex-1 flex flex-col">
+                {{'TICKET.PRICE_DATA.SURCHARGE.CHANNEL' | translate}}
+            </div>
+            <div class="flex-none flex flex-col">
+                {{price?.charges?.channel | absoluteAmount |localCurrency: ccy | amountPrefix:
+            price?.charges?.channel:'addition'}}
+            </div>
+        </div>
+    }
+    @if (!(price?.charges?.promoter === 0 && price?.charges?.secondary_market_promoter !== undefined)) {
+        <div class="summary-price-row flex">
+            <div class="flex-1 flex flex-col">
+                {{'TICKET.PRICE_DATA.SURCHARGE.PROMOTER' | translate}}
+            </div>
+            <div class="flex-none flex flex-col">
+                {{price?.charges?.promoter | absoluteAmount | localCurrency: ccy | amountPrefix:
+            price?.charges?.promoter:'addition'}}
+            </div>
+        </div>
+    }
+    @if (price?.charges?.secondary_market_channel) {
+        @let secMktChannelCharges = price?.charges?.secondary_market_channel || 0;
+        <!-- {fix indentation} -->
+        <div class="summary-price-row flex">
+            <div class="flex-1 flex flex-col">
+                {{'TICKET.PRICE_DATA.SURCHARGE.SECONDARY_MARKET_CHANNEL' | translate}}
+            </div>
+            <div class="flex-none flex flex-col">
+                {{secMktChannelCharges | absoluteAmount | localCurrency: ccy | amountPrefix: secMktChannelCharges : 'addition'}}
+            </div>
+        </div>
+    }
+    @if (price?.charges?.secondary_market_promoter) {
+        @let secMktPromoterCharges = price?.charges?.secondary_market_promoter || 0;
+        <!-- {fix indentation} -->
+        <div class="summary-price-row flex">
+            <div class="flex-1 flex flex-col">
+                {{'TICKET.PRICE_DATA.SURCHARGE.SECONDARY_MARKET_PROMOTER' | translate}}
+            </div>
+            <div class="flex-none flex flex-col">
+                {{secMktPromoterCharges | absoluteAmount | localCurrency: ccy | amountPrefix: secMktPromoterCharges : 'addition'}}
+            </div>
+        </div>
+    }
+    @if (price?.b2b?.conditions; as conditions) {
+        <div class="summary-price-row flex">
+            <div class="flex-1 flex flex-col">
+                {{'TICKET.PRICE_DATA.B2B.CONDITION' | translate}}
+            </div>
+            <div class="flex-none flex flex-col">
+                {{conditions | absoluteAmount | localCurrency: ccy | amountPrefix: conditions:'subtraction'}}
+            </div>
+        </div>
+    }
+</div>
+
+<mat-divider class="self-stretch" />
+
+<div class="summary-price-row summary-price-total flex">
+    <div class="flex-1 flex flex-col mat-headline-5">
+        {{'FORMS.LABELS.TOTAL' | translate}}
+    </div>
+    <div class="flex-none flex flex-col mat-headline-5">
+        {{price?.final | localCurrency: ccy}}
+    </div>
+</div>
+
+@if($hasTaxes()){
+    <div class="order-taxes-info">
+        <app-order-taxes-info
+            [totalTaxes]="$totalTaxes() | absoluteAmount"
+            [ccy]="ccy"
+            [itemsTaxes]="$itemsTaxes()" />
+    </div>
+}

@@ -1,0 +1,36 @@
+const elements = {
+    OVERLAY: '.cdk-overlay-backdrop',
+    OPEN_ACTIONS_MENU: '.actions-container button.mdc-button',
+    ACTIONS_MENU: '.mat-mdc-menu-panel',
+    SEARCH_INPUT: 'app-search-input input',
+    ORDER_LIST_ROW: '.interactive-row',
+    ORDERCODE_CELL: '.cdk-column-code',
+    HEADER_ITEMS_COUNT_COL: '.mat-header-cell.mat-column-items_count',
+    HEADER_DATE_COL: '.mat-header-cell.mat-column-date',
+    HEADER_ARROW: '.mat-sort-header-arrow',
+    OPEN_FILTER_BUTTON: '[data-test="filterBtn"]',
+    FILTER_CHANNEL_ENT: '[formcontrolname="channelEntity"]',
+    FILTER_EVENT_ENT: '[formcontrolname="eventEntity"]',
+    FILTER_CHANNEL: '[formcontrolname="channel"]',
+    FILTER_TYPE: '[formcontrolname="type"]',
+    FILTER_ORDER_ALIVE: '[formcontrolname="orderAlive"]',
+    FILTER_DROPDOWN_OPTION: 'mat-option',
+    REFUNDS_MODAL: 'app-massive-refund',
+    REFUNDS_MODAL_STEP: '.wizard-item.current .step-number',
+    // step 1: detalles de devolucion
+    REFUNDS_ENTITY: 'app-massive-refund [formcontrolname="entity"]',
+    REFUNDS_EVENT: 'app-massive-refund [formcontrolname="event"]',
+    REFUNDS_SESSION: 'app-massive-refund [formcontrolname="session"]',
+    REFUNDS_CHANNEL: 'app-massive-refund [formcontrolname="channel"]',
+    REFUNDS_SEARCH_INPUT: '.mat-option.contains-mat-select-search',
+    REFUNDS_DROPDOWM_OPTION: 'cdk-virtual-scroll-viewport .mat-option:not(.mat-selected)',
+    REFUNDS_TYPE_RADIO_SESSION: 'app-massive-refund [formcontrolname="selectionType"] mat-radio-button:eq(0)',
+    REFUNDS_TYPE_RADIO_CODES: 'app-massive-refund [formcontrolname="selectionType"] mat-radio-button:eq(1)',
+    REFUNDS_CONTINUE_BTN: '.mat-dialog-actions button.mat-primary',
+    REFUNDS_GO_BACK_BTN: '.mat-dialog-actions button.mat-primary',
+    // step 2: tipo de devolucion
+    REFUNDS_METHOD_RADIOS: '.refund-order-section-content mat-radio-button',
+    REFUNDS_SUMMARY_MODAL: 'app-massive-refund-summary',
+    REFUNDS_SUMMARY_ITEM: 'app-massive-refund-summary .mat-list-item span'
+};
+export default elements;

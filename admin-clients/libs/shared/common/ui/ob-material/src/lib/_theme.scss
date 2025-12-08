@@ -1,0 +1,90 @@
+@use "@angular/material" as mat;
+@use "palettes" as palettes;
+@use "sass:map";
+
+$ob-colors: (
+    ob-white: #ffffff,
+    ob-bg-1: #eff0f0,
+    ob-bg-2: #e9e9e9,
+    ob-bg-3: #e0e0e0,
+    ob-grey-light-10: #dadada,
+    ob-grey-light-20: #bbbbbb,
+    ob-grey: #8d8d8f,
+    ob-grey-dark: #545454,
+    ob-bg-dark-10: #0d0e12,
+    ob-bg-dark-20: #272a33,
+    ob-black: #414141,
+    ob-yellow: #ffaa09,
+    ob-blue: #3498db,
+    ob-neutral: #607d8b,
+    ob-tertiary: #427fec,
+    ob-fuchsia: #c55abd
+);
+
+$ob-palettes: (
+    primary: mat.m2-define-palette(palettes.$ob-keppel, 500, 300, 900),
+    accent: mat.m2-define-palette(palettes.$ob-bluemargerite),
+    warn: mat.m2-define-palette(palettes.$ob-internationalorange),
+    success: mat.m2-define-palette(palettes.$ob-emerald),
+    alert: mat.m2-define-palette(palettes.$ob-yellowsea),
+    info: mat.m2-define-palette(palettes.$ob-dodgerblue),
+    menu: mat.m2-define-palette(palettes.$ob-charade, 500, 100, 900),
+    foreground: palettes.ob-foreground($ob-colors),
+    background: palettes.ob-background($ob-colors),
+);
+
+$ob-typography: (
+    font-family: "Nunito Sans",
+    display-4: mat.m2-define-typography-level(45px, 56px, 700, "Montserrat", null),
+    display-3: mat.m2-define-typography-level(37px, 48px, 700, "Montserrat", null),
+    display-2: mat.m2-define-typography-level(31px, 42px, 700, "Montserrat", null),
+    display-1: mat.m2-define-typography-level(26px, 35px, 700, "Montserrat", null),
+    headline: mat.m2-define-typography-level(22px, 24px, 700, "Montserrat", null),
+    title: mat.m2-define-typography-level(18px, 22px, 700, "Montserrat", null),
+    subheading-2: mat.m2-define-typography-level(14px, 18px, 400, "Montserrat", null),
+    subheading-1: mat.m2-define-typography-level(12px, 14px, 400, "Montserrat", null),
+    body-1: mat.m2-define-typography-level(14px, 20px, 400, "Nunito Sans", null),
+    body-2: mat.m2-define-typography-level(14px, 20px, 700, "Nunito Sans", null),
+    caption: mat.m2-define-typography-level(12px, 18px, 400, "Nunito Sans", null),
+    button: mat.m2-define-typography-level(12px, 24px, 700, "Montserrat", null),
+    input: mat.m2-define-typography-level(14px, 1.28572, 400, "Nunito Sans", null),
+    tiny: mat.m2-define-typography-level(10px, 14px, 400, "Nunito Sans", null),
+);
+
+$mat-typography: mat.m2-define-typography-config(
+    $font-family: "Nunito Sans",
+    $headline-1: mat.m2-define-typography-level(45px, 56px, 700, "Montserrat", null),
+    $headline-2: mat.m2-define-typography-level(37px, 48px, 700, "Montserrat", null),
+    $headline-3: mat.m2-define-typography-level(31px, 42px, 700, "Montserrat", null),
+    $headline-4: mat.m2-define-typography-level(26px, 35px, 700, "Montserrat", null),
+    $headline-5: mat.m2-define-typography-level(22px, 24px, 700, "Montserrat", null),
+    $headline-6: mat.m2-define-typography-level(18px, 22px, 700, "Montserrat", null),
+    $subtitle-1: mat.m2-define-typography-level(14px, 18px, 400, "Montserrat", null),
+    $subtitle-2: mat.m2-define-typography-level(14px, 20px, 700, "Nunito Sans", null),
+    $body-1: mat.m2-define-typography-level(12px, 14px, 400, "Montserrat", null),
+    $body-2: mat.m2-define-typography-level(14px, 20px, 400, "Nunito Sans", null),
+    $caption: mat.m2-define-typography-level(12px, 18px, 400, "Nunito Sans", null),
+    $button: mat.m2-define-typography-level(12px, 24px, 700, "Montserrat", null),
+);
+
+$ob-theme: mat.m2-define-light-theme(
+    (
+        "color": $ob-palettes,
+        "typography": $mat-typography,
+        "density": -1,
+    )
+);
+
+$ob-theme: map.merge(
+    $ob-theme,
+    (
+        "color":
+            map.merge(
+                map.get($ob-theme, "color"),
+                (
+                    "background": map.get($ob-palettes, "background"),
+                    "foreground": map.get($ob-palettes, "foreground"),
+                )
+            ),
+    )
+);

@@ -1,0 +1,100 @@
+<div *ngIf="selectionType$ | async as selectionType" fxFlex="0 0 100%" fxLayout="column" fxLayoutAlign="start stretch">
+    <div fxLayoutAlign="center">
+        <h4 class="type-title">{{
+            ('VENUE_TPL_EDITOR.' +
+                (selectionType === 'circle' ? 'CIRCLE' :
+                    selectionType === 'rect' ? 'RECT' :
+                        selectionType === 'text' ? 'TEXT' :
+                            selectionType === 'image' ? 'IMAGE' :
+                                selectionType === 'group' ? 'GROUP' : 'SHAPE')
+            ) | translate}}</h4>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="start center" class="title">
+        <div fxFlex="0 1 100%">
+            <span class="mat-subtitle-2">{{
+                ('VENUE_TPL_EDITOR.' +
+                    (selectionType === 'circle' ? 'CIRCLE' :
+                        selectionType === 'rect' ? 'RECT' :
+                            selectionType === 'text' ? 'TEXT' :
+                                selectionType === 'image' ? 'IMAGE' :
+                                    selectionType === 'group' ? 'GROUP' : 'SHAPE')
+                ) | translate
+                }}</span>
+        </div>
+        <button mat-icon-button aria-label="Delete" class="ob-button xsmall tree-node-action-button"
+            [matTooltip]="'FORMS.ACTIONS.DELETE' | translate" (click)="deleteFormItem()">
+            <mat-icon>delete</mat-icon>
+        </button>
+    </div>
+    <mat-divider class="title-divider" />
+    <div fxLayout="row wrap" [formGroup]="form" class="editor-form">
+        <div *ngIf="form.controls.text.enabled" fxFlex="100%" fxLayout="row" fxLayoutAlign="start center"
+            class="editor-form-field-container">
+            <mat-label fxFlex="40%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.TEXT' | translate">
+                {{'VENUE_TPL_EDITOR.TEXT' | translate}}</mat-label>
+            <mat-form-field fxFlex="60%" appearance="outline" class="ob-form-field inline-field">
+                <input matInput aria-label="text" formControlName="text">
+            </mat-form-field>
+        </div>
+        <div fxLayout="row wrap" fxFlex="100%">
+            <div *ngIf="imageUrl$ | async as url" fxFlex="100%" fxLayout="row" fxLayoutAlign="start center"
+                class="editor-form-field-container">
+                <mat-label fxFlex="40%" appEllipsify [matTooltip]="'VENUE_TPLS_EDITOR.IMAGE_URL' | translate">
+                    {{'VENUE_TPL_EDITOR.IMAGE_URL' | translate}}:
+                </mat-label>
+                <mat-label fxFlex="60%" appEllipsify [matTooltip]="url">{{url}}</mat-label>
+                <app-copy-text [copyText]="url" />
+            </div>
+            <ng-container *ngIf="form.controls.shape.enabled" formGroupName="shape">
+                <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center" class="editor-form-field-container">
+                    <mat-label fxFlex="1000%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.FILL_COLOR' | translate">
+                        {{'VENUE_TPL_EDITOR.FILL_COLOR' | translate}}</mat-label>
+                    <mat-form-field hidden-outline class="ob-form-field min-padding inline-field">
+                        <app-color-picker formControlName="fillColor" />
+                    </mat-form-field>
+                </div>
+                <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center" class="editor-form-field-container">
+                    <mat-label fxFlex="100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.STROKE_COLOR' | translate">
+                        {{'VENUE_TPL_EDITOR.STROKE_COLOR' | translate}}</mat-label>
+                    <mat-form-field hidden-outline class="ob-form-field min-padding inline-field">
+                        <app-color-picker formControlName="strokeColor" />
+                    </mat-form-field>
+                </div>
+                <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center" class="editor-form-field-container">
+                    <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.STROKE_WIDTH' | translate">
+                        {{'VENUE_TPL_EDITOR.STROKE_WIDTH' | translate}}</mat-label>
+                    <mat-form-field fxFlex="100px" appearance="outline" class="ob-form-field inline-field">
+                        <input matInput type="number" aria-label="stroke" formControlName="strokeWidth">
+                        <span matTextSuffix>px</span>
+                    </mat-form-field>
+                </div>
+            </ng-container>
+            <div *ngIf="form.controls.opacity.enabled" fxFlex="100%" fxLayout="row" fxLayoutAlign="start center"
+                class="editor-form-field-container">
+                <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.OPACITY' | translate">
+                    {{'VENUE_TPL_EDITOR.OPACITY' | translate}}</mat-label>
+                <mat-form-field fxFlex="100px" appearance="outline" class="ob-form-field inline-field">
+                    <input matInput type="number" aria-label="opacity" formControlName="opacity">
+                    <span matTextSuffix>%</span>
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-divider class="ob-divider" *ngIf="form.enabled" fxFlex="100%" />
+        <div [matTooltip]="(newNnzDisabled$ | async) ? ('VENUE_TPL_EDITOR.INCREASE_MODE_REQUIRED_NNZ_TOOLTIP' | translate) : ''">
+            <button mat-stroked-button type="button" class="ob-button small editor-form-button" [disabled]="newNnzDisabled$ | async"
+                (click)="convertTo('nnz')">
+                {{'VENUE_TPL_EDITOR.NEW_NNZ_BTN' | translate}}
+            </button>
+        </div>
+        <button mat-stroked-button type="button" class="ob-button small editor-form-button" (click)="convertTo('link')">
+            {{'VENUE_TPL_EDITOR.NEW_LINK_BTN' | translate}}
+        </button>
+        <ng-container *ngIf="operatorMode$ | async">
+            <mat-divider class="ob-divider" fxFlex="100%" />
+            <button mat-stroked-button type="button" class="ob-button small editor-form-button" (click)="openEditSvgDialog()">
+                <mat-icon>code</mat-icon>
+                {{'VENUE_TPL_EDITOR.SVG_CODE_BTN' | translate}}
+            </button>
+        </ng-container>
+    </div>
+</div>

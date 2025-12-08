@@ -1,0 +1,293 @@
+<div class="list-container" fxFlex="100%" fxLayout="column">
+    <div class="flex flex-col order-list-heading-and-filters" appTableMaxHeight [targetElement]="tableElement" [offset]="60">
+        <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+            <div>
+                <h1 class="secondary mat-headline-3">{{'TITLES.ORDERS' | translate}}</h1>
+            </div>
+            <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+                <div class="filter-container" fxFlex="none">
+                    <button mat-icon-button class="ob-button medium" aria-label="refresh" (click)="refresh()">
+                        <mat-icon>autorenew</mat-icon>
+                    </button>
+                </div>
+                @if ((isExportEnabled$ | async) || (enableResendCodes$ | async) || (isInternalOpr$ | async)) {
+                    <div class="filter-container" fxFlex="none">
+                        <button mat-stroked-button color="tertiary" class="ob-button medium only-icon" [matMenuTriggerFor]="ordersListMenu">
+                            <mat-icon>more_horiz</mat-icon>
+                        </button>
+                        <mat-menu #ordersListMenu="matMenu">
+                            <button mat-menu-item
+                                [disabled]="(isExportEnabled$ | async) === false && $ordersMetadata()?.total === 0"
+                                (click)="exportOrders()">
+                                {{'ACTIONS.EXPORT.BTN' | translate}}
+                            </button>
+                            @if (enableResendCodes$ | async) {
+                                <button mat-menu-item (click)="openResendCodesDialog()">
+                                    {{'ORDERS.RESEND_CODES.BTN' | translate}}
+                                </button>
+                            }
+                            <!-- Hidden until product and backend check -->
+                            @if (isInternalOpr$ | async) {
+                                <button mat-menu-item (click)="openMassiveRefundDialog()">
+                                    {{'ORDERS.MASSIVE_REFUND.BTN' | translate}}
+                                </button>
+                            }
+                        </mat-menu>
+                    </div>
+                }
+            </div>
+        </div>
+        <div fxFlex="44px" class="heading-container" fxLayout="row" fxLayoutAlign="space-between center">
+            <div fxFlex="80%" fxLayoutGap="20px" fxLayoutAlign="start center">
+                <div class="filter-container" fxFlex="none">
+                    <app-popover-date-range-picker-filter [matTooltip]="'ORDER.TRANSACTION_DATE' | translate" />
+                </div>
+                <div class="filter-container" fxFlex="none" data-test="filterBtn">
+                    <app-popover appFilter>
+                        <app-orders-list-filter [startDate]="startDate" [endDate]="endDate" #filterContent />
+                    </app-popover>
+                </div>
+                <div class="search-field" fxFlex="100%">
+                    <app-search-input [placeholder]="'ORDER.SEARCH_INPUT' | translate" (valueChanged)="applyRelevance($event)" />
+                </div>
+            </div>
+            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+                @if ($ordersMetadata(); as ordersMetadata) {
+                    <p class="page-summary"
+                        [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: ordersMetadata">
+                    </p>
+                }
+                <app-paginator [length]="$ordersMetadata()?.total" [pageSize]="ordersPageSize" />
+            </div>
+        </div>
+        <div class="heading-container">
+            <app-chips appFilter [showDivider]="false" />
+        </div>
+        @if ($ordersAggregatedData()?.aggregatedData) {
+            <div class="heading-container heading-aggregated">
+                <app-aggregated-data [aggregatedData]="$ordersAggregatedData().aggregatedData"
+                    [aggregationMetrics]="$ordersAggregatedData().aggregationMetrics" [defaultHiddenColumns]="hiddenAggsColumn"
+                    [currency]="$ordersAggregatedData().currency" [currencyFormat]="'narrow'" tableId="HIDDEN_AGGS_ORDERS"
+                    withColumnsPicker />
+            </div>
+        }
+        @if ($loadingData()) {
+            <div class="spinner-container">
+                <mat-spinner />
+            </div>
+        }
+    </div>
+    <mat-table #tableElement cdkDropList (cdkDropListDropped)="dropItem($event)" cdkDropListOrientation="horizontal"
+        class="ob-table ob-table-drop-list" [dataSource]="$orders()" matSort (matSortChange)="unapplyRelevance()"
+        [matSortActive]="initSortCol" [matSortDirection]="initSortDir" matSortDisableClear [attr.aria-label]="'TITLES.ORDERS' | translate"
+        [hidden]="!($ordersMetadata()?.total > 0)">
+        <ng-container [matColumnDef]="ordersListColumns.channel">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ordersListColumns.channel)"
+                cdkDragLockAxis="x" *matHeaderCellDef class="head-cell ob-draggable-column width200">
+                {{'FORMS.LABELS.CHANNEL' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width200">{{row.channel?.name}}</mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ordersListColumns.code">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ordersListColumns.code)"
+                cdkDragLockAxis="x" *matHeaderCellDef class="head-cell ob-draggable-column width200">
+                {{'FORMS.LABELS.CODE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width200">
+                <div fxFlex="0 0 100%" fxLayoutAlign="start center">
+                    <span fxFlex="0 1 100%" appEllipsify [matTooltip]="row.code">{{row.code}}</span>
+                    <app-copy-text [copyText]="row.code" class="copy-button" />
+                </div>
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ordersListColumns.type">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ordersListColumns.type)"
+                cdkDragLockAxis="x" *matHeaderCellDef class="head-cell ob-draggable-column width100">
+                {{'FORMS.LABELS.TYPE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width100">{{('ENUMS.TYPE_OPTS.' + row.type) | translate}}</mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ordersListColumns.date">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ordersListColumns.date)"
+                cdkDragLockAxis="x" *matHeaderCellDef mat-sort-header class="head-cell ob-draggable-column width130">
+                {{'FORMS.LABELS.DATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width130">{{row.date | dateTime : dateTimeFormats.shortDateTime}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ordersListColumns.client">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ordersListColumns.client)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell ob-draggable-column width200">
+                {{'FORMS.LABELS.CLIENT' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width200">
+                <div fxFlex="0 0 100%" fxLayoutAlign="start center">
+                    <div class="ob-text-ellipsis" [matTooltip]="(row.buyer_data?.email ?? '')  + '\n' + (row.buyer_data?.name ?? '') +
+                        '\n' + (row.buyer_data?.surname ?? '') + '\n' + (row.buyer_data?.phone ?? '')">
+                        <div class="ob-text-ellipsis">
+                            {{row.buyer_data?.email ?? ''}}
+                        </div>
+                        <div class="ob-text-ellipsis">
+                            {{row.buyer_data?.name ?? ''}}
+                        </div>
+                        <div class="ob-text-ellipsis">
+                            {{row.buyer_data?.surname ?? ''}}
+                        </div>
+                    </div>
+                    <app-copy-text [copyText]="row.buyer_data.email" [copyTooltip]="'ORDER.COPY_EMAIL' | translate"
+                        class="copy-button" />
+                </div>
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ordersListColumns.event">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ordersListColumns.event)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell ob-draggable-column width200">
+                {{'FORMS.LABELS.EVENT' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width200">
+                <span fxFlex="0 1 100%" class="ob-text-ellipsis" [matTooltip]="row.eventColumnExtendedData">
+                    {{row.eventColumnData}}
+                </span>
+            </mat-cell>
+        </ng-container>
+
+        <ng-container [matColumnDef]="ordersListColumns.ticketsCount">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ordersListColumns.ticketsCount)" cdkDragLockAxis="x"
+                *matHeaderCellDef mat-sort-header class="head-cell right ob-draggable-column width100">
+                {{'ORDER.TICKETS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="right width100">{{row.tickets_count || '-' }}</mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ordersListColumns.productsCount">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ordersListColumns.productsCount)" cdkDragLockAxis="x"
+                *matHeaderCellDef mat-sort-header class="head-cell right ob-draggable-column width100">
+                {{'FORMS.LABELS.PRODUCTS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="right width100">{{row.products_count || '-' }}</mat-cell>
+        </ng-container>
+
+        <ng-container [matColumnDef]="ordersListColumns.basePrice">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ordersListColumns.basePrice)"
+                cdkDragLockAxis="x" *matHeaderCellDef class="head-cell right ob-draggable-column  width100">
+                {{'ORDER.BASE_PRICE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="right width100">
+                {{row.price?.base | localCurrency:row.price?.currency}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ordersListColumns.promotions">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ordersListColumns.promotions)"
+                cdkDragLockAxis="x" *matHeaderCellDef class="head-cell right ob-draggable-column  width100">
+                {{'ORDER.PROMOTIONS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="right  width100">
+                {{row.totalPromotions | localCurrency:row.price?.currency}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ordersListColumns.charges">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ordersListColumns.charges)"
+                cdkDragLockAxis="x" *matHeaderCellDef class="head-cell right ob-draggable-column  width100">
+                {{'ORDER.CHARGES' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="right  width100">
+                {{row.totalCharges | localCurrency:row.price?.currency}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ordersListColumns.donation">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ordersListColumns.donation)"
+                cdkDragLockAxis="x" *matHeaderCellDef class="head-cell right ob-draggable-column  width100">
+                {{'ORDERS.DONATION' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="right  width100">
+                {{(row.price?.donation ?? 0) |
+                localCurrency:row.price?.currency}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ordersListColumns.reallocationRefund">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ordersListColumns.reallocationRefund)"
+                cdkDragLockAxis="x" *matHeaderCellDef class="head-cell right ob-draggable-column  width100">
+                {{'ORDER.REALLOCATION_REFUND' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="right  width100">
+                {{row.price?.reallocation_refund ?? 0 | localCurrency:row.price?.currency}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ordersListColumns.delivery">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ordersListColumns.delivery)"
+                cdkDragLockAxis="x" *matHeaderCellDef class="head-cell right ob-draggable-column  width100">
+                {{'ORDER.DELIVERY_METHOD' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="right width100">
+                {{('ENUMS.DELIVERY_OPTS.' + row?.delivery) | translate}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ordersListColumns.priceGateway">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ordersListColumns.priceGateway)"
+                cdkDragLockAxis="x" *matHeaderCellDef class="head-cell right ob-draggable-column  width100">
+                {{'ORDER.GATEWAY_PRICE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="right width100">
+                {{ (row.price?.gateway ?? 0) | localCurrency:row.price?.currency }}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ordersListColumns.internationalPhonePrefix">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ordersListColumns.internationalPhonePrefix)"
+                cdkDragLockAxis="x" *matHeaderCellDef class="head-cell right ob-draggable-column  width100">
+                {{'ORDER.INTERNATIONAL_PHONE.PREFIX' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="right  width100">
+                {{row.buyer_data?.international_phone?.prefix ? '+' + row.buyer_data?.international_phone?.prefix : '-'}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ordersListColumns.internationalPhoneNumber">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ordersListColumns.internationalPhoneNumber)"
+                cdkDragLockAxis="x" *matHeaderCellDef class="head-cell right ob-draggable-column  width100">
+                {{'ORDER.INTERNATIONAL_PHONE.NUMBER' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="right  width100">
+                {{row.buyer_data?.international_phone?.number ?? '-'}}
+            </mat-cell>
+        </ng-container>
+        <ng-container stickyEnd [matColumnDef]="ordersListColumns.finalPrice">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ordersListColumns.finalPrice)"
+                cdkDragLockAxis="x" *matHeaderCellDef class="head-cell final_price right ob-draggable-column  width100">
+                {{'ORDER.TOTAL_PRICE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="right final_price width100">
+                {{row.price?.final | localCurrency:row.price?.currency}}
+            </mat-cell>
+        </ng-container>
+        <ng-container stickyEnd [matColumnDef]="ordersListColumns.actions">
+            <mat-header-cell *matHeaderCellDef class="actions-cell head-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                <button mat-stroked-button color="secondary" class="ob-button xsmall only-icon"
+                    [matTooltip]="'ACTIONS.TABLE.SELECT_COLUMNS' | translate" (click)="changeColSelection()">
+                    <mat-icon>settings</mat-icon>
+                </button>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="actions-cell" [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true" />
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" />
+        <mat-row *matRowDef="let row; columns: displayedColumns;" class="interactive-row" [routerLink]="[row.code]" />
+    </mat-table>
+    @if ($ordersMetadata()?.total === 0) {
+        <div class="context-notification-container" fxFlex="0 50 100%" fxLayout="row"
+            fxLayoutAlign="center start">
+            <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px" fxFlex="80%"
+                fxLayoutAlign="center start">
+                @if (emptyListWithWordAndDates$ | async) {
+                    <div fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="20px">
+                        <p>{{'ORDER.EMPTY_LIST_WITH_KEYWORD' | translate}}</p>
+                        <button mat-stroked-button color="primary" type="button" class="ob-button medium"
+                            [attr.aria-label]="'ORDER.REMOVE_DATES_FILTER' | translate"
+                            (click)="removeDatesFilter()">
+                            {{'ORDER.REMOVE_DATES_FILTER_BTN' | translate}}
+                        </button>
+                    </div>
+                } @else {
+                    <p>{{'LIST.EMPTY' | translate}}</p>
+                }
+            </app-context-notification>
+        </div>
+    }
+</div>

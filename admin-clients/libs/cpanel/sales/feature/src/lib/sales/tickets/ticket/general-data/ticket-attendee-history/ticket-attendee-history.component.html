@@ -1,0 +1,79 @@
+@if (ticketDetail$ | async; as ticketDetail) {
+    <h3 class="section-title">
+        {{'TICKET.ATTENDEE.CURRENT' | translate }}
+    </h3>
+    @if (ticketDetail.action.edit_attendant) {
+        <div class="edit-button flex justify-end">
+            <button mat-stroked-button color="primary" class="ob-button small"
+                (click)="editAttendee(ticketDetail.order.code, ticketDetail.id)"
+                [attr.aria-label]="'TICKET.ATTENDEE.EDIT.EDIT_BTN' | translate" [matTooltip]="'TICKET.ATTENDEE.EDIT.EDIT_BTN' | translate">
+                <mat-icon>mode_edit</mat-icon>
+                {{'TICKET.ATTENDEE.EDIT.EDIT_BTN' | translate}}
+            </button>
+        </div>
+    }
+    @if (ticketDetail.attendant) {
+        <div class="flex flex-wrap flex-[0_1_100%]">
+            @if ($images()?.length > 0) {
+                <div class="flex flex-wrap images-container flex-[0_1_33.3%]">
+                    @for (image of $images(); track image) {
+                        <div class="flex flex-col gap-2 items-center">
+                            <img [src]="'data:image/jpeg;base64,' + image"
+                                 class="attendees-image flex flex-[0_1_calc(33.3%-24px)]"
+                                 alt="{{'ATTENDANT_FIELD.IMAGE' | translate}}" />
+                            <!--TODO: try to use appDowloadFile -->
+                            <button mat-stroked-button color="primary" class="ob-button small"
+                                    (click)="downloadImage(image, ticketDetail.order.code + '-' + ticketDetail.id +'.jpeg')">
+                                {{'TICKETS.ATTENDEE.DOWNLOAD_IMAGE' | translate}}
+                            </button>
+                        </div>
+                    }
+                </div>
+            }
+            <div [attr.class]="'flex flex-wrap ' + (($images()?.length > 0) ? 'flex-[0_1_66.6%]' : 'flex-[0_1_100%]')">
+                @for (item of ticketDetail.attendant | keyvalue; track item.key) {
+                    <div [attr.class]="'details-non-editable-field flex flex-col flex-[0_0_100%] ' +
+                        (($images()?.length > 0) ? 'sm:flex-[0_1_calc(100%-_24px)] md:flex-[0_1_calc(50%-24px)]' :
+                         'sm:flex-[0_1_calc(50%_-_24px)] md:flex-[0_1_calc(33.3%-24px)]')">
+                        <span class="field-label">{{'ATTENDANT_FIELD.' + item.key | translate}}</span>
+                        <span>{{item.value}}</span>
+                    </div>
+                }
+            </div>
+        </div>
+    } @else {
+        <p class="content-not-defined-message flex justify-start items-center">
+            <mat-icon class="ob-icon small with-text">info</mat-icon>
+            <span>{{'TICKET.ATTENDEE.NO_NOMINAL_DATA' | translate}}</span>
+        </p>
+    }
+    @if ((ticketAttendeeHistory$ | async)?.length) {
+        <h3 class="section-title">
+            {{'TICKET.ATTENDEE.HISTORY' | translate }}
+        </h3>
+        <div class="attendees-table">
+            <table mat-table class="ob-table" [dataSource]="ticketAttendeeHistory$">
+                <ng-container matColumnDef="date">
+                    <th id="ticket-attendee-date" mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'TICKET.ATTENDEE.VALID_UNTIL' | translate}}
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                        {{row.action.invalidation_date | dateTime : dateTimeFormats.shortDateTime}}
+                    </td>
+                </ng-container>
+                @for (field of attendantFields; track $index) {
+                    <ng-container [matColumnDef]="field">
+                        <th [id]="'ticket-attendee-' + field" mat-header-cell *matHeaderCellDef class="head-cell">
+                            {{'ATTENDANT_FIELD.' + field | translate}}
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                            {{row.fields.get(field)}}
+                        </td>
+                    </ng-container>
+                }
+                <tr mat-header-row *matHeaderRowDef="attendeesColumns" class="dense-row"></tr>
+                <tr mat-row *matRowDef="let row; columns: attendeesColumns" class="dense-row"></tr>
+            </table>
+        </div>
+    }
+}

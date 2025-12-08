@@ -1,0 +1,161 @@
+<app-form-container [formGroup]="form" [disabled]="$sectionDisabled() || !form.dirty || (isLoadingOrSaving$ | async)"
+    layout="main" (cancel)="cancel()" (save)="save()">
+    <span class="field-label">{{ 'PRODUCT.DELIVERY.DATE.TITLE' | translate }} *</span>
+    <mat-radio-group formControlName="delivery_type" class="delivery-section-container">
+        <div class="delivery-type-row">
+            <div class="delivery-type-container" [class.disabled-section]="$isProductActive()"
+                [matTooltip]="'PRODUCT.FORMS.INFOS.DELIVERY_SELECTION_DISABLED' | translate"
+                [matTooltipDisabled]="!$isProductActive()">
+                <mat-radio-button class="ob-radio-button vertical-list" [value]="'SESSION'">
+                    {{'PRODUCT.DELIVERY.DATE.SESSION_BUTTON' | translate}}
+                </mat-radio-button>
+            </div>
+        </div>
+        <!-- session type  -->
+        @if (form.controls.delivery_type.value === 'SESSION') {
+            <ng-container [ngTemplateOutlet]="deliveryForm" [ngTemplateOutletContext]="{ type: 'SESSION' }" />
+        }
+        <div class="delivery-type-row">
+            <div class="delivery-type-container" [class.disabled-section]="$isProductActive()"
+                [matTooltip]="'PRODUCT.FORMS.INFOS.DELIVERY_SELECTION_DISABLED' | translate"
+                [matTooltipDisabled]="!$isProductActive()">
+                <mat-radio-button class="ob-radio-button vertical-list" [value]="'PURCHASE'">
+                    {{'PRODUCT.DELIVERY.DATE.PURCHASE_BUTTON' | translate}}
+                </mat-radio-button>
+            </div>
+        </div>
+        <!-- purchase type  -->
+        @if (form.controls.delivery_type.value === 'PURCHASE') {
+            <ng-container [ngTemplateOutlet]="deliveryForm" [ngTemplateOutletContext]="{ type: 'PURCHASE' }" />
+        }
+        <div class="delivery-type-row">
+            <div class="delivery-type-container" [class.disabled-section]="$isProductActive()"
+                [matTooltip]="'PRODUCT.FORMS.INFOS.DELIVERY_SELECTION_DISABLED' | translate"
+                [matTooltipDisabled]="!$isProductActive()">
+                <mat-radio-button class="ob-radio-button vertical-list" [value]="'FIXED_DATES'">
+                    {{'PRODUCT.DELIVERY.DATE.FIXED_BUTTON' | translate}}
+                </mat-radio-button>
+            </div>
+        </div>
+    </mat-radio-group>
+    <!-- purchase type  -->
+    @if (form.controls.delivery_type.value === 'FIXED_DATES') {
+        <ng-container [ngTemplateOutlet]="deliveryForm" [ngTemplateOutletContext]="{ type: 'FIXED_DATES' }" />
+    }
+    <ng-template #deliveryForm let-deliveryType="type">
+        @let productDeliveryUnits = deliveryType === 'PURCHASE' ? productDeliveryUnitsPurchase : productDeliveryUnitsSession;
+        <!-- {} -->
+        <div formGroupName="delivery_data" class="edition-block">
+            <div class="date-block">
+                <span class="ob-label">{{ 'PRODUCT.DELIVERY.DATE.LABEL' | translate }}*</span>
+                @if (deliveryType !== 'FIXED_DATES') {
+                    <div class="date-fields-row">
+                        <span class="date-label">{{ 'PRODUCT.DELIVERY.DATE.FROM_LABEL' | translate }}</span>
+                        <mat-form-field appearance="outline" class="ob-form-field inline-field time-value">
+                            <input formControlName="start_time_value" min="0" type="number" placeholder="0" matInput>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="ob-form-field inline-field time-unit">
+                            <mat-select formControlName="start_time_unit" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                @for (unit of productDeliveryUnits; track unit) {
+                                    <mat-option [value]="unit">
+                                        <div appEllipsify> {{ 'PRODUCT.DELIVERY.DATE_UNIT.' + unit | translate }} </div>
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                        <span>{{ deliveryType === 'PURCHASE'
+                            ? ('PRODUCT.DELIVERY.DATE.AFTER_LABEL.' + deliveryType | translate)
+                            : ('PRODUCT.DELIVERY.DATE.BEFORE_LABEL.' + deliveryType | translate)}}
+                        </span>
+                    </div>
+                    <div class="date-fields-row">
+                        <span class="date-label">{{ 'PRODUCT.DELIVERY.DATE.TO_LABEL' | translate }}</span>
+                        <mat-form-field appearance="outline" class="ob-form-field inline-field time-value">
+                            <input formControlName="end_time_value" min="0" type="number" placeholder="0" matInput>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="ob-form-field inline-field time-unit">
+                            <mat-select formControlName="end_time_unit" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                @for (unit of productDeliveryUnits; track unit) {
+                                    <mat-option [value]="unit">
+                                        <div appEllipsify>
+                                            {{ 'PRODUCT.DELIVERY.DATE_UNIT.' + unit | translate }}
+                                        </div>
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                        <span>{{ 'PRODUCT.DELIVERY.DATE.AFTER_LABEL.' + deliveryType | translate }}</span>
+                    </div>
+                } @else {
+                    <div class="flex gap-5">
+                        <div class="flex flex-col">
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                                <mat-label>{{ 'FORMS.FROM' | translate }}</mat-label>
+                                <input matInput [matDatepicker]="dateFromDP" [placeholder]="dateFormat"
+                                    autocomplete="off" formControlName="delivery_date_from" (focus)="dateFromDP.open()">
+                                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                                    (click)="$event.stopPropagation(); dateFromDP.open();">
+                                    <mat-icon>event</mat-icon>
+                                </button>
+                                <mat-error [ob-form-errors]="form.controls.delivery_data.controls.delivery_date_from" />
+                                <mat-datepicker #dateFromDP />
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col">
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                                <mat-label>{{ 'FORMS.TO' | translate }}</mat-label>
+                                <input matInput [matDatepicker]="dateToDP" [placeholder]="dateFormat"
+                                    autocomplete="off" formControlName="delivery_date_to" (focus)="dateToDP.open()">
+                                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                                    (click)="$event.stopPropagation(); dateToDP.open();">
+                                    <mat-icon>event</mat-icon>
+                                </button>
+                                <mat-error [ob-form-errors]="form.controls.delivery_data.controls.delivery_date_to" />
+                                <mat-datepicker #dateToDP />
+                            </mat-form-field>
+                        </div>
+                    </div>
+                }
+            </div>
+            <mat-divider class="ob-form-divider" />
+            @if (deliveryType === 'SESSION') {
+                <p class="delivery-points-info">
+                    <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                    <span>{{'PRODUCT.FORMS.INFOS.SESSION_DELIVERY_TYPE_INFO' | translate}}</span>
+                </p>
+            } @else if (deliveryType === 'PURCHASE' || deliveryType === 'FIXED_DATES') {
+                <div class="delivery-points-field-container">
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label delivery-points-field">
+                        <mat-label>{{'FORMS.LABELS.DELIVERY_POINTS' | translate}}</mat-label>
+                        <mat-select multiple [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                            formControlName="delivery_point_ids">
+                            <mat-option>
+                                <app-select-search #deliveryPointsSelectSearch [options$]="availableDeliveryPoints$"
+                                    [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name"
+                                    requireSelection="true" />
+                            </mat-option>
+                            @for(deliveryPoint of deliveryPointsSelectSearch.getFilteredOptions$() | async; track deliveryPoint) {
+                                <mat-option [value]="deliveryPoint.id">
+                                    {{deliveryPoint.name}}
+                                </mat-option>
+                            }
+                        </mat-select>
+                        <mat-error [ob-form-errors]="form.controls.delivery_data.controls.delivery_point_ids" />
+                    </mat-form-field>
+                </div>
+                <p class="delivery-points-info">
+                    <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                    <span>{{'PRODUCT.FORMS.INFOS.PURCHASE_DELIVERY_TYPE_INFO' | translate}}</span>
+                </p>
+                <a class="ob-link icon create-delivery-point-link" routerLink="/delivery-points" target="_blank">
+                    {{'PRODUCT.ACTIONS.CREATE_DELIVERY_POINT' | translate}}
+                </a>
+            }
+        </div>
+    </ng-template>
+</app-form-container>
+@if (isLoadingOrSaving$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

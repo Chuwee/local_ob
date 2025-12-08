@@ -1,0 +1,97 @@
+<div class="list-container" fxFlex="100%" fxLayout="column">
+    <div class="heading-container">
+        <h1 class="secondary mat-headline-3">{{'TITLES.SALES_REQUESTS' | translate}}</h1>
+    </div>
+    <div class="heading-container" fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxFlex="70%" fxLayoutGap="20px" fxLayoutAlign="start center">
+            <div class="filter-container" fxFlex="none">
+                <app-popover appFilter>
+                    <app-sales-requests-list-filter #filterContent [canSelectEntity$]="canReadMultipleEntities$">
+                    </app-sales-requests-list-filter>
+                </app-popover>
+            </div>
+            <div class="search-field" fxFlex="100%">
+                <app-search-input [placeholder]="'FORMS.SEARCH.SALE_REQUEST_LIST' | translate"></app-search-input>
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            <p *ngIf="salesRequestsMetadata$ | async as salesRequestsMetadata" class="page-summary"
+                [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: salesRequestsMetadata">
+            </p>
+            <app-paginator [length]="(salesRequestsMetadata$ | async)?.total" [pageSize]="channelsPageSize"></app-paginator>
+        </div>
+    </div>
+    <div class="heading-container heading-divider">
+        <mat-divider></mat-divider>
+    </div>
+    <div class="heading-container">
+        <app-chips appFilter></app-chips>
+    </div>
+    <div class="spinner-container" *ngIf="salesRequestsLoading$ | async">
+        <mat-spinner></mat-spinner>
+    </div>
+    <mat-table class="ob-table" [dataSource]="salesRequests$ | async" [trackBy]="trackByFn"
+        matSort [matSortActive]="initSortCol" [matSortDirection]="initSortDir" matSortDisableClear
+        [attr.aria-label]="'TITLES.SALES_REQUESTS' | translate"
+        [ngClass]="{'not-touchable': (isHandsetOrTablet$ | async) !== true}">
+        <ng-container matColumnDef="date">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'SALES_REQUESTS.DATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.date | dateTime : dateTimeFormats.shortDateTime}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="event_name">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'SALES_REQUESTS.EVENT_NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.eventName}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="event_entity_name">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'SALES_REQUESTS.EVENT_ENTITY_NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.eventEntityName}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="channel_name">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'SALES_REQUESTS.CHANNEL_NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.channelName}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="city">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'SALES_REQUESTS.CITY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.venue?.city}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="venue">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'SALES_REQUESTS.VENUE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.venue?.text}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'SALES_REQUESTS.STATUS.LABEL' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="editable-cell" (click)="$event.stopPropagation()">
+                <app-status-select fxFlex="100" [element]="row" statusType="SALES_REQUESTS"
+                    [statusList]="salesRequestsStatus" [updateStatus]="updateStatus" [hiddenStatusList]="[salesRequestsStatus.pending]">
+                    <ng-template #optionTemplate let-row>
+                        {{'SALES_REQUESTS.STATUS_OPTS.' + row | translate}}
+                    </ng-template>
+                </app-status-select>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="actions-cell head-cell">
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="actions-cell"></mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;" class="interactive-row"
+            [routerLink]="[row.id, 'operative']"></mat-row>
+    </mat-table>
+    <div class="context-notification-container" fxFlex="0 50 100%" fxLayout="row" fxLayoutAlign="center start"
+        *ngIf="(salesRequestsMetadata$ | async)?.total === 0">
+        <app-context-notification class="ob-context-notification" contextType="info"
+            fxFlex.gt-sm="600px" fxFlex="80%"
+            fxLayoutAlign="center start">
+            <p>{{'LIST.EMPTY' | translate}}</p>
+        </app-context-notification>
+    </div>
+</div>

@@ -1,0 +1,99 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" class="fit-to-container overflow-y-auto"
+    [disabled]="!form.dirty || (isInProgress$ | async)">
+    <p class="section-block">
+        {{'CHANNELS.CROSS_RESTRICTIONS.DESCRIPTION' | translate }}
+    </p>
+    <div class="container flex flex-row gap-6">
+        <div class="basis-1/2 flex flex-col">
+
+            <h3 class="section-title">{{'CHANNELS.CROSS_RESTRICTIONS.EVENTS.TITLE' | translate}}</h3>
+
+            @if ((totalEvents$ | async) > 10) {
+                <app-search-input [placeholder]="'FORMS.SEARCH.IN_LIST' | translate"
+                    (valueChanged)="searchEvents.next($event)" searchOnInteraction />
+            }
+
+            @if (filteredChannelEvents$ | async; as events) {
+
+                <p class="description">&nbsp;</p>
+                @if (events?.length) {
+                    <mat-button-toggle-group vertical [formControl]="formEvent"
+                        class="ob-outline-button-group list-container">
+                        @for (event of events; track event.id) {
+                            <mat-button-toggle [value]="event.id" class="event-toggle-button"
+                                [class.restricted]="form.get(event.id.toString())?.value?.length > 0">
+                                {{event.name}}
+                            </mat-button-toggle>
+                        }
+                    </mat-button-toggle-group>
+                }
+
+            }
+
+            @if (!(filteredChannelEvents$ | async)?.length && (isInProgress$ | async) === false) {
+                <div
+                    class="context-message-container">
+                    {{'FORMS.SELECT.NO_RESULTS' | translate}}
+                </div>
+            }
+
+        </div>
+
+        @if (currentForm$ | async; as formSelection) {
+            <div class="list-container basis-1/2 flex flex-col">
+
+                <h3 class="section-title">{{'CHANNELS.CROSS_RESTRICTIONS.SELECTION.TITLE' | translate}}</h3>
+
+                @if ((totalEvents$ | async) > 10) {
+                    <app-search-input [placeholder]="'FORMS.SEARCH.IN_LIST' | translate"
+                        (valueChanged)="searchSelection.next($event)" searchOnInteraction />
+                }
+
+                @let events = filteredSuggestedEvents$ | async;
+                @let hasEvents = events && events.length > 0;
+                @if (events) {
+                    <p class="description">{{'CHANNELS.CROSS_RESTRICTIONS.SELECTION.DESCRIPTION' | translate }}</p>
+                    <mat-selection-list [formControl]="formSelection" class="ob-list small-rows" [class.list-container]="hasEvents">
+                        @if ({
+                            selection: (filteredformSelectionLength$ | async),
+                            filtered: (filteredSuggestedEventsLength$ | async)
+                        }; as data) {
+                            <div class="list-header">
+                                <mat-checkbox color="primary"
+                                    [disabled]="data.filtered <= 1"
+                                    [checked]="data.selection === data.filtered"
+                                    [indeterminate]="data.selection > 0 && data.selection < data.filtered"
+                                    (change)="selectAll($event)" />
+                                <span>{{'CHANNELS.CROSS_RESTRICTIONS.SELECTION.HEADER' | translate}}</span>
+                            </div>
+                        }
+
+                        @for (event of events; track event.id) {
+                            <mat-list-option [value]="event.id"
+                                [hidden]="event.id === currentEventId()"
+                                color="primary" checkboxPosition="before">
+                                <span>{{event.name}}</span>
+                            </mat-list-option>
+                        }
+
+                    </mat-selection-list>
+
+
+                }
+
+                @if (!hasEvents && (isInProgress$ | async) === false) {
+                    <div
+                        class="context-message-container">
+                        {{'FORMS.SELECT.NO_RESULTS' | translate}}
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</app-form-container>
+
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

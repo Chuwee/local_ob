@@ -1,0 +1,41 @@
+<div class="status-notifications-container flex justify-center">
+    <div class="status-bar flex basis-full">
+        <div class="pack-activation" [class.disabled]="statusCtrl.disabled"
+            [matTooltip]="'CHANNELS.PACKS.DISABLED_ACTIVATION_DESC' | translate"
+            [matTooltipDisabled]="statusCtrl.enabled">
+            <mat-slide-toggle class="ob-slide-toggle ob-label"
+                [formControl]="statusCtrl"
+                (change)="handleStatusChange($event.checked)">
+                {{'CHANNELS.PACKS.CHANGE_STATUS' | translate}}
+            </mat-slide-toggle>
+        </div>
+    </div>
+</div>
+<app-form-container [disabled]="!form.dirty || (loading$ | async)" (cancel)="cancel()" (save)="save()" layout="main">
+    <form [formGroup]="form">
+        <div class="pack-form-section">
+            <mat-expansion-panel [expanded]="true" togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'CHANNELS.PACKS.PACK_DATA' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-form-field id="name" appearance="outline" class="ob-form-field field-with-label custom-layout">
+                    <mat-label class="custom-label">{{ 'FORMS.LABELS.NAME' | translate }}</mat-label>
+                    <input formControlName="name" matInput [placeholder]="'CHANNELS.PACKS.GENERAL_DATA.NAME_PLACEHOLDER' | translate">
+                    <mat-error [ob-form-errors]="form" field="name" />
+                </mat-form-field>
+            </mat-expansion-panel>
+            <mat-expansion-panel [expanded]="true" togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.CATEGORIES' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-categories-selection [form]="form" [item]="$pack()" [putItemCtrl]="form.controls['putCategoriesCtrl']" />
+            </mat-expansion-panel>
+        </div>
+    </form>
+</app-form-container>
+
+@if(loading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

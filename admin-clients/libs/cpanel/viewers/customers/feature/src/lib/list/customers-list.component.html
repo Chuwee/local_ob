@@ -1,0 +1,203 @@
+<div class="list-container" fxFlex="0 1 100%" fxLayout="column"
+    [class.import-in-progress]="(importProgress$ | async) === wsgStatus.inProgress">
+    <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">{{'TITLES.CUSTOMERS' | translate}}</h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+            <!-- Create Customer Button-->
+            <div class="filter-container" fxLayoutAlign="end start" fxLayoutGap="10px">
+                <app-entity-filter-button #entityFilterButton [fxShow]="showEntityButton$ | async"
+                    [getEntitiesRequest]="entitiesRequest" />
+                @let showActions = $showActions();
+                @if (showActions) {
+                    <button mat-stroked-button color="primary" type="button"
+                        class="ob-button medium add-button" [attr.aria-label]="'CUSTOMER.NEW_BTN' | translate"
+                        (click)="openNewCustomerDialog()" [disabled]="isLoading$ | async">
+                        <mat-icon>add</mat-icon>
+                        {{'CUSTOMER.NEW_BTN' | translate}}
+                    </button>
+                    @if (canLoggedUserCreateOrDelete$ | async) {
+                        <button mat-stroked-button color="tertiary" class="ob-button medium only-icon"
+                            [matTooltip]="'FORMS.ACTIONS.MORE' | translate"
+                            [matMenuTriggerFor]="customersListMenu">
+                            <mat-icon>more_horiz</mat-icon>
+                        </button>
+                    }
+                    <mat-menu #customersListMenu="matMenu">
+                        <button mat-menu-item (click)="openCustomerListImportDialog()">
+                            {{'FORMS.ACTIONS.IMPORT' | translate}}
+                        </button>
+                        <button mat-menu-item (click)="openCustomerListExportDialog()">
+                            {{'FORMS.ACTIONS.EXPORT' | translate}}
+                        </button>
+                    </mat-menu>
+                }
+            </div>
+        </div>
+    </div>
+    <div [fxShow]="(canReadMultipleEntities$ | async) === false || (entitySelected$ | async)"
+        class="heading-container" fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxFlex="70%" fxLayoutGap="20px" fxLayoutAlign="start center">
+            <div class="filter-container" fxFlex="none">
+                <app-popover appFilter>
+                    <app-customers-list-filter #filterContent />
+                </app-popover>
+            </div>
+            <div class="search-field" fxFlex="100%">
+                <app-search-input [placeholder]="'FORMS.SEARCH.CUSTOMERS_LIST' | translate" />
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            @if (customersMetadata$ | async; as customersMetadata) {
+                <p class="page-summary"
+                    [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: customersMetadata">
+                </p>
+            }
+            <app-paginator [length]="(customersMetadata$ | async)?.total" [pageSize]="customersPageSize" />
+        </div>
+    </div>
+    <div class="heading-container heading-divider">
+        <mat-divider />
+    </div>
+    <!-- Filter chips -->
+    <div [fxShow]="(canReadMultipleEntities$ | async) === false || (entitySelected$ | async)" class="heading-container">
+        <app-chips appFilter />
+    </div>
+    <!-- Loading Spinner -->
+    @if (isLoading$ | async) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+    <!-- Entity not selected notification -->
+    <app-empty-state [fxShow]="showNoEntityEntityButton$ | async" fxFlex="100%"
+        [title]="'LIST.ENTITY_REQUIRED_TITLE' | translate"
+        [description]="'LIST.ENTITY_REQUIRED_DESCRIPTION' | translate">
+        <button type="button" mat-flat-button class="ob-button medium" color="primary"
+            (click)="entityFilterButton.openEntitySelectionDialog()">
+            {{'ACTIONS.SELECT_ENTITY' | translate}}
+        </button>
+    </app-empty-state>
+
+    <!-- Table -->
+    <mat-table [fxShow]="(canReadMultipleEntities$ | async) === false || (entitySelected$ | async)"
+        class="ob-table" [dataSource]="customers$ | async"
+        [attr.aria-label]="'TITLES.CUSTOMERS' | translate"
+        [class.not-touchable]="(isHandsetOrTablet$ | async) !== true" matSortDisableClear matSort
+        [matSortDirection]="initSortDir" [matSortActive]="initSortCol">
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'CUSTOMER.CUSTOMER' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" fxLayout="column" fxLayoutAlign="start">
+                <span appEllipsify [matTooltip]="row.name + ' ' + row.surname" matTooltipClass="ob-tooltip-nowrap">
+                    {{row.name}} {{row.surname}}
+                </span>
+                <span appEllipsify [matTooltip]="row.email" matTooltipClass="ob-tooltip-nowrap">
+                    {{row.email}}
+                </span>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="member_id">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'CUSTOMER.MEMBER_ID' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="customer-member-id">{{row.member_data?.id}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="entity">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'CUSTOMER.ENTITY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.entity?.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="phone">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'CUSTOMER.PHONE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.phone}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="sign_up_date">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'CUSTOMER.SIGN_UP_DATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.sign_up_date | localDateTime : dateTimeFormats.shortDate}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'CUSTOMER.TYPE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{'CUSTOMER.TYPE_OPTS.' + row.type | translate}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'CUSTOMER.STATUS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="status-cell">
+                @if (row.status) {
+
+                    <span [ngClass]="['status-dot', row.status.toLowerCase()]"></span>
+                    <span>{{'CUSTOMER.STATUS_OPTS.' + row.status | translate}}</span>
+
+                }
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="management">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'CUSTOMER.MANAGEMENT' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                {{row.member_data?.admin_type ? ('CUSTOMER.MANAGEMENT_TYPE.' + row.member_data.admin_type | translate) : ''}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="two-actions-cell head-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true" />
+            <mat-cell *matCellDef="let row" class="two-actions-cell" [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                <div class="action-buttons" (click)="$event.stopPropagation()">
+                    @if (!$hasEntityExternalVendorWithInternalAccess()) {
+                        <button mat-icon-button aria-label="Activate user and set password"
+                            class="ob-button medium"
+                            (click)="openSetPasswordDialog(row)"
+                            [matTooltip]="'ACTIONS.SET_PASSWORD' | translate">
+                            <mat-icon svgIcon="new-password" />
+                        </button>
+                    }
+                    @if (canLoggedUserCreateOrDelete$ | async) {
+                        <button mat-icon-button aria-label="Delete customer"
+                            class="ob-button medium" (click)="openDeleteCustomerDialog(row)"
+                            [disabled]="isLoading$ | async">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    }
+                </div>
+            </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="(displayedColumns$ | async); sticky: true" />
+        <mat-row *matRowDef="let row; columns: (displayedColumns$ | async);" class="interactive-row"
+            [routerLink]="[row.id, 'general-data']" [queryParams]="{entityId: row.entity?.id}" />
+    </mat-table>
+    <!-- Empty list notification -->
+    @if (((canReadMultipleEntities$ | async) === false || (entitySelected$ | async)) && (customersMetadata$ | async)?.total === 0) {
+        <div
+            fxFlex="0 50 100%" class="context-notification-container" fxLayout="row" fxLayoutAlign="center start">
+            <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px" fxFlex="80%"
+                fxLayoutAlign="center start">
+                <p>{{'LIST.EMPTY' | translate}}</p>
+            </app-context-notification>
+        </div>
+    }
+    <!-- Customer Import modal progress -->
+    @if ((importProgress$ | async) === wsgStatus.inProgress) {
+        <div class="ob-overlay-wrapper" fxLayoutAlign="center start">
+            <div class="ob-overlay-pane pane-sticky">
+                <app-context-notification class="ob-context-notification-info" contextType="info" fxFlex.gt-sm="600px"
+                    fxFlex="80%">
+                    <p>{{'CUSTOMER.IMPORT_IN_PROGRESS_INFO' | translate}}</p>
+                    <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                        [attr.aria-label]="('CUSTOMER.IMPORT_IN_PROGRESS_INFO' | translate)" />
+                </app-context-notification>
+            </div>
+        </div>
+    }
+</div>

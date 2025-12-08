@@ -1,0 +1,31 @@
+@if (packChannel$ | async; as packChannel) {
+    <app-form-container [disabled]="!form.dirty || (inProgress$ | async)" (cancel)="cancel()" (save)="save()">
+        <form [formGroup]="form">
+            <mat-expansion-panel expanded togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'PACK.CHANNEL.UPGRADE_TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <p class="description">{{'PACK.CHANNEL.UPGRADE_DESCRIPTION' | translate }}</p>
+                <mat-checkbox color="primary" formControlName="suggested">
+                    {{'PACK.CHANNEL.UPGRADE_SHOW_ITEM' | translate}}
+                </mat-checkbox>
+            </mat-expansion-panel>
+            <mat-expansion-panel expanded togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'PACK.CHANNEL.LIMITS_AND_CONDITIONS_TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <p class="mat-subtitle-2" fxLayoutAlign="start center">
+                    {{'PACK.CHANNEL.DISABLE_BUY_DESCRIPTION' | translate }}
+                </p>
+                <mat-checkbox color="primary" formControlName="on_sale_for_logged_users">
+                    {{'PACK.CHANNEL.DISABLE_BUY' | translate}}
+                </mat-checkbox>
+            </mat-expansion-panel>
+        </form>
+    </app-form-container>
+}
+@if (inProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,38 @@
+<app-form-container [formGroup]="form" (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="!form.dirty" class="no-top-padding">
+    <app-tabs-menu #languageTabs type="language" overrideClasses="no-left-padding" fxFlex="0 1 100%">
+        <ng-container *ngFor="let lang of languages$ | async">
+            <ng-template appTab [ctrl]="form.get(lang)" lazyLoad [label]="('LANGUAGES.' + lang) | translate">
+                <div [formGroupName]="lang" fxLayout="column" fxFlex="1 1 100%">
+                    <div fxFlex="100%" fxLayout="row" fxFlexOffset="5px" class="subject-field-container">
+                        <mat-form-field fxFlex="640px" fxFlex.lt-md="100%" appearance="outline" class="ob-form-field field-with-label">
+                            <mat-label>{{'FORMS.LABELS.SUBJECT' | translate}}</mat-label>
+                            <input matInput aria-label="subject" [placeholder]="'FORMS.LABELS.SUBJECT' | translate"
+                                formControlName="subject">
+                            <mat-error [ob-form-errors]="form" [field]="[lang, 'subject']" />
+                        </mat-form-field>
+                    </div>
+                    <div fxFlex="100%" fxLayout="row" fxFlexOffset="5px">
+                        <div fxFlex="640px" fxFlex.lt-md="100%" fxLayout="column">
+                            <span class="field-label">
+                                {{'FORMS.LABELS.BODY' | translate}} *
+                            </span>
+                            <p>{{'GIFT_CARD.TEXT_CONTENT.DESCRIPTION.DESCRIPTION' | translate }}</p>
+                            <mat-form-field appearance="outline" class="ob-form-field no-padding">
+                                <app-rich-text-area aria-label="Email" [placeholder]="'FORMS.TEXT_INPUT_AREA_PLACEHOLDER' | translate"
+                                    formControlName="body" />
+                                <mat-error [ob-form-errors]="form" [field]="[lang, 'body']" />
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div fxFlex="100%" fxLayout="row" fxFlexOffset="5px">
+                        <mat-form-field fxFlex="640px" fxFlex.lt-md="100%" appearance="outline" class="ob-form-field field-with-label">
+                            <mat-label>{{'FORMS.LABELS.COPYRIGHT' | translate}}</mat-label>
+                            <input matInput aria-label="copyright" [placeholder]="'FORMS.LABELS.COPYRIGHT' | translate"
+                                formControlName="copyright">
+                        </mat-form-field>
+                    </div>
+                </div>
+            </ng-template>
+        </ng-container>
+    </app-tabs-menu>
+</app-form-container>

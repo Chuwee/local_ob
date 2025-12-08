@@ -1,0 +1,265 @@
+<div class="list-container" fxFlex="0 1 100%" fxLayout="column">
+    <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">
+                {{'TITLES.MATCHINGS.MATCHINGS_LIST_TITLE' | translate}}
+            </h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end center">
+            <div *ngIf="(loadingData$ | async) === false">
+                <div *ngIf="matcherStatus$ | async as matcher else not_executed" fxLayout="row wrap" fxLayoutGap="10px"
+                    fxLayoutAlign="center center">
+                    <div>
+                        <span class="field-label">{{'MATCHINGS.MATCHER.START_TIME' | translate}}: </span>
+                        <span>{{matcher.start_date | dateTime: dateTimeFormats.shortDateTime}}</span>
+                    </div>
+                    <div *ngIf="matcher.supplier_events">
+                        <span class=" field-label">{{'MATCHINGS.MATCHER.MATCHED_EVENTS' | translate}}: </span>
+                        <span>{{matcher.processed_events}} / {{matcher.supplier_events}}</span>
+                    </div>
+                    <div [ngSwitch]="matcher.status">
+                        <span class="status-dot-spinner" *ngSwitchCase="matcherStatus.inProgress">
+                            <mat-spinner diameter="20" />
+                        </span>
+                        <span *ngSwitchCase="matcherStatus.ok">
+                            <mat-icon class="result-icon success">check_circle</mat-icon>
+                        </span>
+                        <span *ngSwitchCase="matcherStatus.fail">
+                            <mat-icon class="result-icon error" [appHoverOverlay]="content">error</mat-icon>
+                        </span>
+                        <ng-template #content>
+                            <app-error-card [row]="{error_description: matcher.message}"
+                                [unknownErrorDefault]="'MATCHINGS.MATCHER.UNKNOWN_ERROR_DEFAULT_MESSAGE' | translate" />
+                        </ng-template>
+                    </div>
+                </div>
+                <ng-template #not_executed>
+                    <div fxLayout="row wrap" fxLayoutGap="5px" fxLayoutAlign="center center">
+                        <mat-icon class="ob-icon small warning">warning</mat-icon>
+                        <span>{{'MATCHINGS.MATCHER.NOT_EXECUTED' | translate}}</span>
+                    </div>
+                </ng-template>
+            </div>
+            <app-supplier-selection-button [supplier]="selectedSupplierName$ | async"
+                (valueChanged)="changeSelectedSupplier($event)" />
+            <button mat-icon-button class="ob-button medium" aria-label="refresh" (click)="refresh()">
+                <mat-icon>autorenew</mat-icon>
+            </button>
+            <button mat-stroked-button color="tertiary" class="ob-button medium only-icon" [matMenuTriggerFor]="ordersListMenu">
+                <mat-icon>more_horiz</mat-icon>
+            </button>
+            <mat-menu #ordersListMenu="matMenu">
+                <button mat-menu-item [disabled]="isExportLoading$ | async" (click)="openExportMatchingslistDialog()">
+                    {{'MATCHINGS.ACTIONS.OPEN_EXPORT_DIALOG' | translate}}
+                </button>
+                <button mat-menu-item *ngIf="hasWriteMatchingPermissions$ | async" (click)="openLaunchMatcherDialog()">
+                    {{'MATCHINGS.ACTIONS.OPEN_LAUNCH_MATCHER_DIALOG' | translate}}
+                </button>
+            </mat-menu>
+        </div>
+    </div>
+    <div class="matchings-container">
+        <app-searchable-paginated-selection #selection [placeholder]="'FORMS.SEARCH.MATCHINGS_LIST' | translate"
+            (loadData)="loadMatchings($event)" [form]="form" [pageSize]="matchingsPageSize" [data$]="matchingsList$"
+            [metadata$]="matchingsMetadata$" [loading$]="loadingData$" [mainPage]="true">
+            <div *ngIf="matchingsAggregatedData$ | async as matchingsAggData" slot="filter" class="badge-container">
+                {{(selectedMatchings)}} / {{matchingsAggData?.overall?.aggData?.totalListingsCandidate?.value}}
+            </div>
+            <button slot="filter" type="button" class="ob-button only-icon" mat-icon-button color="tertiary"
+                [class.active]="!!(selectedOnly$ | async)" [disabled]="selectedMatchings === 0"
+                [matTooltip]="'MATCHINGS.ACTIONS.SHOW_SELECTED_TOOLTIP' | translate" (click)="clickShowSelected()">
+                <mat-icon>visibility</mat-icon>
+            </button>
+            <button slot="filter" type="button" mat-flat-button class="ob-button" color="primary"
+                [matTooltip]="'MATCHINGS.ACTIONS.MAP_TOOLTIP' | translate"
+                [disabled]="selectedMatchings === 0 && (allSelected$ | async) === false" (click)="mapBulk()">
+                {{'MATCHINGS.ACTIONS.MAP' | translate}}
+            </button>
+            <button slot="filter" type="button" mat-flat-button class="ob-button" color="primary"
+                [matTooltip]="'MATCHINGS.ACTIONS.MAP_TOOLTIP' | translate"
+                [disabled]="selectedMatchings === 0 && (allSelected$ | async) === false" (click)="openBlockCandidateDialog(form.value)">
+                {{'MATCHINGS.ACTIONS.BLACKLIST' | translate}}
+            </button>
+            <div slot="filter" class="filter-container" fxFlex="none" data-test="filterBtn">
+                <app-popover appFilter>
+                    <app-matchings-list-filter #filterContent />
+                </app-popover>
+            </div>
+            <div slot="chips">
+                <app-chips appFilter />
+            </div>
+            <div slot="aggData" class="heading-container heading-aggregated">
+                <app-aggregated-data [aggregatedData]="matchingsAggregatedData$ | async" [aggregationMetrics]="aggDataMatchings" />
+            </div>
+            <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data" let-selectionChanged="selectionChanged">
+                <app-selection-table [data]="data" [columns]="displayedColumns" [pageForm]="pageForm"
+                    [canEditSelection]="hasWriteMappingPermissions$ | async"
+                    [selectionChanged]="selectionChanged" [columnsDisabled]="columnsDisabled$ | async" (rowClicked)="open($event)"
+                    [selectionDisabled]="(allSelected$ | async)" [margin]="true" fxLayout="column" [mainPage]="true"
+                    [class.some-selected]="selectedMatchings > 0 || (allSelected$ | async)" matSort [matSortActive]="initSortCol"
+                    [matSortDirection]="initSortDir" matSortDisableClear>
+                    <ng-container matColumnDef="status">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                            {{'MATCHINGS.STATUS' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            <span [ngClass]="['status-dot', row.status.toLowerCase()]"></span>
+                            <span>{{'MATCHINGS.STATUS_OPTS.' + row.status | translate}}</span>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="supplier_event_name">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                            {{'MATCHINGS.EVENT_NAME' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            <span appEllipsify [matTooltip]="row.supplier_event?.name" matTooltipClass="ob-tooltip-nowrap">
+                                {{row.supplier_event?.name}}
+                            </span>
+                            <app-copy-text *ngIf="row.supplier_event?.name" [copyText]="row.supplier_event?.name"
+                                class="copy-button" />
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="supplier_id">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                            {{'MATCHINGS.EVENT_ID' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            <span appEllipsify [matTooltip]="row.supplier_event?.id" matTooltipClass="ob-tooltip-nowrap">
+                                {{row.supplier_event?.id}}
+                            </span>
+                            <app-copy-text *ngIf="row.supplier_event?.id" [copyText]="row.supplier_event?.id"
+                                class="copy-button" />
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="supplier_venue_name">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                            {{'MATCHINGS.VENUE' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            <span appEllipsify [matTooltip]="row.supplier_event?.venue?.name" matTooltipClass="ob-tooltip-nowrap">
+                                {{row.supplier_event?.venue?.name}}
+                            </span>
+                            <app-copy-text *ngIf="row.supplier_event?.venue?.name" [copyText]="row.supplier_event?.venue?.name"
+                                class="copy-button" />
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="supplier_date">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                            {{'MATCHINGS.EVENT_DATE' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row">{{row.supplier_event?.date | dateTime : dateTimeFormats.shortDateTime}}</mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="supplier_country_code">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                            {{'MATCHINGS.COUNTRY_CODE' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            {{row.supplier_event?.venue?.country_code ?? '-'}}
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="supplier_listings">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                            {{'MATCHINGS.LISTINGS' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            {{row.supplier_event?.availability?.listings ?? '-'}}
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="supplier_tickets">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell with-divider">
+                            {{'MATCHINGS.TICKETS' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row" class="with-divider">
+                            {{row.supplier_event?.availability?.tickets ?? '-'}}
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="shi_event_name">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                            {{'MATCHINGS.SHI_EVENT_NAME' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            <span appEllipsify [matTooltip]="row.shi_event?.name" matTooltipClass="ob-tooltip-nowrap">
+                                {{row.shi_event?.name ?? '-'}}
+                            </span>
+                            <app-copy-text *ngIf="row.shi_event?.name" [copyText]="row.shi_event?.name" class="copy-button" />
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="shi_id">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                            {{'MATCHINGS.SHI_EVENT_ID' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            <span appEllipsify [matTooltip]="row.shi_event?.id" matTooltipClass="ob-tooltip-nowrap">
+                                {{row.shi_event?.id ?? '-'}}
+                            </span>
+                            <app-copy-text *ngIf="row.shi_event?.id" [copyText]="row.shi_event?.id" class="copy-button" />
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="shi_venue_name">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                            {{'MATCHINGS.SHI_VENUE' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            <span appEllipsify [matTooltip]="row.shi_event?.venue?.name" matTooltipClass="ob-tooltip-nowrap">
+                                {{row.shi_event?.venue?.name ?? '-'}}
+                            </span>
+                            <app-copy-text *ngIf="row.shi_event?.venue?.name" [copyText]="row.shi_event?.venue?.name"
+                                class="copy-button" />
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="shi_date">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                            {{'MATCHINGS.SHI_EVENT_DATE' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            {{row.shi_event?.date ? (row.shi_event?.date | dateTime : dateTimeFormats.shortDateTime) : '-' }}
+                        </mat-cell>
+                    </ng-container>
+                    <!-- Actions Column -->
+                    <ng-container matColumnDef="actions">
+                        <mat-header-cell *matHeaderCellDef class="two-actions-cell"
+                            [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true" />
+                        <mat-cell *matCellDef="let row" class="two-actions-cell"
+                            [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                            <div class="action-buttons" (click)="$event.stopPropagation()">
+                                <button mat-icon-button [attr.aria-label]="'MATCHINGS.CREATE_MAPPING_BUTTON' | translate"
+                                    class="ob-button medium" (click)="openCreateMatchingDialog(row)"
+                                    *ngIf="(hasWriteMappingPermissions$ | async) && row.status === matchingStatus.candidate">
+                                    <mat-icon>publish</mat-icon>
+                                </button>
+                                <button mat-icon-button [attr.aria-label]="'MATCHINGS.ACTIONS.BLOCK_CANDIDATE' | translate"
+                                    class="ob-button medium" (click)="openBlockCandidateDialog([row])"
+                                    *ngIf="(hasWriteMatchingPermissions$ | async) && row.status === matchingStatus.candidate">
+                                    <mat-icon>remove_circle_outline</mat-icon>
+                                </button>
+                            </div>
+                        </mat-cell>
+                    </ng-container>
+                    <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" />
+                    <ng-template #noResultsTemplate>
+                        <div class="context-notification-container" *ngIf="(allMatchingsMetadata$ | async)?.total === 0" fxFlex="0 50 100%"
+                            fxLayout="row" fxLayoutAlign="center start">
+                            <app-context-notification *ngIf="(allMatchingsMetadata$ | async)?.total === 0"
+                                class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px" fxFlex="80%"
+                                fxLayoutAlign="center start">
+                                <div *ngIf="emptyListWithWordAndFilters$ | async else normalEmptyList"
+                                    fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="20px">
+                                    <p>{{'LIST.EMPTY_LIST_WITH_KEYWORD' | translate}}</p>
+                                    <button mat-stroked-button color="primary" type="button" class="ob-button medium"
+                                        [attr.aria-label]="'LIST.REMOVE_FILTERS' | translate"
+                                        (click)="removeFilters()">
+                                        {{'LIST.REMOVE_FILTERS_BTN' | translate}}
+                                    </button>
+                                </div>
+                                <ng-template #normalEmptyList>
+                                    <p>{{'LIST.EMPTY' | translate}}</p>
+                                </ng-template>
+                            </app-context-notification>
+                        </div>
+                    </ng-template>
+
+                </app-selection-table>
+            </ng-template>
+        </app-searchable-paginated-selection>
+    </div>
+</div>

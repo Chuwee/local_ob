@@ -1,0 +1,43 @@
+@if (selectedTemplate$ | async; as template) {
+    <div class="zone-template-details-container flex flex-col items-stretch grow-0 shrink basis-full">
+        <app-nav-tabs-menu type="horizontalSubtab" [elements]="
+        [
+            {
+                label: 'ENTITY.ZONE_TEMPLATES.GENERAL_DATA.TITLE',
+                id: 'tab_entity_zone_templates_general_data',
+                param: 'general-data',
+            },
+            {
+                label: 'ENTITY.ZONE_TEMPLATES.EMAIL.TITLE',
+                id: 'tab_entity_zone_templates_email',
+                param: 'email',
+            },
+            {
+                label: 'ENTITY.ZONE_TEMPLATES.THANKS_CONFIG.TITLE',
+                id: 'tab_entity_zone_templates_thanks_config',
+                param: 'thanks-config',
+            }
+        ]" />
+        <div class="status-notifications-container">
+            <div class="status-bar">
+                <div class="template-activation" [class.disabled]="statusCtrl.disabled"
+                    [matTooltip]="'ENTITY.ZONE_TEMPLATE.DISABLED_ACTIVATION_DESC' | translate"
+                    [matTooltipDisabled]="statusCtrl.enabled">
+                    <mat-slide-toggle class="ob-slide-toggle ob-label" [formControl]="statusCtrl"
+                        (change)="handleStatusChange($event.checked)">
+                        {{'ENTITY.ZONE_TEMPLATE.ACTIVATE' | translate}}
+                    </mat-slide-toggle>
+                </div>
+                <div class="template-status">
+                    <span class="template-status-label ob-label">
+                        {{'ENTITY.ZONE_TEMPLATE.STATUS' | translate}}:
+                    </span>
+                    <span class="ob-status-badge" [ngClass]="template.status === 'ENABLED' ? 'active' : 'inactive'">
+                        {{'ENTITY.ZONE_TEMPLATE.STATUS_OPTS.' + template.status | translate}}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <router-outlet (activate)="childComponentChange($event)" />
+    </div>
+}

@@ -1,0 +1,67 @@
+<app-form-container [disabled]="!form.dirty || (loading$ | async)" (cancel)="cancel()" (save)="save()">
+    <form [formGroup]="form">
+        <div class="event-template-container flex flex-row-reverse">
+            <div fxLayoutAlign="center center" fxLayoutGap="4px">
+                <span [matTooltip]="'CHANNELS.PACKS.PACK_PRICE_TYPES.UPDATE_RATES_DISABLED_TOOLTIP' | translate "
+                    [matTooltipDisabled]="!$pack().active"
+                    [class.disabled-section]="$pack().active">
+                    <button mat-stroked-button color="tertiary" type="button"
+                        class="ob-button small"
+                        [disabled]="$pack().active"
+                        [attr.aria-label]="'ACTIONS.REFRESH_RATES' | translate"
+                        (click)="refreshRates()">
+                        <mat-icon>autorenew</mat-icon> {{'ACTIONS.REFRESH_RATES' | translate}}
+                    </button>
+                </span>
+                <app-help-button [message]="'CHANNELS.PACKS.PACK_PRICE_TYPES.REFRESH_RATES_TOOLTIP' | translate" />
+            </div>
+        </div>
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.PACKS.PACK_PRICE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="column" class="pack-form-section" formGroupName="pricing">
+                <mat-radio-group formControlName="type" fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="center">
+                    <mat-radio-button class="ob-radio-button" [value]="'COMBINED'">
+                        <div class="option-title">{{'CHANNELS.PACKS.PACK_PRICE_SUM' | translate}}</div>
+                        <div>{{'CHANNELS.PACKS.PACK_PRICE_SUM_DESC' | translate}}</div>
+                    </mat-radio-button>
+                    <mat-radio-button class="ob-radio-button" [value]="'INCREMENTAL'">
+                        <div class="option-title">{{'CHANNELS.PACKS.PACK_PRICE_INCREMENTAL' | translate}}</div>
+                        <div>{{'CHANNELS.PACKS.PACK_PRICE_INCREMENTAL_DESC' | translate}}</div>
+                    </mat-radio-button>
+                    @if($priceType() === 'INCREMENTAL') {
+                        <div>
+                            <mat-form-field appearance="outline"
+                                class="ob-form-field field-with-label radio-content nested-content">
+                                <mat-label>{{'CHANNELS.PACKS.PACK_PRICES.INCREMENTAL_VALUE' | translate}}</mat-label>
+                                <app-currency-input formControlName="price_increment"
+                                    [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                                    [placeholder]="0 | localCurrency: (currency$ | async) :'narrow'" />
+                            </mat-form-field>
+                        </div>
+                    }
+                    <mat-radio-button class="ob-radio-button" [value]="'NEW_PRICE'">
+                        <div class="option-title">{{'CHANNELS.PACKS.PACK_PRICE_NEW' | translate}}</div>
+                        <div>{{'CHANNELS.PACKS.PACK_PRICE_NEW_DESC' | translate}}</div>
+                    </mat-radio-button>
+                    @if($priceType() === 'NEW_PRICE') {
+                        <app-pack-price-types-matrix #ratePrices class="radio-content" [form]="priceRates"
+                            [saveBtnClicked$]="saveBtnClicked$" />
+                    }
+                </mat-radio-group>
+            </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.PACKS.PRICE_ZONES' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-pack-price-types [venueTpl]="$venueTpl()" [priceTypesForm]="form.controls.priceTypes" />
+        </mat-expansion-panel>
+    </form>
+</app-form-container>
+@if(loading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

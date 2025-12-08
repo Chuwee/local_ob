@@ -1,0 +1,128 @@
+<div fxLayout="column" [formGroup]="form" class="editor-form">
+    <div fxLayout="column" fxFlex="100%" fxLayoutAlign="start stretch" class="editor-form-section">
+        <span fxFlex="0 1 100%" class="mat-subtitle-2" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.SECTOR' | translate">
+            {{'VENUE_TPL_EDITOR.SECTOR' | translate}}
+        </span>
+        <mat-form-field fxFlex="0 1 100%" appearance="outline" class="ob-form-field inline-field editor-form-field">
+            <mat-select formControlName="sector" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                <mat-option>
+                    <app-select-search #sectorsSelectSearch [options$]="sectors$"
+                        [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                        searchField="name" requireSelection="true">
+                    </app-select-search>
+                </mat-option>
+                <mat-option *ngFor="let sector of sectorsSelectSearch?.getFilteredOptions$() | async" [value]="sector.id">
+                    <span fxFlex appEllipsify [matTooltip]="sector.name">{{sector.name}}</span>
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-divider class="ob-divider" fxFlex="100%"></mat-divider>
+        <span class="mat-subtitle-2" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.SEAT_MATRIX' | translate">
+            {{'VENUE_TPL_EDITOR.SEAT_MATRIX' | translate}}
+        </span>
+        <div fxFlex="100%" fxLayoutAlign="start center">
+            <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.FROM_ROW' | translate">
+                {{'VENUE_TPL_EDITOR.FROM_ROW' | translate}}
+            </mat-label>
+            <mat-form-field fxFlex="100px" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                <mat-select formControlName="fromRow">
+                    <mat-option>
+                        <app-select-search #fromRowSearch [options$]="rows$" [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                            searchField="name" requireSelection="true">
+                        </app-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let row of fromRowSearchComponent?.getFilteredOptions$() | async" [value]="row.id">
+                        <span fxFlex appEllipsify [matTooltip]="row.name">{{row.name}}</span>
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div fxFlex="100%" fxLayoutAlign="start center">
+            <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.TO_ROW' | translate">
+                {{'VENUE_TPL_EDITOR.TO_ROW' | translate}}
+            </mat-label>
+            <mat-form-field fxFlex="100px" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                <mat-select formControlName="toRow" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                    <mat-option>
+                        <app-select-search #toRowSearch [options$]="rows$" [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                            searchField="name" requireSelection="true">
+                        </app-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let row of toRowSearchComponent?.getFilteredOptions$() | async" [value]="row.id">
+                        <span fxFlex appEllipsify [matTooltip]="row.name">{{row.name}}</span>
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center">
+            <mat-label fxFlex="0 1 170%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.ROW_SEATS' | translate">
+                {{'VENUE_TPL_EDITOR.ROW_SEATS' | translate}}
+            </mat-label>
+            <mat-form-field fxFlex="0 0 100px" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                <input matInput aria-label="seats" type="number" formControlName="seats">
+            </mat-form-field>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center">
+            <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.SIZE' | translate">
+                {{'VENUE_TPL_EDITOR.SIZE' | translate}}
+            </mat-label>
+            <mat-form-field fxFlex="0 0 100px" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                <input matInput aria-label="size" type="number" formControlName="seatsSize">
+            </mat-form-field>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center">
+            <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.ROWS_DISTANCE' | translate">
+                {{'VENUE_TPL_EDITOR.ROWS_DISTANCE' | translate}}
+            </mat-label>
+            <mat-form-field fxFlex="0 0 100px" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                <input matInput aria-label="size" type="number" formControlName="rowsDistance">
+            </mat-form-field>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center">
+            <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.SEATS_DISTANCE' | translate">
+                {{'VENUE_TPL_EDITOR.SEATS_DISTANCE' | translate}}
+            </mat-label>
+            <mat-form-field fxFlex="0 0 100px" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                <input matInput aria-label="size" type="number" formControlName="seatsDistance">
+            </mat-form-field>
+        </div>
+        <mat-divider class="ob-divider" fxFlex="100%"></mat-divider>
+        <span fxFlex="0 1 100%" class="mat-subtitle-2" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.ROW' | translate">
+            {{'VENUE_TPL_EDITOR.ROW' | translate}}
+        </span>
+        <div fxFlex="100%" fxLayoutAlign="start center">
+            <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.DIRECTION' | translate">
+                {{'VENUE_TPL_EDITOR.DIRECTION' | translate}}
+            </mat-label>
+            <mat-form-field fxFlex="160px" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                <mat-select formControlName="rowsDirection">
+                    <mat-option *ngFor="let direction of rowDirections" [value]="direction">
+                        <span fxFlex appEllipsify
+                            [matTooltip]="('VENUE_TPL_EDITOR.DIRECTION_' + direction.toUpperCase()) | translate">
+                            {{('VENUE_TPL_EDITOR.DIRECTION_' + direction.toUpperCase()) | translate}}
+                        </span>
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <mat-divider class="ob-divider" fxFlex="100%"></mat-divider>
+        <span fxFlex="0 1 100%" class="mat-subtitle-2" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.SEATS' | translate">
+            {{'VENUE_TPL_EDITOR.SEATS' | translate}}
+        </span>
+        <div fxFlex="100%" fxLayoutAlign="start center">
+            <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.DIRECTION' | translate">
+                {{'VENUE_TPL_EDITOR.DIRECTION' | translate}}
+            </mat-label>
+            <mat-form-field fxFlex="160px" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                <mat-select formControlName="seatsDirection">
+                    <mat-option *ngFor="let direction of seatDirections" [value]="direction">
+                        <span fxFlex appEllipsify
+                            [matTooltip]="('VENUE_TPL_EDITOR.DIRECTION_' + direction.toUpperCase()) | translate">
+                            {{('VENUE_TPL_EDITOR.DIRECTION_' + direction.toUpperCase()) | translate}}
+                        </span>
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+</div>

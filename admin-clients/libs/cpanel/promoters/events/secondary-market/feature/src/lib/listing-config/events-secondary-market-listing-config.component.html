@@ -1,0 +1,15 @@
+<div class="status-notifications-container flex items-center">
+    <mat-slide-toggle (change)="handleStatusChange($event.checked)" class="ob-slide-toggle" color="primary"
+        [formControl]="config.form.controls.enabled">
+        {{ 'SECONDARY_MARKET.ENABLED'| translate }}
+    </mat-slide-toggle>
+</div>
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="!config.form.dirty || $loading()">
+    <ob-secondary-market-configuration #config />
+</app-form-container>
+
+@if($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

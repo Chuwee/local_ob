@@ -1,0 +1,35 @@
+<div fxLayout="column" class="promotion-packs-section" [formGroup]="form">
+    <p class="body-1 pack-info">{{'CHANNELS.PROMOTIONS.PACK_INFO' | translate}}</p>
+    <div fxFlex="100%" fxLayout="column" class="channel-promotion-packs-activation">
+        <div fxFlex="28px" fxLayout="row">
+            <mat-slide-toggle class="ob-slide-toggle" formControlName="enabled">
+                {{'CHANNELS.PROMOTIONS.ACTIVATE_PACKS' | translate}}
+            </mat-slide-toggle>
+        </div>
+        <mat-divider fxFlex="100%"></mat-divider>
+    </div>
+    <div *ngIf="form.get('enabled').value" fxLayout="column" class="packs-limits">
+        <p class="mat-subtitle-2">{{'CHANNELS.PROMOTIONS.PACK_DESCRIPTION' | translate}}</p>
+        <div fxFlex="45px" fxLayout="row" class="pack-limit" fxLayoutAlign="start center">
+            {{'CHANNELS.PROMOTIONS.PACK_EVENTS' | translate}}
+            <div fxLayoutAlign="start center">
+                <mat-form-field appearance="outline" fxFlex="100px"
+                    class="ob-form-field inline-field value-field">
+                    <input matInput type="number" formControlName="events" placeholder="0">
+                </mat-form-field>
+            </div>
+        </div>
+        <div fxFlex="45px" fxLayout="row" class="pack-limit" fxLayoutAlign="start center">
+            {{'CHANNELS.PROMOTIONS.PACK_SESSIONS' | translate}}
+            <div fxLayoutAlign="start center">
+                <mat-form-field appearance="outline" fxFlex="100px"
+                    class="ob-form-field inline-field value-field">
+                    <input matInput type="number" formControlName="sessions" placeholder="0">
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-error *ngIf="form.touched && form.hasError('sessionsGreaterThanEvents')">
+            {{'CHANNELS.PROMOTIONS.PACKS_SESSIONS_MUST_BE_GREATER_THAN_EVENTS' | translate}}
+        </mat-error>
+    </div>
+</div>

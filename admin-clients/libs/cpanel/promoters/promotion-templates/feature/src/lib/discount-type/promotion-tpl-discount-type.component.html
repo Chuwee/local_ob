@@ -1,0 +1,96 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="main" class="overflow-y-auto"
+    [disabled]="!form.dirty || (reqInProgress$ | async)">
+    <div [formGroup]="form" fxLayout="column">
+        <p class="mat-subtitle-2">{{'EVENTS.PROMOTIONS.DISCOUNT_TYPE_DESCRIPTION' | translate}} *</p>
+        <div fxFlex fxLayout="row">
+            <mat-radio-group fxFlex="300px" fxLayout="column" formControlName="type">
+                @if ((promotion$ | async).presale) {
+                    <mat-radio-button class="ob-radio-button vertical-list" [value]="discountTypes.noDiscount">
+                        <div>{{'EVENTS.PROMOTIONS.DISCOUNT_TYPE_OPTS.NO_DISCOUNT' | translate}}</div>
+                    </mat-radio-button>
+                }
+                <div class="flex flex-col gap-2">
+                    <mat-radio-button fxFlex="100%" class="ob-radio-button vertical-list" [value]="discountTypes.fixed">
+                        <div>{{'EVENTS.PROMOTIONS.DISCOUNT_TYPE_OPTS.FIXED' | translate}}</div>
+                    </mat-radio-button>
+                    @if (form.get('type').value === discountTypes.fixed && userCurrencies?.length > 1) {
+                        <mat-form-field fxFlex=" 100%" fxFlex.gt-sm="0 1 calc(50%-40px)" appearance="outline"
+                            class="ob-form-field field-with-label nested-content" subscriptSizing="dynamic">
+                            <mat-label>{{'FORMS.LABELS.CURRENCY' | translate}}</mat-label>
+                            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="fixedCurrency">
+                                @for (currency of userCurrencies; track currency) {
+                                    <mat-option [value]="currency.code">
+                                        {{currency.code | localCurrencyFullTranslation }}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                            <mat-error [ob-form-errors]="form" field="fixedCurrency" />
+                        </mat-form-field>
+                        @if (fixCurrencyBS | async; as fixCurrency) {
+                            <mat-form-field fxFlex="100%" appearance="outline"
+                                class="ob-form-field field-with-label nested-content">
+                                <mat-label>{{'FORMS.LABELS.PRICE' | translate}}</mat-label>
+                                <app-currency-input formControlName="fixValue" currencyFormat="narrow"
+                                    [currencyCode]="fixCurrency"
+                                    [placeholder]="0 | localCurrency : fixCurrency : 'narrow'" />
+                                <mat-error [ob-form-errors]="form" field="fixValue" />
+                            </mat-form-field>
+                        }
+                    }
+                </div>
+                <div class="flex flex-col gap-2">
+                    <mat-radio-button class="ob-radio-button vertical-list" [value]="discountTypes.percentage">
+                        <div>{{'EVENTS.PROMOTIONS.DISCOUNT_TYPE_OPTS.PERCENTUAL' | translate}}</div>
+                    </mat-radio-button>
+                    @if (form.get('type').value === discountTypes.percentage) {
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label nested-content">
+                            <mat-label>{{'FORMS.LABELS.PRICE' | translate}}</mat-label>
+                            <app-percentage-input formControlName="percentualValue"
+                                placeholder="{{0 | localNumber : '1.2-2'}}" />
+                            <mat-error [ob-form-errors]="form" field="percentualValue" />
+                        </mat-form-field>
+                    }
+                </div>
+                @if ((promotion$ | async)?.type !== promotionTypes.basic) {
+                    <mat-radio-button class="ob-radio-button vertical-list"
+                        [value]="discountTypes.basePrice">
+                        <div>{{'EVENTS.PROMOTIONS.DISCOUNT_TYPE_OPTS.BASE_PRICE' | translate}}</div>
+                    </mat-radio-button>
+                }
+            </mat-radio-group>
+        </div>
+        @if (form.get('type').value === discountTypes.basePrice) {
+            <div fxLayout="row" class="nested-content">
+                <div fxFlex="470px">
+                    <div fxLayout="column">
+                        @if (userCurrencies?.length > 1) {
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label" fxFlex="100%">
+                                <mat-label>{{'FORMS.LABELS.CURRENCY' | translate}}</mat-label>
+                                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                    formControlName="rangeCurrency">
+                                    @for (currency of userCurrencies; track currency) {
+                                        <mat-option [value]="currency.code">
+                                            {{currency.code | localCurrencyFullTranslation }}
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                                <mat-error [ob-form-errors]="form" field="rangeCurrency" />
+                            </mat-form-field>
+                        }
+                        @if (rangeCurrencyBS | async; as rangeCurrency) {
+                            <div fxFlex="100%">
+                                <app-range-table [disabled]="!form.get('rangeCurrency').value && userCurrencies?.length > 1"
+                                    [form]="form" [data]="(ranges$ | async)"
+                                    [currency]="rangeCurrency" currencyFormat="narrow" onlyFixed="true"
+                                    type="generic" />
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</app-form-container>
+@if (reqInProgress$ | async) {
+    <div class="spinner-container"><mat-spinner /></div>
+}

@@ -1,0 +1,75 @@
+<div class="left-bar-container flex basis-[280px]">
+    <div class="left-bar flex flex-1 flex-col justify-start items-stretch">
+        <div class="left-sidebar-title flex-col">
+            <div class="flex flex-row items-center">
+                <h2 class="title">{{'PRODUCT.EVENTS.TITLE' | translate}}</h2>
+                @if (canWrite$ | async) {
+                    <button mat-icon-button aria-label="new-space" type="button"
+                        class="ob-button mat-stroked-button xsmall" (click)="openNewEventsDialog()">
+                        <mat-icon>add</mat-icon>
+                    </button>
+                }
+            </div>
+            <div class="flex-1">
+                <span class="results-count"
+                    [innerHTML]="('RESULTS.TOTAL' | translate) + ': ' + (productEvents$ | async)?.length || 0">
+                </span>
+            </div>
+        </div>
+        <div class="left-sidebar-header flex justify-between items-center">
+            <div class="filter-container">
+                <app-product-events-list-filter #filterContent />
+            </div>
+            @if (canWrite$ | async) {
+                <button mat-icon-button aria-label="delete-space" class="ob-button small"
+                    (click)="openDeleteEventDialog()" [disabled]="(productEvents$ | async)?.length === 0">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            }
+        </div>
+        @if (!(productEvents$ | async)?.length && filterContent.activeFilters > 0) {
+            <div class="context-message-container with-margin flex justify-center items-center">
+                <div class="flex flex-1 flex-col items-center gap-4">
+                    <p class="title">{{'FORMS.SELECT.NO_RESULTS' | translate}}</p>
+                    <p class="body">{{'PRODUCT.EVENTS.REMOVE_FILTERS_MESSAGE' | translate}}</p>
+                    <a class="ob-link" (click)="filterContent.clear()">
+                        {{'FORMS.REMOVE_FILTERS_BTN' | translate}}
+                    </a>
+                </div>
+            </div>
+        }
+        <div class="list-container flex-1 flex flex-col">
+            <mat-selection-list class="ob-lateral-select-list" appLastPathGuardListener disableRipple [multiple]="false"
+                [currValue]="selectedProductEventId" (selectionChange)="selectionChangeHandler($event.options[0]?.value)">
+                @for (item of (productEvents$ | async); track item) {
+                    <mat-list-option class="with-badge" [value]="item.event.id"
+                        [selected]="item.event.id === selectedProductEventId" [id]="'events-list-option-' + item.event.id">
+                        <div class="flex flex-row flex-[1_1_0%] items-center">
+                            <div class="item-data flex flex-col grow">
+                                <span class="list-item-title" appEllipsify [matTooltip]="item.event.name">
+                                    {{item.event.name}}
+                                </span>
+                                <span class="list-item-subtitle" appEllipsify>
+                                    {{item.event.start_date | localDateTime : dateTimeFormats.shortDateWithWeek}}
+                                </span>
+                            </div>
+                            <div class="badge-container flex flex-row items-center">
+                                <span [class]="'small-badge ob-status-badge ' + (item.status === 'ACTIVE' ? 'active' : 'inactive')"
+                                    [matTooltip]="('PRODUCT.EVENTS.STATUS_TOOLTIP.'+ (item.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE') | translate)">
+                                    {{('PRODUCT.EVENTS.STATUS_OPTS.'+ (item.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE') | translate).substring(0, 1)}}
+                                </span>
+                            </div>
+                        </div>
+                    </mat-list-option>
+                }
+            </mat-selection-list>
+        </div>
+    </div>
+    @if (isLoading$ | async) {
+        <div class="loading-state-container flex justify-center items-center">
+            <div class="loading-state-background flex flex-row justify-center items-center">
+                <mat-spinner />
+            </div>
+        </div>
+    }
+</div>

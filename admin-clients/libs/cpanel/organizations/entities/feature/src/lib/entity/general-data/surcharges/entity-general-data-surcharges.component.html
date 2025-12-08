@@ -1,0 +1,57 @@
+@if (surchargesData$ | async; as surcharges) {
+    <app-form-container (cancel)="reload()" (save)="save()" layout="menu" [disabled]="!form.dirty">
+        <p class="section-description surcharges-description">{{'ENTITY.GENERAL_DATA.SURCHARGES_INFO' | translate}}</p>
+        <!--    TODO(MULTICURRENCY): delete ngIf else when the multicurrency functionality is finished-->
+        @if (isMultiCurrency$ | async) {
+            <div class="heading-container surcharges-title">
+                {{'ENTITY.GENERAL_DATA.SURCHARGES_TYPE.PRIMARY.TITLE' | translate}}
+            </div>
+            <app-tabs-menu class="ranges-container" type="navigation" (changeEmitter)="currencySelectedTabBS.next($event.key)">
+                @for (currency of entityCurrencies$ | async; track currency.code) {
+                    <ng-template appTab [label]="currency.code | localCurrencyPartialTranslation" [key]="currency.code">
+                        <app-entity-surcharges-ranges [form]="form.controls[entitySurchargesTypes.generic]" [currencyCode]="currency.code"
+                            [surchargesRequestCtrl]="surchargesRequestCtrl.controls[entitySurchargesTypes.generic]"
+                            [errorCtrl]="errorCtrl.controls[entitySurchargesTypes.generic]"
+                            [data]="multiCurrencyData$[entitySurchargesTypes.generic] | rangeCurrencyInput:currency.code | async" />
+                    </ng-template>
+                }
+            </app-tabs-menu>
+            <div [fxShow]="hasSecondaryMarket$ | async">
+                <div class="heading-container surcharges-title">
+                    {{'ENTITY.GENERAL_DATA.SURCHARGES_TYPE.SECONDARY.TITLE' | translate}}
+                </div>
+                <app-tabs-menu #secondaryMarketTabs type="navigation" (changeEmitter)="currencySelectedTabSMBS.next($event.key)">
+                    @for (currency of entityCurrencies$ | async; track currency.code) {
+                        <ng-template appTab [label]="currency.code | localCurrencyPartialTranslation" [key]="currency.code">
+                            <app-entity-surcharges-ranges [form]="form.controls[entitySurchargesTypes.secondaryMarketPromoter]"
+                                [currencyCode]="currency.code"
+                                [surchargesRequestCtrl]="surchargesRequestCtrl.controls[entitySurchargesTypes.secondaryMarketPromoter]"
+                                [errorCtrl]="errorCtrl.controls[entitySurchargesTypes.secondaryMarketPromoter]"
+                                [data]="multiCurrencyData$[entitySurchargesTypes.secondaryMarketPromoter] | rangeCurrencyInput:currency.code | async" />
+                        </ng-template>
+                    }
+                </app-tabs-menu>
+            </div>
+        } @else {
+            <div class="heading-container surcharges-title">
+                {{'ENTITY.GENERAL_DATA.SURCHARGES_TYPE.PRIMARY.TITLE' | translate}}
+            </div>
+            <app-range-table class="ranges-container" [form]="form.controls[entitySurchargesTypes.generic]"
+                [data]="surcharges[entitySurchargesTypes.generic].ranges" type="generic" />
+            @if (hasSecondaryMarket$ | async) {
+                <div>
+                    <div class="heading-container surcharges-title">
+                        {{'ENTITY.GENERAL_DATA.SURCHARGES_TYPE.SECONDARY.TITLE' | translate}}
+                    </div>
+                    <app-range-table [form]="form.controls[entitySurchargesTypes.secondaryMarketPromoter]"
+                        [data]="surcharges[entitySurchargesTypes.secondaryMarketPromoter].ranges" type="generic" />
+                </div>
+            }
+        }
+    </app-form-container>
+}
+@if (reqInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,40 @@
+@if(!$loading()) {
+    <app-language-bar
+        [languages]="$languageList()"
+        [selected]="language$ | async"
+        (changed)="changeLanguage($event)"
+        class="sticky" />
+}
+<app-form-container [hideActionBar]="true" class="no-top-padding">
+    @if ($loading()) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    } @else {
+        @if (!!(packDetailPreviewLink$ | async)) {
+            <div class="details-container flex flex-col gap-2">
+                <div class="actions-bar flex flex-row justify-start items-center">
+                    <div class="flex flex-row justify-start items-center">
+                        <span class="copy-label">{{'PACK.CHANNELS.PREVIEW.PACK_LINK_LABEL' | translate}}</span>
+                        <span class="copy-link">{{ (packDetailPreviewLink$ | async)[0]?.detail_link }}</span>
+                        <app-copy-text [copyText]="(packDetailPreviewLink$ | async)[0]?.detail_link"
+                            [copyOk]="'CHANNELS.PACKS.PREVIEW.LINK_COPY_OK' | translate"
+                            [copyKo]="'CHANNELS.PACKS.PREVIEW.LINK_COPY_KO' | translate"
+                            [copyTooltip]="'CHANNELS.PACKS.PREVIEW.COPY_LINK' | translate" />
+                    </div>
+                    <div class="go-link">
+                        <a mat-button aria-label="Go to link" class="ob-button medium" target="_blank"
+                            [href]="(packDetailPreviewLink$ | async)[0]?.detail_link">
+                            <span>{{'CHANNELS.PACKS.PREVIEW.GO_TO_LINK' | translate}}</span>
+                            <mat-icon iconPositionEnd>launch</mat-icon>
+                        </a>
+                    </div>
+                </div>
+                <app-link-list [links$]="packDetailPreviewLink$" [title]="'PACK.CHANNELS.PREVIEW.PACK_SESSIONS'" />
+            </div>
+        } @else {
+            <app-empty-state fxFlex="100%" [title]="'PACK.CHANNELS.PREVIEW.EMPTY_STATE_TITLE' | translate"
+                [description]="'PACK.CHANNELS.PREVIEW.EMPTY_STATE_DESCRIPTION' | translate" />
+        }
+    }
+</app-form-container>

@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" #svg *ngIf="viewBox$ | async as viewBox" [attr.viewBox]="viewBox">
+    <!-- INDIVIDUAL SELECTION RECTS AND CLONES (to use in drag operations) -->
+    <g #selectionModifierContainer *ngIf="selectedInfoWrappers$ | async as selectedInfoWrapper">
+        <g #selectionModifier>
+            <ng-container *ngIf="(showShapesClones$ | async) else shapeRects">
+                <g class="drag-clone" [innerHTML]="selectedInfoWrapper.svgElementsClone"></g>
+            </ng-container>
+            <ng-template #shapeRects>
+                <g>
+                    <g *ngFor="let elementWrapper of selectedInfoWrapper.elementWrappers"
+                        [attr.transform]="elementWrapper.transform | matrix">
+                        <rect vector-effect="non-scaling-stroke" fill-opacity="0" stroke-opacity="0.4" stroke-width="2" stroke="#FFFFFF"
+                            [attr.x]="elementWrapper.bbox.x - .5" [attr.y]="elementWrapper.bbox.y - .5"
+                            [attr.width]="elementWrapper.bbox.width + 1" [attr.height]="elementWrapper.bbox.height + 1">
+                        </rect>
+                        <rect vector-effect="non-scaling-stroke" fill-opacity="0" stroke-opacity="0.8" stroke-width="1" stroke="#0085FF"
+                            [attr.x]="elementWrapper.bbox.x - .5" [attr.y]="elementWrapper.bbox.y - .5"
+                            [attr.width]="elementWrapper.bbox.width + 1" [attr.height]="elementWrapper.bbox.height + 1">
+                        </rect>
+                    </g>
+                </g>
+            </ng-template>
+        </g>
+    </g>
+    <!-- GLOBAL SELECTION RECTS AND CONTROLS -->
+    <g #globalSelectionRect *ngIf="globalSelectionRect$ | async as bigRect"
+        [attr.transform]="'translate('+ bigRect.bbox.x + ',' + bigRect.bbox.y + '), ' +
+         'rotate(' + bigRect.angle + ',' + bigRect.bbox.width / 2 + ',' + bigRect.bbox.height / 2 + ')'">
+        <!-- GLOBAL RECT -->
+        <rect vector-effect="non-scaling-stroke" fill-opacity="0" stroke-opacity="0.5" stroke-width="3" stroke="#FFFFFF"
+            [attr.width]="bigRect.bbox.width" [attr.height]="bigRect.bbox.height">
+        </rect>
+        <rect vector-effect="non-scaling-stroke" fill-opacity="0" stroke-width="2" stroke="#0085FF"
+            [attr.width]="bigRect.bbox.width" [attr.height]="bigRect.bbox.height">
+        </rect>
+        <g *ngIf="invScale$ | async as invScale">
+            <!-- HIDDEN ON TOO SMALL SELECTIONS -->
+            <g *ngIf="bigRect.bbox.width / invScale > 30 && bigRect.bbox.height / invScale > 30 ">
+                <!-- TOP LEFT CONTROLS -->
+                <g [attr.transform]="'rotate(180), scale(' + invScale + ')'">
+                    <g appEditorRotateControl [hideRects]="true" (rotate)="rotateControlMouseDown($event)"></g>
+                    <g *ngIf="!bigRect.disableScale" appEditorScaleControl (scale)="resizeControlMouseDown($event)"></g>
+                </g>
+                <!-- TOP RIGHT CONTROLS -->
+                <g [attr.transform]="'translate(' + bigRect.bbox.width + ',0), rotate(270), scale(' + invScale + ')'">
+                    <g appEditorRotateControl [hideRects]="true" (rotate)="rotateControlMouseDown($event)"></g>
+                    <g *ngIf="!bigRect.disableScale" appEditorScaleControl (scale)="resizeControlMouseDown($event)"></g>
+                </g>
+                <!-- BOTTOM RIGHT CONTROLS -->
+                <g [attr.transform]="'translate(' + bigRect.bbox.width + ',' + bigRect.bbox.height + '), scale(' + invScale + ')'">
+                    <g appEditorRotateControl [hideRects]="true" (rotate)="rotateControlMouseDown($event)"></g>
+                    <g *ngIf="!bigRect.disableScale" appEditorScaleControl (scale)="resizeControlMouseDown($event)"></g>
+                </g>
+                <!-- BOTTOM LEFT CONTROLS -->
+                <g [attr.transform]="'translate(0,' + bigRect.bbox.height + '), rotate(90), scale(' + invScale + ')'">
+                    <g appEditorRotateControl [hideRects]="true" (rotate)="rotateControlMouseDown($event)"></g>
+                    <g *ngIf="!bigRect.disableScale" appEditorScaleControl (scale)="resizeControlMouseDown($event)"></g>
+                </g>
+            </g>
+        </g>
+    </g>
+    <!-- DRAG SELECTION RECT -->
+    <rect #selectDragRect *ngIf="(selectDrag$ | async)?.rect as rect"
+        vector-effect="non-scaling-stroke" fill-opacity="0" stroke-width="1" stroke="#0085FF"
+        [attr.x]="rect.x" [attr.y]="rect.y" [attr.width]="rect.width" [attr.height]="rect.height">
+    </rect>
+    <!-- INVISIBLE LAYER TO HANDLE MOUSE MOVE AND MOUSE UP ON THIS COMPONENT -->
+    <rect *ngIf="dragAreaActive$ | async" class="drag-area" [attr.width]="viewBox[2]" [attr.height]="viewBox[3]" fill-opacity="0"
+        (mousemove)="mouseMove($event)" (mouseup)="mouseUp($event)" (mouseenter)="mouseEnterOnDragGuard($event)">
+    </rect>
+</svg>

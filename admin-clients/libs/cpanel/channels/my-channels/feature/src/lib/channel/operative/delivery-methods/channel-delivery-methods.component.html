@@ -1,0 +1,326 @@
+<!-- eslint-disable @angular-eslint/template/prefer-self-closing-tags -->
+@if (deliverySettings$ | async) {
+    <app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="(inProgress$ | async) || !form.dirty || form.invalid"
+        [formGroup]="form">
+        <mat-accordion multi [togglePosition]="'before'">
+
+            <!-- DELIVERY METHODS SECTION -->
+            <div>
+                <p class="mat-body-2">
+                    {{ 'CHANNELS.DELIVERY_METHODS.FORMS.INFOS.DELIVERY_METHODS' | translate }}
+                </p>
+                <div class="flex flex-row">
+                    <div class="content-scroll w-full">
+                        <table mat-table class="ob-table" id="optionsTable" [dataSource]="deliveryMethods$" appOptionsTable
+                            [columns]="columns" #optionsTable='appOptionsTable'
+                            [form]="this.form.controls.deliveryMethods" [disabled]="(isWriteAllowed$ | async) === false">
+
+                            <!-- Check -->
+                            <ng-container matColumnDef="active" sticky>
+                                <th mat-header-cell *matHeaderCellDef class="head-cell checkbox-column default-padding">
+                                    <mat-checkbox color="primary" appOptionsTableAll />
+                                </th>
+                                <td mat-cell *matCellDef="let row; index as i" class="checkbox-column default-padding">
+                                    <mat-checkbox color="primary"
+                                        [formControl]="this.form.controls.deliveryMethods.controls[i].controls.active"
+                                        (change)="optionsTable.toggleActive(i, $event)" />
+                                </td>
+                            </ng-container>
+
+                            <!-- Favorite -->
+                            <ng-container matColumnDef="default" sticky>
+                                <th mat-header-cell *matHeaderCellDef class="head-cell checkbox-column">
+                                </th>
+                                <td mat-cell *matCellDef="let row; index as i" class="checkbox-column">
+                                    <app-options-table-default [form]="this.form.controls.deliveryMethods" [index]="i"
+                                        [formCtrl]="this.form.controls.deliveryMethods.controls[i].controls.default"
+                                        (setDefault)="optionsTable.setDefault(i)" />
+                                </td>
+                            </ng-container>
+
+                            <!-- Name -->
+                            <ng-container matColumnDef="name" sticky>
+                                <th mat-header-cell *matHeaderCellDef class="head-cell">
+                                    {{ 'CHANNELS.DELIVERY_METHODS.LIST.HEADER'| translate }}
+                                </th>
+                                <td mat-cell *matCellDef="let row; index as i">
+                                    <div class="flex flex-row justify-start items-center">
+                                        <span>{{ 'CHANNELS.DELIVERY_METHODS.LIST.OPTS.' + row.type | translate }}</span>
+                                        @if (row.infoMessage) {
+                                            <app-help-button [message]="row.infoMessage | translate" />
+                                        }
+                                    </div>
+                                </td>
+                            </ng-container>
+
+                            <!-- Taxes -->
+                            <ng-container matColumnDef="taxes" sticky>
+                                <th mat-header-cell *matHeaderCellDef class="head-cell input-column border-right">
+                                    {{ 'CHANNELS.DELIVERY_METHODS.TAXES.HEADER'| translate }}
+                                </th>
+                                <td mat-cell *matCellDef="let row; index as i"
+                                    class="editable-cell border-right">
+                                    <div class="write-value flex justify-start items-center">
+                                        <mat-form-field appearance="outline"
+                                            class="ob-form-field field-with-label ob-form-field-outline no-margin-top">
+                                            @let errorMessage = form.controls.deliveryMethods.controls[i].controls.taxes
+                                                | obErrorMessage$ | async;
+                                            @if (errorMessage) {
+                                                <mat-icon matPrefix [obErrorIcon]="errorMessage">
+                                                    error_outline
+                                                </mat-icon>
+                                            }
+                                            <mat-select [formControl]="form.controls.deliveryMethods.controls[i].controls.taxes"
+                                                multiple [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                                @for (tax of $taxes(); track tax.id) {
+                                                    <mat-option [value]="tax.id">
+                                                        {{ tax.name }}
+                                                    </mat-option>
+                                                }
+                                            </mat-select>
+                                            <mat-error
+                                                [ob-form-errors]="this.form.controls.deliveryMethods.controls[i].controls.taxes" />
+                                        </mat-form-field>
+                                    </div>
+                                </td>
+                            </ng-container>
+                            @if ($currencies(); as currencies) {
+
+                                @if (currencies.length > 1) {
+
+                                    @for (currency of currencies; track $index; let currencyIndex = $index) {
+
+                                        <ng-container [matColumnDef]="currency">
+                                            <th mat-header-cell *matHeaderCellDef class="head-cell right currency-column input-column">
+                                                <div class="flex justify-end items-center">
+                                                    <span appEllipsify [matTooltip]="currency | localCurrencyPartialTranslation">
+                                                        {{currency | localCurrencyPartialTranslation }}
+                                                    </span>
+                                                </div>
+                                            </th>
+                                            <td mat-cell *matCellDef="let row; index as i" class="right currency-column editable-cell">
+                                                <div class="write-value">
+                                                    <mat-form-field appearance="outline" class="ob-form-field">
+                                                        @let errorMessage = form.controls.deliveryMethods.controls[i]
+                                                        .controls.currencies.controls[currencyIndex].controls.cost
+                                                        | obErrorMessage$ | async;
+                                                    @if (errorMessage) {
+                                                            <mat-icon matPrefix [obErrorIcon]="errorMessage">
+                                                                error_outline
+                                                            </mat-icon>
+                                                        }
+                                                        <app-currency-input
+                                                            [formControl]="form.controls.deliveryMethods.controls[i].controls.currencies.controls[currencyIndex].controls.cost"
+                                                            [currencyCode]="currency" [currencyFormat]="'narrow'" class="table-input"
+                                                            [placeholder]="0 | localCurrency:currency:'narrow'" />
+                                                    </mat-form-field>
+                                                </div>
+                                            </td>
+                                        </ng-container>
+
+                                    }
+
+                                } @else {
+
+                                    <ng-container [matColumnDef]="currencies[0]">
+                                        <th mat-header-cell *matHeaderCellDef class="head-cell right currency-column input-column">
+                                        </th>
+                                        <td mat-cell *matCellDef="let row; index as i" class="right currency-column editable-cell">
+                                            <div class="write-value">
+                                                <mat-form-field appearance="outline" class="ob-form-field">
+                                                    @let errorMessage = form.controls.deliveryMethods
+                                                    .controls[i].controls.currencies.controls[0].controls.cost
+                                                    | obErrorMessage$ | async;
+                                                @if (errorMessage) {
+                                                        <mat-icon matPrefix [obErrorIcon]="errorMessage">
+                                                            error_outline
+                                                        </mat-icon>
+                                                    }
+                                                    <app-currency-input
+                                                        [formControl]="form.controls.deliveryMethods.controls[i].controls.currencies.controls[0].controls.cost"
+                                                        [currencyCode]="currencies[0]" [currencyFormat]="'narrow'" class="table-input"
+                                                        [placeholder]="0 | localCurrency:currencies[0]:'narrow'" />
+                                                </mat-form-field>
+                                            </div>
+                                        </td>
+                                    </ng-container>
+
+                                }
+
+
+                            }
+                            <tr mat-header-row *matHeaderRowDef="columns" class="dense-row"></tr>
+                            <tr mat-row *matRowDef="let row; columns: columns" class="dense-row hoverable-row"></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PURCHASE EMAIL CONTENT SECTION -->
+            @if (showEmailDeliveryConfig$ | async) {
+                <mat-expansion-panel
+                    [expanded]="true" class="email-delivery-expansion-panel">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>
+                            {{'CHANNELS.DELIVERY_METHODS.TITLES.SEND_EMAIL' | translate}}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="email-content-type-container flex flex-row flex-wrap">
+                        <p class="mat-body-2 w-full">
+                            {{ 'CHANNELS.DELIVERY_METHODS.FORMS.INFOS.SEND_EMAIL' | translate }}
+                        </p>
+                        <mat-form-field appearance="outline" class="ob-form-field w-full sm:flex-[0_1_440px]">
+                            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                formControlName="purchase_email_content">
+                                @for (type of emailContentTypes$ | async | keyvalue; track type) {
+                                    <mat-option [value]="type.value">
+                                        {{('CHANNELS.DELIVERY_METHODS.EMAIL_CONTENT.OPTS.' + type.value) | translate}}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+
+                        @if (showEmailDownloadMethods$ | async) {
+                            <div class="email-download-methods-container flex flex-col"
+                                formGroupName="receipt_ticket_display">
+
+                                <p class="mat-body-2">
+                                    {{ 'CHANNELS.DELIVERY_METHODS.FORMS.INFOS.SELECT_DOWNLOAD_METHODS'| translate }}
+                                </p>
+
+                                <mat-checkbox color="primary" formControlName="pdf" class="app-checkbox-wrap-label">
+                                    <div class="title">
+                                        {{ 'CHANNELS.DELIVERY_METHODS.FORMS.LABELS.DOWNLOAD_PDF'| translate }}
+                                    </div>
+                                    <div>
+                                        <p>
+                                            {{ 'CHANNELS.DELIVERY_METHODS.FORMS.INFOS.DONWLOAD_PDF'| translate }}
+                                        </p>
+                                        <p>
+                                            {{ 'CHANNELS.DELIVERY_METHODS.FORMS.INFOS.DONWLOAD_PDF_2'| translate }}
+                                        </p>
+                                    </div>
+                                </mat-checkbox>
+
+                                <mat-checkbox color="primary" formControlName="qr" class="app-checkbox-wrap-label">
+                                    <div class="title">
+                                        {{ 'CHANNELS.DELIVERY_METHODS.FORMS.LABELS.CODE_QR'| translate }}
+                                    </div>
+                                    <div>
+                                        {{ 'CHANNELS.DELIVERY_METHODS.FORMS.INFOS.CODE_QR'| translate }}
+                                    </div>
+                                </mat-checkbox>
+
+                                <mat-checkbox color="primary" formControlName="passbook" class="app-checkbox-wrap-label">
+                                    <div class="title">
+                                        {{ 'CHANNELS.DELIVERY_METHODS.FORMS.LABELS.PASSBOOK'| translate }}
+                                    </div>
+                                    <div>
+                                        {{ 'CHANNELS.DELIVERY_METHODS.FORMS.INFOS.PASSBOOK'| translate }}
+                                    </div>
+                                </mat-checkbox>
+
+                                <mat-error [ob-form-errors]="form.controls.receipt_ticket_display" />
+                            </div>
+                        }
+
+                    </div>
+                </mat-expansion-panel>
+            }
+
+            <!-- CHECKOUT TICKET DISPLAY SECTION -->
+            @if (channel$ | async | isWebChannel) {
+                <mat-expansion-panel [expanded]="true" class="email-delivery-expansion-panel">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>
+                            {{'CHANNELS.DELIVERY_METHODS.TITLES.CONFIRMATION_PAGE' | translate}}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="download-link-container flex flex-col" formGroupName="checkout_ticket_display">
+                        <p class="mat-body-2">
+                            {{ 'CHANNELS.DELIVERY_METHODS.FORMS.INFOS.CONFIRMATION_PAGE' | translate }}
+                        </p>
+
+
+                        <mat-checkbox color="primary" formControlName="pdf" class="app-checkbox-wrap-label">
+                            <div class="title">
+                                {{ 'CHANNELS.DELIVERY_METHODS.FORMS.LABELS.DOWNLOAD_PDF'| translate }}
+                            </div>
+                            <div>
+                                {{ 'CHANNELS.DELIVERY_METHODS.FORMS.INFOS.DONWLOAD_PDF'| translate }}
+                            </div>
+                        </mat-checkbox>
+
+
+                        @if (($channel() | isWebV4$ | async) || true) {
+                            <div class="allow-download-passbook-field"
+                                [matTooltip]="'CHANNELS.DELIVERY_METHODS.PASSBOOK.TOOLTIP' | translate"
+                                [matTooltipDisabled]="form.controls.checkout_ticket_display.controls.passbook.enabled"
+                                [matTooltipPosition]="'after'">
+                                <mat-checkbox color="primary" formControlName="passbook" class="app-checkbox-wrap-label">
+                                    <div class="title">
+                                        {{ 'CHANNELS.DELIVERY_METHODS.FORMS.LABELS.PASSBOOK'| translate }}
+                                    </div>
+                                    <div>
+                                        {{ 'CHANNELS.DELIVERY_METHODS.FORMS.INFOS.PASSBOOK'| translate }}
+                                    </div>
+                                </mat-checkbox>
+                            </div>
+                        }
+                    </div>
+                </mat-expansion-panel>
+            }
+
+            <!-- CHANNEL B2B SECTION -->
+            @if ((operatorMode$ | async) && (channel$ | async | isWebB2bChannel)) {
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>
+                            {{'CHANNELS.DELIVERY_METHODS.PUBLIC_DOWNLOAD.LABEL' | translate}}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="flex flex-wrap" formGroupName="b2b_external_download_url">
+                        <div class="flex flex-col">
+                            <p class="mat-body-2">
+                                {{ 'CHANNELS.DELIVERY_METHODS.PUBLIC_DOWNLOAD.DESCRIPTION' | translate }}
+                            </p>
+                            <mat-checkbox color="primary" formControlName="enabled">
+                                {{ 'CHANNELS.DELIVERY_METHODS.PUBLIC_DOWNLOAD.ENABLE_PUBLIC_DOWNLOAD' | translate }}
+                            </mat-checkbox>
+                        </div>
+
+                        @if (form.get('b2b_external_download_url.enabled').value) {
+                            <mat-form-field appearance="outline"
+                                class="ob-form-field sm:flex-[0_1_440px]" style="margin-left: 24px;">
+                                <mat-select [placeholder]="'CHANNELS.DELIVERY_METHODS.PUBLIC_DOWNLOAD.SELECT_CHANNEL' | translate"
+                                    formControlName="target_channel_id">
+                                    <mat-option>
+                                        <app-select-search #channelsSelectSearch [options$]="channels$"
+                                            [placeholderLabel]="'CHANNELS.DELIVERY_METHODS.PUBLIC_DOWNLOAD.SELECT_CHANNEL' | translate"
+                                            searchField="name" requireSelection="true" />
+                                    </mat-option>
+                                    @for (channel of channelsSelectSearch.getFilteredOptions$() | async; track channel) {
+                                        <mat-option [value]="channel.id">
+                                            {{channel.name}}
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                                <mat-error [ob-form-errors]="form" field="b2b_external_download_url.target_channel_id" />
+                            </mat-form-field>
+                        }
+                    </div>
+                </mat-expansion-panel>
+            }
+
+        </mat-accordion>
+    </app-form-container>
+}
+
+@if (inProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

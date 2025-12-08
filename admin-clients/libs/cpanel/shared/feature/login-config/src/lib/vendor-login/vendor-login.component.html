@@ -1,0 +1,155 @@
+<div [formGroup]="form">
+    <div class="flex flex-col" [class.edition-block]="!($entity() | isItalianEntity)">
+        <mat-form-field appearance="outline" class="ob-form-field field-with-label vendor">
+            <mat-label>{{'LOGIN_CONFIG.FORMS.LABELS.EXTERNAL_VENDOR' | translate}}</mat-label>
+            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="vendor">
+                @for (vendor of $authVendorsFiltered(); track vendor) {
+                    <mat-option [value]="vendor">
+                        {{vendor}}
+                    </mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+        @let providers = $loginProviders();
+        @if (providers?.length) {
+            <div formGroupName="providersSettings" class="flex flex-col providers-settings">
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label provider">
+                    <mat-label>{{'LOGIN_CONFIG.FORMS.LABELS.LOGIN_PROVIDER' | translate}}</mat-label>
+                    <mat-select multiple [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="loginProvider">
+                        @for (provider of providers; track provider) {
+                            <mat-option [value]="provider">
+                                {{provider}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field class="ob-form-field field-with-label signup-source" appearance="outline">
+                    <mat-label>{{'LOGIN_CONFIG.FORMS.LABELS.SIGNUP_SOURCE' | translate}}</mat-label>
+                    <input matInput type="text" aria-label="signupSource" formControlName="signupSource">
+                </mat-form-field>
+                <span class="ob-label">{{'LOGIN_CONFIG.FORMS.INFOS.LEGAL_TERMS' | translate}}</span>
+                <app-collection-input class="legal-terms" formControlName="legalTerms" [required]="true"
+                    [placeholder]="'LOGIN_CONFIG.FORMS.LABELS.KEY' | translate" [buttonLabel]="'FORMS.ACTIONS.ADD' | translate" />
+                <app-chips [chips$]="currentLegalTermsChips$" [isRemoveAllShown]="false" (removeEmitter)="removeLegalTerm($event)"
+                    class="without-max-height" />
+            </div>
+        }
+        <div class="flex flex-col gap-6">
+            <div class="flex flex-col gap-4">
+                <span class="title">{{'LOGIN_CONFIG.FORMS.LABELS.USERS' | translate}}</span>
+                @if (!($entity() | isItalianEntity)){
+                    <mat-checkbox formControlName="allowGuest" color="primary">
+                        {{'LOGIN_CONFIG.FORMS.LABELS.ALLOW_GUEST' | translate}}
+                    </mat-checkbox>
+                }
+                <mat-checkbox formControlName="allowEditUserData" color="primary">
+                    {{'LOGIN_CONFIG.FORMS.LABELS.ALLOW_EDIT_USER_DATA' | translate}}
+                </mat-checkbox>
+                @if($entity() | isItalianEntity) {
+                    <div class="flex flex-col gap-4" formGroupName="phoneValidator"
+                        [matTooltip]="'LOGIN_CONFIG.FORMS.FORMS.INFOS.OTP_SMS_DISABLED_TOOLTIP' | translate"
+                        [matTooltipDisabled]="!form.controls.phoneValidator.controls.enabled.disabled">
+                        <mat-checkbox #otpSmsEnabled class="flex items-center" formControlName="enabled" color="primary">
+                            {{'LOGIN_CONFIG.FORMS.LABELS.ENABLE_OTP_SMS_VERIFICATION' | translate}}
+                        </mat-checkbox>
+                        @if (otpSmsEnabled.checked &&
+                            !form.controls.phoneValidator.controls.enabled.disabled && $availableValidators()?.length
+                        ) {
+                            <div class="flex idented">
+                                <mat-form-field appearance="outline" class="ob-form-field field-with-label flex-[0_0_60%]">
+                                    <mat-label>{{'LOGIN_CONFIG.FORMS.LABELS.EXTERNAL_SERVICE' | translate}}</mat-label>
+                                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="validator_id"
+                                        [required]="true">
+                                        @for (validator of $availableValidators(); track validator) {
+                                            <mat-option [value]="validator">{{validator}}</mat-option>
+                                        }
+                                    </mat-select>
+                                    <mat-error [ob-form-errors]="form.controls.phoneValidator" field="validator_id" />
+                                </mat-form-field>
+                            </div>
+                        }
+                    </div>
+                }
+                <!-- @if ($customerRegistry()) {
+                    <mat-checkbox formControlName="disableCreateAccount" color="primary">
+                        {{'LOGIN_CONFIG.FORMS.LABELS.DISABLE_CREATE_ACCOUNT' | translate}}
+                    </mat-checkbox>
+                } -->
+                @let customerTypes = $customerTypes();
+                @if(customerTypes?.length && $customerRegistry()) {
+                    <div class="flex flex-col gap-3">
+                        <mat-checkbox formControlName="blocked_customer_types_enabled" color="primary">
+                            {{ 'LOGIN_CONFIG_FORMS.LABELS.CUSTOMER_TYPES_ENABLED' | translate }}
+                        </mat-checkbox>
+                        @if(form.controls.blocked_customer_types_enabled?.value) {
+                            <div class="flex customer-types">
+                                <mat-form-field appearance="outline" class="ob-form-field flex-[0_0_428px]">
+                                    <mat-select multiple [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                        formControlName="blocked_customer_types">
+                                        @for (customerType of customerTypes; track customerType.code) {
+                                            <mat-option [value]="customerType.code">
+                                                {{customerType.name}}
+                                            </mat-option>
+                                        }
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+            @if (!($entity() | isItalianEntity)){
+                <mat-radio-group formControlName="placement">
+                    <div class="flex flex-col gap-4">
+                        <span class="title">{{'LOGIN_CONFIG.FORMS.LABELS.VISUALIZATION' | translate}}</span>
+                        <span>{{'LOGIN_CONFIG.FORMS.INFOS.VISUALIZATION' | translate}}</span>
+                        <mat-radio-button class="inline" [value]="'BEFORE_CHECKOUT'">
+                            {{'LOGIN_CONFIG.FORMS.LABELS.BEFORE_CHECKOUT' | translate}}
+                        </mat-radio-button>
+                        <mat-radio-button class="inline" [value]="'IMMEDIATELY'">
+                            {{'LOGIN_CONFIG.FORMS.LABELS.IMMEDIATELY' | translate}}
+                        </mat-radio-button>
+                        <mat-radio-button class="inline" [value]="'BEFORE_SELECT_LOCATION'">
+                            {{'LOGIN_CONFIG.FORMS.LABELS.BEFORE_SELECT_LOCATION' | translate}}
+                        </mat-radio-button>
+                    </div>
+                </mat-radio-group>
+            }
+            @if($customerRegistry() && !$isChannel()) {
+                <div class="flex flex-col gap-4" [formGroup]="form.controls.counter">
+                    <span class="title">{{'LOGIN_CONFIG.FORMS.LABELS.ID_COUNTER' | translate}}</span>
+                    <span>{{'LOGIN_CONFIG.FORMS.INFOS.ID_COUNTER' | translate}}</span>
+                    <mat-radio-group formControlName="mode">
+                        <div class="flex flex-col gap-4">
+                            <mat-radio-button class="ob-radio-button" value="DEFAULT">
+                                <div class="flex flex-col gap-1">
+                                    <span class="ob-label">{{'LOGIN_CONFIG.FORMS.LABELS.MANUAL_COUNTER' | translate}}</span>
+                                    <span>{{'LOGIN_CONFIG.FORMS.INFOS.MANUAL_COUNTER' | translate }}</span>
+                                </div>
+                            </mat-radio-button>
+                            <mat-radio-button class="ob-radio-button" value="AUTOINCREMENT">
+                                <div class="flex flex-col gap-1">
+                                    <span class="ob-label">{{'LOGIN_CONFIG.FORMS.LABELS.AUTOMATIC_COUNTER' | translate}}</span>
+                                    <span>{{'LOGIN_CONFIG.FORMS.INFOS.AUTOMATIC_COUNTER' | translate }}</span>
+                                </div>
+                            </mat-radio-button>
+                        </div>
+                    </mat-radio-group>
+                    @if (form.controls.counter.controls.mode.value === 'AUTOINCREMENT') {
+                        <div class="flex nested-content">
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label flex-[0_0_176px]">
+                                <mat-label>{{'LOGIN_CONFIG.FORMS.LABELS.COUNTER_ID' | translate}}</mat-label>
+                                <input matInput type="number" formControlName="id">
+                                <mat-icon matSuffix class="ob-help-icon"
+                                    [matTooltip]="'LOGIN_CONFIG.FORMS.INFOS.COUNTER_ID_TOOLTIP' | translate">
+                                    help_outline
+                                </mat-icon>
+                                <mat-error [ob-form-errors]="form.controls.counter" field="id" />
+                            </mat-form-field>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

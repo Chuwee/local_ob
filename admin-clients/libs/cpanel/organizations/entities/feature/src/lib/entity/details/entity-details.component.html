@@ -1,0 +1,49 @@
+@if ($entity()) {
+    <div class="details-container" fxFlex="0 1 100%" fxLayout="column">
+        <div class="heading-container" fxLayoutAlign="start center">
+            @if (isMyEntityUrl) {
+                <app-go-back defaultPath="/entities" />
+            }
+            <h1 class="secondary mat-headline-3">
+                {{ $entity().name }}
+            </h1>
+        </div>
+        <div class="main-content" fxFlex="0 1 100%" fxLayout="column">
+            <div class="top-actions">
+                <app-nav-tabs-menu type="tabMenu" [elements]="[
+                {
+                    label: 'ENTITY.GENERAL_DATA.TITLE',
+                    param: 'general-data',
+                },
+                {
+                    label: 'ENTITY.REGISTER_USERS.TITLE',
+                    param: 'register-users',
+                    show: !$isSuperOperator()
+                },
+                {
+                    label: 'ENTITY.CATEGORIES.TITLE',
+                    param: 'categories',
+                    show: $isNotEntityAdmin() && !$isSuperOperator()
+                },
+                {
+                    label: 'ENTITY.EXTERNAL.TITLE',
+                    param: 'external',
+                    show: $isOperator() && $isExternal() && $isNotEntityAdmin() && !$isSuperOperator()
+                },
+                {
+                    label: 'ENTITY.TITLES.ADVANCED_CONFIGURATION',
+                    param: 'advanced-config' + ($isSuperOperator() ? '/domain-settings' : ''),
+                    show: $isSuperOperator() || ($isOperator() && !$isOperatorEntity() && $isNotEntityAdmin())
+                },
+                {
+                    label: 'ENTITY.TITLES.ZONE_TEMPLATES',
+                    param: 'zone-templates',
+                    badge: 'INFORMATION_BADGE.BETA_FEATURE',
+                    badgeClass: 'blue'
+                }
+            ]" />
+            </div>
+            <router-outlet />
+        </div>
+    </div>
+}

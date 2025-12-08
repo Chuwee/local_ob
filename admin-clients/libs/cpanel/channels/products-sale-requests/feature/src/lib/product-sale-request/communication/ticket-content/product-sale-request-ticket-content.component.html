@@ -1,0 +1,10 @@
+<app-form-container layout="menu" class="no-padding" [formGroup]="form" hideActionBar>
+    <app-language-bar slot="outside" [languages]="languages$ | async" [selected]="selectedLanguage$ | async"
+        (changed)="changeLanguage($event)" />
+    <app-product-ticket-content-pdf class="flex" #pdfContent [form]="form" [language$]="selectedLanguage$" />
+    <app-product-ticket-content-passbook class="flex" #passbookContent [form]="form" [language$]="selectedLanguage$"
+        id="section_event_communication_ticket-content_passbook" />
+</app-form-container>
+@if (isLoadingOrSaving$ | async) {
+    <div class="spinner-container"><mat-spinner /></div>
+}

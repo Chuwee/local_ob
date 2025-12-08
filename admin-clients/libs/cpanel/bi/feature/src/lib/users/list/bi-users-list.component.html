@@ -1,0 +1,109 @@
+@let entityNotSelected = !$entityIdSelected();
+@let metadata = $metadata();
+<!-- {} -->
+<div class="flex-1 flex flex-col gap-2">
+    <div class="heading-container without-overflow-hidden flex flex-wrap justify-between items-center">
+        <div class="flex-1">
+            <h1 class="secondary mat-headline-3">{{'BI.USERS.TITLES.USERS_LIST' | translate}}</h1>
+        </div>
+        <div class="flex gap-2" [class.hidden]="entityNotSelected">
+            <app-entity-filter-button #entityFilterButton [getEntitiesRequest]="entitiesRequest" />
+            <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                [attr.aria-label]="'BI.USERS_LIST.ACTIONS.CREATE' | translate"
+                (click)="openNewUserDialog()">
+                <mat-icon fontIcon="add" />
+                {{'BI.USERS_LIST.ACTIONS.CREATE' | translate}}
+            </button>
+        </div>
+    </div>
+    <div class="heading-container grid grid-cols-3 gap-2" [class.hidden]="entityNotSelected">
+        <div class="col-span-2">
+            <app-search-input [placeholder]="'BI.USERS_LIST.FORMS.SEARCH_PLACEHOLDER' | translate" />
+        </div>
+        <div class="flex justify-end items-center gap-2">
+            @if (metadata) {
+                <p class="page-summary" [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: metadata"></p>
+            }
+            <app-paginator [length]="$metadata()?.total" [pageSize]="pageSize" />
+        </div>
+    </div>
+    <div class="heading-container heading-divider">
+        <mat-divider />
+    </div>
+    @if (entityNotSelected){
+        <app-empty-state
+            class="flex basis-full"
+            [title]="'LIST.ENTITY_REQUIRED_TITLE' | translate"
+            [description]="'LIST.ENTITY_REQUIRED_DESCRIPTION' | translate">
+            <button type="button" mat-flat-button class="ob-button medium" color="primary"
+                (click)="entityFilterButton.openEntitySelectionDialog()">
+                {{'ACTIONS.SELECT_ENTITY' | translate}}
+            </button>
+        </app-empty-state>
+    }
+    @if ($metadata()?.total === 0 && !$loading()) {
+        <app-empty-state class="flex basis-full" [title]="'BI.USERS_LIST.EMPTY.TITLE' | translate"
+            [description]="'BI.USERS_LIST.EMPTY.DESCRIPTION' | translate">
+            <button mat-flat-button color="primary" type="button" class="ob-button"
+                [attr.aria-label]="'BI.USERS_LIST.ACTIONS.CREATE' | translate" (click)="openNewUserDialog()">
+                <mat-icon fontIcon="add" />
+                {{'BI.USERS_LIST.ACTIONS.CREATE' | translate}}
+            </button>
+        </app-empty-state>
+    } @else {
+        <mat-table class="ob-table"
+            [class.hidden]="entityNotSelected"
+            [dataSource]="$data()"
+            matSort [matSortActive]="initSortCol" [matSortDirection]="initSortDir" matSortDisableClear
+            [attr.aria-label]="'BI.USERS.TITLES.USERS_LIST' | translate"
+            [class.not-touchable]="!$isHandsetOrTablet()">
+            <ng-container matColumnDef="name">
+                <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                    {{'BI.USERS.FORMS.LABELS.NAME' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">{{row?.name}}
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="last_name">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'BI.USERS.FORMS.LABELS.LAST_NAME' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">{{row?.last_name}}
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="email">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'BI.USERS.FORMS.LABELS.EMAIL' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">{{row?.email}}
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="actions">
+                <mat-header-cell *matHeaderCellDef class="head-cell"
+                    [class.float-actions-cell]="!$isHandsetOrTablet()" />
+                <mat-cell *matCellDef="let row" class="two-actions-cell"
+                    [class.float-actions-cell]="!$isHandsetOrTablet()">
+                    <div class="action-buttons" (click)="$event.stopPropagation()">
+                        <button mat-icon-button aria-label="Regenerate password" class="ob-button medium"
+                            (click)="openRegeneratePasswordDialog(row)"
+                            [matTooltip]="'ACTIONS.REGENERATE_PASSWORD' | translate">
+                            <mat-icon svgIcon="renew-password" />
+                        </button>
+                        <button mat-icon-button aria-label="Delete user" class="ob-button medium"
+                            (click)="openDeleteDialog(row)"
+                            [matTooltip]="'FORMS.ACTIONS.DELETE' | translate">
+                            <mat-icon fontIcon="delete" />
+                        </button>
+                    </div>
+                </mat-cell>
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" />
+            <mat-row *matRowDef="let row; columns: displayedColumns;" class="interactive-row" (click)="goToDetails(row)" />
+        </mat-table>
+    }
+</div>
+@if ($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

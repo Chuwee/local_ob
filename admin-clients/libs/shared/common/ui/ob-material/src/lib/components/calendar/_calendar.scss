@@ -1,0 +1,39 @@
+@use '@angular/material' as mat;
+@mixin calendar-override($palettes, $colors, $typography) {
+    .mat-calendar {
+        &.ob-calendar {
+            .mat-calendar-table-header-divider {
+                display: none;
+            }
+            .mat-calendar-body-label {
+                // hides repeated month label
+                &:not(:last-of-type) {
+                    visibility: hidden;
+                }
+                &:last-of-type {
+                    display: none;
+                }
+            }
+            .mat-calendar-header {
+                padding-top: 0;
+            }
+            .mat-calendar-controls {
+                margin: 0;
+            }
+            .mat-calendar-abbr {
+                // week day names
+                @include mat.m2-typography-level($typography, tiny);
+                font-size: 8px;
+            }
+            .mat-calendar-body-cell-content {
+                // day numbers
+                @include mat.m2-typography-level($typography, tiny);
+                font-size: 9px;
+            }
+            .mat-calendar-body-today.mat-calendar-body-selected {
+                // white selection circle
+                box-shadow: none;
+            }
+        }
+    }
+}

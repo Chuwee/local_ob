@@ -1,0 +1,23 @@
+<div class="flex flex-1">
+    @if (entity$ | async; as entity) {
+        <div class="subtabs-container flex flex-col flex-[0_0_200px]">
+            <div class="flex flex-[1_0_100%]">
+                <mat-button-toggle-group vertical [value]="deepPath$ | async" class="ob-subtab"
+                    appLastPathGuardListener [currValue]="(deepPath$ | async)">
+                    <mat-button-toggle routerLink="base-categories" value="base-categories">
+                        {{'ENTITY.BASE_CATEGORIES.TITLE' | translate}}
+                    </mat-button-toggle>
+                    @if (entity.settings?.categories.allow_custom_categories) {
+                        <mat-button-toggle routerLink="my-categories"
+                            value="my-categories">
+                            {{'ENTITY.MY_CATEGORIES' | translate}}
+                        </mat-button-toggle>
+                    }
+                </mat-button-toggle-group>
+            </div>
+        </div>
+    }
+    <div class="flex flex-col flex-1">
+        <router-outlet />
+    </div>
+</div>

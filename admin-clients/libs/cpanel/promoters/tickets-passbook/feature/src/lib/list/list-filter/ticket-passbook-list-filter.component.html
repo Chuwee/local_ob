@@ -1,0 +1,72 @@
+<form [formGroup]="filtersForm" fxLayout="column" fxLayoutGap="24px">
+    <ng-container *ngIf="canSelectEntity$ | async">
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label">
+                {{'TICKET_PASSBOOK.ENTITY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="550px">
+                <mat-form-field appearance="outline" class="ob-form-field entity-select">
+                    <mat-select formControlName="entity" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate">
+                        <mat-option>
+                            <app-select-search #entitySelectSearch [options$]="entities$" searchField="name">
+                            </app-select-search>
+                        </mat-option>
+                        <mat-option *ngFor="let entity of entitySelectSearch.getFilteredOptions$() | async" [value]="entity">
+                            {{entity ? entity.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-divider [inset]="true"></mat-divider>
+    </ng-container>
+    <div fxLayout="row" class="filter-block">
+        <div class="ob-label">
+            {{'TICKET_PASSBOOK.DATE' | translate}}
+        </div>
+        <div class="filter-block-input" fxFlex="180px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="startDate" [placeholder]="dateFormat" formControlName="startDate"
+                    (focus)="startDate.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                (click)="$event.stopPropagation(); startDate.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #startDate></mat-datepicker>
+            </mat-form-field>
+        </div>
+        <div fxFlex="20px">
+            <span fxFlex class="filter-block-dates-separator"></span>
+        </div>
+        <div class="filter-block-input" fxFlex="180px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="endDate" [placeholder]="dateFormat" formControlName="endDate"
+                    (focus)="endDate.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                (click)="$event.stopPropagation(); endDate.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #endDate></mat-datepicker>
+            </mat-form-field>
+        </div>
+    </div>
+
+    <div *ngIf="(canSelectEntity$ | async) ||(isAvetEntityDigitalSeasonTicket$ | async)"
+        fxLayout="row" class="filter-block">
+        <div class="ob-label">
+            {{'TICKET_PASSBOOK.TYPES.TITLE' | translate}}
+        </div>
+        <div class="filter-block-input" fxFlex="550px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-select formControlName="type" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                    <mat-option [value]="null">
+                        {{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}
+                    </mat-option>
+                    <mat-option *ngFor="let type of types" [value]="type">
+                        {{type.name | translate}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+</form>

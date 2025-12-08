@@ -1,0 +1,18 @@
+<app-form-container layout="main" [hideActionBar]="true">
+     <p fxLayout="row" fxLayoutAlign="start start" class="rates-info">
+        <mat-icon class="ob-icon small info with-text">info</mat-icon>
+        <span>{{ 'CUSTOMER.TRANSFER.RATES_INFO' | translate }}</span>
+    </p>
+    <div class="flex flex-wrap gap-y-6 justify-between">
+        <div class="flex flex-col flex-[1_0_50%] gap-2">
+            <span class="ob-label">{{ 'CUSTOMER.SEASON_TICKETS.TRANSFER_SEATS.RATE' | translate }}</span>
+            <span>{{ $selectedSeat()?.ticket.rate.name }}</span>
+        </div>
+        <div class="flex flex-col flex-[1_0_50%] gap-2">
+            <span class="ob-label">{{ 'CUSTOMER.SEASON_TICKETS.TRANSFER_SEATS.TRANSFERS_NUMBER' | translate }}</span>
+            <span>{{ $selectedSeat()?.transfer_data?.total_transfers || '-' }}</span>
+        </div>
+    </div>
+    <app-customer-transfer-season-tickets-session-list (requestChanged)="requestChangedHandler($event)"
+        [selectedSeat]="$selectedSeat()" />
+</app-form-container>

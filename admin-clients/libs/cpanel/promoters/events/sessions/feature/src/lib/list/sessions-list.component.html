@@ -1,0 +1,199 @@
+<div class="left-bar-container" fxLayoutAlign="start stretch">
+    <div fxFlex class="left-bar" fxLayout="column" fxLayoutAlign="start stretch">
+        <div class="left-sidebar-title" fxLayout="column">
+            <div fxLayoutAlign="start center">
+                <h2 class="title">{{'EVENTS.SESSIONS.TITLE' | translate}}</h2>
+                <div [matTooltip]="'EVENTS.NEW_SESSION_DISABLED_BY_EVENT_STATUS' | translate"
+                    [matTooltipDisabled]="(isEventFinalized$ | async) !== true">
+                    @if(!$isSga()) {
+                        <button mat-icon-button type="button"
+                            [disabled]="(isEventFinalized$ | async) || (totalSessionsGenerationStatus$ | async).inProgress > 0"
+                            class="ob-button mat-stroked-button xsmall only-icon" [attr.aria-label]="'EVENTS.NEW_SESSION_BTN' | translate"
+                            [matTooltip]="'EVENTS.NEW_SESSION_BTN' | translate" (click)="openNewSessionDialog()">
+                            <mat-icon>add</mat-icon>
+                        </button>
+                    }
+                </div>
+            </div>
+            <span class="results-count">
+                {{('RESULTS.TOTAL' | translate) + ': ' + (totalSessions | localNumber)}}
+            </span>
+            @if(!$isSga()) {
+                <div fxLayoutAlign="start center">
+                    <app-sessions-list-filter fxFlex [disabled]="(totalSessionsGenerationStatus$ | async).inProgress > 0" />
+                </div>
+            }
+        </div>
+        <!-- Improve of the user experience when no sessions visible on list: -->
+        <div class="context-message-container with-margin" [fxShow]="!(sessionsGroups$ | async)?.length && totalSessions > 0 &&
+            (listFilterComponent.appliedFiltersCounter$ | async) > 0" fxFlex="100%" fxLayout="row" fxLayoutAlign="center">
+            <div fxFlex="100%" fxLayout="column" fxLayoutAlign=" center" fxLayoutGap="15px">
+                <p class="title">{{'EVENTS.SESSION.EMPTY_LIST_MESSAGE' | translate}}</p>
+                <p class="body">{{'EVENTS.REMOVE_SESSIONS_FILTERS_MESSAGE' | translate}}</p>
+                <a class="ob-link" (click)="listFilterComponent.onRemoveFiltersBtnClick()">
+                    {{'FORMS.REMOVE_FILTERS_BTN' | translate}}
+                </a>
+            </div>
+        </div>
+        @if(!$isSga()) {
+            <div *ngIf="sessionsGroups$ | async as sessionsGroups" fxLayoutAlign="space-between center" class="left-sidebar-header"
+                fxFlex="0 0 36px" [fxShow]="sessionsGroups.length">
+                <mat-checkbox color="primary" [checked]="isTotallySelectedList((filteredSessionsCounters$ | async)?.total)"
+                    [indeterminate]="isPartiallySelectedList((filteredSessionsCounters$ | async)?.total)" [disabled]="isAvet$ | async"
+                    [matTooltip]="((isAvet$ | async) ? 'EVENTS.MULTI_SESSION_SELECT_DISABLED' : 'FORMS.SELECT.PLACE_HOLDER') | translate"
+                    (change)="updateAllSelected($event.checked)">
+                    <mat-label>
+                        {{('FORMS.SELECTED_QUANTITY' | translate: {
+                    quantity: selectedSessionWrappers.length
+                })}}
+                    </mat-label>
+                </mat-checkbox>
+                <div fxFlex fxLayout="row" fxLayoutAlign="end center">
+                    <button mat-icon-button class="ob-button small"
+                        [disabled]="!selectedSessionWrappers || selectedSessionWrappers.length !== 1"
+                        (click)="scrollToSelectedSession(sessionsGroups)" [attr.aria-label]="'EVENTS.SCROLL_TO_SESSION_BTN' | translate"
+                        [matTooltip]="'EVENTS.SCROLL_TO_SESSION_BTN' | translate">
+                        <mat-icon>place</mat-icon>
+                    </button>
+                    <button mat-icon-button class="ob-button small" *ngIf="(isAvet$ | async) === false"
+                        [disabled]="!selectedSessionWrappers ||
+                        selectedSessionWrappers.length !== 1 ||
+                        (isEventFinalized$ | async) ||
+                        (totalSessionsGenerationStatus$ | async).inProgress > 0"
+                        (click)="openCloneSessionDialog(selectedSessionWrappers[0])"
+                        [attr.aria-label]="'EVENTS.CLONE_SESSION_BTN' | translate"
+                        [matTooltip]="'EVENTS.CLONE_SESSION_BTN' | translate">
+                        <mat-icon>content_copy</mat-icon>
+                    </button>
+                    <button mat-icon-button class="ob-button small"
+                        [disabled]="!selectedSessionWrappers || (totalSessionsGenerationStatus$ | async).inProgress > 0"
+                        (click)="openDeleteSessionsDialog()" [attr.aria-label]="'EVENTS.DELETE_SESSION_BTN' | translate"
+                        [matTooltip]="'EVENTS.DELETE_SESSION_BTN' | translate">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+            </div>
+        }
+        <div fxLayout="column" fxFlex class="list-container">
+            <mat-accordion *ngIf="pagedSessionsGroups$ | async as pagedSessionsGroups" displayMode="flat"
+                class="sessions-list-container ob-accordion-list tiny" appLastPathGuardListener fxFlex fxLayout="column"
+                (navigationReverted)="undoLastNavigation()">
+                @for (group of pagedSessionsGroups; track $index; let i = $index) {
+                    <mat-expansion-panel #groupPanel fxFlex [fxGrow]="groupPanel.expanded ? '1' : '0'" fxLayout="column"
+                        class="session-group-item exclude-body-padding mat-elevation-z0 exclude-header-padding"
+                        [expanded]="group.startDate === expandedGroup?.startDate" (opened)="openedPanelHandler(groupPanel, i)">
+                        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*" class="session-group-header"
+                            (click)="updateExpandedGroup(group, groupPanel.expanded)">
+                            <mat-panel-title fxFlex="0 0 100%" fxLayoutAlign="start center">
+                                <span class="status-dot" [ngClass]="group.status"></span>
+                                <mat-checkbox color="primary" [indeterminate]="isPartiallySelectedGroup(group)"
+                                    [checked]="isTotallySelectedGroup(group)" [disabled]="isAvet$ | async"
+                                    [matTooltip]="'EVENTS.MULTI_SESSION_SELECT_DISABLED' | translate"
+                                    [matTooltipDisabled]="(isAvet$ | async) === false" (click)="$event.stopPropagation()"
+                                    (change)="updateSelectedGroup($event.checked, group)" class="list-header-checkbox" />
+                                <span class="session-group-title" fxFlex="100%">
+                                    {{group.title.charAt(0).toUpperCase() + group.title.slice(1)}}
+                                </span>
+                                <span class="session-group-content-state group-counters-badge"
+                                    [class.partially-selected]="isPartiallySelectedGroup(group)"
+                                    [class.all-selected]="isTotallySelectedGroup(group)">
+                                    {{group.selectedSessions}}/{{group.totalSessions}}
+                                </span>
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <cdk-virtual-scroll-viewport itemSize="66" [minBufferPx]="66*15" [maxBufferPx]="66*20" class="full-width">
+                            <div *cdkVirtualFor="let sessionWrapper of group.sessions; trackBy: trackByFn"
+                                (click)="selectSession(sessionWrapper)" mat-ripple>
+                                <div class="session-item" fxLayout fxLayoutAlign="start center" [class.selected]="sessionWrapper.selected"
+                                    *ngIf="!sessionWrapper.session.settings ||
+                                    !(sessionWrapper.session.settings?.smart_booking?.type === 'SMART_BOOKING') else childSession">
+                                    <mat-checkbox color="primary" [checked]="sessionWrapper.selected" (click)="$event.stopPropagation()"
+                                        [disabled]="(selectedSessionWrappers.length === 1 && sessionWrapper.selected) || (isAvet$ | async)"
+                                        [matTooltip]="'EVENTS.MULTI_SESSION_SELECT_DISABLED' | translate"
+                                        [matTooltipDisabled]="(isAvet$ | async) === false"
+                                        (change)="updateSelectedSession($event.checked, sessionWrapper)" class="list-checkbox tiny-list" />
+                                    <div fxFlex fxLayout="column" fxLayoutAlign="center" class="session-main-info">
+                                        <span class="session-info-item session-title" appEllipsify
+                                            [matTooltip]="sessionWrapper.session.name">
+                                            {{sessionWrapper.session.name}}
+                                        </span>
+                                        <span class="session-info-item" appEllipsify
+                                            [matTooltip]="sessionWrapper.session.venue_template?.venue?.name">
+                                            {{sessionWrapper.session.venue_template?.venue?.name}}
+                                        </span>
+                                        <span class="session-info-item">
+                                            {{sessionWrapper.session.start_date | localDateTime :
+                                        dateTimeFormats.shortDateTimeWithWeek}}
+                                        </span>
+                                    </div>
+                                    <div class="status-container">
+                                        <mat-icon *ngIf="sessionWrapper.isActiveFromInProgress" class="icon-active">
+                                            check
+                                        </mat-icon>
+                                        <mat-icon *ngIf="sessionWrapper.session.generation_status === sessionGenerationStatus.error"
+                                            class="icon-error">
+                                            error_outline
+                                        </mat-icon>
+                                        <mat-spinner *ngIf="sessionWrapper.session.generation_status === sessionGenerationStatus.inProgress ||
+                                    sessionWrapper.session.generation_status === sessionGenerationStatus.pending" class="icon-in-progress"
+                                            diameter="25" />
+                                    </div>
+                                    <div class="release-sale-status-container" fxLayout="column">
+                                        <span class="ob-status-badge small-badge" [ngClass]="getReleaseStatusIndicator(
+                                        sessionWrapper.session
+                                    )">
+                                            {{('EVENTS.SESSION.RELEASE_STATE' | translate).substring(0, 1)}}
+                                        </span>
+                                        <span class="ob-status-badge small-badge" [ngClass]="getSaleStatusIndicator(
+                                        sessionWrapper.session
+                                    )">
+                                            {{('EVENTS.SESSION.SALE_STATE' | translate).substring(0, 1)}}
+                                        </span>
+                                    </div>
+                                </div>
+                                <ng-template #childSession>
+                                    <div class="session-group-header child-session-item" fxLayout fxLayoutAlign="center"
+                                        [class.selected]="sessionWrapper.selected">
+                                        <div class="arrow-right-icon">
+                                            <mat-icon class="ob-icon xsmall">subdirectory_arrow_right</mat-icon>
+                                        </div>
+                                        <div class="session-main-info" fxLayout="column" fxLayoutAlign="center" fxLayoutGap="5px">
+                                            <div fxLayoutAlign="start center" class="session-info-item session-title">
+                                                <span appEllipsify
+                                                    [matTooltip]="sessionWrapper.session.name">
+                                                    {{sessionWrapper.session.name}}
+                                                </span>
+                                            </div>
+                                            <div fxLayoutGap="5px" class="session-info-item session-title">
+                                                <span [ngClass]="['status-dot', sessionWrapper.session.status.toLowerCase()]"></span>
+                                                <span
+                                                    class="mat-subtitle-2">{{'EVENTS.SESSION.LIST.SMART_BOOKING.TITLE' | translate}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                            </div>
+                        </cdk-virtual-scroll-viewport>
+                    </mat-expansion-panel>
+                    }
+            </mat-accordion>
+        </div>
+        <ng-container *ngIf="filteredSessionsCounters$ | async as filteredSessionsCounters">
+            <div *ngIf="filteredSessionsCounters.page.length && {
+                startItem: getPaginatorStartItem(sessionsGroupsPage$ | async, filteredSessionsCounters),
+                endItem: getPaginatorEndItem(sessionsGroupsPage$ | async, filteredSessionsCounters),
+                total: filteredSessionsCounters.total
+            } as paginationData" class="paginator" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="10px">
+                <p [matTooltip]="'EVENTS.SESSIONS_LIST_PAGE_SUMMARY' | translate: paginationData" class="page-summary"
+                    [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: paginationData">
+                </p>
+                <mat-paginator [pageSize]="PAGE_SIZE" [pageIndex]="sessionsGroupsPage$ | async" hidePageSize
+                    (page)="pageFilter($event)"
+                    [length]="(sessionsGroups$ | async)?.length" />
+            </div>
+        </ng-container>
+    </div>
+    <div *ngIf="loading$ | async" class="spinner-container" fxLayoutAlign="center center">
+        <mat-spinner />
+    </div>
+</div>

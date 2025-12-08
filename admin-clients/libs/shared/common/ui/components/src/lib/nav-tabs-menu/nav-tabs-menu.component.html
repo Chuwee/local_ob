@@ -1,0 +1,45 @@
+<nav mat-tab-nav-bar [ngClass]="typeClass" [tabPanel]="tabPanel">
+    @for (element of elements; track element.param) {
+        @if (element | navsTabsMenuShow) {
+            @if (!element.tooltip) {
+                <a mat-tab-link class="!flex-grow-0 flex-shrink-1"
+                    [id]="element?.id"
+                    [attr.data-test]="element.dataTest"
+                    [routerLink]="(!disabled && !element.disabled || null) && element.param"
+                    [disabled]="disabled || element.disabled"
+                    [active]="element | navsTabsMenuActive : rla.isActive"
+                    [queryParams]="element.queryParams" #rla="routerLinkActive" routerLinkActive>
+                    @if (element.templateRef) {
+                        <ng-template [ngTemplateOutlet]="element.templateRef" />
+                    } @else {
+                        {{element.label | translate}}
+                        @if(element.badge) {
+                            <app-badge [badge]="element.badge" [badgeClass]="element.badgeClass" />
+                        }
+                    }
+                </a>
+            } @else {
+                <div [matTooltip]=" element.tooltip ? (element.tooltip.text | translate) : null"
+                    [matTooltipDisabled]="element.tooltip?.disabled || null" style="display: flex" class="tab-tooltip-container">
+                    <a mat-tab-link class="!flex-grow-0 flex-shrink-1"
+                        [id]="element?.id"
+                        [attr.data-test]="element.dataTest"
+                        [routerLink]="(!disabled && !element.disabled || null) && element.param"
+                        [disabled]="disabled || element.disabled"
+                        [active]="element | navsTabsMenuActive : rla.isActive"
+                        [queryParams]="element.queryParams" #rla="routerLinkActive" routerLinkActive>
+                        @if (element.templateRef) {
+                            <ng-template [ngTemplateOutlet]="element.templateRef" />
+                        } @else {
+                            {{element.label | translate}}
+                            @if(element.badge) {
+                                <app-badge [badge]="element.badge" [badgeClass]="element.badgeClass" />
+                            }
+                        }
+                    </a>
+                </div>
+            }
+        }
+    }
+</nav>
+<mat-tab-nav-panel #tabPanel />

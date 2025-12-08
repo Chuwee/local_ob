@@ -1,0 +1,87 @@
+<div class="new-condition-action" fxLayout="row" fxLayoutAlign="end">
+    <div fxFlex></div>
+    <div [matTooltip]="(channel.languages.selected ? 'NEW_CONDITION_NOT_ALLOWED' : 'SOME_LANGUAGE_NEEDED') | prefix | translate"
+        [matTooltipDisabled]="channel.languages.selected && (data.length < MAX_ADDITIONAL_CONDITIONS)">
+
+        <button mat-stroked-button color="primary" type="button" class="ob-button small add-button"
+            [disabled]="!channel.languages.selected || data.length >= MAX_ADDITIONAL_CONDITIONS"
+            (click)="openAdditionalConditionDialog()">
+            <mat-icon>add</mat-icon>
+            {{ 'NEW_CONDITION_BTN' | prefix | translate }}
+        </button>
+
+    </div>
+</div>
+
+<mat-table #conditionsTable class="ob-table" [dataSource]="data" [formGroup]="form"
+    cdkDropList (cdkDropListDropped)="onDropCondition($event)"
+    [class.not-touchable]="(isHandsetOrTablet$ | async) !== true">
+
+    <!-- enabled checkbox column -->
+    <ng-container matColumnDef="condition-enabled">
+        <mat-header-cell *matHeaderCellDef class="head-cell condition-enabled checkbox-column" fxFlex="48px" />
+        <mat-cell *matCellDef="let row; index as i" [formArrayName]="i" class="icon-cell condition-enabled checkbox-column"
+            fxFlex="48px" fxLayoutAlign="start center">
+            <mat-icon class="drag-icon">drag_indicator</mat-icon>
+            <mat-checkbox color="primary" formControlName="conditionEnabled" />
+        </mat-cell>
+    </ng-container>
+
+    <!-- Field name column -->
+    <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef class="head-cell name">
+            {{ 'ADDITIONAL_CONDITION_NAME' | prefix | translate }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row" class="name">
+            {{ row.name }}
+        </mat-cell>
+    </ng-container>
+
+    <!-- required checkbox column -->
+    <ng-container matColumnDef="condition-required">
+        <mat-header-cell *matHeaderCellDef class="head-cell condition-required checkbox-column"
+            fxLayoutAlign="center center">
+            {{ 'CONDITION_REQUIRED' | prefix | translate }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row; index as i" [formArrayName]="i" class="icon-cell condition-required checkbox-column"
+            fxLayoutAlign="center center">
+            <mat-checkbox color="primary" formControlName="conditionRequired" />
+        </mat-cell>
+    </ng-container>
+
+    <!-- actions column -->
+    <ng-container matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef class="two-actions-cell head-cell"
+            [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true" />
+        <mat-cell *matCellDef="let row" class="two-actions-cell"
+            [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+            <div class="action-buttons" (click)="$event.stopPropagation()">
+                <button mat-icon-button class="ob-button medium"
+                    [matTooltip]="'CONDITION_EDIT_BTN' | prefix | translate"
+                    (click)="openAdditionalConditionDialog(row)">
+                    <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button class="ob-button medium"
+                    [matTooltip]="'CONDITION_DELETE_BTN' | prefix | translate"
+                    (click)="openDeleteConditionDialog(row)">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </div>
+        </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="columns" class="dense-row" />
+
+    <mat-row *matRowDef="let row; columns: columns" class="dense-row hoverable-row ob-draggable-row"
+        cdkDrag cdkDragBoundary=".mat-table" />
+
+</mat-table>
+
+@if (!data.length) {
+    <div class="context-notification-container" fxLayout="row" fxLayoutAlign="center start">
+        <app-context-notification class="ob-context-notification" contextType="info"
+            fxFlex="100%" fxLayoutAlign="center center">
+            {{'LIST.EMPTY' | translate}}
+        </app-context-notification>
+    </div>
+}

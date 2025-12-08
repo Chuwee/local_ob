@@ -1,0 +1,96 @@
+<app-form-container layout="main" [formGroup]="form" (cancel)="cancel()" (save)="save()"
+    [disabled]="!form.dirty || (isInProgress$ | async)" class="overflow-y-auto">
+    @if((canEditUserStatus$ | async) && !$editLoggedUser()){
+        <div slot="outside">
+            <!-- User status -->
+            <div class="user-status flex justify-center">
+                <div class="flex-[0_1_1280px] flex justify-end items-center gap-2.5">
+                    <div class="ob-label">
+                        {{'USER.STATUS' | translate}}
+                    </div>
+                    <div class="user-status-select flex basis-56">
+                        <mat-form-field fxFlex appearance="outline"
+                            class="ob-form-field ob-form-field-outline inline-field thin-select-field basis-56">
+                            <mat-select formControlName="userStatus">
+                                <mat-select-trigger>
+                                    <span
+                                        [ngClass]="['status-dot', form.get('userStatus').value?.toLowerCase() || '']">
+                                    </span>
+                                    <span>{{'USER.STATUS_OPTS.' + form.get('userStatus').value | translate}}</span>
+                                </mat-select-trigger>
+                                @for(status of userStatusList; track $index){
+                                    <mat-option [value]="status">
+                                        <span>{{'USER.STATUS_OPTS.' + status | translate}}</span>
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <mat-divider />
+        </div>
+    }
+    @if (userNotifications$ | async; as notifications){
+        <div>
+            @if (notifications.length){
+                <div class="flex flex-col gap-5">
+                    <!-- Description -->
+                    <div>
+                        <span>{{'USER.NOTIFICATIONS.DESCRIPTION' | translate}}</span>
+                    </div>
+                    <div class="flex flex-col gap-8">
+                        <!-- Channel checkboxes -->
+                        @if ((channelMgrNotifications$ | async)?.length){
+                            <div>
+                                <span class="ob-label">{{'USER.NOTIFICATIONS.CHANNEL_MGMT' | translate}}</span>
+                                @if (channelMgrNotifications$ | async; as channelMgrNotifications) {
+                                    <div class="flex flex-col">
+                                        @for (channelMgrNotification of channelMgrNotifications; track $index) {
+                                            <mat-checkbox
+                                                color="primary" class="inline"
+                                                [formControl]="form.get(['notificationsGroup', channelMgrNotification.type])">
+                                                {{ 'USER.NOTIFICATIONS.TYPE_DESCRIPTIONS.' + channelMgrNotification.type | translate }}
+                                            </mat-checkbox>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        <!-- Event checkboxes  -->
+                        @if ((eventMgrNotifications$ | async)?.length) {
+                            <div>
+                                <span class="ob-label">{{'USER.NOTIFICATIONS.EVENT_MGMT' | translate}}</span>
+                                @if (eventMgrNotifications$ | async; as eventMgrNotifications) {
+                                    <div fxLayout="column">
+                                        @for (eventMgrNotification of eventMgrNotifications; track $index) {
+                                            <mat-checkbox
+                                                color="primary" class="inline"
+                                                [formControl]="form.get(['notificationsGroup', eventMgrNotification.type])">
+                                                {{ 'USER.NOTIFICATIONS.TYPE_DESCRIPTIONS.' + eventMgrNotification.type | translate }}
+                                            </mat-checkbox>
+                                        }
+                                    </div>
+                                }
+
+                            </div>
+                        }
+                    </div>
+                </div>
+            }@else {
+                <div class="flex content-center justify-center">
+                    <app-context-notification class="ob-context-notification flex-[0_1_600px]" contextType="info">
+                        {{'USER.NOTIFICATIONS.NOTIFICATIONS_NOT_ALLOWED' | translate}}
+                    </app-context-notification>
+                </div>
+            }
+        </div>
+    }
+
+</app-form-container>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

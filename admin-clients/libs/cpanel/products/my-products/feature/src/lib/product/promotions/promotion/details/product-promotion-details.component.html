@@ -1,0 +1,45 @@
+@if ($promotion(); as promotion) {
+    <div class="channel-promotions-details-container">
+        <app-nav-tabs-menu type="horizontalSubtab" [elements]=" [
+            {
+                label: 'PRODUCT.PROMOTIONS.GENERAL_DATA',
+                param: 'general-data'
+            },
+            {
+                label: 'PRODUCT.PROMOTIONS.DISCOUNT_TYPE',
+                param: 'type'
+            },
+        ]" [disabled]="!promotion">
+        </app-nav-tabs-menu>
+        <div class="status-notifications-container">
+            <div class="status-bar">
+                <div class="promotion-activation" [class.disabled]="statusCtrl.disabled"
+                    [matTooltip]="'PRODUCT.PROMOTIONS.DISABLED_ACTIVATION_DESC' | translate"
+                    [matTooltipDisabled]="statusCtrl.enabled">
+                    <mat-slide-toggle class="ob-slide-toggle ob-label"
+                        [formControl]="statusCtrl"
+                        (change)="handleStatusChange($event.checked)">
+                        {{'PRODUCT.PROMOTIONS.ACTIVATE_PROMO' | translate}}
+                    </mat-slide-toggle>
+                </div>
+                <div class="promotion-type">
+                    <span class="promotion-type-label ob-label">
+                        {{'PRODUCT.PROMOTIONS.TYPE' | translate}}:
+                    </span>
+                    <span class="promotion-type-value">
+                        {{'PRODUCT.PROMOTIONS.TYPE_OPTS.' + promotion.type.toUpperCase() | translate}}
+                    </span>
+                </div>
+                <div class="promotion-status">
+                    <span class="promotion-status-label ob-label">
+                        {{'PRODUCT.PROMOTIONS.STATUS' | translate}}:
+                    </span>
+                    <span class="ob-status-badge" [ngClass]="promotion.status.toLowerCase()">
+                        {{('PRODUCT.PROMOTIONS.STATUS_OPTS.' + promotion.status) | translate}}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <router-outlet (activate)="childComponentChange($event)" />
+    </div>
+}

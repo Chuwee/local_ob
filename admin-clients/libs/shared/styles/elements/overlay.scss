@@ -1,0 +1,41 @@
+@mixin styles() {
+    $z-index-overlay: 1000;
+    $overlay-background: rgba(0, 0, 0, 0.32);
+    // The nearest ancestor has to have position: relative or a transform applied, for example transform: translateZ(0px)
+    // if it is wanted to be contained in this nearest ancestor
+    .ob-overlay-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: flex;
+        place-content: center;
+        align-items: center;
+        z-index: $z-index-overlay;
+        pointer-events: auto;
+        opacity: 1;
+        background: $overlay-background;
+        height: 100%;
+        width: 100%;
+    }
+
+    // It is the immediate descendant of ob-overlay-wrapper
+    .ob-overlay-pane {
+        position: absolute;
+        display: flex;
+        box-sizing: border-box;
+        z-index: $z-index-overlay;
+        pointer-events: auto;
+        max-width: 100%;
+        max-height: 100%;
+
+        &.pane-sticky {
+            top: 200px;
+            position: -webkit-sticky;
+            position: sticky;
+        }
+
+        &.pane-center {
+            margin-top: 0;
+        }
+    }
+}

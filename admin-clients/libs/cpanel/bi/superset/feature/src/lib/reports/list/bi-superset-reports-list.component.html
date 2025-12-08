@@ -1,0 +1,33 @@
+<div class="list-container flex-1 flex-col">
+    <div class="heading-container without-overflow-hidden flex flex-row flex-wrap justify-between">
+        <div class="flex flex-row flex-wrap">
+            <h1 class="secondary mat-headline-3">{{'BI.REPORTS.TITLES.REPORTS_LIST' | translate}}</h1>
+        </div>
+    </div>
+    <div class="heading-container without-overflow-hidden flex flex-row justify-between items-center">
+        <div class="flex flex-row justify-start items-center basis-1/2" [class.basis-full]="!(isHandset$ | async)">
+            <app-bi-superset-reports-list-search-input class="flex basis-full">
+            </app-bi-superset-reports-list-search-input>
+        </div>
+    </div>
+    <app-form-container hideActionBar layout="main" class="overflow-y-auto list-content">
+        <div class="flex flex-col">
+            @if (searchResults$ | async) {
+                <app-bi-superset-reports-list-search-results class="section-block flex basis-full" />
+            } @else {
+                @if ((recentReports$ | async)?.length > 0) {
+                    <app-superset-reports-list-recents [recentReportsInput]="recentReports$ | async"
+                        class="section-block flex basis-full" />
+                }
+                @if (reports$ | async) {
+                    <app-bi-superset-reports-list-tabs [reports]="reports$ | async" class="section-block flex basis-full" />
+                }
+            }
+        </div>
+    </app-form-container>
+</div>
+@if (isLoading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

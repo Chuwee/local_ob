@@ -1,0 +1,37 @@
+<div class="domain-settings-header flex justify-between items-center" [formGroup]="form">
+    <div>
+        <mat-slide-toggle class="ob-slide-toggle" formControlName="enabled">
+            {{'ADMIN_CHANNEL.CONFIGURATION.SUBDOMAIN.FORMS.LABELS.ENABLED' | translate}}
+        </mat-slide-toggle>
+    </div>
+    <div class="flex flex-1 justify-end items-center gap-3">
+        <span>
+            {{'ADMIN_CHANNEL.CONFIGURATION.SUBDOMAIN.FORMS.LABELS.MODE' | translate}}
+        </span>
+        <mat-form-field appearance="outline" class="ob-form-field ob-form-field-outline inline-field thin-select-field flex-[0_1_180px]">
+            <mat-select formControlName="mode">
+                <mat-option value="DEFAULT">{{'ADMIN_CHANNEL.CONFIGURATION.SUBDOMAIN.FORMS.OPTIONS.DEFAULT' | translate}}</mat-option>
+                <mat-option value="REDIRECT">{{'ADMIN_CHANNEL.CONFIGURATION.SUBDOMAIN.FORMS.OPTIONS.REDIRECT' | translate}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+</div>
+<mat-divider />
+<div class="domain-settings-content grid gap-3">
+    @if($hasDomains()){
+        <div class="flex items-center">
+            <mat-icon class="ob-icon small neutral with-text">info</mat-icon>
+            <span>{{'ADMIN_CHANNEL.CONFIGURATION.SUBDOMAIN.INFOS.LIMIT' | translate}}</span>
+        </div>
+    }
+    <app-domain-settings-list [domains]="$domainsValue()"
+        [canConfigure]="$canConfigure()" [loading]="$loading()"
+        (domainsChange)="updateDomains($event)" (configureRequested)="onConfigureRequested($event)"
+        (configurationChange)="configurationChange.emit($event)" />
+
+    @if($loading()){
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+</div>

@@ -1,0 +1,69 @@
+<app-form-container sidebar [disabled]="!form.dirty || (isInProgress$ | async)" (cancel)="cancel()" (save)="save()">
+    <app-language-bar [languages]="languageList$ | async" [selected]="language$ | async" slot="outside"
+        [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)" />
+    <form [formGroup]="form">
+        <mat-accordion multi togglePosition="before">
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'TICKET_PASSBOOK.TICKET_PASSBOOK_TERMS_CONDITIONS_TITLE' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="flex flex-row">
+                    <div class="flex flex-col gap-2 basis-685px" formGroupName="formTermConditions">
+                        <span class="field-description">
+                            {{'TICKET_PASSBOOK.TICKET_PASSBOOK_TERMS_CONDITIONS_DESCRIPTION' | translate }}
+                        </span>
+                        <mat-form-field appearance="outline" class="ob-form-field" subscriptSizing="dynamic">
+                            <textarea matInput rows="3" aria-label="Short Description"
+                                [placeholder]="'TICKET_PASSBOOK.TICKET_PASSBOOK_TERMS_CONDITIONS_DESCRIPTION_PLACEHOLDER' | translate"
+                                [formControlName]="literalTextAreaKey"></textarea>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'TICKET_PASSBOOK.LITERALS_TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="table-container">
+                    <mat-table class="ob-table" [dataSource]="literalsTable"
+                        formGroupName="formLiteralsTable">
+                        <ng-container [matColumnDef]="tableHead[0]">
+                            <mat-header-cell *matHeaderCellDef class="head-cell">
+                                {{'TICKET_PASSBOOK.TABLE_LITERALS_CONTENT_ID' | translate}}
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row;" class="flex items-center">
+                                <span>{{row.key}}</span>
+                            </mat-cell>
+                        </ng-container>
+                        <ng-container [matColumnDef]="tableHead[1]">
+                            <mat-header-cell *matHeaderCellDef class="head-cell input-column">
+                                {{'TICKET_PASSBOOK.TABLE_PASSBOOK_TITLE' | translate}}
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row; let i = index" [formGroupName]="i"
+                                class="flex items-center editable-cell">
+                                <div class="write-value flex basis-full">
+                                    <mat-form-field appearance="outline" class="ob-form-field">
+                                        <input matInput aria-label="passbook title"
+                                            [placeholder]="'TICKET_PASSBOOK.TABLE_PASSBOOK_TITLE' | translate"
+                                            formControlName="title">
+                                    </mat-form-field>
+                                </div>
+                            </mat-cell>
+                        </ng-container>
+                        <mat-header-row *matHeaderRowDef="tableHead;" class="dense-row" />
+                        <mat-row *matRowDef="let row; columns: tableHead"
+                            class="dense-row interactive-row hoverable-row" />
+                    </mat-table>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </form>
+    <app-ticket-passbook-download slot="sidebar" [language]="language$ | async" />
+</app-form-container>
+
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

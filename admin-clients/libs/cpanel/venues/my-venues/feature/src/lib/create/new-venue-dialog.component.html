@@ -1,0 +1,129 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title>
+        <div class="flex basis-full">
+            <h2 class="secondary title flex basis-full">
+                {{'TITLES.NEW_VENUE' | translate}}
+            </h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content class="flex flex-col">
+        <form [formGroup]="form" class="flex flex-col justify-start align-stretch">
+            <!-- Entity -->
+            @if ($canReadMultipleEntities()) {
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-label>{{'FORMS.LABELS.ENTITY' | translate}}</mat-label>
+                    <app-select-server-search [multiple]="false" required [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                        formControlName="entity" [options$]="entities$" [moreOptionsAvailable$]="moreEntitiesAvailable$"
+                        (loadOptions)="loadEntities($event.q, $event.nextPage)" />
+                    <mat-error [ob-form-errors]="form" field="entity" />
+                </mat-form-field>
+            }
+            <!-- Name -->
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                <input matInput aria-label="name" formControlName="name" [placeholder]="'VENUE.NAME.PLACEHOLDER' | translate">
+                <mat-error [ob-form-errors]="form" field="name" />
+            </mat-form-field>
+            <!-- Venue type -->
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.TYPE' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="type">
+                    @for (type of venueTypes | keyvalue; track type.value) {
+                        <mat-option [value]="type.value">
+                            {{('VENUE.TYPE_OPTIONS.' + type.value) | translate}}
+                        </mat-option>
+                    }
+                </mat-select>
+                <mat-error [ob-form-errors]="form" field="type" />
+            </mat-form-field>
+            <!-- External provider venue -->
+            @if(this.$externalProviderVenues()?.length > 0) {
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-label>{{'FORMS.LABELS.EXTERNAL_PROVIDER_VENUE' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="external_id">
+                        @for (externalVenue of $externalProviderVenues(); track externalVenue.id) {
+                            <mat-option [value]="externalVenue.id">
+                                {{externalVenue.name}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form" field="type" />
+                </mat-form-field>
+            }
+            <!-- Capacity -->
+            <div>
+                <mat-form-field appearance="outline" class="ob-form-field flex basis-1/2">
+                    <mat-label>{{'FORMS.LABELS.MAX_CAPACITY' | translate}}</mat-label>
+                    <input matInput type="number" placeholder="0" aria-label="capacity" formControlName="capacity">
+                    <mat-error [ob-form-errors]="form" field="capacity" />
+                </mat-form-field>
+            </div>
+            <!-- Address Maps Autocomplete-->
+            <app-google-place-autocomplete />
+            @if (this.form.get('googlePlaceId').value && !this.form.get('googlePlaceholder').hasError('invalidLocation')) {
+                <!-- Address -->
+                <div class="details-non-editable-field ob-form-field flex basis-full flex-col">
+                    <span class="field-label">{{'FORMS.LABELS.ADDRESS' | translate}}</span>
+                    <span>{{$googleAddress() || '-'}}</span>
+                </div>
+                <!-- Timezone -->
+                <div class="details-non-editable-field ob-form-field flex basis-full flex-col">
+                    <span class="field-label">{{'FORMS.LABELS.TIMEZONE' | translate}}</span>
+                    <span>{{$timezone()}}</span>
+                </div>
+                <div class="flex basis-full">
+                    <!-- Country -->
+                    <div class="details-non-editable-field ob-form-field flex basis-1/2 flex-col">
+                        <span class="field-label">{{'FORMS.LABELS.COUNTRY' | translate}}</span>
+                        <span>{{$country() || '-'}}</span>
+                    </div>
+                    <!-- Province -->
+                    <div class="details-non-editable-field ob-form-field flex basis-1/2 flex-col">
+                        <span class="field-label">{{'FORMS.LABELS.COUNTRY_SUBDIVISION' | translate}}</span>
+                        <span>{{$province() || '-'}}</span>
+                    </div>
+                </div>
+                <div class="flex basis-full">
+                    <!-- City -->
+                    <div class="details-non-editable-field ob-form-field flex basis-1/2 flex-col">
+                        <span class="field-label">{{'FORMS.LABELS.CITY_MUN' | translate}}</span>
+                        <span>{{form.get('city').value || '-'}}</span>
+                    </div>
+                    <!-- Postal Code -->
+                    <div class="details-non-editable-field ob-form-field flex basis-1/2 flex-col">
+                        <span class="field-label">{{'FORMS.LABELS.POSTAL_CODE' | translate}}</span>
+                        <span>{{form.get('postalCode').value || '-'}}</span>
+                    </div>
+                </div>
+                <!-- Visible Address-->
+                <div class="flex basis-full flex-col">
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label flex basis-full">
+                        <mat-label>{{'FORMS.LABELS.VISIBLE_ADDRESS' | translate}}</mat-label>
+                        <input matInput aria-label="address" formControlName="address"
+                            [placeholder]="'VENUE.ADDRESS.PLACEHOLDER' | translate">
+                        <mat-error [ob-form-errors]="form" field="address" />
+                    </mat-form-field>
+                </div>
+            }
+        </form>
+    </div>
+    <div mat-dialog-actions>
+        <div class="flex basis-full justify-end">
+            <button type="button" mat-button class="ob-button" [disabled]="$isInProgress()" (click)="close()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button mat-flat-button color="primary" type="button" class="ob-button" [disabled]="(!form.dirty) || $isInProgress()"
+                (click)="createVenue()">
+                {{'FORMS.ACTIONS.CREATE' | translate}}
+            </button>
+        </div>
+    </div>
+</div>
+@if ($isInProgress()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

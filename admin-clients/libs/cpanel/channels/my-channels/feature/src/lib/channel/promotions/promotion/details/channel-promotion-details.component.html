@@ -1,0 +1,54 @@
+<div class="channel-promotions-details-container" *ngIf="(promotion$ | async) as promotion">
+    <app-nav-tabs-menu type="horizontalSubtab" [elements]=" [
+        {
+            label: 'CHANNELS.PROMOTIONS.GENERAL_DATA',
+            param: 'general-data'
+        },
+        {
+            label: 'CHANNELS.PROMOTIONS.LIMITS_AND_CONDITIONS',
+            param: 'conditions'
+        },
+        {
+            label: 'CHANNELS.PROMOTIONS.DISCOUNT_TYPE',
+            param: 'type'
+        },
+        {
+            label: 'CHANNELS.PROMOTIONS.ZONES',
+            param: 'zones',
+            hidden: promotion.subtype === 'PACK'
+        }
+    ]" [disabled]="!promotion">
+    </app-nav-tabs-menu>
+    <!-- PROMOTION STATUS INFO -->
+    <div class="status-notifications-container">
+        <div class="status-bar">
+            <div class="promotion-activation" [class.disabled]="statusCtrl.disabled"
+                [matTooltip]="'CHANNELS.PROMOTIONS.DISABLED_ACTIVATION_DESC' | translate"
+                [matTooltipDisabled]="statusCtrl.enabled">
+                <mat-slide-toggle class="ob-slide-toggle ob-label"
+                    [formControl]="statusCtrl"
+                    (change)="handleStatusChange($event.checked)">
+                    {{'CHANNELS.PROMOTIONS.ACTIVATE_PROMO' | translate}}
+                </mat-slide-toggle>
+            </div>
+            <div class="promotion-type">
+                <span class="promotion-type-label ob-label">
+                    {{'CHANNELS.PROMOTIONS.TYPE' | translate}}:
+                </span>
+                <span class="promotion-type-value">
+                    {{'CHANNELS.PROMOTIONS.TYPE_OPTS.' + promotion.type.toUpperCase() | translate}}
+                    {{promotion.subtype ? '-' + promotion.subtype : ''}}
+                </span>
+            </div>
+            <div class="promotion-status">
+                <span class="promotion-status-label ob-label">
+                    {{'CHANNELS.PROMOTIONS.STATUS' | translate}}:
+                </span>
+                <span class="ob-status-badge" [ngClass]="promotion.status.toLowerCase()">
+                    {{('CHANNELS.PROMOTIONS.STATUS_OPTS.' + promotion.status) | translate}}
+                </span>
+            </div>
+        </div>
+    </div>
+    <router-outlet (activate)="childComponentChange($event)"></router-outlet>
+</div>

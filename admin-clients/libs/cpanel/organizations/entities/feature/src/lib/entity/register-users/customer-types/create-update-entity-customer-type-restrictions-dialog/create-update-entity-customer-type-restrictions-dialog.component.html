@@ -1,0 +1,66 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <form [formGroup]="form" fxLayout="column">
+        <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+            <h2 fxFlex="100%" class="secondary title">
+                {{ (actionMode === 'CREATE' 
+                    ? 'ENTITY.CUSTOMER_TYPES.RESTRICTIONS.NEW_TITLE' 
+                    : 'ENTITY.CUSTOMER_TYPES.RESTRICTIONS.EDIT_TITLE') | translate}}
+            </h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+        <div mat-dialog-content fxLayout="column">
+            @if(actionMode === 'CREATE') {
+                <p>{{ 'ENTITY.CUSTOMER_TYPES.RESTRICTIONS.CREATE_DESCRIPTION' | translate }}</p>
+                 <div fxFlex>
+                     <mat-form-field fxFlex="0 1 550px" appearance="outline" class="ob-form-field field-with-label">
+                         <mat-label>{{'ENTITY.CUSTOMER_TYPES.RESTRICTIONS.FIELD_FUNCTIONALITY' | translate}}</mat-label>
+                             <mat-select formControlName="key" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                 @for( restriction of restrictionTypes; track restriction) {
+                                     <mat-option [value]="restriction">
+                                         {{ ('ENTITY.CUSTOMER_TYPES.RESTRICTIONS.TYPES.' + restriction.toUpperCase()) | translate }}
+                                     </mat-option>
+                                 }
+                             </mat-select>
+                         <mat-error [ob-form-errors]="form" field="key"></mat-error>
+                     </mat-form-field>
+                 </div>
+            } @else {
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                    fxLayout="column" aria-label="key name">
+                    <span class="field-label">{{'ENTITY.CUSTOMER_TYPES.RESTRICTIONS.FIELD_FUNCTIONALITY' | translate}}</span>
+                    <span>{{ ('ENTITY.CUSTOMER_TYPES.RESTRICTIONS.TYPES.' + form.controls.key.value) | translate }}</span>
+                 </div>
+            }
+            <div fxFlex>
+                <mat-form-field fxFlex="0 1 550px" appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'ENTITY.CUSTOMER_TYPES.RESTRICTIONS.FIELD_TYPES_WITH_RESTRICTIONS' | translate}}</mat-label>
+                    <mat-select multiple formControlName="restricted_customer_types" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                        @for(customType of customerTypes; track customType?.id) {
+                            <mat-option [value]="customType.id">
+                                {{customType.name}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form" field="restricted_customer_types"></mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div mat-dialog-actions fxLayoutAlign="end">
+            <button [disabled]="$isLoading()" type="button" mat-button class="ob-button" (click)="close()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button [disabled]="$isLoading()" mat-flat-button color="primary" class="ob-button"
+                (click)="createOrUpdateCustomerTypesRestriction()">
+                {{( actionMode === 'CREATE' ? 'FORMS.ACTIONS.CREATE' : 'FORMS.ACTIONS.SAVE') | translate}}
+            </button>
+        </div>
+    </form>
+</div>
+
+@if($isLoading()) {
+    <div class="spinner-container">
+        <mat-spinner></mat-spinner>
+    </div>
+}

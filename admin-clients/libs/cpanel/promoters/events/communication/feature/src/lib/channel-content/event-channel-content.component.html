@@ -1,0 +1,129 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="!form.dirty">
+    <app-language-bar [languages]="languageList$ | async" [selected]="language$ | async"
+        [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)" slot="outside" />
+    <mat-accordion [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>
+                    {{'EVENTS.COMMUNICATION.CHANNEL.EVENT_CONTENT' | translate}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <form id="eventChannelContent" [formGroup]="eventChannelContentForm" fxLayout="row wrap">
+                <div fxFlex="100%" fxLayout="row wrap">
+                    <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label">
+                        <mat-label>{{'EVENTS.COMMUNICATION.CHANNEL.TEXT.TITLE.LABEL' | translate}}</mat-label>
+                        <input matInput aria-label="title"
+                            [placeholder]="'EVENTS.COMMUNICATION.CHANNEL.TEXT.TITLE.PLACEHOLDER' | translate"
+                            formControlName="title">
+                        <mat-error [ob-form-errors]="eventChannelContentForm" [field]="'title'" />
+                    </mat-form-field>
+                    <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label">
+                        <mat-label>{{'EVENTS.COMMUNICATION.CHANNEL.TEXT.SUBTITLE.LABEL' | translate}}</mat-label>
+                        <input matInput aria-label="subtitle"
+                            [placeholder]="'EVENTS.COMMUNICATION.CHANNEL.TEXT.SUBTITLE.PLACEHOLDER' | translate"
+                            formControlName="subtitle">
+                        <mat-error [ob-form-errors]="eventChannelContentForm" [field]="'subtitle'" />
+                    </mat-form-field>
+                    <div fxFlex="100%" fxLayout="column">
+                        <span class="field-label">
+                            {{'EVENTS.COMMUNICATION.CHANNEL.TEXT.DURATION_LANGUAGE.LABEL' | translate}}
+                        </span>
+                        <p>{{'EVENTS.COMMUNICATION.CHANNEL.TEXT.DURATION_LANGUAGE.DESCRIPTION' | translate}}</p>
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <input matInput aria-label="durationLanguage"
+                                [placeholder]="'EVENTS.COMMUNICATION.CHANNEL.TEXT.DURATION_LANGUAGE.PLACEHOLDER' | translate"
+                                formControlName="durationLanguage">
+                            <mat-error [ob-form-errors]="eventChannelContentForm" [field]="'durationLanguage'" />
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div fxFlex="685px" fxFlex.lt-lg="100%" fxLayout="column">
+                    <span class="field-label">
+                        {{'EVENTS.COMMUNICATION.CHANNEL.TEXT.SHORT_DESCRIPTION.LABEL' | translate}}
+                    </span>
+                    <p>{{'EVENTS.COMMUNICATION.CHANNEL.TEXT.SHORT_DESCRIPTION.DESCRIPTION' | translate}}</p>
+                    <mat-form-field appearance="outline" class="ob-form-field no-padding">
+                        <app-rich-text-area aria-label="Short Description"
+                            [placeholder]="'EVENTS.COMMUNICATION.CHANNEL.TEXT.SHORT_DESCRIPTION.PLACEHOLDER' | translate"
+                            formControlName="shortDescription" />
+                        <mat-error [ob-form-errors]="eventChannelContentForm" field="shortDescription" />
+                    </mat-form-field>
+                </div>
+                <div fxFlex="100%" fxLayout="row">
+                    <mat-form-field fxFlex="685px" fxFlex.lt-lg="100%" appearance="outline"
+                        class="ob-form-field field-with-label no-padding">
+                        <mat-label>{{'EVENTS.COMMUNICATION.CHANNEL.TEXT.LONG_DESCRIPTION.LABEL' | translate}}</mat-label>
+                        <app-rich-text-area aria-label="Long Description"
+                            [placeholder]="'EVENTS.COMMUNICATION.CHANNEL.TEXT.LONG_DESCRIPTION.PLACEHOLDER' | translate"
+                            formControlName="longDescription" />
+                        <mat-error [ob-form-errors]="eventChannelContentForm" field="longDescription" />
+                    </mat-form-field>
+                </div>
+                <div fxFlex="100%" fxLayout="column" class="section-block">
+                    <span class="field-label">
+                        {{'EVENTS.COMMUNICATION.CHANNEL.IMAGE.SLIDER.LABEL' | translate}}
+                    </span>
+                    <p>{{'EVENTS.COMMUNICATION.CHANNEL.IMAGE.SLIDER.DESCRIPTION' | translate}}</p>
+                    <div fxLayout="row">
+                        <app-image-uploader hasAltText fxFlex="calc(50% + 20px)" formControlName="slider1"
+                            [imageRestrictions]="sliderRestrictions" hideLabelText [allowPngConversion]="$allowPngConversion()" />
+                        <div fxFlex="50%" fxLayout="row wrap">
+                            <app-image-uploader hasAltText fxFlex="50%" formControlName="slider2" [imageRestrictions]="sliderRestrictions"
+                                hideLabelText [allowPngConversion]="$allowPngConversion()" />
+                            <app-image-uploader hasAltText fxFlex="50%" formControlName="slider3" [imageRestrictions]="sliderRestrictions"
+                                hideLabelText [allowPngConversion]="$allowPngConversion()" />
+                            <app-image-uploader hasAltText fxFlex="50%" formControlName="slider4" [imageRestrictions]="sliderRestrictions"
+                                hideLabelText [allowPngConversion]="$allowPngConversion()" />
+                            <app-image-uploader hasAltText fxFlex="50%" formControlName="slider5" [imageRestrictions]="sliderRestrictions"
+                                hideLabelText [allowPngConversion]="$allowPngConversion()" />
+                        </div>
+                    </div>
+                    <span class="field-format">{{'UPLOAD_IMAGE.FORMAT' | translate: sliderRestrictions}}</span>
+                </div>
+                <div fxFlex="100%" fxLayout="row" fxLayoutGap="10px">
+                    <div fxFlex="50" fxLayout="column">
+                        <span class="field-label">
+                            {{'EVENTS.COMMUNICATION.CHANNEL.IMAGE.MAIN.LABEL' | translate}}
+                        </span>
+                        <p>{{'EVENTS.COMMUNICATION.CHANNEL.IMAGE.MAIN.DESCRIPTION' | translate}}</p>
+                        <app-image-uploader hasAltText [style.max-width]="'220px'" [imageRestrictions]="mainImgRestrictions"
+                            formControlName="mainImg" />
+                    </div>
+                    <div fxFlex="50" fxLayout="column">
+                        <span class="field-label">
+                            {{'EVENTS.COMMUNICATION.CHANNEL.IMAGE.SECONDARY.LABEL' | translate}}
+                        </span>
+                        <p>{{'EVENTS.COMMUNICATION.CHANNEL.IMAGE.SECONDARY.DESCRIPTION' | translate}}</p>
+                        <app-image-uploader hasAltText [style.max-width]="'120px'"
+                            [imageRestrictions]="secondaryImgRestrictions" formControlName="secondaryImg" />
+                    </div>
+                </div>
+            </form>
+        </mat-expansion-panel>
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>
+                    {{'EVENTS.COMMUNICATION.CHANNEL.EVENT_INVOICE_BANNER' | translate}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <form id="eventChannelInvoiceBanner" [formGroup]="eventChannelInvoiceBannerForm" fxLayout="row wrap">
+                <div fxFlex="100%" fxLayout="row">
+                    <div fxFlex="340px" fxLayout="column">
+                        <span class="field-label">
+                            {{'EVENTS.COMMUNICATION.CHANNEL.IMAGE.BANNER.LABEL' | translate}}
+                        </span>
+                        <p>{{'EVENTS.COMMUNICATION.CHANNEL.IMAGE.BANNER.DESCRIPTION' | translate}}</p>
+                        <app-image-uploader [imageRestrictions]="bannerRestrictions"
+                            formControlName="invoiceBanner" />
+                    </div>
+                </div>
+            </form>
+        </mat-expansion-panel>
+    </mat-accordion>
+    <app-archived-event-mgr slot="actions-bar" [disabled]="form.dirty || $isLoadingOrSaving()" />
+</app-form-container>
+@if ($isLoadingOrSaving()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

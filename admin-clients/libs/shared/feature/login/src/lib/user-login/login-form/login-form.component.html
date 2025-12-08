@@ -1,0 +1,84 @@
+@if (!$accountBlocked().show) {
+    <form [formGroup]="form" class="login-tab flex flex-col justify-center items-stretch gap-4" (ngSubmit)="handleSubmit()">
+        @if ($operators(); as operators) {
+            <span class="operators-title">
+                {{'LOGIN.OPERATOR_TITLE' | translate}}
+            </span>
+            <mat-form-field id="operators" appearance="outline" class="ob-form-field field-with-label"
+                [ngClass]="{'mat-form-field-invalid': false}" subscriptSizing="dynamic">
+                <mat-label>{{'LOGIN.OPERATOR' | translate}}</mat-label>
+                <mat-select formControlName="operator">
+                    @for (operator of operators; track operator.code) {
+                        <mat-option [value]="operator.code">
+                            {{ operator.name }}
+                        </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        } @else {
+            <h1 class="mat-headline-1 welcome-title primary">
+                {{'LOGIN.TITLE_LINE_1' | translate}}<br>
+                <span class="app-name">{{'LOGIN.TITLE_LINE_2' | translate}}</span>
+            </h1>
+            @if ($submitted() && (error$ | async)?.code; as code) {
+                <app-context-notification contextType="warn"
+                    class="ob-context-notification flex justify-center items-start">
+                    <span>{{'LOGIN.' + code | uppercase | translate}}</span>
+                </app-context-notification>
+            }
+            <div class="flex flex-col">
+                <mat-form-field class="ob-form-field field-with-label flex-1" appearance="outline"
+                    [ngClass]="{
+                                'mat-form-field-invalid': $submitted() && form.pristine &&
+                                ((error$ | async)?.code === authErrorCode.INVALID || (error$ | async)?.code === authErrorCode.INVALID_GRANT)
+                            }">
+                    <mat-label>{{'LOGIN.USERNAME' | translate}}</mat-label>
+                    <input matInput type="text" aria-label="username" formControlName="username" autocomplete="email" name="email">
+                </mat-form-field>
+                <mat-form-field class="ob-form-field field-with-label flex-1" appearance="outline"
+                    [ngClass]="{
+                                'mat-form-field-invalid': $submitted() && form.pristine
+                                && ((error$ | async)?.code === authErrorCode.INVALID 
+                                || (error$ | async)?.code === authErrorCode.INVALID_GRANT)
+                            }">
+                    <mat-label>{{'LOGIN.PASSWORD' | translate}}</mat-label>
+                    <input matInput [type]="$showPasswordValue() ? 'text' : 'password'" aria-label="password"
+                        formControlName="password" (keyup.enter)="handleSubmit()" autocomplete="password" name="password">
+                    @if (form.get('password').value) {
+                        <button mat-icon-button matSuffix class="ob-button large" type="button"
+                            (click)="handleShowPasswordValue()">
+                            <mat-icon>{{$showPasswordValue() ? 'visibility_off' : 'visibility'}}</mat-icon>
+                        </button>
+                    }
+                </mat-form-field>
+                <span class="ob-link" (click)="navigateToForgotPassword()">{{'LOGIN.FORGOT_PASSWORD' | translate}}</span>
+            </div>
+        }
+        <div class="flex justify-start items-center gap-4">
+            <!-- synthetic test uses this id, don't change it -->
+            <button id="loginBtn" mat-flat-button class="ob-button medium" color="primary" type="submit"
+                [disabled]="loading$ | async">
+                <div class="flex items-center gap-2">
+                    {{'LOGIN.BUTTON' | translate}}
+                    <mat-icon inline=true iconPositionEnd>arrow_forward</mat-icon>
+                </div>
+            </button>
+            @if (loading$ | async) {
+                <div class="spinner-wrapper">
+                    <mat-spinner [diameter]="25" />
+                </div>
+            }
+        </div>
+    </form>
+} @else {
+    <div class="account-blocked-container flex flex-col justify-center items-center gap-4" [@slideIn]>
+        <div class="account-blocked-icon flex justify-center items-center">
+            <mat-icon>warning</mat-icon>
+        </div>
+        <span class="account-blocked-title">{{('LOGIN.ACCOUNT_BLOCKED.' + $accountBlocked().type) | translate}}</span>
+        <span>{{'LOGIN.ACCOUNT_BLOCKED.' + $accountBlocked().type + '_DESCRIPTION' | translate}}</span>
+        <button type="button" mat-button class="ob-button medium" (click)="returnToLoginProcess()">
+            {{'FORMS.ACTIONS.BACK' | translate}}
+        </button>
+    </div>
+}

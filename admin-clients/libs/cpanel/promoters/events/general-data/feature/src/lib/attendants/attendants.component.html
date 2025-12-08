@@ -1,0 +1,111 @@
+<app-form-container (cancel)="refresh()" (save)="save()" [formGroup]="form" [disabled]="!form.dirty || (isLoadingOrSaving$ | async)"
+    layout="menu">
+    <div class="attendants-status-container" slot="outside">
+        <mat-slide-toggle class="ob-slide-toggle" [formControl]="form.controls.status">
+            {{'EVENTS.ATTENDANTS_CONFIG_STATUS' | translate}}
+        </mat-slide-toggle>
+    </div>
+    <p class="description">{{'EVENTS.ATTENDANTS_CONFIG_DESCRIPTION' | translate}}</p>
+    <mat-accordion [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.ATTENDANTS_FIELDS.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <p>{{'EVENTS.ATTENDANTS_FIELDS.DESCRIPTION' | translate}}</p>
+            <app-event-attendants-fields [formControl]="form.controls.fields" />
+        </mat-expansion-panel>
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.ATTENDANTS_CHANNELS.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <p>{{'EVENTS.ATTENDANTS_CHANNELS.DESCRIPTION' | translate}}</p>
+            <div fxLayout="row wrap" class="channels-scope" [formGroup]="form.controls.settings.controls.channelsScope">
+                <mat-radio-group [formControl]="form.controls.settings.controls.channelsScope.controls.type"
+                    fxFlex="100%" fxLayout="column">
+                    <mat-radio-button class="ob-radio-button vertical-list" [value]="attendantsChannelsScopeType.all">
+                        {{'FORMS.OPTIONS.ALL_ELEMENTS_MALE' | translate}}
+                    </mat-radio-button>
+                    <mat-radio-button class="ob-radio-button vertical-list" [value]="attendantsChannelsScopeType.list">
+                        {{'FORMS.OPTIONS.SELECT_SOME' | translate}}
+                    </mat-radio-button>
+                </mat-radio-group>
+                <div *ngIf="form.controls.settings.controls.channelsScope.controls.type.value === attendantsChannelsScopeType.list"
+                    fxLayout="column" class="channel-selection-container nested-content"
+                    [class.clip]="this.form.value.settings?.channelsScope?.type === attendantsChannelsScopeType.all"
+                    [@expandChannelSelection]="this.form.value.settings?.channelsScope?.type === attendantsChannelsScopeType.list ?
+                        'expanded' : 'collapsed'">
+                    <div class="attendants-channels">
+                        <div [class.field-error]="channelsControl.invalid && channelsControl.touched">
+                            <app-searchable-paginated-selection class="ob-medium-list"
+                                [placeholder]="'FORMS.SEARCH.SESSIONS' | translate" [form]="channelsControl"
+                                [pageSize]="channelsListPageSize" [data$]="channels$" [metadata$]="channelsMetadata$"
+                                [loading$]="channelsLoading$" (loadData)="channelsFilterChangeHandler($event)">
+                                <ng-template #selectionTemplate
+                                    let-pageForm="pageForm" let-data="data" let-selectionChanged="selectionChanged">
+                                    <app-selection-list class="small-rows"
+                                        [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged">
+                                        <ng-template #optionTemplate let-row>
+                                            <div fxLayoutAlign="space-between">
+                                                <span>{{row.name}}</span>
+                                            </div>
+                                        </ng-template>
+                                    </app-selection-list>
+                                </ng-template>
+                            </app-searchable-paginated-selection>
+                        </div>
+                        <div *ngIf="channelsControl.hasError('required') && channelsControl.touched" class="error-description">
+                            <span>{{'EVENTS.ATTENDANTS_CHANNELS.SELECT_SOME' | translate}}</span>
+                        </div>
+                    </div>
+                    <mat-checkbox [formControl]="form.controls.settings.controls.channelsScope.controls.addNewEventChannelRelationships"
+                        class="app-checkbox-wrap-label" color="primary">
+                        {{'EVENTS.ATTENDANTS_CONFIG_ADD_NEW_CHANNELS' | translate}}
+                    </mat-checkbox>
+                </div>
+            </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.ATTENDANTS_OTHER_SETTINGS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="column" fxLayoutGap="20px">
+                <mat-checkbox [formControl]="form.controls.settings.controls.edit_attendant"
+                    class="allow-attendant-edition app-checkbox-wrap-label" fxFlex="100%" color="primary">
+                    {{'EVENTS.ATTENDANTS.ALLOW_EDITION' | translate}}
+                </mat-checkbox>
+                <mat-checkbox *ngIf="isAvet$ | async"
+                    fxFlex="100%" [formControl]="form.controls.settings.controls.autofill" color="primary">
+                    {{'EVENTS.ATTENDANTS.AUTOFILL' | translate}}
+                </mat-checkbox>
+                <div *ngIf="form.controls.settings.controls.autofill.value" class="allow-attendant-autofill" fxLayout="column">
+                    <mat-checkbox [formControl]="form.controls.settings.controls.disallow_autofill_edition"
+                        fxFlex="100%" color="primary">
+                        {{'EVENTS.ATTENDANTS.EDIT_AUTOFILL' | translate}}
+                    </mat-checkbox>
+                    <div *ngIf="form.controls.settings.controls.disallow_autofill_edition.value"
+                        class="nested-content" fxLayout="column">
+                        <mat-radio-group [formControl]="form.controls.settings.controls.disallow_all_sectors"
+                            fxFlex="100%" fxLayout="column">
+                            <mat-radio-button class="ob-radio-button vertical-list" [value]="true">
+                                {{'EVENTS.ATTENDANTS.BLOCK_EDIT_AUTOFILL_ALL_SECTORS' | translate}}
+                            </mat-radio-button>
+                            <mat-radio-button class="ob-radio-button vertical-list" [value]="false">
+                                {{'EVENTS.ATTENDANTS.BLOCK_EDIT_AUTOFILL_SOME_SECTORS' | translate}}
+                            </mat-radio-button>
+                        </mat-radio-group>
+                        <app-event-attendants-block-edit-sectors
+                            *ngIf="form.controls.settings.controls.disallow_all_sectors.value === false"
+                            [form]="form.controls.settings.controls.edit_autofill_disallowed_sectors"
+                            [@expandChannelSelection]="form.controls.settings.controls.disallow_all_sectors.value === false ?
+                                'expanded' : 'collapsed'" />
+                    </div>
+                </div>
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+    <app-archived-event-mgr slot="actions-bar" [disabled]="form.dirty || (isLoadingOrSaving$ | async)" />
+</app-form-container>
+
+<div class="spinner-container" *ngIf="isLoadingOrSaving$ | async">
+    <mat-spinner />
+</div>

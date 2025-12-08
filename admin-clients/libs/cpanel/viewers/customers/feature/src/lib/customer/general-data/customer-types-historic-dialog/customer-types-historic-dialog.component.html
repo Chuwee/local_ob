@@ -1,0 +1,61 @@
+<div class="dialog-msg-container flex flex-col">
+    <div mat-dialog-title class="flex-grow-0">
+        <div class="flex items-center justify-between">
+            <h2 class="title">
+                <span>{{customer.name}} {{ customer.surname || ''}} - {{ customer.email}}</span>
+            </h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content class="flex flex-col flex-1">
+        <div class="flex flex-col gap-6">
+            <div class="flex flex-col gap-2">
+                <span><b>{{ 'CUSTOMER.CTS_HISTORIC_CURRENT_TYPES' | translate }}</b></span>
+                <span>{{ customerTypes }}</span>
+            </div>
+            <div class="vertical-timeline flex flex-col">
+                <h3 class="historic-title">
+                    <span>{{ 'CUSTOMER.CTS_HISTORIC_TITLE' | translate }}</span>
+                </h3>
+                <app-vertical-timeline [timelineElements]="elements">
+                    <ng-template #timelineElement let-element>
+                        <div class="timeline-element flex flex-col gap-2">
+                            @if (element.addActionsCts) { 
+                                <div>
+                                    <b>{{ 'CUSTOMER.CTS_HISTORIC_ASSIGNED_TO' | translate}} {{ element.addActionsCts }}</b>
+                                </div> 
+                            }
+                            @if (element.removeActionsCts) { 
+                                <div>
+                                    <span class="field-title">{{ 'CUSTOMER.CTS_HISTORIC_REMOVED_LAST_STATE' | translate }}: </span>
+                                    <span>{{ element.removeActionsCts }}</span>
+                                </div> 
+                            }
+                            @if (element.type) { 
+                                <div>
+                                    <span class="field-title">{{ 'CUSTOMER.CTS_HISTORIC_TYPE_LABEL' | translate }}: </span>
+                                    <span>{{ 'CUSTOMER.CTS_HISTORIC_TYPE_' + element.type | translate }}</span>
+                                </div> 
+                            }
+                            @if (element.trigger) { 
+                                <div>
+                                    <span class="field-title">{{ 'CUSTOMER.CTS_HISTORIC_TRIGGER_LABEL' | translate }}: </span>
+                                    <span>{{ 'CUSTOMER.CTS_HISTORIC_TRIGGER_' + element.trigger | translate }}</span>
+                                </div> 
+                            }
+                            @if (element.event) { 
+                                <div>
+                                    <span class="field-title">{{ 'CUSTOMER.CTS_HISTORIC_EVENT_LABEL' | translate }}: </span>
+                                    <span>{{ element.event.name }}</span>
+                                </div> 
+                            }
+                        </div>
+                    </ng-template>
+                </app-vertical-timeline>
+            </div>
+        </div>
+    </div>
+
+</div>

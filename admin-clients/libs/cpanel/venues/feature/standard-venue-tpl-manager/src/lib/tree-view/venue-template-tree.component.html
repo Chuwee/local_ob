@@ -1,0 +1,143 @@
+<div class="top-view-container">
+    <div class="header-and-tree-container" fxLayout="column" fxLayoutAlign="start stretch">
+        <div class="tree-view-header" fxFlex="52px" fxLayout="row no wrap" fxLayoutAlign="start center" fxLayoutGap="12px">
+            <div fxFlex="0 1 auto" class="select-all-container">
+                <mat-checkbox *ngIf="typesWithSelectAll.includes(editorType)" [formControl]="selectAllControl" color="primary"
+                    [indeterminate]="partiallySelected$ | async">
+                    <mat-label>{{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}</mat-label>
+                </mat-checkbox>
+            </div>
+            <div fxFlex="0 100 100%" fxLayoutAlign="end center">
+                <mat-form-field fxFlex="0 1 400px" appearance="outline" class="ob-form-field search-field inline-field">
+                    <input matInput type="text" [formControl]="sectorSearch" [placeholder]="'VENUE_TPLS.SEARCH_SECTOR' | translate"
+                        aria-label="sector search" [matAutocomplete]="auto" (keyup.enter)="hideAutoComplete()">
+                    <mat-autocomplete #auto="matAutocomplete">
+                        <mat-option *ngFor="let sectorName of sectorNames$ | async" [value]="sectorName">
+                            {{sectorName}}
+                        </mat-option>
+                    </mat-autocomplete>
+                    <button matPrefix mat-icon-button [attr.aria-label]="'VENUE_TPLS.SEARCH_SECTOR' | translate"
+                        class="ob-button large no-hover-ripple" [title]="'VENUE_TPLS.SEARCH_SECTOR' | translate"
+                        (click)="refreshKeyword()">
+                        <mat-icon>search</mat-icon>
+                    </button>
+                    <button *ngIf="!!sectorSearch?.value" matSuffix mat-icon-button [attr.aria-label]="'FORMS.DELETE.SEARCH' | translate"
+                        class="ob-button large no-hover-ripple" [title]="'FORMS.DELETE.SEARCH' | translate" (click)="resetKeyword()">
+                        <mat-icon>clear</mat-icon>
+                    </button>
+                </mat-form-field>
+            </div>
+            <button *ngIf="canAddElements" mat-stroked-button color="tertiary" class="ob-button" (click)="newSector()">
+                <mat-icon>add</mat-icon>
+                {{'FORMS.LABELS.SECTOR' | translate}}
+            </button>
+            <button *ngIf="canAddElements" mat-stroked-button color="tertiary" class="ob-button" (click)="newZone()">
+                <mat-icon>add</mat-icon>
+                {{'FORMS.LABELS.ZONE' | translate}}
+            </button>
+        </div>
+        <cdk-virtual-scroll-viewport fxFlex="100%" class="tree-view-container" [itemSize]="ITEM_HEIGHT" [minBufferPx]="MIN_BUFFER_HEIGHT"
+            [maxBufferPx]="MAX_BUFFER_HEIGHT">
+            <div class="tree-view">
+                <div *cdkVirtualFor="let node of treeDataManager.dataSource" class="tree-node" fxLayout="row" fxLayoutAlign="start center"
+                    [id]="node.wrapper.elementId" [style.margin-left]="LEVEL_LEFT_MARGINS[node.wrapper.level]"
+                    [class.filtered]="node.wrapper.filtered" [class.parent-tree-node]="node.wrapper.showHoverEffect"
+                    [class.sector-closed-node]="node.wrapper.item.itemType === itemTypes.sector" (click)="expandNode(node, node.wrapper)">
+                    <div fxFlex="auto" fxLayoutAlign="start center" [style.overflow]="'hidden'">
+                        <div fxFlex="0 0 35px" fxLayout="none">
+                            <mat-icon *ngIf="node.wrapper.hasChildren">
+                                {{!treeDataManager.treeControl.isExpanded(node) ? ARROW_RIGHT : ARROW_DOWN}}
+                            </mat-icon>
+                        </div>
+                        <mat-checkbox *ngIf="node.wrapper.selectable" #checkbox color="primary" class="tree-checkbox small-touch-area"
+                            [checked]="node.wrapper.selected" [indeterminate]="node.wrapper.partiallySelected"
+                            [disabled]="node.wrapper.filtered"
+                            (click)="selectNode($event, node.wrapper)" />
+                        <svg *ngIf="node.wrapper.statusInfo" class="state-icon" fxFlex="0 0 auto">
+                            <circle cx="9" cy="9" r="9" [attr.fill]="node.wrapper.statusInfo?.color" />
+                            <g class="state-icon-shape" [innerHTML]="node.wrapper.statusInfo?.icon" />
+                        </svg>
+                        <span class="mat-body-2" fxFlex="0 0 auto">{{ node.wrapper.label | translate}}</span>
+                        <div *ngIf="node.wrapper.item.itemType === itemTypes.seat && node.wrapper.vtLabelLabelSeat" fxLayout="row"
+                            fxLayoutAlign="start center">
+                            <div class="current-label-color-indicator" [style.backgroundColor]="node.wrapper.vtLabelColorSeat"></div>
+                            <span>{{ node.wrapper.vtLabelLabelSeat }}</span>
+                        </div>
+                        <div *ngIf="node.wrapper.item.itemType === itemTypes.notNumberedZone && node.wrapper.vtLabelColorNNZ?.length"
+                            fxLayout="row" [matTooltipDisabled]="!node.wrapper.vtLabelLabelNNZTooltip"
+                            [matTooltip]="node.wrapper.vtLabelLabelNNZTooltip">
+                            <div *ngFor="let vtLabelLabel of node.wrapper.vtLabelColorNNZ; let labelIndex=index;" fxLayout="row"
+                                fxFlex="0 0 auto">
+                                <div class="current-label-color-indicator" [style.backgroundColor]="vtLabelLabel"></div>
+                                <span>{{ node.wrapper.vtLabelLabelNNZ[labelIndex] }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span *ngIf="node.wrapper.totalSeats !== undefined" class="mat-caption total-free-seats">
+                        {{node.wrapper.freeSeats !== undefined ?
+                        ('VENUE_TPLS.FREE_TOTAL_SEATS' | translate : ({
+                            free: node.wrapper.freeSeats | localNumber,
+                            total: node.wrapper.totalSeats | localNumber
+                        })) :
+                        (node.wrapper.totalSeats | localNumber)
+                        }}
+                    </span>
+                    <div [ngClass]="{'node-with-actions': node.wrapper.hasAnyButton}">
+                        <div #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="editZoneMenu"></div>
+                        <button *ngIf="node.wrapper.editButton" mat-icon-button aria-label="Edit"
+                            class="ob-button xsmall tree-node-action-button" [matTooltip]="getEditTooltipLiteral(node.wrapper)"
+                            (click)="editNode($event, node.wrapper, menuTrigger)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <mat-menu #editZoneMenu='matMenu' xPosition="before">
+                            <ng-template matMenuContent>
+                                <button mat-menu-item (click)="editZoneName(node.wrapper)">
+                                    {{'VENUE_TPL_MGR.ACTIONS.EDIT_NNZ_NAME' | translate}}
+                                </button>
+                                <button mat-menu-item (click)="editZoneCapacity(node.wrapper)" [disabled]="isDirty$ | async">
+                                    {{'VENUE_TPL_MGR.ACTIONS.EDIT_NNZ_CAPACITY' | translate}}
+                                </button>
+                            </ng-template>
+                        </mat-menu>
+                        <button *ngIf="node.wrapper.cloneButton" mat-icon-button class="ob-button xsmall tree-node-action-button"
+                            aria-label="Clone" [matTooltip]="(node.wrapper.item.itemType === itemTypes.sector ?
+                                'VENUE_TPLS.CLONE_SECTOR' : 'VENUE_TPL_MGR.ACTIONS.CLONE_NNZ') | translate"
+                            (click)="cloneNode($event, node.wrapper)">
+                            <mat-icon>content_copy</mat-icon>
+                        </button>
+                        <button *ngIf="node.wrapper.deleteButton" mat-icon-button class="ob-button xsmall tree-node-action-button"
+                            aria-label="Delete" [matTooltip]="(node.wrapper.item.itemType === itemTypes.sector ?
+                                'VENUE_TPLS.DELETE_SECTOR' : 'VENUE_TPLS.DELETE_NNZ') | translate"
+                            (click)="deleteNodeWarning($event, node.wrapper)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+                    <!-- AISLE -->
+                    <div *ngIf="node.wrapper.isAisle" class="aisle-node" fxFlex="0 1 100%" fxLayoutAlign="center center">
+                        <span class="mat-caption">{{'VENUE_TPLS.AISLE' | translate}}</span>
+                    </div>
+                </div>
+            </div>
+        </cdk-virtual-scroll-viewport>
+        <div *ngIf="inCapacityIncrease" fxFlex="40px" fxLayoutAlign="start center" class="capacity-increase-bottom-bar">
+            <mat-icon class="ob-icon small with-text">info</mat-icon>
+            <span fxFlex class="mat-subtitle-2 description">{{'VENUE_TPLS.CAPACITY_INCREASE_INFO' | translate}}</span>
+            <button type="button" mat-button class="ob-mdc-button light-button small" (click)="cancel()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button type="button" mat-stroked-button class="ob-mdc-button light-button small" [disabled]="(isDirty$ | async) === false"
+                (click)="saveCapacityIncrease()">
+                {{'FORMS.ACTIONS.UPDATE' | translate}}
+            </button>
+        </div>
+    </div>
+    <div *ngIf="!loaded || (loading$ | async)" class="loading-state-container" fxLayoutAlign="center center">
+        <div class="loading-state-background" fxLayout="row" fxLayoutAlign="center center">
+            <mat-spinner *ngIf="(loading$ | async) || venueTemplate?.status === venueTemplateStatus.inProgress" />
+            <div *ngIf="(loading$ | async) === false && venueTemplate?.status !== venueTemplateStatus.inProgress" class="error-icon"
+                fxLayoutAlign="center center">
+                <mat-icon>cancel</mat-icon>
+            </div>
+        </div>
+    </div>
+</div>

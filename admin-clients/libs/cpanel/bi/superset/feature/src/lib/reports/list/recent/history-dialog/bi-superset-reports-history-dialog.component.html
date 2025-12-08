@@ -1,0 +1,51 @@
+<div class="dialog-msg-container flex flex-col basis-full">
+    <div mat-dialog-title class="flex flex-row basis-full justify-start items-center">
+        <h2 class="secondary title basis-full">{{'BI.REPORTS.TITLES.RECENT_DIALOG' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content>
+        @if ((isHandset$ | async) !== true) {
+            <mat-table class="ob-table" [dataSource]="biReports"
+                [attr.aria-label]="'BI.REPORTS.LISTS.RECENTS_TABLE' | translate">
+                <ng-container [matColumnDef]="columns[0]">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'BI.REPORTS.LISTS.COL_REPORT_NAME' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row;" class="report-name icon">{{row.name}}</mat-cell>
+                </ng-container>
+                <ng-container [matColumnDef]="columns[1]">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'BI.REPORTS.LISTS.COL_REPORT_CATEGORY' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row;">{{row.category}}</mat-cell>
+                </ng-container>
+                <ng-container [matColumnDef]="columns[2]">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">{{'BI.REPORTS.LISTS.COL_REPORT_DATE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row;">{{row.date | dateTime : dateTimeFormats.shortDateTime}}</mat-cell>
+                </ng-container>
+                <mat-header-row *matHeaderRowDef="columns; sticky: true"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: columns;" class="dense-row interactive-row" (click)="load(row)">
+                </mat-row>
+            </mat-table>
+        } @else {
+            <div class="flex flex-col gap-2">
+                @for (biReport of biReports; track biReport.id) {
+                    <div class="ob-card flex basis-full">
+                        <a class="dense flex flex-col" (click)="load(biReport)">
+                            <span class="report-name icon" appEllipsify>{{ biReport.name }}</span>
+                            <div class="card-footer">
+                                <span class="card-additional" appEllipsify>
+                                    {{ biReport.date | dateTime : dateTimeFormats.shortDateTime}}
+                                </span>
+                                <span class="card-subtitle">{{ biReport.category }}</span>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

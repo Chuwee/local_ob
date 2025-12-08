@@ -1,0 +1,55 @@
+<form fxLayout="row wrap" fxLayoutAlign="space-between">
+    <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="0 0 calc(50% -20px)" fxLayout="column">
+        <span class="field-label">{{ 'SEASON_TICKET.ENTITY' | translate }}</span>
+        <span>{{ seasonTicket?.entity?.name }}</span>
+    </div>
+    <div fxFlex="100%" fxFlex.gt-sm="0 0 calc(50% -20px)">
+        <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label">
+            <mat-label>{{ 'SEASON_TICKET.NAME' | translate }}</mat-label>
+            <input matInput aria-label="name" required [placeholder]=" 'SEASON_TICKET.NAME' | translate "
+                [formControl]="dataForm.controls.name" />
+            <mat-error [ob-form-errors]="dataForm.controls.name"></mat-error>
+        </mat-form-field>
+    </div>
+    <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="0 0 calc(50% -20px)" fxLayout="column">
+        <span class="field-label">{{ 'SEASON_TICKET.PRODUCER' | translate }}</span>
+        <span>{{ seasonTicket?.producer?.name }}</span>
+    </div>
+    <div fxFlex="100%" fxFlex.gt-sm="0 0 calc(50% -20px)">
+        <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label">
+            <mat-label>{{ 'SEASON_TICKET.REFERENCE' | translate }}</mat-label>
+            <input matInput aria-label="reference" [placeholder]=" 'SEASON_TICKET.REFERENCE' | translate "
+                [formControl]="dataForm.controls.reference" />
+            <mat-error [ob-form-errors]="dataForm.controls.reference"> </mat-error>
+        </mat-form-field>
+    </div>
+    <div fxFlex="100%" fxFlex.gt-sm="0 0 calc(50% -20px)">
+        <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label">
+            <mat-label>{{ 'SEASON_TICKET.STATUS' | translate }}</mat-label>
+            <mat-select fxFlex="100%" [placeholder]=" 'FORMS.SELECT.PLACE_HOLDER' | translate "
+                [formControl]="seasonTicketStatusCtrl">
+                <mat-option *ngFor=" let status of seasonTicketStatus | keyvalue " [value]="status.value">
+                    {{ 'SEASON_TICKET.STATUS_OPTS.' + status.value | translate }}
+                </mat-option>
+                <ng-template [ngIf]="isGenerationStatusInProgress$ | async">
+                    <mat-option [value]=" generationStatus.inProgress ">
+                        {{ 'SEASON_TICKET.STATUS_OPTS.' + generationStatus.inProgress | translate }}
+                    </mat-option>
+                </ng-template>
+                <ng-template [ngIf]="isGenerationStatusError$ | async">
+                    <mat-option [value]="generationStatus.error">
+                        {{ 'SEASON_TICKET.STATUS_OPTS.' + generationStatus.error | translate }}
+                    </mat-option>
+                </ng-template>
+            </mat-select>
+            <mat-hint *ngIf="isGenerationStatusInProgress$ | async" fxFlex="0 1 100%">
+                <mat-icon class="ob-icon xsmall hint-icon">error</mat-icon>
+                {{ 'SEASON_TICKET.STATUS_IN_PROGRESS_INFO' | translate }}
+            </mat-hint>
+            <mat-hint *ngIf="isGenerationStatusError$ | async" fxFlex="0 1 100%">
+                <mat-icon class="ob-icon xsmall hint-icon">error</mat-icon>
+                {{ 'SEASON_TICKET.STATUS_ERROR_INFO' | translate }}
+            </mat-hint>
+        </mat-form-field>
+    </div>
+</form>

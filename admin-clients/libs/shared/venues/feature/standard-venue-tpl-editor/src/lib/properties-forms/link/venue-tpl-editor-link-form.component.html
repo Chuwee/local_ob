@@ -1,0 +1,47 @@
+<div *ngIf="element$ | async as element" fxFlex="0 0 100%" fxLayout="column" fxLayoutAlign="start stretch">
+    <div fxLayoutAlign="center">
+        <h4 class="type-title">{{'VENUE_TPL_EDITOR.LINK' | translate}}</h4>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="start center" class="title">
+        <div fxFlex="0 1 100%">
+            <span class="mat-subtitle-2">{{'VENUE_TPL_EDITOR.LINK' | translate}}</span>
+        </div>
+        <button mat-icon-button aria-label="Delete" class="ob-button xsmall tree-node-action-button"
+            [matTooltip]="'FORMS.ACTIONS.DELETE' | translate" (click)="deleteFormItem()">
+            <mat-icon>delete</mat-icon>
+        </button>
+    </div>
+    <mat-divider class="title-divider"></mat-divider>
+    <div fxLayout="row wrap" [formGroup]="form" class="editor-form">
+        <div fxLayout="row wrap" fxFlex="100%">
+            <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center" class="editor-form-field-container">
+                <mat-label fxFlex="40%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.VIEW' | translate">
+                    {{'VENUE_TPL_EDITOR.VIEW' | translate}}</mat-label>
+                <mat-form-field fxFlex="60%" appearance="outline" class="ob-form-field inline-field">
+                    <mat-select formControlName="view">
+                        <mat-option>
+                            <app-select-search #viewsSelectSearch [options$]="views$" searchField="name" requireSelection="true"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                            </app-select-search>
+                        </mat-option>
+                        <mat-option *ngFor="let view of viewsSelectSearchComponent?.getFilteredOptions$() | async" [value]="view.id"
+                            fxLayout="row">
+                            <span fxFlex appEllipsify [matTooltip]="view.name">{{view.name}}</span>
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <button *ngIf="form.value.view" mat-icon-button class="ob-button small go-to-view-button"
+                    [matTooltip]="'VENUE_TPL_EDITOR.GO_TO_VIEW' | translate" (click)="gotoSelectedView()">
+                    <mat-icon>launch</mat-icon>
+                </button>
+            </div>
+        </div>
+        <ng-container *ngIf="operatorMode$ | async">
+            <mat-divider class="ob-divider" fxFlex="100%"></mat-divider>
+            <button mat-stroked-button type="button" class="ob-button small editor-form-button" (click)="openEditSvgDialog()">
+                <mat-icon>code</mat-icon>
+                {{'VENUE_TPL_EDITOR.SVG_CODE_BTN' | translate}}
+            </button>
+        </ng-container>
+    </div>
+</div>

@@ -1,0 +1,31 @@
+<mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field inline-field-bottom" subscriptSizing="dynamic">
+    <button matPrefix mat-icon-button class="ob-button large no-hover-ripple"
+        [matTooltip]="'CHANNELS.OPTIONS.CONDITION_EDIT_BTN' | translate"
+        (click)="emitChange()">
+        <mat-icon>search</mat-icon>
+    </button>
+    <div fxLayout="row" fxLayoutGap="10px">
+        @if (currentOption && currentOption !== defaultOption) {
+            <span class="selected-option-label">
+                {{currentOption | translate}}:
+            </span>
+        }
+        <input matInput type="text" [formControl]="inputControl"
+            [placeholder]="'ACTIONS.SEARCH' | translate" aria-label="sector search"
+            [matAutocomplete]="auto" (keyup.enter)="emitChange()">
+    </div>
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="optionSelected($event)">
+        @for (option of options$ | async; track option.value) {
+            <mat-option [value]="inputControl.value" [id]="option.value">
+                {{option.label}}
+            </mat-option>
+        }
+    </mat-autocomplete>
+    @if (inputControl.value) {
+        <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+            [attr.aria-label]="'FORMS.DELETE.SEARCH' | translate"
+            [title]="'FORMS.DELETE.SEARCH' | translate" (click)="resetKeyword()">
+            <mat-icon>clear</mat-icon>
+        </button>
+    }
+</mat-form-field>

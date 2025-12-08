@@ -1,0 +1,22 @@
+<div fxLayout="row" fxLayoutAlign="start" class="ob-date-time-form-field">
+    <mat-form-field fxFlex="0 1 140px" appearance="outline" class="ob-form-field ob-date-form-field"
+        [class.field-with-label]="!!label">
+        @if (!!label) {
+            <mat-label>{{label}}</mat-label>
+        }
+        <input aria-label="start date" matInput [matDatepicker]="datepicker" [placeholder]="dateFormat"
+            autocomplete="off" [min]="min" [max]="max" [required]="required" [formControl]="datePickerCtrl"
+            (click)="datepicker.open()" (blur)="onBlur()">
+        <button mat-icon-button matSuffix type="button" [disabled]="ngControl.disabled" class="ob-button large no-hover-ripple"
+            (click)="$event.stopPropagation(); datepicker.open();">
+            <mat-icon>event</mat-icon>
+        </button>
+        <mat-datepicker #datepicker/>
+        <mat-error [ob-form-errors]="datePickerCtrl" />
+    </mat-form-field>
+    <mat-divider fxFlex="0 1 20px" class="date-time-divider" [ngClass]="{
+        'invalid-field-divider': !!datePickerCtrl.errors && datePickerCtrl.touched,
+        'with-label': !!label
+    }" />
+    <app-time-picker [formControl]="timePickerCtrl" [isLabelSet]="!!label" />
+</div>

@@ -1,0 +1,236 @@
+@let dayFormatCtrl = form.controls.common?.controls.changeDate.controls.calendar.controls.dayFormat;
+@let timeFormatCtrl = form.controls.common?.controls.changeDate.controls.calendar.controls.timeFormat;
+<!-- {} -->
+@if (isV4$ | async) {
+    <app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [formGroup]="form" [disabled]="!form.dirty">
+        <mat-accordion [multi]="true" [togglePosition]="'before'">
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title> {{ 'EVENTS.PORTAL_DESIGN.TITLES.SESSIONS_DESIGN' | translate }} </mat-panel-title>
+                </mat-expansion-panel-header>
+                @if(isFestival){
+                    <div class="flex flex-col gap-6">
+                        <p>{{ 'EVENTS.PORTAL_DESIGN.FORMS.INFOS.SESSIONS_DESGIN_FESTIVAL' | translate }}</p>
+                        <img class="image-festival" src="assets/ob-portal-design/sessions-list/vertical-list-with-image.svg" />
+                    </div>
+                } @else {
+                    <div fxLayout="column" fxLayoutGap="16px">
+                        <mat-expansion-panel class="ob-expansion-card" [expanded]="false" formGroupName="list" [togglePosition]="'before'">
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                <mat-panel-title> {{ 'EVENTS.PORTAL_DESIGN.TITLES.LIST' | translate }} </mat-panel-title>
+                                <div class="header-actions" fxLayoutAlign="start center" fxLayoutGap="16px">
+                                    @if (listConfig?.enabled && calendarConfig?.enabled) {
+                                        <div class="default" fxLayoutAlign="start center"
+                                            fxLayoutGap="4px" (click)="$event.stopPropagation(); setDefaultDisplay('LIST')">
+                                            <mat-icon class="ob-icon xsmall" [ngClass]="{
+                                                selected: form.controls.defaultDisplay.value === 'LIST',
+                                                'not-selected': form.controls.defaultDisplay.value !== 'LIST', default: true
+                                            }">
+                                                {{ form.controls.defaultDisplay.value === 'LIST' ? 'star' : 'star_border' }}
+                                            </mat-icon>
+                                            {{ 'EVENTS.PORTAL_DESIGN.ACTIONS.SET_DEFAULT' | translate }}
+                                        </div>
+                                    }
+                                    <mat-divider vertical="true" fxFlexAlign="stretch" />
+                                    <div [matTooltip]="'EVENTS.PORTAL_DESIGN.FORMS.INFOS.' + (isFestival ?
+                                    'FESTIVAL_FIXED_CONFIG' : 'AT_LEAST_ONE_ENABLED') | translate"
+                                        [matTooltipDisabled]="form.controls.list.controls.enabled.enabled">
+                                        <mat-checkbox (click)="$event.stopPropagation()" formControlName="enabled" color="primary">
+                                            {{ 'EVENTS.PORTAL_DESIGN.ACTIONS.ENABLE' | translate }}
+                                        </mat-checkbox>
+                                    </div>
+                                </div>
+                            </mat-expansion-panel-header>
+                            <div fxLayout="column" fxLayoutGap="16px" class="gray-card-content">
+                                <div fxFlex="1 1 100%" fxLayoutAlign="space-between" class="config-header">
+                                    <span> {{ 'EVENTS.PORTAL_DESIGN.FORMS.INFOS.LIST_FORMAT' | translate }} </span>
+                                </div>
+                                <div class="config-option" fxLayout="column" fxLayoutGap="8px">
+                                    <mat-radio-group fxFlex="100%" fxLayout="row wrap" fxLayoutGap="32px" formControlName="cardFormat">
+                                        <app-radio-image-button value=" NONE_IMAGE" [checked]="listConfig?.cardFormat === 'NONE_IMAGE'"
+                                            [control]="form.controls.list.controls.cardFormat"
+                                            [imageAlt]="'EVENTS.PORTAL_DESIGN.FORMS.LABELS.WTHOUT_IMAGE' | translate"
+                                            imageUrl="assets/ob-portal-design/sessions-list/list-without-image.svg">
+                                            {{ 'EVENTS.PORTAL_DESIGN.FORMS.LABELS.WTHOUT_IMAGE' | translate }}
+                                        </app-radio-image-button>
+                                        <app-radio-image-button value="HORIZONTAL" [checked]="listConfig?.cardFormat === 'HORIZONTAL'"
+                                            [control]="form.controls.list.controls.cardFormat"
+                                            [imageAlt]="'EVENTS.PORTAL_DESIGN.FORMS.LABELS.HORIZONTAL' | translate"
+                                            imageUrl="assets/ob-portal-design/sessions-list/horizontal-list-with-image.svg">
+                                            {{ 'EVENTS.PORTAL_DESIGN.FORMS.LABELS.HORIZONTAL' | translate }}
+                                        </app-radio-image-button>
+                                        <app-radio-image-button value="VERTICAL" [checked]="listConfig?.cardFormat === 'VERTICAL'"
+                                            [control]="form.controls.list.controls.cardFormat"
+                                            [imageAlt]="'EVENTS.PORTAL_DESIGN.FORMS.LABELS.VERTICAL' | translate"
+                                            imageUrl="assets/ob-portal-design/sessions-list/vertical-list-with-image.svg">
+                                            {{ 'EVENTS.PORTAL_DESIGN.FORMS.LABELS.VERTICAL' | translate }}
+                                        </app-radio-image-button>
+                                    </mat-radio-group>
+                                </div>
+                            </div>
+                        </mat-expansion-panel>
+                        <mat-expansion-panel class="ob-expansion-card" [expanded]="false" formGroupName="calendar"
+                            [togglePosition]="'before'">
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                <mat-panel-title> {{ 'EVENTS.PORTAL_DESIGN.TITLES.CALENDAR' | translate }} </mat-panel-title>
+                                <div class="header-actions" fxLayoutAlign="start center" fxLayoutGap="16px">
+                                    @if (listConfig?.enabled && calendarConfig?.enabled) {
+                                        <div class="default" fxLayoutAlign="start center"
+                                            fxLayoutGap="4px" (click)="$event.stopPropagation(); setDefaultDisplay('CALENDAR')">
+                                            <mat-icon class="ob-icon xsmall" [class.selected]="form.value.defaultDisplay === 'CALENDAR'"
+                                                [class.not-selected]="form.value.defaultDisplay !== 'CALENDAR'">
+                                                {{ form.controls.defaultDisplay.value === 'CALENDAR' ? 'star' : 'star_border' }}
+                                            </mat-icon>
+                                            {{ 'EVENTS.PORTAL_DESIGN.ACTIONS.SET_DEFAULT' | translate }}
+                                        </div>
+                                    }
+                                    <mat-divider vertical="true" fxFlexAlign="stretch" />
+                                    <div [matTooltip]="'EVENTS.PORTAL_DESIGN.FORMS.INFOS.' + (isFestival ?
+                                    'FESTIVAL_FIXED_CONFIG' : 'AT_LEAST_ONE_ENABLED') | translate"
+                                        [matTooltipDisabled]="form.controls.calendar?.controls.enabled?.enabled">
+                                        <mat-checkbox (click)="$event.stopPropagation()" formControlName="enabled" color="primary">
+                                            {{ 'EVENTS.PORTAL_DESIGN.ACTIONS.ENABLE' | translate }}
+                                        </mat-checkbox>
+                                    </div>
+                                </div>
+                            </mat-expansion-panel-header>
+                            <div fxLayout="column" fxLayoutGap="16px" class="gray-card-content">
+                                <div fxFlex="1 1 100%" fxLayoutAlign="space-between" class="config-header">
+                                    <span> {{ 'EVENTS.PORTAL_DESIGN.FORMS.INFOS.CALENDAR_FORMAT' | translate }} </span>
+                                </div>
+                                <div class="config-option" fxLayout="column" fxLayoutGap="8px">
+                                    <span class="option-title"> {{ 'EVENTS.PORTAL_DESIGN.FORMS.LABELS.DAY_FORMAT' | translate }} </span>
+                                    <mat-radio-group fxFlex="100%" fxLayout="row wrap" fxLayoutGap="32px" formControlName="dayFormat">
+                                        <app-radio-image-button [value]="'WEEKLY'" [checked]="calendarConfig?.dayFormat === 'WEEKLY'"
+                                            [control]="form.controls.calendar?.controls.dayFormat"
+                                            [disabled]="form.controls.calendar?.controls.dayFormat?.disabled"
+                                            [imageAlt]="'DATES.WEEKLY' | translate"
+                                            imageUrl="assets/ob-portal-design/sessions-list/weekly-calendar.svg">
+                                            {{ 'DATES.WEEKLY' | translate }}
+                                        </app-radio-image-button>
+                                        <app-radio-image-button [value]="'MONTHLY'" [checked]="calendarConfig?.dayFormat === 'MONTHLY'"
+                                            [imageAlt]="'DATES.MONTHLY' | translate" [control]="form.controls.calendar?.controls.dayFormat"
+                                            [disabled]="form.controls.calendar?.controls.dayFormat?.disabled"
+                                            imageUrl="assets/ob-portal-design/sessions-list/monthly-calendar.svg">
+                                            {{ 'DATES.MONTHLY' | translate }}
+                                        </app-radio-image-button>
+                                    </mat-radio-group>
+                                </div>
+                                <div class="config-option" fxLayout="column" fxLayoutGap="8px" fxFlexOffset="8px">
+                                    <span class="option-title"> {{ 'EVENTS.PORTAL_DESIGN.FORMS.LABELS.HOUR_FORMAT' | translate }} </span>
+                                    <mat-radio-group fxFlex="100%" fxLayout="row wrap" fxLayoutGap="32px" formControlName="timeFormat">
+                                        <app-radio-image-button [value]="'BY_HOUR'" [checked]="calendarConfig?.timeFormat === 'BY_HOUR'"
+                                            [control]="form.controls.calendar?.controls.timeFormat"
+                                            [disabled]="form.controls.calendar?.controls.timeFormat?.disabled"
+                                            [imageAlt]="'DATES.HOUR' | translate"
+                                            imageUrl="assets/ob-portal-design/sessions-list/session-hours-hour.svg">
+                                            {{ 'DATES.HOUR' | translate }}
+                                        </app-radio-image-button>
+                                        <app-radio-image-button [value]="'BY_LIST'" [checked]="calendarConfig?.timeFormat === 'BY_LIST'"
+                                            [control]="form.controls.calendar?.controls.timeFormat"
+                                            [disabled]="form.controls.calendar?.controls.timeFormat?.disabled"
+                                            [imageAlt]="'EVENTS.PORTAL_DESIGN.SESSIONS.DESIGN_CALENDAR_LIST' | translate"
+                                            imageUrl="assets/ob-portal-design/sessions-list/session-hours-list.svg">
+                                            {{ 'EVENTS.PORTAL_DESIGN.SESSIONS.DESIGN_CALENDAR_LIST' | translate }}
+                                        </app-radio-image-button>
+                                    </mat-radio-group>
+                                </div>
+                            </div>
+                        </mat-expansion-panel>
+                    </div>
+                }
+            </mat-expansion-panel>
+            <mat-expansion-panel formGroupName="common" [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title> {{ 'EVENTS.PORTAL_DESIGN.TITLES.SESSIONS_CONFIGURATION' | translate }} </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div fxLayout="column" fxLayoutGap="24px">
+                    <p> {{ 'EVENTS.PORTAL_DESIGN.FORMS.INFOS.SESSIONS_CONFIGURATION' | translate }} </p>
+                    <div fxLayout="column" fxLayoutGap="16px">
+                        <p class="mat-subtitle-2"> {{ 'EVENTS.PORTAL_DESIGN.TITLES.AVAILABILITY_AND_PRICES' | translate }} </p>
+                        <mat-checkbox color="primary" formControlName="showAvailability">
+                            <div class="flex gap-2 items-center">
+                                <span>{{ 'EVENTS.PORTAL_DESIGN.FORMS.INFOS.SHOW_SESSION_AVAILABILITY' | translate }}</span>
+                                <a class="ob-link" (click)="openSessionAvailabilityInfoDialog($event)">
+                                    {{ 'EVENTS.PORTAL_DESIGN.FORMS.INFOS.SHOW_SESSION_AVAILABILITY_INFO_BTN' | translate }}</a>
+                            </div>
+                        </mat-checkbox>
+                        <mat-checkbox color="primary" formControlName="showMinPrices">
+                            <div class="flex items-center gap-2">
+                                <span>{{ 'EVENTS.PORTAL_DESIGN.FORMS.INFOS.SHOW_SESSION_PRICES' | translate }}</span>
+                                <mat-icon fxFlexAlign="center" class="ob-help-icon"
+                                    [matTooltip]="'EVENTS.PORTAL_DESIGN.FORMS.INFOS.SHOW_SESSION_PRICES_TOOLTIP' | translate">
+                                    help_outline
+                                </mat-icon>
+                            </div>
+                        </mat-checkbox>
+                    </div>
+                    <div fxLayout="column" fxLayoutGap="16px" formGroupName="changeDate">
+                        <p class="mat-subtitle-2"> {{ 'EVENTS.PORTAL_DESIGN.TITLES.CONFIG_SELECT_DATES' | translate }} </p>
+                        <mat-checkbox color="primary" formControlName="enabled">
+                            {{ 'EVENTS.PORTAL_DESIGN.FORMS.INFOS.CONFIG_SELECT_DATES' | translate }}
+                        </mat-checkbox>
+                        <!-- Change date calendar config -->
+                        <mat-expansion-panel class="ob-expansion-card change-date-calendar" [expanded]="false" formGroupName="calendar"
+                            [togglePosition]="'before'">
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                <mat-panel-title> {{ 'EVENTS.PORTAL_DESIGN.TITLES.CALENDAR' | translate }} </mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <div fxLayout="column" fxLayoutGap="16px" class="gray-card-content">
+                                <div fxFlex="1 1 100%" fxLayoutAlign="space-between" class="config-header">
+                                    <span> {{ 'EVENTS.PORTAL_DESIGN.FORMS.INFOS.CALENDAR_FORMAT' | translate }} </span>
+                                </div>
+                                <div class="config-option" fxLayout="column" fxLayoutGap="8px">
+                                    <span class="option-title"> {{ 'EVENTS.PORTAL_DESIGN.FORMS.LABELS.DAY_FORMAT' | translate }} </span>
+                                    <mat-radio-group fxFlex="100%" fxLayout="row wrap" fxLayoutGap="32px" formControlName="dayFormat">
+                                        <app-radio-image-button [value]="'WEEKLY'" [checked]="changeDateConfig?.dayFormat === 'WEEKLY'"
+                                            [control]="dayFormatCtrl"
+                                            [disabled]="dayFormatCtrl?.disabled"
+                                            [imageAlt]="'DATES.WEEKLY' | translate"
+                                            imageUrl="assets/ob-portal-design/sessions-list/weekly-calendar.svg">
+                                            {{ 'DATES.WEEKLY' | translate }}
+                                        </app-radio-image-button>
+                                        <app-radio-image-button [value]="'MONTHLY'"
+                                            [checked]="changeDateConfig?.dayFormat === 'MONTHLY'"
+                                            [imageAlt]="'DATES.MONTHLY' | translate"
+                                            [control]="dayFormatCtrl"
+                                            [disabled]="dayFormatCtrl?.disabled"
+                                            imageUrl="assets/ob-portal-design/sessions-list/monthly-calendar.svg">
+                                            {{ 'DATES.MONTHLY' | translate }}
+                                        </app-radio-image-button>
+                                    </mat-radio-group>
+                                </div>
+                                <div class="config-option" fxLayout="column" fxLayoutGap="8px" fxFlexOffset="8px">
+                                    <span class="option-title"> {{ 'EVENTS.PORTAL_DESIGN.FORMS.LABELS.HOUR_FORMAT' | translate }} </span>
+                                    <mat-radio-group fxFlex="100%" fxLayout="row wrap" fxLayoutGap="32px" formControlName="timeFormat">
+                                        <app-radio-image-button [value]="'BY_HOUR'"
+                                            [checked]="changeDateConfig?.timeFormat === 'BY_HOUR'"
+                                            [control]="timeFormatCtrl"
+                                            [disabled]="timeFormatCtrl?.disabled"
+                                            [imageAlt]="'DATES.HOUR' | translate"
+                                            imageUrl="assets/ob-portal-design/sessions-list/session-hours-hour.svg">
+                                            {{ 'DATES.HOUR' | translate }}
+                                        </app-radio-image-button>
+                                        <app-radio-image-button [value]="'BY_LIST'"
+                                            [checked]="changeDateConfig?.timeFormat === 'BY_LIST'"
+                                            [control]="timeFormatCtrl"
+                                            [disabled]="timeFormatCtrl?.disabled"
+                                            [imageAlt]="'EVENTS.PORTAL_DESIGN.SESSIONS.DESIGN_CALENDAR_LIST' | translate"
+                                            imageUrl="assets/ob-portal-design/sessions-list/session-hours-list.svg">
+                                            {{ 'EVENTS.PORTAL_DESIGN.SESSIONS.DESIGN_CALENDAR_LIST' | translate }}
+                                        </app-radio-image-button>
+                                    </mat-radio-group>
+                                </div>
+                            </div>
+                        </mat-expansion-panel>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </app-form-container>
+}
+@if (loading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

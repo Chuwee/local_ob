@@ -1,0 +1,55 @@
+<ng-container xmlns:svg="http://www.w3.org/2000/svg">
+    <svg:g class="group" *ngIf="viewBox$ | async as viewbox">
+        <svg:defs>
+            <!--GRADIENT-->
+            <svg:linearGradient id="linearGradient">
+                <svg:stop *ngFor="let stop of gradientStops$ | async" [attr.stop-color]="stop.color" [attr.offset]="stop.offset">
+                </svg:stop>
+            </svg:linearGradient>
+            <svg:radialGradient id="radialGradient" xlink:href="#linearGradient"></svg:radialGradient>
+            <!-- SEATS MASK -->
+            <svg:mask id="seatsMask">
+                <g [innerHTML]="seatsMask$ | async"></g>
+            </svg:mask>
+        </svg:defs>
+        <!-- SEATS COLORS USING GRADIENT AND MASK -->
+        <svg:g *ngIf="gradientCoords$ | async as coords" mask="url(#seatsMask)">
+            <svg:g [attr.transform]="'translate(' + coords.axisPoint.x + ',' + coords.axisPoint.y + ')'">
+                <svg:rect [attr.fill]="firstKeyColor"
+                    [attr.x]="-coords.bgSize / 2" [attr.y]="-coords.bgSize / 2" [attr.width]="coords.bgSize" [attr.height]="coords.bgSize">
+                </svg:rect>
+                <svg:rect [attr.x]="-coords.gradientSize" [attr.y]="-coords.gradientSize"
+                    [attr.width]="coords.gradientSize * 2" [attr.height]="coords.gradientSize * 2" fill="url(#radialGradient)">
+                </svg:rect>
+            </svg:g>
+        </svg:g>
+        <!-- SEATS STROKE -->
+        <g [innerHTML]="seatsStrokes$ | async"></g>
+        <!-- CONTROLS -->
+        <ng-container *ngIf="controlsData$ | async as cData">
+            <ng-container *ngIf="!cData.emitPreCommit else saverContainer">
+                <svg:polyline class="controls-line-shadow"
+                    [attr.points]="cData.axisPoint.x + ',' + cData.axisPoint.y + ' ' + cData.sizePoint.x + ',' + cData.sizePoint.y">
+                </svg:polyline>
+                <svg:polyline class="controls-line"
+                    [attr.points]="cData.axisPoint.x + ',' + cData.axisPoint.y + ' ' + cData.sizePoint.x + ',' + cData.sizePoint.y">
+                </svg:polyline>
+                <svg:g
+                    [attr.transform]="'translate(' + cData.axisPoint.x + ',' + cData.axisPoint.y + '), scale(' + (invScale$ | async) + ')'"
+                    appEditorPointControl (move)="moveInit('axis')"></svg:g>
+                <svg:g
+                    [attr.transform]="'translate(' + cData.gradientPoint.x + ',' + cData.gradientPoint.y + '),'
+                    + ' scale(' + (invScale$ | async) + ')'"
+                    appEditorPointControl (move)="moveInit('gradient')"></svg:g>
+                <svg:g
+                    [attr.transform]="'translate(' + cData.sizePoint.x + ',' + cData.sizePoint.y + '), scale(' + (invScale$ | async) + ')'"
+                    appEditorPointControl (move)="moveInit('size')"></svg:g>
+                <svg:rect *ngIf="cData.currentMovingPoint" [attr.width]="viewbox[2]" [attr.height]="viewbox[3]" class="interactive-overlay"
+                    (mousemove)="movePoint($event)" (mouseup)="moveEnd()" (mouseenter)="moveCheck($event)"></svg:rect>
+            </ng-container>
+            <ng-template #saverContainer>
+                <ng-container *ngIf="saver$ | async"></ng-container><!-- saver template subscription triggers the pre commit process)-->
+            </ng-template>
+        </ng-container>
+    </svg:g>
+</ng-container>

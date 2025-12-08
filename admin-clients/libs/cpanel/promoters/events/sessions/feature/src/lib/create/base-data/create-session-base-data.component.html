@@ -1,0 +1,241 @@
+@let form = $form();
+<!-- {fix indentations} -->
+<ng-container [formGroup]="form">
+    @if (showSmartBooking$ | async) {
+        <div class="session-smart-booking">
+            <mat-checkbox color="primary" formControlName="enableSmartBooking">
+                {{'EVENTS.SESSION.SMART_BOOKING.TITLE' | translate}}
+            </mat-checkbox>
+        </div>
+    }
+    <div class="session-base-data-container flex flex-col gap-y-2">
+        @let isAvet = event$ | async | isAvetEvent;
+        @let creationType = $creationType();
+        @let canAllowGroups = canAllowGroups$ | async;
+        @let hasFortressVenue = $hasFortressVenue();
+        <!-- {fix indentations} -->
+        @if (hasFortressVenue) {
+            <div class="flex flex-row create-session-info-block">
+                <div class="flex basis-[760px]">
+                    @if (creationType === sessionCreationType.single) {
+                        <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                        {{'EVENTS.SESSION.FORTRESS.INFO_MESSAGE' | translate}}
+                    }
+                    @if (creationType === sessionCreationType.multiple) {
+                        <mat-icon class="ob-icon small warning with-text">warning</mat-icon>
+                        {{'EVENTS.SESSION.FORTRESS.WARNING_MESSAGE' | translate}}
+                    }
+                </div>
+            </div>
+        }
+
+        <div class="flex flex-1 gap-x-4 gap-y-2 flex-wrap md:flex-nowrap"
+            [class.flex-col]="hasFortressVenue && creationType === sessionCreationType.single">
+
+            <div class="flex flex-1">
+                <div class="flex basis-1/2" [class.basis-full]="!(hasFortressVenue && creationType === sessionCreationType.single)">
+                    <mat-form-field appearance="outline" class="flex flex-1 ob-form-field field-with-label basis-full grow shrink">
+                        <mat-label>{{'EVENTS.NAME' | translate}}</mat-label>
+                        <input matInput aria-label="name" [placeholder]="'EVENTS.NAME' | translate" formControlName="name">
+                        <mat-error [ob-form-errors]="form" [field]="'name'" />
+                    </mat-form-field>
+                </div>
+            </div>
+
+            @if (creationType === sessionCreationType.multiple) {
+                <div class="flex flex-1 gap-x-4">
+                    <mat-form-field appearance="outline" class="flex-grow-[0.3] ob-form-field field-with-label">
+                        <mat-label>{{'EVENTS.SESSION.DURATION' | translate}}</mat-label>
+                        <input matInput type="number" aria-label="durationHours" formControlName="durationHours"
+                            [placeholder]="'EVENTS.SESSION.DURATION_HOURS' | translate"
+                            [required]="hasFortressVenue">
+                        <mat-error [ob-form-errors]="form" [field]="'durationHours'" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="flex-grow-[0.3] ob-form-field field-with-label">
+                        <input matInput type="number" aria-label="durationMins" formControlName="durationMins"
+                            [placeholder]="'EVENTS.SESSION.DURATION_MINS' | translate">
+                        <mat-error [ob-form-errors]="form" [field]="'durationMins'" />
+                    </mat-form-field>
+                </div>
+            }
+            @if (isAvet) {
+                <div class="details-non-editable-field ob-form-field basis-full grow shrink flex flex-col">
+                    <span class="field-label">{{'DATES.START_DATE' | translate}}</span>
+                    <span>{{form.get('startDate').value | dateTime : dateTimeFormats.shortDateTime }}</span>
+                </div>
+            }
+            @if (creationType === sessionCreationType.single && !isAvet) {
+                <div class="flex flex-1 gap-x-4">
+                    <app-date-time-picker class="basis-full grow shrink create-session-date-fields" formControlName="startDate"
+                        [label]="'DATES.START_DATE' | translate" />
+                    @if (hasFortressVenue) {
+                        <app-date-time-picker class="basis-full grow shrink create-session-date-fields" formControlName="endDate"
+                            [label]="'DATES.END_DATE' | translate" />
+                    }
+                </div>
+            }
+        </div>
+        <div class="flex flex-1 gap-x-4 flex-wrap md:flex-nowrap">
+            @if (isAvet) {
+                <mat-form-field appearance="outline" class="basis-full grow shrink ob-form-field field-with-label">
+                    <mat-label>{{'SESSION.MATCH' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.ACTIONS.SELECT' | translate" formControlName="avetMatch">
+                        <mat-option>
+                            <app-select-search #avetMatchSearch [options$]="matches" requireSelection="true"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" />
+                        </mat-option>
+                        @for (match of avetMatchSearch.getFilteredOptions$() | async; track match.id) {
+                            <mat-option [value]="match">
+                                <div appEllipsify [matTooltip]="match.name">
+                                    {{match.name}}
+                                </div>
+                            </mat-option>
+                        }
+                    </mat-select>
+                    @if (form.get('avetMatch').hasError('required')) {
+                        <mat-error>
+                            {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                        </mat-error>
+                    }
+                </mat-form-field>
+            }
+            @if ((venueTemplates$ | async); as venueTemplates) {
+                @if (venueTemplates.length === 1){
+                    <div class="details-non-editable-field ob-form-field basis-full grow shrink flex flex-col">
+                        <span class="field-label">{{'EVENTS.SESSION.CAPACITY_TEMPLATE' | translate}}</span>
+                        <span>{{(venueTemplates$ | async)[0].name}}</span>
+                    </div>
+                } @else if(venueTemplates.length > 1){
+                    <mat-form-field appearance="outline" class="basis-full grow shrink ob-form-field">
+                        <mat-label>{{'EVENTS.SESSION.CAPACITY_TEMPLATE' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.ACTIONS.SELECT' | translate" formControlName="venueTemplate">
+                            <mat-option>
+                                <app-select-search #venueTemplateSelectSearch [options$]="venueTemplates$" requireSelection="true"
+                                    [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" />
+                            </mat-option>
+                            @for (venueTemplate of venueTemplateSelectSearch.getFilteredOptions$() | async; track venueTemplate.id) {
+                                <mat-option [value]="venueTemplate">
+                                    <div appEllipsify [matTooltip]="venueTemplate.name">
+                                        {{venueTemplate.name}}
+                                    </div>
+                                </mat-option>
+                            }
+                        </mat-select>
+                        @if (form.controls['venueTemplate'].hasError('required')) {
+                            <mat-error>
+                                {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                            </mat-error>
+                        }
+                    </mat-form-field>
+                }
+            }
+            @if (hasFortressVenue) {
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label basis-full grow shrink">
+                    <mat-label>{{'FORMS.LABELS.REFERENCE' | translate}}</mat-label>
+                    <input matInput aria-label="reference"
+                        [placeholder]="'FORMS.LABELS.REFERENCE' | translate"
+                        formControlName="reference">
+                    <mat-error [ob-form-errors]="form" [field]="'reference'" />
+                </mat-form-field>
+            }
+        </div>
+        @if (!isAvet) {
+            <div class="flex flex-1 gap-x-4 flex-wrap md:flex-nowrap">
+                @if($isSga()){
+                    <mat-form-field appearance="outline" class="basis-full grow shrink ob-form-field">
+                        <mat-label>{{'SESSION.SELECT_EXTERNAL_SESSION' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="externalProviderSession">
+                            @for (session of (externalProviderSessions$ | async); track session.id) {
+                                <mat-option [value]="session">
+                                    {{session.name}}
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                } @else {
+                    <app-session-rates class="basis-full grow shrink" [form]="form.get('sessionRates')" [rates]="eventRates$ | async" />
+                }
+                <div class="basis-full grow shrink">
+                    <div class="flex flex-wrap">
+                        <mat-form-field appearance="outline" class="basis-full grow shrink ob-form-field">
+                            <mat-label>{{'EVENTS.SESSION.TICKET_TAXES' | translate}}</mat-label>
+                            <mat-select [placeholder]="'FORMS.ACTIONS.SELECT' | translate" formControlName="ticketTax">
+                                <mat-option>
+                                    <app-select-search #ticketTaxesSelectSearch [options$]="taxes$"
+                                        [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name"
+                                        requireSelection="true" />
+                                </mat-option>
+                                @for (ticketTax of ticketTaxesSelectSearch.getFilteredOptions$() | async; track ticketTax.id) {
+                                    <mat-option [value]="ticketTax">
+                                        {{ticketTax.name}}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                            @if (form.controls['ticketTax'].hasError('required')) {
+                                <mat-error>
+                                    {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                                </mat-error>
+                            }
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="basis-full grow shrink ob-form-field">
+                            <mat-label>{{'EVENTS.SESSION.SURCHARGES_TAXES' | translate}}</mat-label>
+                            <mat-select [placeholder]="'FORMS.ACTIONS.SELECT' | translate" formControlName="surchargeTax">
+                                <mat-option>
+                                    <app-select-search #surchargeTaxesSelectSearch [options$]="taxes$"
+                                        [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name"
+                                        requireSelection="true" />
+                                </mat-option>
+                                @for (surchargeTax of surchargeTaxesSelectSearch.getFilteredOptions$() | async; track surchargeTax.id) {
+                                    <mat-option [value]="surchargeTax">
+                                        {{surchargeTax.name}}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                            @if (form.controls['surchargeTax'].hasError('required')) {
+                                <mat-error>
+                                    {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                                </mat-error>
+                            }
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            @if (canAllowGroups) {
+                <div class="flex flex-1 flex-col">
+                    <span class="mat-subtitle-2">{{'EVENTS.SESSION.ACTIVITY_TICKET_TYPES' | translate}}</span>
+                    <mat-form-field hidden-outline class="basis-full grow shrink ob-form-field field-with-label">
+                        <input matInput aria-label="activity available ticket types" class="hidden" formControlName="activitySaleType">
+                        <mat-radio-group formControlName="activitySaleType" class="flex gap-x-4">
+                            <mat-radio-button [value]="activitySaleType.individual">
+                                {{'EVENTS.SESSION.ACTIVITY_TICKET_INDIVIDUAL' | translate}}
+                            </mat-radio-button>
+                            <mat-radio-button [value]="activitySaleType.mixed">
+                                {{'EVENTS.SESSION.ACTIVITY_TICKET_MIXED' | translate}}
+                            </mat-radio-button>
+                            <mat-radio-button [value]="activitySaleType.group">
+                                {{'EVENTS.SESSION.ACTIVITY_TICKET_GROUP' | translate}}
+                            </mat-radio-button>
+                        </mat-radio-group>
+                        @if (form.get('activitySaleType').hasError('required')) {
+                            <mat-error>
+                                {{'FORMS.ERRORS.REQUIRED_FIELD' | translate }}
+                            </mat-error>
+                        }
+                    </mat-form-field>
+                </div>
+            }
+        }
+        @if (showOrphanSeats$ | async) {
+            <div class="flex items-center justify-start">
+                <mat-checkbox class="basis-full grow shrink" color="primary" formControlName="enableOrphanSeats">
+                    {{'EVENTS.SESSION.ENABLE_ORPHAN_SEATS.LABEL' | translate}}
+                </mat-checkbox>
+            </div>
+        }
+    </div>
+</ng-container>
+@if (isReqInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

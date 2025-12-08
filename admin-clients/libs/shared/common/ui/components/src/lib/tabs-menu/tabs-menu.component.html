@@ -1,0 +1,16 @@
+<mat-tab-group mat-align-tabs="start" mat-stretch-tabs="false" class="ob-tab-component" [ngClass]="$tabsMenuStringClasses()"
+    [disablePagination]="$disablePagination()" [dynamicHeight]="isDynamicHeight">
+    @for (tab of tabs; track $index) {
+        @if (!tab.isLazyLoad) {
+            <mat-tab [label]="tab.label">
+                <ng-template [ngTemplateOutlet]="tab.templateRef" />
+            </mat-tab>
+        } @else {
+            <mat-tab [label]="tab.label">
+                <ng-template matTabContent>
+                    <ng-template [ngTemplateOutlet]="tab.templateRef" />
+                </ng-template>
+            </mat-tab>
+        }
+    }
+</mat-tab-group>

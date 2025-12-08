@@ -1,0 +1,28 @@
+<app-form-container fxFlex="0 1 100%" [disabled]="!form.dirty || (loading$ | async)" (cancel)="cancel()" (save)="save()">
+    <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+        <!-- GATES -->
+        <mat-expansion-panel [expanded]="true" togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'VENUES.GATES' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-activity-venue-template-gates fxFlex="0 0 100%" fxFlex.gt-md="0 0 50%"
+                class="template-gates-form-element" [form]="form" (dataChange)="gatesChanged()" />
+        </mat-expansion-panel>
+        <!-- PRICE TYPE GATES -->
+        <mat-expansion-panel [expanded]="true" togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{
+                    $isSga() ? 'VENUE_TPLS.MEMBERSHIP_TYPE_GATES' : 'VENUE_TPLS.PRICE_TYPE_GATES' | translate
+                    }}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-activity-venue-template-price-types-gates fxFlex="0 0 100%" class="template-gates-form-element"
+                [venueTemplate]="$venueTemplate()" [form]="form" [isSga]="$isSga()" />
+        </mat-expansion-panel>
+    </mat-accordion>
+    <app-archived-event-mgr slot="actions-bar" [disabled]="form.dirty || (loading$ | async)" />
+</app-form-container>
+@if(loading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

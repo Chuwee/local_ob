@@ -1,0 +1,43 @@
+@if (promotionTpl$ | async; as promotionTpl) {
+    <div class="details-container flex flex-col basis-full">
+        <div class="heading-container flex justify-start items-center">
+            <app-go-back defaultPath="/event-promotion-templates" />
+            <h1 class="secondary mat-headline-3">
+                {{ promotionTpl.name }}
+            </h1>
+        </div>
+        <div class="main-content flex flex-col basis-full">
+            <div class="top-actions">
+                <app-nav-tabs-menu type="tabMenu" [elements]="[
+                    {
+                        label: 'EVENTS.PROMOTIONS.GENERAL_DATA',
+                        param: 'general-data',
+                    },
+                    {
+                        label: 'EVENTS.PROMOTIONS.LIMITS_AND_CONDITIONS',
+                        param: 'conditions',
+                    },
+                    {
+                        label: 'EVENTS.PROMOTIONS.DISCOUNT_TYPE',
+                        param: 'discount-type',
+                    },
+                ]" />
+            </div>
+            <div class="status-notifications-container flex flex-col">
+                <div class="flex basis-full justify-center">
+                    <div class="flex basis-[1232px] justify-between">
+                        <div class="promotion-type">
+                            <span class="promotion-type-label ob-label">
+                                {{'EVENTS.PROMOTIONS.TYPE' | translate}}:
+                            </span>
+                            <span class="promotion-type-value">
+                                {{'EVENTS.PROMOTIONS.TYPE_OPTS.' + promotionTpl.type.toUpperCase() + '.LONG' | translate}}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <router-outlet />
+        </div>
+    </div>
+}

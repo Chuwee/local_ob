@@ -1,0 +1,68 @@
+@if(priceTypes$ | async; as priceTypes) {
+    <div fxLayout="row wrap">
+        <div fxFlex="0 1 100%" fxLayoutAlign="end start" fxLayoutGap="10px" class="select-type">
+            <span class="assign-gate-label">{{
+                isSga() ? 'VENUE_TPLS.ASSIGN_GATE_TO_MEMBERSHIP_TYPES' : 'VENUE_TPLS.ASSIGN_GATE_TO_PRICE_TYPES' | translate
+                }}</span>
+            <mat-form-field fxFlex="0 1 200px" appearance="outline" class="ob-form-field">
+                <mat-select [formControl]="gatesAssignControl" [placeholder]="'FORMS.ACTIONS.SELECT' | translate">
+                    @for (gate of gates$ | async; track gate.id) {
+                        <mat-option [value]="gate.id">
+                            {{gate.name}}
+                        </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            <div class="assing-gate-button" fxFlex="none">
+                <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                    [disabled]="!gatesAssignControl.dirty || gatesAssignControl.invalid || !gatesAssignControl.value"
+                    (click)="assingGate()">
+                    <mat-icon>assignment_returned</mat-icon>
+                    {{'FORMS.ACTIONS.ASSIGN' | translate}}
+                </button>
+            </div>
+        </div>
+        <mat-table fxFlex="0 1 100%" class="ob-table not-touchable" id="gatesTable" [formGroup]="form()"
+            [dataSource]="priceTypes">
+            <ng-container matColumnDef="name">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{isSga() ? 'VENUE_TPLS.MEMBERSHIP_TYPES' : 'VENUE_TPLS.TICKET_TYPES' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row;">
+                    {{row.name}}
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="gate_id">
+                <mat-header-cell *matHeaderCellDef class="editable-cell head-cell">
+                    {{'VENUES.GATES' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row" class="editable-cell" fxLayoutAlign="end">
+                    <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field" [formGroupName]="row.id">
+                        <mat-select formControlName="gateId">
+                            @for (gate of gates$ | async; track gate.id) {
+                                <mat-option [value]="gate.id">
+                                    {{gate.name}}
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="restrictive_access">
+                <mat-header-cell *matHeaderCellDef class="head-cell" fxLayoutAlign="center">
+                    {{'VENUE_TPLS.RESTRICTIVE_ACCESS' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row" class="editable-cell" fxLayoutAlign="center center">
+                    <mat-form-field fxFlex="60px" hidden-outline class="ob-form-field" [formGroupName]="row.id">
+                        <input matInput fxHide aria-label="restrictive access">
+                        <mat-checkbox formControlName="restrictiveAccess" color="primary">
+                            <mat-label />
+                        </mat-checkbox>
+                    </mat-form-field>
+                </mat-cell>
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="columnNames" class="dense-row" />
+            <mat-row *matRowDef="let row; columns: columnNames;" class="dense-row hoverable-row" />
+        </mat-table>
+    </div>
+}

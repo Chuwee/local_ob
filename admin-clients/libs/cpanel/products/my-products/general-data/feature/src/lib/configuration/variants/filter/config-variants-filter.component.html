@@ -1,0 +1,86 @@
+<button mat-stroked-button color="tertiary" class="ob-button medium" [class]="{'active': activeFilters}"
+    [matBadge]="activeFilters || ''" [satPopoverAnchor]="filterPopover" (click)="open()">
+    {{'FORMS.OPEN_FILTER_BTN' | translate}}
+    <mat-icon iconPositionEnd>
+        filter_list
+    </mat-icon>
+</button>
+<sat-popover #filterPopover hasBackdrop yAlign="below" autoFocus="false" restoreFocus="false">
+    <mat-card class="ob-card">
+        <mat-card-content class="form-container">
+            <form [formGroup]="form" fxLayout="column" fxLayoutGap="24px">
+                <div fxLayout="row" class="filter-block">
+                    <div class="ob-label" fxFlex="0 0 100px">
+                        {{'FORMS.LABELS.STATUS' | translate}}
+                    </div>
+                    <div class="filter-block-input" fxFlex="0 0 300px">
+                        <mat-form-field appearance="outline" class="ob-form-field type-select">
+                            <mat-select formControlName="status" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                                @for (status of productStatus; track status) {
+                                    <mat-option [value]="status">
+                                        {{('PRODUCT.VARIANTS.STATUS_OPTS.' + status) | translate}}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <mat-divider />
+                @if (productIsStocked$ | async) {
+                    <div fxLayout="row" class="filter-block">
+                        <div class="ob-label" fxFlex="0 0 100px">
+                            {{'FORMS.LABELS.PRODUCT_STOCK' | translate}}
+                        </div>
+                        <div class="filter-block-input" fxFlex="0 0 300px">
+                            <mat-form-field appearance="outline" class="ob-form-field type-select">
+                                <mat-select formControlName="stock" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                                    <mat-option value="1">
+                                        {{'PRODUCT.VARIANTS.STOCK.AVAILABLE' | translate}}
+                                    </mat-option>
+                                    <mat-option value="0">
+                                        {{'PRODUCT.VARIANTS.STOCK.SOLD_OUT' | translate}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                }
+                <div fxLayout="row" class="filter-block">
+                    <div class="ob-label" fxFlex="0 0 100px">
+                        {{'PRODUCT.VARIANTS.VARIANTS' | translate}}
+                    </div>
+                    <div class="filter-block-input" fxFlex="300px">
+                        <mat-form-field appearance="outline" class="ob-form-field status-select">
+                            <mat-select formControlName="ids" multiple [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                                <mat-option>
+                                    <app-select-search #variantsSelect [options$]="variantsList$" [requireSelection]="true"
+                                        [placeholderLabel]="'FORMS.SEARCH.IN_LIST' | translate" searchField="name" />
+                                </mat-option>
+                                @for (variant of variantsSelect.getFilteredOptions$() | async; track variant) {
+                                    <mat-option [value]="variant?.id">
+                                        {{variant && variant.name}}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </form>
+        </mat-card-content>
+        <mat-card-footer fxLayoutAlign="start center">
+            <div fxFlex="grow" class="left-actions">
+                <a class="ob-link" #removeLink (click)="clear()">
+                    {{'FORMS.REMOVE_FILTERS_BTN' | translate}}
+                </a>
+            </div>
+            <div fxFlex="none" class="right-actions">
+                <button (click)="close()" mat-button class="ob-button small">
+                    {{'FORMS.CLOSE_FILTER_BTN' | translate}}
+                </button>
+                <button (click)="apply()" mat-flat-button color="primary" class="ob-button small">
+                    {{'FORMS.APPLY_FILTER_BTN' | translate}}
+                </button>
+            </div>
+        </mat-card-footer>
+    </mat-card>
+</sat-popover>

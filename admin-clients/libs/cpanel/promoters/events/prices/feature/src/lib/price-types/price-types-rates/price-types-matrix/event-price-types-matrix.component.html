@@ -1,0 +1,126 @@
+<div class="price-types-matrix-container">
+    @if (venueTemplates$ | async; as templates) {
+        <form [formGroup]="pricesForm" class="flex flex-col">
+            <div class="event-template-container">
+                @if (templates.length > 1 && !groupMode) {
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label venue-tpl-select flex basis-[400px]">
+                        <mat-label>{{'EVENTS.SELECT_EVENT_TEMPLATE' | translate}}</mat-label>
+                        <mat-select id="venue-selector" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate"
+                            [formControl]="venueTplCtrl" [compareWith]="compareWith">
+                            @for (venue of templates; track venue.id) {
+                                <mat-option [value]="venue">
+                                    <div appEllipsify [matTooltip]="venue?.name">
+                                        {{venue?.name}}
+                                    </div>
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                }
+                @if (templates.length === 1) {
+                    <div class="details-non-editable-field flex flex-col">
+                        <span class="field-label">{{'EVENTS.SELECT_EVENT_TEMPLATE' | translate}}</span>
+                        <span>{{templates[0]?.name}}</span>
+                    </div>
+                }
+                @if (!templates.length) {
+                    <p class="body-1 no-templates-message">{{'EVENTS.NO_TEMPLATES' | translate}}</p>
+                }
+            </div>
+
+            <app-tabs-menu type="navigation" [class.hidden]="!templates?.length">
+                <ng-template appTab
+                    [label]="(
+                        !groupMode ? 'EVENTS.PRICEZONE.TITLE_CONFIGURATION_TABLE' : 'EVENTS.PRICEZONE.TITLE_GROUP_CONFIGURATION_TABLE'
+                    ) | translate">
+                    <div class="flex flex-col gap-6">
+                        @if (!groupMode) {
+                            <div class="flex flex-col" formGroupName="draggableTable"
+                                id="section_event_price-types_custom-order-info">
+                                <div class="flex items-center gap-2">
+                                    <mat-slide-toggle class="ob-slide-toggle" (change)="onDragChange($event.checked)"
+                                        formControlName="enabled">
+                                        {{'EVENTS.CUSTOM_ORDER' | translate}}
+                                    </mat-slide-toggle>
+                                    <mat-icon [matTooltip]="'EVENTS.CUSTOM_ORDER_INFO' | translate" class="ob-help-icon">
+                                        help_outline
+                                    </mat-icon>
+                                </div>
+                            </div>
+                        }
+                        <div class="prices-table-container">
+                            @if (eventPricesMatrix$ | async; as eventPrices) {
+                                <table mat-table formGroupName="pricesMatrix" id="pricesTable" class="ob-table"
+                                    [dataSource]="eventPrices" cdkDropList (cdkDropListDropped)="onListDrop($event)">
+                                    <ng-container [matColumnDef]="pricesTableHead[0]" sticky>
+                                        <th mat-header-cell *matHeaderCellDef class="head-cell border-right">
+                                            {{'VENUE_TPLS.' + pricesTableHead[0] | translate}}
+                                        </th>
+                                        <td mat-cell *matCellDef="let row" class="border-right">
+                                            <div class="title-price-column flex items-center gap-2">
+                                                @if(draggableTable.value.enabled) {
+                                                    <mat-icon class="drag-icon">drag_indicator</mat-icon>
+                                                }
+                                                {{row[0]}}
+                                            </div>
+                                        </td>
+                                    </ng-container>
+                                    @for (rateName of rateNames; track rateName) {
+                                        <ng-container [matColumnDef]="rateName" [formArrayName]="rateName">
+                                            <th mat-header-cell *matHeaderCellDef class="head-cell right price-column input-column">
+                                                <div class="flex items-center justify-end">
+                                                    @if (defaultRatesMap[rateName]) {
+                                                        <mat-icon class="default-rate-icon"
+                                                            matTooltip="{{'EVENTS.DEFAULT_RATE' | translate}}">
+                                                            star
+                                                        </mat-icon>
+                                                    }
+                                                    <span appEllipsify [matTooltip]="rateName">{{rateName}}</span>
+                                                </div>
+                                            </th>
+                                            <td mat-cell *matCellDef="let row; index as j" class="right price-column"
+                                                [class.editable-cell]="isEventEditable$ | async">
+                                                <div class="write-value">
+                                                    @if (pricesMatrix.get([rateName,j])) {
+                                                        <mat-form-field appearance="outline" class="ob-form-field">
+                                                            @let errorMessage = pricesMatrix.get([rateName,j]) | obErrorMessage$ | async;
+                                                            @if (errorMessage) {
+                                                                <mat-icon matIconPrefix [obErrorIcon]="errorMessage">
+                                                                    error_outline
+                                                                </mat-icon>
+                                                            }
+                                                            <app-currency-input [formControlName]="j" class="table-input"
+                                                                [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                                                                [placeholder]="0 | localCurrency:(currency$ | async):'narrow'" />
+                                                        </mat-form-field>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </ng-container>
+                                    }
+                                    <tr mat-header-row *matHeaderRowDef="pricesTableHead; sticky: true" class="dense-row"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: pricesTableHead;" class="dense-row"
+                                        [class.hoverable-row]="isEventEditable$ | async"
+                                        [class.ob-draggable-row]="draggableTable.value.enabled"
+                                        [cdkDragDisabled]="!draggableTable.value.enabled"
+                                        cdkDrag cdkDragBoundary=".mat-table" [cdkDragData]="row"></tr>
+                                </table>
+                            }
+                        </div>
+                    </div>
+                </ng-template>
+                @if (!isActivity) {
+                    <ng-template appTab lazyLoad [label]="'EVENTS.PRICEZONE.TITLE_DESCRIPTION_TRANSLATE_TABLE' | translate">
+                        <app-price-type-translations class="flex basis-[50%]" [form]="channelContentsGroup"
+                            [languages$]="languages$" [venueTplId]="venueTplCtrl.value?.id" />
+                    </ng-template>
+                }
+                @if (enableRestrictionTab) {
+                    <ng-template appTab [label]="'EVENTS.PRICEZONE.RESTRICTIONS.TITLE' | translate">
+                        <app-event-price-type-restrictions [venueTplId]="tplId" />
+                    </ng-template>
+                }
+            </app-tabs-menu>
+        </form>
+    }
+</div>

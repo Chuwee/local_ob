@@ -1,0 +1,32 @@
+<div class="season-ticket-channels-details-container">
+    <div fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="stretch">
+        <app-nav-tabs-menu type="horizontalSubtab" [elements]="[
+            {
+                label: 'CHANNELS.GENERAL_DATA',
+                param: 'general-data',
+            },
+            {
+                label: 'CHANNELS.PROFESSIONAL_SELLING.TITLE',
+                param: 'professional-selling',
+                show: $entity()?.settings.enable_B2B &&
+                    $seasonTicketChannel()?.channel.type === channelType.webB2B &&
+                    $seasonTicketChannel()?.channel.entity.id === $entity()?.id
+            },
+            {
+                label: 'CHANNELS.SURCHARGES.TITLE',
+                param: 'surcharges',
+            },
+            {
+                label: 'CHANNELS.COMMISSIONS.TITLE',
+                param: 'channel-commission',
+                disabled: (requestAccepted$ | async) === false
+            },
+            {
+                label: 'CHANNELS.CONTENTS',
+                param: 'contents',
+                disabled: (requestAccepted$ | async) === false
+            }
+        ]" />
+        <router-outlet />
+    </div>
+</div>

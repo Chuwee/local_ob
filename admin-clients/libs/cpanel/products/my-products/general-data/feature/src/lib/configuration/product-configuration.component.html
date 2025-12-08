@@ -1,0 +1,37 @@
+@if (product$ | async; as product) {
+    @if (productHasVariants$ | async) {
+        @if (product.product_type === 'SIMPLE') {
+            <app-product-simple fxFlex [product]="product" />
+        } @else {
+            <div fxFlex fxLayout="column">
+                <app-nav-tabs-menu type="navigation" [elements]="[
+                    {
+                        label: 'PRODUCT.VARIANTS.VARIANTS',
+                        param: 'variants'
+                    },
+                    {
+                        label: 'PRODUCT.VARIANTS.LITERALS.TITLE',
+                        param: 'literals'
+                    }
+                ]" />
+                <router-outlet />
+            </div>
+        }
+    } @else if ((isLoadingOrSaving$ | async) === false) {
+        <app-empty-state fxFlex="100%"
+            [title]="'PRODUCT.VARIANTS.EMPTY' | translate"
+            [description]="'PRODUCT.VARIANTS.EMPTY_DESCRIPTION' | translate" (click)="openCreateProductVariantsDialog()">
+            @if (canWrite$ | async) {
+                <button mat-flat-button class="ob-button" color="primary">
+                    <mat-icon>add</mat-icon>
+                    {{'PRODUCT.VARIANTS.ACTIONS.CREATE_VARIANTS' | translate}}
+                </button>
+            }
+        </app-empty-state>
+    }
+}
+@if (isLoadingOrSaving$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,102 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" sidebar
+    [disabled]="(isLoadingOrSaving$ | async) || !form.dirty">
+    <div fxFlex="0 1 100%" fxLayout="column" class="season-ticket-general-data">
+        <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+            <!-- ST Data -->
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{ 'SEASON_TICKET.SEASON_TICKET_DATA' | translate }}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-season-ticket-principal-info-st-data [form]="form" [seasonTicket]="seasonTicket$ | async"
+                    [putSeasonTicketCtrl]="form.controls.putSeasonTicketCtrl"
+                    [putSeasonTicketStatusCtrl]="form.controls.putSeasonTicketStatusCtrl"
+                    [seasonTicketStatusCtrl]="form.controls.seasonTicketStatusCtrl" />
+            </mat-expansion-panel>
+            <!-- Currency -->
+            @if (isMultiCurrency$ | async) {
+                <mat-expansion-panel [expanded]="true" id="multiCurrencyForm">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'EVENTS.CURRENCY.TITLE' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <app-season-ticket-principal-info-currency [form]="form" [putSeasonTicketCtrl]="form.controls.putSeasonTicketCtrl"
+                        [seasonTicketStatusCtrl]="form.controls.seasonTicketStatusCtrl" />
+                </mat-expansion-panel>
+            }
+            <!-- Languages -->
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{ 'SEASON_TICKET.LANGUAGES' | translate }}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="ob-form-field">
+                    <app-season-ticket-principal-info-language #languageSelector [form]="form"
+                        [seasonTicket]="seasonTicket$ | async" [putSeasonTicketCtrl]="form.controls.putSeasonTicketCtrl" />
+                </div>
+            </mat-expansion-panel>
+            <!-- Tax Info -->
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{ 'SEASON_TICKET.INVOICE_DATA' | translate }}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-invoice-info [form]="form" [putCtrl]="form.controls.putSeasonTicketCtrl"
+                    [statusCtrl]="form.controls.seasonTicketStatusCtrl" [programmingStatus]="$programmingStatus()"
+                    [status]="seasonTicketStatus().status" [producerId]="(seasonTicket$ | async)?.producer?.id"
+                    [entityId]="(seasonTicket$ | async)?.entity?.id"
+                    [simplifiedInvoice]="(seasonTicket$ | async)?.settings?.simplified_invoice"
+                    [useProducerFiscalData]="(seasonTicket$ | async)?.settings?.use_producer_fiscal_data"
+                    [literalKeys]="literalKeysFather" />
+            </mat-expansion-panel>
+
+            <!-- Categories -->
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'SEASON_TICKET.CATEGORIES' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-categories-selection [form]="form" [item]="seasonTicket$ | async"
+                    [putItemCtrl]="form.controls.putSeasonTicketCtrl" [categoryIsRequired]="true" />
+            </mat-expansion-panel>
+            <!-- Subscription list -->
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{ 'SEASON_TICKET.CUSTOMER_RELATIONSHIP' | translate }}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-season-ticket-customer-relationship [form]="form" [seasonTicket]="seasonTicket$ | async"
+                    [putSeasonTicketCtrl]="form.controls.putSeasonTicketCtrl" />
+            </mat-expansion-panel>
+            <!-- Customer types assignation -->
+            @if($hasAutomaticPurchaseCustomerTypes()) {
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'SEASON_TICKET.CUSTOMER_TYPES_ASSIGNATION.TITLE' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <app-customer-types-assignation [form]="form" [customerTypes]="$entityCustomerTypes()"
+                        [customerTypesAssigned]="$stCustomerTypesAssigned()" />
+                </mat-expansion-panel>
+            }
+            <!-- Contact info -->
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*">
+                    <mat-panel-title>{{ 'SEASON_TICKET.CONTACT' | translate }}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-season-ticket-principal-info-contact [form]="form" [seasonTicket]="seasonTicket$ | async"
+                    [putSeasonTicketCtrl]="form.controls.putSeasonTicketCtrl" />
+            </mat-expansion-panel>
+            <!-- Sales goals -->
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{ 'SEASON_TICKET.SALE_GOALS' | translate }}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-season-ticket-sales-goals [form]="form" [seasonTicket]="seasonTicket$ | async"
+                    [putSeasonTicketCtrl]="form.controls.putSeasonTicketCtrl" />
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+    <div slot="sidebar" class="season-ticket-sidebar-container-data" fxLayout="column">
+        <span class="season-ticket-sidebar-label">{{ 'SEASON_TICKET.ID' | translate }}</span>
+        <span>{{ (seasonTicket$ | async)?.id }}</span>
+    </div>
+</app-form-container>
+@if ( isLoadingOrSaving$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

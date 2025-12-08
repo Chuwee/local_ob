@@ -1,0 +1,38 @@
+<div class="event-promotions-details-container" *ngIf="(promotion$ | async) as promotion">
+    <app-nav-tabs-menu type="horizontalSubtab" [elements]="elements" [disabled]="!promotion" />
+    <!-- PROMOTION STATUS INFO -->
+    <div class="status-notifications-container">
+        <div class="status-bar">
+            <div class="promotion-activation" [class.disabled]="statusCtrl.disabled"
+                [matTooltip]="(!$disabledDueToStatus() ?
+                    'EVENTS.PROMOTIONS.DISABLED_ACTIVATION_DESC' :
+                    'EVENTS.PROMOTIONS.FORMS.INFOS.DISABLED_ACTIVATION_DUE_TO_STATUS') | translate"
+                [matTooltipDisabled]="statusCtrl.enabled">
+                <mat-slide-toggle class="ob-slide-toggle ob-label" [formControl]="statusCtrl"
+                    (change)="handleStatusChange($event.checked)">
+                    {{'EVENTS.PROMOTIONS.ACTIVATE_PROMO' | translate}}
+                </mat-slide-toggle>
+            </div>
+            <div class="promotion-type">
+                <span class="promotion-type-label ob-label">
+                    {{'EVENTS.PROMOTIONS.TYPE' | translate}}:
+                </span>
+                <span class="promotion-type-value">
+                    {{'EVENTS.PROMOTIONS.TYPE_OPTS.' + promotion.type.toUpperCase() + '.LONG' | translate}}
+                </span>
+                <span *ngIf="promotion.presale" class="promotion-presale-label highlighted-box transparent">
+                    {{'EVENTS.PRESALE' | translate}}
+                </span>
+            </div>
+            <div class="promotion-status">
+                <span class="promotion-status-label ob-label">
+                    {{'EVENTS.PROMOTIONS.STATUS' | translate}}:
+                </span>
+                <span class="ob-status-badge" [ngClass]="promotion.status.toLowerCase()">
+                    {{'EVENTS.PROMOTIONS.STATUS_OPTS.' + promotion.status | translate}}
+                </span>
+            </div>
+        </div>
+    </div>
+    <router-outlet (activate)="childComponentChange($event)" />
+</div>

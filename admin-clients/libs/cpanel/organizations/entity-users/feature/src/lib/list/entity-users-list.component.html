@@ -1,0 +1,165 @@
+<div class="list-container" fxFlex="100%" fxLayout="column">
+    <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">{{'TITLES.USERS' | translate}}</h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+            @if (userCanWrite$ | async) {
+                <div class="filter-container" fxFlex="none">
+                    <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                        [attr.aria-label]="'USER.NEW_BTN' | translate" (click)="openNewUserDialog()">
+                        <mat-icon>add</mat-icon>
+                        {{'USER.NEW_BTN' | translate}}
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="heading-container" fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxFlex="70%" fxLayoutGap="20px" fxLayoutAlign="start center">
+            <div class="filter-container" fxFlex="none">
+                <app-popover appFilter>
+                    <ob-entity-users-filter #filterContent />
+                </app-popover>
+            </div>
+            <div class="search-field" fxFlex="100%">
+                <app-search-input [placeholder]="'FORMS.SEARCH.ENTITY_USER_LIST' | translate" />
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            @if (usersMetadata$ | async; as usersMetadata) {
+                <p class="page-summary"
+                    [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: usersMetadata">
+                </p>
+            }
+            <app-paginator [length]="(usersMetadata$ | async)?.total" [pageSize]="usersPageSize" />
+        </div>
+    </div>
+    <div class="heading-container heading-divider">
+        <mat-divider />
+    </div>
+    <div class="heading-container">
+        <app-chips appFilter />
+    </div>
+    @if (usersLoading$ | async) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+    <mat-table class="ob-table" [dataSource]="users$ | async" [trackBy]="trackByFn"
+        matSort [matSortActive]="initSortCol" [matSortDirection]="initSortDir" matSortDisableClear
+        [attr.aria-label]="'TITLES.USERS' | translate"
+        [class.not-touchable]="(isHandsetOrTablet$ | async) !== true">
+        <!-- Operator Column -->
+        <ng-container matColumnDef="operator">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'USER.OPERATOR' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.operator?.name}}</mat-cell>
+        </ng-container>
+        <!-- Entity Column -->
+        <ng-container matColumnDef="entity">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'USER.ENTITY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.entity?.name}}</mat-cell>
+        </ng-container>
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'USER.NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.name}}</mat-cell>
+        </ng-container>
+        <!-- Last Name Column -->
+        <ng-container matColumnDef="last_name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'USER.LASTNAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.last_name}}</mat-cell>
+        </ng-container>
+        <!-- Email Column -->
+        <ng-container matColumnDef="email">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'USER.EMAIL' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span fxFlex="0 1 100%" appEllipsify [matTooltip]="row.email">
+                    {{row.email}}
+                </span>
+            </mat-cell>
+        </ng-container>
+        <!-- Job Title Column -->
+        <ng-container matColumnDef="job_title">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'USER.POSITION' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.job_title}}</mat-cell>
+        </ng-container>
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'USER.STATUS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" [class]="(userCanWrite$ | async) ? 'editable-cell' : 'status-cell'">
+                @if ((userCanWrite$ | async) && $loggedUser()?.id !== row.id) {
+                    <app-status-select fxFlex="100" [element]="row" statusType="USER" [statusList]="userStatusList"
+                        [updateStatus]="updateStatus" (click)="$event.stopPropagation()">
+                        <ng-template #optionTemplate let-row>
+                            {{'USER.STATUS_OPTS.' + row | translate}}
+                        </ng-template>
+                    </app-status-select>
+                } @else {
+                    <span [ngClass]="['status-dot', row.status.toLowerCase()]"></span>
+                    <span>{{'USER.STATUS_OPTS.' + row.status | translate}}</span>
+                }
+            </mat-cell>
+        </ng-container>
+        <!-- MFA Type Column -->
+        <ng-container matColumnDef="mfa_type">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'USER.MFA_TYPE' | translate}}</mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                @if (row.mfa_type && row.mfa_type !== mfaTypes.disabled) {
+                    <span class="ob-status-badge success capitalized">
+                        <mat-icon class="ob-icon xsmall"> check_circle_outline </mat-icon> {{ 'USER.STATUS_OPTS.ACTIVE' | translate }}
+                    </span>
+                }
+            </mat-cell>
+        </ng-container>
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="three-actions-cell head-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true" />
+            <mat-cell *matCellDef="let row" class="three-actions-cell" [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                @if (userCanWrite$ | async) {
+                    <div class="action-buttons" (click)="$event.stopPropagation()">
+                        <button mat-icon-button aria-label="Regenerate password" class="ob-button medium"
+                            (click)="openRegeneratePasswordDialog(row)"
+                            [matTooltip]="'ACTIONS.REGENERATE_PASSWORD' | translate">
+                            <mat-icon svgIcon="renew-password" />
+                        </button>
+                        @if ((isUserOperatorMgr$ | async) || (isSysAdmin$ | async)) {
+                            <button mat-icon-button aria-label="Set password"
+                                class="ob-button medium"
+                                (click)="openSetPasswordDialog(row)"
+                                [matTooltip]="'ACTIONS.SET_PASSWORD' | translate">
+                                <mat-icon svgIcon="new-password" />
+                            </button>
+                        }
+                        <button mat-icon-button aria-label="Delete user" class="ob-button medium"
+                            (click)="openDeleteUserDialog(row)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+                }
+            </mat-cell>
+        </ng-container>
+        @if (displayedColumns$ | async; as displayedColumns) {
+            <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" />
+            <mat-row *matRowDef="let row; columns: displayedColumns;" class="interactive-row"
+                [routerLink]="[row.id, 'register-data']" />
+        }
+    </mat-table>
+    @if ((usersMetadata$ | async)?.total === 0) {
+        <div class="context-notification-container" fxFlex="0 50 100%" fxLayout="row" fxLayoutAlign="center start">
+            <app-context-notification class="ob-context-notification" contextType="info"
+                fxFlex.gt-sm="600px" fxFlex="80%" fxLayoutAlign="center start">
+                <p>{{'LIST.EMPTY' | translate}}</p>
+            </app-context-notification>
+        </div>
+    }
+</div>

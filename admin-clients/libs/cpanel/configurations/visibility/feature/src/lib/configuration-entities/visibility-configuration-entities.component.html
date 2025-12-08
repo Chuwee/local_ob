@@ -1,0 +1,74 @@
+<div class="visibility-config-container" fxLayout="row">
+
+    <div fxFlex="0 0 250px" fxLayout="column">
+        <app-selector-list class="operator-selector" fxFlex="none" [externalOptions$]="operatorsBS"
+            [loadBy]="loadOperators" [formControl]="operatorSelectForm" [searchInputPlaceholder]="'FORMS.SEARCH.OPERATOR' | translate">
+            <ng-template #optionTemplate let-row>
+                <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between">
+                    <span fxLayoutAlign="start center">{{row.name}}</span>
+                    <span *ngIf="(selectedEntitiesInEachOperatorBS | async)[row.id] as entitiesCounter" fxFlex="none"
+                        class="badge-option">
+                        {{ entitiesCounter }}
+                    </span>
+                    <span *ngIf="(selectedOperatorsBS| async).includes(row.id)" fxFlex="none"
+                        class="badge-option">
+                        {{ 'VISIBILITY.OPERATOR_ALL' | translate }}
+                    </span>
+                </div>
+            </ng-template>
+        </app-selector-list>
+    </div>
+
+    <app-searchable-paginated-selection fxFlex="1 1"
+        [placeholder]="'FORMS.SEARCH.ENTITIES' | translate" (loadData)="filterChangeHandler($event)"
+        [form]="selectedEntitiesCtrl" [pageSize]="pageSize" [data$]="entitiesList$"
+        [metadata$]="metadata$" [loading$]="entitiesLoading$">
+        <button slot="filter" type="button" mat-flat-button class="show-selected-only-button ob-button"
+            color="tertiary" [class.active]="isSelectedOnlyMode$ | async"
+            [matTooltip]="'VISIBILITY.SHOW_SELECTED_TOOLTIP' | translate"
+            (click)="showSelectedOnlyClick.emit()" [disabled]="(selectedEntitiesInSelectedOperatorBS | async).length === 0">
+            <mat-icon>visibility</mat-icon>
+            {{'VISIBILITY.SHOW_SELECTED' | translate}}
+        </button>
+        <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data"
+            let-selectionChanged="selectionChanged">
+            <app-selection-list [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged" class="small-rows"
+                [selectionDisabled]="allSelectedBS | async">
+                <div slot="subheader" class="list-header">
+                    <div fxLayoutAlign="space-between" fxFlex="0 1 100%">
+                        <div>
+                            <mat-checkbox color="primary" [disabled]="(isSelectedOnlyMode$ | async)"
+                                (change)="selectOperatorAsVisible($event)"
+                                [checked]="(allSelectedBS | async)"
+                                [indeterminate]="(selectedEntitiesInSelectedOperatorBS | async).length > 0 &&
+                                    (selectedEntitiesInSelectedOperatorBS | async).length < (metadata$ | async).total">
+                            </mat-checkbox>
+                            <span>{{ selectedOperator.name }}</span>
+                        </div>
+                        <div fxFlex="0 1 200px">
+                            <span>{{'VISIBILITY.LABELS.TYPE' | translate}}</span>
+                        </div>
+                    </div>
+                </div>
+                <ng-template #optionTemplate let-row>
+                    <div fxLayoutAlign="space-between center">
+                        <span>{{row.name}}</span>
+                        <div fxFlex="0 1 250px" (click)="$event.stopPropagation()">
+                            <mat-form-field fxFlex appearance="outline"
+                                class="ob-form-field type-select thin-select-field">
+                                <mat-select [placeholder]="'FORMS.ACTIONS.SELECT' | translate" (selectionChange)="typeChange($event, row)"
+                                    [value]="row.type" [disabled]="row.disabled">
+                                    <mat-option *ngFor="let type of visibilityRelationTypes" [value]="type">
+                                        <div>
+                                            {{('VISIBILITY.RELATION_TYPE.' + type) | translate}}
+                                        </div>
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </ng-template>
+            </app-selection-list>
+        </ng-template>
+    </app-searchable-paginated-selection>
+</div>

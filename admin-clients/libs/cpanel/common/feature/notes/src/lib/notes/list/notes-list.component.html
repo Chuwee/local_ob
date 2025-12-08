@@ -1,0 +1,52 @@
+<div class="left-bar-container" fxFlex="1 1 100%" *ngIf="notesList$ | async as notes">
+    <div class="left-bar" fxFlex="1 1 auto" fxLayout="column" fxLayoutAlign="justify">
+        <div class="left-sidebar-title" fxLayout="column">
+            <div fxLayout="row" fxLayoutAlign="justify center">
+                <h2 class="title">{{'NOTES.TITLE' | translate}}</h2>
+                <button mat-icon-button type="button" *ngIf="userCanWrite" [disabled]="isLoading$ | async"
+                    class="ob-button mat-stroked-button xsmall" (click)="addNote.emit()" [matTooltip]="'NOTES.NEW' | translate">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+            <div fxFlex class="results-count">
+                <span>
+                    {{'RESULTS.TOTAL' | translate}}
+                </span>
+                <span>{{ totalNotes }}</span>
+            </div>
+        </div>
+        <div fxFlex="36px" class="left-sidebar-header" fxLayoutAlign="end center">
+            <ng-container *ngIf="{ current: currentNote$ | async } as note">
+                <button mat-icon-button aria-label="Delete promotion" class="ob-button small" *ngIf="userCanWrite"
+                    (click)="onDeleteNote(note.current)" [disabled]="(isLoading$ | async) || totalNotes === 0"
+                    [matTooltip]="'NOTES.DELETE' | translate">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </ng-container>
+        </div>
+        <div fxLayout="column" fxFlex="1 1 100%" class="list-container">
+            <mat-selection-list (selectionChange)="onNoteSelected($event.options[0]?.value)" class="ob-lateral-select-list"
+                appLastPathGuardListener disableRipple [currValue]="(currentNote$ | async)?.id" [multiple]="false">
+                <mat-list-option #option *ngFor="let item of notes" [value]="item.id" [selected]="item.id === selectedNoteId"
+                    [disabled]="option.selected" [id]="'note-list-option-' + item.id">
+                    <span class="list-item-title" appEllipsify [matTooltip]="item.title" [matTooltipShowDelay]="500">
+                        {{item.title}}
+                    </span>
+                    <span class="list-item-subtitle" appEllipsify [matTooltip]="(item.dates.create_date | dateTime : showDateTime ?
+                        dateTimeFormats.shortDateTime : dateTimeFormats.shortDate)" matTooltipClass="ob-tooltip-nowrap"
+                        [matTooltipShowDelay]="800">
+                        {{item.dates.update_date | dateTime : showDateTime ? dateTimeFormats.shortDateTime : dateTimeFormats.shortDate}}
+                    </span>
+                    <span class="list-item-subtitle" *ngIf="showNoteUser">
+                        {{item?.users?.update_user?.username}}
+                    </span>
+                </mat-list-option>
+            </mat-selection-list>
+        </div>
+    </div>
+    <div *ngIf="isLoading$ | async" class="loading-state-container" fxLayoutAlign="center center">
+        <div class="loading-state-background" fxLayout="row" fxLayoutAlign="center center">
+            <mat-spinner *ngIf="isLoading$ | async"></mat-spinner>
+        </div>
+    </div>
+</div>

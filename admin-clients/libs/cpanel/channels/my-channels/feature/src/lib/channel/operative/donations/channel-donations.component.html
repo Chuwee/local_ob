@@ -1,0 +1,127 @@
+<app-form-container (cancel)="cancel()" [disabled]="(inProgress$ | async) || !form.dirty" (save)="save()" layout="menu"
+    class="overflow-y-auto">
+    <div [formGroup]="form" fxLayout="column" fxLayoutGap="16px">
+        <p class="mat-body-2">
+            {{'CHANNELS.DONATIONS.DESCRIPTION' | translate}}
+        </p>
+        <mat-checkbox class="allow-donations-check" color="primary" formControlName="enabled">
+            {{'CHANNELS.DONATIONS.ALLOW'| translate}}
+        </mat-checkbox>
+        <div fxLayout="column" class="checkbox-content" [fxShow]="form.controls.enabled.value" fxLayoutGap="24px">
+            <div fxLayout="row">
+                <mat-form-field [hideRequiredMarker]="true" fxFlex="368px" appearance="outline"
+                    class="ob-form-field field-with-label inline-field">
+                    <mat-label>{{'CHANNELS.DONATIONS.PROVIDER' | translate}}</mat-label>
+                    <mat-select [formControl]="providerFormGroup.controls.id" placeholder="{{'FORMS.ACTIONS.SELECT' | translate }}"
+                        data-test="donation-provider">
+                        @for (donationProvider of donationsProviders$ | async; track donationProvider.id) {
+                            <mat-option [value]="donationProvider.id">
+                                {{ donationProvider.name }}
+                            </mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="" />
+                </mat-form-field>
+            </div>
+            <div [fxShow]="providerFormGroup.controls.id.value" fxLayout="column" fxLayoutGap="16px">
+                <div fxLayout="column" fxLayoutGap="8px">
+                    <div class="campaign-title">{{'CHANNELS.DONATIONS.CAMPAIGN.LABEL' | translate}}</div>
+                    <div>{{'CHANNELS.DONATIONS.CAMPAIGN.DESCRIPTION' | translate}}</div>
+                </div>
+                <div fxLayout="column" fxLayoutGap="8px">
+                    <div fxLayout="row">
+                        <mat-form-field fxFlex="368px" appearance="outline" class="ob-form-field inline-field">
+                            <mat-select class="select-campaign" [formControl]="providerFormGroup.controls.target_id"
+                                placeholder="{{'FORMS.ACTIONS.SELECT' | translate }}"
+                                data-test="donation-campaign" #select>
+                                @if (selectedCampaign$ | async; as campaign) {
+                                    <ng-container ngProjectAs="mat-select-trigger">
+                                        <mat-select-trigger>
+                                            <div>{{ campaign?.name }}&nbsp;<b>{{campaign?.foundation}}</b></div>
+                                        </mat-select-trigger>
+                                    </ng-container>
+                                }
+                                @for (campaign of campaigns$ | async; track campaign.id) {
+                                    <mat-option [value]="campaign.id">
+                                        <div class="campaign-option">{{ campaign?.name }}
+                                            <div><b>{{campaign?.foundation}}</b></div>
+                                        </div>
+                                    </mat-option>
+                                }
+                            </mat-select>
+                            <mat-error [ob-form-errors]="" />
+                        </mat-form-field>
+                    </div>
+                    @if (selectedCampaign$ | async; as campaign) {
+                        <div fxLayoutAlign="start center" fxLayout="row">
+                            <mat-icon class="ob-icon small neutral with-text">info</mat-icon>
+                            <span>{{'CHANNELS.DONATIONS.CAMPAIGN.CURRENCY' | translate:
+                        {currency: ((('CURRENCIES.' + campaign.currency_code) | translate)
+                        + ' (' + (campaign.currency_code | localCurrencySymbol) + ')')} }}</span>
+                        </div>
+                    }
+                </div>
+                @if (selectedProvider$ | async; as provider) {
+                    <div fxLayout="row" fxLayoutGap="8px">
+                        <div><mat-icon>search_off</mat-icon></div>
+                        <div fxLayout="column" fxLayoutGap="8px">
+                            <div class="campaign-title">{{'CHANNELS.DONATIONS.CAMPAIGN.NOT_FOUND.TITLE' | translate}}</div>
+                            <a class="ob-link" target="_blank"
+                                [href]="('CHANNELS.DONATIONS.PROVIDERS.' + provider + '.ADD_MORE_LINK') | translate">
+                                {{'CHANNELS.DONATIONS.CAMPAIGN.NOT_FOUND.ACTION' | translate}}
+                            </a>
+                        </div>
+                    </div>
+                }
+                <div fxLayout="column" fxLayoutGap="16px" [fxShow]="providerFormGroup.controls.target_id.value">
+                    <mat-divider class="ob-divider" />
+                    <div [formGroup]="settingsFormGroup" fxLayout="column" fxLayoutGap="8px">
+                        <div class="donations-type">{{'CHANNELS.DONATIONS.TYPE.TITLE' | translate}}</div>
+                        <div>{{'CHANNELS.DONATIONS.TYPE.DESCRIPTION' | translate}}</div>
+                        <mat-radio-group class="donation-types" fxFlex.lt-md="100%" fxLayout="column" fxLayoutGap="16px"
+                            formControlName="type">
+                            <mat-radio-button class="ob-radio-button wrap-label" [value]="'ROUND_UP'">
+                                <div class="option-title">{{'CHANNELS.DONATIONS.TYPE.ROUND_UP.TITLE' | translate}}</div>
+                                <div class="mat-radio-label">{{'CHANNELS.DONATIONS.TYPE.ROUND_UP.DESCRIPTION' | translate}}</div>
+                            </mat-radio-button>
+                            <mat-radio-button class="ob-radio-button wrap-label" [value]="'UNRESTRICTED'">
+                                <div class="option-title">{{'CHANNELS.DONATIONS.TYPE.UNRESTRICTED.TITLE' | translate}}</div>
+                                <div class="mat-radio-label">{{'CHANNELS.DONATIONS.TYPE.UNRESTRICTED.DESCRIPTION' | translate}}</div>
+                            </mat-radio-button>
+                            <mat-radio-button class="ob-radio-button wrap-label" [value]="'CUSTOM'" fxLayout="column">
+                                <div class="option-title">{{'CHANNELS.DONATIONS.TYPE.CUSTOM.TITLE' | translate}}</div>
+                                <div class="custom-body">{{'CHANNELS.DONATIONS.TYPE.CUSTOM.DESCRIPTION' | translate}}</div>
+                            </mat-radio-button>
+                            <div class="nested-content" fxLayout="column"
+                                [fxShow]="settingsFormGroup.controls.type.value === 'CUSTOM'">
+                                <div fxLayout="row">
+                                    <app-collection-input fxFlex="412px" formControlName="options" [placeholder]="0.00"
+                                        [buttonLabel]="'FORMS.ACTIONS.ADD' | translate" avoidNegativeNumbers
+                                        [currencyType]="currency$ | async">
+                                        <ng-template #elementsCollectionTemplate>
+                                            <app-chips [chips$]="currentAmountsChips$" [isRemoveAllShown]="false"
+                                                (removeEmitter)="removeChip($event)"
+                                                class="ellipsified-chips without-max-height amounts-chips" />
+                                        </ng-template>
+                                    </app-collection-input>
+                                </div>
+                                @if (!settingsFormGroup.hasError('required', 'options')) {
+                                    <mat-error
+                                        [ob-form-errors]="settingsFormGroup" field="options" />
+                                }
+                            </div>
+                        </mat-radio-group>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</app-form-container>
+
+@if (inProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

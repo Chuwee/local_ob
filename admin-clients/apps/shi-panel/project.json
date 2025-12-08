@@ -1,0 +1,114 @@
+{
+  "name": "shi-panel",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/shi-panel/src",
+  "prefix": "admin-clients",
+  "tags": ["scope:shi-panel", "type:app"],
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:application",
+      "outputs": ["{options.outputPath}"],
+      "inputs": ["styled", "^production"],
+      "options": {
+        "outputPath": "dist/apps/shi-panel",
+        "index": "apps/shi-panel/src/index.html",
+        "browser": "apps/shi-panel/src/main.ts",
+        "polyfills": ["apps/shi-panel/src/polyfills.ts"],
+        "tsConfig": "apps/shi-panel/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": [
+          "apps/shi-panel/src/assets",
+          "apps/shi-panel/src/environment.js",
+          "apps/shi-panel/src/manifest.webmanifest"
+        ],
+        "styles": ["apps/shi-panel/src/styles.scss"],
+        "stylePreprocessorOptions": {
+          "includePaths": [""]
+        }
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "outputHashing": "all",
+          "sourceMap": false,
+          "namedChunks": false,
+          "extractLicenses": true,
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "2mb",
+              "maximumError": "5mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "serviceWorker": "apps/shi-panel/ngsw-config.json"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "proxyConfig": "apps/shi-panel/proxy.conf.js",
+          "buildTarget": "shi-panel:build:production"
+        },
+        "development": {
+          "proxyConfig": "apps/shi-panel/proxy.conf.js",
+          "buildTarget": "shi-panel:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "buildTarget": "shi-panel:build"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/shi-panel/jest.config.ts"
+      }
+    },
+    "deploy": {
+      "executor": "@OneboxTM/tools:deploy",
+      "options": {
+        "buildOutputPath": "dist/apps/shi-panel/browser",
+        "environments": "apps/shi-panel/environments.json",
+        "removeMode": "DEPRECATE"
+      }
+    },
+    "remove": {
+      "executor": "@OneboxTM/tools:remove",
+      "options": {
+        "environments": "apps/shi-panel/environments.json"
+      }
+    },
+    "info": {
+      "executor": "@OneboxTM/tools:info",
+      "options": {
+        "buildOutputPath": "dist/apps/shi-panel/browser"
+      }
+    },
+    "environment": {
+      "executor": "@OneboxTM/tools:env"
+    }
+  }
+}

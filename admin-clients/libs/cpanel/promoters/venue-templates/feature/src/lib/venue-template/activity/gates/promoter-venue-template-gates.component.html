@@ -1,0 +1,26 @@
+<app-form-container fxFlex="0 1 100%" layout="main" [disabled]="!form.dirty || (loading$ | async)"
+    (cancel)="cancel()" (save)="save()">
+    <div>
+        <!-- GATES -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'VENUES.GATES' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-activity-venue-template-gates fxFlex="0 0 100%" fxFlex.gt-md="0 0 50%"
+                class="template-gates-form-element" [form]="form" (dataChange)="gatesChanged()" />
+        </mat-expansion-panel>
+        <!-- PRICE TYPE GATES -->
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'VENUE_TPLS.PRICE_TYPE_GATES' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-activity-venue-template-price-types-gates fxFlex="0 0 100%" class="template-gates-form-element"
+                [venueTemplate]="venueTemplate$ | async" [form]="form" />
+        </mat-expansion-panel>
+    </div>
+</app-form-container>
+@if(loading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

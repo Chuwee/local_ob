@@ -1,0 +1,187 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="!form.dirty" [formGroup]="form">
+    <!-- THIRD PARTIES LOGIN -->
+    <mat-expansion-panel expanded togglePosition="before">
+        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+            <mat-panel-title>{{'ENTITY.THIRD_PARTIES_LOGIN' | translate}}</mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="flex">
+            <div class="flex flex-col basis-full">
+                <mat-checkbox color="primary" [formControl]="form.controls.thirdPartyLogin">
+                    {{'ENTITY.ENABLE_THIRD_PARTIES_LOGIN' | translate}}
+                </mat-checkbox>
+                <div class="flex">
+                    <div class="flex flex-col lg:basis-2/5 basis-full">
+                        <mat-form-field appearance="outline"
+                            class="ob-form-field entity-configuration-selector field-with-label">
+                            <mat-label>{{'FORMS.LABELS.PLATFORMS' | translate}}</mat-label>
+                            <mat-select [multiple]="true" [formControl]="form.controls.authVendors"
+                                [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                                @for (vendor of authVendorsList$ |async; track vendor.id) {
+                                    <mat-option [value]="vendor.id">{{vendor.id}}</mat-option>
+                                }
+                            </mat-select>
+                            <mat-error [ob-form-errors]="form.controls.authVendors" />
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-expansion-panel>
+    <!-- INTERACTIVE VENUES -->
+    <mat-expansion-panel expanded togglePosition="before">
+        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+            <mat-panel-title>{{'ENTITY.INTERACTIVE_VENUES' | translate}}</mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="flex">
+            <div class="flex flex-col basis-full">
+                <div class="flex gap-2 items-start">
+                    <mat-checkbox color="primary" [formControl]="form.controls.interactiveVenue">
+                        {{'ENTITY.ENABLE_INTERACTIVE_VENUES' | translate}}
+                    </mat-checkbox>
+                    <mat-icon class="ob-help-icon" [matTooltip]="'ENTITY.INTERACTIVE_VENUES_INFO' | translate">
+                        help_outline
+                    </mat-icon>
+                </div>
+                <div class="flex">
+                    <div class="flex flex-col lg:basis-2/5 basis-full">
+                        <mat-form-field appearance="outline" class="ob-form-field entity-configuration-selector field-with-label">
+                            <mat-label>{{'FORMS.LABELS.ALLOWED_INTERACTIVE_VENUES' | translate}}</mat-label>
+                            <mat-select [multiple]="true" [formControl]="form.controls.allowedInteractiveVenues"
+                                [placeholder]="'FORMS.ACTIONS.SELECT' | translate">
+                                @for (interactiveVenue of interactiveVenues | keyvalue; track interactiveVenue.value) {
+                                    <mat-option [value]="interactiveVenue.value">
+                                        {{('ENTITY.ALLOWED_INTERACTIVE_VENUES.' + interactiveVenue.value) | translate}}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                            <mat-error [ob-form-errors]="form.controls.allowedInteractiveVenues" />
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-expansion-panel>
+    <!-- ENABLE WHATSAPP -->
+    @if (isOperatorManager$ | async) {
+        <mat-expansion-panel expanded togglePosition="before" [formGroup]="whatsappFormGroup">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'ENTITY.ALLOW_WHATSAPP_TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex">
+                <div class="flex flex-col basis-full gap-4">
+                    <mat-checkbox color="primary" [formControl]="whatsappFormGroup.controls.enabled">
+                        {{'ENTITY.ALLOW_WHATSAPP_CHECKBOX' | translate}}
+                    </mat-checkbox>
+                    <div class="flex items-start">
+                        <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                        <span>{{'ENTITY.ALLOW_WHATSAPP_INFO' | translate}}</span>
+                    </div>
+                    @if (showWhatsappTemplates$ | async) {
+                        <div class="whatsapp-templates-container">
+                            <p class="whatsapp-template-title">{{'ENTITY.ALLOW_WHATSAPP.TEMPLATES.TITLE' | translate}}</p>
+                            <div class="whatsapp-template-description">{{'ENTITY.ALLOW_WHATSAPP.TEMPLATES.DESCRIPTION' | translate}}</div>
+                            <mat-radio-group [formControl]="whatsappFormGroup.controls.whatsapp_template" class="no-padding flex flex-col">
+                                @for (whatsappTemplate of whatsappTemplates$ | async; track whatsappTemplate.id) {
+                                    <mat-radio-button class="ob-radio-button vertical-list flex flex-col" [value]="whatsappTemplate.id">
+                                        <div class="whatsapp-template-name">{{whatsappTemplate.name}}</div>
+                                        <div class="flex">
+                                            <p class="basis-[405px] shrink whatsapp-template-preview">{{whatsappTemplate.preview}}</p>
+                                        </div>
+                                    </mat-radio-button>
+                                }
+                            </mat-radio-group>
+                        </div>
+                    }
+                </div>
+            </div>
+        </mat-expansion-panel>
+    }
+    <!-- ACCOMMODATIONS -->
+    @if (isAccommodationsAllowed$ | async) {
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'ENTITY.ACCOMMODATIONS.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex">
+                <div class="flex flex-col basis-full">
+                    <div class="accommodations-checkbox flex gap-5" [formGroup]="accommodationsFormGroup">
+                        <mat-checkbox color="primary" [formControl]="accommodationsFormGroup.controls.enabled">
+                            {{'ENTITY.ACCOMMODATIONS.ENABLE' | translate}}
+                        </mat-checkbox>
+                    </div>
+                    <div [class.hidden]="accommodationsFormGroup.value.enabled !== true" class="accommodations-form-section"
+                        [formGroup]="accommodationsFormGroup">
+                        <div class="channels-description">
+                            <span class="mat-subtitle-2 flex items-center justify-start">
+                                {{'ENTITY.ACCOMMODATIONS.CHANNELS_DESCRIPTION' | translate}}
+                            </span>
+                        </div>
+                        <mat-radio-group [formControl]="accommodationsFormGroup.controls.channel_enabling_mode" class="flex flex-col">
+                            <mat-radio-button class="ob-radio-button vertical-list" [value]="accommodationsScope.all">
+                                {{'ENTITY.ACCOMMODATIONS.CHANNELS_OPTS.ALL' | translate}}
+                            </mat-radio-button>
+                            <mat-radio-button class="ob-radio-button vertical-list" [value]="accommodationsScope.restricted">
+                                {{'ENTITY.ACCOMMODATIONS.CHANNELS_OPTS.SELECT' | translate}}
+                            </mat-radio-button>
+                        </mat-radio-group>
+                        <div [class.hidden]="accommodationsFormGroup.controls.channel_enabling_mode.value !== accommodationsScope.restricted"
+                            class="channels-container">
+                            <div class="channels-list-container nested-content">
+                                <div class="channels-list" [class.field-error]="accommodationsFormGroup.controls.enabled_channels.invalid &&
+                                        accommodationsFormGroup.controls.enabled_channels.touched">
+                                    <app-searchable-paginated-selection class="ob-medium-list"
+                                        [placeholder]="'FORMS.SEARCH_CHANNEL_FIELD' | translate"
+                                        [pageSize]="pageSize" [form]="accommodationsFormGroup.controls.enabled_channels"
+                                        [loading$]="isLoading$" [data$]="channelsListData$" [metadata$]="metadata$"
+                                        (loadData)="reloadChannelsList($event)">
+                                        <div slot="filter">
+                                            <div class="flex">
+                                                <div class="flex flex-col basis-[200px]">
+                                                    <mat-form-field appearance="outline"
+                                                        class="ob-form-field field-with-label inline-field">
+                                                        <mat-label>{{'CHANNELS.TYPE' | translate}}</mat-label>
+                                                        <mat-select [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate"
+                                                            [formControl]="typeControl">
+                                                            <mat-option>
+                                                                {{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}
+                                                            </mat-option>
+                                                            @for (type of channelType | keyvalue; track type.value) {
+                                                                <mat-option [value]="type.value">
+                                                                    {{type.value && 'CHANNELS.TYPE_OPTS.' + type.value | translate}}
+                                                                </mat-option>
+                                                            }
+                                                        </mat-select>
+                                                    </mat-form-field>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data"
+                                            let-selectionChanged="selectionChanged">
+                                            <app-selection-list [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged"
+                                                class="small-rows">
+                                                <ng-template #optionTemplate let-row>
+                                                    <div class="flex justify-between">
+                                                        <span>{{row.name}}</span>
+                                                    </div>
+                                                </ng-template>
+                                            </app-selection-list>
+                                        </ng-template>
+                                    </app-searchable-paginated-selection>
+                                </div>
+                                @if (accommodationsFormGroup.controls.enabled_channels.hasError('required') &&
+                                    accommodationsFormGroup.controls.enabled_channels.touched) {
+                                    <span class="error-description">
+                                        {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-expansion-panel>
+    }
+</app-form-container>
+@if (reqInProgress$ | async) {
+    <div class="spinner-container"><mat-spinner /></div>
+}

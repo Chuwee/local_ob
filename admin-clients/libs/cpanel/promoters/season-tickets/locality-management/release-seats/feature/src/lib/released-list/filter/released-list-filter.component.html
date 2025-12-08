@@ -1,0 +1,39 @@
+<div [formGroup]="form" class="flex flex-wrap justify-between items-start gap-4">
+    <div class="flex flex-row filter-block">
+        <div class="filter-block-input released-list">
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label" subscriptSizing="dynamic">
+                <mat-label>{{'FORMS.LABELS.SEASON_TICKET.RELEASE_SEAT.RELEASED_LIST.SESSION' | translate}}</mat-label>
+                <mat-select #selectTarget formControlName="session_id" (selectionChange)="changeSessionHandler($event)"
+                    [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                    <mat-option>
+                        <app-select-search #sessionSelectSearch [options$]="originalSessionList$" [requireSelection]="true"
+                            [placeholderLabel]="'FORMS.SEARCH.IN_LIST' | translate" searchField="session_name" />
+                    </mat-option>
+                    @if (sessionSelectSearch.getFilteredOptions$() | async; as targetOptions) {
+                        @for (session of targetOptions; track $index) {
+                            <mat-option [value]="session.session_id">
+                                <span>{{session && (session.session_name + ' - ' | translate)}}</span>
+                                <span>{{session && (session.session_starting_date | dateTime : dateTimeFormats.shortDateTime)}}</span>
+                            </mat-option>
+                        }
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+    <div class="flex flex-row filter-block">
+        <div class="filter-block-input released-status">
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label status-select" subscriptSizing="dynamic">
+                <mat-label>{{'FORMS.LABELS.SEASON_TICKET.RELEASE_SEAT.RELEASED_LIST.STATUS' | translate}}</mat-label>
+                <mat-select formControlName="release_status" multiple (openedChange)="changeStatusHandler($event)"
+                    [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                    @for (status of statusList; track $index) {
+                        <mat-option [value]="status.id">
+                            {{status && (status.name | translate)}}
+                        </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+</div>

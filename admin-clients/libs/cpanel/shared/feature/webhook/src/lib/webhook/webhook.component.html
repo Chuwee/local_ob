@@ -1,0 +1,68 @@
+@if ({webhook: webhook$ | async}; as data) {
+    <div [formGroup]="form" fxLayout="column" fxLayoutGap="24px">
+        @if($isSysAdminForm()){
+            <mat-checkbox fxFlex="100%" color="primary" formControlName="enabled" #enabler>
+                {{'WEBHOOKS.ENABLE' | translate}}
+            </mat-checkbox>
+        }
+        <div fxLayout="row">
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label"
+                [ngClass]="$isSysAdminForm() ? 'flex-[0_1_60%]' : 'flex-[0_1_100%]'">
+                <mat-label>{{'WEBHOOKS.URL' | translate}}</mat-label>
+                <input matInput [placeholder]="'WEBHOOKS.URL_PLACEHOLDER' | translate" formControlName="url" aria-label="url">
+                <app-help-button matSuffix [message]="'WEBHOOKS.URL_INFO' | translate" />
+                <mat-error [ob-form-errors]="form" field="url" />
+            </mat-form-field>
+        </div>
+        <div fxFlex="0 1 100%" fxLayout="column" fxLayoutGap="16px" formGroupName="events">
+            <div class="flex flex-col gap-[8px]">
+                <span class="events-label">{{'WEBHOOKS.EVENTS_TITLE' | translate}}</span>
+                <p class="description">
+                    {{'WEBHOOKS.EVENTS_DESCRIPTION' | translate}}
+                </p>
+            </div>
+            @for (event of webhookEvents; track event) {
+                <mat-checkbox fxFlex="100%" color="primary" [formControlName]="event">
+                    {{'WEBHOOKS.EVENT.' + event | translate}}
+                </mat-checkbox>
+            }
+            @if (form.get('events').touched && form.get('events').invalid) {
+                <mat-error [ob-form-errors]="form" field="events" />
+            }
+        </div>
+        @if($isSysAdminForm() || data.webhook?.id){
+            <div class="details-non-editable-field ob-form-field webhook-key"
+                fxFlex="100%" fxFlex.gt-sm="50%" fxLayout="column" aria-label="">
+                <span class="field-label">{{'WEBHOOKS.KEY' | translate}}</span>
+                <div fxLayoutAlign="start center">
+                    <span>{{apiKeyCtrl?.value || ('WEBHOOKS.KEY_PLACEHOLDER' | translate)}}</span>
+                    @if (!!data.webhook) {
+                        <app-copy-text class="copy-key-button" [copyText]="apiKeyCtrl?.value"
+                            [copyOk]="'WEBHOOKS.KEY_COPY_OK' | translate" [copyKo]="'WEBHOOKS.KEY_COPY_KO' | translate"
+                            [copyTooltip]="'WEBHOOKS.COPY_KEY' | translate" />
+                        <button mat-icon-button class="ob-button medium only-icon refresh-key-button" aria-label="refresh"
+                            [matTooltip]="'WEBHOOKS.KEY_REFRESH' | translate" (click)="refresh()">
+                            <mat-icon fontIcon="autorenew" />
+                        </button>
+                    } @else{
+                        <mat-icon [matTooltip]="'WEBHOOKS.KEY_INFO' | translate" class="ob-help-icon" fontIcon="help_outline" />
+                    }
+                </div>
+            </div>
+            <div class="details-non-editable-field ob-form-field"
+                fxFlex="100%" fxFlex.gt-sm="50%" fxLayout="column" aria-label="">
+                <span class="field-label">{{'WEBHOOKS.ID' | translate}}</span>
+                <div fxLayoutAlign="start center">
+                    <span>{{data.webhook?.id || ('WEBHOOKS.ID_PLACEHOLDER' | translate)}}</span>
+                    @if (!!data.webhook) {
+                        <app-copy-text class="copy-id-button" [copyText]="data.webhook?.id"
+                            [copyOk]="'WEBHOOKS.ID_COPY_OK' | translate" [copyKo]="'WEBHOOKS.ID_COPY_KO' | translate"
+                            [copyTooltip]="'WEBHOOKS.COPY_ID' | translate" />
+                    } @else {
+                        <mat-icon [matTooltip]="'WEBHOOKS.ID_INFO' | translate" class="ob-help-icon" fontIcon="help_outline" />
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}

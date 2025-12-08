@@ -1,0 +1,29 @@
+<app-form-container [disabled]="!form.dirty || (loading$ | async)" (cancel)="cancel()" (save)="save()">
+    <form [formGroup]="form">
+        <div fxLayout="row wrap" class="pack-form-section">
+            <mat-expansion-panel [expanded]="true" togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'CHANNELS.PACKS.PACK_DATA' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-form-field id="name" fxFlex="100%" fxFlex.gt-md="50%" appearance="outline"
+                    class="ob-form-field field-with-label custom-layout">
+                    <mat-label class="custom-label">{{ 'FORMS.LABELS.NAME' | translate }}</mat-label>
+                    <input formControlName="name" matInput [placeholder]="'CHANNELS.PACKS.GENERAL_DATA.NAME_PLACEHOLDER' | translate">
+                    <mat-error [ob-form-errors]="form" field="name" />
+                </mat-form-field>
+            </mat-expansion-panel>
+            <mat-expansion-panel [expanded]="true" togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.CATEGORIES' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-categories-selection [form]="form" [item]="$pack()" [putItemCtrl]="form.controls['putCategoriesCtrl']" />
+            </mat-expansion-panel>
+        </div>
+    </form>
+</app-form-container>
+
+@if(loading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,114 @@
+<form [formGroup]="filtersForm" fxLayout="column" fxLayoutGap="16px">
+    @if(canSelectEntity$ | async) {
+        <div fxLayout="row" class="filter-block">
+            <div class="ob-label" fxFlex="120px">
+                {{'FORMS.LABELS.ENTITY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="550px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select formControlName="entity" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate">
+                        <mat-option>
+                            <app-select-search #entitySelectSearch [options$]="entities$" searchField="name" />
+                        </mat-option>
+                        @for (entity of entitySelectSearch.getFilteredOptions$() | async; track entity) {
+                            <mat-option [value]="entity">
+                                {{entity ? entity.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-divider [inset]="true" />
+    }
+    <div fxLayout="row" fxLayoutAlign="space-between" class="filter-block" fxLayoutGap="10px">
+        <div>
+            <div class="ob-label" fxFlex="120px">
+                {{'FORMS.LABELS.VENUE_ENTITY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select formControlName="venueEntity" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option>
+                            <app-select-search #venueEntitySelectSearch [options$]="venueEntities$" searchField="name" />
+                        </mat-option>
+                        @for (entity of venueEntitySelectSearch.getFilteredOptions$() | async; track entity) {
+                            <mat-option [value]="entity">
+                                <div appEllipsify [matTooltip]="entity ? entity.name : ('FORMS.SELECT.ALL_ELEMENTS_MALE' | translate)">
+                                    {{entity ? entity.name : ('FORMS.SELECT.ALL_ELEMENTS_MALE' | translate)}}
+                                </div>
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div>
+            <div class="ob-label">
+                {{'FORMS.LABELS.VENUE' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <app-select-server-search formControlName="venue" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate"
+                        [options$]="venues$" (loadOptions)="loadVenues($event)" [moreOptionsAvailable$]="moreVenuesAvailable$" />
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="space-between" class="filter-block" fxLayoutGap="10px">
+        <div>
+            <div class="ob-label" fxFlex="120px">
+                {{'FORMS.LABELS.CITY' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select formControlName="city" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate">
+                        <mat-option>
+                            <app-select-search #citySelectSearch [options$]="cities$" searchField="name" />
+                        </mat-option>
+                        @for(city of citySelectSearch.getFilteredOptions$() | async; track city) {
+                            <mat-option [value]="city">
+                                {{city ? city.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div>
+            <div class="ob-label">
+                {{'VENUE_TPLS.GRAPHIC' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select formControlName="graphic" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate">
+                        <mat-option>{{'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate}}</mat-option>
+                        <mat-option [value]="true">{{'FORMS.LABELS.YES' | translate}}</mat-option>
+                        <mat-option [value]="false">{{'FORMS.LABELS.NO' | translate}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="space-between" class="filter-block" fxLayoutGap="10px">
+        <div>
+            <div class="ob-label" fxFlex="120px">
+                {{'FORMS.LABELS.TYPE' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field type-select">
+                    <mat-select formControlName="type" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option [value]="null">
+                            {{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}
+                        </mat-option>
+                        @for(type of types; track type) {
+                            <mat-option [value]="type">
+                                {{type?.name | translate}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+</form>

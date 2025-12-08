@@ -1,0 +1,78 @@
+<div class="b2b-publishing-general-data-container" fxLayout="column" fxFlex="100%" *ngIf="b2bSeat$ | async as b2bSeat">
+    <div fxLayout="column">
+        <div class="main-content" fxLayout="row wrap" fxLayoutAlign="space-between start">
+            <div fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="stretch">
+                <div fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="center stretch">
+                    <mat-accordion class="details-form-container" fxFlex="0 1 1230px" [multi]="true" togglePosition="before">
+                        <mat-expansion-panel [expanded]="true">
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                <mat-panel-title>{{'B2B_PUBLISHINGS.SEAT_DATA' | translate}}</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <div fxLayout="row wrap" fxLayoutGap="24px">
+                                <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-md="0 1 calc(33.3% - 24px)"
+                                    fxFlex.gt-xs="0 1 calc(50% - 24px)" fxLayout="column">
+                                    <span class="field-label">{{'FORMS.LABELS.SEAT' | translate}}</span>
+                                    <span>{{b2bSeat.seat?.sector_name + (b2bSeat.seat?.row_name ? (' - ' + ('B2B_PUBLISHINGS.SEAT_ROW' |
+                                        translate) + ' ' + b2bSeat.seat?.row_name) : '') +
+                                        (b2bSeat.seat?.seat_name ? (' - ' + ('B2B_PUBLISHINGS.SEAT_NAME' | translate) + ' ' +
+                                        b2bSeat.seat?.seat_name) : '')}}</span>
+                                </div>
+                                <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-md="0 1 calc(33.3% - 24px)"
+                                    fxFlex.gt-xs="0 1 calc(50% - 24px)" fxLayout="column">
+                                    <span class="field-label">{{'FORMS.LABELS.DATE' | translate}}</span>
+                                    <span>{{b2bSeat.date | dateTime : dateTimeFormats.shortDateTime}}</span>
+                                </div>
+                                <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-md="0 1 calc(33.3% - 24px)"
+                                    fxFlex.gt-xs="0 1 calc(50% - 24px)" fxLayout="column">
+                                    <span class="field-label">{{'FORMS.LABELS.STATUS' | translate}}</span>
+                                    <span>{{('ENUMS.B2B_SEAT_TYPE_OPTS.' + b2bSeat.type) | translate}}, {{(('ENUMS.SEAT_STATUS_OPTS.' +
+                                        b2bSeat.seat.status) | translate) | lowercase}}</span>
+                                </div>
+                                <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-md="0 1 calc(33.3% - 24px)"
+                                    fxFlex.gt-xs="0 1 calc(50% - 24px)" fxLayout="column">
+                                    <span class="field-label">{{'FORMS.LABELS.CHANNEL' | translate}}</span>
+                                    <span>{{b2bSeat.channel?.name}}</span>
+                                </div>
+                                <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-md="0 1 calc(33.3% - 24px)"
+                                    fxFlex.gt-xs="0 1 calc(50% - 24px)" fxLayout="column">
+                                    <span class="field-label">{{'FORMS.LABELS.EVENT' | translate}}</span>
+                                    <span>{{b2bSeat.event?.name}}</span>
+                                </div>
+                                <div class="details-non-editable-field" fxFlex="100%"
+                                    fxFlex.gt-xs="1 1 calc(33.3% - 24px)" fxLayout="column">
+                                    <span class="field-label">{{'FORMS.LABELS.SESSION' | translate}}</span>
+                                    <span>{{b2bSeat.session?.name}}</span>
+                                </div>
+                            </div>
+                            <mat-divider class="ob-divider" />
+                            <div fxLayout="row wrap" fxLayoutGap="24px">
+                                <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-md="0 1 calc(33.3% - 24px)"
+                                    fxFlex.gt-xs="0 1 calc(50% - 24px)" fxLayout="column">
+                                    <span class="field-label">{{'FORMS.LABELS.PROFESSIONAL_CLIENT' | translate}}</span>
+                                    <span>{{b2bSeat.publisher?.client_name}}</span>
+                                </div>
+                                <div class="details-non-editable-field" fxFlex="100%" fxFlex.gt-md="0 1 calc(33.3% - 24px)"
+                                    fxFlex.gt-xs="0 1 calc(50% - 24px)" fxLayout="column">
+                                    <span class="field-label">{{'FORMS.LABELS.NAME' | translate}}</span>
+                                    <span>{{b2bSeat.publisher?.username}}</span>
+                                </div>
+                            </div>
+                        </mat-expansion-panel>
+                        <mat-expansion-panel *ngIf="b2bSeat.historic?.length" [expanded]="true">
+                            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                <mat-panel-title>{{'B2B_PUBLISHINGS.ACTIONS_HISTORIC' | translate}}</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <app-b2b-publishing-details-historic
+                                [actions]="b2bSeat.historic">
+                            </app-b2b-publishing-details-historic>
+                        </mat-expansion-panel>
+                    </mat-accordion>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="spinner-container" *ngIf="loading$ | async">
+        <mat-spinner></mat-spinner>
+    </div>
+</div>

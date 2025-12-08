@@ -1,0 +1,192 @@
+<div fxFill fxLayout="column">
+    <div fxFlex="none" fxLayout="row wrap" class="currency-container" fxLayoutAlign="end"
+        [fxShow]="$currencies()?.length > 1 && $selectedCurrency() && $migrated()">
+        <app-b2b-economy-management-currency-filter #currencyFilter [selectedCurrency]="$selectedCurrency()"/>
+    </div>
+    <app-form-container [fxShow]="$selectedCurrency() !== null && (clientHasAccount$ | async)" layout="main"
+        class="overflow-y-auto" hideActionBar>
+        <div slot="outside">
+            <app-aggregated-data [aggregatedData]="b2bClientBalanceAggregatedData$ | async" [aggregationMetrics]="b2bClientBalanceAggMetrics"
+                [maxWidth]="'1280px'" [currency]="$selectedCurrency()" [currencyFormat]="'narrow'" />
+        </div>
+        <div class="actions-container" fxLayout="row wrap" fxLayoutAlign="end">
+            <button mat-stroked-button color="primary" type="button" class="ob-button small add-button"
+                (click)="openNewOperationDialog(operationTypes.deposit)">
+                <mat-icon>add</mat-icon>
+                {{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.NEW_DEPOSIT_BTN' | translate}}
+            </button>
+            <button mat-stroked-button color="tertiary" class="ob-button small only-icon"
+                [matMenuTriggerFor]="b2bTransactionsMenu">
+                <mat-icon>more_horiz</mat-icon>
+            </button>
+            <mat-menu #b2bTransactionsMenu="matMenu">
+                <button mat-menu-item (click)="openNewOperationDialog(operationTypes.creditLimit)">
+                    {{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.UPDATE_CREDIT_LIMIT_BTN' | translate}}
+                </button>
+                <button mat-menu-item (click)="openNewOperationDialog(operationTypes.cashAdjustment)">
+                    {{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.CASH_ADJUSTMENT_BTN' | translate}}
+                </button>
+                <button mat-menu-item [disabled]="(clientTransactionsMetadata$ | async)?.total === 0"
+                    (click)="exportTransactions()">
+                    {{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.EXPORT_CSV_BTN' | translate}}
+                </button>
+            </mat-menu>
+        </div>
+        <div class="paginated-list-container">
+            <div class="filters" fxLayout="row" fxLayoutAlign="space-between center">
+                <div fxFlex="80%" fxLayoutGap="20px" fxLayoutAlign="start center">
+                    <div class="filter-container" fxFlex="none">
+                        <app-popover-date-range-picker-filter
+                            [matTooltip]="'B2B_CLIENTS.ECONOMIC_MANAGEMENT.TRANSACTIONS_DATES_FILTER' | translate"
+                            [hideRemoveFiltersBtn]="true" />
+                    </div>
+                    <app-popover appFilter class="filter-container" fxFlex="none" [onRemoveFunction]="onRemoveFunction">
+                        <app-b2b-client-economic-management-filter #filterContent [entityId$]="entityId$" [operatorMode$]="isOperatorUser$" />
+                    </app-popover>
+                    <app-search-input [placeholder]="'FORMS.SEARCH.B2B_ECONOMIC_MANAGEMENT_TRANSACTIONS' | translate"
+                        class="search-field" fxFlex="100%" />
+                </div>
+                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+                    <div *ngIf="clientTransactionsMetadata$ | async as clientTransactionsMetadata" class="page-summary"
+                        [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: clientTransactionsMetadata">
+                    </div>
+                    <app-paginator [length]="(clientTransactionsMetadata$ | async)?.total"
+                        [pageSize]="clientTransactionsPageSize" />
+                </div>
+            </div>
+            <mat-table class="ob-table" [dataSource]="clientTransactions$ | async">
+                <ng-container matColumnDef="created">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.HEAD.TRANSACTION_DATE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{row.created | dateTime : dateTimeFormats.shortDateTime}}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="effective_date">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.HEAD.EFFECTIVE_DATE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{row.effective_date | dateTime : dateTimeFormats.shortDateTime}}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="transaction_type">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.HEAD.TRANSACTION_TYPE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        {{('B2B_CLIENTS.ECONOMIC_MANAGEMENT.TRANSACTIONS.TRANSACTION_TYPES.' + row.transaction_type | translate)}}
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="channel">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.HEAD.TRANSACTION_CHANNEL' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{row.channel}}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="user">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.HEAD.TRANSACTION_USER' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        <span fxFlex="0 1 100%" class="ob-text-ellipsis" [matTooltip]="row.user">
+                            {{row.user}}
+                        </span>
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="order_code">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.HEAD.TRANSACTION_ORDER_CODE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        <span fxFlex="0 1 100%" class="ob-text-ellipsis" [matTooltip]="row.order_code">
+                            {{row.order_code}}
+                        </span>
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="notes">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.HEAD.TRANSACTION_NOTES' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{row.notes}}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="previous_balance">
+                    <mat-header-cell *matHeaderCellDef class="head-cell right large-price">
+                        {{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.HEAD.PREVIOUS_BALANCE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row" class="right large-price">
+                        <span appEllipsify [matTooltip]="row.previous_balance | localCurrency:$selectedCurrency():'narrow'">
+                            {{row.previous_balance | localCurrency:$selectedCurrency():'narrow'}}
+                        </span>
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="amount">
+                    <mat-header-cell *matHeaderCellDef class="head-cell right large-price">
+                        {{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.HEAD.TRANSACTION_AMOUNT' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row" class="right large-price">
+                        <span appEllipsify [matTooltip]="row.amount | localCurrency:$selectedCurrency():'narrow'">
+                            {{row.amount | localCurrency:$selectedCurrency():'narrow'}}
+                        </span>
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="balance">
+                    <mat-header-cell *matHeaderCellDef class="head-cell right large-price">
+                        {{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.HEAD.BALANCE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row" class="right large-price">
+                        <span appEllipsify [matTooltip]="row.balance | localCurrency:$selectedCurrency():'narrow'">
+                            {{row.balance | localCurrency:$selectedCurrency():'narrow'}}
+                        </span>
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="credit">
+                    <mat-header-cell *matHeaderCellDef class="head-cell right large-price">
+                        {{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.HEAD.CREDIT_LIMIT' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row" class="right large-price">
+                        <span appEllipsify [matTooltip]="row.credit | localCurrency:$selectedCurrency():'narrow'">
+                            {{row.credit | localCurrency:$selectedCurrency():'narrow'}}
+                        </span>
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="debt">
+                    <mat-header-cell *matHeaderCellDef class="head-cell right">
+                        {{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.HEAD.DEBT' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row" class="right">{{row.debt | localCurrency:$selectedCurrency():'narrow'}}</mat-cell>
+                </ng-container>
+                <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="dense-row" />
+                <mat-row *matRowDef="let row; columns: displayedColumns;" class="dense-row" />
+            </mat-table>
+        </div>
+        <app-empty-state [fxShow]="(clientTransactionsMetadata$ | async)?.total === 0"
+            [title]="'B2B_CLIENTS.ECONOMIC_MANAGEMENT.TRANSACTIONS.EMPTY_LIST' | translate"
+            [description]="'B2B_CLIENTS.ECONOMIC_MANAGEMENT.TRANSACTIONS.EMPTY_LIST_DESCRIPTION' | translate" />
+    </app-form-container>
+    @if ((clientHasAccount$ | async) && !$selectedCurrency() && $migrated()) {
+        <div fxFlex="100%" fxLayout="column"
+             fxLayoutAlign="center center" class="context-message-container">
+            <p class="title">{{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.ACCOUNT.NO_CURRENCY_SELECTED' | translate}}</p>
+            <p class="body">{{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.ACCOUNT.SELECT_CURRENCY_MESSAGE' | translate}}</p>
+            <button mat-flat-button class="ob-button" color="primary" type="button"
+            (click)="currencyFilter.openCurrencySelectionDialog()">
+                {{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.ACCOUNT.SELECT_CURRENCY' | translate}}
+            </button>
+        </div>
+    }
+    @if ((clientHasAccount$ | async) === false && (isInProgress$ | async) === false) {
+        <div fxFlex="100%" fxLayout="column"
+            fxLayoutAlign="center center" class="context-message-container">
+            <p class="title">{{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.ACCOUNT.NO_ACCOUNT' | translate}}</p>
+            <p class="body">{{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.ACCOUNT.CREATE_MESSAGE' | translate}}</p>
+            <button mat-stroked-button class="ob-button" (click)="createAccount()">
+                <mat-icon>add</mat-icon>
+                {{'B2B_CLIENTS.ECONOMIC_MANAGEMENT.ACCOUNT.CREATE_ACCOUNT' | translate}}
+            </button>
+        </div>
+    }
+</div>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}
+

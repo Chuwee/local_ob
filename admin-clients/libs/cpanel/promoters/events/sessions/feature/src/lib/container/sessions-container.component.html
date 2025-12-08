@@ -1,0 +1,27 @@
+<div fxFlex="0 0 100%" fxLayout="column" fxLayoutAlign="stretch stretch">
+    <mat-drawer-container fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="start stretch">
+        <mat-drawer #drawer mode="side" opened fxFlex="0 0 280px">
+            <app-sessions-list />
+        </mat-drawer>
+        <mat-drawer-content fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="start stretch" class="session-details-container">
+            <div class="ob-sidebar-toggle" (click)="changeSidebarState()" [ngClass]="{'collapsed': !drawer.opened}">
+                <span class="arrow"></span>
+            </div>
+            <router-outlet />
+            @if ($isLoading()) {
+                <div class="spinner-container">
+                    <mat-spinner />
+                </div>
+            } @else if ($listComponent()?.totalSessions === 0) {
+                <app-empty-state fxFlex="100%"
+                    [title]="'EVENTS.SESSION.EMPTY_LIST_MESSAGE' | translate"
+                    [description]="'EVENTS.NEW_SESSION_MESSAGE' | translate">
+                    <button mat-flat-button class="ob-button" color="primary" (click)="openNewSessionDialog()">
+                        <mat-icon>add</mat-icon>
+                        {{'EVENTS.NEW_SESSION_BTN' | translate}}
+                    </button>
+                </app-empty-state>
+            }
+        </mat-drawer-content>
+    </mat-drawer-container>
+</div>

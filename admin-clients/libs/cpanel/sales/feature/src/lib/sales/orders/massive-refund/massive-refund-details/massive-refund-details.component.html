@@ -1,0 +1,61 @@
+<div mat-dialog-content class="with-wizard-bar" [formGroup]="refundDetailsForm">
+    <p class="mat-body-2 massive-refund-dialog-info">{{'ORDERS.MASSIVE_REFUND.DIALOG.INFO' | translate}}</p>
+    <div fxLayout="column" class="refund-selectors-container" mat-dialog-content>
+        <div fxLayout="row" fxLayoutGap="25px">
+            <mat-form-field fxFlex="calc(50% - 25px)" appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.ENTITY' | translate}}</mat-label>
+                <app-select-server-search [placeholder]="'FORMS.SEARCH.ENTITY' | translate" formControlName="entity"
+                    [options$]="entities$" [moreOptionsAvailable$]="moreEntitiesAvailable$"
+                    (loadOptions)="loadEntities($event.q, $event.nextPage)" />
+                <mat-error [ob-form-errors]="refundDetailsForm" field="entity" />
+            </mat-form-field>
+            <mat-form-field fxFlex="calc(50% - 25px)" appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.EVENT' | translate}}</mat-label>
+                <app-select-server-search [placeholder]="'FORMS.SEARCH.EVENT' | translate" formControlName="event"
+                    [options$]="events$" [moreOptionsAvailable$]="moreEventsAvailable$"
+                    (loadOptions)="loadEvents($event.q, $event.nextPage)" />
+                <mat-error [ob-form-errors]="refundDetailsForm" field="event" />
+            </mat-form-field>
+        </div>
+        <div fxLayout="row" fxLayoutGap="25px">
+            <mat-form-field fxFlex="calc(50% - 25px)" appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.SESSION' | translate}}</mat-label>
+                <app-select-server-search [placeholder]="'FORMS.SEARCH.SESSIONS' | translate" formControlName="session"
+                    [options$]="sessions$" [moreOptionsAvailable$]="moreSessionsAvailable$"
+                    (loadOptions)="loadSessions($event.q, $event.nextPage)">
+                    <ng-template #optionTemplate let-row>
+                        <ng-container>
+                            {{row.date_start | dateTime : dateTimeFormats.shortDateTime}} - {{row.name}}
+                        </ng-container>
+                    </ng-template>
+                </app-select-server-search>
+                <mat-error [ob-form-errors]="refundDetailsForm" field="session" />
+            </mat-form-field>
+            <mat-form-field fxFlex="calc(50% - 25px)" appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.CHANNEL' | translate}}</mat-label>
+                <app-select-server-search [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate"
+                    formControlName="channel" [options$]="channels$" [moreOptionsAvailable$]="moreChannelsAvailable$"
+                    (loadOptions)="loadChannels($event.q, $event.nextPage)" />
+                <mat-error [ob-form-errors]="refundDetailsForm" field="channel" />
+            </mat-form-field>
+        </div>
+    </div>
+    <div class="massive-refund-type-container" fxLayout="row">
+        <mat-radio-group formControlName="selectionType" fxFlex="100%" fxLayoutGap="25px">
+            <mat-radio-button [value]="type" *ngFor="let type of massiveRefundSelectionTypeList" fxFlex="50%"
+                class="ob-radio-card-button">
+                <div class="massive-refund-type-option-title">
+                    {{('ORDERS.MASSIVE_REFUND.DIALOG.' + type + '.TITLE') | translate}}
+                </div>
+                <div>
+                    {{('ORDERS.MASSIVE_REFUND.DIALOG.' + type + '.INFO') | translate}}
+                </div>
+            </mat-radio-button>
+        </mat-radio-group>
+    </div>
+    <div class="barcodes-selector-container nested-content">
+        <app-csv-selector *ngIf="refundDetailsForm.get('selectionType').value === massiveRefundSelectionType.ordersList"
+            [csvFormGroup]="refundDetailsForm.get('barcodesListSelectionForm')" [csvControlName]="selectionControlName"
+            [exampleCsv]="exampleCsv" />
+    </div>
+</div>

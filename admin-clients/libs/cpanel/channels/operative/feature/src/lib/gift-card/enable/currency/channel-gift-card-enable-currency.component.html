@@ -1,0 +1,21 @@
+<div fxLayout="row wrap" fxLayoutGap="40px">
+    <mat-form-field class="ob-form-field field-with-label" hidden-outline
+        [matTooltip]="'CHANNELS.GIFT_CARD.DISABLED_TOOLTIP' | translate" [matTooltipDisabled]="giftCardEnableCtrl.enabled"
+        matTooltipPosition="right">
+        <input fxHide matInput>
+        <mat-checkbox [formControl]="giftCardEnableCtrl" color="primary">
+            {{'CHANNELS.GIFT_CARD.ACTIVATE' | translate}}
+        </mat-checkbox>
+    </mat-form-field>
+    <mat-form-field fxFlex="grow" fxFlex.gt-sm="0 1 708px" appearance="outline" class="ob-form-field field-with-label">
+        <mat-label>{{'CHANNELS.GIFT_CARD.CONFIGURATION' | translate}}</mat-label>
+        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" [formControl]="giftCardGroupCtrl">
+            <mat-option *ngFor="let group of voucherGroupsList$ | async" [value]="group.id">
+                <div appEllipsify [matTooltip]="group.name">
+                    {{group.name}}
+                </div>
+            </mat-option>
+        </mat-select>
+        <mat-error [ob-form-errors]="giftCardGroupCtrl"></mat-error>
+    </mat-form-field>
+</div>

@@ -1,0 +1,178 @@
+@if (viewData$ | async; as viewData) {
+    <div fxLayout="column" fxLayoutAlign="start stretch">
+        <div fxLayoutAlign="center">
+            <h4 class="type-title">{{'VENUE_TPL_EDITOR.VIEW' | translate}}</h4>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" class="title">
+            @if (!viewData.view.root) {
+                <button mat-icon-button class="ob-button medium"
+                    [matTooltip]="'VENUE_TPL_EDITOR.DEFAULT_VIEW_TOOLTIP' | translate"
+                    (click)="setDefaultView(viewData)">
+                    <mat-icon>star_border</mat-icon>
+                </button>
+            } @else {
+                <mat-icon class="root-view-icon">star</mat-icon>
+            }
+            <div fxFlex="0 1 100%">
+                <span class="mat-subtitle-2">{{viewData.view.name}}</span>
+            </div>
+            @if (!viewData.view.root) {
+                <button mat-icon-button aria-label="Delete" class="ob-button xsmall tree-node-action-button"
+                    [matTooltip]="'FORMS.ACTIONS.DELETE' | translate" (click)="deleteFormItem()">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            }
+        </div>
+        <mat-divider class="title-divider" />
+        <div fxLayout="row wrap" [formGroup]="form" class="editor-form">
+            <div fxLayout="row wrap" formGroupName="view" fxFlex="100%">
+                <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center" class="editor-form-field-container">
+                    <mat-label fxFlex="40%" appEllipsify [matTooltip]="'FORMS.LABELS.NAME' | translate">
+                        {{'FORMS.LABELS.NAME' | translate}}
+                    </mat-label>
+                    <mat-form-field fxFlex="60%" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                        <input matInput aria-label="name" formControlName="name" [placeholder]="'FORMS.LABELS.NAME' | translate">
+                        <mat-error [ob-form-errors]="form.controls.view.controls.name" />
+                    </mat-form-field>
+                </div>
+                <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center" class="editor-form-field-container">
+                    <mat-label fxFlex="40%" appEllipsify [matTooltip]="'FORMS.LABELS.CODE' | translate">
+                        {{'FORMS.LABELS.CODE' | translate}}
+                    </mat-label>
+                    <mat-form-field fxFlex="60%" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                        <input matInput aria-label="code" formControlName="code" [placeholder]="'FORMS.LABELS.CODE' | translate">
+                        <mat-error [ob-form-errors]="form.controls.view.controls.code" />
+                    </mat-form-field>
+                </div>
+                <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center" class="editor-form-field-container">
+                    <mat-label fxFlex="40%" appEllipsify [matTooltip]="'FORMS.LABELS.ID' | translate">
+                        {{'FORMS.LABELS.ID' | translate}}
+                    </mat-label>
+                    <div fxFlex="60%" fxLayoutAlign="end center" class="editor-form-field">
+                        <mat-label>{{viewData.view.id}}</mat-label>
+                    </div>
+                </div>
+                @if (mmcIntegrationEnabled$ | async) {
+                    @if (isNotRootView$ | async) {
+                        <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center" class="editor-form-field-container">
+                            <div fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="start center">
+                                <mat-label appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.AGGREGATED_VIEW' | translate">
+                                    {{'VENUE_TPL_EDITOR.AGGREGATED_VIEW' | translate}}
+                                </mat-label>
+                                <button mat-icon-button type="button" class="ob-button medium" fxFlexAlign="center"
+                                    [matTooltip]="'VENUE_TPL_EDITOR.AGGREGATED_VIEW_HELP' | translate">
+                                    <mat-icon class="ob-help-icon">help_outline</mat-icon>
+                                </button>
+                            </div>
+                            <mat-slide-toggle
+                                class="ob-form-field inline-field editor-form-field" formControlName="aggregatedView" color="primary" />
+                        </div>
+                    }
+                    @if (seatsInViewWarning$ | async) {
+                        <div class="contextual-message" fxFlex="100%" fxLayout="row">
+                            <mat-icon class="ob-icon xsmall warning">warning</mat-icon>
+                            <p fxFlex="0 1 100%" class="mat-body-1">{{'VENUE_TPL_EDITOR.SEATS_IN_VIEW_WARNING' | translate}}</p>
+                        </div>
+                    }
+                    @if (viewNotLinkedWarning$ | async) {
+                        <div class="contextual-message" fxFlex="100%" fxLayout="row">
+                            <mat-icon class="ob-icon xsmall warning">warning</mat-icon>
+                            <p fxFlex="0 1 100%" class="mat-body-1">{{'VENUE_TPL_EDITOR.AGGREGATED_VIEW_NOT_LINKED' | translate}}</p>
+                        </div>
+                    }
+                    <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center" class="editor-form-field-container">
+                        <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.DISPLAY_3D' | translate">
+                            {{'VENUE_TPL_EDITOR.DISPLAY_3D' | translate}}
+                        </mat-label>
+                        <mat-slide-toggle
+                            class="ob-form-field inline-field editor-form-field" formControlName="display3D" color="primary" />
+                    </div>
+                }
+                <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center" class="editor-form-field-container">
+                    <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.VIP_VIEW' | translate">
+                        {{'VENUE_TPL_EDITOR.VIP_VIEW' | translate}}
+                    </mat-label>
+                    <mat-slide-toggle class="ob-form-field inline-field editor-form-field" formControlName="vip" color="primary" />
+                </div>
+            </div>
+            <mat-divider class="ob-divider" fxFlex="100%" />
+            <span class="title mat-subtitle-2">{{'VENUE_TPL_EDITOR.CANVAS' | translate}}</span>
+            <div fxLayout="row wrap" formGroupName="svg" fxFlex="100%">
+                <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center" class="editor-form-field-container">
+                    <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.VIEW_WIDTH' | translate">
+                        {{'VENUE_TPL_EDITOR.VIEW_WIDTH' | translate}}</mat-label>
+                    <mat-form-field fxFlex="100px" appearance="outline" class="ob-form-field inline-field">
+                        <input matInput type="number" aria-label="width" formControlName="width"
+                            [placeholder]="'VENUE_TPL_EDITOR.VIEW_WIDTH' | translate">
+                        <mat-error [ob-form-errors]="form.controls.svg.controls.width" />
+                    </mat-form-field>
+                </div>
+                <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center" class="editor-form-field-container">
+                    <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.VIEW_HEIGHT' | translate">
+                        {{'VENUE_TPL_EDITOR.VIEW_HEIGHT' | translate}}
+                    </mat-label>
+                    <mat-form-field fxFlex="100px" appearance="outline" class="ob-form-field inline-field ">
+                        <input matInput type="number" aria-label="height" formControlName="height"
+                            [placeholder]="'VENUE_TPL_EDITOR.VIEW_HEIGHT' | translate">
+                        <mat-error [ob-form-errors]="form.controls.svg.controls.height" />
+                    </mat-form-field>
+                </div>
+            </div>
+            @if (operatorMode$ | async) {
+                <mat-divider class="ob-divider" fxFlex="100%" />
+                <button mat-stroked-button type="button" class="ob-button small editor-form-button" (click)="openEditSvgDialog()">
+                    <mat-icon>code</mat-icon>
+                    {{'VENUE_TPL_EDITOR.SVG_CODE_BTN' | translate}}
+                </button>
+            }
+            @if (hasLinks$ | async) {
+                <mat-divider class="ob-divider" fxFlex="100%" />
+                <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center" class="title">
+                <span fxFlex="0 1 100%" class="mat-subtitle-2" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.LINKED_VIEWS' | translate">
+                    {{'VENUE_TPL_EDITOR.LINKED_VIEWS' | translate}}
+                </span>
+                    <button type="button" mat-icon-button aria-label="unlink" class="ob-button medium" (click)="deleteAllLinks()"
+                        [matTooltip]="'VENUE_TPL_EDITOR.DELETE_VIEW_LINKS' | translate">
+                        <mat-icon>link_off</mat-icon>
+                    </button>
+                </div>
+                <div fxFlex="100%" fxLayout="row" class="editor-form-field-container">
+                    <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field inline-field">
+                        <button matPrefix mat-icon-button class="ob-button large no-hover-ripple" aria-label="search">
+                            <mat-icon>search</mat-icon>
+                        </button>
+                        <input matInput [formControl]="viewSearchControl" [placeholder]="'ACTIONS.SEARCH' | translate"/>
+                        @if (viewSearchControl.value?.length) {
+                            <button matSuffix mat-icon-button
+                                class="ob-button large no-hover-ripple" (click)="viewSearchControl.setValue(null)">
+                                <mat-icon>clear</mat-icon>
+                            </button>
+                        }
+                    </mat-form-field>
+                </div>
+                <mat-list fxFlex="100%" class="ob-list small-rows links-list" role="list">
+                    @for (link of viewDataLinks$ | async; track link.id) {
+                        <mat-list-item role="listitem" class="hoverable-item">
+                            <div fxLayout="row" fxLayoutAlign="start center" fxFlex="0 1 100%" (click)="selectLink(link)">
+                                @if (link && !link.hasGraphicShape) {
+                                    <mat-icon class="ob-icon xsmall error"
+                                        [matTooltip]="'VENUE_TPL_EDITOR.LINK_WITHOUT_GRAPHIC_SHAPE' | translate">
+                                        error
+                                    </mat-icon>
+                                }
+                                <span appEllipsify fxFlex="0 1 100%" [matTooltip]="link.view.name" class="link-list-label">
+                                    {{link.view.name}}
+                                </span>
+                                <button type="button" mat-icon-button aria-label="unlink" class="ob-button medium"
+                                    [matTooltip]="'VENUE_TPL_EDITOR.DELETE_VIEW_LINK' | translate"
+                                    (click)="$event.stopPropagation(); deleteLink(link)">
+                                    <mat-icon>link_off</mat-icon>
+                                </button>
+                            </div>
+                        </mat-list-item>
+                    }
+                </mat-list>
+            }
+        </div>
+    </div>
+}

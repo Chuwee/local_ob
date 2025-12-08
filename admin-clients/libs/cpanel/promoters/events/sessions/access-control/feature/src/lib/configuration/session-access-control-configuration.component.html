@@ -1,0 +1,44 @@
+<div id="settings.access_control.admission_dates.override" fxLayout="row wrap" class="session-form-section" [formGroup]="form">
+    <span fxFlex="100%">{{'EVENTS.SESSION.ACCESS_CONTROL_PERIOD_MSG' | translate}}</span>
+    <mat-form-field fxFlex="100%" hidden-outline class="session-form-field" subscriptSizing="dynamic" formGroupName="admission_dates">
+        <input fxHide matInput>
+        <mat-radio-group fxFlex="100%" fxLayout="column" class="access-control-radio-group" formControlName="override">
+            <mat-radio-button [value]="false">
+                <mat-label>{{'FORMS.OPTIONS.AUTOMATIC' | translate}}</mat-label>
+            </mat-radio-button>
+            <mat-radio-button [value]="true">
+                <mat-label>{{'FORMS.OPTIONS.CUSTOM' | translate}}</mat-label>
+            </mat-radio-button>
+        </mat-radio-group>
+    </mat-form-field>
+    <div fxFlex="100%" fxLayout="row wrap" class="nested-content" formGroupName="admission_dates">
+        <app-date-time-picker id="settings.access_control.admission_dates.start" maxErrors="1" fxFlex="100%"
+            fxFlex.gt-md="50%" class="session-form-field" [label]="'DATES.START_DATE' | translate" formControlName="start" />
+        <app-date-time-picker id="settings.access_control.admission_dates.end" maxErrors="1" fxFlex="100%"
+            fxFlex.gt-md="50%" class="session-form-field" formControlName="end" [label]="'DATES.END_DATE' | translate" />
+    </div>
+    <div fxFlex="100%" class="session-form-field">
+        <mat-divider fxFlex="100%" />
+    </div>
+    <mat-form-field id="settings.access_control.space.override" fxFlex="100%" hidden-outline subscriptSizing="dynamic"
+        formGroupName="space">
+        <input fxHide matInput>
+        <mat-checkbox formControlName="override" color="primary">
+            <mat-label>
+                {{'EVENTS.SESSION.ACCESS_CONTROL_CUSTOM_GATE_MSG' | translate}}
+            </mat-label>
+        </mat-checkbox>
+    </mat-form-field>
+    <mat-form-field id="settings.access_control.space.id" fxFlex="100%" fxFlex.gt-md="50%" appearance="outline"
+        formGroupName="space" class="ob-form-field field-with-label nested-content session-form-field">
+        <mat-label>{{'VENUES.SPACE' | translate}}</mat-label>
+        <mat-select formControlName="id" fxFlex="100%" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+            <mat-option *ngFor="let space of spaces$ | async" [value]="space.id">
+                <div appEllipsify [matTooltip]="space.name">
+                    {{space.name}}
+                </div>
+            </mat-option>
+        </mat-select>
+        <mat-error [ob-form-errors]="form" field="space.id" />
+    </mat-form-field>
+</div>

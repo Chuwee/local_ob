@@ -1,0 +1,26 @@
+<div class="flex basis-full">
+    <div class="subtabs-container basis-[200px] shrink-0">
+        <mat-button-toggle-group appLastPathGuardListener [currValue]="$deepPath()" vertical
+            [value]="$deepPath()" class="ob-subtab">
+            @if($isOperatorUser()){
+                <mat-button-toggle value="customer-communication" routerLink="customer-communication">
+                    {{'CHANNELS.CUSTOMER_COMMUNICATION.TITLE' | translate}}
+                </mat-button-toggle>
+            }
+            @if((($channel() | isWebChannel) || ($channel() | isMembersChannel ) || ($channel() | isBoxOffice))  && $isOperatorUser()){
+                <mat-button-toggle routerLink="payment-methods" value="payment-methods">
+                    {{'CHANNELS.PAYMENT_METHODS.TITLE' | translate}}
+                </mat-button-toggle>
+            }
+            @if((($channel() | isWebChannel) || ($channel() | isMembersChannel)) && $isOperatorUser()){
+                <mat-button-toggle routerLink="external-tools" value="external-tools">
+                    {{'CHANNELS.EXTERNAL_TOOLS.TITLE' | translate}}
+                </mat-button-toggle>
+                <mat-button-toggle routerLink="server-tracking" value="server-tracking">
+                    {{'CHANNELS.SERVER_TRACKING.TITLE' | translate}}
+                </mat-button-toggle>
+            }
+        </mat-button-toggle-group>
+    </div>
+    <router-outlet />
+</div>

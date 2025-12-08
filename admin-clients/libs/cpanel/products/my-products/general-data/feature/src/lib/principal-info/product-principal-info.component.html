@@ -1,0 +1,42 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu"
+    [disabled]="(canWrite$ | async) !== true || !form.dirty|| (isLoadingOrSaving$ | async)">
+    <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'PRODUCT.PRINCIPAL-INFO.DATA_TITLE' | translate }}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-product-principal-info-data [form]="form" [product]="product$ | async" [putProductCtrl]="form.controls.putProductCtrl"
+                [canWrite]="canWrite$ | async" />
+        </mat-expansion-panel>
+        <!-- TODO(MULTICURRENCY): delete if when the multicurrency functionality is finished -->
+        @if (isMultiCurrency$ | async) {
+            <mat-expansion-panel [expanded]="true" id="multiCurrencyForm">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'PRODUCT.CURRENCY_TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-product-principal-info-currency [form]="form" [product]="product$ | async"
+                    [putProductCtrl]="form.controls.putProductCtrl" [canWrite]="canWrite$ | async" />
+            </mat-expansion-panel>
+        }
+        @if (canWrite$ | async) {
+            <mat-expansion-panel [expanded]="true" id="languagesForm">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'PRODUCT.PRINCIPAL_INFO.LANGUAGES' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-product-principal-info-language [form]="form" />
+            </mat-expansion-panel>
+        }
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.CATEGORIES' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-categories-selection [form]="form" [item]="product$ | async"
+                [putItemCtrl]="form.controls.putProductCtrl" [categoryIsRequired]="false" />
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+@if (isLoadingOrSaving$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

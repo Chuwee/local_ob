@@ -1,0 +1,185 @@
+<div class="flex flex-col create-single-session-container">
+    <div mat-dialog-title>
+        <div class="flex self-start flex-auto">
+            <h2 class="flex basis-full grow shrink secondary title">{{'TITLES.NEW_SESSION' | translate}}</h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content>
+        <mat-accordion class="details-form-container" multi [togglePosition]="'before'" [formGroup]="form">
+            <!-- BASE DATA -->
+            <mat-expansion-panel expanded togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.SESSION.BASE_DATA' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-create-session-base-data [eventId]="eventId" [lastSessionId]="lastSessionId"
+                    [form]="form.get('base')"
+                    [creationType]="sessionCreationType.single" [refreshChanges$]="refreshChanges$" />
+            </mat-expansion-panel>
+            <!-- RELEASE -->
+            <mat-expansion-panel expanded togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.SESSION.CHANNEL_RELEASE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div>
+                    <app-date-time-picker class="session-form-field" required
+                        [label]="'EVENTS.SESSION.CHANNEL_RELEASE' | translate" formControlName="releaseDate" />
+                </div>
+            </mat-expansion-panel>
+            <!-- BOOKINGS -->
+            @if (bookingsEnabled) {
+                <mat-expansion-panel expanded togglePosition="before">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'EVENTS.SESSION.BOOKINGS' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="flex justify-between gap-4 flex-wrap">
+                        <div class="flex-1">
+                            <app-date-time-picker class="session-form-field" required
+                                [label]="'EVENTS.SESSION.BOOKINGS_START' | translate" formControlName="bookingsStartDate" />
+                        </div>
+                        <div class="flex flex-col flex-1 gap-8">
+                            <app-date-time-picker class="session-form-field" required
+                                [label]="'EVENTS.SESSION.BOOKINGS_END' | translate" formControlName="bookingsEndDate" />
+
+                            <mat-form-field appearance="outline" class="ob-form-field session-date-custom">
+                                <mat-select [placeholder]="'FORMS.OPTIONS.CUSTOM' | translate" formControlName="bookingEndDateModifier">
+                                    @for (dateModifier of sessionDateCustomModifiers | keyvalue; track dateModifier) {
+                                        <mat-option [value]="dateModifier.value">
+                                            {{('EVENTS.SESSION.DATES_MOD_OPTS.' + dateModifier.value) | translate}}
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+
+                        </div>
+                    </div>
+                </mat-expansion-panel>
+            }
+            <!-- SALES -->
+            <mat-expansion-panel expanded togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.SESSION.SALE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="flex justify-between gap-4 flex-wrap">
+                    <div class="flex-1">
+                        <app-date-time-picker class="session-form-field" required
+                            [label]="'EVENTS.SESSION.SALE_START' | translate" formControlName="salesStartDate" />
+                    </div>
+                    <div class="flex flex-col flex-1 gap-8">
+                        <app-date-time-picker class="session-form-field" required
+                            [label]="'EVENTS.SESSION.SALE_END' | translate" formControlName="salesEndDate" />
+                        <mat-form-field appearance="outline" class="ob-form-field session-date-custom">
+                            <mat-select [placeholder]="'FORMS.OPTIONS.CUSTOM' | translate" formControlName="saleEndDateModifier">
+                                @for (dateModifier of sessionDateCustomModifiers | keyvalue; track dateModifier) {
+                                    <mat-option [value]="dateModifier.value">
+                                        {{('EVENTS.SESSION.DATES_MOD_OPTS.' + dateModifier.value) | translate}}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+            <!-- LOYALTY POINTS -->
+            @if ($showLoyaltyPointsSettings()) {
+                <mat-expansion-panel expanded togglePosition="before">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'EVENTS.SESSION.LOYALTY_POINTS_TITLE' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="flex flex-col flex-1" [formGroup]="form.controls.loyaltyPointGainConfig">
+                        <p>{{'EVENTS.SESSION.LOYALTY_POINTS_INFO' | translate}}</p>
+                        <mat-radio-group class="flex flex-col" formControlName="type">
+                            <mat-radio-button class="ob-radio-button vertical-list" [value]="sessionLoyaltyPointsGainType.sessionPurchased">
+                                <div class="flex flex-col">
+                                    <div class="option-title">{{'EVENTS.SESSION.LOYALTY_POINTS_SESSION_PURCHASED' | translate}}</div>
+                                    <div>{{'EVENTS.SESSION.LOYALTY_POINTS_SESSION_PURCHASED_INFO' | translate}}</div>
+                                </div>
+                            </mat-radio-button>
+                            @if (form.controls.loyaltyPointGainConfig.value.type === sessionLoyaltyPointsGainType.sessionPurchased) {
+                                <div class="flex loyalty-points-amount nested-content">
+                                    <mat-form-field appearance="outline" class="grow shrink basis-[140px] ob-form-field field-with-label">
+                                        <mat-label>{{'EVENTS.SESSION.LOYALTY_POINTS_AMOUNT' | translate}}</mat-label>
+                                        <input matInput type="number" placeholder="0" formControlName="amount">
+                                        <mat-error [ob-form-errors]="form.controls.loyaltyPointGainConfig" [field]="'amount'" />
+                                    </mat-form-field>
+                                </div>
+                            }
+                            <mat-radio-button class="ob-radio-button vertical-list" [value]="sessionLoyaltyPointsGainType.ticketPurchased">
+                                <div class="flex flex-col">
+                                    <div class="option-title">{{'EVENTS.SESSION.LOYALTY_POINTS_TICKET_PURCHASED' | translate}}</div>
+                                    <div>{{'EVENTS.SESSION.LOYALTY_POINTS_TICKET_PURCHASED_INFO' | translate}}</div>
+                                </div>
+                            </mat-radio-button>
+                            @if (form.controls.loyaltyPointGainConfig.value.type === sessionLoyaltyPointsGainType.ticketPurchased) {
+                                <div class="flex loyalty-points-amount nested-content">
+                                    <mat-form-field appearance="outline" class="grow shrink basis-[140px] ob-form-field field-with-label">
+                                        <mat-label>{{'EVENTS.SESSION.LOYALTY_POINTS_AMOUNT' | translate}}</mat-label>
+                                        <input matInput type="number" placeholder="0" formControlName="amount">
+                                        <mat-error [ob-form-errors]="form.controls.loyaltyPointGainConfig" [field]="'amount'" />
+                                    </mat-form-field>
+                                </div>
+                            }
+                        </mat-radio-group>
+                    </div>
+                </mat-expansion-panel>
+            }
+            <!-- SECONDARY MARKET SALES -->
+            @if ($showSecondaryMarketSettings()) {
+                <mat-expansion-panel expanded togglePosition="before">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'EVENTS.SESSION.SECONDARY_MARKET' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="flex flex-col gap-4">
+                        <mat-checkbox color="primary" [formControl]='enableSecondaryMarketCtrl'>
+                            {{'EVENTS.SESSION.ACTIVATE_SECONDARY_MARKET_DATES' | translate}}
+                        </mat-checkbox>
+                        <div class="justify-between gap-4 flex-wrap"
+                            [style.display]="$showSecondaryMarketDates() ? 'flex' : 'none'" formGroupName="secondaryMarket">
+                            <div class="flex-1">
+                                <app-date-time-picker class="session-form-field" required
+                                    [label]="'EVENTS.SESSION.SECONDARY_MARKET_SALE_START' | translate"
+                                    formControlName="salesStartDate" />
+                            </div>
+                            <div class="flex flex-col flex-1 gap-8">
+                                <app-date-time-picker class="session-form-field" required
+                                    [label]="'EVENTS.SESSION.SECONDARY_MARKET_SALE_END' | translate" formControlName="salesEndDate" />
+                                <mat-form-field appearance="outline" class="ob-form-field session-date-custom">
+                                    <mat-select [placeholder]="'FORMS.OPTIONS.CUSTOM' | translate"
+                                        formControlName="saleEndDateModifier">
+                                        @for (dateModifier of sessionDateCustomModifiers | keyvalue; track dateModifier) {
+                                            <mat-option [value]="dateModifier.value">
+                                                {{('EVENTS.SESSION.DATES_MOD_OPTS.' + dateModifier.value) | translate}}
+                                            </mat-option>
+                                        }
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </mat-expansion-panel>
+            }
+        </mat-accordion>
+    </div>
+    <div mat-dialog-actions>
+        <div class="flex flex-1 flex-wrap justify-end">
+            <button type="button" mat-button class="ob-button" (click)="close()" [disabled]="isReqInProgress$ | async">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button mat-stroked-button color="tertiary" type="button" class="ob-button" (click)="createSession(true)"
+                [disabled]="isReqInProgress$ | async">
+                {{'FORMS.ACTIONS.CREATE_AND_NEW' | translate}}
+            </button>
+            <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createSession()"
+                [disabled]="isReqInProgress$ | async">
+                {{'FORMS.ACTIONS.CREATE' | translate}}
+            </button>
+        </div>
+    </div>
+</div>
+@if (isReqInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

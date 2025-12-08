@@ -1,0 +1,46 @@
+<app-form-container [formGroup]="form" (save)="save()" (cancel)="cancel()" layout="menu" [disabled]="$isLoading() || !form.dirty">
+    <mat-accordion [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'SEASON_TICKET.OPERATIVE.PURCHASE_PERMISSIONS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-4" formGroupName="max_buying_limit">
+                    <mat-checkbox formControlName="override" color="primary">
+                        {{'SEASON_TICKET.OPERATIVE.MAX_LIMIT_TICKETS_CHECK' | translate}}
+                    </mat-checkbox>
+                    @if (form.value.max_buying_limit?.override) {
+                        <div class="flex flex-wrap gap-2 items-center max-limit-tickets-form-nested-field">
+                            <label>{{'SEASON_TICKET.OPERATIVE.MAX_LIMIT_TICKETS_NUMBER' | translate}}</label>
+                            <mat-form-field class="ob-form-field max-tickets-dropdown" appearance="outline" subscriptSizing="dynamic">
+                                <input matInput type="number" formControlName="value" min="1">
+                            </mat-form-field>
+                            <label>{{'SEASON_TICKET.OPERATIVE.MAX_LIMIT_TICKETS_UNIT' | translate}}</label>
+                        </div>
+                    }
+                </div>
+                <div class="flex flex-col gap-4" formGroupName="purchasePermissionsForm">
+                    <mat-checkbox formControlName="register_mandatory" color="primary">
+                        {{'SEASON_TICKET.OPERATIVE.MEMBER_REQUIRED_CHECK' | translate}}
+                    </mat-checkbox>
+                    @if (form.value.purchasePermissionsForm?.register_mandatory) {
+                        <div class="flex flex-wrap gap-2 items-center register-mandatory-form-nested-field">
+                            <mat-checkbox formControlName="enable_customer_max_seats" color="primary" />
+                            <label>{{'SEASON_TICKET.OPERATIVE.REGISTER_MANDATORY_CHECK' | translate}}</label>
+                            <mat-form-field class="ob-form-field max-tickets-dropdown" appearance="outline" subscriptSizing="dynamic">
+                                <input matInput type="number" formControlName="customer_max_seats" min="1">
+                            </mat-form-field>
+                            <label>{{'SEASON_TICKET.OPERATIVE.REGISTER_MANDATORY_MAX_TICKETS_UNIT' | translate}}</label>
+                        </div>
+                    }
+                </div>
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+
+@if($isLoading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

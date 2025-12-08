@@ -1,0 +1,109 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <form [formGroup]="form" fxLayout="column">
+        <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+            <h2 fxFlex="100%" class="secondary title">{{'EVENTS.PROMOTIONS.NEW' | translate}}</h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+        <div mat-dialog-content fxLayout="column">
+            <div fxFlex fxLayout="row wrap" fxLayoutGap="10px">
+                @if ((entities$ | async) && (canSelectEntity$ | async)) {
+                    <mat-form-field fxFlex="100%" fxFlex.gt-sm appearance="outline" class="ob-form-field">
+                        <mat-label>{{'EVENTS.ENTITY' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate" formControlName="entity">
+                            <mat-option>
+                                <app-select-search #entitySelectSearch [options$]="entities$"
+                                    [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                    searchField="name" requireSelection="true" />
+                            </mat-option>
+                            @for (entity of entitySelectSearch.getFilteredOptions$() | async; track entity) {
+                                <mat-option [value]="entity">
+                                    <div appEllipsify [matTooltip]="entity.name">
+                                        {{entity.name}}
+                                    </div>
+                                </mat-option>
+                            }
+                        </mat-select>
+                        @if (form.hasError('required', 'entity')) {
+                            <mat-error>{{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}</mat-error>
+                        }
+                    </mat-form-field>
+                }
+                <mat-form-field fxFlex="100%" fxFlex.gt-sm appearance="outline" class="ob-form-field">
+                    <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                    <input matInput aria-label="name" [placeholder]="'FORMS.LABELS.NAME' | translate" formControlName="name"
+                        autocomplete="off">
+                    @if (form.hasError('required', 'name')) {
+                        <mat-error>{{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}</mat-error>
+                    }
+                    @if (form.hasError('maxlength', 'name')) {
+                        <mat-error>
+                            {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value: nameRestrictions.maxNameLength})}}
+                        </mat-error>
+                    }
+                    @if (form.hasError('minlength', 'name')) {
+                        <mat-error>
+                            {{'FORMS.ERRORS.MIN_LENGTH' | translate : ({value: nameRestrictions.minNameLength})}}
+                        </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+            <mat-divider class="ob-form-divider" />
+            <mat-radio-group formControlName="type" fxFlex="100%" fxLayout.gt-sm="row wrap" fxLayout="column" fxLayoutGap="20px"
+                fxLayoutAlign="center" class="promotion-type-options">
+                <mat-radio-button fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 10px)" class="ob-radio-card-button"
+                    [value]="creationTypes.automatic">
+                    <div class="option-title">{{'EVENTS.PROMOTIONS.NEW_AUTOMATIC' | translate}}</div>
+                    <div>
+                        {{'EVENTS.PROMOTIONS.INFO_AUTOMATIC' | translate}}
+                    </div>
+                </mat-radio-button>
+                <mat-radio-button fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 10px)" class="ob-radio-card-button"
+                    [value]="creationTypes.manual">
+                    <div class="option-title">{{'EVENTS.PROMOTIONS.NEW_MANUAL' | translate}}</div>
+                    <div>
+                        {{'EVENTS.PROMOTIONS.INFO_MANUAL' | translate}}
+                    </div>
+                </mat-radio-button>
+            </mat-radio-group>
+            <div fxLayout="column" [fxShow]="form.get('type').value === creationTypes.manual">
+                <mat-divider class="ob-form-divider" />
+                <div fxFlex>
+                    <mat-radio-group formControlName="manualType" fxLayout="row wrap" fxLayoutGap="20px" fxLayoutAlign="center"
+                        class="manual-type-options">
+                        <mat-radio-button fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 10px)" class="ob-radio-card-button"
+                            [value]="creationSubtypes.basic">
+                            <div class="option-title">{{'EVENTS.PROMOTIONS.NEW_BASIC' | translate}}</div>
+                            <div>{{'EVENTS.PROMOTIONS.INFO_BASIC' | translate}}</div>
+                        </mat-radio-button>
+                        <mat-radio-button fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 10px)" class="ob-radio-card-button"
+                            [value]="creationSubtypes.plus">
+                            <div class="option-title">{{'EVENTS.PROMOTIONS.NEW_PLUS' | translate}}</div>
+                            <div>{{'EVENTS.PROMOTIONS.INFO_PLUS' | translate}}</div>
+                        </mat-radio-button>
+                    </mat-radio-group>
+                    <div fxLayoutAlign.gt-sm="start start" fxLayoutAlign="center start" class="combination-info">
+                        <mat-icon [class.info]="(!form.get('manualType').value)" [class.alert]="(!!form.get('manualType').value)">
+                            {{ (!form.get('manualType').value) ? 'info' : 'warning'}}
+                        </mat-icon>
+                        {{ (form.get('manualType').value === creationSubtypes.plus) ?
+                        ('EVENTS.PROMOTIONS.COMBINATION_INFO_PLUS' | translate) :
+                        ((form.get('manualType').value === creationSubtypes.basic) ?
+                        ('EVENTS.PROMOTIONS.COMBINATION_INFO_BASIC' | translate) :
+                        ('EVENTS.PROMOTIONS.COMBINATION_INFO' | translate))
+                        }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div mat-dialog-actions fxLayoutAlign="end">
+            <button type="button" mat-button class="ob-button" (click)="close()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button [disabled]="!form.valid || (saving$ | async)" mat-flat-button color="primary" class="ob-button" (click)="create()">
+                {{'FORMS.ACTIONS.CREATE' | translate}}
+            </button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,136 @@
+syntax = "proto3";
+
+package es.onebox.venue.venuetemplates;
+
+option java_package = "es.onebox.venue.venuetemplates";
+option java_outer_classname = "VenueMapProto";
+
+message VenueMap {
+    repeated SectorMap sector_map = 1;
+}
+
+message SectorMap {
+    int32 id = 1;
+    int32 venuetemplate = 2;
+    string code = 3;
+    string description = 4;
+    int32 type = 5;
+    bool default = 6;
+    int32 order = 7;
+    int64 save_sequence = 8;
+    repeated RowMap row_map = 9;
+    repeated NotNumberedZoneMap not_numbered_zone_map = 10;
+}
+
+message RowMap {
+    int32 id = 1;
+    string name = 2;
+    int32 sector_id = 3;
+    int32 order = 4;
+    int64 save_sequence = 5;
+    repeated SeatMap seat_map = 6;
+}
+
+message Enums {
+    enum SeatStatus {
+        UNKNOWN = 0;
+        FREE = 1;
+        SOLD = 2;
+        PROMOTOR_LOCKED = 3;
+        SYSTEM_LOCKED = 4;
+        BOOKED = 5;
+        KILL = 6;
+        EMITTED = 7;
+        VALIDATED = 8;
+        IN_REFUND = 9;
+        CANCELLED = 10;
+        PRESOLD_LOCKED = 11;
+        SOLD_LOCKED = 12;
+        GIFT = 13;
+        SEASON_LOCKED = 14;
+        EXTERNAL_LOCKED = 15;
+        EXTERNAL_DELETE = 16;
+    }
+    enum Visibility {
+        VIS_UNKNOWN = 0;
+        FULL = 1;
+        PARTIAL = 2;
+        NONE = 3;
+        SIDE = 4;
+    }
+    enum Accessibility {
+        ACC_UNKNOWN = 0;
+        NORMAL = 1;
+        REDUCED_MOBILITY = 2;
+    }
+}
+
+message SeatMap {
+    int64 id = 1;
+    string name = 2;
+    Enums.SeatStatus status = 3;
+    int32 view = 4;
+    string row_block = 5;
+    int32 quota = 6;
+    int32 price_type = 7;
+    int32 blocking_reason = 8;
+    Enums.Visibility visibility = 9;
+    Enums.Accessibility accessibility = 10;
+    int64 gate = 11;
+    int64 dynamic_tag1 = 12;
+    int64 dynamic_tag2 = 13;
+    int64 external = 14;
+    int32 order = 15;
+    int32 weight = 16;
+    int32 pos_x = 17;
+    int32 pos_y = 18;
+    int64 save_sequence = 19;
+    int64 ticket_id = 20;
+    int64 session_pack = 21;
+    bool linkable = 22;
+    bool linked = 23;
+
+}
+
+message NotNumberedZoneMap {
+    int64 id = 1;
+    string name = 2;
+    int32 sector = 3;
+    int32 price_type = 4;
+    int32 view = 5;
+    Enums.Visibility visibility = 6;
+    Enums.Accessibility accessibility = 7;
+    int64 gate = 8;
+    int64 dynamic_tag1 = 9;
+    int64 dynamic_tag2 = 10;
+    int32 capacity = 11;
+    int32 oldCapacity = 12;
+    int64 save_sequence = 13;
+    int32 linkable_seats = 14;
+    repeated StatusCounterMap status_counters = 15;
+    repeated BlockingReasonsCounterMap blocking_reason_counters = 16;
+    repeated SessionPackCounterMap session_pack_counters = 17;
+    repeated QuotaCountersMap quota_counters = 18;
+}
+
+message StatusCounterMap {
+    Enums.SeatStatus status = 1;
+    int32 count = 2;
+    bool linked = 3;
+}
+
+message BlockingReasonsCounterMap {
+  int32 blocking_reason = 1;
+  int32 count = 2;
+}
+
+message SessionPackCounterMap {
+  int64 session_pack = 1;
+  int32 count = 2;
+}
+
+message QuotaCountersMap {
+    int32 quota = 1;
+    int32 count = 2;
+    int32 available = 3;
+}

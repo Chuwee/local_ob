@@ -1,0 +1,78 @@
+<div class="dialog-msg-container flex flex-col basis-full">
+    <div mat-dialog-title>
+        <div class="flex flex-row items-center">
+            <h2 class="secondary title basis-full">{{'TITLES.NEW_INSURER' | translate}}</h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+        
+    </div>
+    <div mat-dialog-content class="flex flex-col justify-start items-stretch">
+        <form [formGroup]="form" class="flex flex-col justify-start items-stretch">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.OPERATOR' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="operator"
+                    aria-label="currency">
+                    @for(operator of $operators(); track $index){
+                        <mat-option [value]="operator">
+                            {{operator.name | translate : ''}}
+                        </mat-option>
+                    }
+                </mat-select>
+                <mat-error [ob-form-errors]="form" field="operator" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                <input matInput aria-label="name" [placeholder]="'FORMS.LABELS.NAME' | translate" formControlName="name">
+                <mat-error [ob-form-errors]="form" field="name" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.REGISTERED_NAME' | translate}}</mat-label>
+                <input matInput aria-label="business" [placeholder]="'FORMS.LABELS.BUSINESS_NAME' | translate" formControlName="business">
+                <mat-error [ob-form-errors]="form" field="business" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.CIF' | translate}}</mat-label>
+                <input matInput aria-label="cif" [placeholder]="'FORMS.LABELS.TAX_ID' | translate" formControlName="cif">
+                <mat-error [ob-form-errors]="form" field="cif" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.EMAIL' | translate}}</mat-label>
+                <input matInput aria-label="email" [placeholder]="'FORMS.LABELS.EMAIL' | translate" formControlName="email">
+                <mat-error [ob-form-errors]="form" field="email" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.ADDRESS' | translate}}</mat-label>
+                <input matInput aria-label="address" [placeholder]="'FORMS.LABELS.ADDRESS' | translate" formControlName="address">
+                <mat-error [ob-form-errors]="form" field="address" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.ZIPCODE' | translate}}</mat-label>
+                <input matInput aria-label="zip" [placeholder]="'FORMS.LABELS.ZIPCODE' | translate" formControlName="zip">
+                <mat-error [ob-form-errors]="form" field="zip" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.PHONE' | translate}}</mat-label>
+                <input matInput aria-label="phone" [placeholder]="'FORMS.LABELS.PHONE' | translate" formControlName="phone">
+                <mat-error [ob-form-errors]="form" field="phone" />
+            </mat-form-field>
+        </form>
+    </div>
+    <div mat-dialog-actions>
+        <div class="flex-1 flex justify-end">
+            <button mat-button type="button" class="ob-button" (click)="close()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createInsurer()">
+                {{'FORMS.ACTIONS.CREATE' | translate}}
+            </button>
+        </div>
+    </div>
+</div>
+@if($reqInProgress()){
+    <div class="spinner-container">
+        <mat-progress-spinner />
+    </div>
+}
+

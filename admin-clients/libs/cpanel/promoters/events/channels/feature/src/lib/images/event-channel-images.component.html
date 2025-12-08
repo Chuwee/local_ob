@@ -1,0 +1,27 @@
+<app-form-container [formGroup]="form" (cancel)="cancel()" (save)="save()" [disabled]="!form.dirty">
+    <div class="flex flex-col gap-10">
+        <div class="flex flex-col gap-4">
+            <div class="flex flex-col">
+                <h3 class="section-title">{{ 'EVENTS.CHANNEL.SQUARE_IMAGES.SUBTITLE' | translate | uppercase }}</h3>
+                <span>{{ 'EVENTS.CHANNEL.SQUARE_IMAGES.DESCRIPTION' | translate }}</span>
+            </div>
+            <app-event-channel-image-uploader [formGroup]="form" />
+        </div>
+        @if ($isFestivalOrSessionPack()) {
+            @defer {
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-col">
+                        <h3 class="section-title">{{ 'EVENTS.CHANNEL.SQUARE_SESSION_IMAGES.SUBTITLE' | translate | uppercase }}</h3>
+                        <span>{{ 'EVENTS.CHANNEL.SQUARE_SESSION_IMAGES.DESCRIPTION' | translate }}</span>
+                    </div>
+                    <app-event-channel-session-images [eventId]="eventId" [eventChannelId]="eventChannelId" />
+                </div>
+            }
+        }
+    </div>
+</app-form-container>
+@if ($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

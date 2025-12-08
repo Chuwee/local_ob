@@ -1,0 +1,291 @@
+@if (eventChannel$ |async; as eventChannel) {
+    <div class="status-notifications-container flex justify-center">
+        <div class="status-bar flex justify-between items-center basis-full">
+            <div class="default-button flex justify-between items-center">
+                @if (isNotOperatorUser$ | async) {
+                    <button mat-stroked-button color="tertiary" class="ob-button small favorite-btn"
+                        (click)="updateFavoriteChannel(eventChannel)">
+                        <mat-icon>
+                            <!-- Spinner only if channel added to favorite from detail (favorite button) -->
+                            @if (favoriteChannelClickedFromDetail$ | async) {
+                                <span class="default-change-spinner">
+                                    <mat-spinner diameter="20" />
+                                </span>
+                            } @else {
+                                <mat-icon class="default-icon" [class.default-icon-checked]="eventChannel.channel.favorite">
+                                    {{eventChannel.channel.favorite ? 'star' : 'star_outline'}}
+                                </mat-icon>
+                            }
+                        </mat-icon>
+                        {{'EVENTS.CHANNEL.FAVORITE' | translate}}
+                    </button>
+                    <app-help-button [message]="'EVENTS.CHANNEL.FAVORITE_DESCRIPTION' | translate" />
+                }
+            </div>
+            <div class="channel-status">
+                <span class="channel-status-label ob-label">
+                    {{'EVENTS.CHANNEL.CHANNEL_STATUS' | translate}}:
+                </span>
+                <span class="ob-status-badge"
+                    [ngClass]="getReleaseStatusIndicator(eventChannel.status.request, eventChannel.status.release)"
+                    [matTooltip]="'EVENTS.CHANNEL.RELEASE_STATUS.' + eventChannel.status.release | translate">
+                    {{'EVENTS.CHANNEL.RELEASE_STATE' | translate}}
+                </span>
+                <span [matTooltip]="'EVENTS.CHANNEL.SALE_STATUS.' + eventChannel.status.sale | translate"
+                    class="ob-status-badge" [ngClass]="getSaleStatusIndicator(eventChannel.status.request, eventChannel.status.sale)">
+                    {{'EVENTS.CHANNEL.SALE_STATE' | translate}}
+                </span>
+            </div>
+        </div>
+    </div>
+    <app-form-container [disabled]="!form?.dirty" (cancel)="cancel()" (save)="save()" sidebar>
+        <div class="events-channel-form-container flex flex-col">
+            <form [formGroup]="form" class="flex flex-col">
+                <!-- OPERATIVE -->
+                <mat-accordion multi togglePosition="before">
+                    <mat-expansion-panel expanded togglePosition="before" formGroupName="operativeForm" class="without-body-padding">
+                        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                            <mat-panel-title>
+                                {{'EVENTS.CHANNEL.OPERATIVE' | translate}}
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <div class="flex flex-col">
+                            <div class="expansion-subheader flex flex-col basis-full">
+                                <mat-slide-toggle class="ob-slide-toggle" formControlName="use_event_dates"
+                                    (change)="checkUseEventChange()">
+                                    {{'EVENTS.CHANNEL.USE_OPERATIVE_ST' | translate}}
+                                </mat-slide-toggle>
+                            </div>
+                            <div class="expansion-body flex flex-col">
+                                <!-- RELEASE DATE-->
+                                <div class="events-channel-form-section flex flex-wrap" id="releaseDate" formGroupName="release">
+                                    <div class="events-channel-form-feature-activation flex flex-col basis-full">
+                                        <div class="flex basis-[28px]">
+                                            <mat-slide-toggle class="ob-slide-toggle" formControlName="enabled"
+                                                (change)="checkPublishChange($event.checked)">
+                                                {{'EVENTS.CHANNEL.RELEASE' | translate}}
+                                            </mat-slide-toggle>
+                                        </div>
+                                        <mat-divider class="basis-full" />
+                                    </div>
+                                    <p class="field-with-label basis-full">
+                                        {{'EVENTS.CHANNEL.RELEASE_INFO' | translate}}:
+                                    </p>
+                                    <app-date-time-picker class="events-channel-form-field basis-full sm:basis-1/2"
+                                        [label]="'DATES.DATE' | translate" formControlName="date" />
+                                    <!-- TODO: Uncoment when event have all properties -->
+                                    <!-- <div [formGroup]="eventDatesForm" fxFlex="100%" fxFlex.gt-sm="50%"
+                                    *ngIf="getUseEventValue">
+                                    <app-date-time-picker fxFlex="100%" class="events-channel-form-field"
+                                        [label]="'DATES.DATE' | translate"
+                                        formControlName="st_release_date">
+                                    </app-date-time-picker>
+                                </div> -->
+                                </div>
+                                <!-- SALE DATE -->
+                                <div class="events-channel-form-section flex flex-wrap" id="saleDate" formGroupName="sale">
+                                    <div class="events-channel-form-feature-activation flex flex-col basis-full">
+                                        <div class="flex basis-[28px]">
+                                            <mat-slide-toggle class="ob-slide-toggle" (change)="checkSaleChange($event.checked)"
+                                                formControlName="enabled">
+                                                {{'EVENTS.CHANNEL.SALE' | translate}}
+                                            </mat-slide-toggle>
+                                        </div>
+                                        <mat-divider class="basis-full" />
+                                    </div>
+                                    <p class="field-with-label basis-full">{{'EVENTS.CHANNEL.SALE_INFO' | translate}}</p>
+                                    <!-- START SALE DATE -->
+                                    <div class="flex flex-col basis-full sm:basis-1/2">
+                                        <app-date-time-picker class="events-channel-form-field basis-full"
+                                            [label]="'DATES.START_DATE' | translate" formControlName="start_date" />
+                                    </div>
+                                    <!-- TODO: Uncoment when event have all properties -->
+                                    <!-- <div [formGroup]="eventDatesForm" fxFlex="100%" fxFlex.gt-sm="50%"
+                                    *ngIf="getUseEventValue">
+                                    <app-date-time-picker fxFlex="100%" class="events-channel-form-field"
+                                        [label]="'DATES.START_DATE' | translate"
+                                        formControlName="st_sale_start_date">
+                                    </app-date-time-picker>
+                                </div> -->
+                                    <!-- END SALE DATE -->
+                                    <div class="flex flex-col basis-full sm:basis-1/2">
+                                        <app-date-time-picker class="events-channel-form-field basis-full"
+                                            [label]="'DATES.END_DATE' | translate" formControlName="end_date" />
+                                    </div>
+                                    <!-- TODO: Uncoment when event have all properties -->
+                                    <!-- <div [formGroup]="eventDatesForm" fxFlex="100%" fxFlex.gt-sm="50%"
+                                    *ngIf="getUseEventValue">
+                                    <app-date-time-picker fxFlex="100%" class="events-channel-form-field"
+                                        [label]="'DATES.END_DATE' | translate"
+                                        formControlName="st_sale_end_date">
+                                    </app-date-time-picker>
+                                </div> -->
+                                </div>
+                                <!-- BOOKING DATE -->
+                                @if (allowBooking) {
+                                    <div class="events-channel-form-section flex flex-wrap" id="bookingDate" formGroupName="booking">
+                                        <div class="events-channel-form-feature-activation flex flex-col basis-full">
+                                            <div class="flex basis-[28px]">
+                                                <mat-slide-toggle class="ob-slide-toggle" formControlName="enabled">
+                                                    {{'EVENTS.CHANNEL.BOOKING' | translate}}
+                                                </mat-slide-toggle>
+                                            </div>
+                                            <mat-divider class="basis-full" />
+                                        </div>
+                                        <p class="field-with-label basis-full">
+                                            {{'EVENTS.CHANNEL.BOOKING_INFO' | translate}}
+                                        </p>
+                                        <!-- START BOOKING DATE -->
+                                        <div class="flex flex-col basis-full sm:basis-1/2">
+                                            <app-date-time-picker class="events-channel-form-field basis-full"
+                                                [label]="'DATES.START_DATE' | translate" formControlName="start_date" />
+                                        </div>
+                                        <!-- END BOOKING DATE -->
+                                        <div class="flex flex-col basis-full sm:basis-1/2">
+                                            <app-date-time-picker class="events-channel-form-field basis-full"
+                                                [label]="'DATES.END_DATE' | translate" formControlName="end_date" />
+                                        </div>
+                                    </div>
+                                }
+                                <!-- SECONDARY MARKET -->
+                                @if (allowSecondaryMarketSale) {
+                                    <div class="events-channel-form-section flex flex-wrap" id="secondaryMarket"
+                                        formGroupName="secondary_market_sale">
+                                        <div class="events-channel-form-feature-activation flex flex-col basis-full">
+                                            <div class="flex basis-[28px]">
+                                                <mat-slide-toggle class="ob-slide-toggle" id="secondaryMarketEnable"
+                                                    formControlName="enabled">
+                                                    {{'EVENTS.CHANNEL.SECONDARY_MARKET_SALE' | translate}}
+                                                </mat-slide-toggle>
+                                            </div>
+                                            <mat-divider class="basis-full" />
+                                        </div>
+                                        <p class="field-with-label basis-full">
+                                            {{'EVENTS.CHANNEL.SECONDARY_MARKET_SALE_INFO' | translate}}
+                                        </p>
+                                        <!-- START SECONDARY MARKET DATE -->
+                                        <div class="flex flex-col basis-full sm:basis-1/2">
+                                            <app-date-time-picker class="events-channel-form-field basis-full"
+                                                [label]="'DATES.START_DATE' | translate" formControlName="start_date" />
+                                        </div>
+                                        <!-- END SECONDARY MARKET DATE -->
+                                        <div class="flex flex-col basis-full sm:basis-1/2">
+                                            <app-date-time-picker class="events-channel-form-field basis-full"
+                                                [label]="'DATES.END_DATE' | translate" formControlName="end_date" />
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </mat-expansion-panel>
+                    <!-- QUOTAS -->
+                    <mat-expansion-panel expanded togglePosition="before" formGroupName="quotaForm" id="quotas">
+                        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                            <mat-panel-title>
+                                {{'EVENTS.CHANNEL.SALE_GROUP' | translate}}
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+                            <div class="events-channel-form-section flex flex-col">
+                            <div class="flex flex-wrap basis-[40px]">
+                                <p class="field-with-label basis-full">
+                                    {{'EVENTS.CHANNEL.SALE_GROUP_INFO' | translate}}:
+                                </p>
+                            </div>
+                            <!-- ALL QUOTAS SELECTION RADIO -->
+                            <div class="quotas-radio-group flex flex-wrap">
+                                <div class="edition-block channels-scope flex flex-wrap basis-full">
+                                    <mat-radio-group class="flex flex-col basis-full gap-4" formControlName="use_all_quotas">
+                                        <mat-radio-button class="ob-radio-button" [value]="true">
+                                            {{'EVENTS.CHANNEL.SALE_GROUP_ALL' | translate}}
+                                        </mat-radio-button>
+                                        <mat-radio-button class="ob-radio-button" [value]="false">
+                                            {{'EVENTS.CHANNEL.SALE_GROUP_SELECT_SALE_GROUP' | translate}}
+                                        </mat-radio-button>
+                                    </mat-radio-group>
+                                    <div class="quotas-selection nested-content flex flex-wrap basis-full"
+                                        [@expandQuotaSelection]="!form.value.quotaForm.use_all_quotas ? 'expanded' : 'collapsed'">
+                                        @if (activityEvent) {
+                                            <mat-selection-list class="ob-list quotas-list basis-full" formControlName="quotas">
+                                                @for (quota of eventChannel.parsedQuotas; track quota) {
+                                                    <mat-list-option color="primary" [value]="quota.template_id" [selected]="quota.selected"
+                                                        checkboxPosition="before">
+                                                        <div class="sale-request-status flex basis-full
+                                                        justify-between items-center shrink-0 grow-0 gap-5">
+                                                            <span>{{quota.template_name}}</span>
+                                                            <mat-form-field appearance="outline"
+                                                                class="ob-form-field inline-field basis-2/5"
+                                                                (click)="$event.stopPropagation()">
+                                                                <mat-select (selectionChange)="changeQuotaMap(quota.template_id, $event)"
+                                                                    [value]="quota.quotaActive">
+                                                                    @for (opt of quota.quotas; track opt) {
+                                                                        <mat-option [value]="opt.id">
+                                                                            {{opt.description}}
+                                                                        </mat-option>
+                                                                    }
+                                                                </mat-select>
+                                                            </mat-form-field>
+                                                        </div>
+                                                    </mat-list-option>
+                                                }
+                                            </mat-selection-list>
+                                        } @else {
+                                            <mat-selection-list class="ob-list quotas-list basis-full" formControlName="quotas">
+                                                @for (quota of eventChannel.parsedQuotas; track quota; let first = $first) {
+                                                    <div>
+                                                        <div matSubheader [ngClass]="{'first-subheader': first}">
+                                                            {{quota.template_name}}
+                                                        </div>
+                                                        @for (opt of quota.quotas; track opt) {
+                                                            <mat-list-option color="primary" [value]="opt.id"
+                                                                [selected]="quota.selected && opt.id === quota.quotaActive"
+                                                                checkboxPosition="before">
+                                                                {{opt.description}}
+                                                            </mat-list-option>
+                                                        }
+                                                    </div>
+                                                }
+                                            </mat-selection-list>
+                                        }
+                                        @if (form.hasError('quotasListEmpty', 'quotaForm')) {
+                                            <mat-error>{{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}</mat-error>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </form>
+        </div>
+        <!-- CHANNEL INFO -->
+        <div slot="sidebar" class="channel-sidebar-container">
+            <div class="channel-img-container flex">
+                @if (eventChannel.channel.entity.logo) {
+                    <img class="channel-image" alt="channel entity logo"
+                        [src]="eventChannel.channel.entity.logo" />
+                }
+                @if (!eventChannel.channel.entity.logo) {
+                    <mat-icon class="material-icons basis-full justify-center items-center">
+                        image
+                    </mat-icon>
+                }
+            </div>
+            <h4 class="sidebar-title">{{eventChannel.channel.name}}</h4>
+            <div [matTooltip]="(archivedEvent$ | async) ? ('EVENTS.ARCHIVED_CHANNEL_REQ_TOOLTIP' | translate) : ''">
+                <button mat-flat-button color="primary" type="button" class="ob-button" (click)="handleRequestChannel(eventChannel)"
+                    [disabled]="eventChannel.status.request !== eventChannelRequestStatus.pendingRequest || (archivedEvent$ | async)">
+                    {{'FORMS.ACTIONS.REQUEST' | translate}}
+                </button>
+            </div>
+            <div class="channel-sidebar-container-data flex flex-col">
+                <span class="channel-sidebar-label">{{'CHANNELS.ENTITY' | translate}}</span>
+                <span>{{eventChannel.channel.entity.name}}</span>
+                <span class="channel-sidebar-label">{{'CHANNELS.TYPE' | translate}}</span>
+                <span>{{('CHANNELS.TYPE_OPTS.' + eventChannel.channel.type) | translate}}</span>
+                <span class="channel-sidebar-label">{{'CHANNELS.ID' | translate}}</span>
+                <span>{{eventChannel.channel.id}}</span>
+            </div>
+        </div>
+        <app-archived-event-mgr slot="actions-bar" [disabled]="form.dirty" />
+    </app-form-container>
+}

@@ -1,0 +1,44 @@
+<form [formGroup]="filtersForm" class="flex flex-col gap-6">
+    @if($canSelectEntity()) {
+        <div class="filter-block flex flex-row">
+            <div class="ob-label">
+                {{'FORMS.LABELS.ENTITY' | translate}}
+            </div>
+            <div class="filter-block-input flex flex-[1_1_300px]">
+                <mat-form-field appearance="outline" class="ob-form-field entity-select">
+                    <mat-select formControlName="entity" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate">
+                        <mat-option>
+                            <app-select-search #entitySelectSearch [options$]="$entities()" searchField="name" />
+                        </mat-option>
+                        @for(entity of entitySelectSearch.getFilteredOptions$() | async; track entity) {
+                            <mat-option [value]="entity">
+                                {{entity ? entity.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                            </mat-option>
+
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-divider [inset]="true" />
+    }
+
+    <div class="filter-block flex flex-row">
+        <div class="ob-label">
+            {{'PACK.STATUS' | translate}}
+        </div>
+        <div class="filter-block-input flex flex-[1_1_300px]">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-select formControlName="status" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                    @for (status of statusOptions; track status) {
+                        <mat-option [value]="status">
+                            <div appEllipsify>
+                                {{ 'PACK.STATUS_OPTS.' + status | translate }}
+                            </div>
+                        </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+</form>

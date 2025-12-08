@@ -1,0 +1,30 @@
+<div class="flex flex-col justify-between gap-1" fxFlex="100%" fxLayout="column" fxLayoutAlign="stretch stretch">
+    <mat-drawer-container fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="start stretch">
+        <mat-drawer #drawer mode="side" opened fxFlex="0 0 {{sidebarWidth$ | async}}">
+            <app-product-channels-list />
+        </mat-drawer>
+        <mat-drawer-content fxFlex="0 1 100%" class="product-channels-container">
+            <div class="ob-sidebar-toggle" (click)="drawer.toggle();" [ngClass]="{'collapsed': !drawer.opened}">
+                <span class="arrow"></span>
+            </div>
+            @if ((productChannels$ | async)?.length) {
+                <router-outlet />
+            }
+            @if ((productChannels$ | async)?.length === 0) {
+                <app-empty-state fxFlex="1 1 100%"
+                    [title]="'PRODUCT.CHANNELS.EMPTY_LIST_MESSAGE' | translate"
+                    [description]="'PRODUCT.CHANNELS.CREATE_MESSAGE' | translate">
+                    @if (canWrite$ | async) {
+                        <button mat-flat-button class="ob-button" color="primary" (click)="addChannels()">
+                            <mat-icon>add</mat-icon>
+                            {{'PRODUCT.CHANNELS.ADD_CHANNELS' | translate}}
+                        </button>
+                    }
+                </app-empty-state>
+            }
+            @if (isLoading$ | async) {
+                <div class="spinner-container"><mat-spinner /></div>
+            }
+        </mat-drawer-content>
+    </mat-drawer-container>
+</div>

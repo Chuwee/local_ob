@@ -1,0 +1,83 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'TITLES.NEW_VOUCHER' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch" class="dialog-grid-form">
+        <form fxLayout="row wrap" fxLayoutGap="20px grid" fxLayoutAlign="start start">
+            <div fxFlex="calc(100% - 20px)" fxLayout="row wrap" fxLayoutGap="20px grid" fxLayoutAlign="start start">
+                <mat-form-field *ngIf="(hasCodeAndPin$ | async) !== true" fxFlex="100%" fxFlex.gt-sm="50%"
+                    appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.CODES_NUMBER' | translate}}</mat-label>
+                    <input matInput type="number" [formControl]="form.controls.quantity" placeholder="1" min="1">
+                    <mat-error [ob-form-errors]="form" field="quantity"></mat-error>
+                </mat-form-field>
+
+                <mat-form-field fxFlex="100%" fxFlex.gt-sm="50%" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.BALANCE' | translate}}</mat-label>
+                    <app-currency-input [formControl]="form.controls.balance"
+                        [currencyCode]="currency$ | async" [currencyFormat]="'narrow'"
+                        [placeholder]="0 | localCurrency:(currency$ | async):'narrow'">
+                    </app-currency-input>
+                    <mat-error [ob-form-errors]="form" field="balance"></mat-error>
+                </mat-form-field>
+            </div>
+
+
+            <mat-form-field *ngIf="hasCodeAndPin$ | async" fxFlex="100%" fxFlex.gt-sm="50%" appearance="outline"
+                class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.PIN' | translate}}</mat-label>
+                <input matInput aria-label="pin" [placeholder]="'FORMS.LABELS.PIN' | translate" [formControl]="form.controls.pin">
+                <mat-error [ob-form-errors]="form" field="pin"></mat-error>
+            </mat-form-field>
+            <mat-form-field *ngIf="hasCodeAndPin$ | async" fxFlex="100%" fxFlex.gt-sm="50%" appearance="outline"
+                class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.EMAIL' | translate}}</mat-label>
+                <input matInput aria-label="email" [placeholder]="'FORMS.LABELS.EMAIL' | translate"
+                    [formControl]="form.controls.email">
+                <mat-error [ob-form-errors]="form" field="email"></mat-error>
+            </mat-form-field>
+
+            <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center" class="voucher-limit" fxLayoutGap="20px">
+                <mat-checkbox #expirationEnabler color="primary" [formControl]="form.controls.expirationEnabled">
+                    {{'GIFT_CARD.EXPIRATION.ACTIVATE' | translate}}
+                </mat-checkbox>
+                <mat-form-field fxLayoutAlign="start center" *ngIf="expirationEnabler.checked" appearance="outline"
+                    class="ob-form-field inline-field" fxFlex="160px">
+                    <input matInput [matDatepicker]="expirationDate" [placeholder]="dateFormat"
+                        [formControl]="form.controls.expirationDate" (focus)="expirationDate.open()">
+                    <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                        (click)="$event.stopPropagation(); expirationDate.open();">
+                        <mat-icon>event</mat-icon>
+                    </button>
+                    <mat-datepicker #expirationDate></mat-datepicker>
+                </mat-form-field>
+            </div>
+
+            <div fxFlex="45px" fxLayout="row" fxLayoutAlign="start center" class="voucher-limit">
+                <mat-checkbox color="primary" [formControl]="form.controls.enableLimit" (change)="toggleLimit($event.checked)"
+                    [checked]="enableLimit">
+                    {{'VOUCHER.USAGE_MAX' | translate}}
+                </mat-checkbox>
+                <div *ngIf="enableLimit" fxLayoutAlign="start center">
+                    <mat-form-field id="limit" appearance="outline" fxFlex="100px"
+                        class="ob-form-field inline-field value-field">
+                        <input matInput type="number" [formControl]="form.controls.limit" placeholder="0">
+                    </mat-form-field>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div mat-dialog-actions fxFlex="auto" fxLayout="row no wrap" fxLayoutAlign="end" fxFlexOffset="15px">
+        <button mat-button type="button" class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createVoucher()"
+            [disabled]="isSaving$ | async">
+            {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>

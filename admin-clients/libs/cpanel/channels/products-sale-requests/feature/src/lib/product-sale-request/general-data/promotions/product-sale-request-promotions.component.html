@@ -1,0 +1,65 @@
+@let promotions = promotionsList$ | async;
+@let metadata = promotionsMetadata$ | async;
+@let isLoading = isLoading$ | async;
+
+@if (metadata?.total > 0) {
+    <app-form-container layout="main" class="overflow-y-auto" hideActionBar>
+        <div class="details-form-container">
+            <div class="section-block">
+                <span class="mat-subtitle-2 total-promotions">
+                    {{'PRODUCTS_SALE_REQUESTS.FORMS.INFOS.TOTAL_PROMOTIONS' | translate}}: {{metadata.total}}
+                </span>
+            </div>
+            @for (promotion of promotions; track promotion.id) {
+                <div class="section-block">
+                    <h3 class="section-title">
+                        {{promotion.name}}&nbsp;-&nbsp;
+                        {{'PRODUCTS_SALE_REQUESTS.FORMS.LABELS.TYPE_OPTS.' + promotion.type.toUpperCase() + '.LONG'
+                        | translate | uppercase}}
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="details-non-editable-field ob-form-field flex flex-col basis-full">
+                            <span class="field-label">{{'PRODUCTS_SALE_REQUESTS.FORMS.LABELS.COLLECTIVE' | translate}}</span>
+                            @if (promotion?.activator?.type === 'COLLECTIVE') {
+                                <span>{{promotion.activator.collective?.name}}</span>
+                            } @else {
+                                <span>{{'PRODUCTS_SALE_REQUESTS.FORMS.ALL_COLLECTIVES' | translate}}</span>
+                            }
+                        </div>
+                        @if (promotion.discount) {
+                            <div class="details-non-editable-field ob-form-field flex flex-col basis-full">
+                                <span class="field-label">{{'PRODUCTS_SALE_REQUESTS.FORMS.LABELS.DISCOUNT_TYPE' | translate}}</span>
+                                @switch (promotion.discount.type) {
+                                    @case ('FIXED') {
+                                        <span>
+                                            {{'PRODUCTS_SALE_REQUESTS.FORMS.LABELS.DISCOUNT_TYPE_OPTS.'
+                                            + promotion.discount.type.toUpperCase() | translate}}&nbsp;-&nbsp;
+                                            {{promotion.discount.value | localCurrency:(currency$| async):'narrow'}}
+                                        </span>
+                                    }
+                                    @case ('PERCENTAGE') {
+                                        <span>
+                                            {{'PRODUCTS_SALE_REQUESTS.FORMS.LABELS.DISCOUNT_TYPE_OPTS.'
+                                            + promotion.discount.type.toUpperCase() | translate}}&nbsp;-&nbsp;
+                                            {{promotion.discount.value | localNumber : '1.2-2'}} %
+                                        </span>
+                                    }
+                                }
+                            </div>
+                        }
+                    </div>
+                    @if (!$last) {
+                        <mat-divider class="ob-divider" />
+                    }
+                </div>
+            }
+        </div>
+    </app-form-container>
+} @else if (!isLoading) {
+    <app-empty-state [title]="'PRODUCTS_SALE_REQUESTS.FORMS.INFOS.EMPTY_PROMOTIONS' | translate" class="flex-grow basis-0" />
+}
+@if (isLoading) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

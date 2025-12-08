@@ -1,0 +1,55 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="100%" class="secondary title">
+            {{ 'VENUE_TPLS.ELEMENT_INFO.FEATURES_LIST.LINKS_MODAL.TITLE' | translate }}
+        </h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" [formGroup]="form">
+        <span class="ob-label">{{'VENUE_TPLS.ELEMENT_INFO.FEATURES_LIST.LINKS_MODAL.FEATURE_TYPE' | translate }}</span>
+        <mat-radio-group formControlName="type">
+            <mat-radio-button [value]="featureType.text">
+                <mat-label>{{'VENUE_TPLS.ELEMENT_INFO.FEATURES_LIST.LINKS_TYPES.TEXT' | translate}}</mat-label>
+            </mat-radio-button>
+            <mat-radio-button [value]="featureType.link">
+                <mat-label>{{'VENUE_TPLS.ELEMENT_INFO.FEATURES_LIST.LINKS_TYPES.LINK' | translate}}</mat-label>
+            </mat-radio-button>
+        </mat-radio-group>
+
+        <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label">
+            <mat-label>{{'VENUE_TPLS.ELEMENT_INFO.FEATURES_LIST.LINKS_MODAL.TEXT' | translate }}</mat-label>
+            <input matInput formControlName="text">
+            <mat-error [ob-form-errors]="form" field="text" />
+        </mat-form-field>
+
+        <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label">
+            <mat-label>{{'VENUE_TPLS.ELEMENT_INFO.FEATURES_LIST.LINKS_MODAL.URL' | translate }}</mat-label>
+            <input matInput formControlName="url">
+            <mat-error [ob-form-errors]="form" field="url" />
+        </mat-form-field>
+
+        <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label">
+            <mat-label>{{'VENUE_TPLS.ELEMENT_INFO.FEATURES_LIST.LINKS_MODAL.ACTION' | translate }}</mat-label>
+            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="action">
+                @for (action of linkActions; track action) {
+                    <mat-option [value]="action">
+                        {{ 'VENUE_TPLS.ELEMENT_INFO.FEATURES_LIST.LINKS_ACTIONS.' + action | translate }}
+                    </mat-option>
+                }
+            </mat-select>
+            <mat-error [ob-form-errors]="form" field="type" />
+        </mat-form-field>
+
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button mat-button type="button" class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="save()"
+            [disabled]="form.invalid">
+            {{'FORMS.ACTIONS.OK' | translate}}
+        </button>
+    </div>
+</div>

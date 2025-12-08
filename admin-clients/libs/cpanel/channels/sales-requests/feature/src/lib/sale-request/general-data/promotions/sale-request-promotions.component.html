@@ -1,0 +1,115 @@
+<app-form-container *ngIf="saleRequestPromotions$ | async as saleRequestPromotions" layout="menu" hideActionBar>
+    <div *ngIf="(saleRequestPromotionMetadata$ | async)?.total !== 0">
+        <p class="mat-subtitle-2 details-promotions-total">
+            {{'SALE_REQUEST.PROMOTIONS.TOTAL' | translate}}: {{(saleRequestPromotionMetadata$ | async)?.total}}
+        </p>
+        <div class="details-form-container">
+            <div *ngFor="let promotion of saleRequestPromotions">
+                <h3 class="section-title" fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="start flex-end">
+                    <span class="details-promotion-title">{{promotion.name}}</span>
+                    <span class="promotion-title-type">
+                        <span class="promotion-type-badge">
+                            {{'EVENTS.PROMOTIONS.TYPE_OPTS.' + promotion.type.toUpperCase() + '.LONG' | translate}}
+                        </span>
+                    </span>
+                </h3>
+                <div fxLayout="row wrap">
+                    <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                        fxLayout="column">
+                        <span class="field-label">{{'SALE_REQUEST.PROMOTIONS.COLLECTIVE' | translate}}</span>
+                        <div *ngIf="!promotion.collective else collective">
+                            <span>{{'SALE_REQUEST.PROMOTIONS.ALL_COLLECTIVES' | translate}}</span>
+                        </div>
+                        <ng-template #collective>
+                            <span>{{promotion.collective.name}}</span>
+                        </ng-template>
+                    </div>
+                    <div *ngIf="promotion.validity_period.type === saleRequestPromotionValidityPeriodTypes.period"
+                        class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                        fxLayout="column">
+                        <span class="field-label">{{'DATES.DATES' | translate}}</span>
+                        <span>
+                            {{('DATES.DATE_FROM' | translate) + ': ' + (promotion.validity_period.from | dateTime :
+                            dateTimeFormats.shortDate) + ' - ' +
+                            ('DATES.DATE_TO' | translate) + ': ' + (promotion.validity_period.to | dateTime :
+                            dateTimeFormats.shortDate)}}
+                        </span>
+                    </div>
+                    <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                        fxLayout="column">
+                        <span class="field-label">{{'SALE_REQUEST.PROMOTIONS.DISCOUNT_TYPE' | translate}}</span>
+                        <div [ngSwitch]="promotion.price_variation.type">
+                            <div *ngSwitchCase="promotionDiscountTypes.percentage">
+                                <span>{{'EVENTS.PROMOTIONS.DISCOUNT_TYPE_OPTS.PERCENTUAL' | translate}}</span>
+                                &nbsp;-&nbsp;
+                                <span>{{promotion.price_variation.value | localNumber : '1.2-2'}} %</span>
+                            </div>
+                            <div *ngSwitchCase="promotionDiscountTypes.fixed">
+                                <span>{{'EVENTS.PROMOTIONS.DISCOUNT_TYPE_OPTS.FIXED' | translate}}</span>
+                                &nbsp;-&nbsp;
+                                <span>{{promotion.price_variation.value | localCurrency:(currency$| async):'narrow'}}</span>
+                            </div>
+                            <div *ngSwitchCase="promotionDiscountTypes.basePrice">
+                                <mat-table class="ob-table not-touchable base-price-range-table"
+                                    [dataSource]="promotion.price_variation.ranges"
+                                    [attr.aria-label]="'SALE_REQUEST.PROMOTIONS.RANGE' | translate">
+                                    <ng-container matColumnDef="range">
+                                        <mat-header-cell *matHeaderCellDef class="head-cell">
+                                            {{'SALE_REQUEST.PROMOTIONS.RANGE' | translate}}
+                                        </mat-header-cell>
+                                        <mat-cell *matCellDef="let row" class="range-title">
+                                            <span>{{row.from | localCurrency:(currency$| async):'narrow'}}</span>
+                                            &nbsp;-&nbsp;
+                                            <span *ngIf="row.to">{{row.to | localCurrency:(currency$| async):'narrow'}}</span>
+                                            <mat-icon *ngIf="!row.to">all_inclusive</mat-icon>
+                                        </mat-cell>
+                                    </ng-container>
+                                    <ng-container matColumnDef="price">
+                                        <mat-header-cell *matHeaderCellDef class="head-cell right">
+                                            {{'SALE_REQUEST.PROMOTIONS.BASE_PRICE' | translate}}
+                                        </mat-header-cell>
+                                        <mat-cell *matCellDef="let row" class="right">{{row.value | localCurrency:(currency$| async):'narrow'}}
+                                        </mat-cell>
+                                    </ng-container>
+                                    <mat-header-row *matHeaderRowDef="['range','price'];"></mat-header-row>
+                                    <mat-row *matRowDef="let row; columns: ['range','price'];"></mat-row>
+                                </mat-table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                        fxLayout="column">
+                        <span class="field-label">{{'SALE_REQUEST.PROMOTIONS.SESSIONS' | translate}}</span>
+                        <div *ngIf="!promotion.sessions || !promotion.sessions.length else sessions">
+                            <span>{{'SALE_REQUEST.PROMOTIONS.ALL_SESSIONS' | translate}}</span>
+                        </div>
+                        <ng-template #sessions>
+                            <span *ngFor="let session of promotion.sessions">
+                                {{session.date.start | dateTime : dateTimeFormats.shortDateTime}} - {{session.name}}
+                            </span>
+                        </ng-template>
+                    </div>
+                    <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="50%"
+                        fxLayout="column">
+                        <span class="field-label">{{'SALE_REQUEST.PROMOTIONS.PRICE_TYPES' | translate}}</span>
+                        <div *ngIf="!promotion.price_types || !promotion.price_types.length else priceTypes">
+                            <span>{{'SALE_REQUEST.PROMOTIONS.ALL_PRICE_TYPES' | translate}}</span>
+                        </div>
+                        <ng-template #priceTypes>
+                            <span *ngFor="let priceType of promotion.price_types">
+                                {{priceType.name}} - {{priceType?.venue_template?.name}}
+                            </span>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <app-empty-state [fxShow]="(saleRequestPromotionMetadata$ | async)?.total === 0" fxFlex="100%"
+        [title]="'SALE_REQUEST.PROMOTIONS.EMPTY_LIST_MESSAGE' | translate">
+    </app-empty-state>
+</app-form-container>
+
+<div class="spinner-container" *ngIf="isLoading$ | async">
+    <mat-spinner></mat-spinner>
+</div>

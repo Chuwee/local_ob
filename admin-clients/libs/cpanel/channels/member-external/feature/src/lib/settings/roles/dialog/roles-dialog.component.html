@@ -1,0 +1,40 @@
+<div class="dialog-msg-container" fxLayout="column" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">
+            {{'CHANNELS.MEMBER_EXTERNAL.ROLES.EDIT_TITLE' | translate}}
+        </h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <form [formGroup]="form" mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <div fxLayout="column" class="communication">
+            <p>{{'CHANNELS.MEMBER_EXTERNAL.ROLES.COMMUNICATION_DESCRIPTION' | translate}}</p>
+            <div fxLayout="row wrap" class="non-editable-data-container">
+                <div class="details-non-editable-field" fxLayout="column" fxFlex="50%">
+                    <span class="field-label">{{'CHANNELS.MEMBER_EXTERNAL.ROLES.ID' | translate}}</span>
+                    <span>{{data.role.id}}</span>
+                </div>
+                <div class="details-non-editable-field" fxLayout="column" fxFlex="50%">
+                    <span class="field-label">{{'FORMS.LABELS.NAME' | translate}}</span>
+                    <span>{{data.role.name}}</span>
+                </div>
+            </div>
+            <app-communication-fields [form]="form" [fields]="fields" [languages]="languages">
+            </app-communication-fields>
+        </div>
+    </form>
+    <div mat-dialog-actions fxFlex="auto" fxLayout="row no wrap" fxLayoutAlign="end">
+        <button mat-button type="button" class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button [disabled]="loading$ | async" (click)="save()"
+            mat-flat-button color="primary" type="button" class="ob-button">
+            {{'FORMS.ACTIONS.SAVE' | translate }}
+        </button>
+    </div>
+</div>
+
+<div class="spinner-container" *ngIf="loading$ | async">
+    <mat-spinner></mat-spinner>
+</div>

@@ -1,0 +1,95 @@
+<app-form-container (cancel)="cancel()" (save)="save()" [disabled]="!form.dirty|| (isLoadingOrSaving$ | async)" layout="menu" sidebar>
+    @let event = event$ | async;
+    @if(event?.external_reference && $isFeverZoneEnabled()){
+        <div class="flex justify-end">
+            <app-fever-zone-plan-link [planId]="event.external_reference" [entityId]="event.entity.id" type="event" />
+        </div>
+    }
+    <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.EVENT_DATA' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-event-principal-info-data [form]="form" [event]="event" [putEventCtrl]="form.controls.putEventCtrl"
+                [eventStatusCtrl]="form.controls.eventStatusCtrl" />
+        </mat-expansion-panel>
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.CONTACT_DATA' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-event-principal-info-contact [form]="form" [event]="event" [putEventCtrl]="form.controls.putEventCtrl" />
+        </mat-expansion-panel>
+        <!--        TODO(MULTICURRENCY): delete when the multicurrency functionality is finished-->
+        @if (isMultiCurrency$ | async) {
+            <mat-expansion-panel [expanded]="true" id="multiCurrencyForm">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.CURRENCY.TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-event-principal-info-currency [form]="form" [event]="event" [putEventCtrl]="form.controls.putEventCtrl"
+                    [eventStatusCtrl]="form.controls.eventStatusCtrl" />
+            </mat-expansion-panel>
+        }
+
+        <mat-expansion-panel [expanded]="true" id="languagesForm">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.LANGUAGES' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-event-principal-info-language [form]="form" [event]="event" [putEventCtrl]="form.controls.putEventCtrl" />
+        </mat-expansion-panel>
+
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.INVOICE_DATA' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-invoice-info [form]="form" [putCtrl]="form.controls.putEventCtrl"
+                [statusCtrl]="form.controls.eventStatusCtrl" [programmingStatus]="$programmingStatus()"
+                [status]="event?.status" [producerId]="event?.producer?.id"
+                [entityId]="event?.entity?.id"
+                [simplifiedInvoice]="event?.settings?.simplified_invoice"
+                [useProducerFiscalData]="event?.settings?.use_producer_fiscal_data"
+                [literalKeys]="literalKeysFather" />
+        </mat-expansion-panel>
+
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.CATEGORIES' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-categories-selection [form]="form" [item]="event" [putItemCtrl]="form.controls.putEventCtrl"
+                [categoryIsRequired]="true" />
+        </mat-expansion-panel>
+
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.CUSTOMER_RELATIONSHIP' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-event-principal-info-customer-relationship [form]="form" [event]="event"
+                [putEventCtrl]="form.controls.putEventCtrl" />
+        </mat-expansion-panel>
+
+        @if($hasAutomaticPurchaseCustomerTypes()) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.CUSTOMER_TYPES_ASSIGNATION.TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-customer-types-assignation [form]="form" [customerTypes]="$entityCustomerTypes()"
+                    [customerTypesAssigned]="$eventCustomerTypesAssigned()" />
+            </mat-expansion-panel>
+        }
+
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.SALE_GOALS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-event-principal-info-sale-goals [form]="form" [event]="event"
+                [putEventCtrl]="form.controls.putEventCtrl" />
+        </mat-expansion-panel>
+    </mat-accordion>
+    <app-event-principal-info-sidebar [event]="event" slot="sidebar" />
+    <app-archived-event-mgr slot="actions-bar" [disabled]="form.dirty || (isLoadingOrSaving$ | async)" />
+</app-form-container>
+
+@if (isLoadingOrSaving$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

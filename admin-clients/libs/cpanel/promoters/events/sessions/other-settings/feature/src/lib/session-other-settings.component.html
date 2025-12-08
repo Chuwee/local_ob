@@ -1,0 +1,284 @@
+<app-form-container (cancel)="cancel()" (save)="save()" [disabled]="(!form?.dirty) || (loading$ | async) || (saving$ | async)">
+    <mat-accordion [multi]="true" [togglePosition]="'before'" [formGroup]="form">
+        @if(session$ | async; as session) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.SESSION.OTHER_SETTINGS.RATE_RESTRICTIONS' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                @if($isSga()){
+                    <p>{{'EVENTS.SESSION.RATES_RESTRICTIONS.SGA_INFO' | translate}}</p>
+                    <app-sga-restricted-rates-list [contextId]="session.event.id" [rates]="$sessionRates()"
+                        [sessionId]="session.id" />
+                } @else {
+                    <p>{{'EVENTS.SESSION.RATES_RESTRICTIONS.SESSION_INFO' | translate}}</p>
+                    <app-restricted-rates-list [contextId]="session.event.id" [entityId]="session.entity?.id"
+                        [rates]="$sessionRates()" [venueTemplates]="[session.venue_template]" [loadCondition]="session.id" />
+                }
+            </mat-expansion-panel>
+        }
+        @if (enableRestrictions) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.SESSION.OTHER_SETTINGS.PRICE_TYPE_RESTRICTIONS' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-session-price-type-restrictions />
+            </mat-expansion-panel>
+        }
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.SESSION.OTHER_SETTINGS.TICKET_LIMIT' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-session-sale-constraints [form]="saleConstraintsGroup" />
+            <app-session-ticket-limit [form]="sessionDataGroup" />
+        </mat-expansion-panel>
+        <form formGroupName="sessionDataGroup">
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.SESSION.TAX_DATA.TITLE' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-session-tax-data [form]="sessionDataGroup" />
+            </mat-expansion-panel>
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.SESSION.SUBSCRIPTION_LISTS.TITLE' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-session-subscription-list [form]="sessionDataGroup" />
+            </mat-expansion-panel>
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.SESSION.CHANNELS.SHOW_DATE_AND_TIME.TITLE' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-session-show-date [form]="sessionDataGroup" />
+            </mat-expansion-panel>
+            @if (countries$ | async) {
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'EVENTS.SESSION.COUNTRY_FILTER.TITLE' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <app-session-country-filter [form]="sessionDataGroup" />
+                </mat-expansion-panel>
+            }
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.SESSION.ATTENDANTS_CONFIG.TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-session-attendants [form]="sessionDataGroup" />
+            </mat-expansion-panel>
+            <!-- CAPTCHA -->
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.SESSION.CAPTCHA_TITLE' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="flex flex-col basis-full">
+                    <div class="flex basis-[28px]">
+                        <mat-slide-toggle class="ob-slide-toggle" formControlName="enableCaptcha">
+                            {{'EVENTS.SESSION.CAPTCHA' | translate}}
+                        </mat-slide-toggle>
+                    </div>
+                    <mat-divider />
+                </div>
+            </mat-expansion-panel>
+            @if (sessionDataGroup.get('enableOrphanSeatsProtection').enabled) {
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'EVENTS.SESSION.ORPHAN_SEATS.TITLE' | translate}}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="flex">
+                        <mat-checkbox class="flex" formControlName="enableOrphanSeatsProtection" color="primary">
+                            {{'EVENTS.SESSION.ENABLE_ORPHAN_SEATS.LABEL' | translate}}
+                        </mat-checkbox>
+                    </div>
+                </mat-expansion-panel>
+            }
+            @if (isOperator$ | async) {
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'EVENTS.SESSION.VIRTUAL_QUEUE.TITLE' | translate}}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <app-session-virtual-queues [form]="sessionDataGroup" />
+                </mat-expansion-panel>
+            }
+            <!-- LIVE STREAMING SETTINGS -->
+            @if ((showLiveStreaming$| async) && ((sessionType$ | async) === sessionTypes.session)) {
+                <mat-expansion-panel expanded togglePosition="before">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'EVENTS.SESSION.LIVE_STREAMING' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <app-session-live-streaming [form]="sessionDataGroup" />
+                </mat-expansion-panel>
+            }
+            <!-- MEMBER LOGIN LIMIT -->
+            @if (isAvetEvent$ | async) {
+                <mat-expansion-panel expanded togglePosition="before">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'EVENTS.SESSION.MEMBER.LIMITS' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <app-member-login-limit [form]="sessionDataGroup" />
+                </mat-expansion-panel>
+            }
+        </form>
+        @if (isAvetWs$ | async) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{'EVENTS.SESSION.JOINT_SALES.TITLE' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="flex flex-col">
+                    <div class="enable-option-container flex flex-col basis-full">
+                        <div class="flex basis-[28px]">
+                            <mat-slide-toggle class="ob-slide-toggle" formControlName="enableJointSales">
+                                {{'EVENTS.SESSION.ENABLE_JOINT_SALES.LABEL' | translate}}
+                            </mat-slide-toggle>
+                        </div>
+                        <mat-divider />
+                    </div>
+                    <div class="flex">
+                        <span>{{'EVENTS.SESSION.ENABLE_JOINT_SALES.DESCRIPTION' | translate}}</span>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+        }
+        @if (allowsVipViews$ | async) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.SESSION.VIP_VIEWS.TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-venue-template-vip-views />
+            </mat-expansion-panel>
+        }
+        @if ($showLoyaltyPointsSettings()) {
+            <mat-expansion-panel expanded togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.SESSION.LOYALTY_POINTS' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="flex flex-col" [formGroup]="form.controls['loyaltyPointGainConfig']">
+                    <p>{{'EVENTS.SESSION.LOYALTY_POINTS_INFO' | translate}}</p>
+                    <mat-radio-group class="flex flex-col" formControlName="type">
+                        <mat-radio-button class="ob-radio-button vertical-list" [value]="sessionLoyaltyPointsGainType.sessionPurchased">
+                            <div class="flex flex-col">
+                                <div class="option-title">{{'EVENTS.SESSION.LOYALTY_POINTS_SESSION_PURCHASED' | translate}}</div>
+                                <div>{{'EVENTS.SESSION.LOYALTY_POINTS_SESSION_PURCHASED_INFO' | translate}}</div>
+                            </div>
+                        </mat-radio-button>
+                        @if (form.controls['loyaltyPointGainConfig'].value.type === sessionLoyaltyPointsGainType.sessionPurchased) {
+                            <div class="nested-content flex">
+                                <mat-form-field appearance="outline" class="ob-form-field field-with-label flex basis-[140px]">
+                                    <mat-label>{{'EVENTS.SESSION.LOYALTY_POINTS_AMOUNT' | translate}}</mat-label>
+                                    <input matInput type="number" placeholder="0" formControlName="amount">
+                                    <mat-error [ob-form-errors]="form.controls['loyaltyPointGainConfig']" [field]="'amount'" />
+                                </mat-form-field>
+                            </div>
+                        }
+                        <mat-radio-button class="ob-radio-button vertical-list" [value]="sessionLoyaltyPointsGainType.ticketPurchased">
+                            <div class="flex flex-col">
+                                <div class="option-title">{{'EVENTS.SESSION.LOYALTY_POINTS_TICKET_PURCHASED' | translate}}</div>
+                                <div>{{'EVENTS.SESSION.LOYALTY_POINTS_TICKET_PURCHASED_INFO' | translate}}</div>
+                            </div>
+                        </mat-radio-button>
+                        @if (form.controls['loyaltyPointGainConfig'].value.type === sessionLoyaltyPointsGainType.ticketPurchased) {
+                            <div class="nested-content flex">
+                                <mat-form-field appearance="outline" class="ob-form-field field-with-label flex basis-[140px]">
+                                    <mat-label>{{'EVENTS.SESSION.LOYALTY_POINTS_AMOUNT' | translate}}</mat-label>
+                                    <input matInput type="number" placeholder="0" formControlName="amount">
+                                    <mat-error [ob-form-errors]="form.controls['loyaltyPointGainConfig']" [field]="'amount'" />
+                                </mat-form-field>
+                            </div>
+                        }
+                    </mat-radio-group>
+                </div>
+            </mat-expansion-panel>
+        }
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.SESSION.HIGH_DEMAND.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex flex-col">
+                <mat-checkbox class="flex" formControlName="enableHighDemand" color="primary">
+                    <b>{{'EVENTS.SESSION.HIGH_DEMAND.LABEL' | translate}}</b>
+                </mat-checkbox>
+                <p class="nested">{{'EVENTS.SESSION.HIGH_DEMAND.DESCRIPTION' | translate}}</p>
+            </div>
+        </mat-expansion-panel>
+        @if ((isAvetEvent$ | async) && isAvetApim$ | async) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'TITLES.EXTERNAL_DIGITAL_TICKET' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <form formGroupName="session_external_config" class="external-config-form">
+                    <div class="flex flex-col basis-full gap-4">
+                        <span>{{'SESSION.EXTERNAL.DIGITAL_TICKET.DESCRIPTION' | translate}}</span>
+                        <mat-radio-group class="flex flex-col gap-4" formControlName="useSessionConfig">
+                            <div class="flex gap-4 items-center">
+                                <mat-radio-button class="ob-radio-button" [value]="false">
+                                    {{'SESSION.EXTERNAL.DIGITAL_TICKET.CONFIG.USE_EVENT' | translate}}
+                                </mat-radio-button>
+                                <a class="ob-link icon" [routerLink]="linkToEventWalletConfig" target="_blank">
+                                    {{'ACTIONS.GO_TO_CONFIGURATION' | translate}}
+                                </a>
+                            </div>
+                            <mat-radio-button class="ob-radio-button" [value]="true">
+                                {{'SESSION.EXTERNAL.DIGITAL_TICKET.CONFIG.USE_SESSION' | translate}}
+                            </mat-radio-button>
+                        </mat-radio-group>
+                        @if (form.controls.session_external_config.controls.useSessionConfig.value) {
+                            <mat-radio-group class="nested-content flex flex-col basis-full gap-4"
+                                formControlName="digital_ticket_mode">
+                                <mat-radio-button class="ob-radio-button" [value]="digitalTicketModes[2]">
+                                    <div class="flex flex-col">
+                                        <span class="ob-label">
+                                            {{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.WALLET_NFC.LABEL' | translate}}
+                                        </span>
+                                        <span>{{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.WALLET_NFC.DESC' | translate}}</span>
+                                    </div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button" [value]="digitalTicketModes[3]">
+                                    <div class="flex flex-col">
+                                        <span class="ob-label">
+                                            {{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.WALLET.LABEL' | translate}}
+                                        </span>
+                                        <span>{{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.WALLET.DESC'| translate}}</span>
+                                    </div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button" [value]="digitalTicketModes[1]">
+                                    <div class="flex flex-col">
+                                        <span class="ob-label">
+                                            {{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.PASSBOOK.LABEL' | translate}}
+                                        </span>
+                                        <span>{{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.PASSBOOK.DESC'| translate}}</span>
+                                    </div>
+                                </mat-radio-button>
+                                <mat-radio-button class="ob-radio-button" [value]="digitalTicketModes[0]">
+                                    <div class="flex flex-col">
+                                        <span class="ob-label">
+                                            {{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.DISABLED.LABEL' | translate}}
+                                        </span>
+                                        <span>{{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.DISABLED.DESC' | translate}}</span>
+                                    </div>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        }
+                        <span class="flex items-center justify-start">
+                            <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                            <span>{{'EVENTS.EXTERNAL.DIGITAL_TICKET.INFO' | translate}}</span>
+                        </span>
+                    </div>
+                </form>
+            </mat-expansion-panel>
+        }
+    </mat-accordion>
+    <app-archived-event-mgr slot="actions-bar" [disabled]="form.dirty || (loading$ | async)" />
+</app-form-container>
+@if (loading$ | async) {
+    <div class="spinner-container">
+        <mat-progress-spinner mode="indeterminate" />
+    </div>
+}

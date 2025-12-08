@@ -1,0 +1,54 @@
+<ion-header class="ob-layout__header">
+    <ion-toolbar>
+        <back-button [viewTitle]="'PROFILE.LANGUAGE' | translate" [manualBackActivated]="true" (tap)="onBack()"></back-button>
+    </ion-toolbar>
+</ion-header>
+<ion-content class="ob-layout__content language-selector">
+    <ion-content class="language-selector__scroll-content">
+        <ion-list class="language-selector__options">
+            <ion-item class="language-selector__option"
+                ngClass="{{
+                        language.code === selectedLang ? 'selected' : ''
+                    }}"
+                *ngFor="let language of languages" (click)="changeLang(language.code)">
+                <div class="language-selector__option-content">
+                    <div class="language-selector__option-content--left">
+                        <ion-label class="language-selector__language">
+                            {{ "LANG-SELECTOR." + language.code.toUpperCase() | translate }}
+                        </ion-label>
+                        <ion-label class="language-selector__language-translated">
+                            {{ "LANG-SELECTOR.TRANSLATED-" + language.code.toUpperCase() | translate }}
+                        </ion-label>
+                    </div>
+                    <ion-icon *ngIf="language.code === selectedLang" class="language-selector__option-icon"
+                        src="./assets/media/icons/check.svg"></ion-icon>
+                </div>
+            </ion-item>
+        </ion-list>
+        <ng-template #skeleton>
+            <ion-list class="language-selector__options">
+                <ion-item class="language-selector__option" *ngFor="let _ of [].constructor(3)">
+                    <div class="language-selector__option-content">
+                        <div class="language-selector__option-content--left">
+                            <ion-label class="language-selector__language">
+                                <ion-skeleton-text [animated]="true"></ion-skeleton-text>
+                            </ion-label>
+                            <ion-label class="language-selector__language-translated">
+                                <ion-skeleton-text [animated]="true"></ion-skeleton-text>
+                            </ion-label>
+                        </div>
+                        <ion-icon class="language-selector__option-icon"></ion-icon>
+                    </div>
+                </ion-item>
+            </ion-list>
+        </ng-template>
+    </ion-content>
+
+    <ion-button data-override-styles="" class="ob-btn primary size--medium language-selector__button" (click)="saveOptions()">
+        {{ "BUTTONS.SAVE" | translate }}
+    </ion-button>
+</ion-content>
+<ion-footer class="ob-layout__footer"> </ion-footer>
+
+<ion-alert [isOpen]="alertOpen" header="{{ 'PROFILE.ALERT-TITLE-CHANGES' | translate }}" [buttons]="alertButtons" data-override-styles=""
+    class="ob-alert alert-warning" backdropDismiss="false" (ionAlertDidDismiss)="toggleAlert()"></ion-alert>

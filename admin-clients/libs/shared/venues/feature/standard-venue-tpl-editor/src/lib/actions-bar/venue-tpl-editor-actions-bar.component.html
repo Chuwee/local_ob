@@ -1,0 +1,152 @@
+<div [formGroup]="form" fxFlex="100%" class="btn-container" fxLayout="row" fxLayoutAlign="start center">
+    <ng-container *ngIf="(mode$ | async) === editorModes.base" [formGroup]="form">
+        <button mat-icon-button class="ob-mdc-button" [disabled]="undoDisabled$ | async" (click)="undoAction()">
+            <mat-icon>undo</mat-icon>
+        </button>
+        <button mat-icon-button class="ob-mdc-button" [disabled]="redoDisabled$ | async" (click)="redoAction()">
+            <mat-icon>redo</mat-icon>
+        </button>
+        <mat-divider vertical></mat-divider>
+        <button *ngIf="seatMatrixModeAvailable$ | async" mat-icon-button class="ob-mdc-button"
+            [matTooltip]="'VENUE_TPL_EDITOR.NEW_SEAT_MATRIX' | translate" (click)="setSeatMatrixMode()">
+            <mat-icon svgIcon="svg-seat-matrix"></mat-icon>
+        </button>
+        <button mat-icon-button class="ob-mdc-button" [matTooltip]="'VENUE_TPL_EDITOR.EDIT_WEIGHTS' | translate"
+            (click)="setWeightsSetupMode()">
+            <mat-icon svgIcon="svg-weights-setup"></mat-icon>
+        </button>
+        <button mat-icon-button class="ob-mdc-button" [matTooltip]="'VENUE_TPL_EDITOR.EDIT_AISLES' | translate"
+            (click)="setBlocksSetupMode()">
+            <mat-icon svgIcon="svg-blocks-setup"></mat-icon>
+        </button>
+        <mat-divider vertical></mat-divider>
+        <button mat-icon-button class="ob-mdc-button" [matTooltip]="'VENUE_TPL_EDITOR.INSERT_RECT' | translate"
+            (click)="addShape('rect')">
+            <mat-icon svgIcon="svg-rect"></mat-icon>
+        </button>
+        <button mat-icon-button class="ob-mdc-button" [matTooltip]="'VENUE_TPL_EDITOR.INSERT_TEXT' | translate"
+            (click)="addShape('text')">
+            <mat-icon svgIcon="svg-text"></mat-icon>
+        </button>
+        <button mat-icon-button class="ob-mdc-button" [matTooltip]="'VENUE_TPL_EDITOR.INSERT_IMAGE' | translate"
+            (click)="openSelectImageFileDialog()">
+            <mat-icon svgIcon="svg-image"></mat-icon>
+        </button>
+        <button mat-icon-button class="ob-mdc-button" [matTooltip]="'VENUE_TPL_EDITOR.INSERT_SVG' | translate"
+            (click)="openSelectSVGFileDialog()">
+            <mat-icon svgIcon="svg-file"></mat-icon>
+        </button>
+        <input #svgInput fxHide type="file" accept=".svg" (change)="openInsertSvgDialog($event.target)">
+        <input #imageInput fxHide type="file" accept="image/png, image/jpeg, image/jpg" (change)="openInsertImageDialog($event.target)">
+        <button *ngIf="showGroup$ | async" mat-icon-button class="ob-mdc-button" (click)="groupSelectedItems()"
+            [matTooltip]="'VENUE_TPL_EDITOR.GROUP_ELEMENTS' | translate">
+            <mat-icon svgIcon="svg-group"></mat-icon>
+        </button>
+        <button *ngIf="showUngroup$ | async" mat-icon-button class="ob-mdc-button" (click)="ungroupSelectedItems()"
+            [matTooltip]="'VENUE_TPL_EDITOR.UNGROUP_ELEMENTS' | translate">
+            <mat-icon svgIcon="svg-ungroup"></mat-icon>
+        </button>
+        <button *ngIf="showReorder$ | async" mat-icon-button class="ob-mdc-button" [matMenuTriggerFor]="changeOrderMenu"
+            [matTooltip]="'VENUE_TPL_EDITOR.CHANGE_ELEMENTS_ORDER' | translate" (menuOpened)="setOpenedMenu(changeOrderMenu)">
+            <mat-icon>layers</mat-icon>
+        </button>
+        <mat-menu #changeOrderMenu formGroupName="lock" [hasBackdrop]="false">
+            <ng-template matMenuContent>
+                <button mat-menu-item (click)="$event.stopPropagation(); moveSelectionToTop()">
+                    <mat-icon>flip_to_front</mat-icon>
+                    {{'VENUE_TPL_EDITOR.SEND_ELEMENT_TO_FRONT' | translate}}
+                </button>
+                <button mat-menu-item (click)="$event.stopPropagation(); moveSelectionUp()">
+                    <mat-icon>move_up</mat-icon>
+                    {{'VENUE_TPL_EDITOR.MOVE_ELEMENT_UP' | translate}}
+                </button>
+                <button mat-menu-item (click)="$event.stopPropagation(); moveSelectionDown()">
+                    <mat-icon>move_down</mat-icon>
+                    {{'VENUE_TPL_EDITOR.MOVE_ELEMENT_DOWN' | translate}}
+                </button>
+                <button mat-menu-item (click)="$event.stopPropagation(); moveSelectionToBottom()">
+                    <mat-icon>flip_to_back</mat-icon>
+                    {{'VENUE_TPL_EDITOR.SEND_ELEMENT_TO_BACK' | translate}}
+                </button>
+            </ng-template>
+        </mat-menu>
+        <span fxFlex="0 1 100%" fxLayoutAlign="center center"></span>
+        <ng-container *ngIf="isInUse$ | async">
+            <div *ngIf="capacityIncreaseButtonState$ | async as buttonState" fxLayout="row" fxLayoutAlign="start center"
+                [matTooltip]="(buttonState === 'disabledByEventState' ?
+                    'VENUE_TPLS.FORMS.INFOS.INCREASE_DISABLED_BY_EVENT_STATUS' : '') | translate">
+                <button *ngIf="buttonState !== 'inSetup'" mat-stroked-button type="button" class="ob-button small"
+                    [disabled]="buttonState !== 'enabled'" (click)="setInCapacityIncrease()">
+                    <mat-icon>person_add</mat-icon>
+                    {{'VENUE_TPLS.ACTIONS.INCREASE_CAPACITY' | translate}}
+                </button>
+                <div *ngIf="buttonState === 'inSetup'" class="capacity-increase-button-selected">
+                    <button mat-button type="button" class="ob-mdc-button small light-button" disabled>
+                        <mat-icon>person_add</mat-icon>
+                        {{'VENUE_TPLS.ACTIONS.INCREASE_CAPACITY' | translate}}
+                    </button>
+                </div>
+            </div>
+        </ng-container>
+        <button mat-stroked-button class="ob-button only-icon small" [matMenuTriggerFor]="interactionModesMenu"
+            [matTooltip]="'VENUE_TPL_EDITOR.INTERACTION_MODES_TOOLTIP' | translate" (menuOpened)="setOpenedMenu(interactionModesMenu)">
+            <mat-icon>lock</mat-icon>
+        </button>
+        <mat-menu #interactionModesMenu formGroupName="lock" [hasBackdrop]="false"
+            [matTooltip]="'VENUE_TPL_EDITOR.LOCK_ELEMENTS' | translate">
+            <ng-template matMenuContent>
+                <div mat-menu-item class="check-menu-item"
+                    (click)="$event.stopPropagation(); changeControlValue(form.controls.lock.controls.design)">
+                    <mat-checkbox formControlName='design' color="primary">
+                        {{'VENUE_TPL_EDITOR.LOCK_DESIGN' | translate}}
+                    </mat-checkbox>
+                </div>
+                <div mat-menu-item class="check-menu-item"
+                    (click)="$event.stopPropagation(); changeControlValue(form.controls.lock.controls.interactive)">
+                    <mat-checkbox formControlName="interactive" color="primary">
+                        {{'VENUE_TPL_EDITOR.LOCK_INTERACTIVE' | translate}}
+                    </mat-checkbox>
+                </div>
+            </ng-template>
+        </mat-menu>
+    </ng-container>
+
+    <app-venue-tpl-editor-seat-matrix-buttons
+        *ngIf="(mode$ | async) === editorModes.seatMatrixCreate || (mode$ | async) === editorModes.seatMatrixIncrease">
+    </app-venue-tpl-editor-seat-matrix-buttons>
+
+    <app-venue-tpl-editor-blocks-setup-buttons *ngIf="(mode$ | async) === editorModes.blocksSetup">
+    </app-venue-tpl-editor-blocks-setup-buttons>
+
+    <app-venue-tpl-editor-weights-setup-buttons *ngIf="(mode$ | async) === editorModes.weightsSetup">
+    </app-venue-tpl-editor-weights-setup-buttons>
+
+    <span fxFlex></span>
+
+    <button mat-stroked-button class="ob-button only-icon small" [matMenuTriggerFor]="visualizationMode"
+        [matTooltip]="'VENUE_TPL_EDITOR.VISUALIZATION_MODES' | translate" (menuOpened)="setOpenedMenu(visualizationMode)">
+        <mat-icon>visibility</mat-icon>
+    </button>
+    <mat-menu #visualizationMode formGroupName="show" [hasBackdrop]="false">
+        <ng-template matMenuContent>
+            <div mat-menu-item class="check-menu-item"
+                (click)="$event.stopPropagation(); changeControlValue(form.controls.show.controls.blocks)">
+                <mat-checkbox fxFlex="0 1 100%"  formControlName="blocks" color="primary">
+                    {{'VENUE_TPL_EDITOR.SHOW_BLOCKS' | translate}}
+                </mat-checkbox>
+            </div>
+            <div mat-menu-item class="check-menu-item"
+                (click)="$event.stopPropagation(); changeControlValue(form.controls.show.controls.weights)">
+                <mat-checkbox fxFlex="0 1 100%" formControlName="weights" color="primary">
+                    {{'VENUE_TPL_EDITOR.SHOW_WEIGHTS' | translate}}
+                </mat-checkbox>
+            </div>
+            <div mat-menu-item class="check-menu-item"
+                (click)="$event.stopPropagation(); changeControlValue(form.controls.show.controls.names)">
+                <mat-checkbox fxFlex="0 1 100%"  formControlName="names" color="primary">
+                    {{'VENUE_TPL_EDITOR.SHOW_NAMES' | translate}}
+                </mat-checkbox>
+            </div>
+        </ng-template>
+    </mat-menu>
+</div>

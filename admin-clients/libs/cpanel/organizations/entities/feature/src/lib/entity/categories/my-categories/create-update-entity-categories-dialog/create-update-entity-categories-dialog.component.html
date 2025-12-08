@@ -1,0 +1,61 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title>
+        <div class="flex flex-row justify-between items-center">
+            <h2 class="secondary title">
+                {{data.action === dialogActions.add
+                ? data.categoryId ? ('TITLES.NEW_SUBCATEGORY' | translate) : ('TITLES.NEW_CATEGORY' | translate)
+                : ('TITLES.EDIT_CATEGORY' | translate)}}
+            </h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content>
+        <div class="flex flex-col">
+            <form [formGroup]="form" class="flex flex-col">
+                <!-- Name -->
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'ENTITY.OWN_CATEGORIES.NAME' | translate}}</mat-label>
+                    <input matInput aria-label="name" formControlName="description"
+                        [placeholder]="'ENTITY.OWN_CATEGORIES.CATEGORY' | translate">
+                    <mat-error [ob-form-errors]="form.controls.description" />
+                </mat-form-field>
+                <!-- ID -->
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{('ENTITY.OWN_CATEGORIES.ID' | translate).toUpperCase()}}</mat-label>
+                    <input matInput aria-label="id" formControlName="code" [placeholder]="'ENTITY.OWN_CATEGORIES.CODE' | translate">
+                    <mat-error [ob-form-errors]="form.controls.code" />
+                </mat-form-field>
+            </form>
+        </div>
+    </div>
+    <div mat-dialog-actions class="flex gap-4" [align]="'end'">
+        <div class="flex flex-1" [class.justify-end]="data.action === dialogActions.update">
+            <button type="button" mat-button class="ob-button" [disabled]="isInProgress$ | async" (click)="close()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+        </div>
+        <div class="flex">
+            @if (data.action === dialogActions.add) {
+                <button mat-stroked-button color="tertiary" type="button" class="ob-button"
+                    [disabled]="(!form.dirty) || (isInProgress$ | async)"
+                    (click)="createOrUpdateCategory(true)">
+                    {{'FORMS.ACTIONS.CREATE_AND_NEW' | translate}}
+                </button>
+            }
+            <button mat-flat-button color="primary" type="button" class="ob-button"
+                [disabled]="(!form.dirty) || (isInProgress$ | async)"
+                (click)="createOrUpdateCategory()">
+                {{data.action === dialogActions.add
+                ? ('FORMS.ACTIONS.CREATE' | translate)
+                : ('FORMS.ACTIONS.SAVE' | translate)}}
+            </button>
+        </div>
+    </div>
+</div>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

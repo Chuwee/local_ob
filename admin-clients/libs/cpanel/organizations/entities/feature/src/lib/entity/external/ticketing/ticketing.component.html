@@ -1,0 +1,294 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="!form.dirty">
+    <div slot="outside">
+        <app-club-code-selector [$formConnection]="form.controls.avet_connection_type" />
+        <mat-divider />
+    </div>
+    <form [formGroup]="form" fxLayout="column" autocomplete=off>
+        @if(this.form.controls.avet_connection_type.value === 'SOCKET'){
+            <div fxLayout="row" formGroupName="connection">
+                <mat-form-field id="name" fxFlex="0 1 calc(100% - 32px)" fxFlex.gt-sm="0 1 calc(50% - 32px)"
+                    class="ob-form-field field-with-label" appearance="outline">
+                    <mat-label>{{'FORMS.LABELS.CLUB_NAME' | translate}}</mat-label>
+                    <input autocomplete=off formControlName="name" matInput
+                        [placeholder]="'FORMS.LABELS.CLUB_NAME' | translate">
+                    <mat-error [ob-form-errors]="connectionForm.controls.name" />
+                </mat-form-field>
+            </div>
+        } @else {
+            <!-- CONNECTION -->
+            <mat-accordion multi togglePosition="before">
+                <mat-expansion-panel expanded formGroupName="connection">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'ENTITY.EXTERNAL.CONNECTION.TITLE' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <p fxLayoutAlign="start center" class="description">
+                        <mat-icon class="ob-icon small warning with-text">warning</mat-icon>
+                        <span>{{'ENTITY.EXTERNAL.CONNECTION.WARNING' | translate}}</span>
+                    </p>
+                    <div fxLayout="column">
+                        <div fxLayout="row">
+                            <mat-form-field id="name" fxFlex="0 1 calc(100% - 32px)" fxFlex.gt-sm="0 1 calc(50% - 32px)"
+                                class="ob-form-field field-with-label" appearance="outline">
+                                <mat-label>{{'FORMS.LABELS.CLUB_NAME' | translate}}</mat-label>
+                                <input autocomplete=off formControlName="name" matInput
+                                    [placeholder]="'FORMS.LABELS.CLUB_NAME' | translate">
+                                <mat-error [ob-form-errors]="connectionForm.controls.name" />
+                            </mat-form-field>
+                        </div>
+                        @if(this.form.controls.avet_connection_type.value === 'WEBSERVICES'){
+                            <div fxLayout="row wrap" fxLayoutGap="32px">
+                                <mat-form-field id="username" fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 32px)"
+                                    class="ob-form-field field-with-label" appearance="outline">
+                                    <mat-label>{{'FORMS.LABELS.USERNAME' | translate}}</mat-label>
+                                    <input autocomplete="new-username" formControlName="username" matInput
+                                        [placeholder]="'FORMS.LABELS.USERNAME' | translate">
+                                    <mat-error [ob-form-errors]="connectionForm.controls.username" />
+                                </mat-form-field>
+                                <mat-form-field id="password" fxFlex="0 1 calc(100% - 32px)" fxFlex.gt-sm="0 1 calc(50% - 32px)"
+                                    class="ob-form-field field-with-label" appearance="outline">
+                                    <mat-label>{{'FORMS.LABELS.PASSWORD' | translate}}</mat-label>
+                                    <input autocomplete="new-password" type="password" formControlName="password" matInput
+                                        [placeholder]="'FORMS.LABELS.PASSWORD' | translate">
+                                    <mat-error [ob-form-errors]="connectionForm.controls.password" />
+                                </mat-form-field>
+                            </div>
+                        }
+                    </div>
+                    @if(this.form.controls.avet_connection_type.value === 'WEBSERVICES'){
+                        <mat-divider class="ob-divider" />
+                        <div fxLayout="column">
+                            <div fxLayout="row" [formGroup]="form">
+                                <mat-form-field id="avet_ws_environment" fxFlex="0 1 calc(100% - 32px)" fxFlex.gt-sm="0 1 25%"
+                                    class="ob-form-field field-with-label" appearance="outline">
+                                    <mat-label>{{'FORMS.LABELS.ENVIRONMENT' | translate}}</mat-label>
+                                    <mat-select formControlName="avet_ws_environment"
+                                        [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                        @for(environment of environments; track environment){
+                                            <mat-option [value]="environment">{{environment}}</mat-option>
+                                        }
+                                    </mat-select>
+                                    <mat-error [ob-form-errors]="form.controls.avet_ws_environment" />
+                                </mat-form-field>
+                            </div>
+                            <div fxLayout="row wrap" fxLayoutGap="32px">
+                                <mat-form-field fxFlex="0 1 calc(100% - 32px)" fxFlex.gt-sm="calc(25% - 32px)"
+                                    class="ob-form-field field-with-label" appearance="outline">
+                                    <mat-label>{{'ENTITY.EXTERNAL.CONNECTION.VERSION' | translate}}</mat-label>
+                                    <mat-select formControlName="ws_connection_version"
+                                        [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                        @for(version of versions; track version) {
+                                            <mat-option [value]="version">
+                                                {{('ENTITY.EXTERNAL.CONNECTION.VERSIONS.' + version) | translate}}
+                                            </mat-option>
+                                        }
+                                    </mat-select>
+                                    <mat-error [ob-form-errors]="connectionForm.controls.ws_connection_version" />
+                                </mat-form-field>
+                                <mat-form-field id="protocol" fxFlex="0 1 calc(100% - 32px)" fxFlex.gt-sm="0 1 calc(25% - 32px)"
+                                    class="ob-form-field field-with-label" appearance="outline">
+                                    <mat-label>{{'FORMS.LABELS.PROTOCOL' | translate}}</mat-label>
+                                    <mat-select formControlName="protocol" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                        @for(protocol of protocols; track protocol) {
+                                            <mat-option [value]="protocol">{{protocol}}</mat-option>
+                                        }
+                                    </mat-select>
+                                    <mat-error [ob-form-errors]="connectionForm.controls.protocol" />
+                                </mat-form-field>
+                                <mat-form-field id="ip" fxFlex="0 1 calc(100% - 32px)" fxFlex.gt-sm="0 1 calc(25% - 32px)"
+                                    class="ob-form-field field-with-label" appearance="outline">
+                                    <mat-label>{{'FORMS.LABELS.IP' | translate}}</mat-label>
+                                    <input autocomplete=off formControlName="ip" matInput [placeholder]="'FORMS.LABELS.IP' | translate">
+                                    <mat-error [ob-form-errors]="connectionForm.controls.ip" />
+                                </mat-form-field>
+                                <mat-form-field id="port" fxFlex="0 1 calc(100% - 32px)" fxFlex.gt-sm="0 1 calc(25% - 32px)"
+                                    class="ob-form-field field-with-label" appearance="outline">
+                                    <mat-label>{{'FORMS.LABELS.PORT' | translate}}</mat-label>
+                                    <input autocomplete=off formControlName="port" matInput [placeholder]="'FORMS.LABELS.PORT' | translate">
+                                    <mat-error [ob-form-errors]="connectionForm.controls.port" />
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <mat-divider class="ob-divider" />
+                        <div fxLayout="row wrap" fxLayoutGap="32px">
+                            <span class="field-label title" fxFlex="0 1 calc(100% - 32px)" fxFlex.gt-sm="100%">
+                                {{'ENTITY.EXTERNAL.CONNECTION.NOTIFICATION' | translate}}
+                            </span>
+                            <mat-checkbox color="primary" formControlName="ping_requests_blocked"
+                                fxFlex="0 1 calc(100% - 32px)" fxFlex.gt-sm="100%">
+                                {{'ENTITY.EXTERNAL.CONNECTION.PING_BLOCK' | translate}}
+                            </mat-checkbox>
+                        </div>
+                    }
+                </mat-expansion-panel>
+                <!-- CAPACITIES -->
+                <mat-expansion-panel expanded formGroupName="capacity" class="capacities">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'ENTITY.EXTERNAL.CAPACITY.TITLE' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div fxLayout="row wrap" fxLayoutGap="32px">
+                        <mat-form-field fxFlex="0 1 calc(50% - 32px)" fxFlex.gt-sm="0 1 calc(25% - 32px)"
+                            class="ob-form-field field-with-label" appearance="outline">
+                            <mat-label>{{'ENTITY.EXTERNAL.CAPACITY.TYPE' | translate}}</mat-label>
+                            <mat-select formControlName="capacity_name_type"
+                                [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                @for(type of capacityTypes; track type) {
+                                    <mat-option [value]="type">
+                                        {{('ENTITY.EXTERNAL.CAPACITY.TYPES.' + type) | translate}}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                            <mat-error [ob-form-errors]="capacityForm.controls.capacity_name_type" />
+                        </mat-form-field>
+                        <mat-form-field fxFlex="0 1 calc(50% - 32px)" fxFlex.gt-sm="0 1 calc(25% - 32px)"
+                            class="ob-form-field field-with-label" appearance="outline">
+                            <mat-label>{{'ENTITY.EXTERNAL.CAPACITY.SEASON' | translate}}</mat-label>
+                            <input autocomplete=off type="text" matInput formControlName="season"
+                                [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                            <mat-error [ob-form-errors]="capacityForm.controls.season" />
+                        </mat-form-field>
+                        <p fxLayoutAlign="start center" class="description">
+                            <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                            <span>{{'ENTITY.EXTERNAL.CAPACITY.INFO' | translate}}</span>
+                        </p>
+                        <app-capacities-table fxFlex="100%" ngDefaultControl [formControl]="form.get(['capacity','capacities'])"
+                            [defaultCapacity]="form.get(['capacity', 'members_capacity_id'])" />
+                    </div>
+                </mat-expansion-panel>
+                <!-- OPERATIVE -->
+                <mat-expansion-panel expanded formGroupName="operative">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'ENTITY.EXTERNAL.OPERATIVE.TITLE' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div fxLayout="column">
+                        <div fxLayout="column">
+                            <span class="field-label no-margin">
+                                {{'ENTITY.EXTERNAL.OPERATIVE.VALIDATION_LABEL' | translate}}
+                            </span>
+                            <mat-radio-group formControlName="partner_validation_type" fxLayout="column" class="radio-group">
+                                @for(type of validationTypes; track type) {
+                                    <mat-radio-button class="ob-radio-button vertical-list" [value]="type">
+                                        {{('ENTITY.EXTERNAL.OPERATIVE.TYPES.' + type) | translate}}
+                                    </mat-radio-button>
+                                }
+                            </mat-radio-group>
+                            <mat-divider class="ob-divider" />
+                            <div fxFlex="100%" fxLayout="row">
+                                <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(25% - 32px)" appearance="outline"
+                                    class="ob-form-field field-with-label">
+                                    <mat-label>{{'ENTITY.EXTERNAL.OPERATIVE.PAYMENT_METHOD' | translate}}</mat-label>
+                                    <input autocomplete=off type="number" matInput formControlName="payment_method"
+                                        [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                    <mat-error [ob-form-errors]="operativeForm.controls.payment_method" />
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <mat-divider class="ob-divider" />
+                        <div fxFlex="100%" fxLayout="column">
+                            <span class="field-label title">
+                                {{'ENTITY.EXTERNAL.OPERATIVE.AVET_LABEL' | translate}}
+                            </span>
+                            <p>{{'ENTITY.EXTERNAL.OPERATIVE.AVET_DESCRIPTION' | translate}}</p>
+                            <div fxLayout="row wrap" fxLayoutAlign="start center" fxLayoutGap="8px">
+                                <mat-checkbox color="primary" formControlName="send_id_number">
+                                    {{'ENTITY.EXTERNAL.OPERATIVE.SEND_ID_NUMBER' | translate}}
+                                </mat-checkbox>
+                                <mat-form-field fxFlex="0 1 70px" class="ob-form-field inline-field" appearance="outline">
+                                    <input autocomplete=off type="number" matInput formControlName="id_number_max_length" placeholder="0">
+                                </mat-form-field>
+                                <span>{{'ENTITY.EXTERNAL.OPERATIVE.ID_NUMBER_MAX_LENGTH' | translate}}</span>
+                            </div>
+                            <mat-error [ob-form-errors]="operativeForm.controls.id_number_max_length" />
+                            <div fxLayout="row wrap" fxLayoutAlign="start center" fxLayoutGap="8px">
+                                <mat-checkbox color="primary" formControlName="check_partner_pin_regexp">
+                                    {{'ENTITY.EXTERNAL.OPERATIVE.CHECK_PARTNER_PIN_REGEXP' | translate}}
+                                </mat-checkbox>
+                                <mat-form-field fxFlex="0 1 160px" class="ob-form-field inline-field" appearance="outline">
+                                    <input autocomplete=off type="text" matInput formControlName="partner_pin_regexp"
+                                        [placeholder]="'ENTITY.EXTERNAL.OPERATIVE.PARTNER_PIN_REGEXP' | translate">
+                                </mat-form-field>
+                            </div>
+                            <mat-error [ob-form-errors]="operativeForm.controls.partner_pin_regexp" />
+                        </div>
+                        <mat-divider class="ob-divider" />
+                        <div fxFlex="100%" fxLayout="column">
+                            <span class="field-label title">
+                                {{'ENTITY.EXTERNAL.OPERATIVE.TICKET_LABEL' | translate}}
+                            </span>
+                            <mat-checkbox color="primary" formControlName="generate_partner_ticket" fxFlex="100%">
+                                {{'ENTITY.EXTERNAL.OPERATIVE.GENERATE_PARTNER_TICKET' | translate}}
+                            </mat-checkbox>
+                        </div>
+                        @if (this.form.controls.avet_connection_type.value === 'APIM') {
+                            <mat-divider class="ob-divider" />
+                            <div fxFlex="100%" fxLayout="column">
+                                <span class="field-label title">
+                                    {{'TITLES.EXTERNAL_DIGITAL_TICKET' | translate}}
+                                </span>
+                                <span>{{'ENTITY.EXTERNAL.DIGITAL_TICKET.DESCRIPTION' | translate}}</span>
+                                <div fxFlex="100%" fxLayout="column" class="event-form-section">
+                                    <mat-radio-group class="nested" fxFlex="100%" fxLayout="column"
+                                        formControlName="digital_ticket_mode">
+                                        <mat-radio-button class="ob-radio-button vertical-list" [value]="digitalTicketModes[2]">
+                                            <div class="flex flex-col">
+                                                <span class="ob-label">
+                                                    {{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.WALLET_NFC.LABEL' | translate}}
+                                                </span>
+                                                <span>{{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.WALLET_NFC.DESC' | translate}}</span>
+                                            </div>
+                                        </mat-radio-button>
+                                        <mat-radio-button class="ob-radio-button vertical-list" [value]="digitalTicketModes[3]">
+                                            <div class="flex flex-col">
+                                                <span class="ob-label">
+                                                    {{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.WALLET.LABEL' | translate}}
+                                                </span>
+                                                <span>{{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.WALLET.DESC'| translate}}</span>
+                                            </div>
+                                        </mat-radio-button>
+                                        <mat-radio-button class="ob-radio-button vertical-list" [value]="digitalTicketModes[1]">
+                                            <div class="flex flex-col">
+                                                <span class="ob-label">
+                                                    {{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.PASSBOOK.LABEL' | translate}}
+                                                </span>
+                                                <span>{{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.PASSBOOK.DESC'| translate}}</span>
+                                            </div>
+                                        </mat-radio-button>
+                                        <mat-radio-button class="ob-radio-button vertical-list" [value]="digitalTicketModes[0]">
+                                            <div class="flex flex-col">
+                                                <span class="ob-label">
+                                                    {{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.DISABLED.LABEL' | translate}}
+                                                </span>
+                                                <span>{{'ENTITY.EXTERNAL.DIGITAL_TICKET.OPTIONS.DISABLED.DESC' | translate}}</span>
+                                            </div>
+                                        </mat-radio-button>
+                                    </mat-radio-group>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </mat-expansion-panel>
+                <!-- PRICES -->
+                <mat-expansion-panel expanded formGroupName="operative">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'ENTITY.EXTERNAL.PRICES.TITLE' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div fxLayout="row wrap" fxLayoutAlign="start center" fxLayoutGap="8px">
+                        <mat-checkbox color="primary" formControlName="scheduled">
+                            {{'ENTITY.EXTERNAL.OPERATIVE.SCHEDULED' | translate}}
+                        </mat-checkbox>
+                        <mat-form-field fxFlex="0 1 70px" class="ob-form-field inline-field" appearance="outline">
+                            <input autocomplete=off type="number" matInput formControlName="fixed_delay_in_minutes" placeholder="0"
+                                [min]="30">
+                        </mat-form-field>
+                        <span>{{'ENTITY.EXTERNAL.OPERATIVE.DELAY' | translate}}</span>
+                    </div>
+                </mat-expansion-panel>
+            </mat-accordion>
+        }
+    </form>
+</app-form-container>
+@if(loading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

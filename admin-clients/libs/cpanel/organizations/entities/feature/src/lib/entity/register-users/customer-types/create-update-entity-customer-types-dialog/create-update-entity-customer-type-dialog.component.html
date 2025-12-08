@@ -1,0 +1,130 @@
+<div class="flex flex-col flex-nowrap dialog-msg-container">
+    <form [formGroup]="form" class="flex flex-col">
+        <div mat-dialog-title>
+            <div class="flex flex-row flex-auto items-start">
+                <span class="basis-full secondary title">
+                    {{ (actionMode === 'CREATE' ? 'ENTITY.CUSTOMER_TYPES.NEW_TITLE' : 'ENTITY.CUSTOMER_TYPES.EDIT_TITLE') | translate}}
+                </span>
+                <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </div>
+        </div>
+        <div mat-dialog-content class="flex flex-col">
+            <div class="flex flex-col gap-1">
+                <div class="flex">
+                    <mat-form-field appearance="outline" class="flex flex-[0_1_550px] ob-form-field field-with-label">
+                        <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                        <input matInput aria-label="name" [placeholder]="'FORMS.LABELS.NAME' | translate"
+                            formControlName="name" autocomplete="off">
+                        <mat-error [ob-form-errors]="form" field="name" />
+                    </mat-form-field>
+                </div>
+                @if ( actionMode === 'CREATE') {
+                    <div class="flex flex-col gap-2">
+                        <div class="flex">
+                            <mat-form-field appearance="outline" class="flex flex-[0_1_250px] ob-form-field field-with-label">
+                                <mat-label>{{'FORMS.LABELS.CODE' | translate}}</mat-label>
+                                <input matInput aria-label="code" [placeholder]="'FORMS.LABELS.CODE' | translate"
+                                    formControlName="code" autocomplete="off">
+                                <app-help-button matSuffix [message]="'ENTITY.CUSTOMER_TYPES.CODE_FIELD_TOOLTIP' | translate" />
+                                <mat-error [ob-form-errors]="form" field="code" />
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col gap-4">
+                            <span class="body-1">{{ 'ENTITY.CUSTOMER_TYPES.FIELD_ASSIGNATION_TYPE' | translate }}*</span>
+                            <mat-radio-group formControlName="assignation_type" class="flex flex-col gap-4">
+                                <mat-radio-button class="ob-radio-button" [value]="'AUTOMATIC'">
+                                    <div class="option-title">
+                                        {{'ENTITY.CUSTOMER_TYPES.ASSIGNATION_TYPES.AUTOMATIC' | translate}}
+                                    </div>
+                                    {{'ENTITY.CUSTOMER_TYPES.ASSIGNATION_TYPES.AUTOMATIC_DESCRIPTION' | translate}}
+                                </mat-radio-button>
+                                @if (form.value.assignation_type === 'AUTOMATIC') {
+                                    <div class="nested-content flex flex-col" formGroupName="triggers">
+                                        <div>
+                                            <mat-checkbox color="primary" formControlName="purchase">
+                                                <b> {{'ENTITY.CUSTOMER_TYPES.TRIGGER_PURCHASE.ENABLE' | translate}}</b>
+                                            </mat-checkbox>
+                                            <div class="trigger-description">
+                                                <p>{{'ENTITY.CUSTOMER_TYPES.TRIGGER_PURCHASE.ENABLE_DESCRIPTION' | translate}}</p>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <mat-checkbox color="primary" formControlName="registration">
+                                                <b> {{'ENTITY.CUSTOMER_TYPES.TRIGGER_REGISTRATION.ENABLE' | translate}}</b>
+                                            </mat-checkbox>
+                                            <div class="trigger-description">
+                                                <p>{{'ENTITY.CUSTOMER_TYPES.TRIGGER_REGISTER.ENABLE_DESCRIPTION' | translate}}</p>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <mat-checkbox color="primary" formControlName="login">
+                                                <b> {{'ENTITY.CUSTOMER_TYPES.TRIGGER_LOGIN.ENABLE' | translate}}</b>
+                                            </mat-checkbox>
+                                            <div class="trigger-description">
+                                                <p>{{'ENTITY.CUSTOMER_TYPES.TRIGGER_LOGIN.ENABLE_DESCRIPTION' | translate}}</p>
+                                            </div>
+                                        </div>
+                                        @if (form.controls.triggers.touched) {
+                                            <mat-error [ob-form-errors]="form.controls.triggers" />
+                                        }
+                                    </div>
+                                }
+                                <mat-radio-button class="ob-radio-button" [value]="'MANUAL'">
+                                    <div class="option-title">
+                                        {{'ENTITY.CUSTOMER_TYPES.ASSIGNATION_TYPES.MANUAL' | translate}}
+                                    </div>
+                                    {{'ENTITY.CUSTOMER_TYPES.ASSIGNATION_TYPES.MANUAL_DESCRIPTION' | translate}}
+                                </mat-radio-button>
+                            </mat-radio-group>
+                            <div class="flex flex-row justify-start items-start presale-warning">
+                                <mat-icon class="ob-icon small warning with-text">warning</mat-icon>
+                                {{'ENTITY.CUSTOMER_TYPES.WARNING' | translate}}
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            @if (actionMode === 'UPDATE') {
+                <div class="flex flex-col details-non-editable-field ob-form-field" aria-label="entity customer types">
+                    <span class="field-label">{{'FORMS.LABELS.CODE' | translate}}</span>
+                    <span>{{form.controls.code?.value}}</span>
+                </div>
+                <div class="flex flex-col details-non-editable-field ob-form-field" aria-label="entity customer types">
+                    <span class="field-label">{{'ENTITY.CUSTOMER_TYPES.FIELD_ASSIGNATION_TYPE' | translate}}</span>
+                    <span>
+                        {{ ('ENTITY.CUSTOMER_TYPES.ASSIGNATION_TYPES.' + customerType.assignation_type) | uppercase | translate   }}
+                        @if (customerType.assignation_type === 'AUTOMATIC') {
+                            <span>|</span>
+                            @for(trigger of customerTypeTriggers; track trigger.trigger) {
+                                {{ ('ENTITY.CUSTOMER_TYPES.TRIGGER_' + trigger.trigger + '.ENABLE') | translate }}
+                                @if ( ! $last ) {
+                                    <span> - </span>
+                                }
+                            }
+                        }
+                    </span>
+                </div>
+            }
+
+        </div>
+        <div mat-dialog-actions>
+            <div class="flex flex-row basis-full justify-end">
+                <button [disabled]="$isLoading()" type="button" mat-button class="ob-button" (click)="close()">
+                    {{'FORMS.ACTIONS.CANCEL' | translate}}
+                </button>
+                <button [disabled]="$isLoading()" mat-flat-button color="primary" class="ob-button"
+                    (click)="createOrUpdateCustomerType()">
+                    {{( actionMode === 'CREATE' ? 'FORMS.ACTIONS.CREATE' : 'FORMS.ACTIONS.SAVE') | translate}}
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@if($isLoading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,62 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'BI.IMPERSONATION.TITLES.IMPERSONATION_DIALOG' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <form [formGroup]="form" fxLayout="column" fxLayoutAlign="start stretch">
+            <!-- Entity -->
+            @if ((entities$ | async)?.length > 0) {
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.ENTITY' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate" [formControl]="form.controls.entityId">
+                        <mat-option>
+                            <app-select-search #entitySelectSearch [options$]="entities$"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name"
+                                requireSelection="true">
+                            </app-select-search>
+                        </mat-option>
+                        @for (entity of entitySelectSearch.getFilteredOptions$() | async; track $index) {
+                            <mat-option [value]="entity.id">{{entity.name}}</mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form.controls.entityId"></mat-error>
+                </mat-form-field>
+            }
+            <!-- User -->
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.USER' | translate}}</mat-label>
+                <mat-select [formControl]="form.controls.userId" aria-label="userId" [placeholder]="'FORMS.LABELS.USER' | translate">
+                    <mat-option>
+                        <app-select-search #usersSearch [options$]="users$" searchField="email" requireSelection="true"
+                            [placeholderLabel]="'FORMS.SEARCH.ENTITY_USER_LIST' | translate">
+                        </app-select-search>
+                    </mat-option>
+                    @for (user of usersSearch.getFilteredOptions$() | async; track $index) {
+                        <mat-option [value]="user.id">
+                            {{user.name}} {{user.last_name}} - {{user.email}}
+                        </mat-option>
+                    }
+                </mat-select>
+                <mat-error [ob-form-errors]="form.controls.userId"></mat-error>
+            </mat-form-field>
+        </form>
+    </div>
+    <div mat-dialog-actions>
+        <button mat-button type="button" class="ob-button" [disabled]="reqInProgress$ | async" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" [disabled]="(reqInProgress$ | async) || !form.valid"
+            (click)="selectUser()">
+            {{'FORMS.ACTIONS.SELECT' | translate}}
+        </button>
+    </div>
+</div>
+@if (reqInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}
+

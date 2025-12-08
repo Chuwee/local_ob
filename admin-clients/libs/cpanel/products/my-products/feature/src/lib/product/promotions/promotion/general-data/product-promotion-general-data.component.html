@@ -1,0 +1,66 @@
+<app-form-container [disabled]="!form.dirty || $loading()" (cancel)="cancel()" (save)="save()">
+    <form [formGroup]="form">
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'PRODUCT.PROMOTIONS.GENERAL_INFO' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="row wrap" class="promotion-form-section">
+                <mat-form-field id="name" fxFlex="340px" appearance="outline"
+                    class="ob-form-field field-with-label name-form-field">
+                    <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                    <input formControlName="name" matInput [placeholder]="'FORMS.LABELS.NAME' | translate">
+                    <mat-error [ob-form-errors]="form" field="name" />
+                </mat-form-field>
+            </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'PRODUCT.PROMOTIONS.CONDITIONS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="column" class="promotion-form-section" formGroupName="activator">
+                <p class="mat-subtitle-2" fxFlex="100%" fxLayoutAlign="start center">
+                    {{'PRODUCT.PROMOTIONS.COLLECTIVES.TITLE' | translate}} *
+                    <mat-icon fxFlexAlign="center" class="ob-help-icon" [matTooltip]="'PRODUCT.PROMOTIONS.COLLECTIVES.INFO' | translate">
+                        help_outline
+                    </mat-icon>
+                </p>
+                <mat-radio-group formControlName="type" fxFlex="100%" fxLayout="column" class="tax-data-radio-group">
+                    <mat-radio-button [value]="activatorType.default" class="ob-radio-button vertical-list">
+                        {{'PRODUCT.PROMOTIONS.COLLECTIVES.DEFAULT' | translate}}
+                    </mat-radio-button>
+                    <mat-radio-button [value]="activatorType.collective" class="ob-radio-button vertical-list">
+                        {{'PRODUCT.PROMOTIONS.COLLECTIVES.SPECIFIC' | translate}}
+                    </mat-radio-button>
+                </mat-radio-group>
+                @if (form.controls.activator.controls.type.value === activatorType.collective) {
+                    <div fxFlex="100%" fxLayout="column" class="nested-content">
+                        <div>
+                            <mat-form-field appearance="outline" class="ob-form-field ob-form-field-outline" fxFlex="0 1 50%">
+                                <app-select-server-search formControlName="collective" [enableTracing]="true"
+                                    [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                    [options$]="collectives$"
+                                    (loadOptions)="loadCollectives($event.q)">
+                                    <ng-template #optionTemplate let-row>
+                                        <span appEllipsify [matTooltip]="(row?.name) + ' - ' +
+                                            (('COLLECTIVE.TYPE_OPTS.' + row?.type) | translate) + ' - ' +
+                                            (('COLLECTIVE.SUBTYPE_OPTS.' + row?.validation_method) | translate)">
+                                            {{row?.name}} -
+                                            {{('COLLECTIVE.TYPE_OPTS.' + row?.type) | translate}} -
+                                            {{('COLLECTIVE.SUBTYPE_OPTS.' + row?.validation_method) | translate}}
+                                        </span>
+                                    </ng-template>
+                                </app-select-server-search>
+                                <mat-error [ob-form-errors]="form" field="activator.collective" />
+                            </mat-form-field>
+                        </div>
+                    </div>
+                }
+            </div>
+        </mat-expansion-panel>
+    </form>
+</app-form-container>
+@if ($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

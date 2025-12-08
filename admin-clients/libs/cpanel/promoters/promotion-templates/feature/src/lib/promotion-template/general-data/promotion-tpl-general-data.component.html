@@ -1,0 +1,55 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="main" class="overflow-y-auto"
+    [disabled]="!form.dirty || (reqInProgress$ | async)">
+    <div class="flex flex-col gap-6">
+        <app-default-icon [tplId]="promotionTemplate?.id"
+            [tplName]="promotionTemplate?.name" [checked]="promotionTemplate?.favorite"
+            [updateDefault]="updateFavorite" [literals]="favoritePromotionLiterals">
+            <ng-container slot="label">{{'EVENTS.PROMOTIONS.DEFAULT_TEMPLATE' | translate}}</ng-container>
+            <ng-container slot="helper">
+                <app-help-button [message]="'EVENTS.PROMOTIONS.DEFAULT_TEMPLATE_DESCRIPTION' | translate" />
+            </ng-container>
+        </app-default-icon>
+        <form [formGroup]="form">
+            <!-- PROMOTION GENERAL INFO -->
+            <mat-expansion-panel expanded togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.PROMOTIONS.GENERAL_INFO' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="flex flex-col">
+                    <!-- PROMOTION NAME -->
+                    <div class="flex flex-row">
+                        <mat-form-field id="name" appearance="outline" subscriptSizing="dynamic"
+                            class="ob-form-field field-with-label flex basis-1/3">
+                            <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                            <input formControlName="name" matInput [placeholder]="'FORMS.LABELS.NAME' | translate">
+                            <mat-error [ob-form-errors]="form" field="name" />
+                        </mat-form-field>
+                    </div>
+                    <mat-form-field id="use-name-as-communication" class="ob-form-field inline-field" hidden-outline>
+                        <input hidden matInput>
+                        <mat-checkbox formControlName="useNameForCommunication" color="primary">
+                            <mat-label>
+                                {{'EVENTS.PROMOTIONS.USE_NAME_IN_COMMUNICATION' | translate}}
+                            </mat-label>
+                        </mat-checkbox>
+                    </mat-form-field>
+                </div>
+            </mat-expansion-panel>
+            <!-- PROMOTION CHANNEL COMMUNICATION -->
+            <mat-expansion-panel expanded togglePosition="before" class="without-body-padding">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.PROMOTIONS.CHANNEL_COMMUNICATION' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-communication-text-content
+                    [form]="form" [restrictions]="fieldRestrictions"
+                    [languages$]="languages$" />
+            </mat-expansion-panel>
+        </form>
+    </div>
+</app-form-container>
+@if (reqInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,332 @@
+@if ((orderDetail$ | async); as orderDetail) {
+    <div class="order-general-data-container" fxLayout="column" fxFlex="100%">
+        @if (orderDetail.action?.print || orderDetail.action?.resend || orderDetail.action?.cancel
+            || orderDetail.action?.resend_external_invoice || orderDetail.action?.refund) {
+            <div class="actions-bar" fxLayout="column">
+                <div fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="center">
+                    <div fxFlex="0 1 1175px" fxLayout="row" fxLayoutGap="8px">
+                        @if (orderDetail.action?.resend) {
+                            <button mat-button type="button" class="ob-button small"
+                                (click)="openResendDialog(orderDetail.buyer_data?.email)"
+                                [attr.aria-label]="'ACTIONS.RESEND.BTN' | translate"
+                                [matTooltip]="'ACTIONS.RESEND.BTN' | translate">
+                                <mat-icon>redo</mat-icon>
+                                {{'ACTIONS.RESEND.BTN' | translate}}
+                            </button>
+                        }
+                        @if (orderDetail.action?.print) {
+                            <button mat-button type="button" class="ob-button small" (click)="showTickets()"
+                                [attr.aria-label]="'ACTIONS.SEE_TICKETS.BTN' | translate"
+                                [matTooltip]="'ACTIONS.SEE_TICKETS.BTN' | translate">
+                                <mat-icon>remove_red_eye</mat-icon>
+                                {{'ACTIONS.SEE_TICKETS.BTN' | translate}}
+                            </button>
+                        }
+                        @if (orderDetail.action?.regenerate) {
+                            <button mat-button type="button" class="ob-button small"
+                                (click)="regenerateOrder()" [attr.aria-label]="'ACTIONS.REGENERATE.BTN' | translate"
+                                [matTooltip]="'ACTIONS.REGENERATE.BTN' | translate">
+                                <mat-icon>refresh</mat-icon>
+                                {{'ACTIONS.REGENERATE.BTN' | translate}}
+                            </button>
+                        }
+                        @if (orderDetail.action?.resend_external_invoice) {
+                            <button mat-button type="button" class="ob-button small"
+                                (click)="openResendInvoiceDialog(orderDetail.buyer_data?.email)"
+                                [attr.aria-label]="'ACTIONS.RESEND_INVOICE.BTN' | translate"
+                                [matTooltip]="'ACTIONS.RESEND_INVOICE.BTN' | translate">
+                                <mat-icon>redo</mat-icon>
+                                {{'ACTIONS.RESEND_INVOICE.BTN' | translate}}
+                            </button>
+                        }
+                        @if (orderDetail.action?.cancel) {
+                            <button mat-button type="button" class="ob-button small" (click)="cancelOrder()"
+                                [attr.aria-label]="'ACTIONS.CANCEL.BTN' | translate" [matTooltip]="'ACTIONS.CANCEL.BTN' | translate">
+                                <mat-icon>delete</mat-icon>
+                                {{'ACTIONS.CANCEL.BTN' | translate}}
+                            </button>
+                        }
+                        @if (orderDetail.action?.refund) {
+                            <button [disabled]="!isRefundActive && isAllowedPartialRefund"
+                                mat-button type="button" class="ob-button small" (click)="openRefundDialog()"
+                                [attr.aria-label]="'ACTIONS.REFUND.BTN' | translate" [matTooltip]="'ACTIONS.REFUND.BTN' | translate">
+                                <mat-icon>subdirectory_arrow_left</mat-icon>
+                                {{'ACTIONS.REFUND.BTN' | translate}}
+                            </button>
+                        }
+                        @if (orderDetail.action?.refresh_external_permissions) {
+                            <button class="ob-button small" mat-button type="button"
+                                [disabled]="disableActionButton['resend_permissions']" (click)="refreshExternalPermissions()"
+                                [attr.aria-label]="'ORDER.RESEND_PERMISSIONS.BTN' | translate"
+                                [matTooltip]="'ORDER.RESEND_PERMISSIONS.INFO' | translate">
+                                <mat-icon>sync</mat-icon>
+                                {{'ORDER.RESEND_PERMISSIONS.BTN' | translate}}
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+        <app-form-container [hideActionBar]="true" layout="main" class="no-padding">
+            <div fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="stretch">
+                <div fxLayout="row" fxLayoutAlign="center stretch">
+                    <mat-accordion class="details-form-container" multi togglePosition="before" fxFlex="0 1 845px">
+                        @if ($orderChangeSeat(); as orderChangeSeat) {
+                            <div class="flex gap-[8px] align-center change-seat-container">
+                                <div class="flex gap-[8px]">
+                                    <mat-slide-toggle
+                                        (change)="onAvailabilityChangeSeatChange($event.checked, orderDetail.code)"
+                                        class="ob-slide-toggle" color="primary"
+                                        [formControl]="enableChangeSeatControl">
+                                        {{'ORDER.RELOCATIONS.ACTIONS.TOGGLE_ACCESS' | translate }}
+                                    </mat-slide-toggle>
+                                </div>
+
+                                @if (orderChangeSeat.enabled && orderChangeSeat.order_event_change_seat_config) {
+                                    <mat-divider vertical />
+                                    <div class="flex gap-[8px] align-center">
+                                        <a class="change-seat-help-button ob-link"
+                                            (click)="openChangeSeatDialog()"
+                                            [attr.aria-label]="'ORDER.RELOCATIONS.FORMS.LABELS.LINK' | translate">
+                                            {{'ORDER.RELOCATIONS.FORMS.LABELS.LINK' | translate}}
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        @if ($packGroups()?.length) {
+                            <div fxLayout="row" fxLayoutAlign="start center" class="pack-info">
+                                <mat-icon class="ob-icon xsmall info with-text">info</mat-icon>
+                                <span>{{'ORDER.PACK.CONTENT' | translate}}</span>
+                            </div>
+                        }
+                        <mat-expansion-panel [expanded]="true">
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    {{'ORDER.ORDER_DATA' | translate}}
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <app-order-data [order]="orderDetail" />
+                        </mat-expansion-panel>
+                        <mat-expansion-panel [expanded]="true">
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    {{'ORDER.BUYER_DATA.TITLE' | translate}}
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <app-order-details-buyer-data [order]="orderDetail" />
+                        </mat-expansion-panel>
+                        @if (orderDetail.buyer_data?.invoice) {
+                            <mat-expansion-panel [expanded]="true">
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        {{'ORDER.INVOICE_DATA.TITLE' | translate}}
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <app-order-details-invoice-data [invoiceData]="orderDetail.buyer_data.invoice" />
+                            </mat-expansion-panel>
+                        }
+                        @if (orderDetail.buyer_data?.b2b_data) {
+                            <mat-expansion-panel [expanded]="true">
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        {{'ORDER.B2B_BUYER_DATA.TITLE' | translate}}
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <app-order-details-b2b-buyer-data [order]="orderDetail" />
+                            </mat-expansion-panel>
+                        }
+                        @if ($packGroups()?.length) {
+                            <mat-expansion-panel [expanded]="true">
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>{{ 'ORDER.PACK.BREAKDOWN' | translate }}</mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <div fxFlex="100%" fxLayout="column" fxLayoutGap="24px">
+                                    @for (group of $packGroups(); track group.id) {
+                                        <div class="order-general-data-tickets-table" fxFlex="100%" fxLayout="row">
+                                            <div fxFlex="100%" fxLayout="column">
+                                                <div fxLayout="row" fxLayoutAlign="start center" class="principal-title">
+                                                    <span>{{ group.pack.name | uppercase }}</span>
+                                                    <span class="order-general-data-tickets-count">
+                                                        {{
+                                                            'ORDER.PACK.TOTAL' | translate: {
+                                                              numPack: group.packCount
+                                                            }
+                                                          }}
+                                                    </span>
+                                                </div>
+                                                @if (group.sessions.length > 0) {
+                                                    @for(tickets of group.sessions; track tickets.event.id) {
+                                                        @for (session of tickets.sessions; track $index) {
+                                                            <div fxFlex="100%" class="skip-generation-container">
+                                                                <span class="secondary-title">
+                                                                    {{ (session.pack.main_item ? 'ORDER.PACK.MAIN_ITEM' : 'ORDER.PACK.ENTRIES_PACK') | translate }}
+                                                                </span>
+                                                            </div>
+                                                            <div fxFlex="100%" fxLayout="column">
+                                                                <span class="title">
+                                                                    {{ tickets.event.name }} - {{ session.session.name }}
+                                                                </span>
+                                                                <div fxFlex="100%" class="skip-generation-container">
+                                                                    <span class="subtitle">
+                                                                        {{ session.session.date.start | localDateTime: dateTimeFormats.shortDateTime }}
+                                                                    </span>
+                                                                </div>
+                                                                <app-order-details-tickets-table
+                                                                    [orderCode]="orderCode"
+                                                                    [sessionData]="session"
+                                                                    [selection]="selections"
+                                                                    [isAllowedPartialRefund]="isAllowedPartialRefund"
+                                                                    [canHaveValidations]="canOrderTypeHaveValidations"
+                                                                    [isSeatReallocationOrder]="isSeatReallocationOrder"
+                                                                    [orderType]="orderDetail.type"
+                                                                    [originalReallocationCode]="
+                                                                        orderDetail.related_original_reallocation_code ?? null
+                                                                    " />
+                                                            </div>
+                                                        }
+                                                    }
+                                                }
+                                                @if (group.products.length > 0) {
+                                                    <div fxFlex="100%" class="skip-generation-container">
+                                                        <span
+                                                            class="secondary-title">{{ 'ORDER.PACK.ENTRIES_INCLUDED_PRODUCT' | translate }}
+                                                        </span>
+                                                        <div class="product">
+                                                            <span class="subtitle">
+                                                                {{ orderDetail.date | localDateTime: dateTimeFormats.shortDateTime }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div fxFlex="100%" fxLayout="column">
+                                                        <app-order-details-products-table
+                                                            [products]="group.products"
+                                                            [orderCode]="orderCode"
+                                                            [isAllowedPartialRefund]="isAllowedPartialRefund"
+                                                            [selection]="selectedProducts"
+                                                            [canHaveValidations]="canOrderTypeHaveValidations" />
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </mat-expansion-panel>
+                        }
+                        @if ((events$ | async)?.length) {
+                            <mat-expansion-panel [expanded]="true">
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        {{'ORDER.TICKETS_DATA.TITLE' | translate}}
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <div fxLayout="column" fxLayoutGap="24px">
+                                    <div fxFlex="100%">
+                                        <span class="order-general-data-tickets-count" fxFlex="1 1 auto">
+                                            {{'ORDER.TICKETS_DATA.TOTAL_NUMBER' | translate: {numTickets: $ticketsCount()} }}
+                                            @if((orderDetail$ | async).type === orderTypes.booking) {
+                                                <ng-container>
+                                                    // {{'ORDER.TICKETS_DATA.TOTAL_NUMBER_PENDING' | translate:
+                                                    {numTickets: orderDetail.items | orderItemStateCount: ticketStates.booked} }}
+                                                </ng-container>
+                                            }
+                                        </span>
+                                    </div>
+                                    @for (eventData of (events$ | async); track eventData.event.id) {
+                                        <div fxFlex="100%" fxLayout="column" fxLayoutGap="24px">
+                                            @for (sessionData of eventData.sessions; track sessionData.session.id) {
+                                                <div class="order-general-data-tickets-table" fxFlex="100%" fxLayout="row">
+                                                    <div fxFlex="100%" fxLayout="column">
+                                                        <span class="title">
+                                                            {{ eventData.event.name }} - {{ sessionData.session.name }}
+                                                        </span>
+                                                        <div fxFlex="100%" class="skip-generation-container">
+                                                            <span class="subtitle" fxFlex="1 1 auto">
+                                                                {{sessionData.session.date.start | localDateTime : dateTimeFormats.shortDateTime}}
+                                                            </span>
+                                                            @if (sessionData.isSkipGeneration) {
+                                                                <div fxFlex="0 0 auto" fxLayoutAlign="end center">
+                                                                    <span class="ob-label skip-generation-label">
+                                                                        {{'TICKET_DELIVERY.DISABLED.TITLE' | translate}}
+                                                                    </span>
+                                                                    <mat-icon fxFlexAlign="center" class="ob-help-icon"
+                                                                        [matTooltip]="'TICKET_DELIVERY.DISABLED.INFO' | translate">
+                                                                        help_outline
+                                                                    </mat-icon>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                        <app-order-details-tickets-table
+                                                            [orderCode]="orderCode"
+                                                            [sessionData]="sessionData"
+                                                            [selection]="selections"
+                                                            [isAllowedPartialRefund]="isAllowedPartialRefund"
+                                                            [canHaveValidations]="canOrderTypeHaveValidations"
+                                                            [isSeatReallocationOrder]="isSeatReallocationOrder"
+                                                            [orderType]="orderDetail.type"
+                                                            [originalReallocationCode]="
+                                                                orderDetail.related_original_reallocation_code ?? null
+                                                            " />
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </mat-expansion-panel>
+                        }
+                        @if ($productItems()?.length) {
+                            <mat-expansion-panel [expanded]="true">
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        {{'ORDER.PRODUCTS_DATA.TITLE' | translate}}
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <div fxLayout="column" fxLayoutGap="24px">
+                                    <div fxFlex="100%">
+                                        <span class="order-general-data-tickets-count" fxFlex="1 1 auto">
+                                            {{'ORDER.PRODUCTS_DATA.TOTAL_NUMBER' | translate:{numProducts: $productItems().length} }}
+                                        </span>
+                                    </div>
+                                    <app-order-details-products-table
+                                        [products]="$productItems()"
+                                        [orderCode]="orderCode"
+                                        [isAllowedPartialRefund]="isAllowedPartialRefund"
+                                        [selection]="selectedProducts"
+                                        [canHaveValidations]="canOrderTypeHaveValidations" />
+                                </div>
+                            </mat-expansion-panel>
+                        }
+                        <mat-expansion-panel [expanded]="true">
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    {{'ORDER.PAYMENT.TITLE' | translate}}
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <app-order-details-payments [order]="orderDetail" />
+                        </mat-expansion-panel>
+                        @if (orderDetail.payment_detail?.reimbursements_info?.length > 0) {
+                            <mat-expansion-panel [expanded]="true">
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        {{'ORDER.REIMBURSEMENTS.TITLE' | translate}}
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <app-order-details-reimbursements [order]="orderDetail" />
+                            </mat-expansion-panel>
+                        }
+                    </mat-accordion>
+                    <mat-divider vertical="true" fxFlexAlign="stretch" />
+                    <div class="ob-summary sidebar-container" fxFlex="0 1 340px" fxLayout="column">
+                        <app-order-price [order]="orderDetail" />
+                    </div>
+                </div>
+            </div>
+        </app-form-container>
+    </div>
+}
+@if (loading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

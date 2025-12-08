@@ -1,0 +1,151 @@
+@use '@angular/material' as mat;
+@mixin select-override($palettes, $colors) {
+    $ob-black: map-get($colors, ob-black);
+    $ob-white: map-get($colors, ob-white);
+    $ob-grey-light-10: map-get($colors, ob-grey-light-10);
+    $ob-grey-light-20: map-get($colors, ob-grey-light-20);
+    $ob-grey: map-get($colors, ob-grey);
+    $success-color: mat.m2-get-color-from-palette(map-get($palettes, success));
+    $warn-color: mat.m2-get-color-from-palette(map-get($palettes, warn));
+    $alert-color: mat.m2-get-color-from-palette(map-get($palettes, alert));
+    $info-color: mat.m2-get-color-from-palette(map-get($palettes, info));
+
+    mat-select {
+        --mat-select-trigger-text-font: Nunito Sans;
+        --mat-select-trigger-text-line-height: 14px;
+        --mat-select-trigger-text-size: 14px;
+        --mat-select-focused-arrow-color: var(--ob-theme-color-black);
+    }
+
+    .ob-select-server-search-panel {
+        &.mat-mdc-select-panel {
+            &.elements-shown-4 {
+                max-height: 275px; //4 elements in select-server-search
+            }
+            &.elements-shown-8 {
+                max-height: 550px; //8 elements in select-server-search
+            }
+        }
+    }
+
+    mat-option {
+        --mat-option-label-text-font: Nunito Sans;
+        --mat-option-label-text-line-height: 14px;
+        --mat-option-label-text-size: 14px;
+        &.mat-mdc-option {
+            min-height: 40px;
+            .mat-pseudo-checkbox-full {
+                margin-right: 8px;
+            }
+        }
+    }
+
+    mat-select .mat-mdc-select-arrow-wrapper {
+        height: 20px;
+    }
+
+    mat-optgroup.mat-mdc-optgroup {
+        color: $ob-grey;
+    }
+
+    // Status-dots on selects
+    mat-select-trigger {
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            background-color: $ob-grey;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+            flex-shrink: 0;
+            &.accepted,
+            &.paid,
+            &.active {
+                background-color: $success-color;
+            }
+            &.refunded,
+            &.pending,
+            &.disable {
+                background-color: $alert-color;
+            }
+            &.inactive,
+            &.rejected,
+            &.blocked,
+            &.unpaid,
+            &.disabled {
+                background-color: $warn-color;
+            }
+            &.temporary_blocked {
+                background-color: $info-color;
+            }
+        }
+        .status-dot-spinner {
+            height: 12px;
+            width: 12px;
+            display: inline-block;
+            margin-right: 6px;
+        }
+    }
+    .mat-select-panel {
+        // mat-select-panel with virtual scroll styles:
+        .cdk-virtual-scroll-content-wrapper {
+            max-width: 100%;
+        }
+    }
+    .mat-option {
+        min-height: 40px;
+        padding-inline: 16px;
+        display: flex;
+        align-items: center;
+    }
+    .mat-mdc-option {
+        &.mat-active {
+            background-color: rgba(grey, 0.15);
+        }
+        &.mat-selected {
+            background-color: $ob-grey-light-10;
+            .mat-option-text {
+                color: $ob-black;
+            }
+        }
+        &.mat-option-disabled {
+            .mat-option-text {
+                color: $ob-grey-light-20;
+            }
+        }
+        .mat-option-text {
+            color: $ob-grey;
+        }
+        .mat-icon.no-margin {
+            margin: 0;
+        }
+        &.select-all {
+            .mat-pseudo-checkbox {
+                display: none;
+            }
+        }
+        &.options-loader {
+            pointer-events: none;
+            .mat-pseudo-checkbox {
+                display: none;
+            }
+            &.mat-selected:not(.mat-option-multiple) {
+                background-color: $ob-white;
+            }
+        }
+        &.option-container {
+            min-height: 48px;
+            .option-title {
+                font: var(--ob-theme-font-body-2);
+            }
+            .option-subtitle {
+                color: $ob-grey;
+                font: var(--ob-theme-font-body-1);
+            }
+        }
+    }
+
+    .mat-select-search-inner input.mat-select-search-input {
+        border-bottom: 1px solid var(--ob-theme-color-grey-light-10);
+    }
+}

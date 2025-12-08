@@ -1,0 +1,73 @@
+<app-form-container layout="menu" class="overflow-y-auto" hideActionBar>
+    <div class="section-block" fxLayout="column">
+        <h3 class="section-title">
+            {{'EVENTS.TITLES.RESTRICTIONS' | translate}}
+        </h3>
+        <p class="section-description">
+            {{'EVENTS.RESTRICTIONS_CONFIG_DESCRIPTION' | translate }}
+        </p>
+        <div fxLayout="column" fxLayoutGap="16px">
+            <div fxLayout="row">
+                <div fxFlex="100%" fxFlex.gt-sm="800px" fxLayoutAlign="end">
+                    <button mat-stroked-button color="primary" class="ob-button small add-button"
+                        [disabled]="(isAvetEvent$ | async) === false" (click)="createRestriction()"
+                        [attr.aria-label]="'EVENTS.ACTIONS.CREATE_RESTRICTION' | translate">
+                        <mat-icon>add</mat-icon>
+                        {{'EVENTS.ACTIONS.CREATE_RESTRICTION' | translate}}
+                    </button>
+                </div>
+            </div>
+            <div fxLayout="row">
+                <div fxFlex="100%" fxFlex.gt-sm="800px">
+                    @if((restrictions$  | async)?.length ){
+                        <mat-accordion [multi]="true" [togglePosition]="'before'">
+                            @for(restriction of restrictions$ | async; track $index) {
+                                <mat-expansion-panel class="ob-expansion-card"
+                                    [id]="restriction.sid" [expanded]="restriction.new || restriction.loaded"
+                                    (opened)="loadRestrictionDetail(restriction)">
+                                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                        <mat-panel-title>{{restriction.name}}</mat-panel-title>
+                                        <div fxLayout="row" fxLayoutGap="16px">
+                                            <span fxFlexAlign="center">
+                                                <span [ngClass]="['status-dot',
+                                                restriction.editing ? 'info' : restriction.activated ? 'active' : 'inactive'
+                                            ]"></span>
+                                                {{(restriction.editing ? 'FORMS.LABELS.EDITING' :
+                                            restriction.activated ? 'EVENTS.FORMS.LABELS.ENABLED.SINGULAR_FEMALE' :
+                                            'FORMS.LABELS.NOT_ENABLED') | translate}}
+                                            </span>
+                                            <button mat-icon-button color="tertiary" class="ob-button small"
+                                                [matMenuTriggerFor]="actions"
+                                                (click)="$event.stopPropagation()">
+                                                <mat-icon>more_horiz</mat-icon>
+                                            </button>
+                                        </div>
+                                        <mat-menu #actions="matMenu">
+                                            <button mat-menu-item (click)="renameRestriction(restriction)">
+                                                {{'EVENTS.ACTIONS.EDIT_NAME' | translate}}
+                                            </button>
+                                            <button mat-menu-item (click)="deleteRestriction(restriction)">
+                                                {{'EVENTS.ACTIONS.DELETE' | translate}}
+                                            </button>
+                                        </mat-menu>
+                                    </mat-expansion-panel-header>
+                                    <app-event-restriction [form]="form.get(restriction.sid)" [restriction]="restriction" />
+                                </mat-expansion-panel>
+                            }
+                        </mat-accordion>
+                    } @else {
+                        <app-empty-state [title]="'EVENTS.RESTRICTIONS_CONFIG.EMPTY_LIST' | translate"
+                            [description]="'EVENTS.RESTRICTIONS_CONFIG.EMPTY_LIST_DESCRIPTION' | translate" />
+                    }
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</app-form-container>
+@if(isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,124 @@
+<div class="list-container" fxFlex="0 1 100%" fxLayout="column">
+    <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">{{'TITLES.SEASON_TICKETS' | translate}}</h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+            <div class="filter-container" fxFlex="none">
+                <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                    [attr.aria-label]="'SEASON_TICKET.NEW_BTN' | translate" (click)="openNewSeasonTicketDialog()"
+                    [disabled]="isLoading$ | async">
+                    <mat-icon>add</mat-icon>
+                    {{'SEASON_TICKET.NEW_BTN' | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="heading-container" fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxFlex="70%" fxLayoutGap="20px" fxLayoutAlign="start center">
+            <div class="filter-container" fxFlex="none">
+                <app-popover appFilter>
+                    <app-season-tickets-list-filter #filterContent [canSelectEntity$]="canSelectEntity$">
+                    </app-season-tickets-list-filter>
+                </app-popover>
+            </div>
+            <div class="search-field" fxFlex="100%">
+                <app-search-input [placeholder]="'FORMS.SEARCH.SEASON_TICKET_LIST' | translate"></app-search-input>
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            <p *ngIf="seasonTicketsMetadata$ | async as seasonTicketsMetadata" class="page-summary"
+                [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: seasonTicketsMetadata">
+            </p>
+            <app-paginator [length]="(seasonTicketsMetadata$ | async)?.total" [pageSize]="seasonTicketsPageSize"></app-paginator>
+        </div>
+    </div>
+    <div class="heading-container heading-divider">
+        <mat-divider></mat-divider>
+    </div>
+    <div class="heading-container">
+        <app-chips appFilter></app-chips>
+    </div>
+    <div class="spinner-container" *ngIf="isLoading$ | async">
+        <mat-spinner></mat-spinner>
+    </div>
+    <mat-table class="ob-table" [dataSource]="seasonTickets$ | async" [trackBy]="trackByFn"
+        matSort [matSortActive]="initSortCol" [matSortDirection]="initSortDir" matSortDisableClear
+        [attr.aria-label]="'TITLES.SEASON_TICKETS' | translate"
+        [ngClass]="{'not-touchable': (isHandsetOrTablet$ | async) !== true}">
+        <ng-container matColumnDef="info">
+            <mat-header-cell *matHeaderCellDef class="info-cell head-cell" fxFlex="0 0 40px">
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="info-cell" fxFlex="0 0 40px" fxLayoutAlign="center">
+                <div *ngIf="row.generation_status === 'ERROR'" class="season-ticket-details-icon"
+                    [matTooltip]="'SEASON_TICKET.CREATION.ERROR' | translate"
+                    matTooltipClass="ob-tooltip-error">
+                    <mat-icon class="icon-error">error_outline</mat-icon>
+                </div>
+                <div *ngIf="row.generation_status === 'IN_PROGRESS'" class="season-ticket-details-icon">
+                    <mat-spinner diameter="20"></mat-spinner>
+                </div>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'SEASON_TICKET.NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="entity">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'SEASON_TICKET.ENTITY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.entity && row.entity.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="producer">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'SEASON_TICKET.PRODUCER' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.producer?.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="venue">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'SEASON_TICKET.VENUE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.venue_templates?.text}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="currency">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'FORMS.LABELS.CURRENCY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.currency_code | localCurrencyPartialTranslation}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'SEASON_TICKET.STATUS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="status-cell">
+                <span>
+                    {{('SEASON_TICKET.STATUS_OPTS.' + row.status) | translate}}
+                </span>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="actions-cell head-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="actions-cell" [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                <div class="action-buttons" (click)="$event.stopPropagation()">
+                    <button mat-icon-button aria-label="Delete season ticket" class="ob-button medium"
+                        (click)="openDeleteSeasonTicketDialog(row)" [disabled]="isLoading$ | async">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+            </mat-cell>
+        </ng-container>
+        <ng-container *ngIf="displayedColumns$ | async as displayedColumns">
+            <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;" class="interactive-row"
+                [routerLink]="[row.id, 'general-data']"
+                [class.ob-row-error]="row.generation_status === 'ERROR'"></mat-row>
+        </ng-container>
+    </mat-table>
+    <div class="context-notification-container" *ngIf="(seasonTicketsMetadata$ | async)?.total === 0" fxFlex="0 50 100%"
+        fxLayout="row" fxLayoutAlign="center start">
+        <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px" fxFlex="80%"
+            fxLayoutAlign="center start">
+            <p>{{'LIST.EMPTY' | translate}}</p>
+        </app-context-notification>
+    </div>
+</div>

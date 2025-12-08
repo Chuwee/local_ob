@@ -1,0 +1,12 @@
+<mat-form-field fxFlex="0 1 {{showsAPM ? '125px' : '95px'}}" appearance="outline"
+    class="ob-form-field ob-time-form-field" [class.field-with-label]="isLabelSet">
+    <mat-label *ngIf="!!label">{{label}}</mat-label>
+    <input matInput #timePickerInput [ngxTimepicker]="timePicker" [formControl]="timePickerCtrl" [disableClick]="true"
+        [value]="timeValue$ | async" placeholder="hh:mm" autocomplete="off" [format]="showsAPM ? 12 : 24"
+        (blur)="onBlur()" />
+    <button mat-icon-button matSuffix [disabled]="disabled$ | async" class="ob-button large no-hover-ripple"
+        (click)="$event.stopPropagation(); timePicker.open();">
+        <mat-icon>access_time</mat-icon>
+    </button>
+</mat-form-field>
+<ngx-material-timepicker #timePicker [format]="showsAPM ? 12 : 24" />

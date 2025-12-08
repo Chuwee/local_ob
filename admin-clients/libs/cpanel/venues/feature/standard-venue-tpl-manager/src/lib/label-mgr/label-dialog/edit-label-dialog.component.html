@@ -1,0 +1,41 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{title | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="cancel()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <form [formGroup]="form" fxLayout="row wrap" fxLayoutAlign="start stretch">
+            <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field">
+                <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                <input matInput aria-label="name" [placeholder]="'FORMS.LABELS.NAME' | translate"
+                    formControlName="name">
+                <mat-error [ob-form-errors]="form" field="name"></mat-error>
+            </mat-form-field>
+            @if (form.controls.code.enabled) {
+                <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field">
+                    <mat-label>{{'FORMS.LABELS.CODE' | translate}}</mat-label>
+                    <input matInput aria-label="code" [placeholder]="'FORMS.LABELS.CODE' | translate"
+                        formControlName="code">
+                    <mat-error [ob-form-errors]="form" field="code"></mat-error>
+                </mat-form-field>
+            }
+            <mat-form-field appearance="outline" fxFlex="90px" class="ob-form-field min-padding">
+                <mat-label>{{'FORMS.LABELS.COLOR' | translate}}</mat-label>
+                <app-color-picker formControlName="color" [customColors]="templateColors$ | async"></app-color-picker>
+                <mat-error [ob-form-errors]="form" field="color"></mat-error>
+            </mat-form-field>
+        </form>
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="cancel()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="save()"
+            [disabled]="!form.dirty || form.invalid || (loading$ | async)">
+            {{(data.isCreation && 'FORMS.ACTIONS.CREATE' || 'FORMS.ACTIONS.SAVE') |
+            translate}}
+        </button>
+    </div>
+</div>

@@ -1,0 +1,38 @@
+<div>
+    <div mat-dialog-title>
+        <div class="flex flex-row justify-between">
+            <h2 class="secondary title">
+                {{'USER.API_KEY.TITLE' | translate}}
+            </h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon fontIcon="close" />
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content>
+        <p>{{'USER.API_KEY.DESCRIPTION' | translate}}</p>
+        <div>
+            <span class="ob-label">
+                {{'USER.API_KEY.LABEL' | translate}}
+            </span>
+            <div class="flex items-center gap-2">
+                <span>{{ $apiKey() }}</span>
+                @if($allowCopyApiKey()){
+                    <app-copy-text class="copy-key-button" [copyText]="$apiKey()"
+                        [copyOk]="'USER.API_KEY.KEY_COPY_OK' | translate" [copyKo]="'USER.API_KEY.KEY_COPY_KO' | translate"
+                        [copyTooltip]="'USER.API_KEY.COPY_KEY' | translate" />
+                }
+                <button mat-stroked-button color="tertiary" class="ob-button small" aria-label="refresh"
+                    (click)="openRegenerateApiKeyDialog()" [disabled]="$isLoading()">
+                    <mat-icon fontIcon="autorenew" />
+                    {{'USER.API_KEY.REFRESH' | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+    <div mat-dialog-actions align="end">
+        <button mat-flat-button type="button" color="primary" class="ob-button" (click)="close()">
+            {{ 'FORMS.ACTIONS.CLOSE' | translate }}
+        </button>
+    </div>
+</div>

@@ -1,0 +1,73 @@
+<button mat-stroked-button color="tertiary" class="ob-button medium" [class.active]="activeFilters" [disabled]="$disabled()"
+    [matBadge]="activeFilters || ''" [satPopoverAnchor]="filterPopover" (click)="open()">
+    {{'FORMS.OPEN_FILTER_BTN' | translate}}
+    <mat-icon iconPositionEnd>
+        filter_list
+    </mat-icon>
+</button>
+<sat-popover #filterPopover hasBackdrop yAlign="below" autoFocus="false" restoreFocus="false">
+    <mat-card class="ob-card">
+        <mat-card-content class="form-container">
+            <form [formGroup]="form" fxLayout="column" fxLayoutGap="24px">
+                <div fxLayout="row" class="filter-block">
+                    <div class="ob-label" fxFlex="0 0 100px">
+                        {{'FORMS.LABELS.TYPE' | translate}}
+                    </div>
+                    <div class="filter-block-input" fxFlex="0 0 300px">
+                        <mat-form-field appearance="outline" class="ob-form-field type-select">
+                            <mat-select formControlName="type" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                                @for (elementInfoType of elementInfoTypes; track elementInfoType) {
+                                    <mat-option [value]="elementInfoType">
+                                        {{('VENUE_TPLS.ELEMENTS_INFO.TYPE_OPTS.' + elementInfoType) | translate}}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                @if ($status()) {
+                    <div fxLayout="row" class="filter-block">
+                        <div class="ob-label" fxFlex="0 0 100px">
+                            {{'FORMS.LABELS.STATUS' | translate}}
+                        </div>
+                        <div class="filter-block-input" fxFlex="0 0 300px">
+                            <mat-form-field appearance="outline" class="ob-form-field type-select">
+                                <mat-select formControlName="status" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                                    <mat-option value="ENABLED">
+                                        {{'VENUE_TPLS.ELEMENTS_INFO.STATUS_OPTS.ENABLED' | translate}}
+                                    </mat-option>
+                                    <mat-option value="DISABLED">
+                                        {{'VENUE_TPLS.ELEMENTS_INFO.STATUS_OPTS.DISABLED' | translate}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                }
+                <!-- TODO: Backend missing
+                 <div fxLayout="row" class="filter-block">
+                    <div class="filter-block-input" fxFlexOffset="100px">
+                        <mat-checkbox color="primary" formControlName="hasContents">
+                            {{'VENUE_TPLS.ELEMENTS_INFO.HAS_CONTENTS_FILTER' | translate}}
+                        </mat-checkbox>
+                    </div>
+                </div> -->
+            </form>
+        </mat-card-content>
+        <mat-card-footer fxLayoutAlign="start center">
+            <div fxFlex="grow" class="left-actions">
+                <a class="ob-link" #removeLink (click)="clear()">
+                    {{'FORMS.REMOVE_FILTERS_BTN' | translate}}
+                </a>
+            </div>
+            <div fxFlex="none" class="right-actions">
+                <button (click)="close()" mat-button class="ob-button small">
+                    {{'FORMS.CLOSE_FILTER_BTN' | translate}}
+                </button>
+                <button (click)="apply()" mat-flat-button color="primary" class="ob-button small">
+                    {{'FORMS.APPLY_FILTER_BTN' | translate}}
+                </button>
+            </div>
+        </mat-card-footer>
+    </mat-card>
+</sat-popover>

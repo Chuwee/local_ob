@@ -1,0 +1,25 @@
+@if((user$ | async); as user) {
+    <div class="popover-user-button avatar avatar-sm" [class.active]="userPopover.isOpen()" [satPopoverAnchor]="userPopover"
+        (click)="userPopover.toggle()" matTooltip="{{user.username + '\n' + user.name }}">
+        {{(user.name?.[0] || '')}}
+    </div>
+
+    <sat-popover #userPopover hasBackdrop yAlign="below" autoFocus="false" restoreFocus="false">
+        <mat-card class="ob-card">
+            <mat-card-content>
+                <div class="flex flex-col items-center gap-4">
+                    <div class="avatar avatar-lg">{{(user.name?.[0] || '')}}</div>
+                    <div class="flex flex-col items-center">
+                        <span class="mat-body-strong">{{user.name}}</span>
+                        <span>{{user.username}}</span>
+                    </div>
+                </div>
+            </mat-card-content>
+            <mat-card-footer class="flex items-stretch flex-col">
+                <button mat-stroked-button color="tertiary" class="ob-button" (click)="logout()">
+                    {{'FORMS.LOGOUT' | translate}}
+                </button>
+            </mat-card-footer>
+        </mat-card>
+    </sat-popover>
+}

@@ -1,0 +1,321 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="100%" class="secondary title">{{'TITLES.CUSTOMER' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()" [disabled]="(isLoadingOrSaving$ | async)">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column">
+        <form [formGroup]="form" fxLayout="column" fxLayoutAlign="start stretch">
+            @let signInFields = $adminCustomerFieldNames();
+             <!-- Entity -->
+              @if (isOperator$ | async) {
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'CUSTOMER.ENTITY' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="entity"
+                        [compareWith]="compareById">
+                        <mat-option>
+                            <app-select-search #entitySelectSearch [options$]="entities$"
+                                [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name"
+                                requireSelection="true" />
+                        </mat-option>
+                        @for (entity of entitySelectSearch.getFilteredOptions$() | async; track entity.id) {
+                            <mat-option [value]="entity">
+                                {{entity.name}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form" field="entity" />
+                </mat-form-field>
+            }
+            <!-- Name -->
+            @if (signInFields.includes('name')) {
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'CUSTOMER.NAME' | translate}}</mat-label>
+                    <input matInput aria-label="name" [placeholder]="'CUSTOMER.NAME' | translate" formControlName="name">
+                    <mat-error [ob-form-errors]="form" field="name" />
+                </mat-form-field>
+            }
+            <!-- Surname -->
+            @if (signInFields.includes('surname')) {
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'CUSTOMER.SURNAME' | translate}}</mat-label>
+                    <input matInput aria-label="surname" [placeholder]="'CUSTOMER.SURNAME' | translate"
+                        formControlName="surname">
+                    <mat-error [ob-form-errors]="form" field="surname" />
+                </mat-form-field>
+            }
+            @if (signInFields.includes('identification') || signInFields.includes('birthday')) {
+                <div fxLayout="row wrap" fxLayoutGap.gt-sm="10px" fxLayoutAlign="space-between">
+                    <!-- Birthday -->
+                    @if (signInFields.includes('birthday')) {
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label"
+                            fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 5px)">
+                            <mat-label>{{'CUSTOMER.BIRTHDAY' | translate}}</mat-label>
+                            <input matInput [matDatepicker]="birthdayDP" [placeholder]="dateFormat" formControlName="birthday"
+                                (focus)="birthdayDP.open()" aria-label="birthday">
+                            <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                                (click)="$event.stopPropagation(); birthdayDP.open();">
+                                <mat-icon>event</mat-icon>
+                            </button>
+                            <mat-datepicker #birthdayDP />
+                        </mat-form-field>
+                    }
+                    <!-- Id Card -->
+                    @if (signInFields.includes('identification')) {
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label"
+                            fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 5px)">
+                            <mat-label>{{'CUSTOMER.ID_CARD' | translate}}</mat-label>
+                            <input matInput aria-label="id card" [placeholder]="'CUSTOMER.ID_CARD' | translate"
+                                formControlName="identification">
+                        </mat-form-field>
+                    }
+                </div>
+            }
+            <!-- Title -->
+            <div fxLayout="row wrap" fxLayoutGap.gt-sm="10px" fxLayoutAlign="space-between">
+                @if (signInFields.includes('title')) {
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label"
+                        fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 5px)">
+                        <mat-label>{{'CUSTOMER.TITLE' | translate}}</mat-label>
+                        <mat-select formControlName="title" aria-label="title"
+                            [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                            @for (title of customerTitle; track title) {
+                                <mat-option [value]="title">
+                                    {{('CUSTOMER.TITLE_OPTS.' + title) | translate}}
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                }
+            </div>
+            <div fxLayout="row wrap" fxLayoutGap.gt-sm="10px" fxLayoutAlign="space-between">
+                <!-- Gender -->
+                @if (signInFields.includes('gender')) {
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label"
+                        fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 5px)">
+                        <mat-label>{{'CUSTOMER.GENDER' | translate}}</mat-label>
+                        <mat-select formControlName="gender" aria-label="gender"
+                            [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                            <mat-option [value]="customerGenderEnum.none">{{'FORMS.SELECT.PLACE_HOLDER' | translate}}
+                            </mat-option>
+                            @for (gender of customerGenderValues; track gender) {
+                                <mat-option [value]="gender">
+                                    {{('CUSTOMER.GENDER_OPTS.' + gender) | translate}}
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                }
+                @if (signInFields.includes('language')) {
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label"
+                        fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 5px)">
+                        <mat-label>{{'CUSTOMER.LANGUAGE' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="language"
+                            aria-label="language">
+                            @for(languageCode of $languageCodes(); track languageCode) {
+                                <mat-option
+                                    [value]="languageCode">{{ ('LANGUAGES.' + languageCode ) | translate }}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                }
+            </div>
+            @if (signInFields.includes('postal_code') || signInFields.includes('country')) {
+                <div fxLayout="row wrap" fxLayoutGap.gt-sm="10px" fxLayoutAlign="space-between" formGroupName="location">
+                    <!-- Country -->
+                    @if (signInFields.includes('country')) {
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label"
+                            fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 5px)">
+                            <mat-label>{{'CUSTOMER.COUNTRY' | translate}}</mat-label>
+                            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="country"
+                                aria-label="country">
+                                <mat-option>
+                                    <app-select-search #countrySelectSearch [options$]="countries$"
+                                        [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" />
+                                </mat-option>
+                                @for (country of countrySelectSearch.getFilteredOptions$() | async; track country) {
+                                    <mat-option
+                                        [value]="country?.code">
+                                        {{country ? country.name : ''}}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    }
+                    <!-- Postal Code-->
+                    @if (signInFields.includes('postal_code')) {
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label"
+                            fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 5px)">
+                            <mat-label>{{'CUSTOMER.POSTAL_CODE' | translate}}</mat-label>
+                            <input matInput aria-label="postal code" [placeholder]="'CUSTOMER.POSTAL_CODE' | translate"
+                                formControlName="postal_code">
+                            <mat-error [ob-form-errors]="form.controls.location" field="postal_code" />
+                        </mat-form-field>
+                    }
+                </div>
+            }
+            @if (signInFields.includes('province_code') || signInFields.includes('city')) {
+                <div fxLayout="row wrap" fxLayoutGap.gt-sm="10px" fxLayoutAlign="space-between" formGroupName="location">
+                    <!-- Country Subdivision -->
+                    @if (signInFields.includes('province_code')) {
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label"
+                            fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 5px)">
+                            <mat-label>{{'FORMS.LABELS.COUNTRY_SUBDIVISION' | translate}}</mat-label>
+                            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                formControlName="province_code" aria-label="province">
+                                <mat-option>
+                                    <app-select-search #provincesSelectSearch [options$]="provinces$"
+                                        [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" />
+                                </mat-option>
+                                @for (province of provincesSelectSearch.getFilteredOptions$() | async; track province) {
+                                    <mat-option
+                                        [value]="province?.code">
+                                        {{province ? province.name : ''}}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    }
+                    <!-- City-->
+                    @if (signInFields.includes('city')) {
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label"
+                            fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 5px)">
+                            <mat-label>{{'CUSTOMER.CITY' | translate}}</mat-label>
+                            <input matInput aria-label="city" [placeholder]="'CUSTOMER.CITY' | translate" formControlName="city">
+                            <mat-error [ob-form-errors]="form.controls.location" field="city" />
+                        </mat-form-field>
+                    }
+                </div>
+            }
+            <!-- Address -->
+            @if (signInFields.includes('address')) {
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label" formGroupName="location">
+                    <mat-label>{{'CUSTOMER.ADDRESS' | translate}}</mat-label>
+                    <input matInput aria-label="address" [placeholder]="'CUSTOMER.ADDRESS' | translate"
+                        formControlName="address">
+                    <mat-error [ob-form-errors]="form.controls.location" field="address" />
+                </mat-form-field>
+            }
+            <!-- Adress 2 -->
+            @if (signInFields.includes('address_2')) {
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label" formGroupName="location">
+                    <mat-label>{{'CUSTOMER.ADDRESS_2' | translate}}</mat-label>
+                    <input matInput aria-label="address_2" [placeholder]="'CUSTOMER.ADDRESS_2' | translate"
+                        [formControl]="form.controls.address_2">
+                    <mat-error [ob-form-errors]="form" field="address_2" />
+                </mat-form-field>
+            }
+            <!-- Phone -->
+            @if (signInFields.includes('phone') && !signInFields.includes('int_phone')) {
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'CUSTOMER.PHONE' | translate}}</mat-label>
+                    <input matInput aria-label="phone" formControlName="phone" [placeholder]="'CUSTOMER.PHONE' | translate">
+                    <mat-error [ob-form-errors]="form" field="phone" />
+                </mat-form-field>
+            }
+            <!-- Phone 2 -->
+            @if (signInFields.includes('phone_2')) {
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'CUSTOMER.PHONE_2' | translate}}</mat-label>
+                    <input matInput aria-label="phone_2" formControlName="phone_2" [placeholder]="'CUSTOMER.PHONE_2' | translate">
+                    <mat-error [ob-form-errors]="form" field="phone_2" />
+                </mat-form-field>
+            }
+            @if (signInFields.includes('int_phone')) {
+                <div fxLayout="row wrap" fxLayoutGap.gt-sm="10px" fxLayoutAlign="space-between" formGroupName="int_phone">
+                    <!-- Prefix -->
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label"
+                        fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 5px)">
+                        <mat-label>{{'CUSTOMER.PREFIX_PHONE' | translate}}</mat-label>
+                        <mat-select class="custom-dropdown" formControlName="phone_prefix"
+                            [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                            @let selectPrefix = form.controls.int_phone.controls['phone_prefix'].value;
+                            @if(selectPrefix){
+                                <mat-select-trigger>
+                                    <i [innerHTML]="internationalPhoneCountry()"></i>&nbsp;&nbsp;
+                                    {{'(+' + selectPrefix + ')' }}
+                                </mat-select-trigger>
+                            }
+                            <mat-option>
+                                <app-select-search #prefixPhoneSelectSearch [options$]="prefixList$"
+                                    [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="label" />
+                            </mat-option>
+                            @for (listPhone of prefixPhoneSelectSearch.getFilteredOptions$() | async; track listPhone) {
+                                <mat-option [value]="listPhone?.value">
+                                    {{listPhone ? listPhone?.label:''}}
+                                </mat-option>
+                            }
+                        </mat-select>
+                        <mat-error [ob-form-errors]="form.controls.int_phone" field="phone_prefix" />
+                    </mat-form-field>
+                    <!-- Phone -->
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label"
+                        fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 5px)">
+                        <mat-label>{{'CUSTOMER.PHONE' | translate}}</mat-label>
+                        <input matInput aria-label="phone" [placeholder]="'CUSTOMER.PHONE' | translate"
+                            formControlName="phone">
+                        <mat-error [ob-form-errors]="form.controls.int_phone" field="phone" />
+                    </mat-form-field>
+                </div>
+            }
+            <!-- Email -->
+            @if (signInFields.includes('email')) {
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'CUSTOMER.EMAIL' | translate}}</mat-label>
+                    <input matInput aria-label="email" formControlName="email" [placeholder]="'CUSTOMER.EMAIL' | translate">
+                    <mat-error [ob-form-errors]="form" field="email" />
+                </mat-form-field>
+            }
+            <!-- Member Id -->
+            @if (signInFields.length && $entityMemberIdGeneration() === 'DEFAULT') {
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'CUSTOMER.MEMBER_ID' | translate}}</mat-label>
+                    <input matInput aria-label="member id" formControlName="member_id"
+                        [placeholder]="'CUSTOMER.MEMBER_ID' | translate">
+                    <mat-error [ob-form-errors]="form" field="member_id" />
+                </mat-form-field>
+            }
+            <!-- External id  -->
+            @let entityVendorConfig = $entityExternalVendorConfig();
+            @if (entityVendorConfig?.enabled && entityVendorConfig?.vendor_id?.length) {
+                <div class="flex flex-col flex-wrap sm:flex-row gap-2 sm:justify-between"
+                    formGroupName="vendor">
+                    <div class="flex flex-auto">
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label flex flex-auto">
+                            <mat-label>{{'FORMS.LABELS.VENDOR' | translate}}</mat-label>
+                            <mat-select formControlName="vendor_name" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                aria-label="vendor_name">
+                                <mat-option value="">{{'FORMS.SELECT.PLACE_HOLDER' | translate}}</mat-option>
+                                @for (vendor of $vendorSelectOptions(); track vendor) {
+                                    <mat-option [value]="vendor"> {{vendor}} </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex flex-auto">
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label flex flex-auto">
+                            <mat-label>{{'CUSTOMER.EXTERNAL_ID' | translate}}</mat-label>
+                            <input formControlName="vendor_id" matInput aria-label="vendor_id"
+                                [placeholder]="'CUSTOMER.EXTERNAL_ID' | translate">
+                        </mat-form-field>
+                    </div>
+                </div>
+            }
+        </form>
+    </div>
+    <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()" [disabled]="isLoadingOrSaving$ | async">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createCustomer()"
+            [disabled]="(isLoadingOrSaving$ | async) || form.pristine">
+            {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>
+@if (isLoadingOrSaving$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

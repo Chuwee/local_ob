@@ -1,0 +1,51 @@
+<div class="event-channels-details-container flex flex-col items-stretch grow-0 shrink basis-full">
+    @let entity = $entity();
+    @let eventChannel = $eventChannel();
+    @let requestAccepted = $requestAccepted();
+    <!-- {} -->
+    <app-nav-tabs-menu type="horizontalSubtab" [elements]="[
+        {
+            label: 'CHANNELS.GENERAL_DATA',
+            param: 'general-data',
+        },
+        {
+            label: 'EVENTS.CHANNEL.PROFESSIONAL_SELLING.TITLE',
+            param: 'professional-selling',
+            show: entity?.settings.enable_B2B &&
+            eventChannel?.channel.type === channelType.webB2B
+        },
+        {
+            label: 'EVENTS.CHANNEL.PUBLISH.TITLE',
+            param: 'publish',
+            show: entity?.settings.enable_B2B &&
+            entity?.settings.allow_B2B_publishing &&
+            eventChannel?.channel.type === channelType.webB2B &&
+            !eventChannel?.channel.is_v4
+        },
+        {
+            label: 'CHANNELS.SURCHARGES.TITLE',
+            param: 'surcharges',
+        },
+        {
+            label: 'CHANNELS.COMMISSIONS.TITLE',
+            param: 'channel-commission',
+            disabled: !requestAccepted
+        },
+        {
+            label: 'EVENTS.CHANNEL.SQUARE_IMAGES.TITLE',
+            param: 'images',
+            show: eventChannel?.channel.whitelabel_type === 'EXTERNAL'
+        },
+        {
+            label: 'CHANNELS.CONTENTS',
+            param: 'contents',
+            disabled: !requestAccepted
+        },
+        {
+            label: 'Additional options',
+            param: 'destination',
+            disabled: !eventChannel?.channel.id
+        }
+    ]" />
+    <router-outlet />
+</div>

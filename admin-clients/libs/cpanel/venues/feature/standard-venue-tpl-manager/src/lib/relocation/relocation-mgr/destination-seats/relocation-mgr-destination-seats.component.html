@@ -1,0 +1,56 @@
+<div class="destination-container flex flex-col gap-[24px]">
+    <div>
+        <p class="no-margin">
+            {{'VENUE_TPLS.FORMS.INFOS.SELECT_DESTINATION' | translate}}
+        </p>
+        <p class="total-count no-margin">{{'VENUE_TPLS.FORMS.INFOS.TOTAL_DESTINATION_SELECTED' | translate}}:
+            {{$totalSelectedDestSeats()}}/{{$totalSelectedTickets()}}
+        </p>
+    </div>
+    <div class="orders-container flex flex-col gap-[24px]">
+        @for (orderObj of $selectedSeats(); track $index) {
+            <div class="order-row flex flex-col gap-[8px]">
+                <p class="no-margin"><strong>{{'VENUE_TPLS.FORMS.LABELS.ORDER_CODE' | translate}} {{orderObj.code}}</strong></p>
+                @if (!orderObj.isConsecutive) {
+                    <div class="flex items-center gap-[8px] warning-message">
+                        <mat-icon class="warning-icon">warning</mat-icon>
+                        <p class="no-margin">{{'VENUE_TPLS.FORMS.INFOS.NOT_CONSECUTIVE_SEATS' | translate}}</p>
+                    </div>
+                }
+                @for (seatRow of orderObj.venueItems; track seatRow[0].id) {
+                    <div class="flex items-center justify-between gap-[12px]">
+                        <div class="selected-seat">
+                            <div>{{seatRow[0]?.sectorName}}</div>
+                            <div>
+                                {{'VENUE_TPLS.FORMS.LABELS.ROW' | translate}} <strong>{{seatRow[0]?.rowName}}</strong> -
+                                {{'VENUE_TPLS.FORMS.LABELS.SEAT' | translate}} <strong>{{seatRow[0]?.name}}</strong>
+                            </div>
+                        </div>
+                        <div>
+                            <mat-icon class="arrow">arrow_forward</mat-icon>
+                        </div>
+
+                        @if (seatRow[1]; as destinationSeat) {
+                            <div class="selected-seat destination-seat flex items-center justify-between gap-[8px]">
+                                <div>
+                                    <p class="no-margin">{{destinationSeat.sectorName}}</p>
+                                    <p class="no-margin">
+                                        {{'VENUE_TPLS.FORMS.LABELS.ROW' | translate}} <strong>{{destinationSeat.rowName}}</strong> -
+                                        {{'VENUE_TPLS.FORMS.LABELS.SEAT' | translate}} <strong>{{destinationSeat.name}}</strong>
+                                    </p>
+                                </div>
+                                <button mat-icon-button matSuffix class="ob-button" (click)="unselectSeats([destinationSeat.id])">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </div>
+                        } @else {
+                            <div class="not-selected-seat flex items-center justify-center">
+                                <span>{{'VENUE_TPLS.FORMS.LABELS.SEAT_NOT_SELECTED' | translate}}</span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

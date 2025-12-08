@@ -1,0 +1,120 @@
+@if ($pack(); as pack) {
+    <app-form-container [hideActionBar]="true">
+        @if($items(); as packItems) {
+            <p class="section-description">
+                {{ pack.type === 'AUTOMATIC' ? ('CHANNELS.PACKS.AUTOMATIC_DESCRIPTION' | translate)
+                : ('CHANNELS.PACKS.MANUAL_DESCRIPTION' | translate) }}
+            </p>
+            @if($mainSession(); as mainSession){
+                <div>
+                    <h3 class="mat-subtitle-2" fxLayoutAlign="start center"> {{'CHANNELS.PACKS.MAIN_SESSION' | translate}} </h3>
+                    <div class="main-session-details" fxLayout="row" fxLayoutGap="24" fxLayoutAlign="space-between center">
+                        <div class="info-block" fxLayout="column">
+                            <span class="info-block-title"> {{'CHANNELS.PACKS.EVENT' | translate}}</span>
+                            @if(mainSession.type !== 'EVENT'){
+                                <span class="info-block-content">{{mainSession.session_data?.event?.name}}</span>
+                            } @else if(mainSession.type === 'EVENT'){
+                                <span class="info-block-content">{{mainSession.name}}</span>
+                            }
+                        </div>
+                        <div class="info-block" fxLayout="column">
+                            <span class="info-block-title"> {{'CHANNELS.PACKS.SESSION_TITLE' | translate}}</span>
+                            @if(mainSession.type !== 'EVENT'){
+                                <span class="info-block-content">{{mainSession.name}}</span>
+                            }@else if(mainSession.type === 'EVENT'){
+                                <span class="info-block-content">{{'CHANEL.PACK.ALL_SESSIONS' | translate}}</span>
+                            }
+                        </div>
+                       @if(mainSession.type !== 'EVENT'){
+                            <div class="info-block" fxLayout="column">
+                                <span class="info-block-title"> {{'CHANNELS.PACKS.DATE' | translate}}</span>
+                                <span class="info-block-content">
+                                    {{mainSession.session_data.dates.start | dateTime : dateTimeFormats.longDateTime}}
+                                </span>
+                            </div>
+                        }
+                        <div class="info-block" fxLayout="column">
+                            <span class="info-block-title"> {{'CHANNELS.PACKS.VENUE' | translate}}</span>
+                            @if(mainSession.type !== 'EVENT'){
+                                <span class="info-block-content">{{mainSession.session_data.venue_template.venue.name}}</span>
+                            } @else if(mainSession.type === 'EVENT'){
+                                <span class="info-block-content">{{mainSession.event_data.venue_template.venue.name}}</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+            <div>
+                <h3 class="mat-subtitle-2" fxLayoutAlign="start center">
+                    {{pack.type ==='AUTOMATIC' ? ('CHANNELS.PACKS.SECONDARY_ELEMENTS.TITLE' | translate) :
+                    'CHANNELS.PACKS.ELEMENTS.TITLE' | translate}}
+                </h3>
+                <p class="section-description"> {{ 'CHANNELS.PACKS.ELEMENTS.DESCRIPTION' | translate }} </p>
+                @if (!packItems.length && !!!(loading$ | async)) {
+                    <app-empty-state-tiny
+                        [title]="pack.type === 'AUTOMATIC' ?
+                            ('CHANNELS.PACKS.ELEMENTS.NO_SECONDARY_ELEMENTS_TITLE' | translate) :
+                            ('CHANNELS.PACKS.ELEMENTS.NO_ELEMENTS_TITLE' | translate)"
+                        [description]="'CHANNELS.PACKS.ELEMENTS.NO_ELEMENTS_DESCRIPTION' | translate"
+                        [emptyBorder]="true" (click)="openAddPackElementDialog()">
+                        <button mat-stroked-button type="button" class="ob-button medium"
+                            color="primary">
+                            <mat-icon>add</mat-icon>
+                            {{'CHANNELS.PACKS.ELEMENTS.ADD_ELEMENT' | translate}}
+                        </button>
+                    </app-empty-state-tiny>
+                } @else {
+                    <div class="section-box-card" fxLayout="column">
+                        <div fxFlex="60px" fxLayoutAlign="end center">
+                            <button mat-stroked-button color="primary" class="ob-button medium add-button"
+                                [attr.aria-label]="'CHANNELS.PACKS.ELEMENTS.ADD_ELEMENT' | translate"
+                                (click)="openAddPackElementDialog()">
+                                <mat-icon>add</mat-icon>
+                                {{'CHANNELS.PACKS.ELEMENTS.ADD_ELEMENT' | translate}}
+                            </button>
+                        </div>
+                        <mat-accordion [multi]="true" [togglePosition]="'before'" fxLayout="column" displayMode="flat">
+                            @for (item of packItems; track $index) {
+                                <div fxLayout="row" fxLayoutAlign="space-between baseline" fxLayoutGap="16">
+                                    <span class="ob-round-badge" fxFlex="0 1 auto">
+                                        {{$index + 1}}
+                                    </span>
+                                    <mat-expansion-panel #panel class="ob-expansion-card" fxFlex="0 1 100%">
+                                        <mat-expansion-panel-header collapsedHeight="*">
+                                            <mat-panel-title fxLayout="column" fxLayoutAlign="center start">
+                                                <span>{{item.name}}</span>
+                                                <span class="panel-subtitle">{{item.session_data?.event.name}}</span>
+                                            </mat-panel-title>
+                                            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                                                <span class="pack-item-type">{{item.type}}</span>
+                                                <mat-divider class="header-divider" vertical="true"></mat-divider>
+                                                <button mat-icon-button color="tertiary" class="ob-button small"
+                                                    (click)="delete(item)">
+                                                    <mat-icon>delete</mat-icon>
+                                                </button>
+                                            </div>
+                                        </mat-expansion-panel-header>
+                                        @if(item.type === 'SESSION'){
+                                            <app-session-detail [session]="item"
+                                                [channelId]="$channel().id" [packId]="$pack().id"></app-session-detail>
+                                        } @else if (item.type === 'PRODUCT') {
+                                            <app-product-detail [product]="item" [entityId]="$channel().entity.id"
+                                                [channelId]="$channel().id" [packId]="$pack().id" [packType]="pack.type">
+                                            </app-product-detail>
+                                        }
+                                    </mat-expansion-panel>
+                                </div>
+                            }
+                        </mat-accordion>
+                    </div>
+                }
+            </div>
+        }
+    </app-form-container>
+}
+
+@if(loading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner></mat-spinner>
+    </div>
+}

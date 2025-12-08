@@ -1,0 +1,56 @@
+import { StateProperty } from '@OneboxTM/utils-state';
+import { FormsField } from '@admin-clients/cpanel/common/utils';
+import { DomainSettings } from '@admin-clients/cpanel/shared/data-access';
+import { EntitiesBaseState, EntityCategory } from '@admin-clients/shared/common/data-access';
+import { IdName } from '@admin-clients/shared/data-access/models';
+import { Injectable } from '@angular/core';
+import { DonationCampaign } from '../models/donation-campaign.model';
+import { EntityBankAccount } from '../models/entity-bank-accounts.model';
+import { EntityCategoryMappingField } from '../models/entity-category-mapping.model';
+import { EntityCommunicationElementImage } from '../models/entity-communication-element-image';
+import { EntityCommunicationElementText } from '../models/entity-communication-element-text';
+import { EntityContent } from '../models/entity-content.model';
+import { EntityCookiesSettings } from '../models/entity-cookies-settings.model';
+import { CustomerForms } from '../models/entity-customer-forms.model';
+import { EntityCustomerTypeRestrictions } from '../models/entity-customer-type-restriction.model';
+import { EntityLoyaltyPoints } from '../models/entity-loyalty-points.model';
+import { EntitySecuritySettings } from '../models/entity-security-settings.model';
+import { EntityTextContent } from '../models/entity-text-content.model';
+import { OriginEntityVisibility } from '../models/entity-visibility.model';
+import { EntityWhatsappTemplate } from '../models/entity-whatsapp-template.model';
+import { ZoneTemplateContent } from '../models/entity-zone-template-content.model';
+import { EntityZoneTemplate } from '../models/entity-zone-template.model';
+import { GetEntityZoneTemplatesResponse } from '../models/get-entity-zone-templates-response.model';
+
+@Injectable()
+export class EntitiesState extends EntitiesBaseState {
+    readonly entityTextContents = new StateProperty<EntityTextContent[]>();
+    readonly entityCategory = new StateProperty<EntityCategory>();
+    readonly entityCategoriesMapping = new StateProperty<EntityCategoryMappingField[]>();
+    readonly entityCookies = new StateProperty<EntityCookiesSettings>();
+    readonly entitySecurity = new StateProperty<EntitySecuritySettings>();
+    readonly entityLoyaltyProgram = new StateProperty<EntityLoyaltyPoints>();
+    readonly resetEntityLoyaltyPoints = new StateProperty<void>();
+    readonly authVendors = new StateProperty<{ id: string }[]>();
+    readonly authVendor = new StateProperty<{ id: string; properties?: { [key: string]: string } }>();
+    readonly barcodeFormats = new StateProperty<{ id: string }[]>();
+    readonly entityVisibility = new StateProperty<OriginEntityVisibility>();
+    readonly donationsProviders = new StateProperty<IdName[]>();
+    readonly donationsCampaigns = new StateProperty<DonationCampaign[]>();
+    readonly whatsappTemplates = new StateProperty<EntityWhatsappTemplate[]>();
+    readonly customerAdminForm = new StateProperty<CustomerForms>();
+    readonly customerUserForm = new StateProperty<CustomerForms>();
+    readonly customerProfileForm = new StateProperty<FormsField[][]>();
+    readonly customerSignInForm = new StateProperty<FormsField[][]>();
+    readonly payoutForm = new StateProperty<FormsField[][]>();
+    readonly entityCustomTypesRestrictions = new StateProperty<EntityCustomerTypeRestrictions>();
+    readonly entityContents = new StateProperty<EntityContent[]>();
+    readonly entityCommunicationElementImages = new StateProperty<EntityCommunicationElementImage[]>();
+    readonly entityCommunicationElementTexts = new StateProperty<EntityCommunicationElementText[]>();
+    readonly entityBankAccountList = new StateProperty<EntityBankAccount[]>();
+    readonly entityBankAccount = new StateProperty<EntityBankAccount>();
+    readonly zoneTemplates = new StateProperty<GetEntityZoneTemplatesResponse>();
+    readonly zoneTemplate = new StateProperty<EntityZoneTemplate>();
+    readonly customerDomainSettings = new StateProperty<DomainSettings>();
+    readonly zoneTemplateContents = new StateProperty<ZoneTemplateContent[]>();
+}

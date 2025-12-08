@@ -1,0 +1,96 @@
+<div class="details-container" fxFlex="100%" fxLayout="column" *ngIf="terminal$ | async as terminal">
+    <div class="heading-container only-title" fxLayout="row wrap" fxLayoutAlign="start center">
+        <app-go-back defaultPath="/terminals"></app-go-back>
+        <h1 class="secondary mat-headline-3">
+            {{terminal.name}}
+        </h1>
+    </div>
+    <div class="main-content" fxFlex="0 1 100%" fxLayout="column">
+        <app-form-container layout="main" class="overflow-y-auto" [formGroup]="form" [disabled]="form.pristine"
+            (save)="save()" (cancel)="cancel()">
+            <div fxLayout="column" fxLayoutAlign="start stretch" slot="outside">
+                <div fxLayout="row" fxLayoutAlign="center center">
+                    <div fxFlex="0 1 1280px" fxLayoutAlign="end center">
+                        <span>{{'FORMS.LABELS.STATUS' | translate}}</span>
+                        <mat-form-field fxFlex="0 0 150px" appearance="outline" class="ob-form-field inline-field terminal-status-select">
+                            <mat-select formControlName="licenseEnabled">
+                                <mat-select-trigger>
+                                    <ng-container *ngIf="form.controls.licenseEnabled.value else inactive">
+                                        <span class="status-dot active"></span>
+                                        {{'FORMS.LABELS.ACTIVE'| translate}}
+                                    </ng-container>
+                                    <ng-template #inactive>
+                                        <span class="status-dot inactive"></span>
+                                        {{'FORMS.LABELS.INACTIVE'| translate}}
+                                    </ng-template>
+                                </mat-select-trigger>
+                                <mat-option [value]="true">
+                                    <span class="status-dot active"></span>
+                                    {{'FORMS.LABELS.ACTIVE' | translate}}
+                                </mat-option>
+                                <mat-option [value]="false">
+                                    <span class="status-dot inactive"></span>
+                                    {{'FORMS.LABELS.INACTIVE' | translate}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <mat-divider></mat-divider>
+            </div>
+            <div fxLayout="row">
+                <mat-form-field fxFlex="320px" appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'FORMS.LABELS.ENTITY' | translate}}</mat-label>
+                    <app-select-server-search formControlName="entity" [placeholder]="'FORMS.ACTIONS.SELECT' | translate"
+                        [options$]="entities$" [moreOptionsAvailable$]="moreEntitiesAvailable$" (loadOptions)="loadEntities($event)">
+                    </app-select-server-search>
+                    <mat-error [ob-form-errors]="form" field="entity"></mat-error>
+                </mat-form-field>
+            </div>
+            <mat-divider class="ob-divider"></mat-divider>
+            <div fxLayout="row">
+                <div fxFlex="320px" fxLayout="column">
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                        <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                        <input matInput formControlName="name">
+                        <mat-error [ob-form-errors]="form" field="name"></mat-error>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label mat-form-field-outline-hidden">
+                        <mat-label>{{'TERMINALS.FORMS.LABELS.TERMINAL_ID' | translate}}</mat-label>
+                        <input matInput fxHide>
+                        <div fxLayout="row" fxLayoutAlign="start center" class="field-value">
+                            <span>{{terminal.code}}</span>
+                            <app-copy-text matSuffix [copyText]="terminal.code"></app-copy-text>
+                        </div>
+                    </mat-form-field>
+                </div>
+            </div>
+            <mat-divider class="ob-divider"></mat-divider>
+            <div fxLayout="row">
+                <div fxFlex="320px" fxLayout="column">
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label mat-form-field-outline-hidden">
+                        <mat-label>{{'TERMINALS.FORMS.LABELS.LICENSE_CODE' | translate}}</mat-label>
+                        <input matInput fxHide>
+                        <div fxLayout="row" fxLayoutAlign="start center" class="field-value">
+                            <span>{{terminal.license.code}}</span>
+                            <app-copy-text matSuffix [copyText]="terminal.license.code"></app-copy-text>
+                        </div>
+                        <a class="ob-link" [class.disabled]="form.dirty" (click)="regenerateLicense()">
+                            {{'TERMINALS.ACTIONS.REGENERATE_CODE' | translate}}
+                        </a>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label mat-form-field-outline-hidden">
+                        <mat-label>{{'TERMINALS.FORMS.LABELS.ACTIVATION_DATE' | translate}}</mat-label>
+                        <input matInput fxHide>
+                        <div class="field-value">
+                            <span>{{terminal.license.activation_date | dateTime : shortDateTimeFormat}}</span>
+                        </div>
+                    </mat-form-field>
+                </div>
+            </div>
+        </app-form-container>
+    </div>
+    <div class="spinner-container" *ngIf="inProgress$ | async">
+        <mat-spinner></mat-spinner>
+    </div>
+</div>

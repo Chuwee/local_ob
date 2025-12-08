@@ -1,0 +1,60 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" class="no-top-padding"
+    [disabled]="!form.dirty || (isLoadingOrSaving$ | async)">
+    <app-language-bar slot="outside" [languages]="languageList$ | async" [selected]="selectedLanguage$ | async"
+        [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)"></app-language-bar>
+    <div class="actions-bar" *ngIf="showLinks && (links$ | async) as links" fxLayout="row" fxLayoutAlign="start center">
+        <div fxLayout="row" fxLayoutAlign="start center">
+            <span class="copy-label">{{'SALE_REQUEST.COMMUNICATION.CHANNEL.EVENT_LINK_LABEL' | translate}}</span>
+            <span class="copy-link">{{links.event_link}}</span>
+            <app-copy-text [copyText]="links.event_link" [copyOk]="'SALE_REQUEST.COMMUNICATION.CHANNEL.LINK_COPY_OK' | translate"
+                [copyKo]="'SALE_REQUEST.COMMUNICATION.CHANNEL.LINK_COPY_KO' | translate"
+                [copyTooltip]="'SALE_REQUEST.COMMUNICATION.CHANNEL.COPY_LINK' | translate">
+            </app-copy-text>
+        </div>
+        <div class="go-link">
+            <a mat-button aria-label="Go to link" class="ob-button medium" target="_blank" href="{{links.event_link}}">
+                <span>{{'SALE_REQUEST.COMMUNICATION.CHANNEL.GO_TO_LINK' | translate}}</span>
+                <mat-icon iconPositionEnd>launch</mat-icon>
+            </a>
+        </div>
+    </div>
+    <div fxFlex="0 1 100%" fxLayout="column">
+        <mat-accordion multi togglePosition="before">
+            <app-sale-request-sessions-link-list *ngIf="showLinks && (links$ | async) as links"
+                [saleRequestId]="saleRequest.id" [language]="links.language"></app-sale-request-sessions-link-list>
+
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{'SALE_REQUEST.COMMUNICATION.CHANNEL.EVENT_CONTENT' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-sale-request-event-channel-contents *ngIf="!isSeasonTicket" [language$]="selectedLanguage$">
+                </app-sale-request-event-channel-contents>
+                <app-sale-request-season-ticket-channel-contents *ngIf="isSeasonTicket" [language$]="selectedLanguage$">
+                </app-sale-request-season-ticket-channel-contents>
+            </mat-expansion-panel>
+
+            <mat-expansion-panel [expanded]="true" *ngIf="showPurchaseContent">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{'SALE_REQUEST.COMMUNICATION.CHANNEL.PURCHASE_CONTENT' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-sale-request-purchase-contents [form]="form" [language$]="selectedLanguage$"></app-sale-request-purchase-contents>
+            </mat-expansion-panel>
+
+            <mat-expansion-panel [expanded]="true" *ngIf="showPurchaseContent">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{'SALE_REQUEST.COMMUNICATION.CHANNEL.ADDITIONAL_BANNER' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-sale-request-additional-banner [form]="form" [language$]="selectedLanguage$"></app-sale-request-additional-banner>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+</app-form-container>
+<div class="spinner-container" *ngIf="isLoadingOrSaving$ | async">
+    <mat-spinner></mat-spinner>
+</div>

@@ -1,0 +1,26 @@
+<app-searchable-paginated-selection
+    [placeholder]="'FORMS.SEARCH.EVENT' | translate"
+    [hideSearch]="false"
+    [data$]="eventsData$"
+    [metadata$]="eventsMetadata$"
+    [loading$]="eventsLoading$"
+    [pageSize]="pageSize"
+    [form]="eventsCtrl"
+    (loadData)="loadEvents($event)"
+    (selected)="selectedEvents($event)">
+    <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data" let-selectionChanged="selectionChanged">
+        <app-selection-list class="small-rows"
+            [data]="data"
+            [disabledOptionPredicate]="$shouldDisableEvent()"
+            [selectionChanged]="selectionChanged"
+            [pageForm]="pageForm"
+            [disabledTooltip]="'CHANNELS.REVIEWS.SESSIONS.ITEM_DISABLED_TOOLTIP' | translate">
+            <div slot="subheader" class="list-header">
+                <span class="list-header-label">{{'FORMS.LABELS.EVENTS' | translate}}</span>
+            </div>
+            <ng-template #optionTemplate let-row>
+                <span>{{row.event.name}}</span>
+            </ng-template>
+        </app-selection-list>
+    </ng-template>
+</app-searchable-paginated-selection>

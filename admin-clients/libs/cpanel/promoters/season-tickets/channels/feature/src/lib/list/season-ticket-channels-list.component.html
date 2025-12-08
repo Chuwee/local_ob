@@ -1,0 +1,78 @@
+<div class="flex left-bar-container">
+    <div class="flex flex-1 flex-col justify-between left-bar">
+        <div class="flex flex-col left-sidebar-title">
+            <div class="flex items-center">
+                <h2 class="title">{{'SEASON_TICKET.CHANNELS' | translate}}</h2>
+                <button mat-icon-button aria-label="New channel" type="button"
+                    class="ob-button mat-stroked-button xsmall"
+                    [disabled]="(isLoading$ | async) || (isGenerationStatusReady$ | async) === false" (click)="openNewChannelDialog()">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+            <div class="flex-1">
+                <p class="results-count" [innerHTML]="('RESULTS.TOTAL' | translate) + ': ' + (totalChannels$ | async)"></p>
+            </div>
+        </div>
+        <div class="flex flex-shrink-0 justify-end items-center basis-9 left-sidebar-header">
+            <button mat-icon-button aria-label="Delete channel" class="ob-button small"
+                (click)="openDeleteChannelDialog(selectedSeasonTicketChannel)"
+                [disabled]="(isLoading$ | async) || (isGenerationStatusReady$ | async) === false || (totalChannels$ | async) === 0">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </div>
+        <div class="flex flex-1 flex-col list-container">
+            <mat-selection-list class="ob-lateral-select-list" appLastPathGuardListener
+                [currValue]="(seasonTicketChannel$ | async)?.channel.name" [multiple]="false">
+                @for (item of (channelList$ | async); track item) {
+                    <mat-list-option class="with-badge"
+                        [selected]="item.channel.id === (seasonTicketChannel$ | async)?.channel.id"
+                        [value]="item.channel.name" (click)="selectionChangeHandler(item)"
+                        [id]="'channel-list-option-' + item.channel.id">
+                        <div class="flex justify-between items-center gap-1">
+                            <div class="flex flex-col channel-main-info">
+                                <span class="list-item-title ellipsify-no-wrap" appEllipsify [matTooltip]="item.channel.name">
+                                    {{item.channel.name}}
+                                </span>
+                                <span class="list-item-subtitle" appEllipsify [matTooltip]="item.channel.entity.name">
+                                    {{item.channel.entity.name}}
+                                </span>
+                            </div>
+                            <div class="flex flex-1 justify-end items-center">
+                                <div class="flex flex-col gap-1 channel-date-info"
+                                    [matTooltipShowDelay]="500" [matTooltip]="'EVENTS.CHANNEL.SESSION_DATES' | translate">
+                                    <span class="list-item-subtitle">
+                                        {{item.settings.release.date | localDateTime : dateTimeFormats.shortDate}}
+                                    </span>
+                                    <span class="list-item-subtitle">
+                                        {{item.settings.sale.start_date | localDateTime : dateTimeFormats.shortDate}}
+                                    </span>
+                                </div>
+                                <div class="flex flex-col badge-container">
+                                    <span class="ob-status-badge small-badge"
+                                        [class]="getReleaseStatusIndicator(item.status.request, item.status.release)"
+                                        [matTooltipShowDelay]="500"
+                                        [matTooltip]="'EVENTS.CHANNEL.RELEASE_STATUS.' + item.status.release | translate">
+                                        {{('EVENTS.CHANNEL.RELEASE_STATE' | translate).substring(0,1)}}
+                                    </span>
+                                    <span class="ob-status-badge small-badge"
+                                        [class]="getSaleStatusIndicator(item.status.request, item.status.sale)"
+                                        [matTooltipShowDelay]="500"
+                                        [matTooltip]="'EVENTS.CHANNEL.SALE_STATUS.' + item.status.sale | translate">
+                                        {{('EVENTS.CHANNEL.SALE_STATE' | translate).substring(0,1)}}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </mat-list-option>
+                }
+            </mat-selection-list>
+        </div>
+    </div>
+    @if ((isLoading$ | async)) {
+        <div class="flex justify-center items-center loading-state-container">
+            <div class="flex flex-col justify-center items-center loading-state-background">
+                <mat-spinner />
+            </div>
+        </div>
+    }
+</div>

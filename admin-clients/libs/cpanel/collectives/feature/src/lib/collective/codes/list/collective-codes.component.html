@@ -1,0 +1,153 @@
+<div class="list-container detail" fxFlex="0 1 100%" fxLayout="column" *ngIf="collective$ | async as collective">
+    <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start flex-end">
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+            <div class="filter-container" fxFlex="none">
+                <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                    [attr.aria-label]="'COLLECTIVE.CODES.NEW_COLLECTIVE' | translate"
+                    [matTooltip]="'COLLECTIVE.CODES.NEW_COLLECTIVE' | translate" (click)="newCollectiveCode(collective.validation_method)">
+                    <mat-icon>add</mat-icon>
+                    {{'COLLECTIVE.CODES.NEW_COLLECTIVE' | translate}}
+                </button>
+            </div>
+            <div class="filter-container" fxFlex="none">
+                <button mat-stroked-button color="tertiary" class="ob-button medium only-icon" [matMenuTriggerFor]="vouchersListMenu">
+                    <mat-icon>more_horiz</mat-icon>
+                </button>
+                <mat-menu #vouchersListMenu="matMenu">
+                    <button mat-menu-item (click)="importCollectives(collective.validation_method)">
+                        {{'COLLECTIVE.CODES.UPLOAD_CSV_BTN' | translate}}
+                    </button>
+                    <button mat-menu-item [disabled]="(totalCodes$ | async) === 0"
+                        (click)="exportCollectives(collective.validation_method)">
+                        {{'COLLECTIVE.CODES.EXPORT_BTN' | translate}}
+                    </button>
+                </mat-menu>
+            </div>
+        </div>
+    </div>
+    <div class="collective-codes-container">
+        <app-searchable-paginated-selection #selection [placeholder]="'FORMS.SEARCH.CODES' | translate"
+            (loadData)="loadCollectiveCodes($event)" [form]="selected" [pageSize]="pageSize" [data$]="collectiveCodesList$"
+            [metadata$]="metadata$" [loading$]="reqInProgress$">
+
+            <div slot="filter" class="badge-container" [class.empty]="(totalCodes$ | async) === 0">
+                {{((allSelected$ | async) ? (totalCodes$ | async) : selectedCodes)}} / {{totalCodes$ | async}}
+            </div>
+            <button slot="filter" type="button" mat-flat-button class="show-selected-only-button ob-button" color="tertiary"
+                [class.active]="!!(selectedOnly$ | async)" [disabled]="selectedCodes === 0 || (allSelected$ | async)"
+                [matTooltip]="'COLLECTIVE.CODES.SHOW_SELECTED_TOOLTIP' | translate" (click)="clickShowSelected()">
+                <mat-icon>visibility</mat-icon>
+                {{'COLLECTIVE.CODES.SHOW_SELECTED' | translate}}
+            </button>
+            <button slot="filter" type="button" mat-stroked-button class="show-selected-only-button ob-button" color="tertiary"
+                [matTooltip]="'COLLECTIVE.CODES.EDIT_TOOLTIP' | translate"
+                [disabled]="selectedCodes === 0 && (allSelected$ | async) === false" (click)="editMultipleCollectiveCodes()">
+                <mat-icon>edit</mat-icon>
+                {{'COLLECTIVE.CODES.EDIT' | translate}}
+            </button>
+            <button slot="filter" type="button" mat-stroked-button class="show-selected-only-button ob-button" color="tertiary"
+                [matTooltip]="'COLLECTIVE.CODES.DELETE_TOOLTIP' | translate"
+                [disabled]="selectedCodes === 0 && (allSelected$ | async) === false" (click)="deleteMultipleCollectiveCodes()">
+                <mat-icon>delete</mat-icon>
+                {{'COLLECTIVE.CODES.DELETE' | translate}}
+            </button>
+            <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data" let-selectionChanged="selectionChanged">
+                <app-selection-table [data]="data" [columns]="columns" [pageForm]="pageForm" [selectionChanged]="selectionChanged"
+                    [selectionDisabled]="(allSelected$ | async)" [class.some-selected]="selectedCodes > 0 || (allSelected$ | async)">
+                    <ng-template #selectAllTemplate>
+                        <mat-checkbox #allSelected color="primary" [disabled]="(selectedOnly$ | async) || (totalCodes$ | async) === 0"
+                            [checked]="selectedCodes === (totalCodes$ | async) || (selectedOnly$ | async) || (allSelected$ | async)"
+                            [indeterminate]="selectedCodes > 0 && selectedCodes < (totalCodes$ | async) && !allSelected.checked"
+                            (change)="allSelectedClick.emit(allSelected.checked)">
+                        </mat-checkbox>
+                    </ng-template>
+                    <ng-container matColumnDef="code">
+                        <mat-header-cell *matHeaderCellDef class="head-cell code">
+                            <ng-container
+                                *ngIf="(collective | isUserPassCollective) || (collective | isUserCollective) else codeCollective">
+                                {{'COLLECTIVE.CODES.USER' | translate}}
+                            </ng-container>
+                            <ng-template #codeCollective>
+                                {{'COLLECTIVE.CODES.CODE' | translate}}
+                            </ng-template>
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="code">
+                            {{ row.code }}
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container *ngIf="collective | isUserPassCollective" matColumnDef="key">
+                        <mat-header-cell *matHeaderCellDef class="head-cell key">
+                            {{ 'COLLECTIVE.CODES.KEY' | translate }}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="key">
+                            {{ row.key }}
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="usage_limit">
+                        <mat-header-cell *matHeaderCellDef class="head-cell limit right">
+                            {{ 'COLLECTIVE.CODES.USAGE_LIMIT' | translate }}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="limit right">
+                            {{ row.usage?.limit }}
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="validity_from">
+                        <mat-header-cell *matHeaderCellDef class="head-cell from">
+                            {{ 'COLLECTIVE.CODES.VALIDITY_FROM' | translate }}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="from">
+                            {{ row.validity_period?.from | dateTime : dateTimeFormats.shortDate }}
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="validity_to">
+                        <mat-header-cell *matHeaderCellDef class="head-cell to">
+                            {{ 'COLLECTIVE.CODES.VALIDITY_TO' | translate }}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="to">
+                            {{ row.validity_period?.to | dateTime : dateTimeFormats.shortDate }}
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="usage_current">
+                        <mat-header-cell *matHeaderCellDef class="head-cell current right">
+                            {{ 'COLLECTIVE.CODES.USAGE_CURRENT' | translate }}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" class="current right">
+                            {{ row.usage?.current }}
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="actions">
+                        <mat-header-cell *matHeaderCellDef class="two-actions-cell head-cell"
+                            [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true"></mat-header-cell>
+                        <mat-cell *matCellDef="let row; index as i" class="two-actions-cell"
+                            [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                            <div class="action-buttons" (click)="$event.stopPropagation()">
+                                <button mat-icon-button matTooltip="{{'COLLECTIVE.CODES.EDIT_TOOLTIP' | translate}}"
+                                    aria-label="Edit collective code" class="ob-button medium" (click)="editCollectiveCode(row)">
+                                    <mat-icon>edit</mat-icon>
+                                </button>
+                                <button matTooltip="{{'COLLECTIVE.CODES.DELETE_TOOLTIP' | translate}}" mat-icon-button
+                                    aria-label="Delete collective code" class="ob-button medium"
+                                    (click)="deleteCollectiveCode(row)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </div>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-template #noResultsTemplate>
+                        <div class="context-message-container">
+                            <div fxFlex="100%" fxLayout="row" fxLayoutAlign="center">
+                                <div fxFlex="100%" fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="15px">
+                                    <p class="title">{{'COLLECTIVE.CODES.EMPTY_LIST_MESSAGE' | translate}}</p>
+                                    <p class="body">{{'COLLECTIVE.CODES.CREATE_MESSAGE' | translate}}</p>
+                                    <button mat-stroked-button class="ob-button" (click)="newCollectiveCode(collective.validation_method)">
+                                        {{'COLLECTIVE.CODES.NEW_COLLECTIVE' | translate}}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </app-selection-table>
+            </ng-template>
+        </app-searchable-paginated-selection>
+    </div>
+</div>

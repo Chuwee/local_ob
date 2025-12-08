@@ -1,0 +1,22 @@
+<div fxFlex="100%" fxLayout="column" fxLayoutAlign="flex-start stretch" fxLayoutGap="10px">
+    <app-file-status (cancelFile)="cancelFileHandler()" [state]="fileStatusState$ | async" [disabled]="isDisabled$ | async"
+        [size]="fileSize$ | async" [name]="fileName$ | async" />
+    <div fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="center center">
+        <div [matTooltip]="'CSV.IMPORT.SELECTION_LIMIT' | translate"
+             [matTooltipDisabled]="(isButtonDisabled$ | async) === false">
+            <button mat-stroked-button color="primary" type="button" class="ob-button medium file-button"
+                appUploadFile accept=".csv" [disabled]="(isButtonDisabled$ | async) || (isDisabled$ | async)"
+                [attr.aria-label]="'CSV.IMPORT.SELECT_BTN' | translate"
+                (fileChange)="fileInputHandler($event)" (click)="clickHandler()">
+                <span>
+                    {{'CSV.IMPORT.SELECT_BTN' | translate}}
+                </span>
+            </button>
+        </div>
+        <span class="field-format" fxLayout="column">
+            <span>{{fileSelectedText$ | async}}</span>
+            <span>{{'CSV.IMPORT.FORMAT_INFO' | translate }}</span>
+        </span>
+    </div>
+</div>
+

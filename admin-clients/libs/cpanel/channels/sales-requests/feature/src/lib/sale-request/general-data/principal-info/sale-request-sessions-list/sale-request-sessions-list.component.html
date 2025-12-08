@@ -1,0 +1,54 @@
+<div fxLayout="column">
+    <div class="session-paginator list-container" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="10px">
+        <p *ngIf="salesRequestsSessionsMetadata$ | async as salesRequestsSessionsMetadata" class="page-summary"
+            [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: salesRequestsSessionsMetadata">
+        </p>
+        <mat-paginator *ngIf="salesRequestsSessionsMetadata$ | async" [pageSize]="sessionsPageSize" hidePageSize
+            (page)="loadSessionsData($event)"
+            [length]="(salesRequestsSessionsMetadata$ | async)?.total"></mat-paginator>
+    </div>
+    <div class="spinner-container" *ngIf="saleRequestSessionsLoading$ | async">
+        <mat-spinner></mat-spinner>
+    </div>
+    <mat-table class="ob-table not-touchable" [dataSource]="(saleRequestSessions$ | async)"
+        [attr.aria-label]="'SALE_REQUEST.SESSIONS' | translate">
+        <ng-container matColumnDef="start_date">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'SALE_REQUEST.SESSIONS_START_DATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.date.start | dateTime : dateTimeFormats.shortDateTime}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'SALE_REQUEST.SESSIONS_NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.name}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'SALE_REQUEST.SESSIONS_TYPE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{('EVENTS.SESSION.TYPE_OPTS.' + row.type) | translate}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'SALE_REQUEST.SESSIONS_STATUS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{('EVENTS.SESSION.STATUS_OPTS.' + row.status) | translate}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="publication_date">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'SALE_REQUEST.SESSIONS_PUBLICATION_DATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.date.publication | dateTime : dateTimeFormats.shortDateTime}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="sales_start">
+            <mat-header-cell *matHeaderCellDef class="head-cell ellipsis">{{'SALE_REQUEST.SESSIONS_SALES_START_DATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.date.sales_start | dateTime : dateTimeFormats.shortDateTime}}
+            </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+</div>

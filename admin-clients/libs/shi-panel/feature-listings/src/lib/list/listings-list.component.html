@@ -1,0 +1,173 @@
+<div class="list-container" fxFlex="0 1 100%" fxLayout="column">
+    <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">
+                {{'TITLES.LISTINGS.LISTINGS_LIST_TITLE' | translate}}
+            </h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+            <div class="filter-container" fxFlex="none">
+                <button mat-icon-button class="ob-button medium" aria-label="refresh" (click)="refresh()">
+                    <mat-icon>autorenew</mat-icon>
+                </button>
+                <button mat-stroked-button color="tertiary" class="ob-button medium only-icon" [matMenuTriggerFor]="ordersListMenu">
+                    <mat-icon>more_horiz</mat-icon>
+                </button>
+                <mat-menu #ordersListMenu="matMenu">
+                    <button mat-menu-item
+                        [disabled]="isExportLoading$ | async"
+                        (click)="openExportListingslistDialog()">
+                        {{'LISTINGS.ACTIONS.OPEN_EXPORT_DIALOG' | translate}}
+                    </button>
+                    <button *ngIf="hasWritePermissions$ | async" mat-menu-item (click)="openBulkBlacklistManagementDialog()">
+                        {{'LISTINGS.ACTIONS.OPEN_MANAGE_BLACKLIST_DIALOG' | translate}}
+                    </button>
+                </mat-menu>
+            </div>
+        </div>
+    </div>
+    <div class="heading-container" fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxFlex="80%" fxLayoutGap="20px" fxLayoutAlign="start center">
+            <div class="filter-container" fxFlex="none">
+                <app-popover-date-range-picker-filter [matTooltip]="'LISTINGS.LAST_UPDATE' | translate" />
+            </div>
+            <div class="filter-container" fxFlex="none" data-test="filterBtn">
+                <app-popover appFilter>
+                    <app-listings-list-filter #filterContent />
+                </app-popover>
+            </div>
+            <div class="search-field" fxFlex="100%">
+                <app-search-input [placeholder]="'FORMS.SEARCH.LISTINGS_LIST' | translate" />
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            <p *ngIf="listingsMetadata$ | async as listingsMetadata" class="page-summary"
+                [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: listingsMetadata">
+            </p>
+            <app-paginator [length]="(listingsMetadata$ | async)?.total" [pageSize]="listingsPageSize" />
+        </div>
+    </div>
+    <div class="heading-container">
+        <app-chips appFilter />
+    </div>
+    <div class="heading-container heading-aggregated">
+        <app-aggregated-data [aggregatedData]="listingsAggregatedData$ | async" [aggregationMetrics]="aggDataListings" />
+    </div>
+    <div class="spinner-container" *ngIf="loadingData$ | async">
+        <mat-spinner />
+    </div>
+    <mat-table class="ob-table" [dataSource]="listings$ | async" matSort [matSortActive]="initSortCol" [matSortDirection]="initSortDir"
+        matSortDisableClear [attr.aria-label]="'TITLES.LISTINGS.LISTINGS_LIST_TITLE' | translate"
+        [class.not-touchable]="(isHandsetOrTablet$ | async) !== true">
+        <ng-container matColumnDef="listing_id">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'LISTINGS.LISTING_ID' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="badge-container">
+                <span [ngClass]="{'badge' : row.id}" appEllipsify [matTooltip]="row.id" matTooltipClass="ob-tooltip-nowrap">
+                    {{row.id ?? '-'}}
+                </span>
+                <app-copy-text *ngIf="row.id" [copyText]="row.id" class="copy-button" />
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="last_update">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'LISTINGS.LAST_UPDATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                {{row.last_update | dateTime : dateTimeFormats.shortDateTime}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="created">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'LISTINGS.CREATED' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                {{row.created | dateTime : dateTimeFormats.shortDateTime}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="event_id">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'LISTINGS.EVENT_ID' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef=" let row">
+                <span class="ob-link" appEllipsify [matTooltip]="row.event_id" matTooltipClass="ob-tooltip-nowrap"
+                    (click)="searchMapping(row.event_id)">
+                    {{row.event_id}}
+                </span>
+                <app-copy-text *ngIf="row.event_id" [copyText]="row.event_id" class="copy-button" />
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell status-cell">{{'LISTINGS.STATUS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="badge-container status-cell">
+                <span class="badge"
+                    [ngClass]="{
+                        'imported': row.status === listingStatus.imported,
+                        'imported_with_error' : row.status === listingStatus.importedWithError,
+                        'deleted' : row.status === listingStatus.deleted
+                    }" [appHoverOverlay]="content" [overlayDisabled]="row.status !== listingStatus.importedWithError">
+                    <mat-icon *ngIf="row.status === listingStatus.importedWithError">
+                        error_outline
+                    </mat-icon>
+                    {{'LISTINGS.STATUS_OPTS.' + row.status | translate}}
+                </span>
+                <ng-template #content>
+                    <app-error-card [row]="row"
+                        [unknownErrorDefault]="'LISTINGS.LISTINGS_LIST.UNKNOWN_ERROR_DEFAULT_MESSAGE' | translate" />
+                </ng-template>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="quantity">
+            <mat-header-cell *matHeaderCellDef class="head-cell small-cell with-divider">{{'LISTINGS.QUANTITY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="small-cell with-divider">{{row.quantity}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="supplier">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'LISTINGS.SUPPLIER' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                {{row.supplier}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="supplier_id">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'LISTINGS.SUPPLIER_ID' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span appEllipsify [matTooltip]="row.supplier_id" matTooltipClass="ob-tooltip-nowrap">
+                    {{row.supplier_id}}
+                </span>
+                <app-copy-text *ngIf="row.supplier_id" [copyText]="row.supplier_id" class="copy-button" />
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="supplier_event_id">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'LISTINGS.SUPPLIER_EVENT_ID' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span class="ob-link" appEllipsify [matTooltip]="row.supplier_event_id" matTooltipClass="ob-tooltip-nowrap"
+                    (click)="searchMapping(row.supplier_event_id)">
+                    {{row.supplier_event_id}}
+                </span>
+                <app-copy-text *ngIf="row.supplier_event_id" [copyText]="row.supplier_event_id" class="copy-button" />
+            </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" />
+        <mat-row *matRowDef="let row; columns: displayedColumns;" class="interactive-row" matRipple
+            (click)="open(row)" [class.ob-row-selected]="(clickedRow$ | async) === row" />
+    </mat-table>
+    <div class="context-notification-container" *ngIf="(listingsMetadata$ | async)?.total === 0" fxFlex="0 50 100%" fxLayout="row"
+        fxLayoutAlign="center start">
+        <app-context-notification *ngIf="(listingsMetadata$ | async)?.total === 0"
+            class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px" fxFlex="80%" fxLayoutAlign="center start">
+            <div *ngIf="emptyListWithWordAndFilters$ | async else normalEmptyList"
+                fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="20px">
+                <p>{{'LIST.EMPTY_LIST_WITH_KEYWORD' | translate}}</p>
+                <button mat-stroked-button color="primary" type="button" class="ob-button medium"
+                    [attr.aria-label]="'LIST.REMOVE_FILTERS' | translate"
+                    (click)="removeFilters()">
+                    {{'LIST.REMOVE_FILTERS_BTN' | translate}}
+                </button>
+            </div>
+            <ng-template #normalEmptyList>
+                <p>{{'LIST.EMPTY' | translate}}</p>
+            </ng-template>
+        </app-context-notification>
+    </div>
+</div>

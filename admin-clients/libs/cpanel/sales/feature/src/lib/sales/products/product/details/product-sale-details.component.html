@@ -1,0 +1,17 @@
+<div class="details-container" fxFlex="0 1 100%" fxLayout="column" *ngIf="ticketDetail$ | async as ticketDetail">
+    <div class="heading-container only-title" fxLayoutAlign="start center">
+        <app-go-back defaultPath="/products-sales" [customCopy]="{copy: 'DETAILS.BACK_TO_ORDER', rule: '/transactions/'}"></app-go-back>
+        <h1 class="secondary mat-headline-3">
+            {{
+            ('ENUMS.TYPE_OPTS.' + ticketDetail.order.type) | translate}} {{'TITLES.PRODUCT_DETAILS' | translate:
+            {
+            orderCode: ticketDetail.order.code,
+            barcode: ticketDetail.product.barcode | obfuscateString : undefined
+            }
+            }}
+        </h1>
+    </div>
+    <div class="main-content" fxFlex="0 1 100%" fxLayout="column">
+        <router-outlet></router-outlet>
+    </div>
+</div>

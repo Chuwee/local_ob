@@ -1,0 +1,269 @@
+<div class="list-container" fxFlex="100%" fxLayout="column">
+    <div class="flex flex-col order-list-heading-and-filters" appTableMaxHeight [targetElement]="tableElement" [offset]="60">
+        <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+            <div>
+                <h1 class="secondary mat-headline-3">{{'TITLES.TICKETS' | translate}}</h1>
+            </div>
+            <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+                <div class="filter-container" fxFlex="none">
+                    <button mat-icon-button class="ob-button medium" aria-label="refresh" (click)="refresh()">
+                        <mat-icon> autorenew</mat-icon>
+                    </button>
+                </div>
+                <div class="filter-container" fxFlex="none" *ngIf="(isExportEnabled$ | async)">
+                    <button mat-stroked-button color="tertiary" class="ob-button medium only-icon" [matMenuTriggerFor]="ticketsListMenu">
+                        <mat-icon>more_horiz</mat-icon>
+                    </button>
+                    <mat-menu #ticketsListMenu="matMenu">
+                        <button mat-menu-item [disabled]="$ticketsMetadata()?.total === 0" (click)="exportTickets()">
+                            {{'TICKET.EXPORT_TICKETS.BTN' | translate}}
+                        </button>
+                        <button mat-menu-item [disabled]="$ticketsMetadata()?.total === 0"
+                            (click)="exportTicketActions()">
+                            {{'TICKET.EXPORT_TICKET_ACTIONS.BTN' | translate}}
+                        </button>
+                    </mat-menu>
+                </div>
+            </div>
+        </div>
+        <div class="heading-container" fxLayout="row" fxLayoutAlign="space-between center">
+            <div fxFlex="80%" fxLayoutGap="20px" fxLayoutAlign="start center">
+                <div class="filter-container" fxFlex="none">
+                    <app-popover-date-range-picker-filter [matTooltip]="'ORDER.TRANSACTION_DATE' | translate" />
+                </div>
+                <div class="filter-container" fxFlex="none">
+                    <app-popover appFilter>
+                        <app-tickets-list-filter [startDate]="startDate" [endDate]="endDate" #filterContent />
+                    </app-popover>
+                </div>
+                <div class="search-field" fxFlex="100%">
+                    <app-search-input [placeholder]="'TICKET.SEARCH_INPUT' | translate" (valueChanged)="applyRelevance($event)" />
+                </div>
+            </div>
+            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+                @if ($ticketsMetadata(); as ticketsMetadata) {
+                    <p class="page-summary"
+                        [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: ticketsMetadata">
+                    </p>
+                }
+                <app-paginator [length]="$ticketsMetadata()?.total" [pageSize]="ticketsPageSize" />
+            </div>
+        </div>
+        <div class="heading-container">
+            <app-chips appFilter [showDivider]="false" />
+        </div>
+        @if ($ticketsAggregatedData()?.aggregatedData) {
+            <div class="heading-container heading-aggregated">
+                <app-aggregated-data [aggregatedData]="$ticketsAggregatedData().aggregatedData"
+                    [aggregationMetrics]="$ticketsAggregatedData().aggregationMetrics"
+                    [currency]="$ticketsAggregatedData().currency" [currencyFormat]="'narrow'" />
+            </div>
+        }
+        @if ($loadingData()) {
+            <div class="spinner-container">
+                <mat-spinner />
+            </div>
+        }
+    </div>
+    <mat-table #tableElement class="ob-table ob-table-drop-list" [dataSource]="tickets$ | async" [trackBy]="trackByFn"
+        cdkDropList (cdkDropListDropped)="dropItem($event)" cdkDropListOrientation="horizontal"
+        matSort (matSortChange)="unapplyRelevance()" [matSortActive]="initSortCol" [matSortDirection]="initSortDir" matSortDisableClear
+        [attr.aria-label]="'TITLES.TICKETS' | translate"
+        [hidden]="!($ticketsMetadata()?.total > 0)">
+        <ng-container [matColumnDef]="ticketsListColumns.code">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ticketsListColumns.code)" cdkDragLockAxis="x"
+                fxFlex="0 0 160px" *matHeaderCellDef class="head-cell ob-draggable-column">
+                {{'FORMS.LABELS.CODE' | translate}}</mat-header-cell>
+            <mat-cell fxFlex="0 0 160px" *matCellDef="let row">
+                <div fxFlex="0 0 100%" fxLayoutAlign="start center">
+                    <span fxFlex="0 1 100%" appEllipsify [matTooltip]="row.order.code">{{row.order.code}}</span>
+                    <app-copy-text [copyText]="row.order.code" class="copy-button" />
+                </div>
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ticketsListColumns.event">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ticketsListColumns.event)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell ob-draggable-column width200">
+                {{'TICKET.EVENT_NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width200">{{row.ticket?.allocation?.event?.name}}</mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ticketsListColumns.session">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ticketsListColumns.session)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell ob-draggable-column width200">
+                {{'TICKET.SESSION_NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width200">{{row.ticket?.allocation?.session?.name}}</mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ticketsListColumns.sessionDate">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ticketsListColumns.sessionDate)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell ob-draggable-column width130">
+                <span appEllipsify [matTooltip]="('TICKET.SESSION_DATE' | translate)" [matTooltipShowDelay]="300">
+                    {{'TICKET.SESSION_DATE' | translate}}
+                </span>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width130">
+                {{row.ticket?.allocation?.session?.date?.start | localDateTime : dateTimeFormats.shortDateTime}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ticketsListColumns.sector">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ticketsListColumns.sector)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell ob-draggable-column width200">
+                {{'TICKET.SECTOR' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width200">
+                {{row.ticket?.allocation?.sector ? row.ticket?.allocation?.sector.name : '-'}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ticketsListColumns.priceType">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ticketsListColumns.priceType)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell ob-draggable-column width200">
+                <span appEllipsify [matTooltip]="('TICKET.PRICE_TYPE' | translate)" [matTooltipShowDelay]="300">
+                    {{'TICKET.PRICE_TYPE' | translate}}
+                </span>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width200">
+                {{row.ticket?.allocation?.price_type ? row.ticket?.allocation?.price_type.name : '-'}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ticketsListColumns.barcode">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ticketsListColumns.barcode)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell ob-draggable-column width100">
+                {{'TICKET.BARCODE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width100">
+                <span>{{row.ticket?.barcode?.code | obfuscateString :
+                    row.ticket?.allocation?.event?.type === eventType.avet ? obfuscatePattern.between : undefined}}
+                </span>
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ticketsListColumns.purchaseDate">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ticketsListColumns.purchaseDate)" cdkDragLockAxis="x"
+                *matHeaderCellDef mat-sort-header class="head-cell ob-draggable-column width130">
+                {{'TICKET.PURCHASE_DATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width130">
+                {{row.order?.date | dateTime : dateTimeFormats.shortDateTime}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ticketsListColumns.channel">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ticketsListColumns.channel)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell ob-draggable-column width200">
+                {{'TICKET.CHANNEL_NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width200">{{row.channel?.name}}</mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ticketsListColumns.client">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ticketsListColumns.client)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell ob-draggable-column width200">
+                {{'TICKET.CLIENT' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width200">
+                <div fxFlex="0 0 100%" fxLayoutAlign="start center">
+                    <div class="ob-text-ellipsis" [matTooltip]="(row.buyer_data?.email ?? '')  + '\n' + (row.buyer_data?.name ?? '') +
+                    '\n' + (row.buyer_data?.surname ?? '') + '\n' + (row.buyer_data?.phone ?? '')">
+                        <div class="ob-text-ellipsis">
+                            {{row.buyer_data?.email}}
+                        </div>
+                        <div class="ob-text-ellipsis">
+                            {{row.buyer_data?.name ?? ''}}
+                        </div>
+                        <div class="ob-text-ellipsis">
+                            {{row.buyer_data?.surname ?? ''}}
+                        </div>
+                    </div>
+                    <app-copy-text [copyText]="row.buyer_data?.email" [copyTooltip]="'ORDER.COPY_EMAIL' | translate"
+                        class="copy-button" />
+                </div>
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ticketsListColumns.prints">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ticketsListColumns.prints)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell right ob-draggable-column width100">
+                {{'TICKET.PRINTS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="right width100">
+                {{row.ticket.total_prints}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ticketsListColumns.validation">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ticketsListColumns.validation)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell ob-draggable-column width100">
+                {{'TICKET.VALIDATION' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width100">
+                @if (isTicketStateValidForValidations(row.state)) {
+                    <mat-icon [class.mat-warn]="!row.ticket?.validation_last_date">lens</mat-icon>
+                } @else {
+                    -
+                }
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ticketsListColumns.state">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ticketsListColumns.state)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell ob-draggable-column width100">
+                {{'TICKET.STATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width100">
+                <span>{{'TICKET.STATE_OPTS.' + row.state | translate}}</span>
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="ticketsListColumns.originMarket">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ticketsListColumns.originMarket)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell ob-draggable-column width100">
+                {{'TICKET.ORIGIN_MARKET' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="width100">
+                <span class="ob-status-badge small-badge" [ngClass]="row.origin_market === 'SECONDARY' ? 'disabled' : 'neutral'"
+                    [matTooltip]="('TICKET.ORIGIN_MARKET_OPTS.'+(row.origin_market ?? 'PRIMARY')).toUpperCase() | translate">
+                    {{'TICKET.' + (row.origin_market ?? 'PRIMARY') + '_ORIGIN_MARKET_BADGE' | translate}}
+                </span>
+            </mat-cell>
+        </ng-container>
+        <ng-container stickyEnd [matColumnDef]="ticketsListColumns.price">
+            <mat-header-cell cdkDrag [cdkDragDisabled]="fixedColumns.includes(ticketsListColumns.price)" cdkDragLockAxis="x"
+                *matHeaderCellDef class="head-cell ob-draggable-column width100 final_price">
+                {{'TICKET.FINAL_PRICE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="final_price width100">{{row.price?.final |
+                localCurrency:row.price?.currency}}</mat-cell>
+        </ng-container>
+        <ng-container stickyEnd [matColumnDef]="ticketsListColumns.actions">
+            <mat-header-cell *matHeaderCellDef class="actions-cell head-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                <button mat-stroked-button color="secondary" class="ob-button xsmall only-icon"
+                    [matTooltip]="'ACTIONS.TABLE.SELECT_COLUMNS' | translate" (click)="changeColSelection()">
+                    <mat-icon>settings</mat-icon>
+                </button>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="actions-cell">
+                @if (row.ticket.type === invitation) {
+                    <mat-icon [matTooltip]="'FORMS.LABELS.INVITATION' | translate">local_activity</mat-icon>
+                }
+            </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" />
+        <mat-row *matRowDef="let row; columns: displayedColumns;" class="interactive-row"
+            [routerLink]="[row.order.code + '-' + row.id]" />
+    </mat-table>
+    @if ($ticketsMetadata()?.total === 0) {
+        <div class="context-notification-container" fxFlex="0 50 100%" fxLayout="row"
+            fxLayoutAlign="center start">
+            <app-context-notification
+                class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px" fxFlex="80%" fxLayoutAlign="center start">
+                @if (emptyListWithWordAndDates$ | async) {
+                    <div fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="20px">
+                        <p>{{'TICKET.EMPTY_LIST_WITH_KEYWORD' | translate}}</p>
+                        <button mat-stroked-button color="primary" type="button" class="ob-button medium"
+                            [attr.aria-label]="'ORDER.REMOVE_DATES_FILTER' | translate"
+                            (click)="removeDatesFilter()">
+                            {{'TICKET.REMOVE_DATES_FILTER_BTN' | translate}}
+                        </button>
+                    </div>
+                } @else {
+                    <p>{{'LIST.EMPTY' | translate}}</p>
+                }
+            </app-context-notification>
+        </div>
+    }
+</div>

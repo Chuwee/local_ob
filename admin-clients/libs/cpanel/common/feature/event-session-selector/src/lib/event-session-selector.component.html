@@ -1,0 +1,65 @@
+<div class="select-sessions-container" fxLayout="row"
+    [class.field-error]="form.hasError('required', 'selected') && form.get('selected').touched">
+    <div fxFlex="0 0 250px" fxLayout="column">
+        <app-selector-list class="event-selector" fxFlex="none" [externalOptions$]="events$" [loadBy]="loadEvents"
+            [listTitle]="'TITLES.EVENTS' | translate" [searchInputPlaceholder]="'FORMS.SEARCH.EVENT' | translate"
+            [formControl]="eventSelectForm">
+            <ng-template #optionTemplate let-row>
+                <div fxFlex="100%" fxLayout="row" fxLayoutAlign="space-between">
+                    <span fxLayoutAlign="start center">{{row.name}}</span>
+                    <span *ngIf="getSelectedSessionsInEvent(row)" fxFlex="none" class="badge-option">
+                        {{getSelectedSessionsInEvent(row)}}
+                    </span>
+                </div>
+            </ng-template>
+        </app-selector-list>
+    </div>
+    <app-searchable-paginated-selection fxFlex="1 1"
+        [placeholder]="'FORMS.SEARCH.SESSIONS' | translate" (loadData)="filterChangeHandler($event)"
+        [form]="form.get('selected')" [pageSize]="pageSize" [data$]="sessionsList$"
+        [metadata$]="metadata$" [loading$]="loading$">
+        <button slot="filter" type="button" mat-flat-button class="show-selected-only-button ob-button"
+            color="tertiary" [class.active]="selectedOnly$ | async"
+            [matTooltip]="'CHANNELS.PROMOTIONS.SHOW_SELECTED_TOOLTIP' | translate"
+            (click)="showSelectedOnlyClick.emit()">
+            <mat-icon>visibility</mat-icon>
+            {{'CHANNELS.PROMOTIONS.SHOW_SELECTED' | translate}}
+        </button>
+        <div slot="filter" class="filter-container" fxFlex="none">
+            <app-sessions-selector-filter (filterChange)="filterChangeHandler($event)" />
+        </div>
+        <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data" let-selectionChanged="selectionChanged">
+            <app-selection-list [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged"
+                class="small-rows">
+                <div slot="subheader" class="list-header">
+                    <div fxLayoutAlign="space-between" fxFlex="0 1 100%">
+                        <div>
+                            <mat-checkbox *ngIf="selectAllEnabled" color="primary" [disabled]="(selectedOnly$ | async)"
+                                [checked]="getSelectedSessionsInEvent() === (totalSessions$ | async) || (selectedOnly$ | async)"
+                                [indeterminate]="getSelectedSessionsInEvent() > 0 && getSelectedSessionsInEvent() < (totalSessions$ | async)"
+                                (change)="selectAll($event)" />
+                            <span [class.no-checkbox-header]="!selectAllEnabled">{{'FORMS.LABELS.SESSIONS_AND_PACKS' | translate}}</span>
+                        </div>
+                        <div fxFlex="0 1 200px">
+                            <span>{{'FORMS.LABELS.DATE' | translate}}</span>
+                        </div>
+                    </div>
+                </div>
+                <ng-template #groupHeaderTemplate let-group>
+                    <div *ngIf="group.value.length && group.key !== 'unknown'" class="group-header">
+                        {{(group.key === 'sessions' ?
+                        'EVENTS.SESSIONS.TITLE' : 'EVENTS.SESSION_PACKS') | translate | uppercase}}
+                    </div>
+                </ng-template>
+                <ng-template #optionTemplate let-row>
+                    <div fxLayoutAlign="space-between">
+                        <span>{{row.name}}</span>
+                        <div fxFlex="0 1 200px">
+                            <span>{{row.dates?.start | dateTime : dateTimeFormats.shortDateTimeWithWeek}}</span>
+                        </div>
+                    </div>
+                </ng-template>
+            </app-selection-list>
+        </ng-template>
+    </app-searchable-paginated-selection>
+</div>

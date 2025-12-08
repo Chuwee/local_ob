@@ -1,0 +1,68 @@
+<form [formGroup]="filtersForm" fxLayout="column" fxLayoutGap="24px">
+    <div fxLayout="row" fxLayoutAlign="space-between" class="filter-block">
+        <div>
+            <div class="ob-label" fxFlex="120px">
+                {{'SEASON_TICKET.SESSIONS_EVENT' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select formControlName="event" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option>
+                            <app-select-search #eventSelectSearch [options$]="events$" searchField="name">
+                            </app-select-search>
+                        </mat-option>
+                        <mat-option *ngFor="let event of eventSelectSearch.getFilteredOptions$() | async" [value]="event">
+                            <div appEllipsify [matTooltip]="event ? event.name : ('FORMS.SELECT.ALL_ELEMENTS_MALE' | translate)">
+                                {{event ? event.name : ('FORMS.SELECT.ALL_ELEMENTS_MALE' | translate)}}
+                            </div>
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div>
+            <div class="ob-label">
+                {{'SEASON_TICKET.SESSION_STATUS' | translate}}
+            </div>
+            <div class="filter-block-input" fxFlex="200px">
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-select formControlName="status" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                        <mat-option *ngFor="let status of statusListTempl" [value]="status">
+                            {{status ? (status.name | translate) : ('FORMS.SELECT.ALL_ELEMENTS_MALE' | translate)}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    <mat-divider [inset]="true"></mat-divider>
+    <div fxLayout="row" class="filter-block">
+        <div class="ob-label" fxFlex="120px">
+            {{'SEASON_TICKET.SESSION_DATE' | translate}}
+        </div>
+        <div class="filter-block-input" fxFlex="180px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="startDateDP" [placeholder]="dateFormat" formControlName="startDate"
+                    (focus)="startDateDP.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                (click)="$event.stopPropagation(); startDateDP.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #startDateDP></mat-datepicker>
+            </mat-form-field>
+        </div>
+        <div fxFlex="20px">
+            <span fxFlex class="filter-block-dates-separator"></span>
+        </div>
+        <div class="filter-block-input" fxFlex="180px">
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <input matInput [matDatepicker]="endDateDP" [placeholder]="dateFormat" formControlName="endDate" (focus)="endDateDP.open()">
+                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                (click)="$event.stopPropagation(); endDateDP.open();">
+                    <mat-icon>event</mat-icon>
+                </button>
+                <mat-datepicker #endDateDP></mat-datepicker>
+            </mat-form-field>
+        </div>
+    </div>
+</form>

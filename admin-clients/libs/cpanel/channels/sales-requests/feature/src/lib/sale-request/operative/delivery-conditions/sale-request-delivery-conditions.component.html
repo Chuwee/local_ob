@@ -1,0 +1,26 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu"
+    [disabled]="(loadingOrSaving$ | async) || !form.dirty" *ngIf="(deliveryConditions$ | async) else loading">
+    <span class="field-label">{{'SALE_REQUEST.DELIVERY_CONDITIONS.LABEL' | translate}}</span>
+    <p class="description">{{'SALE_REQUEST.DELIVERY_CONDITIONS.DESCRIPTION' | translate}}</p>
+    <p class="description">{{'SALE_REQUEST.DELIVERY_CONDITIONS.REMINDER' | translate}}</p>
+
+    <mat-checkbox fxFlex="none" color="primary" id="avoid-delivery-enabled" class="app-checkbox-wrap-label"
+        (change)="changeTicketHandlingOption()" [checked]="ticketHandling === avoidEnabled">
+        {{ 'SALE_REQUEST.DELIVERY_CONDITIONS.AVOID_DELIVERY_ENABLE' | translate }}
+    </mat-checkbox>
+
+    <div class="delivery-conditions-warning-container" fxLayout="row">
+        <mat-icon>warning</mat-icon>
+        <p class="delivery-conditions-warning-message">
+            {{ 'SALE_REQUEST.DELIVERY_CONDITIONS.WARNING_MESSAGE' | translate }}
+        </p>
+    </div>
+</app-form-container>
+
+<ng-template #loading>
+    <div fxFlex="0 1 1080px" fxLayout="column">
+        <div fxFlex="0 0 300px" fxLayoutAlign="center center">
+            <mat-spinner></mat-spinner>
+        </div>
+    </div>
+</ng-template>

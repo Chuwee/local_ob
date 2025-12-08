@@ -1,0 +1,54 @@
+<div class="dialog-msg-container flex flex-col flex-wrap">
+    <div mat-dialog-title>
+        <div class="flex flex-row items-center">
+            <h2 class="secondary title basis-full">
+                {{'SALE_REQUESTS.PAYMENT_METHODS.BENEFITS.TITLES.ADD_CONTENT_DIALOG' | translate}}
+            </h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="dialogRef.close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content>
+        <div class="flex flex-col gap-2">
+            <p>{{'SALE_REQUESTS.PAYMENT_METHODS.BENEFITS.FORMS.INFOS.ADD_CONTENT' | translate}}</p>
+            <mat-selection-list [formControl]="optionCtrl" class="ob-grid-select-list no-padding-right" [multiple]="false">
+                <div class="grid grid-cols-1 gap-2">
+                    @for (option of options; track option.value) {
+                        <mat-list-option color="primary" [value]="option.value" [disabled]="option.disabled">
+                            <div class="grid grid-cols-3">
+                                <div class="col-span-2 flex">
+                                    <div class="flex flex-col justify-evenly" appEllipsify>
+                                        <span class="card-title" appEllipsify>
+                                            {{ option.label | translate }}
+                                        </span>
+                                        <span class="card-text" appEllipsify>
+                                            {{ option.description | translate }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <img class="thumbnail col-span-1 place-self-end" [src]="option.image" alt="element content">
+                            </div>
+                        </mat-list-option>
+                    }
+                </div>
+            </mat-selection-list>
+            @let optionErrorMessage = optionCtrl
+                | obErrorMessage$
+                | async;
+            @if (optionErrorMessage) {
+                <div class="ob-error-message">{{optionErrorMessage}}</div>
+            }
+        </div>
+    </div>
+    <div mat-dialog-actions>
+        <div class="flex flex-row flex-nowrap justify-end basis-full">
+            <button mat-button type="button" class="ob-button" (click)="close()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button mat-flat-button color="primary" type="button" class="ob-button" [disabled]="optionCtrl.disabled" (click)="save()">
+                {{'FORMS.ACTIONS.CREATE' | translate}}
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,33 @@
+<div *ngIf="{data: (data$ | async), metadata: (metadata$ | async)} as list" fxLayout="column" class="paginated-list-container"
+    fxLayoutAlign="center">
+    <div fxLayout="row" fxLayoutAlign="space-between center" class="filters">
+        <div fxFlex fxLayoutAlign="start center" fxLayoutGap="8px">
+            <ng-content select="[slot='filter']"></ng-content>
+            <app-search-input *ngIf="!hideSearch" [placeholder]="placeholder" (valueChanged)="searchChanged.emit($event)"
+                fxFlex="0 1 600px">
+            </app-search-input>
+            <ng-content select="[slot='indicator']"></ng-content>
+        </div>
+        <div class="paginator above">
+            <mat-paginator #paginator hidePageSize fxFlex="0 0 auto" class="with-range-label transparent"
+                [pageIndex]="list.metadata?.offset / list.metadata?.limit" [pageSize]="list.metadata?.limit" [length]="list.metadata?.total"
+                (page)="pageChanged.emit($event)"></mat-paginator>
+        </div>
+    </div>
+    <div class="paginated-list">
+        <mat-list [class.small-rows]="smallRows" class="ob-list">
+            <ng-content select="[slot='subheader']"></ng-content>
+            <mat-list-item *ngFor="let row of list.data" [class.hoverable-item]="hoverable">
+                <ng-container *ngTemplateOutlet="optionTemplateRef; context: {$implicit: row}"></ng-container>
+            </mat-list-item>
+        </mat-list>
+        <div class="spinner-container" *ngIf="loading$ | async">
+            <mat-spinner></mat-spinner>
+        </div>
+        <div *ngIf="(!list.data?.length) && (loading$ | async) === false">
+            <app-empty-state-tiny fxFlex [title]="(emptyListTitle || 'FORMS.SELECT.NO_RESULTS' | translate)"
+                [description]="emptyListDescription | translate">
+            </app-empty-state-tiny>
+        </div>
+    </div>
+</div>

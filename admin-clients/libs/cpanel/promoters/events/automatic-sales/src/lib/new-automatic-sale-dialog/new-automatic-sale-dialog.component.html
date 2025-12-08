@@ -1,0 +1,194 @@
+<div class="dialog-msg-container">
+    <div class="dialog-header-container" fxLayout="row" mat-dialog-title>
+        <h2 fxFlex="100%" fxLayoutAlign="start end" class="secondary title">
+            {{ 'EVENTS.SESSION.NEW_AUTOMATIC_SALES.TITLE'| translate}}
+        </h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <app-wizard-bar
+        [steps]="['EVENTS.SESSION.NEW_AUTOMATIC_SALES.GENERAL_DATA', 'EVENTS.SESSION.NEW_AUTOMATIC_SALES.CONFIG',
+        'EVENTS.SESSION.NEW_AUTOMATIC_SALES.IMPORT', 'EVENTS.SESSION.NEW_AUTOMATIC_SALES.ASSOCIATION']" />
+    <div mat-dialog-content class="with-wizard-bar">
+        <div [fxShow]="$currentStep() === 1" class="container" [formGroup]="formStep1" fxLayout="column">
+            <p>
+                {{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.EMAIL_RECEIPT_DESCRIPTION' | translate}}
+            </p>
+            <div fxLayout="row">
+                <mat-form-field fxFlex="50%" appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.EMAIL_RECEIPT' | translate}}</mat-label>
+                    <input matInput
+                        [placeholder]="'FORMS.LABELS.EMAIL' | translate"
+                        formControlName="receipt_email">
+                    <mat-error [ob-form-errors]="formStep1" field="receipt_email" />
+                </mat-form-field>
+            </div>
+            <div fxLayout="row">
+                <mat-form-field fxFlex="50%" appearance="outline" class="ob-form-field field-with-label no-margin-bottom">
+                    <mat-label>{{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.FILENAME' | translate}}</mat-label>
+                    <input matInput
+                        [placeholder]="'FORMS.LABELS.NAME' | translate"
+                        formControlName="filename">
+                    <mat-error [ob-form-errors]="formStep1" field="filename" />
+                </mat-form-field>
+            </div>
+            <mat-divider class="ob-divider" />
+            <p>
+                {{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.SELECT_CHANNEL' | translate}}
+            </p>
+            <div fxLayout="row">
+                <mat-form-field fxFlex="50%" appearance="outline" class="ob-form-field">
+                    <mat-label>{{'FORMS.LABELS.CHANNEL' | translate}}</mat-label>
+                    <app-select-server-search [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                        [formControl]="channelCtrl" [options$]="channels$" [moreOptionsAvailable$]="moreChannelsAvailable$"
+                        (loadOptions)="loadChannels($event.q, $event.nextPage)">
+                        <ng-template #optionTemplate let-row>
+                            <span>{{row.name}}</span>
+                        </ng-template>
+                    </app-select-server-search>
+                    <mat-error [ob-form-errors]="formStep1" field="channel_id" />
+                </mat-form-field>
+            </div>
+        </div>
+        <div [fxShow]="$currentStep() === 2" class="container" [formGroup]="formStep2" fxLayout="column">
+            <div fxLayout="column" fxLayoutGap="18px">
+                <mat-label>
+                    {{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.TYPE.TITLE' | translate}}
+                </mat-label>
+                <mat-radio-group fxLayout="column" fxLayoutGap="16px" formControlName="use_seat_mappings">
+                    <mat-radio-button class="ob-radio-button" [value]="false">
+                        {{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.TYPE.AUTO' | translate}}
+                    </mat-radio-button>
+                    <mat-radio-group [fxShow]="typeCtrl.enabled" class="nested-content" fxLayout="column"
+                        fxLayoutGap="16px"
+                        [formControl]="typeCtrl">
+                        <mat-radio-button class="ob-radio-button" value="SECTOR">
+                            {{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.AUTO.BY_SECTOR' | translate}}
+                        </mat-radio-button>
+                        <mat-radio-button class="ob-radio-button" value="PRICE_ZONE">
+                            {{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.AUTO.BY_PRICE_ZONE' | translate}}
+                        </mat-radio-button>
+                        <mat-error class="radio-error" [fxShow]="typeCtrl.touched && typeCtrl.invalid"
+                            [ob-form-errors]="typeCtrl" />
+                        <mat-checkbox [fxShow]="typeCtrl.enabled" formControlName="allow_skip_non_adjacent_seats"
+                            color="primary" class="app-checkbox-wrap-label checkbox-under-radio">
+                            {{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.SKIP_NON_ADJACENT_SEATS' | translate}}
+                        </mat-checkbox>
+                    </mat-radio-group>
+                    <mat-radio-button class="ob-radio-button" [value]="true">
+                        {{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.TYPE.MANUAL' | translate}}
+                    </mat-radio-button>
+                    <mat-error class="radio-error" [fxShow]="formStep2.touched && formStep2.controls.use_seat_mappings.invalid"
+                        [ob-form-errors]="formStep2"
+                        field="use_seat_mappings" />
+                    <mat-radio-group [fxShow]="(isAvet$ | async) && formStep2.controls.use_ob_ids_for_seat_mappings.enabled"
+                        class="nested-content"
+                        fxLayout="column"
+                        fxLayoutGap="16px"
+                        formControlName="use_ob_ids_for_seat_mappings">
+                        <mat-radio-button class="ob-radio-button" [value]="true">
+                            {{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.MANUAL.OB_IDS' | translate}}
+                        </mat-radio-button>
+                        <mat-radio-button class="ob-radio-button" [value]="false">
+                            {{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.MANUAL.AVET_IDS' | translate}}
+                        </mat-radio-button>
+                        <mat-error class="radio-error"
+                            [fxShow]="formStep2.touched && formStep2.controls.use_ob_ids_for_seat_mappings.invalid"
+                            [ob-form-errors]="formStep2"
+                            field="use_ob_ids_for_seat_mappings" />
+                    </mat-radio-group>
+                </mat-radio-group>
+            </div>
+            <mat-divider class="ob-divider" />
+            <div fxLayout="column" fxLayoutGap="16px" class="automatic-sale-settings">
+                <mat-label>
+                    {{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.AUTOMATIC_SALE_CONFIG.TITLE' | translate}}
+                </mat-label>
+                <mat-checkbox (change)="formStep2.controls.default_purchase_language.setValue(!$event.checked)"
+                    color="primary" class="app-checkbox-wrap-label">
+                    {{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.AVOID_DEFAULT_PURCHASE_LANGUAGE' | translate}}
+                </mat-checkbox>
+                <div [fxShow]="!formStep2.controls.default_purchase_language.value" fxLayout="row" class="nested-content">
+                    <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                    <span>{{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.AVOID_DEFAULT_PURCHASE_LANGUAGE_INFO' | translate}}</span>
+                </div>
+                <mat-checkbox formControlName="use_locators" color="primary" class="app-checkbox-wrap-label">
+                    {{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.USE_LOCATORS' | translate}}
+                </mat-checkbox>
+                <mat-checkbox formControlName="sort" color="primary" class="app-checkbox-wrap-label">
+                    {{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.SORT' | translate}}
+                </mat-checkbox>
+                <mat-checkbox formControlName="force_multi_ticket" color="primary" class="app-checkbox-wrap-label">
+                    {{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.FORCE_MULTI_TICKET' | translate}}
+                </mat-checkbox>
+                <mat-checkbox formControlName="allow_break_adjacent_seats" color="primary" class="app-checkbox-wrap-label">
+                    {{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.ALLOW_BREAK_ADJACENT_SEATS' | translate}}
+                </mat-checkbox>
+                <mat-checkbox formControlName="skip_add_attendant" color="primary" class="app-checkbox-wrap-label">
+                    {{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.SKIP_ADD_ATTENDANT' | translate}}
+                </mat-checkbox>
+                <mat-checkbox formControlName="add_extra_attendee_information" color="primary" class="app-checkbox-wrap-label">
+                    {{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.ADD_EXTRA_ATTENDEE_INFORMATION' | translate}}
+                </mat-checkbox>
+                @if(formStep2.controls.add_extra_attendee_information.value){
+                    <div class="extra-fields-container" fxLayout="row">
+                        <mat-form-field fxFlex="50%" appearance="outline" class="ob-form-field field-with-label">
+                            <mat-label>{{'EVENTS.SESSION.NEW_AUTOMATIC_SALES.EXTRA_INFORMATION' | translate}}</mat-label>
+                            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="extra_field_value">
+                                <mat-option>
+                                    <app-select-search #fieldsSelectSearch [options$]="attendantFields$"
+                                        [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name"
+                                        requireSelection="true" />
+                                </mat-option>
+                                <mat-option *ngFor="let field of fieldsSelectSearch.getFilteredOptions$() | async" [value]="field.sid">
+                                    {{field.name}}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error [ob-form-errors]="formStep2" field="extra_field_value" />
+                        </mat-form-field>
+                    </div>
+                }
+            </div>
+        </div>
+        <div [fxShow]="$currentStep() === 3" class="container">
+            <app-import-automatic-sale [config]="$config()" [automaticSaleFormGroup]="formCsv" [mandatoryFields]="$mandatoryFields()"
+                automaticSaleControlName="sales" />
+        </div>
+        <div *ngIf="$currentStep() === 4" class="container">
+            <app-import-automatic-sale-header-match [headerMatchFormGroup]="formHeaders" [headerMatchControlName]="'headers'" />
+        </div>
+        <div fxLayout="row wrap">
+        </div>
+    </div>
+
+    <div mat-dialog-actions fxLayoutAlign="center center">
+        <div fxFlex fxLayoutAlign="end">
+            <div fxLayoutAlign="center start">
+                <button type="button" mat-button class="ob-button" (click)="close()">
+                    {{'FORMS.ACTIONS.CANCEL' | translate}}
+                </button>
+                <button mat-stroked-button color="tertiary" type="button" class="ob-button" (click)="previousStep()"
+                    [disabled]="$currentStep() === 1">
+                    <mat-icon>arrow_back</mat-icon>
+                    {{'FORMS.ACTIONS.PREVIOUS' | translate}}
+                </button>
+                <button mat-flat-button color="primary" type="button" class="ob-button"
+                    [fxShow]="$currentStep() === 1 || $currentStep() === 2 || $currentStep() === 3"
+                    [disabled]="(!$hasProcessedFile() && $currentStep() === 3)"
+                    (click)="nextStep()">
+                    {{'FORMS.ACTIONS.NEXT' | translate}}
+                    <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+                </button>
+                <button #saveBtn mat-flat-button color="primary" type="button" class="ob-button"
+                    [fxShow]="$currentStep() === 4"
+                    [disabled]="!formStep1.valid || !formStep2.valid || !formCsv.valid || !formHeaders.valid" (click)="save()">
+                    {{'FORMS.ACTIONS.IMPORT' | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="spinner-container" *ngIf="isLoading$ | async">
+    <mat-spinner />
+</div>

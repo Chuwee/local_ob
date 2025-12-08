@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="blocks-setup-svg" *ngIf="viewBox$ | async as viewBox" [attr.viewBox]="viewBox">
+    <rect [attr.width]="viewBox[2]" [attr.height]="viewBox[3]" class="background-overlay"
+        (mousedown)="beginDragCreation($event)">
+    </rect>
+    <ng-container *ngFor="let row of rowInfos$ | async">
+        <polyline class="row-line" [attr.points]="row.points"></polyline>
+    </ng-container>
+    <ng-container *ngFor="let aisle of aislesInfo$ | async">
+        <polyline class="aisle-line"
+            [class.selected]="aisleIsSelected(aisle, selectedBlockChanges$ | async)"
+            [class.disabled]="aisleCreation$ | async"
+            [attr.points]="aisle.points" (click)="selectAisle(aisle)">
+        </polyline>
+        <circle *ngFor="let blockChange of aisle.blockChanges" class="aisle-point"
+            [class.selected]="blockChangeIsSelected(blockChange, selectedBlockChanges$ | async)"
+            [class.disabled]="aisleCreation$ | async"
+            r="4" [attr.cx]="blockChange.x" [attr.cy]="blockChange.y" (click)="selectBlockChange(blockChange)">
+        </circle>
+    </ng-container>
+    <ng-container *ngIf="aisleCreation$ | async as aisleCreation">
+        <polyline *ngIf="aisleCreation.changed" class="aisle-creation-line"
+            [attr.points]="aisleCreation.initPos.x + ',' + aisleCreation.initPos.y
+            + ' ' + aisleCreation.endPos.x + ',' + aisleCreation.endPos.y">
+        </polyline>
+        <rect [attr.width]="viewBox[2]" [attr.height]="viewBox[3]" class="aisle-creation-drag-area"
+            (mouseenter)="mouseEnterOnDragGuard($event)" (mousemove)="dragCreationMove($event)" (mouseup)="endDragCreation()">
+        </rect>
+    </ng-container>
+</svg>

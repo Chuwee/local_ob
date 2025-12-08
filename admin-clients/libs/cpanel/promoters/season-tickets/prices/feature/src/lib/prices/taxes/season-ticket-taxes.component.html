@@ -1,0 +1,34 @@
+<app-form-container (save)="save()" (cancel)="cancel()" layout="menu" [disabled]="($isLoadingOrSaving() || !form.dirty)">
+    <div class="section-block flex flex-col">
+        <div class="flex flex-row">
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label flex-[0_1_170px]">
+                <mat-label>{{'SEASON_TICKETS.TAX_LABEL' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" [formControl]="form.controls.tax_id">
+                    @for (tax of $entityTaxes(); track tax.id) {
+                        <mat-option [value]="tax.id">
+                            {{tax.name}}
+                        </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="flex flex-row">
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label flex-[0_1_170px]">
+                <mat-label>{{'SEASON_TICKETS.CHARGES_TAX_LABEL' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" [formControl]="form.controls.charges_tax_id">
+                    @for (chargesTax of $entityTaxes(); track chargesTax.id) {
+                        <mat-option [value]="chargesTax.id">
+                            {{chargesTax.name}}
+                        </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+</app-form-container>
+
+@if ($isLoadingOrSaving()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

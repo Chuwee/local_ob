@@ -1,0 +1,87 @@
+<div class="left-bar-container">
+    <div fxFlex class="left-bar" fxLayout="column" fxLayoutAlign="justify">
+        <div class="left-sidebar-title" fxLayout="column">
+            <div fxLayout="row" fxLayoutAlign="justify center">
+                <h2 class="title">{{'EVENTS.CHANNELS' | translate}}</h2>
+                <button mat-icon-button aria-label="New channel" type="button"
+                    class="ob-button mat-stroked-button xsmall" (click)="openNewChannelDialog()">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+            <div fxFlex>
+                <p class="results-count" [innerHTML]="('RESULTS.TOTAL' | translate) + ': ' + (totalChannels$ | async)"></p>
+            </div>
+        </div>
+        <div fxFlex="36px" class="left-sidebar-header" fxLayoutAlign="end center">
+            <button mat-icon-button aria-label="Delete channel" class="ob-button small"
+                (click)="openDeleteChannelDialog()" [disabled]="(totalChannels$ | async) === 0">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </div>
+        <mat-divider class="list-divider"></mat-divider>
+        <div fxLayout="column" fxFlex class="list-container">
+            <mat-selection-list class="ob-lateral-select-list" [multiple]="false"
+                appLastPathGuardListener [currValue]="(eventChannel$ | async)?.channel.id.toString()">
+                <mat-list-option *ngFor="let item of (channelList$ | async)"
+                    [id]="'channel-list-option-' + item.channel.id" class="with-badge with-select-button"
+                    [value]="item.channel.id.toString()" [selected]="item.channel.id === (eventChannel$ | async)?.channel.id"
+                    (click)="selectionChangeHandler(item)">
+                    <div fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+                        <button mat-icon-button class="ob-button xsmall only-icon favorite-btn"
+                            [disabled]="isOperatorUser$ | async" (click)="updateFavoriteChannel(item, $event)"
+                            [matTooltip]="item.channel.favorite ? 'EVENTS.CHANNEL.UNMARK_FAVORITE' : 'EVENTS.CHANNEL.MARK_FAVORITE'">
+                            <!-- Spinner only if added to favorite from list -->
+                            <span class="default-change-spinner"
+                                *ngIf="(favoriteChannelSavingId$ | async) === item.channel.id else noSpinner">
+                                <mat-spinner diameter="20"></mat-spinner>
+                            </span>
+                            <ng-template #noSpinner>
+                                <mat-icon class="default-icon" [class.default-icon-checked]="item.channel.favorite">
+                                    {{item.channel.favorite ? 'star' : 'star_outline'}}
+                                </mat-icon>
+                            </ng-template>
+                        </button>
+                        <div fxLayout="column" class="channel-main-info">
+                            <span class="list-item-title ellipsify-no-wrap" appEllipsify [matTooltip]="item.channel.name">
+                                {{item.channel.name}}
+                            </span>
+                            <span class="list-item-subtitle" appEllipsify [matTooltip]="item.channel.entity.name">
+                                {{item.channel.entity.name}}
+                            </span>
+                        </div>
+                        <div fxFlex fxLayout="row" fxLayoutAlign="end center">
+                            <div fxLayout="column" class="channel-date-info" fxLayoutGap="12px"
+                                [matTooltipShowDelay]="500" [matTooltip]="'EVENTS.CHANNEL.SESSION_DATES' | translate">
+                                <span class="list-item-subtitle">
+                                    {{item.settings.release.date | localDateTime : dateTimeFormats.shortDate}}
+                                </span>
+                                <span class="list-item-subtitle">
+                                    {{item.settings.sale.start_date | localDateTime : dateTimeFormats.shortDate}}
+                                </span>
+                            </div>
+                            <div class="badge-container" fxLayout="column" fxLayoutGap="5px">
+                                <span class="small-badge ob-status-badge"
+                                    [ngClass]="getReleaseStatusIndicator(item.status.request, item.status.release)"
+                                    [matTooltipShowDelay]="500"
+                                    [matTooltip]="'EVENTS.CHANNEL.RELEASE_STATUS.' + item.status.release | translate">
+                                    {{('EVENTS.CHANNEL.RELEASE_STATE' | translate).substring(0,1)}}
+                                </span>
+                                <span class="small-badge ob-status-badge"
+                                    [ngClass]="getSaleStatusIndicator(item.status.request, item.status.sale)"
+                                    [matTooltipShowDelay]="500"
+                                    [matTooltip]="'EVENTS.CHANNEL.SALE_STATUS.' + item.status.sale | translate">
+                                    {{('EVENTS.CHANNEL.SALE_STATE' | translate).substring(0,1)}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </mat-list-option>
+            </mat-selection-list>
+        </div>
+    </div>
+    <div *ngIf="(loading$ | async)" class="loading-state-container" fxLayoutAlign="center center">
+        <div class="loading-state-background" fxLayout="row" fxLayoutAlign="center center">
+            <mat-spinner></mat-spinner>
+        </div>
+    </div>
+</div>

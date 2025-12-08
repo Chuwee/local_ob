@@ -1,0 +1,28 @@
+@if (showInfo) {
+    <div class="info-container" fxLayout="column">
+        <mat-accordion [togglePosition]="'before'">
+            <mat-expansion-panel [class]="class + ' ob-dialog-panel tiny'">
+                <mat-expansion-panel-header>
+                    <div class="download-csv-example-container" fxLayoutAlign="flex-start center">
+                        <mat-panel-title>
+                            {{'CSV.IMPORT.INFO_TITLE' | translate}}
+                        </mat-panel-title>
+                        <button mat-stroked-button type="button" class="ob-button small" [appDownloadFile]="exampleCsv"
+                                [attr.aria-label]="'CSV.IMPORT.DOWNLOAD_TPL_BTN' | translate">
+                            <mat-icon>download</mat-icon>
+                            {{'CSV.IMPORT.DOWNLOAD_TPL_BTN' | translate}}
+                        </button>
+                    </div>
+                </mat-expansion-panel-header>
+                <div class="info">
+                    <p [innerHTML]="importInfoText | translate"></p>
+                    <ng-content select="[slot='additional-info']" />
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+}
+
+<form class="upload-container" [formGroup]="csvFormGroup">
+    <app-csv-file-selector [formControlName]="csvControlName" />
+</form>

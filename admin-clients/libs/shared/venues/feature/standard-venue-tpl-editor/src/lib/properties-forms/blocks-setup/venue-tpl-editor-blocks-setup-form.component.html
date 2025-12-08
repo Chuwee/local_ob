@@ -1,0 +1,39 @@
+<div fxFlex="0 0 100%" fxLayout="column" fxLayoutAlign="start stretch">
+    <ng-container *ngIf="noSelection$ | async">
+        <div fxLayoutAlign="center">
+            <h4 class="type-title">{{'VENUE_TPL_EDITOR.AISLE' | translate}}</h4>
+        </div>
+        <p class="help-message" [innerHTML]="'VENUE_TPL_EDITOR.BLOCKS_SETUP_HELP' | translate"></p>
+    </ng-container>
+    <ng-container *ngIf="blockChangesSelected$ | async as blockChanges">
+        <div fxLayoutAlign="center">
+            <h4 class="type-title">
+                {{(blockChanges.length > 1 ? 'VENUE_TPL_EDITOR.EDIT_AISLE' : 'VENUE_TPL_EDITOR.EDIT_INTERSECTION') | translate}}
+            </h4>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" class="title">
+            <div fxFlex="0 1 100%">
+                <span class="mat-subtitle-2">
+                    {{(blockChanges.length > 1 ? 'VENUE_TPL_EDITOR.AISLE' : 'VENUE_TPL_EDITOR.INTERSECTION') | translate}}
+                </span>
+            </div>
+            <button mat-icon-button aria-label="Delete" class="ob-button xsmall tree-node-action-button"
+                [matTooltip]="'FORMS.ACTIONS.DELETE' | translate" (click)="deleteFormItem()">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </div>
+        <mat-divider class="title-divider" />
+        <div fxLayout="row" class="aisles-details-container">
+            <div fxFlex="0 1 50%" fxLayout="column">
+                <span class="mat-subtitle-2">{{'VENUE_TPL_EDITOR.ROW' | translate}}</span>
+                <span *ngFor="let blockChange of blockChanges">{{blockChange.row.name}}</span>
+            </div>
+            <div fxFlex="0 1 50%" fxLayout="column">
+                <span class="mat-subtitle-2">{{'VENUE_TPL_EDITOR.SEATS' | translate}}</span>
+                <span *ngFor="let blockChange of blockChanges">
+                    {{blockChange.seatWrappers[0].seat.name}} - {{blockChange.seatWrappers[1].seat.name}}
+                </span>
+            </div>
+        </div>
+    </ng-container>
+</div>

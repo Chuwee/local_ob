@@ -1,0 +1,45 @@
+<app-form-container layout="menu" sidebar [disabled]="!form.dirty || (isInProgress$ | async)" (cancel)="cancel()" (save)="save()">
+    <mat-accordion multi togglePosition="before" class="page-container">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'TICKET_PASSBOOK.CONTENT_SECTION' | translate}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="50px" class="page-content">
+                <p>{{'TICKET_PASSBOOK.SUBHEADER_ADVISE' | translate}}</p>
+                <div *ngFor="let fieldName of passbookFields; let i = index">
+                    <div *ngIf="formArrays?.get(fieldName) as fieldForm" fxFlex="0 1 500px" fxLayout="column">
+                        <div fxLayout="row" fxLayoutAlign="space-between center" class="field-content">
+                            <div fxLayout="row" fxLayoutGap="10px" fxLayoutAlign=" center">
+                                <span class="ob-round-badge badge-passbook">{{i + 1}}</span>
+                                <p class="content-header-title">
+                                    {{'TICKET_PASSBOOK.' + ticketPassbookFieldsSettings.get(fieldName).headerTitle | translate}}
+                                </p>
+                            </div>
+                            <p class="content-header-max-content">
+                                {{ticketPassbookFieldsSettings.get(fieldName).maxContent === 1 ?
+                                ('TICKET_PASSBOOK.MAX_CONTENT' | translate : { maxContent: 1 }) :
+                                ticketPassbookFieldsSettings.get(fieldName).maxContent > 1 ?
+                                ('TICKET_PASSBOOK.MAX_CONTENTS' | translate : { maxContent:
+                                ticketPassbookFieldsSettings.get(fieldName).maxContent }) :
+                                ('TICKET_PASSBOOK.NO_LIMIT' | translate)
+                                }}
+                            </p>
+                        </div>
+                        <app-ticket-content-list [form]="fieldForm" (openAddContentDialog)="openAddContentDialog(fieldName, $event)">
+                        </app-ticket-content-list>
+                        <button mat-stroked-button color="primary" class="ob-button medium add-button"
+                            (click)="openAddContentDialog(fieldName, false)" [disabled]="checkMaxContent(fieldName)">
+                            <mat-icon>add</mat-icon>
+                            {{'TICKET_PASSBOOK.ADD_CONTENT' | translate}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+    <app-ticket-passbook-download *ngIf="svgName" slot="sidebar" [svgName]="svgName"></app-ticket-passbook-download>
+</app-form-container>
+<div class="spinner-container" *ngIf="isInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

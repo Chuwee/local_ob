@@ -1,0 +1,93 @@
+@let order = $order();
+@for (item of order.items; track item) {
+    <div class="section-block">
+        <h3 class="section-title">
+            {{ item.member.partner_id === order.buyer_data.partner_id ?
+            ('MEMBER_ORDER.USER_MANAGER' | translate) :
+            ('MEMBER_ORDER.USER_ADDED' | translate) }}
+        </h3>
+        <div class="flex flex-row flex-wrap">
+            @if (item.member.email) {
+                <div class="details-non-editable-field flex flex-col sm:grow-0 sm:shrink
+                    basis-full md:basis-[calc(50%-24px)] xl:basis-[calc(33.3%-24px)]">
+                    <span class="field-label">{{'FORMS.LABELS.EMAIL' | translate}}</span>
+                    <span appEllipsify [matTooltip]="item.member.email">
+                        {{item.member.email}}
+                    </span>
+                </div>
+            }
+            @if (item.member.name) {
+                <div class="details-non-editable-field flex flex-col sm:grow-0 sm:shrink
+                    basis-full md:basis-[calc(50%-24px)] xl:basis-[calc(33.3%-24px)]">
+                    <span class="field-label">{{'FORMS.LABELS.NAME' | translate}}</span>
+                    <span>{{item.member.name}}</span>
+                </div>
+            }
+            @if (item.member.surname) {
+                <div class="details-non-editable-field flex flex-col sm:grow-0 sm:shrink
+                    basis-full md:basis-[calc(50%-24px)] xl:basis-[calc(33.3%-24px)]">
+                    <span class="field-label">{{'FORMS.LABELS.SURNAME' | translate}}</span>
+                    <span>{{item.member.surname}}</span>
+                </div>
+            }
+            @if (item.member.partner_id) {
+                <div class="details-non-editable-field flex flex-col sm:grow-0 sm:shrink
+                    basis-full md:basis-[calc(50%-24px)] xl:basis-[calc(33.3%-24px)]">
+                    <span class="field-label">{{'MEMBER_ORDER.PARTNER_ID' | translate}}</span>
+                    <span>{{item.member.partner_id}}</span>
+                </div>
+            }
+            @if (item.member.person_id) {
+                <div class="details-non-editable-field flex flex-col sm:grow-0 sm:shrink
+                    basis-full md:basis-[calc(50%-24px)] xl:basis-[calc(33.3%-24px)]">
+                    <span class="field-label">{{'MEMBER_ORDER.PERSON_ID' | translate}}</span>
+                    <span>{{item.member.person_id}}</span>
+                </div>
+            }
+            @if (item.member.tutor) {
+                @let name = item.member.tutor.name;
+                @let firstSurname = item.member.tutor.lastname ? ' ' + item.member.tutor.lastname  : '';
+                @let secondSurname = item.member.tutor.surname2 ? ' ' + item.member.tutor.lastname : '';
+                @let email = item.member.tutor.email;
+                <div class="details-non-editable-field flex flex-col sm:grow-0 sm:shrink
+                    basis-full md:basis-[calc(50%-24px)] xl:basis-[calc(33.3%-24px)]">
+                    <span class="field-label">{{'MEMBER_ORDER.TUTOR' | translate}}</span>
+                    <span>{{name + firstSurname + secondSurname}}</span>
+                    <span>{{email}}</span>
+                </div>
+            }
+        </div>
+    </div>
+}
+@if (order.type === memberOrderType.transfer) {
+    <div class="section-block">
+        <h3 class="section-title">
+            {{'MEMBER_ORDER.USER_TRANSFERRED' | translate }}
+        </h3>
+        <div class="flex flex-row flex-wrap">
+            @if (order.buyer_data.email) {
+                <div class="details-non-editable-field flex flex-col sm:grow-0 sm:shrink
+                    basis-full md:basis-[calc(50%-24px)] xl:basis-[calc(33.3%-24px)]">
+                    <span class="field-label">{{'FORMS.LABELS.EMAIL' | translate}}</span>
+                    <span appEllipsify [matTooltip]="order.buyer_data.email">
+                        {{order.buyer_data.email}}
+                    </span>
+                </div>
+            }
+            @if (order.buyer_data.name) {
+                <div class="details-non-editable-field flex flex-col sm:grow-0 sm:shrink
+                    basis-full md:basis-[calc(50%-24px)] xl:basis-[calc(33.3%-24px)]">
+                    <span class="field-label">{{'FORMS.LABELS.NAME' | translate}}</span>
+                    <span>{{order.buyer_data.name}}</span>
+                </div>
+            }
+            @if (order.buyer_data.surname) {
+                <div class="details-non-editable-field flex flex-col sm:grow-0 sm:shrink
+                    basis-full md:basis-[calc(50%-24px)] xl:basis-[calc(33.3%-24px)]">
+                    <span class="field-label">{{'FORMS.LABELS.SURNAME' | translate}}</span>
+                    <span>{{order.buyer_data.surname}}</span>
+                </div>
+            }
+        </div>
+    </div>
+}

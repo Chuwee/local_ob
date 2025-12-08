@@ -1,0 +1,44 @@
+@if ($postContents()) {
+    <div class="flex flex-col gap-4">
+        @if ($postContents().badge) {
+            <div class="flex flex-row justify-between items-center">
+                <div class="basis-[60%] benefit-content-info-container">
+                    <p>{{'SALE_REQUESTS.PAYMENT_METHODS.BENEFITS.FORMS.INFOS.BADGE' | translate | uppercase}}</p>
+                </div>
+                <div class="basis-[30%] delete-benefit-content-link-container self-start">
+                    <a class="ob-link" (click)="removeContent('BADGE')"
+                        [attr.disabled]="!$vmSaleRequestGatewayBenefit().beingModified ? true : null">
+                        {{'FORMS.ACTIONS.DELETE_CONTENT' | translate}}
+                    </a>
+                </div>
+
+            </div>
+            <app-sale-request-payment-methods-benefits-badge [vmSaleRequestGatewayBenefit]="$vmSaleRequestGatewayBenefit()"
+                [(postBadge)]="$postContents().badge" />
+        }
+        @if ($postContents().description) {
+            <div class="flex flex-row justify-between items-center">
+                <div class="basis-[60%] benefit-content-info-container">
+                    <p>{{'SALE_REQUESTS.PAYMENT_METHODS.BENEFITS.FORMS.INFOS.DESCRIPTION' | translate | uppercase}}</p>
+                </div>
+                <div class="basis-[30%] delete-benefit-content-link-container self-start">
+                    <a class="ob-link" (click)="removeContent('DESCRIPTION')"
+                        [attr.disabled]="!$vmSaleRequestGatewayBenefit().beingModified ? true : null">
+                        {{'FORMS.ACTIONS.DELETE_CONTENT' | translate}}
+                    </a>
+                </div>
+            </div>
+            <app-sale-request-payment-methods-benefits-description [vmSaleRequestGatewayBenefit]="$vmSaleRequestGatewayBenefit()"
+                [(postDescription)]="$postContents().description" />
+        }
+    </div>
+}
+
+<div class="flex flex-row justify-center items-center">
+    <button mat-button type="button" class="ob-button small" color="tertiary"
+        [disabled]="!$vmSaleRequestGatewayBenefit().beingModified || ($postContents()?.description && $postContents()?.badge)"
+        (click)="add()">
+        <mat-icon>add</mat-icon>
+        {{'FORMS.LABELS.ADD_CONTENT' | translate}}
+    </button>
+</div>

@@ -1,0 +1,48 @@
+<div mat-dialog-content>
+    <div class="filter-container" fxLayoutGap="20px">
+        <div fxFlex="200px">
+            <mat-form-field fxFlex="200px" appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>{{'CHANNELS.TYPE' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate" (selectionChange)="emitFilterChange($event.value)">
+                    <mat-option>
+                        <div appEllipsify [matTooltip]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                            {{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}
+                        </div>
+                    </mat-option>
+                    <mat-option *ngFor="let group of passbookAvailableTypeFieldsOpts$ | async" [value]="group">
+                        <div appEllipsify [matTooltip]="'TICKET_PASSBOOK.' + group | uppercase | translate">
+                            {{'TICKET_PASSBOOK.' + group | uppercase | translate}}
+                        </div>
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="search-field" fxFlex="0 1 100%">
+            <app-search-input [searchOnInteraction]="true" (valueChanged)="emitSearchInputChange($event)"
+                [placeholder]="('FORMS.SEARCH_CONTENTS_FIELD' | translate)">
+            </app-search-input>
+        </div>
+    </div>
+
+    <div fxLayout="row" class="ob-mat-dialog-content">
+        <form fxFlex="100%" [formGroup]="formGroup" fxLayout="row wrap">
+            <mat-selection-list fxFlex="100%" gdColumns="1fr" gdColumns.gt-sm="1fr 1fr"
+                class="ob-grid-select-list" [multiple]="true" (selectionChange)="onSelectionChange($event.options[0])">
+                <mat-list-option #fieldOption color="primary" checkboxPosition="before"
+                    *ngFor="let field of (passbookAvailableFields$ | async)" [value]="field"
+                    [disabled]="totalFieldsSelected >= maxFields && !fieldOption.selected"
+                    [selected]="standardContentsControl.value && standardContentsControl.value?.indexOf(field) >= 0">
+                    <div fxFlex="100%" fxLayout="column" fxLayoutAlign="center start">
+                        <p class="card-title" appEllipsify
+                            [matTooltip]="'TICKET_PASSBOOK.FIELDS.' + field.key | uppercase | translate">
+                            {{'TICKET_PASSBOOK.FIELDS.' + field.key | uppercase | translate}}
+                        </p>
+                        <p class="card-text">
+                            {{'TICKET_PASSBOOK.' + field.group | uppercase | translate}}
+                        </p>
+                    </div>
+                </mat-list-option>
+            </mat-selection-list>
+        </form>
+    </div>
+</div>

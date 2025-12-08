@@ -1,0 +1,177 @@
+@use '@angular/material' as mat;
+@mixin accordion-list-override($palettes, $colors, $typography) {
+    $grey: map-get($colors, ob-grey);
+    $white: map-get($colors, ob-white);
+    $black: map-get($colors, ob-black);
+    $bg-1: map-get($colors, ob-bg-1);
+    $bg-2: map-get($colors, ob-bg-2);
+    $grey-light-10: map-get($colors, ob-grey-light-10);
+    $grey-light-20: map-get($colors, ob-grey-light-20);
+    $error-palette: map-get($palettes, warn);
+    $primary-palette: map-get($palettes, primary);
+
+    .ob-accordion-list {
+
+        &.mat-accordion {
+            overflow-y: auto;
+            .mat-expansion-panel {
+                &:first-of-type,
+                &:last-of-type {
+                    border-radius: 0;
+                }
+            }
+        }
+        &.tiny.mat-accordion {
+            .mat-expansion-panel {
+                color: $black;
+                min-height: 35px; // expansion-panel-header height + expansion-panel-header border
+                .mat-expansion-panel-header {
+                    background: $grey-light-10;
+                    height: 34px;
+                    border-top: 1px $white solid;
+                    border-left: 0; // override del listado no tiny
+                    border-bottom: 0; // override del listado no tiny
+                    &.mat-expanded {
+                        border-bottom: 1px $white solid;
+                        min-height: 34px;
+                    }
+                    .mat-content {
+                        margin-left: 0; // override del listado no tiny
+                    }
+                }
+                .mat-expansion-panel-content {
+                    overflow: auto;
+                    height: 100%;
+                    .mat-expansion-panel-body {
+                        height: 100%;
+                        border: 0; // override del listado no tiny
+                        margin: 0; // override del listado no tiny
+                        > * {
+                            margin: 0; // override del listado no tiny
+                        }
+                        .cdk-virtual-scroll-viewport {
+                            height: 100%;
+                        }
+                    }
+                }
+            }
+        }
+        .mat-expansion-panel {
+            background: $bg-1;
+            color: $grey;
+            border-radius: 0;
+            .mat-expansion-panel-content-wrapper {
+                flex: 1;
+            }
+            .mat-expansion-panel-header {
+                border-bottom: 1px $grey-light-10 solid;
+                border-left: 46px transparent solid;
+                height: 46px;
+                &.ng-trigger-expansionHeight {
+                    height: 46px;
+                }
+                @include mat.m2-typography-level($typography, body-1);
+                font-weight: bold;
+                line-height: 20px;
+                padding: 0 18px;
+                .mat-content {
+                    margin-left: -46px;
+                }
+                .mat-expansion-panel-header-title,
+                .mat-expansion-panel-header-description {
+                    color: inherit;
+                    padding-right: 10px;
+                }
+                .group-counters-badge {
+                    @include mat.m2-typography-level($typography, tiny);
+                    font-weight: bold;
+                    border-radius: 50px;
+                    padding: 0 8px;
+                    color: $white;
+                    background-color: $grey-light-20;
+                    &.partially-selected {
+                        background-color: $grey;
+                    }
+                    &.all-selected {
+                        background-color: mat.m2-get-color-from-palette(
+                            $primary-palette
+                        );
+                    }
+                }
+                .mat-expansion-indicator {
+                    transition: padding-top 200ms ease-out;
+                    padding-bottom: 6px;
+                    &::after {
+                        color: $black;
+                        padding: 3px;
+                        margin-bottom: 0;
+                        border-width: 0 2px 2px 0;
+                    }
+                }
+            }
+            .mat-expansion-panel-body {
+                padding: 10px 18px 10px 18px;
+                border-bottom: 1px $grey-light-10 solid;
+                border-left: 46px transparent solid;
+                margin-right: -46px;
+                > * {
+                    margin-left: -46px;
+                }
+            }
+            &:not(.mat-expanded) {
+                .mat-expansion-panel-header:not([aria-disabled="true"]):hover {
+                    color: $black;
+                    background-color: $bg-2;
+                }
+            }
+            &.mat-expanded {
+                background-color: $white;
+                .mat-expansion-panel-header {
+                    border-bottom-color: rgba($grey-light-10, 0.75);
+                }
+                .mat-expansion-panel-header[aria-disabled="true"] {
+                    .mat-expansion-panel-header-title {
+                        margin-right: 24px;
+                    }
+                }
+            }
+            &.exclude-body-padding {
+                .mat-expansion-panel-body {
+                    padding: 0;
+                }
+            }
+            &.exclude-header-padding {
+                .mat-expansion-panel-header {
+                    .mat-content {
+                        margin-left: -46px; // border-left (46px) -28px = 18px
+                    }
+                }
+            }
+            &.error-status {
+                border: 1px mat.m2-get-color-from-palette($error-palette, 500)
+                    solid;
+            }
+            &.error-status + .error-status {
+                border-top: none;
+            }
+        }
+        .accordion-table {
+            .mat-expansion-panel-header {
+                background-color: $white;
+                font-weight: normal;
+                color: $black;
+                border-left: none;
+                padding: 0 8px;
+                .mat-content {
+                    margin: 0;
+                    height: 100%;
+                }
+            }
+            .mat-expansion-panel-body {
+                color: $black;
+                border-bottom: none;
+                -webkit-scrollbar: none;
+            }
+        }
+    }
+}

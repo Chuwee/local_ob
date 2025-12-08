@@ -1,0 +1,42 @@
+<div mat-dialog-content class="with-wizard-bar flex flex-col">
+    @let customerToBeFriend = $customerToBeFriend();
+    <div class="customer-confirmation-container flex justify-center">
+        <mat-card class="customer-card ob-card">
+            <mat-card-content class="card-content flex-[1_1_100%]">
+                <div class="details-non-editable-field ob-form-field flex flex-col">
+                    <span class="field-label">{{'CUSTOMER.NAME_AND_SURNAME' | translate}}</span>
+                    <div class="flex flex-row">
+                        <span>{{customerToBeFriend.name}}&nbsp;</span>
+                        <span>{{customerToBeFriend.surname}}</span>
+                    </div>
+                </div>
+                <div class="details-non-editable-field ob-form-field flex flex-col">
+                    <span class="field-label">{{'CUSTOMER.RELATION' | translate}}</span>
+                    <span>{{'CUSTOMER.FRIENDS_AND_FAMILY.RELATION_TYPE_OPTS.' + customerToBeFriend.relation | translate}}&nbsp;</span>
+                </div>
+                @if ($entityMemberIdGeneration() === 'DEFAULT') {
+                    <div class="details-non-editable-field ob-form-field flex flex-col" aria-label="member id">
+                        <span class="field-label">{{'CUSTOMER.MEMBER_ID' | translate}}</span>
+                        <span appEllipsify [matTooltip]="customerToBeFriend.member_id">
+                            {{customerToBeFriend.member_id || '-'}}
+                        </span>
+                    </div>
+                }
+            </mat-card-content>
+            <mat-card-content class="card-content flex-[1_1_100%]">
+                <div class="details-non-editable-field ob-form-field flex flex-col" aria-label="email">
+                    <span class="field-label">{{'CUSTOMER.EMAIL' | translate}}</span>
+                    <span appEllipsify [matTooltip]="customerToBeFriend.email" data-test="customerEmail">
+                        {{customerToBeFriend.email || '-'}}
+                    </span>
+                </div>
+                <div class="details-non-editable-field ob-form-field flex flex-col" aria-label="id card">
+                    <span class="field-label">{{'CUSTOMER.ID_CARD' | translate}}</span>
+                    <span appEllipsify [matTooltip]="customerToBeFriend.identification">
+                        {{customerToBeFriend.identification || '-'}}
+                    </span>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

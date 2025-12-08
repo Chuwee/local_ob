@@ -1,0 +1,61 @@
+<div class="logo-ob">
+    <img alt="Onebox" class="logo-ob-image" [src]="logo" />
+</div>
+<div class="sections-list">
+    @for (section of sectionList; track section?.id) {
+        <nav [id]="section?.id" class="nav-list">
+            @if(section.link && section.visible) {
+                <a class="list-item" [routerLink]="section.link"
+                    [routerLinkActive]="section.link ? 'active-link' : ''">
+                    @if (section.customIcon) {
+                        <mat-icon [svgIcon]="section.icon" />
+                    } @else {
+                        <mat-icon fontSet="material-icons"> {{section.icon}} </mat-icon>
+                    }
+                    <span class="list-title" [matTooltip]="(section.label | translate)" appEllipsify>{{section.label | translate}}</span>
+                </a>
+            }
+            @if (!section.link && section.visible) {
+                <div class="list-item" [class.active-menu]="section.isActive">
+                    <button mat-icon-button [satPopoverAnchor]="popoverMenu" class="popover-menu-btn"
+                        [class.active-popover]="popoverMenu.isOpen()" (click)="popoverMenu.toggle()">
+                        @if (section.customIcon) {
+                            <mat-icon [svgIcon]="section.icon" />
+                        } @else {
+                            <mat-icon fontSet="material-icons"> {{section.icon}} </mat-icon>
+                        }
+                        <span class="list-title" [matTooltip]="(section.label | translate)"
+                            appEllipsify>{{section.label | translate}}</span>
+                    </button>
+                    <sat-popover #popoverMenu hasBackdrop horizontalAlign="after" verticalAlign="center">
+                        <div class="sidenav-popover-menu">
+                            <h3 class="menu-title">
+                                {{section.label | translate}}
+                                @if(section.badge) {
+                                    <app-badge [badge]="section.badge" [badgeClass]="section.badgeClass" />
+                                }
+                            </h3>
+                            <mat-divider />
+                            <nav class="nav-list">
+                                @for (subsection of section.subsections; track subsection?.id) {
+                                    @if (subsection.visible) {
+                                        <a class="list-item gap-1"
+                                            [id]="subsection?.id"
+                                            [routerLink]="subsection.link"
+                                            [routerLinkActive]="subsection.link ? 'active-link' : ''"
+                                            (click)="popoverMenu.toggle()">
+                                            {{subsection.label | translate}}
+                                            @if(subsection?.icon) {
+                                                <mat-icon class="ob-icon mat-icon xsmall" [fontIcon]="subsection.icon" />
+                                            }
+                                        </a>
+                                    }
+                                }
+                            </nav>
+                        </div>
+                    </sat-popover>
+                </div>
+            }
+        </nav>
+    }
+</div>

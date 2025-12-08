@@ -1,0 +1,61 @@
+<div fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="stretch stretch">
+    <div fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="start stretch">
+        <div fxFlex="0 0 280px" fxLayout="column" class="left-panel">
+            <app-venue-tpl-editor-views></app-venue-tpl-editor-views>
+            <app-venue-tpl-editor-tree fxFlex="0 1 100%"></app-venue-tpl-editor-tree>
+        </div>
+        <div fxFlex="0 1 100%" fxLayout="column">
+            <app-venue-tpl-editor-actions-bar>
+            </app-venue-tpl-editor-actions-bar>
+            <div fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="start stretch">
+                <div fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="start stretch" class="middle-panel">
+                    <div fxFlex="0 1 100%" fxLayout="row" fxLayoutAlign="start stretch">
+                        <app-venue-tpl-editor-svg fxFlex="0 1 100%" class="venue-tpl-editor-view"></app-venue-tpl-editor-svg>
+                    </div>
+                    <div class="bottom-actions-bar" [class.increase-bottom-actions]="inCapacityIncrease$ | async">
+                        <div class="bottom-action-content" fxFlex="0 1 100%" fxLayoutAlign="end center">
+                            <ng-container *ngIf="(inCapacityIncrease$ | async) else defaultButtons">
+                                <mat-icon class="ob-icon small with-text increase-legend">info</mat-icon>
+                                <span class="mat-subtitle-2 increase-legend description">
+                                        {{'VENUE_TPLS.CAPACITY_INCREASE_INFO' | translate}}
+                                    </span>
+                                <button type="button" mat-button class="ob-mdc-button light-button medium"
+                                    [disabled]="!!!(baseMode$ | async)" (click)="cancel()">
+                                    {{'FORMS.ACTIONS.CANCEL' | translate}}
+                                </button>
+                                <button type="button" mat-stroked-button class="ob-mdc-button light-button medium"
+                                    [disabled]="(isNotDirty$ | async) || !!!(baseMode$ | async)" (click)="save()">
+                                    {{'FORMS.ACTIONS.UPDATE' | translate}}
+                                </button>
+                            </ng-container>
+                            <ng-template #defaultButtons>
+                                <button type="button" mat-button class="ob-button medium"
+                                    [disabled]="(isNotDirty$ | async) || !!!(baseMode$ | async)" (click)="cancel()">
+                                    {{'FORMS.ACTIONS.CANCEL' | translate}}
+                                </button>
+                                <button type="button" mat-flat-button class="ob-button medium" color="primary"
+                                    [disabled]="(isNotDirty$ | async) || !!!(baseMode$ | async)" (click)="save()">
+                                    {{'FORMS.ACTIONS.UPDATE' | translate}}
+                                </button>
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+                <app-venue-tpl-editor-properties-forms fxFlex="0 0 300px"></app-venue-tpl-editor-properties-forms>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="spinner-container" *ngIf="inProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>
+<div *ngIf="increasingCapacity$ | async" class="ob-overlay-wrapper">
+    <div class="ob-overlay-pane pane-center">
+        <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px" fxFlex="80%">
+            <p>{{'VENUE_TPL_EDITOR.SESSION_CAPACITY_UPDATE_IN_PROGRESS' | translate}}</p>
+            <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                [attr.aria-label]="('VENUE_TPL_EDITOR.SESSION_CAPACITY_UPDATE_IN_PROGRESS' | translate)">
+            </mat-progress-bar>
+        </app-context-notification>
+    </div>
+</div>

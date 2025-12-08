@@ -1,0 +1,50 @@
+<form [formGroup]="form">
+    <mat-table id="optionsTable" class="ob-table dense-table" [dataSource]="data" appOptionsTable #optionsTable='appOptionsTable'
+        [columns]="columns"
+        [disabled]="disabled" [form]="form" [activeRequired]="activeRequired">
+        <ng-content />
+        <!-- Active checkbox column -->
+        <ng-container *ngIf="columns.includes(col.active)" matColumnDef="active">
+            <mat-header-cell *matHeaderCellDef class="head-cell active" fxFlex="42px" fxLayoutAlign="center center">
+                <mat-checkbox color="primary" appOptionsTableAll />
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row; index as i" [formArrayName]="i" class="icon-cell active" fxFlex="42px"
+                fxLayoutAlign="center center">
+                <mat-checkbox color="primary" formControlName="active"
+                    (change)="optionsTable.toggleActive(i, $event)" />
+            </mat-cell>
+        </ng-container>
+        <!-- Default (favorite) checkbox column -->
+        <ng-container *ngIf="columns.includes(col.default)" matColumnDef="default">
+            <mat-header-cell *matHeaderCellDef fxFlex="42px" fxLayoutAlign="center center" class="head-cell default" />
+            <mat-cell *matCellDef="let row; index as i" [formArrayName]="i" fxFlex="42px" fxLayoutAlign="center center"
+                class="icon-cell default">
+                <app-options-table-default [form]="form" [index]="i"
+                    [formCtrl]="form.at(i).get('default')" (setDefault)="optionsTable.setDefault(i)" />
+            </mat-cell>
+        </ng-container>
+        <!-- Price/Cost Column -->
+        <ng-container *ngIf="columns.includes(col.cost)" matColumnDef="cost">
+            <mat-header-cell *matHeaderCellDef class="head-cell cost right price-column input-column" />
+            <mat-cell *matCellDef="let row; index as i" [formArrayName]="i" class="right price-column editable-cell">
+                <div class="write-value" fxFlex="100%">
+                    <mat-form-field appearance="outline" class="ob-form-field">
+                        @let errorMessage = form.at(i).get('cost') | obErrorMessage$ | async;
+                        @if (errorMessage) {
+                            <mat-icon matPrefix [obErrorIcon]="errorMessage">
+                                error_outline
+                            </mat-icon>
+                        }
+                        <app-currency-input formControlName="cost" class="table-input"
+                            [placeholder]="0 | localCurrency" />
+                    </mat-form-field>
+                </div>
+            </mat-cell>
+        </ng-container>
+        <ng-container *ngIf="header">
+            <mat-header-row *matHeaderRowDef="columns" class="dense-row" />
+        </ng-container>
+        <mat-row *matRowDef="let row; columns: columns; index as j" class="dense-row hoverable-row" />
+    </mat-table>
+</form>
+<ng-content select="[slot='empty']" />

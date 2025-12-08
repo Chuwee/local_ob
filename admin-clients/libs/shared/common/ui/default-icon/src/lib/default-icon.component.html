@@ -1,0 +1,35 @@
+@let checked = (defaultValue$ | async);
+@let changing = (defaultChangeRequested$ | async);
+@let tooltipDisabled = enabled && (!onlyIcon || checked);
+@let tooltip = (!enabled ? literals?.tooltipDisabledReason : literals?.tooltipInfo) | translate;
+
+@if(!onlyIcon) {
+    <div class="flex gap-2 items-center">
+        <div [matTooltipDisabled]="tooltipDisabled" [matTooltip]="tooltip">
+            <button mat-stroked-button color="tertiary" aria-label="Default Item" class="ob-button medium"
+                (click)="updateElementDefault(tplId, !checked)" [disabled]="!enabled">
+                <mat-icon>
+                    <ng-container [ngTemplateOutlet]="defaultIcon" />
+                </mat-icon>
+                <ng-content select="[slot='label']" />
+            </button>
+        </div>
+        <ng-content select="[slot='helper']" />
+    </div>
+}
+@else {
+    <div [matTooltipDisabled]="tooltipDisabled" [matTooltip]="tooltip">
+        <button mat-icon-button aria-label="Default Item" class="ob-button medium"
+            (click)="updateElementDefault(tplId, !checked)" [disabled]="!enabled">
+            <ng-container [ngTemplateOutlet]="defaultIcon" />
+        </button>
+    </div>
+}
+
+<ng-template #defaultIcon>
+    @if (changing) {
+        <mat-spinner diameter="24" />
+    } @else {
+        <app-star-icon [checked]="checked" />
+    }
+</ng-template>

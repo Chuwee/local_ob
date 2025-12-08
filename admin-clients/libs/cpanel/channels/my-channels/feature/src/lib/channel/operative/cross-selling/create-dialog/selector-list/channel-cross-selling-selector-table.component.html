@@ -1,0 +1,83 @@
+<div fxLayout="column">
+    <app-searchable-paginated-selection (loadData)="loadSalesRequests($event)" [hideSearch]="false"
+        [placeholder]="'CHANNELS.CROSS_SELLING.SEARCH_EVENTS' | translate" [form]="form.controls.events" [pageSize]="pageSize"
+        [data$]="catalogueSalesRequestsData$" [metadata$]="catalogueSalesRequestsMetadata$" [loading$]="isLoadingSalesRequests$">
+        <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data" let-selectionChanged="selectionChanged">
+            <app-selection-list [data]="data" [disabledOptionPredicate]="shouldDisableEvent"
+                [selectionChanged]="selectionChanged" class="small-rows" [pageForm]="pageForm"
+                [class.invalid-table]="this.form.controls.events.invalid && this.form.controls.events.touched">
+                <div slot="subheader" class="list-header">
+                    <mat-checkbox fxHide />
+                    <div class="list-header-label" fxFlex="0 1 100%">
+                        {{'CHANNELS.CROSS_SELLING.EVENTS_COLUMN' | translate}}
+                    </div>
+                </div>
+                <ng-template #optionTemplate let-row>
+                    <span>{{row.name}}</span>
+                </ng-template>
+            </app-selection-list>
+        </ng-template>
+    </app-searchable-paginated-selection>
+    <mat-error *ngIf="this.form.controls.events.touched && this.form.controls.events.errors?.['required']">
+        {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+    </mat-error>
+    <mat-error *ngIf="this.form.controls.events.errors?.['selfSelectedEvent']">
+        {{'CHANNELS.CROSS_SELLING.SELF_EVENT_SELECTED' | translate}}
+    </mat-error>
+    <mat-error *ngIf="this.form.controls.events.errors?.['maxSuggestionsLimitExceeded']">
+        {{'CHANNELS.CROSS_SELLING.MAX_SUGGESTIONS_LIMIT_EXCEEDED' | translate : { value: maxSelection} }}
+    </mat-error>
+    <mat-radio-group *ngIf="form.value.events.length > 0" [formControl]="form.controls.allSessions">
+        <mat-radio-button [value]="true">
+            <mat-label>{{'CHANNELS.CROSS_SELLING.ALL_SESSIONS' | translate}}</mat-label>
+        </mat-radio-button>
+        <mat-radio-button [value]="false" [disabled]="form.value.events.length > 1">
+            <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center">
+                <mat-label>{{'CHANNELS.CROSS_SELLING.CHOOSE_SESSIONS' | translate}}</mat-label>
+                <app-help-button matSuffix small [message]="'CHANNELS.CROSS_SELLING.CHOOSE_SESSIONS_INFO' | translate" />
+            </div>
+        </mat-radio-button>
+    </mat-radio-group>
+    <div class="sessions-table">
+        <app-searchable-paginated-selection (loadData)="loadSaleRequestSessions($event)" [hideSearch]="false"
+            [placeholder]="'CHANNELS.CROSS_SELLING.SEARCH_SESSIONS' | translate"
+            [form]="form.controls.sessions" *ngIf="form.value.allSessions === false"
+            [pageSize]="pageSize" [data$]="sessionsData$" [metadata$]="sessionsMetadata$" [loading$]="isLoadingSessions$">
+            <div slot="filter" class="filter-container" fxFlex="none">
+                <app-cross-selling-sessions-filter (filterChange)="loadSaleRequestSessions($event)" />
+            </div>
+            <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data" let-selectionChanged="selectionChanged">
+                <app-selection-list [data]="data" [disabledOptionPredicate]="shouldDisableSession"
+                    [selectionChanged]="selectionChanged" class="small-rows" [pageForm]="pageForm"
+                    [class.invalid-table]="this.form.controls.sessions.invalid && this.form.controls.sessions.touched">
+                    <div slot="subheader" class="list-header">
+                        <div fxLayout="row">
+                            <div fxFlex="61.3%">
+                                <span>{{'CHANNELS.CROSS_SELLING.SESSIONS_COLUMN' | translate}}</span>
+                            </div>
+                            <div>
+                                <span>{{'CHANNELS.CROSS_SELLING.DATE_COLUMN' | translate}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <ng-template #optionTemplate let-row>
+                        <div fxLayout="row">
+                            <span fxFlex="60%">
+                                {{row.name}}
+                            </span>
+                            <div fxFlex="40%">
+                                <span>{{row.start_date | dateTime : dateTimeFormats.shortDateTimeWithWeek }}</span>
+                            </div>
+                        </div>
+                    </ng-template>
+                </app-selection-list>
+            </ng-template>
+        </app-searchable-paginated-selection>
+        <mat-error *ngIf="this.form.controls.sessions.errors?.['required'] && this.form.controls.sessions.touched">
+            {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+        </mat-error>
+        <mat-error *ngIf="this.form.controls.sessions.errors?.['maxSuggestionsLimitExceeded']">
+            {{'CHANNELS.CROSS_SELLING.MAX_SUGGESTIONS_LIMIT_EXCEEDED' | translate : { value: maxSelection} }}
+        </mat-error>
+    </div>
+</div>

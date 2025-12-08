@@ -1,0 +1,21 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="(isInProgress$ | async) || !form.dirty"
+    [formGroup]="form">
+    <p class="section-description">{{'CHANNELS.COMMISSIONS.DESCRIPTION' | translate}}</p>
+    <div class="section-block">
+        <div class="flex justify-start items-center gap-1">
+            <mat-checkbox id="promotions-surcharges-enabled" color="primary" [formControl]="enabledPromotionRangesCtrl">
+                {{'CHANNELS.COMMISSIONS.PROMOTION_ENABLE' | translate}}
+            </mat-checkbox>
+        </div>
+    </div>
+    <app-channel-commissions-generic class="section-block" [userCanWrite]="$userCanWrite()"
+        [commissionsRequestCtrl]="commissionsRequestCtrl" [currencySelectedTabBS]="currencySelectedTabBS" />
+    <app-channel-commissions-promotion class="section-block" [userCanWrite]="$userCanWrite()"
+        [enabledPromotionRangesCtrl]="enabledPromotionRangesCtrl" [commissionsRequestCtrl]="commissionsRequestCtrl"
+        [currencySelectedTabBS]="currencySelectedTabBS" />
+</app-form-container>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

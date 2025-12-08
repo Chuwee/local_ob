@@ -1,0 +1,335 @@
+@use '@angular/material' as mat;
+
+@mixin buttons-override($palettes, $colors) {
+    $primary: map-get($palettes, primary);
+    $white: map-get($colors, ob-white);
+    $black: map-get($colors, ob-black);
+    $grey-light-10: map-get($colors, ob-grey-light-10);
+    $grey-light-20: map-get($colors, ob-grey-light-20);
+
+    .ob-button {
+        // Common
+        --mdc-filled-button-label-text-transform: uppercase;
+        --mdc-text-button-label-text-transform: uppercase;
+        --mdc-outlined-button-label-text-transform: uppercase;
+        &.mdc-button {
+            -webkit-font-smoothing: auto;
+            border-radius: 2px;
+
+            &:not(.only-icon) {
+                gap: 4px;
+            }
+
+            .mat-icon {
+                width: 24px;
+                height: 24px;
+                font-size: 24px;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        &:not(.mat-mdc-icon-button):not(.only-icon) {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        &.mat-mdc-icon-button {
+            border-radius: 50%;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            &:hover {
+                .mat-mdc-button-persistent-ripple::before {
+                    opacity: 0.1;
+                }
+            }
+            &.no-hover-ripple {
+                .mat-mdc-button-persistent-ripple::before {
+                    display: none;
+                }
+            }
+            &[disabled] {
+                color: $grey-light-20;
+            }
+            &.mat-mdc-outlined-button,
+            &.mat-stroked-button {
+                background-color: $white;
+                border: solid 1px $grey-light-10;
+                &:hover:not([disabled]) {
+                    .mat-mdc-button-touch-target {
+                        opacity: 0;
+                    }
+                    background-color: $white;
+                    border: solid 1px $black;
+                }
+            }
+            .mat-icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            &.mat-tertiary {
+                &.active:not([disabled]) {
+                    transition: background-color 200ms ease-out;
+                    background-color: $grey-light-10;
+                }
+                &:hover:not([disabled]):not(.active) {
+                    transition: background-color 200ms ease-out;
+                    background-color: $grey-light-10;
+                }
+            }
+        }
+
+        // Primary, small, medium and large
+        &.mat-mdc-icon-button,
+        &.mat-mdc-button,
+        &.mat-mdc-raised-button,
+        &.mat-mdc-unelevated-button,
+        &.mat-button-toggle,
+        &.mat-mdc-outlined-button {
+            // Height by default, equal to medium
+            height: 36px;
+            min-width: 36px;
+            .mat-icon {
+                font-size: 20px;
+                line-height: 24px;
+                min-width: 24px;
+                width: auto;
+                height: auto;
+                margin: 0;
+            }
+            &.only-icon {
+                width: 36px;
+            }
+            .mdc-button__label {
+                white-space: nowrap;
+                +.mat-icon {
+                    margin: 0;
+                }
+            }
+            .mat-mdc-button-touch-target {
+                height: auto;
+            }
+            &.xsmall {
+                height: 26px;
+                min-width: 26px;
+                .mat-icon {
+                    font-size: 18px;
+                    line-height: 24px;
+                    margin: 0;
+                }
+                &.only-icon {
+                    width: 26px;
+                }
+            }
+            &.small {
+                height: 30px;
+                min-width: 30px;
+                .mat-icon {
+                    font-size: 18px;
+                    line-height: 22px;
+                }
+                &:not(.only-icon) {
+                    .mat-icon {
+                        width: 20px;
+                        height: 20px;
+                        font-size: 18px;
+                        line-height: 20px;
+                        margin: 0;
+                    }
+                    .mdc-button__label {
+                        line-height: 19px;
+                    }
+                }
+                &.only-icon {
+                    width: 30px;
+                }
+            }
+            &.medium {
+                height: 36px;
+                min-width: 36px;
+                .mat-icon {
+                    font-size: 20px;
+                    line-height: 24px;
+                    min-width: 24px;
+                    width: auto;
+                    height: auto;
+                    margin: 0;
+                }
+                &.only-icon {
+                    width: 36px;
+                }
+            }
+            &.large {
+                height: 42px;
+                min-width: 42px;
+                .mat-icon {
+                    font-size: 22px;
+                    line-height: 24px;
+                }
+                &.only-icon {
+                    width: 42px;
+                }
+            }
+        }
+
+        // Primary, small, medium and large
+        &.mat-mdc-icon-button {
+            width: 36px;
+            &.xsmall {
+                width: 26px;
+            }
+            &.small {
+                width: 30px;
+            }
+            &.medium {
+                width: 36px;
+            }
+            &.large {
+                width: 42px;
+            }
+        }
+
+        // Basic button
+        &.mat-mdc-button {
+            &:hover:not([disabled]) .mat-mdc-button-touch-target {
+                opacity: 0.15;
+            }
+            &.active:not([disabled]) {
+                transition: color 300ms ease-out;
+                color: mat.m2-get-color-from-palette($primary, darker);
+                &:hover .mat-mdc-button-touch-target {
+                    // disable hover when active
+                    opacity: 0;
+                }
+            }
+            &:not(:disabled) {
+                color: $black;
+            }
+            &[disabled] {
+                color: $grey-light-20;
+            }
+            .mat-mdc-button-touch-target {
+                height: auto;
+            }
+        }
+        // Flat Button
+        &.mat-mdc-unelevated-button {
+            &:not([disabled]) {
+                color: $black;
+            }
+            &[disabled] {
+                cursor: not-allowed;
+                color: $grey-light-20;
+            }
+            // Primary button
+            &.mat-primary {
+                &:hover:not([disabled]):not(.active) {
+                    transition: background-color 200ms ease-out;
+                    background-color: mat.m2-get-color-from-palette($primary, darker);
+                }
+                &.active:not([disabled]) {
+                    transition: background-color 200ms ease-out;
+                    background-color: mat.m2-get-color-from-palette($primary, darker);
+                }
+                &[disabled] {
+                    color: $white;
+                    background-color: $grey-light-20;
+                }
+                &:not([disabled]) {
+                    color: $white;
+                }
+            }
+            // Tertiary button
+            &.mat-tertiary {
+                &.active:not([disabled]) {
+                    transition: background-color 200ms ease-out;
+                    background-color: $grey-light-10;
+                }
+                &:hover:not([disabled]):not(.active) {
+                    transition: background-color 200ms ease-out;
+                    background-color: $grey-light-10;
+                }
+            }
+        }
+        // Stroked Button
+        &.mat-mdc-outlined-button {
+            &[disabled] {
+                color: $grey-light-20;
+                border: 1px solid $grey-light-20;
+                cursor: not-allowed;
+            }
+            &:not([disabled]) {
+                color: $black;
+            }
+            // Primary button
+            &.mat-primary {
+                &:not([disabled]) {
+                    border-color: mat.m2-get-color-from-palette($primary);
+                    color: mat.m2-get-color-from-palette($primary);
+                }
+                &:hover:not([disabled]):not(.active) {
+                    transition: background-color 200ms ease-out;
+                    background-color: mat.m2-get-color-from-palette($primary, 50);
+                }
+                &.active:not([disabled]) {
+                    transition: color 200ms ease-out, border-color 200ms ease-out;
+                    color: mat.m2-get-color-from-palette($primary, darker);
+                    border-color: mat.m2-get-color-from-palette($primary, darker);
+                    &:hover .mat-mdc-button-touch-target {
+                        // disable hover when active
+                        opacity: 0;
+                    }
+                }
+                &[disabled] {
+                    border-color: $grey-light-20;
+                    color: $grey-light-20;
+                }
+            }
+            // Tertiary button
+            &.mat-tertiary {
+                color: $black;
+                border-color: $grey-light-20;
+                &.active:not([disabled]) {
+                    background-color: $grey-light-10;
+                    transition: border-color 300ms ease-out;
+                    border-color: $black;
+                    &:hover .mat-mdc-button-touch-target {
+                        // disable hover when active
+                        opacity: 0;
+                    }
+                }
+                &:hover:not([disabled]):not(.active) {
+                    background-color: $grey-light-10;
+                    stroke-opacity: 90%;
+                    border-color: $grey-light-20;
+                }
+                &[disabled] {
+                    border-color: $grey-light-20;
+                    color: $grey-light-20;
+                }
+            }
+        }
+
+        // Others
+        &.only-icon {
+            .mat-icon {
+                width: auto;
+                height: auto;
+            }
+            padding: 0;
+        }
+
+        &.ticket-template-preview {
+            color: $black;
+        }
+        &.not-uppercase {
+            text-transform: none;
+        }
+    }
+}
+

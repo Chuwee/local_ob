@@ -1,0 +1,59 @@
+@if($domains()?.length; as total){
+    <div class="grid gap-3">
+        <div class="flex justify-end">
+            <div [matTooltip]="'ADMIN_CHANNEL.CONFIGURATION.SUBDOMAIN.ACTIONS.LIMIT' | translate"
+                [matTooltipDisabled]="!(total >= maxItems)">
+                <button mat-stroked-button color="primary" type="button" class="ob-button medium"
+                    [attr.aria-label]="'ADMIN_CHANNEL.CONFIGURATION.SUBDOMAIN.ACTIONS.CREATE' | translate"
+                    (click)="openCreateDialog()"
+                    [disabled]="(total >= maxItems)">
+                    <mat-icon fontIcon="add" />
+                    {{'ADMIN_CHANNEL.CONFIGURATION.SUBDOMAIN.ACTIONS.CREATE' | translate}}
+                </button>
+            </div>
+        </div>
+        <mat-list class="ob-list" role="list">
+            @for(domain of $domains(); track $index){
+                <mat-list-item class="editable-item" role="listitem">
+                    <div matListItemAvatar class="flex justify-center items-center">
+                        <mat-button-toggle
+                            class="ob-icon-button-toggle-simple yellow-icon-appearance ob-button only-icon fake-icon-button"
+                            [checked]="domain.default" [disabled]="domain.default" (click)="updateDefault($index)">
+                            <mat-icon [class]="domain.default ? 'selected' : 'not-selected'"
+                                matTooltip="{{'ADMIN_CHANNEL.CONFIGURATION.SUBDOMAIN.INFOS.DEFAULT' | translate}}"
+                                [matTooltipDisabled]="!domain.default"
+                                [fontIcon]="domain.default ? 'star' : 'star_border'" />
+                        </mat-button-toggle>
+
+                    </div>
+                    <h3 matListItemTitle>{{domain.domain}}</h3>
+                    <div matListItemMeta class="flex flex-row actions-container">
+                        @if($canConfigure()){
+                            <button type="button" mat-icon-button aria-label="ADMIN_CHANNEL.CONFIGURATION.SUBDOMAIN.ACTIONS.CONFIGURE"
+                                class="ob-button medium"
+                                (click)="onConfigure(domain, $index)">
+                                <mat-icon class="ob-black" fontIcon=" edit" />
+                            </button>
+                        }
+                        @if(!domain.default){
+                            <button type="button" mat-icon-button aria-label="FORMS.ACTIONS.DELETE" class="ob-button medium"
+                                (click)="openDeleteDialog(domain, $index)">
+                                <mat-icon class="ob-black" fontIcon="delete" />
+                            </button>
+                        }
+                    </div>
+                </mat-list-item>
+            }
+        </mat-list>
+    </div>
+} @else if(!$loading()){
+    <app-empty-state
+        [hideImage]=" true"
+        [title]="'ADMIN_CHANNEL.CONFIGURATION.SUBDOMAIN.ACTIONS.EMPTY' | translate"
+        [description]="'ADMIN_CHANNEL.CONFIGURATION.SUBDOMAIN.ACTIONS.EMPTY_DESCRIPTION' | translate">
+        <button mat-stroked-button class="ob-button" color="primary" (click)="openCreateDialog()">
+            <mat-icon fontIcon="add" />
+            {{'ADMIN_CHANNEL.CONFIGURATION.SUBDOMAIN.ACTIONS.CREATE' | translate}}
+        </button>
+    </app-empty-state>
+}

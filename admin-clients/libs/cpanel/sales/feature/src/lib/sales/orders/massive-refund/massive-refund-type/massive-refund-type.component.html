@@ -1,0 +1,106 @@
+<div mat-dialog-content fxLayout="column">
+    <form [formGroup]="refundTypeForm" fxLayout="column">
+        <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center" class="refund-order-dialog-advice">
+            <mat-icon class="ob-icon small neutral with-text">info</mat-icon>
+            <span>{{'ORDERS.MASSIVE_REFUND.DIALOG.TYPE.ADVICE' | translate}}</span>
+        </div>
+        <div fxLayout="row" fxLayoutGap="30px">
+            <div class="refund-order-section" fxLayout="column" fxFlex="1 1 50%">
+                <div class="mat-h4 refund-order-section-title">
+                    {{'ORDERS.MASSIVE_REFUND.DIALOG.TYPE.TYPE_SELECT' | translate}}
+                </div>
+                <mat-divider></mat-divider>
+                <div class="refund-order-section-content" fxLayout="row" fxFlexOffset="6px">
+                    <mat-radio-group (change)="updateType($event.value)" fxFlex="100%" fxLayout="column" fxLayoutGap="10px">
+                        <mat-radio-button *ngFor="let type of refundTypeList" class="ob-radio-card-button" [value]="type"
+                            [checked]="refundTypeForm.get('type').value === type">
+                            <div class="refund-order-option-text">
+                                {{'ORDERS.MASSIVE_REFUND.DIALOG.TYPE.' + type + '.NAME' | translate}}
+                            </div>
+                            <div>
+                                {{'ORDERS.MASSIVE_REFUND.DIALOG.TYPE.' + type + '.DESCRIPTION' | translate}}
+                            </div>
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </div>
+            </div>
+            <div *ngIf="amount$ | async as amount" class="refund-order-section" fxLayout="column" fxFlex="1 1 50%">
+                <div class="mat-h4 refund-order-section-title">
+                    {{'ORDERS.MASSIVE_REFUND.DIALOG.TYPE.AMOUNTS_SELECT' | translate}}
+                </div>
+                <mat-divider></mat-divider>
+                <div class="refund-order-section-content" fxLayout="row">
+                    <div fxLayout="column" fxFlex="1 1 auto">{{'ORDER.TICKETS' | translate}}</div>
+                    <div fxLayout="column" fxFlex="0 0 auto">{{amount.tickets | localCurrency: currency}}</div>
+                    <div fxLayout="column" fxFlex="30px"></div>
+                </div>
+                <div class="refund-order-section-content" fxLayout="row">
+                    <div fxLayout="column" fxFlex="1 1 auto">{{'FORMS.LABELS.DISCOUNTS' | translate}}</div>
+                    <div fxLayout="column" fxFlex="0 0 auto">{{amount.discounts | localCurrency: currency}}</div>
+                    <div fxLayout="column" fxFlex="30px"></div>
+                </div>
+                <div class="refund-order-section-content" fxLayout="row">
+                    <div fxLayout="column" fxFlex="1 1 auto">{{'FORMS.LABELS.PROMOTIONS' | translate}}</div>
+                    <div fxLayout="column" fxFlex="0 0 auto">{{amount.promotions | localCurrency: currency}}</div>
+                    <div fxLayout="column" fxFlex="30px"></div>
+                </div>
+                <div class="refund-order-section-content" fxLayout="row">
+                    <div fxLayout="column" fxFlex="1 1 auto">{{'ORDER.PRICE_DATA.ORDER_SALES' | translate}}</div>
+                    <div fxLayout="column" fxFlex="0 0 auto">{{amount.orderSales| localCurrency: currency}}</div>
+                    <div fxLayout="column" fxFlex="30px"></div>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="refund-order-section-content mat-body-strong" fxLayout="row">
+                    <div fxLayout="column" fxFlex="1 1 auto">
+                        {{'ACTIONS.REFUND.AMOUNTS.TOTAL_TICKETS' | translate}}
+                    </div>
+                    <div fxLayout="column" fxFlex="0 0 auto">{{amount.totalTickets | localCurrency: currency}}</div>
+                    <div fxLayout="column" fxFlex="30px" fxLayoutAlign="center center">
+                        <input fxHide matInput>
+                        <mat-checkbox color="primary" disabled checked="true"></mat-checkbox>
+                    </div>
+                </div>
+                <div class="refund-order-section-content" fxLayout="row">
+                    <div fxLayout="column" fxFlex="1 1 auto">
+                        {{'FORMS.LABELS.ADMINISTRATION_FEES' | translate}}
+                    </div>
+                    <div fxLayout="column" fxFlex="0 0 auto">{{amount.fees | localCurrency: currency}}</div>
+                    <div fxLayout="column" fxFlex="30px" fxLayoutAlign="center center">
+                        <input fxHide matInput>
+                        <mat-checkbox formControlName="surcharges" color="primary"></mat-checkbox>
+                    </div>
+                </div>
+                <div class="refund-order-section-content" fxLayout="row">
+                    <div fxLayout="column" fxFlex="1 1 auto">{{'FORMS.LABELS.DELIVERY_COSTS' | translate}}</div>
+                    <div fxLayout="column" fxFlex="0 0 auto">{{amount.delivery | localCurrency: currency}}</div>
+                    <div fxLayout="column" fxFlex="30px" fxLayoutAlign="center center">
+                        <input fxHide matInput>
+                        <mat-checkbox formControlName="delivery" color="primary"></mat-checkbox>
+                    </div>
+                </div>
+                <div class="refund-order-section-content" fxLayout="row">
+                    <div fxLayout="column" fxFlex="1 1 auto">{{'ORDER.PRICE_DATA.INSURANCE' | translate}}</div>
+                    <div fxLayout="column" fxFlex="0 0 auto">{{amount.insurance | localCurrency: currency}}</div>
+                    <div fxLayout="column" fxFlex="30px" fxLayoutAlign="center center">
+                        <input fxHide matInput>
+                        <mat-checkbox formControlName="insurance" color="primary"></mat-checkbox>
+                    </div>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="refund-order-section-content refund-order-amount-total mat-body-strong" fxLayout="row">
+                    <div fxLayout="column" fxFlex="1 1 auto">
+                        <div>
+                            {{'ACTIONS.REFUND.AMOUNTS.AMOUNT_TO_RETURN' | translate}}
+                            <span class="refund-order-amount-total-max">
+                                {{'ACTIONS.REFUND.AMOUNTS.MAX' |
+                                translate:{value: amount.max | localCurrency: currency} }}
+                            </span>
+                        </div>
+                    </div>
+                    <div fxLayout="column" fxFlex="0 0 auto">{{amountToRefund | localCurrency: currency}}</div>
+                    <div fxLayout="column" fxFlex="30px"></div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

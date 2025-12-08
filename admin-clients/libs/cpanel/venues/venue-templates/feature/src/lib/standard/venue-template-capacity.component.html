@@ -1,0 +1,74 @@
+<app-form-container-full [sidebarWidth]="standardVenueTemplateComponent?.$labelMgrWidth()"
+    [disabled]="isDirty$ === undefined || (isDirty$ | async) === false" (cancel)="cancelChanges()" (save)="saveChanges()">
+    <mat-drawer-container class="left-bar-container" fxFlex="0 1 100%" fxLayoutAlign="stretch">
+        <mat-drawer #drawer mode="side" opened fxFlex="0 0 {{sidebarWidth$ | async}}" class="left-bar detail-bar">
+            <div *ngIf="venueTemplate$ | async as template" fxLayout="column" fxLayoutAlign="start stretch">
+                <div class="left-sidebar-title" fxFlex="0 0 68px">
+                    <h2 class="title">{{'EVENTS.TEMPLATE' | translate}}</h2>
+                    <div fxLayoutAlign="end bottom">
+                        <button mat-icon-button aria-label="Edit template" class="ob-button small"
+                            [disabled]="isDirty$ | async" (click)="openEditTemplateDialog(template)"
+                            [matTooltip]="'EVENTS.EDIT_TPL_BTN' | translate">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                    </div>
+                </div>
+                <div fxFlex="36px" class="left-sidebar-subheader">
+                    <h3 class="section-title">{{'VENUE_TPLS.DETAILS_TITLE' | translate | uppercase}}</h3>
+                </div>
+                <div class="item-details" fxLayout="column" fxLayoutGap="14px">
+                    <div>
+                        <div class="mat-subtitle-2">{{template.name}}</div>
+                        <div class="value">{{template.venue?.name}}</div>
+                        <div class="value">
+                            {{template.venue?.city + ' (' + ('COUNTRIES.' + template.venue?.country | translate) + ')'}}
+                        </div>
+                    </div>
+                    <div>
+                        <div fxFlex fxLayout="column">
+                            <span class="label primary">{{'VENUE_TPLS.ID' | translate}}</span>
+                            <span class="value">{{template.id}}</span>
+                        </div>
+                        <mat-divider vertical class="detail-bar-divider" />
+                        <div fxFlex fxLayout="column">
+                            <span class="label primary">{{'FORMS.LABELS.OWNER' | translate}}</span>
+                            <span class="value">{{template.entity?.name}}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div fxFlex fxLayout="column">
+                            <span class="label primary">{{'VENUES.MAX_CAPACITY' | translate}}</span>
+                            <span class="value">{{template.venue?.capacity}}</span>
+                        </div>
+                        <mat-divider vertical class="detail-bar-divider" />
+                        <div fxFlex fxLayout="column">
+                            <span class="label primary">{{'FORMS.LABELS.TYPE' | translate}}</span>
+                            <span class="value">{{'EVENTS.TYPE_OPTS.' + template.type | translate}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-drawer>
+        <mat-drawer-content fxFlex="0 1 100%" fxLayout="column">
+            <div class="ob-sidebar-toggle" (click)="sidebarToggle(drawer)" [ngClass]="{'collapsed': !drawer.opened}">
+                <span class="arrow"></span>
+            </div>
+            <div fxFlex="0 1 100%" *ngIf="(venueTemplateStatus$ | async) !== venueTemplateStatus.inProgress">
+                <app-std-venue-tpl-mgr *ngIf="venueTemplate$ | async as venueTemplate" fxFlex="0 1 100%"
+                    [editorType]="venueTemplateEditorType.venueTemplate" [venueTemplate]="venueTemplate"
+                    [editorEnabled]="showEditorBtn$ | async"
+                    (gotoEditor)="gotoEditor()" />
+            </div>
+            <div *ngIf="(venueTemplateStatus$ | async) !== venueTemplateStatus.active" class="ob-overlay-wrapper">
+                <div class="ob-overlay-pane pane-center">
+                    <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px" fxFlex="80%">
+                        <p>{{'VENUE_TPLS.DUPLICATION_IN_PROGRESS' | translate}}</p>
+                        <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                            [attr.aria-label]="('VENUE_TPLS.DUPLICATION_IN_PROGRESS' | translate)" />
+                    </app-context-notification>
+                </div>
+            </div>
+        </mat-drawer-content>
+    </mat-drawer-container>
+
+</app-form-container-full>

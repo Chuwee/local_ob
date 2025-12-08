@@ -1,0 +1,81 @@
+<div class="list-container" fxFlex="100%" fxLayout="column">
+    <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">{{'TITLES.OPERATORS' | translate}}</h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+            <div class="filter-container" fxFlex="none">
+                <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                    [attr.aria-label]="'OPERATOR.NEW_BTN' | translate" [matTooltip]="'OPERATOR.NEW_BTN' | translate"
+                    (click)="openNewOperatorDialog()">
+                    <mat-icon>add</mat-icon>
+                    {{'OPERATOR.NEW_BTN' | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="heading-container" fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxFlex="70%" fxLayoutGap="20px" fxLayoutAlign="start center">
+            <div class="search-field" fxFlex="100%">
+                <app-search-input [placeholder]="'FORMS.SEARCH.OPERATORS_LIST' | translate"></app-search-input>
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            <p *ngIf="operatorsMetadata$ | async as operatorsMetadata" class="page-summary"
+                [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: operatorsMetadata">
+            </p>
+            <app-paginator [length]="(operatorsMetadata$ | async)?.total" [pageSize]="operatorsPageSize"></app-paginator>
+        </div>
+    </div>
+    <div class="heading-container heading-divider">
+        <mat-divider></mat-divider>
+    </div>
+    <div class="spinner-container" *ngIf="operatorsLoading$ | async">
+        <mat-spinner></mat-spinner>
+    </div>
+    <mat-table class="ob-table" [dataSource]="operators$ | async" matSort [matSortActive]="initSortCol"
+        [matSortDirection]="initSortDir" matSortDisableClear [attr.aria-label]="'TITLES.OPERATORS' | translate"
+        [class.not-touchable]="(isHandsetOrTablet$ | async) !== true">
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'FORMS.LABELS.NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.name}}</mat-cell>
+        </ng-container>
+        <!-- Short name Column -->
+        <ng-container matColumnDef="short_name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'FORMS.LABELS.SHORT_NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.short_name}}</mat-cell>
+        </ng-container>
+        <!-- Language Column -->
+        <ng-container matColumnDef="language">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'FORMS.LABELS.LANGUAGE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{('LANGUAGES.' + row.language.code) | translate}}</mat-cell>
+        </ng-container>
+        <!-- Currency Column -->
+        <ng-container matColumnDef="currency">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'FORMS.LABELS.CURRENCY' | translate}}
+            </mat-header-cell>
+            <mat-cell
+                *matCellDef="let row">{{('CURRENCIES.' + (row.currencies?.default_currency || row.currency.code) ) | translate}}</mat-cell>
+        </ng-container>
+        <!-- Timezone Column -->
+        <ng-container matColumnDef="timezone">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'FORMS.LABELS.TIMEZONE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.timezone?.code}}</mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;" class="interactive-row"
+            [routerLink]="[row.id, 'general-data']"></mat-row>
+    </mat-table>
+    <div class="context-notification-container" fxFlex="0 50 100%" fxLayout="row" fxLayoutAlign="center start"
+        *ngIf="(operatorsMetadata$ | async)?.total === 0">
+        <app-context-notification class="ob-context-notification" contextType="info"
+            fxFlex.gt-sm="600px" fxFlex="80%" fxLayoutAlign="center start">
+            <p>{{'LIST.EMPTY' | translate}}</p>
+        </app-context-notification>
+    </div>
+</div>

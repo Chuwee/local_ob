@@ -1,0 +1,19 @@
+<app-form-container (save)="savePrices()" (cancel)="cancel()" [disabled]="!formPriceTypesRates.dirty" layout="menu">
+  @if (isGenerationStatusInProgress$ | async) {
+    <div class="ob-overlay-wrapper" fxLayoutAlign="center start" slot="overlay">
+      <div class="ob-overlay-pane pane-sticky">
+        <app-context-notification contextType="info" fxFlex="80%" fxFlex.gt-sm="600px" class="ob-context-notification">
+          <p>{{'SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate}}</p>
+          <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+            [attr.aria-label]="('SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate)" />
+        </app-context-notification>
+      </div>
+    </div>
+  }
+  <app-season-ticket-price-types-matrix [form]="formPriceTypesRates" [saveBtnClicked$]="saveBtnClicked$" />
+</app-form-container>
+@if (isInProgress$ | async) {
+  <div class="spinner-container">
+    <mat-spinner />
+  </div>
+}

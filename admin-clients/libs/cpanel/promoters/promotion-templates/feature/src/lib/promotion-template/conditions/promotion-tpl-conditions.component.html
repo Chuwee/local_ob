@@ -1,0 +1,158 @@
+<app-form-container [formGroup]="form" (cancel)="cancel()" (save)="save()" layout="main" class="overflow-y-auto"
+    [disabled]="!form.dirty || (reqInProgress$ | async)">
+    <mat-accordion multi [togglePosition]="'before'">
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.PROMOTIONS.CONDITIONS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <!-- PROMOTION COLLECTIVES -->
+            @if ((promotion$ | async)?.type !== promotionTypes.automatic) {
+                <div class="promotion-form-section flex flex-col" formGroupName="collective">
+                    <p class="mat-subtitle-2">
+                        {{'EVENTS.PROMOTIONS.COLLECTIVES.TITLE' | translate}} *
+                    </p>
+                    <mat-radio-group formControlName="type" class="tax-data-radio-group flex flex-col">
+                        <mat-radio-button class="ob-radio-button vertical-list" [value]="promotionCollectiveScope.none">
+                            {{'EVENTS.PROMOTIONS.COLLECTIVES.NONE' | translate}}
+                        </mat-radio-button>
+                        <mat-radio-button class="ob-radio-button vertical-list" [value]="promotionCollectiveScope.restricted">
+                            {{'EVENTS.PROMOTIONS.COLLECTIVES.SPECIFIC' | translate}}
+                        </mat-radio-button>
+                    </mat-radio-group>
+                    @if (form.get('collective.type').value === promotionCollectiveScope.restricted) {
+                        <div class="flex flex-col select-collective-container nested-content">
+                            <div class="flex items-baseline gap-4">
+                                <mat-form-field appearance="outline" class="ob-form-field ob-form-field-outline flex basis-1/2">
+                                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="collectiveId"
+                                        aria-label="collective">
+                                        @for (collective of collectives$ |async; track collective) {
+                                            <mat-option [value]="collective?.id">
+                                                <div appEllipsify [matTooltip]="collective?.name + ' - ' +
+                                                     (('COLLECTIVE.TYPE_OPTS.' + collective?.type) | translate) + ' - ' +
+                                                     (('COLLECTIVE.SUBTYPE_OPTS.' + collective?.validation_method) | translate)">
+                                                    {{collective?.name}} -
+                                                    {{('COLLECTIVE.TYPE_OPTS.' + collective?.type) | translate}} -
+                                                    {{('COLLECTIVE.SUBTYPE_OPTS.' + collective?.validation_method) |
+                                                     translate}}
+                                                </div>
+                                            </mat-option>
+                                        }
+                                    </mat-select>
+                                </mat-form-field>
+                                @if (form.value.collective?.collectiveId) {
+                                    <div class="flex items-baseline">
+                                        <a aria-label="Go to link" class="ob-link flex" target="_blank"
+                                            [routerLink]="['/collectives', form.value.collective.collectiveId, 'general-data']">
+                                            <span>{{'ACTIONS.GO_TO_COLLECTIVE' | translate}}</span>
+                                            <mat-icon class="ob-icon xsmall" iconPositionEnd>launch</mat-icon>
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                            <div class="flex flex-col">
+                                <mat-checkbox color="primary" formControlName="restrictiveSale" class="inline">
+                                    {{'EVENTS.PROMOTIONS.COLLECTIVE.RESTRICTIVE_SALE' | translate}}
+                                </mat-checkbox>
+                                <mat-checkbox color="primary" formControlName="presaleSale" class="inline presale-sale">
+                                    {{'EVENTS.PROMOTIONS.COLLECTIVE.PRESALE_SALE' | translate}}
+                                </mat-checkbox>
+                                <mat-checkbox color="primary" formControlName="notBoxOfficeValidation" class="inline">
+                                    {{'EVENTS.PROMOTIONS.COLLECTIVE.NOT_BOX_OFFICE_VALIDATION' | translate}}
+                                </mat-checkbox>
+                            </div>
+                        </div>
+                    }
+                    <mat-divider class="ob-form-divider" />
+                </div>
+            }
+            <!-- PROMOTION AUTO IS COMBINABLE -->
+            @if ((promotion$ | async)?.type === promotionTypes.automatic) {
+                <div class="promotion-form-section flex flex-col">
+                    <mat-checkbox color="primary" formControlName="notCombinable" class="inline">
+                        {{'EVENTS.PROMOTIONS.IS_COMBINABLE' | translate}}
+                    </mat-checkbox>
+                    <mat-divider class="ob-divider" />
+                </div>
+            }
+            <!-- PROMOTION ALTERNATIVE FEES -->
+            <div class="promotion-form-section flex flex-col">
+                <p class="mat-subtitle-2">{{'EVENTS.PROMOTIONS.SURCHARGES' | translate}}</p>
+                <mat-checkbox color="primary" formControlName="enableAlternativeChannelSurcharges" class="inline">
+                    {{'EVENTS.PROMOTIONS.CHANNEL_SURCHARGES' | translate}}
+                </mat-checkbox>
+                <mat-checkbox color="primary" formControlName="enableAlternativePromoterSurcharges" class="inline">
+                    {{'EVENTS.PROMOTIONS.PROMOTER_SURCHARGES' | translate}}
+                </mat-checkbox>
+            </div>
+            <mat-divider class="ob-divider" />
+            <!-- PROMOTION IN TICKET CONFIG -->
+            <div class="flex flex-col promotion-form-section">
+                <p class="mat-subtitle-2">{{'EVENTS.PROMOTIONS.TICKET_OPTIONS' | translate}}</p>
+                @if ((promotion$ | async)?.type !== promotionTypes.automatic) {
+                    <mat-checkbox color="primary"
+                        formControlName="showDiscountNameInTicket" class="inline">
+                        {{'EVENTS.PROMOTIONS.SHOW_DISCOUNT_NAME_TICKET' | translate}}
+                    </mat-checkbox>
+                }
+                <mat-checkbox color="primary" formControlName="showTicketPriceWithoutDiscount" class="inline">
+                    {{'EVENTS.PROMOTIONS.SHOW_RAW_PRICE_TICKET' | translate}}
+                </mat-checkbox>
+            </div>
+            <mat-divider class="ob-divider" />
+            <!-- PROMOTION ACCESS CONTROL -->
+            <div class="flex flex-col promotion-form-section">
+                <p class="mat-subtitle-2">{{'EVENTS.PROMOTIONS.ACCESS_CONTROL' | translate}}</p>
+                <mat-checkbox color="primary" formControlName="accessControlRestricted" class="inline">
+                    {{'EVENTS.PROMOTIONS.ACCESS_CONTROL_TOGGLE' | translate}}
+                </mat-checkbox>
+            </div>
+            <mat-divider class="ob-divider" />
+            <!-- PROMOTION VALIDITY PERIOD -->
+            <div class="flex flex-col promotion-form-section" formGroupName="validityPeriod">
+                <p class="mat-subtitle-2">{{'EVENTS.PROMOTIONS.VALIDITY_PERIOD' | translate}} *</p>
+                <mat-radio-group formControlName="type" class="flex flex-col">
+                    <mat-radio-button class="ob-radio-button vertical-list" [value]="validityPeriodTypes.event">
+                        {{'EVENTS.PROMOTIONS.VALIDITY_PERIOD_ALL' | translate}}
+                    </mat-radio-button>
+                    <mat-radio-button class="ob-radio-button vertical-list" [value]="validityPeriodTypes.period">
+                        {{'EVENTS.PROMOTIONS.VALIDITY_PERIOD_SELECT' | translate}}
+                    </mat-radio-button>
+                </mat-radio-group>
+                @if (form.get('validityPeriod.type').value === validityPeriodTypes.period) {
+                    <div formGroupName="dates" class="dates-selection nested-content flex flex-row flex-wrap">
+                        <div class="flex xl:basis-1/2 basis-full flex-col">
+                            <app-date-time-picker class="date-form-field" [label]="'DATES.START_DATE' | translate"
+                                formControlName="start" />
+                        </div>
+                        <div class="flex xl:basis-1/2 basis-full flex-col">
+                            <app-date-time-picker class="date-form-field" [label]="'DATES.END_DATE' | translate"
+                                formControlName="end" />
+                        </div>
+                    </div>
+                }
+            </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.PROMOTIONS.OPERATIVE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <!-- PROMOTION CHANNELS -->
+            <div [class.atomic-saving-error]="errors.savePromotionChannels">
+                <app-promotion-tpl-channels [promotionId]="promotionId" [channelsForm]="form.get('channels')" />
+                @if (errors.savePromotionChannels) {
+                    <span class="error-description">
+                        {{'EVENTS.PROMOTIONS.ATOMIC_SAVING_ERROR' | translate}}
+                    </span>
+                }
+            </div>
+            <mat-divider class="ob-divider" />
+            <!-- PROMOTION LIMITS -->
+            <app-promotion-limits [form]="form" [promotion$]="promotion$" />
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+@if (reqInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

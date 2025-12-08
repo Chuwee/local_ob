@@ -1,0 +1,51 @@
+<div class="dialog-msg-container">
+    <div class="dialog-header-container" fxLayout="row" mat-dialog-title>
+        <h2 fxFlex="100%" fxLayoutAlign="start end" class="secondary title">
+            {{'MEMBER_EXTERNAL.DATES_FILTER_DIALOG.TITLE' | translate}}
+        </h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutGap="8px" fxLayoutAlign="start stretch" [formGroup]="form">
+        <div fxLayout="column" >
+           <p class="description">{{'MEMBER_EXTERNAL.DATES_FILTER_DIALOG.DESCRIPTION' | translate }}</p>
+            <div fxLayout="row">
+                <app-collection-input fxFlex="412px" formControlName="users"
+                                      [placeholder]="'MEMBER_EXTERNAL.DATES_FILTER_DIALOG.INPUT_PLACEHOLDER' | translate"
+                                      [label]="'MEMBER_EXTERNAL.DATES_FILTER_DIALOG.INPUT_LABEL'"
+                                      [buttonLabel]="'FORMS.ACTIONS.ADD' | translate" avoidNegativeNumbers>
+                    <ng-template #elementsCollectionTemplate>
+                        <app-chips [chips$]="currentAmountsChips$" [isRemoveAllShown]="false"
+                                   (removeEmitter)="removeChip($event)"
+                                   class="ellipsified-chips without-max-height chips-content">
+                        </app-chips>
+                    </ng-template>
+                </app-collection-input>
+            </div>
+            <mat-error *ngIf="!form.hasError('required', 'users')"
+                       [ob-form-errors]="form" field="options"></mat-error>
+        </div>
+        <div fxFlex="100%" fxFlex.gt-md="50%" fxLayout="column">
+            <app-date-time-picker fxFlex="100%" class="date-form-field" [label]="'DATES.START_DATE' | translate"
+                                  formControlName="date">
+            </app-date-time-picker>
+        </div>
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="center center">
+        <div fxFlex fxLayoutAlign="end">
+            <div fxLayoutAlign="center start">
+                <button type="button" mat-button class="ob-button" (click)="close()">
+                    {{'FORMS.ACTIONS.CANCEL' | translate}}
+                </button>
+                <button #saveBtn mat-flat-button color="primary" type="button" class="ob-button"
+                        [disabled]="!form.valid || !form.dirty" (click)="save()">
+                    {{'FORMS.ACTIONS.ADD' | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="spinner-container" *ngIf="isLoading$ | async">
+    <mat-spinner></mat-spinner>
+</div>

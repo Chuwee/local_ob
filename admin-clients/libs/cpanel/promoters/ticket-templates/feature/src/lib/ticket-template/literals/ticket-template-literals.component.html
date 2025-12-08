@@ -1,0 +1,62 @@
+<app-form-container (cancel)="cancel()" [disabled]="!form.dirty || (isInProgress$ | async)" (save)="save()" layout="main">
+    <app-language-bar [languages]="languageList$ | async" [selected]="currentLang$ | async" slot="outside"
+        [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)">
+    </app-language-bar>
+    <form [formGroup]="form">
+        <mat-accordion [multi]="true" [togglePosition]="'before'">
+            <mat-expansion-panel [expanded]="true" *ngIf="literalsKeys">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'TICKET_TEMPLATE.TEXTS_TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="table-container" formGroupName="texts">
+                    <mat-form-field *ngFor="let key of textsKeys" fxFlex="100%" appearance="outline"
+                        class="ob-form-field no-padding field-with-label">
+                        <mat-label>{{'TICKET_TEMPLATE.TEXT_' + key | translate}}</mat-label>
+                        <app-rich-text-area [formControlName]="key" pasteAsText viewCode="false" [autoresize]="{min: 80, max: 350}"
+                            class="vertical-stretch">
+                        </app-rich-text-area>
+                    </mat-form-field>
+                </div>
+            </mat-expansion-panel>
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'TICKET_TEMPLATE.LITERALS_TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="table-container" formGroupName="literals">
+                    <mat-table class="ob-table" [dataSource]="literalsKeys" *ngIf="literalsKeys">
+                        <ng-container [matColumnDef]="tableHead[0]">
+                            <mat-header-cell *matHeaderCellDef class="head-cell">
+                                {{'TICKET_TEMPLATE.TABLE_TEXT_KEY' | translate}}
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row" fxLayoutAlign="start center">
+                                <span>{{row}}</span>
+                            </mat-cell>
+                        </ng-container>
+                        <ng-container [matColumnDef]="tableHead[1]">
+                            <mat-header-cell *matHeaderCellDef class="head-cell input-column">
+                                {{'TICKET_TEMPLATE.TABLE_TEXT_VALUE' | translate}}
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row" fxLayoutAlign="start center" class="editable-cell">
+                                <div fxFlex="100%" class="write-value">
+                                    <mat-form-field appearance="outline" class="ob-form-field">
+                                        <input matInput aria-label="ticket-template title"
+                                            [placeholder]="'TICKET_TEMPLATE.TABLE_TEMPLATE_TITLE' | translate"
+                                            [formControlName]="row">
+                                    </mat-form-field>
+                                </div>
+                            </mat-cell>
+                        </ng-container>
+                        <mat-header-row *matHeaderRowDef="tableHead;" class="dense-row"></mat-header-row>
+                        <mat-row *matRowDef="let row; columns: tableHead"
+                            class="dense-row interactive-row hoverable-row">
+                        </mat-row>
+                    </mat-table>
+                </div>
+            </mat-expansion-panel>
+
+        </mat-accordion>
+    </form>
+</app-form-container>
+<div class="spinner-container" *ngIf="isInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

@@ -1,0 +1,56 @@
+<div class="promotion-form-section flex flex-col" [formGroup]="$packsForm()">
+    <mat-checkbox color="primary" formControlName="allow_entity_packs">
+        <mat-label class="ob-label"> {{ 'EVENTS.PROMOTIONS.PACKS.ENABLE_LABEL' | translate }} </mat-label>
+        <div> {{ 'EVENTS.PROMOTIONS.PACKS.ENABLE_DESCRIPTION' | translate }} </div>
+    </mat-checkbox>
+    @if($packsForm().controls['allow_entity_packs'].value) {
+        <div class="promotion-packs-container">
+            <p class="flex flex-row items-center promo-pack-warning">
+                <mat-icon class="ob-icon small warning">warning</mat-icon>
+                {{'EVENTS.PROMOTIONS.PACKS.WARNING' | translate}}
+            </p>
+            <div class="packs-list-container"
+                [class.field-error]="$packsForm().hasError('required', 'packs') && $packsForm().get('packs').touched">
+                <app-searchable-paginated-selection [placeholder]="'FORMS.SEARCH.PACKS' | translate" [form]="$packsForm().get('packs')"
+                    [pageSize]="pageSize" [data$]="packsList$" [metadata$]="metadata$" [loading$]="loading$"
+                    (loadData)="filterChangeHandler($event)">
+                    <div slot="filter" class="badge-container">
+                        {{selectedPacks}} / {{(totalPacks$ | async)}}
+                    </div>
+                    <button slot="filter" type="button" mat-icon-button class="show-selected-only-button ob-button"
+                        color="tertiary" [class.active]="selectedOnly$ | async"
+                        [matTooltip]="'EVENTS.PROMOTIONS.SHOW_SELECTED_TOOLTIP' | translate"
+                        (click)="showSelectedOnlyClick.emit()">
+                        <mat-icon>visibility</mat-icon>
+                    </button>
+                    <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data"
+                        let-selectionChanged="selectionChanged">
+                        <app-selection-list [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged"
+                            class="small-rows">
+                            <div slot="subheader" class="list-header">
+                                <div>
+                                    <mat-checkbox color="primary" [disabled]="(selectedOnly$ | async)"
+                                        [checked]="selectedPacks === (totalPacks$ | async) || (selectedOnly$ | async)"
+                                        [indeterminate]="selectedPacks > 0 && selectedPacks < (totalPacks$ | async)"
+                                        (change)="selectAll($event)" />
+                                    <span>{{'FORMS.LABELS.PACK' | translate}}</span>
+                                </div>
+                            </div>
+                            <ng-template #optionTemplate let-row>
+                                <div>
+                                    <span>{{row.name}}</span>
+                                </div>
+                            </ng-template>
+                        </app-selection-list>
+                    </ng-template>
+                </app-searchable-paginated-selection>
+            </div>
+            @if($packsForm().hasError('required', 'packs') && $packsForm().get('packs').touched) {
+                <span class="error-description">
+                    {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                </span>
+            }
+        </div>
+    }
+
+</div>

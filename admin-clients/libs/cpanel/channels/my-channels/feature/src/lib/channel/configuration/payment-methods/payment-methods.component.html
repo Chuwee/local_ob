@@ -1,0 +1,182 @@
+@let disabled = disabled$ | async;
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="(isInProgress$ | async) || !form.dirty">
+    <p class="body-1 description">{{ 'CHANNELS.PAYMENT_METHODS.DESCRIPTION' | translate }}</p>
+
+@if (!disabled) {
+    <div class="flex justify-end">
+        <button mat-stroked-button color="primary" class="ob-button medium add-button"
+            [attr.aria-label]="'CHANNELS.PAYMENT_METHODS.NEW' | translate"
+            (click)="openAddPaymentMethodDialog()">
+            <mat-icon>add</mat-icon>
+            {{'CHANNELS.PAYMENT_METHODS.NEW' | translate}}
+        </button>
+    </div>
+}
+
+<!-- // TODO: Delete columnsProEnv and use columns instead -->
+<app-options-table [disabled]="(disabled$ | async) || (isInProgress$ | async)" [activeRequired]="false" [data]="paymentMethods$"
+    [form]="gatewaysGroup" [columns]="columns">
+
+    <ng-container matColumnDef="id">
+        <mat-header-cell *matHeaderCellDef class="head-cell name">
+            {{ 'CHANNELS.PAYMENT_METHODS.PAYMENT_METHOD' | translate }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row; index as i" class="name">
+            {{ row.gateway_sid }}
+        </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef class="head-cell name">
+            {{ 'CHANNELS.PAYMENT_METHODS.NAME' | translate }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row; index as i" class="name">
+            {{ row.name }}
+        </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="currencies">
+        <mat-header-cell *matHeaderCellDef class="head-cell name">
+            {{ 'CHANNELS.PAYMENT_METHODS.CURRENCIES' | translate }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row; index as i" class="currencies">
+            @if (row.currencyCodes | joinedLocalCurrenciesFullTranslation; as currencies) {
+                <span appEllipsify [matTooltip]="currencies" [textContent]="currencies"></span>
+            }
+        </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="surcharges">
+        <mat-header-cell *matHeaderCellDef class="head-cell name">
+            {{ 'CHANNELS.PAYMENT_METHODS.SURCHARGE' | translate }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row; index as i" class="flex justify-center">
+            @if (row.surcharges) {
+                <span class="ob-status-badge finished surcharge flex items-center gap-1"
+                    [matTooltip]="(row.surcharges?.[0] === 'FIXED' ?
+                        'CHANNELS.PAYMENT_METHODS.SURCHARGE_TYPE_FIXED_TOOLTIP' :
+                        'CHANNELS.PAYMENT_METHODS.SURCHARGE_TYPE_PERCENT_TOOLTIP') | translate">
+                    {{ (row.surcharges?.[0] === 'FIXED' ?
+                    'CHANNELS.PAYMENT_METHODS.SURCHARGE_TYPE_FIXED' :
+                    'CHANNELS.PAYMENT_METHODS.SURCHARGE_TYPE_PERCENT') | translate }}
+                    <mat-icon class="ob-icon xsmall finished">info</mat-icon>
+                </span>
+            } @else {
+                {{ '-' }}
+            }
+        </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef class="head-cell actions-cell two-actions-cell"
+            [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true" />
+        <mat-cell *matCellDef="let row; index as i" class="actions-cell two-actions-cell"
+            [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+            <div class="action-buttons" (click)="$event.stopPropagation()">
+                <button mat-icon-button
+                    matTooltip="{{'CHANNELS.PAYMENT_METHODS.EDIT_TITLE' | translate}}"
+                    aria-label="Edit payment method" class="ob-button medium"
+                    (click)="openEditPaymentMethodDialog(row)">
+                    @if (!disabled) {
+                        <mat-icon class="spin-icon">edit</mat-icon>
+                    } @else {
+                        <mat-icon>more_vert</mat-icon>
+                    }
+                </button>
+                @if (!disabled) {
+                    <button matTooltip="{{'CHANNELS.PAYMENT_METHODS.DELETE_TITLE' | translate}}" mat-icon-button
+                        aria-label="Delete payment method" class="ob-button medium" (click)="delete(row)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                }
+            </div>
+        </mat-cell>
+    </ng-container>
+    @if ((paymentMethods$ | async)?.length === 0) {
+        <ng-container slot="empty">
+            <app-empty-state-tiny [title]="'CHANNELS.PAYMENT_METHODS.EMPTY_LIST.TITLE' | translate"
+                [description]="'CHANNELS.PAYMENT_METHODS.EMPTY_LIST.DESCRIPTION' | translate" />
+        </ng-container>
+    }
+</app-options-table>
+
+@if((($channel() | isWebChannel) || ($channel() | isMembersChannel)) && $isOperatorUser()){
+    @if (channelVouchers$ | async) {
+        @if ((entity$ | async)?.settings?.allow_loyalty_points) {
+            <div class="vouchers-channel-config flex flex-col">
+                <h3 class="section-title">{{ 'CHANNELS.PAYMENT_METHODS.ADDITIONAL_PAYMENT.LABEL' | translate }}</h3>
+                <mat-radio-group class="flex flex-col gap-4" [formControl]="form.get('additionalPaymentMethod')">
+                    <mat-radio-button class="ob-radio-button align" [value]="'VOUCHER'">
+                        {{'CHANNELS.PAYMENT_METHODS.VOUCHERS.ADDITIONAL_LABEL' | translate}}
+                    </mat-radio-button>
+                    <div>
+                        <mat-radio-button class="ob-radio-button align" [value]="'LOYALTY_PROGRAM'">
+                            {{'CHANNELS.PAYMENT_METHODS.LOYALTY_POINTS.ALLOW_POINTS' | translate}}
+                        </mat-radio-button>
+                        @if (form.get('additionalPaymentMethod').value === 'LOYALTY_PROGRAM') {
+                            <div class="nested-content flex flex-col">
+                                @if (loyaltyPointsGroup.get('enabled').value) {
+                                    <div class="flex flex-col" [formGroup]="loyaltyPointsGroup.get('maximum')">
+                                        <mat-checkbox color="primary" formControlName="enabled" class="inline">
+                                            {{ 'CHANNELS.PAYMENT_METHODS.LOYALTY_POINTS.MAXIMUM_ENABLED'| translate }}
+                                        </mat-checkbox>
+                                        @if (loyaltyPointsGroup.get('maximum.enabled').value) {
+                                            <div class="loyalty-input nested-content flex flex-row">
+                                                <mat-form-field class="ob-form-field field-with-label" appearance="outline">
+                                                    <mat-label>
+                                                        {{'CHANNELS.PAYMENT_METHODS.LOYALTY_POINTS.MAXIMUM' | translate}}
+                                                    </mat-label>
+                                                    <input matInput type="number" inputmode="numeric" placeholder="1"
+                                                        formControlName="amount" step="1">
+                                                    <mat-error [ob-form-errors]="loyaltyPointsGroup.get('maximum.amount')" />
+                                                </mat-form-field>
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="flex flex-col" [formGroup]="loyaltyPointsGroup.get('percentage')">
+                                        <mat-checkbox color="primary" class="inline" data-test="voucher-refund" formControlName="enabled">
+                                            {{ 'CHANNELS.PAYMENT_METHODS.LOYALTY_POINTS.PERCENTAGE_ENABLED'| translate }}
+                                        </mat-checkbox>
+                                        @if (loyaltyPointsGroup.get('percentage.enabled').value) {
+                                            <div class="loyalty-input nested-content flex flex-row">
+                                                <mat-form-field class="ob-form-field field-with-label" appearance="outline">
+                                                    <mat-label>
+                                                        {{'CHANNELS.PAYMENT_METHODS.LOYALTY_POINTS.PERCENTAGE' | translate}}
+                                                    </mat-label>
+                                                    <app-percentage-input placeholder="{{1 | localNumber : '1.2-2'}} %"
+                                                        formControlName="value" />
+                                                    <mat-error class="under_error"
+                                                        [ob-form-errors]="loyaltyPointsGroup.get('percentage.value')" />
+                                                </mat-form-field>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </mat-radio-group>
+            </div>
+        } @else {
+            <div class="vouchers-channel-config flex flex-col">
+                <h3 class="section-title">{{ 'CHANNELS.PAYMENT_METHODS.ADDITIONAL_PAYMENT.LABEL' | translate }}</h3>
+                <mat-checkbox color="primary" [formControl]="form.controls.allowRedeemVouchers" class="inline" data-test="voucher-redeem">
+                    {{ 'CHANNELS.PAYMENT_METHODS.VOUCHERS.ALLOW_REDEEM'| translate }}
+                </mat-checkbox>
+            </div>
+        }
+        <div class="refund-channel-config flex flex-col">
+            <h3 class="section-title">{{ 'CHANNELS.PAYMENT_METHODS.REFUND.LABEL' | translate }}</h3>
+            <mat-checkbox color="primary" [formControl]="form.controls.allowRefundToVouchers" data-test="voucher-refund">
+                {{ 'CHANNELS.PAYMENT_METHODS.VOUCHERS.ALLOW_REFUND'| translate }}
+            </mat-checkbox>
+        </div>
+    }
+}
+</app-form-container>
+
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,33 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'NOTIFICATIONS.EMAIL_NOTIFICATION.SEND_TEST_EMAIL_DIALOG.TITLE' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <p>{{'NOTIFICATIONS.EMAIL_NOTIFICATION.SEND_TEST_EMAIL_DIALOG.DESCRIPTION' | translate}}</p>
+        <form [formGroup]="form" fxLayout="column" fxLayoutAlign="start stretch" class="test-email-form">
+            <mat-form-field appearance="outline" class="ob-form-field no-grid-spacing">
+                <mat-label>{{'NOTIFICATIONS.EMAIL_NOTIFICATION.SEND_TEST_EMAIL_DIALOG.SEND_TO' | translate}}</mat-label>
+                <input matInput aria-label="emails"
+                    [placeholder]="'NOTIFICATIONS.EMAIL_NOTIFICATION.SEND_TEST_EMAIL_DIALOG.SEND_TO' | translate"
+                    formControlName="emails">
+                <mat-error *ngIf="form.get('emails').hasError('toAddress')">
+                    {{'NOTIFICATIONS.EMAIL_NOTIFICATION.EMAIL_FORMAT_INCORRECT' | translate}}
+                </mat-error>
+                <mat-error *ngIf="form.get('emails').hasError('maxEmailsExceeded')">
+                    {{'NOTIFICATIONS.EMAIL_NOTIFICATION.MAX_TEST_EMAILS_EXCEEDED' | translate}}
+                </mat-error>
+            </mat-form-field>
+        </form>
+    </div>
+    <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="submit()" [disabled]="!form.valid">
+            {{'FORMS.ACTIONS.SEND' | translate}}
+        </button>
+    </div>
+</div>

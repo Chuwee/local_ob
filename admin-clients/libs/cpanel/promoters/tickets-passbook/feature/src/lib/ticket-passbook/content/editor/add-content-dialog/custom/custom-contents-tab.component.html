@@ -1,0 +1,32 @@
+<div mat-dialog-content fxLayout="column" *ngIf="customContentsForm?.controls.length else noData">
+    <form [formGroup]="form" fxLayout="column" fxLayoutAlign="start stretch">
+        <ng-container formArrayName="customContents">
+            <app-custom-content-field class="custom-content-field"
+                *ngFor="let item of customContentsForm.controls; let i=index"
+                [customTemplateLiterals$]="customTemplateLiterals$"
+                [customTemplatePlaceholders$]="customTemplatePlaceholders$" [formGroup]="item" [contentNumber]="i + 1"
+                (deleteContent)="deleteSelectedContent(i)"></app-custom-content-field>
+        </ng-container>
+    </form>
+    <div class="add-custom-content" fxLayout="row" fxFlex="30px">
+        <button mat-stroked-button color="primary" class="ob-button medium add-button" (click)="addNewContent()"
+            [disabled]="shouldDisableAddButton()">
+            <mat-icon>add</mat-icon>
+            {{'TICKET_PASSBOOK.ADD_CUSTOM_CONTENT' | translate | uppercase}}
+        </button>
+    </div>
+</div>
+<ng-template #noData>
+    <div mat-dialog-content fxFlex="100%" fxLayout="row wrap">
+        <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start">
+            <div fxFlex="100%" fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="15px">
+                <p class="body">{{'TICKET_PASSBOOK.NO_CUSTOM_CONTENTS' | translate}}</p>
+                <button mat-stroked-button color="primary" class="ob-button medium add-button" (click)="addNewContent()"
+                    [disabled]="shouldDisableAddButton()">
+                    <mat-icon>add</mat-icon>
+                    {{'TICKET_PASSBOOK.ADD_CUSTOM_CONTENT' | translate | uppercase}}
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>

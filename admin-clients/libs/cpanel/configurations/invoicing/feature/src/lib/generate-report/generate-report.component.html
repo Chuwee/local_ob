@@ -1,0 +1,138 @@
+<div fxFlex="0 1 100%" fxLayout="column" [formGroup]="form">
+    <ng-content select="[slot='outside']" />
+    <div class="form-details-area">
+        <div class="details-form-container" fxLayoutAlign="center">
+            <div fxFlex="0 1 1280px" fxLayout="column" class="details">
+                <div>
+                    <form fxFlex="100%" fxLayout="row wrap" fxLayoutGap.gt-sm="40px">
+                        <div fxFlex="100%">
+                            <p>{{'INVOICING.GENERATE_REPORT.FORMS.INFOS.CONFIGURE_DATA' | translate }}</p>
+                        </div>
+                        <!-- Operator -->
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label" fxFlex="100%"
+                            fxFlex.gt-sm="50%">
+                            <mat-label>{{'FORMS.LABELS.OPERATOR' | translate}}</mat-label>
+                            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="operator">
+                                <mat-option>
+                                    <app-select-search #operators [options$]="operators$"
+                                        [placeholderLabel]="'INVOICING.OPERATORS_CONFIGURATION.INFOS.SEARCH' | translate" searchField="name"
+                                        requireSelection="true" />
+                                </mat-option>
+                                @for (operator of operators.getFilteredOptions$() | async; track operator.id) {
+                                    <mat-option [value]="operator">{{operator.name}}</mat-option>
+                                }
+                            </mat-select>
+                            <mat-error [ob-form-errors]="form" field="operator" />
+                        </mat-form-field>
+
+                        <!-- Operator type -->
+                        <mat-radio-group fxFlex="100%" class="margin-bottom" formControlName="type" fxLayoutGap="16px" fxLayout="column">
+                            <mat-radio-button [value]="orderPerspectiveEnum.event" class="ob-radio-image-button">
+                                <div class="option-title">
+                                    {{'FORMS.LABELS.PROMOTER' | translate}}
+                                </div>
+                                <div class="option-body" fxLayout="column">
+                                    <span style="margin-bottom: 16px;">
+                                        {{'INVOICING.GENERATE_REPORT.FORMS.INFOS.EVENT' | translate}}
+                                    </span>
+                                    @if (isPromotorSelected$ | async) {
+                                        <!-- Entity -->
+                                        <mat-form-field fxFlex="100%" fxFlex.gt-sm="50%" appearance="outline"
+                                            class="ob-form-field field-with-label">
+                                            <mat-label>{{'FORMS.LABELS.ENTITY' | translate}}</mat-label>
+                                            <app-select-server-search formControlName="entity"
+                                                [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                                [options$]="entities$" (loadOptions)="loadEntities($event)"
+                                                [moreOptionsAvailable$]="moreAvailableEntities$" />
+                                            <mat-error [ob-form-errors]="form" field="entity" />
+                                        </mat-form-field>
+
+                                        <!-- Events -->
+                                        <mat-form-field fxFlex="100%" fxFlex.gt-sm="50%" appearance="outline"
+                                            class="ob-form-field field-with-label">
+                                            <mat-label>{{'FORMS.LABELS.EVENTS' | translate}}</mat-label>
+                                            <mat-select [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate" multiple
+                                                formControlName="events">
+                                                <mat-option>
+                                                    <app-select-search #eventSelectSearch [options$]="events$"
+                                                        [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name"
+                                                        requireSelection="true" />
+                                                </mat-option>
+                                                @for (event of eventSelectSearch.getFilteredOptions$() | async; track event.id) {
+                                                    <mat-option [value]="event">
+                                                        {{event.name}}
+                                                    </mat-option>
+                                                }
+                                            </mat-select>
+                                            <mat-error [ob-form-errors]="form" field="events" />
+                                        </mat-form-field>
+                                    }
+                                </div>
+                            </mat-radio-button>
+
+                            <mat-radio-button [value]="orderPerspectiveEnum.channel" class="ob-radio-image-button">
+                                <div class="option-title">
+                                    {{'FORMS.LABELS.CHANNEL' | translate}}
+                                </div>
+                                <div class="option-body">
+                                    {{'INVOICING.GENERATE_REPORT.FORMS.INFOS.CHANNEL' | translate}}
+                                </div>
+                            </mat-radio-button>
+                        </mat-radio-group>
+
+                        <mat-divider fxFlex="100%" class="margin-bottom" />
+
+                        <!-- Email -->
+                        <mat-form-field fxFlex="100%" fxFlex.gt-sm="50%" appearance="outline"
+                            class="ob-form-field field-with-label">
+                            <mat-label>{{'FORMS.LABELS.EMAIL' | translate}}</mat-label>
+                            <input matInput aria-label="email" formControlName="email" [placeholder]="'FORMS.LABELS.EMAIL' | translate">
+                            <mat-error [ob-form-errors]="form" field="email" />
+                        </mat-form-field>
+                        <div fxLayoutGap.gt-sm="40px" fxLayout="row" fxLayout.lt-md="column" fxFlex.gt-sm="50%" fxFlex="100%">
+                            <!-- Date From -->
+                            <mat-form-field fxFlex="100%" fxFlex.gt-sm="50%"
+                                appearance="outline" class="ob-form-field field-with-label">
+                                <mat-label>{{'INVOICING.DATE_FROM' | translate}}</mat-label>
+                                <input matInput [matDatepicker]="dateFrom" [placeholder]="dateFormat"
+                                    formControlName="dateFrom" (focus)="dateFrom.open()">
+                                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                                    (click)="$event.stopPropagation(); dateFrom.open();">
+                                    <mat-icon>event</mat-icon>
+                                </button>
+                                <mat-datepicker #dateFrom />
+                                <mat-error [ob-form-errors]="form" field="dateFrom" />
+                            </mat-form-field>
+                            <!-- Date To -->
+                            <mat-form-field fxFlex="100%" fxFlex.gt-sm="50%"
+                                appearance="outline" class="ob-form-field field-with-label">
+                                <mat-label>{{'INVOICING.DATE_TO' | translate}}</mat-label>
+                                <input matInput [matDatepicker]="dateTo" [placeholder]="dateFormat"
+                                    formControlName="dateTo" (focus)="dateTo.open()">
+                                <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                                    (click)="$event.stopPropagation(); dateTo.open();">
+                                    <mat-icon>event</mat-icon>
+                                </button>
+                                <mat-datepicker #dateTo />
+                                <mat-error [ob-form-errors]="form" field="dateTo" />
+                            </mat-form-field>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="bottom-actions-bar" fxLayoutAlign="center">
+        <div class="bottom-action-content" fxFlex="0 1 100%" fxLayoutAlign="end center">
+            <button type="button" mat-flat-button class="ob-button medium" color="secondary" (click)="clearForm()">
+                {{'FORMS.ACTIONS.RESET' | translate}}
+            </button>
+            <button type="button" mat-flat-button class="ob-button medium" color="primary" (click)="generateReport()">
+                {{'FORMS.ACTIONS.GENERATE_REPORT' | translate}}
+            </button>
+        </div>
+    </div>
+</div>
+@if (reqInProgress$ | async) {
+    <div class="spinner-container"><mat-spinner /></div>
+}

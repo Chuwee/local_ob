@@ -1,0 +1,16 @@
+<app-wizard-bar #wizard [steps]="steps | channelGatewayMapSteps" />
+<ng-content />
+<div mat-dialog-actions fxLayout="row" fxLayoutAlign="end">
+    <button type="button" mat-button class="ob-button" (click)="closeEmitter.emit()">
+        {{'FORMS.ACTIONS.CANCEL' | translate}}
+    </button>
+    <button mat-stroked-button color="tertiary" type="button" class="ob-button" (click)="previousStep()"
+        [disabled]="wizard.$active() === 0">
+        <mat-icon>arrow_back</mat-icon>
+        {{'FORMS.ACTIONS.PREVIOUS' | translate}}
+    </button>
+    <button mat-flat-button color="primary" type="button" class="ob-button" (click)="nextStep()">
+        {{steps | channelGatewayNextTextPipe: wizard.$active() }}
+        <mat-icon iconPositionEnd [fxHide]="wizard.$active() === steps.length - 1">arrow_forward</mat-icon>
+    </button>
+</div>

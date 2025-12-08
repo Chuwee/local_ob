@@ -1,0 +1,146 @@
+@if (id) {
+    @let selectedCount = $selectedInfoViewsCount(); <!-- {} -->
+    <app-searchable-paginated-selection [placeholder]="'FORMS.SEARCH.ELEMENTS_INFO' | translate" class="boxed-options"
+        (loadData)="loadElementsInfo($event)" [form]="selectedInfoViewsControl" [pageSize]="pageSize" [data$]="elementsInfoList$"
+        [metadata$]="metadata$" [loading$]="reqInProgress$" [searchDisabled]="showSelectedOnlyState$  | async">
+
+        <div slot="filter" class="badge-container" [class.empty]="!$availableInfoViewsCount()">
+            {{(selectedCount)}} / {{$initialApiInfoViewsCount()}}
+        </div>
+        <button slot="filter" type="button" mat-icon-button class="ob-button medium" color="tertiary"
+            [class.active]="!!(showSelectedOnlyState$ | async)"
+            [disabled]="selectedCount === 0 || selectedCount === this.$initialApiInfoViewsCount()"
+            [matTooltip]="'VENUE_TPLS.ELEMENTS_INFO.SHOW_SELECTED_TOOLTIP' | translate" (click)="toggleShowSelectedInfoViews()">
+            <mat-icon>visibility</mat-icon>
+        </button>
+        <button slot="filter" type="button" mat-icon-button class="ob-button medium" color="tertiary"
+            [matTooltip]="'VENUE_TPLS.ELEMENTS_INFO.EDIT_TOOLTIP' | translate"
+            [disabled]="selectedCount === 0 && (allSelectedState$ | async) === false" (click)="editMultipleInfoView()">
+            <mat-icon>edit</mat-icon>
+        </button>
+        <div slot="filter" class="filter-container">
+            <button mat-icon-button color="tertiary" class="ob-button medium"
+                [disabled]="selectedCount === 0 && (allSelectedState$ | async) === false" [matMenuTriggerFor]="listMenu">
+                <mat-icon>more_horiz</mat-icon>
+            </button>
+            <mat-menu #listMenu="matMenu">
+                @if (delete) {
+                    <button mat-menu-item (click)="deleteMultipleInfoView()">
+                        {{'VENUE_TPLS.ELEMENTS_INFO.DELETE_TOOLTIP' | translate}}
+                    </button>
+                }
+                @if (status) {
+                    <button mat-menu-item (click)="changeMultipleStatus(true)">
+                        {{'VENUE_TPLS.ELEMENTS_INFO.STATUS_ENABLE_MULTIPLE' | translate}}
+                    </button>
+                    <button mat-menu-item (click)="changeMultipleStatus(false)">
+                        {{'VENUE_TPLS.ELEMENTS_INFO.STATUS_DISABLE_MULTIPLE' | translate}}
+                    </button>
+                }
+            </mat-menu>
+        </div>
+        <div slot="filter" class="filter-push">
+            <app-elements-info-filter [status]="status" (filterChange)="loadElementsInfo($event)"
+                [disabled]="showSelectedOnlyState$  | async" />
+        </div>
+        <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data" let-selectionChanged="selectionChanged">
+            <app-selection-table [data]="data" [columns]="columns" [pageForm]="pageForm" [selectionChanged]="selectionChanged"
+                [class.some-selected]="selectedCount > 0 || (allSelectedState$ | async)">
+                <ng-template #selectAllTemplate>
+                    <mat-checkbox #allSelected color="primary"
+                        [disabled]="(showSelectedOnlyState$ | async) || $availableInfoViewsCount() === 0"
+                        [checked]="$checkboxAllSelectedState() === checkState.Checked"
+                        [indeterminate]="$checkboxAllSelectedState() === checkState.Indeterminate"
+                        (change)="changeAllSelectedState(allSelected.checked)" />
+                </ng-template>
+                <ng-container matColumnDef="name">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        <ng-container>
+                            {{'VENUE_TPLS.ELEMENTS_INFO.VIEW_NAME' | translate}}
+                        </ng-container>
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row;">
+                        {{ row.name }}
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="type">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{ 'VENUE_TPLS.ELEMENTS_INFO.TYPE' | translate }}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row;">
+                        {{('VENUE_TPLS.ELEMENTS_INFO.TYPE_OPTS.' + row.type) | translate}}
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="templates_zones">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{ 'VENUE_TPLS.ELEMENTS_INFO.TEMPLATE_ZONES' | translate }}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row;">
+                        @if (row?.element?.templates_zones?.length) {
+                            @let templates = getTemplateZonesValue(row?.element?.templates_zones);
+                                <span appEllipsify [matTooltip]="templates">{{templates}}</span>
+                    }
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="content">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{ 'VENUE_TPLS.ELEMENTS_INFO.HAS_CONTENT' | translate }}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        @if (row.element) {
+                            <span class="content-badge">
+                                <mat-icon class="ob-icon xsmall"> check_circle_outline </mat-icon>
+                                {{ 'VENUE_TPLS.ELEMENTS_INFO.HAS_CONTENT_BADGE' | translate }}
+                            </span>
+                        }
+                    </mat-cell>
+                </ng-container>
+                @if (status) {
+                    <ng-container matColumnDef="status">
+                        <mat-header-cell *matHeaderCellDef class="head-cell">
+                            {{ 'VENUE_TPLS.ELEMENTS_INFO.STATUS' | translate }}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;" (click)="$event.stopPropagation()">
+                            <mat-slide-toggle class="ob-slide-toggle" [ngModel]="row.element?.status === 'ENABLED'"
+                                [disabled]="!row.element?.id" (change)="changeStatus($event, row)" />
+                        </mat-cell>
+                    </ng-container>
+                }
+                <ng-container matColumnDef="actions">
+                    <mat-header-cell *matHeaderCellDef class="two-actions-cell head-cell"
+                        [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true" />
+                    <mat-cell *matCellDef="let row; index as i" class="two-actions-cell"
+                        [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                        <div class="action-buttons" (click)="$event.stopPropagation()">
+                            <button mat-icon-button matTooltip="{{'VENUE_TPLS.ELEMENTS_INFO.EDIT_TOOLTIP' | translate}}"
+                                aria-label="Edit element info" class="ob-button medium" (click)="editInfoView(row)">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                            @if(status && row.element?.id) {
+                                <button mat-icon-button aria-label="Recover element inheritance info"
+                                    class="ob-button medium" [matMenuTriggerFor]="recoverMenu" [appMoreActionsButton]="true">
+                                    <mat-icon>more_horiz</mat-icon>
+                                </button>
+                                <mat-menu #recoverMenu="matMenu">
+                                    <button mat-menu-item (click)="recoverInheritanceElementsInfo(row)">
+                                        {{'VENUE_TPLS.ELEMENTS_INFO.RECOVER_MENU_ITEM' | translate}}
+                                    </button>
+                                </mat-menu>
+                            }
+                        </div>
+                    </mat-cell>
+                </ng-container>
+                <ng-template #noResultsTemplate>
+                    <div class="context-message-container">
+                        <div class="flex basis-full justify-center">
+                            <div class="flex flex-col justify-start items-center gap-4">
+                                <p class="title">{{'VENUE_TPLS.ELEMENTS_INFO.EMPTY_LIST_MESSAGE' | translate}}</p>
+                                <div class="desc">{{'VENUE_TPLS.ELEMENTS_INFO.EMPTY_LIST_MESSAGE_DESC' | translate}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </app-selection-table>
+        </ng-template>
+    </app-searchable-paginated-selection>
+    }

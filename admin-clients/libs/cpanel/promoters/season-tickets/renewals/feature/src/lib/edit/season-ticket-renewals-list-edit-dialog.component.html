@@ -1,0 +1,238 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title>
+        <div class="flex flex-row justify-between items-center">
+            <h2 class="secondary title">{{'SEASON_TICKET.RENEWALS.LIST.EDIT_DIALOG_TITLE' | translate}}</h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="closeHandler()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content class="dialog-grid-form">
+        <div class="flex flex-col list-container gap-4">
+            @if ($isAutoRenewalAvailable() && $renewalType() === 'XML_SEPA') {
+                <div class="flex justify-start items-center">
+                    <mat-icon class="ob-icon xsmall info with-text">info</mat-icon>
+                    <span class="tiny">
+                        {{ 'SEASON_TICKET.RENEWALS.LIST.' + $renewalType() + '_TYPE_INFO' | translate }}
+                    </span>
+                </div>
+            }
+            <div class="table-container">
+                <mat-table class="ob-table" [dataSource]="$renewalsEdits()"
+                    [class.not-touchable]="$isHandsetOrTablet() !== true"
+                    [attr.aria-label]="'SEASON_TICKET.RENEWALS.LIST.EDIT_DIALOG_TABLE' | translate">
+                    <ng-container matColumnDef="selection">
+                        <mat-header-cell *matHeaderCellDef class="head-cell with-status-border without-gap flex-[0_1_20px]" />
+                        <mat-cell *matCellDef="let row" class="with-status-border without-gap flex-[0_1_20px]"
+                            [class.alert]="row.mapping_status === mappingStatus.notMapped"
+                            [class.success]="row.mapping_status === mappingStatus.mapped" />
+                    </ng-container>
+                    <ng-container matColumnDef="name">
+                        <mat-header-cell *matHeaderCellDef
+                            class="head-cell with-border">{{'SEASON_TICKET.RENEWALS.LIST.MEMBER_DATA' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row" class="flex flex-col with-border items-stretch">
+                            <span appEllipsify [matTooltip]="row.name + ' ' + row.surname" matTooltipClass="ob-tooltip-nowrap"
+                                class="status-cell">{{row.name}} {{row.surname}}</span>
+                            <span appEllipsify [matTooltip]="row.email" matTooltipClass="ob-tooltip-nowrap"
+                                class="status-cell">{{row.email}}</span>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="historic_seat">
+                        <mat-header-cell *matHeaderCellDef class="head-cell">{{'SEASON_TICKET.RENEWALS.LIST.HISTORIC_SEAT' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row" class="flex flex-col items-stretch">
+                            <span appEllipsify [matTooltip]="getLocationInfo(row.historic_seat)" matTooltipClass="ob-tooltip-nowrap"
+                                class="status-cell">{{getLocationInfo(row.historic_seat)}}</span>
+                            <span appEllipsify [matTooltip]="row.historic_seat.price_zone" matTooltipClass="ob-tooltip-nowrap"
+                                class="status-cell">{{row.historic_seat.price_zone}}</span>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="actual_seat">
+                        <mat-header-cell *matHeaderCellDef
+                            class="head-cell border-right">{{'SEASON_TICKET.RENEWALS.LIST.ACTUAL_SEAT' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row"
+                            [class]="'flex items-stretch border-right ' 
+                            + (row.actual_seat ? 'flex-col items-center' : 'flex-row items-stretch')"
+                            [matTooltip]="'SEASON_TICKET.RENEWALS.LIST.NOT_AVAILABLE_REASON' | translate"
+                            [matTooltipDisabled]="!!row.actual_seat">
+                            @if (row.actual_seat) {
+                                <span appEllipsify [matTooltip]="getLocationInfo(row.actual_seat)" matTooltipClass="ob-tooltip-nowrap"
+                                    class="status-cell">{{getLocationInfo(row.actual_seat)}}</span>
+                                <span appEllipsify [matTooltip]="row.actual_seat.price_zone" matTooltipClass="ob-tooltip-nowrap"
+                                    class="status-cell">{{row.actual_seat.price_zone}}</span>
+                            } @else {
+                                <span class="status-cell not-available">
+                                    {{'SEASON_TICKET.RENEWALS.LIST.NOT_AVAILABLE' | translate}}
+                                </span>
+                            }
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="sector">
+                        <mat-header-cell *matHeaderCellDef class="head-cell">
+                            {{'SEASON_TICKET.RENEWALS.LIST.SECTOR' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row; let index = index;" class="editable-cell"
+                            (click)="$event.stopPropagation()">
+                            <mat-form-field appearance="outline" class="ob-form-field inline-field ob-form-field-outline flex-[0_1_90%]">
+                                <mat-select [placeholder]="'SEASON_TICKET.RENEWALS.LIST.SECTOR' | translate"
+                                    [value]="row.assignedSectorId"
+                                    (selectionChange)="changeSectorHandler($event.value, row, index)">
+                                    <mat-option>
+                                        <app-select-search #sectorsSelectSearch [options$]="row.sectorsToShow$" [requireSelection]="true"
+                                            [placeholderLabel]="'SEASON_TICKET.RENEWALS.LIST.SECTOR' | translate"
+                                            searchField="sector_name" />
+                                    </mat-option>
+                                    @for (sector of sectorsSelectSearch.getFilteredOptions$() | async; track sector.sector_id) {
+                                        <mat-option [value]="sector.sector_id">
+                                            {{sector?.sector_name}}
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                            <mat-divider class="flex-[0_1_10%]" />
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="row_nnz">
+                        <mat-header-cell *matHeaderCellDef class="head-cell without-gap">
+                            {{'SEASON_TICKET.RENEWALS.LIST.ROWS_NNZS' | translate}}
+                            <mat-icon class="small tooltip-icon margin-left ob-help-icon"
+                                [matTooltip]="'SEASON_TICKET.RENEWALS.LIST.ROWS_NNZS_INFO' | translate">help_outline
+                            </mat-icon>
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row; let index = index;" class="editable-cell without-gap"
+                            (click)="$event.stopPropagation()">
+                            <mat-form-field appearance="outline" class="ob-form-field inline-field ob-form-field-outline flex-[0_1_90%]">
+                                <mat-select [placeholder]="'SEASON_TICKET.RENEWALS.LIST.ROWS_NNZS' | translate"
+                                    [value]="row.assignedRowId ?? row.assignedNnzId"
+                                    (selectionChange)="changeRowOrNnzHandler($event.value, row, index, $event)">
+                                    <mat-option>
+                                        <app-group-select-search #groupSelectSearch [optionGroups$]="row.rowNnzGroupsToShow$"
+                                            [placeholderLabel]="'SEASON_TICKET.RENEWALS.LIST.ROWS_NNZS' | translate"
+                                            [searchFields]="searchGroupFields" />
+                                    </mat-option>
+                                    @for (group of groupSelectSearch.filteredOptionGroups$ | async; track group.name) {
+                                        <mat-optgroup [label]="group.name">
+                                            @for (data of group.data; track data['row_id'] ?? data['not_numbered_zone_id']) {
+                                                <mat-option [value]="data['row_id'] ?? data['not_numbered_zone_id']">
+                                                    {{data['row_name'] ?? data['not_numbered_zone_name']}}
+                                                </mat-option>
+                                            }
+                                        </mat-optgroup>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                            <mat-divider class="flex-[0_1_10%]" />
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="seat">
+                        <mat-header-cell *matHeaderCellDef class="head-cell without-gap">{{'SEASON_TICKET.RENEWALS.LIST.SEAT' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row; let index = index;" class="editable-cell without-gap"
+                            (click)="$event.stopPropagation()">
+                            <div class="flex-[0_1_100%]" [matTooltip]="'SEASON_TICKET_RENEWALS.LIST.NNZ_SEAT_INFO' | translate"
+                                [matTooltipDisabled]="!isSeatSelectDisabled(row)">
+                                <mat-form-field appearance="outline" class="ob-form-field inline-field ob-form-field-outline">
+                                    <mat-select [placeholder]="'SEASON_TICKET.RENEWALS.LIST.SEAT' | translate"
+                                        [value]="row.assignedSeatId"
+                                        (selectionChange)="changeRowSeatHandler($event.value, row, index)"
+                                        [disabled]="isSeatSelectDisabled(row)">
+                                        <mat-option>
+                                            <app-select-search #seatsSelectSearch [options$]="row.rowSeatsToShow$" [requireSelection]="true"
+                                                [placeholderLabel]="'SEASON_TICKET.RENEWALS.LIST.SEAT' | translate"
+                                                searchField="seat_name" />
+                                        </mat-option>
+                                        @for (seat of seatsSelectSearch.getFilteredOptions$() | async; track seat.seat_id) {
+                                            <mat-option [value]="seat.seat_id">
+                                                {{seat?.seat_name}}
+                                            </mat-option>
+                                        }
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="rate">
+                        <mat-header-cell *matHeaderCellDef class="head-cell">{{'SEASON_TICKET.RENEWALS.LIST.RATE' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row; let index = index;" class="editable-cell" (click)="$event.stopPropagation()">
+                            <mat-form-field appearance="outline" class="ob-form-field inline-field ob-form-field-outline">
+                                <mat-select [placeholder]="'SEASON_TICKET.RENEWALS.LIST.SELECT_RATE' | translate" [value]="row.assignedRate"
+                                    (selectionChange)="changeRateHandler($event.value, index)">
+                                    <mat-option>
+                                        <app-select-search #ratesSelectSearch [options$]="rates$" [requireSelection]="true"
+                                            [placeholderLabel]="'SEASON_TICKET.RENEWALS.LIST.SELECT_RATE' | translate" searchField="name" />
+                                    </mat-option>
+                                    @for (rate of ratesSelectSearch.getFilteredOptions$() | async; track rate.name) {
+                                        <mat-option [value]="rate?.name">
+                                            {{rate?.name}}
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </mat-cell>
+                    </ng-container>
+                    @if ($isAutoRenewalAvailable()) {
+                        <ng-container matColumnDef="renewal_type">
+                            <mat-header-cell *matHeaderCellDef class="head-cell">
+                                {{'SEASON_TICKET.RENEWALS.LIST.TYPE' | translate}}
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row; let index = index;" class="editable-cell"
+                                (click)="$event.stopPropagation()">
+                                @if (isRenewalTypeEditable(row)) {
+                                    <mat-form-field appearance="outline" class="ob-form-field inline-field ob-form-field-outline">
+                                        <mat-select [placeholder]="'SEASON_TICKET.RENEWALS.LIST.RENEWAL_TYPE' | translate"
+                                            [value]="row.assignedAutoRenewal"
+                                            (selectionChange)="changeAutoRenewalHandler($event.value, index)">
+                                            <mat-option [value]="true">
+                                                {{'SEASON_TICKETS.RENEWALS.LIST.AUTOMATIC_TYPE' | translate}}
+                                            </mat-option>
+                                            <mat-option [value]="false">
+                                                {{'SEASON_TICKET.RENEWALS.LIST.MANUAL_TYPE' | translate}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                } @else {
+                                    <span>{{'SEASON_TICKET.RENEWALS.LIST.MANUAL_TYPE' | translate}}</span>
+                                }
+                            </mat-cell>
+                        </ng-container>
+                    }
+                    <ng-container matColumnDef="actions_renewal_edit">
+                        <mat-header-cell *matHeaderCellDef class="actions-cell head-cell flex-[0_0_52px]" />
+                        <mat-cell *matCellDef="let row; let index = index;" class="actions-cell flex-[0_0_52px] justify-end">
+                            <div class="action-buttons content-center" (click)="$event.stopPropagation()">
+                                @if (hasAnyDirtyChanges(row)) {
+                                    <button mat-icon-button aria-label="Deselect Assignment" class="ob-button medium"
+                                        (click)="resetHandler(row, index)"
+                                        [matTooltip]="'SEASON_TICKET.RENEWALS.LIST.RESET_RENEWAL_INFO' | translate">
+                                        <mat-icon>undo</mat-icon>
+                                    </button>
+                                }
+                            </div>
+                        </mat-cell>
+                    </ng-container>
+                    <mat-header-row *matHeaderRowDef="displayedColumns$(); sticky: true" />
+                    <mat-row *matRowDef="let row; columns: displayedColumns$();" class="interactive-row" />
+                </mat-table>
+            </div>
+        </div>
+    </div>
+    <div mat-dialog-actions align="end">
+        <button type="button" mat-button class="ob-button"
+            [disabled]="$isLoading()" (click)="closeHandler()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="saveHandler()"
+            [disabled]="isSaveDisabled$ | async">
+            {{'FORMS.ACTIONS.SAVE' | translate}}
+        </button>
+    </div>
+</div>
+
+@if ($isLoading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,124 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="(inProgress$ | async) || !form.dirty" [formGroup]="form">
+    <p class="section-description">{{'CHANNELS.CODE_EDITOR.DESCRIPTION_TITLE' | translate}}</p>
+    <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.CODE_EDITOR.CSS.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-tabs-menu fxFlex="100%" type="language" formGroupName="css" overrideClasses="vertical fixed-width">
+                <ng-template appTab lazyLoad [label]="'CHANNELS.CODE_EDITOR.CSS.CUSTOM_STYLES' | translate">
+                    <div class="editor-container">
+                        <ob-code-editor formControlName="customStyles" language="css" />
+                        <section class="actions">
+                            <app-copy-text [copyText]="form.controls['css'].get('customStyles').getRawValue()"
+                                [copyOk]="'CHANNELS.CODE_EDITOR.CODE_COPIED_SUCCESSFULLY' | translate"
+                                [copyTooltip]="'CHANNELS.CODE_EDITOR.COPY_CODE' | translate" />
+                            <button mat-icon-button aria-label="full-screen" class="ob-button xsmall only-icon"
+                                (click)="openFullScreenEditor(['css','customStyles'])"
+                                [matTooltip]="('ACTIONS.OPEN_FULLSCREEN' | translate)">
+                                <mat-icon>fullscreen</mat-icon>
+                            </button>
+                        </section>
+                    </div>
+                </ng-template>
+            </app-tabs-menu>
+        </mat-expansion-panel>
+        @if (!($channel() | isExternalWhitelabelType)) {
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'CHANNELS.CODE_EDITOR.HTML.TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div fxLayout="column" class="header-texts-section">
+                    <app-language-bar [noPadding]="true" [languages]="$languageList()" [selected]="selectedLanguage$ | async"
+                        slot="outside" [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)" />
+                    <app-tabs-menu fxFlex="100%" type="language" formGroupName="html" overrideClasses="vertical fixed-width">
+                        <ng-template appTab lazyLoad [label]="'CHANNELS.CODE_EDITOR.HTML.HEADER' | translate">
+                            <div class="editor-container">
+                                <ob-code-editor
+                                    formControlName="header"
+                                    language="html" />
+                                <section class="actions">
+                                    <app-copy-text [copyText]="form.controls['html'].get('header').getRawValue()"
+                                        [copyOk]="'CHANNELS.CODE_EDITOR.CODE_COPIED_SUCCESSFULLY' | translate"
+                                        [copyTooltip]="'CHANNELS.CODE_EDITOR.COPY_CODE' | translate" />
+                                    <button mat-icon-button aria-label="full-screen" class="ob-button xsmall only-icon"
+                                        (click)="openFullScreenEditor(['html','header'])"
+                                        [matTooltip]="('ACTIONS.OPEN_FULLSCREEN' | translate)">
+                                        <mat-icon>fullscreen</mat-icon>
+                                    </button>
+                                </section>
+                            </div>
+                        </ng-template>
+                        <ng-template appTab lazyLoad [label]="'CHANNELS.CODE_EDITOR.HTML.FOOTER' | translate">
+                            <div class="editor-container">
+                                <ob-code-editor
+                                    formControlName="footer"
+                                    language="html" />
+                                <section class="actions">
+                                    <app-copy-text [copyText]="form.controls['html'].get('footer').getRawValue()"
+                                        [copyOk]="'CHANNELS.CODE_EDITOR.CODE_COPIED_SUCCESSFULLY' | translate"
+                                        [copyTooltip]="'CHANNELS.CODE_EDITOR.COPY_CODE' | translate" />
+                                    <button mat-icon-button aria-label="full-screen" class="ob-button xsmall only-icon"
+                                        (click)="openFullScreenEditor(['html','footer'])"
+                                        [matTooltip]="('ACTIONS.OPEN_FULLSCREEN' | translate)">
+                                        <mat-icon>fullscreen</mat-icon>
+                                    </button>
+                                </section>
+                            </div>
+                        </ng-template>
+                    </app-tabs-menu>
+                </div>
+            </mat-expansion-panel>
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'CHANNELS.DESIGN.TITLES.CODE_EDITOR_RESOURCES' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div fxLayout="column" class="custom-resources-section">
+                    <div fxLayoutAlign="end">
+                        <input #fileUpload type="file" id="fileUpload" fxHide (click)="fileUpload.value = null"
+                            (change)="importFile($event)"
+                            multiple />
+                        <button mat-stroked-button color="primary" type="button" class="ob-button medium"
+                            [attr.aria-label]="'CHANNELS.DESIGN.ACTIONS.ADD_RESOURCE' | translate"
+                            (click)="fileUpload.click()">
+                            <mat-icon>add</mat-icon>
+                            {{'CHANNELS.DESIGN.ACTIONS.ADD_RESOURCE' | translate}}
+                        </button>
+                    </div>
+                    <app-searchable-paginated-list fxFlex="1 1 100%" fxLayout="column" [hoverable]="true" [smallRows]="false"
+                        [placeholder]="'FORMS.SEARCH.IN_LIST' | translate" [data$]="customResourcesData$"
+                        [metadata$]="customResourcesMetadata$" (loadData)="loadChannelCustomAssets($event)"
+                        [loading$]="customResourcesInProgress$"
+                        [emptyListTitle]="'CHANNELS.DESIGN.CODE_EDITOR.EMPTY_LIST_TITLE' | translate"
+                        [emptyListDescription]="'CHANNELS.DESIGN.CODE_EDITOR.EMPTY_LIST_DESCRIPTION'">
+                        <div slot="subheader" class="list-header with-action-button">
+                            <div fxFlex="0 1 100%" fxLayoutAlign="space-between">
+                                <span>{{'CHANNELS.DESIGN.TITLES.CODE_EDITOR_RESOURCES' | translate}}</span>
+                            </div>
+                        </div>
+                        <ng-template #optionTemplate let-row>
+                            <div fxFlex fxLayout="column" class="files">
+                                <b>{{row.filename}}</b>
+                                <span appEllipsify>{{row.url}}</span>
+                            </div>
+                            <div class="flex items-center action-buttons"
+                                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true" (click)="$event.stopPropagation()">
+                                <app-copy-text [copyText]="row.url"
+                                    [copyOk]="'CHANNELS.CODE_EDITOR.URL_COPIED_SUCCESSFULLY' | translate"
+                                    [copyTooltip]="'CHANNELS.CODE_EDITOR.COPY_URL' | translate" />
+                                <button mat-icon-button class="ob-button medium"
+                                    [matTooltip]="'CHANNELS.DESIGN.ACTIONS.DELETE_RESOURCE' | translate"
+                                    (click)="openDelete(row.filename)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </div>
+                        </ng-template>
+                    </app-searchable-paginated-list>
+                </div>
+            </mat-expansion-panel>
+        }
+    </mat-accordion>
+</app-form-container>
+<div class="spinner-container" *ngIf="inProgress$ | async">
+    <mat-spinner />
+</div>

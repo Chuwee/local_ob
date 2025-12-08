@@ -1,0 +1,123 @@
+<button mat-stroked-button color="tertiary" class="ob-button medium" [class.active]="activeFilters"
+    [matBadge]="activeFilters || ''" [satPopoverAnchor]="filterPopover" (click)="open()" [disabled]="disabled()">
+    {{'FORMS.OPEN_FILTER_BTN' | translate}}
+    <mat-icon>
+        filter_list
+    </mat-icon>
+</button>
+<sat-popover #filterPopover hasBackdrop yAlign="below" autoFocus="false" restoreFocus="false">
+    <mat-card class="ob-card">
+        <mat-card-content class="form-container">
+            <form [formGroup]="form" class="flex flex-col gap-6">
+                <div class="filter-block flex">
+                    <div class="ob-label flex-[0_0_100px]">
+                        {{'FORMS.LABELS.STATUS' | translate}}
+                    </div>
+                    <div class="filter-block-input flex-[0_0_300px]">
+                        <mat-form-field appearance="outline" class="ob-form-field status-select">
+                            <mat-select formControlName="status" multiple
+                                [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                                @for (status of statusList; track status) {
+                                    <mat-option [value]="status.id">
+                                        {{status && (status.name | translate)}}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <mat-divider [inset]="true" />
+                <div class="filter-block flex" formGroupName="start_date">
+                    <div class="ob-label flex-[0_0_100px]">
+                        {{'DATES.START_DATE' | translate}}
+                    </div>
+                    <div class="filter-block-input flex flex-[1_0_140px]">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <input matInput [matDatepicker]="initStartDateDP" [placeholder]="dateFormat"
+                                autocomplete="off" formControlName="from" (focus)="initStartDateDP.open()">
+                            <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                                (click)="$event.stopPropagation(); initStartDateDP.open();">
+                                <mat-icon>event</mat-icon>
+                            </button>
+                            <mat-datepicker #initStartDateDP />
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-[0_1_20px]">
+                        <span class="block filter-block-dates-separator"></span>
+                    </div>
+                    <div class="filter-block-input flex flex-[1_0_140px]">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <input matInput [matDatepicker]="finalStartDateDP" [placeholder]="dateFormat"
+                                autocomplete="off" formControlName="to" (focus)="finalStartDateDP.open()">
+                            <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                                (click)="$event.stopPropagation(); finalStartDateDP.open();">
+                                <mat-icon>event</mat-icon>
+                            </button>
+                            <mat-datepicker #finalStartDateDP />
+                        </mat-form-field>
+                    </div>
+                </div>
+                <mat-divider [inset]="true" />
+                <div class="filter-block flex flex-col">
+                    <span class="field-label">{{'DATES.WEEKDAYS' | translate}}</span>
+                    <div>
+                        <mat-button-toggle-group class="ob-round-button-group weekdays-selector" multiple="true"
+                            formControlName="weekdays">
+                            @for (day of weekdays; track day) {
+                                <mat-button-toggle [value]="day.key">
+                                    {{day.label}}
+                                </mat-button-toggle>
+                            }
+                        </mat-button-toggle-group>
+                    </div>
+                </div>
+                <mat-divider [inset]="true" />
+                <div class="filter-block hour-ranges-filter flex flex-col">
+                    <span class="field-label">{{'EVENTS.HOURS' | translate}}</span>
+                    @for(hourRange of hourRanges.controls; track $index) {
+                        <div class="hour-range flex flex-row place-content-around gap-1" [formGroup]="hourRange">
+                            <div class="flex flex-row">
+                                <span class="timer-label">{{'FORMS.FROM' | translate}}</span>
+                                <app-time-picker formControlName="startTime" />
+                            </div>
+                            <div class="flex flex-row">
+                                <span class="timer-label">{{'FORMS.TO' | translate}}</span>
+                                <app-time-picker formControlName="endTime" />
+                            </div>
+                            <button mat-icon-button aria-label="Delete hour range" class="ob-button medium"
+                                (click)="deleteHourRange($index)" [matTooltip]="'EVENTS.DELETE_HOUR_RANGE_BTN' | translate">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </div>
+                    }
+
+                    <div class="flex flex-row content-start add-hour-range"
+                        [class.disabled]="hourRanges.length === maxHourRanges">
+                        <button mat-icon-button aria-label="new hour range" type="button" [disabled]="hourRanges.length === maxHourRanges"
+                            class="ob-button mat-stroked-button xsmall" (click)="addHourRange()">
+                            <mat-icon>add</mat-icon>
+                        </button>
+                        <span (click)="addHourRange()">
+                            {{'EVENTS.ADD_HOUR_RANGE' | translate}}
+                        </span>
+                    </div>
+                </div>
+            </form>
+        </mat-card-content>
+        <mat-card-footer class="flex justify-start items-center">
+            <div class="grow left-actions">
+                <a class="ob-link" #removeLink (click)="clear()">
+                    {{'FORMS.REMOVE_FILTERS_BTN' | translate}}
+                </a>
+            </div>
+            <div class="flex-none right-actions">
+                <button (click)="close()" mat-button class="ob-button small">
+                    {{'FORMS.CLOSE_FILTER_BTN' | translate}}
+                </button>
+                <button (click)="apply()" mat-flat-button color="primary" class="ob-button small">
+                    {{'FORMS.APPLY_FILTER_BTN' | translate}}
+                </button>
+            </div>
+        </mat-card-footer>
+    </mat-card>
+</sat-popover>

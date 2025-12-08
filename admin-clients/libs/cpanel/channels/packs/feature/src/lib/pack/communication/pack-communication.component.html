@@ -1,0 +1,158 @@
+<app-form-container class="no-top-padding" (cancel)="cancel()" (save)="save()" [disabled]="!form.dirty">
+    <app-language-bar [languages]="languageList$ | async" [selected]="language$ | async"
+        [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)" class="sticky" />
+    <div class="details-container">
+        <div id="eventChannelContent" [formGroup]="form" fxLayout="row wrap">
+            @if(packType === 'AUTOMATIC') {
+                <div>
+                    <div class="details-container" fxFlex="0 1 880px">
+                        <p class="section-description">{{'CHANNELS.PACKS.COMMUNICATION_DESCRIPTION' | translate}}</p>
+                    </div>
+
+                    <mat-divider vertical="true" fxFlexAlign="stretch" />
+                    <div fxFlex="0 0 200px"></div>
+                </div>
+            }
+            <div>
+                <div class="details-container" fxLayout="column" fxFlex="0 1 880px">
+                    <mat-expansion-panel togglePosition="before" expanded [class.padding-top]="packType === 'MANUAL'">
+                        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                            <mat-panel-title>{{'CHANNELS.PACKS.COMMUNICATION.PACK_CONTENTS' | translate}}</mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <div fxLayout="column">
+                            <div fxFlex="100%" fxLayout="column">
+                                <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label">
+                                    <mat-label>{{'CHANNELS.PACKS.COMMUNICATION.TITLE_LABEL' | translate}}</mat-label>
+                                    <input matInput aria-label="title"
+                                        [placeholder]="'CHANNELS.PACKS.COMMUNICATION.TITLE_PLACEHOLDER' | translate"
+                                        formControlName="title">
+                                    <mat-error [ob-form-errors]="form" [field]="'title'" />
+                                </mat-form-field>
+                                <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label">
+                                    <mat-label>{{'CHANNELS.PACKS.COMMUNICATION.SUBTITLE_LABEL' | translate}}</mat-label>
+                                    <input matInput aria-label="subtitle"
+                                        [placeholder]="'CHANNELS.PACKS.COMMUNICATION.SUBTITLE_PLACEHOLDER' | translate"
+                                        formControlName="subtitle">
+                                    <mat-error [ob-form-errors]="form" [field]="'subtitle'" />
+                                </mat-form-field>
+                                <div fxFlex="100%" fxLayout="column">
+                                    <span class="field-label">
+                                        {{'CHANNELS.PACKS.COMMUNICATION.DURATION_LANGUAGE_LABEL' | translate}}
+                                    </span>
+                                    <p>{{'CHANNELS.PACKS.COMMUNICATION.DURATION_LANGUAGE_DESCRIPTION' | translate}}</p>
+                                    <mat-form-field appearance="outline" class="ob-form-field">
+                                        <input matInput aria-label="durationLanguage"
+                                            [placeholder]="'CHANNELS.PACKS.COMMUNICATION.DURATION_LANGUAGE_PLACEHOLDER' | translate"
+                                            formControlName="durationLanguage">
+                                        <mat-error [ob-form-errors]="form" [field]="'durationLanguage'" />
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div fxFlex.lt-lg="100%" fxLayout="column">
+                                <span class="field-label"> {{'CHANNELS.PACKS.COMMUNICATION.SHORT_DESCRIPTION_LABEL' | translate}} </span>
+                                <p>{{'CHANNELS.PACKS.COMMUNICATION.SHORT_DESCRIPTION_DESCRIPTION' | translate}}</p>
+                                <mat-form-field appearance="outline" class="ob-form-field no-padding">
+                                    <app-rich-text-area aria-label="Short Description"
+                                        [placeholder]="'CHANNELS.PACKS.COMMUNICATION.SHORT_DESCRIPTION_PLACEHOLDER' | translate"
+                                        formControlName="shortDescription" />
+                                    <mat-error [ob-form-errors]="form" field="shortDescription" />
+                                </mat-form-field>
+                            </div>
+                            <div fxFlex.lt-lg="100%" fxLayout="column">
+                                <span class="field-label">{{'CHANNELS.PACKS.COMMUNICATION.LONG_DESCRIPTION_LABEL' | translate}}</span>
+                                <p>{{'CHANNELS.PACKS.COMMUNICATION.LONG_DESCRIPTION_DESCRIPTION' | translate}}</p>
+                                <mat-form-field appearance="outline" class="ob-form-field field-with-label no-padding">
+                                    <app-rich-text-area aria-label="Long Description"
+                                        [placeholder]="'CHANNELS.PACKS.COMMUNICATION.LONG_DESCRIPTION_PLACEHOLDER' | translate"
+                                        formControlName="longDescription" />
+                                    <mat-error [ob-form-errors]="form" field="longDescription" />
+                                </mat-form-field>
+                            </div>
+                            <div fxFlex="100%" fxLayout="column" class="section-block">
+                                <span class="field-label">
+                                    {{'CHANNELS.PACKS.COMMUNICATION.SLIDER_LABEL' | translate}}
+                                </span>
+                                <p>{{'CHANNELS.PACKS.COMMUNICATION.SLIDER_DESCRIPTION' | translate}}</p>
+                                <div fxLayout="row">
+                                    <app-image-uploader hasAltText fxFlex="calc(50% + 20px)" formControlName="slider1"
+                                        [imageRestrictions]="sliderRestrictions" hideLabelText />
+                                    <div fxFlex="50%" fxLayout="row wrap">
+                                        <app-image-uploader hasAltText fxFlex="50%" formControlName="slider2"
+                                            [imageRestrictions]="sliderRestrictions" hideLabelText />
+                                        <app-image-uploader hasAltText fxFlex="50%" formControlName="slider3"
+                                            [imageRestrictions]="sliderRestrictions" hideLabelText />
+                                        <app-image-uploader hasAltText fxFlex="50%" formControlName="slider4"
+                                            [imageRestrictions]="sliderRestrictions" hideLabelText />
+                                        <app-image-uploader hasAltText fxFlex="50%" formControlName="slider5"
+                                            [imageRestrictions]="sliderRestrictions" hideLabelText />
+                                    </div>
+                                </div>
+                                <span class="field-format">{{'UPLOAD_IMAGE.FORMAT' | translate: sliderRestrictions}}</span>
+                            </div>
+                            <div fxFlex="100%" fxLayout="row" fxLayoutGap="10px">
+                                <div fxFlex="50" fxLayout="column">
+                                    <span class="field-label">
+                                        {{'CHANNELS.PACKS.COMMUNICATION.MAIN_IMAGE_LABEL' | translate}}
+                                    </span>
+                                    <p>{{'CHANNELS.PACKS.COMMUNICATION.MAIN_IMAGE_DESCRIPTION' | translate}}</p>
+                                    <app-image-uploader hasAltText [style.max-width]="'220px'" [imageRestrictions]="mainImgRestrictions"
+                                        formControlName="mainImg" />
+                                </div>
+                                <div fxFlex="50" fxLayout="column">
+                                    <span class="field-label">
+                                        {{'CHANNELS.PACKS.COMMUNICATION.SECONDARY_IMAGE_LABEL' | translate}}
+                                    </span>
+                                    <p>{{'CHANNELS.PACKS.COMMUNICATION.SECONDARY_IMAGE_DESCRIPTION' | translate}}</p>
+                                    <app-image-uploader hasAltText [style.max-width]="'120px'"
+                                        [imageRestrictions]="secondaryImgRestrictions"
+                                        formControlName="secondaryImg" />
+                                </div>
+                            </div>
+                        </div>
+                    </mat-expansion-panel>
+                </div>
+                <mat-divider vertical="true" fxFlexAlign="stretch" />
+                <div fxFlex="0 0 200px">
+                </div>
+            </div>
+            <div>
+                <div class="details-container" fxLayout="column" fxFlex="0 1 880px">
+                    <mat-expansion-panel togglePosition="before" expanded (expandedChange)="infoMessageExpanded = $event">
+                        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                            <mat-panel-title>{{'CHANNELS.PACKS.COMMUNICATION.INFO_MESSAGE' | translate}}</mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <div fxFlex="685px" fxFlex.lt-lg="100%" fxLayout="column">
+                            <span class="field-label">{{'CHANNELS.PACKS.COMMUNICATION.INFORMATIVE_MESSAGE_LABEL' | translate}}</span>
+                            <p>{{'CHANNELS.PACKS.COMMUNICATION.INFORMATIVE_MESSAGE_DESCRIPTION' | translate}}</p>
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label no-padding">
+                                <app-rich-text-area aria-label="Informative Message"
+                                    [placeholder]="'CHANNELS.PACKS.COMMUNICATION.INFORMATIVE_MESSAGE_PLACEHOLDER' | translate"
+                                    formControlName="informativeMessage" />
+                                <mat-error [ob-form-errors]="form" field="informativeMessage" />
+                            </mat-form-field>
+                        </div>
+                    </mat-expansion-panel>
+                </div>
+                <mat-divider vertical="true" fxFlexAlign="stretch" />
+                <div fxFlex="0 0 200px">
+                    <div class="info-message-legend" [fxHide]="!infoMessageExpanded" fxLayout="column"
+                        fxLayoutAlign="start start">
+                        <img src="assets/ob-portal-design/info-message-grafico.svg"
+                            [alt]="'CHANNELS.PACKS.COMMUNICATION_INFO_MESSAGE.GRAPHIC' | translate">
+                        <img src="assets/ob-portal-design/info-message-no-grafico.svg"
+                            [alt]="'CHANNELS.PACKS.COMMUNICATION_INFO_MESSAGE.NO_GRAPHIC' | translate">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div fxFlex="grow" class="bottom-content">
+            <div fxFlex="0 1 880px"></div>
+            <div fxFlex="0 0 200px"></div>
+        </div>
+    </div>
+</app-form-container>
+@if(isLoadingOrSaving$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

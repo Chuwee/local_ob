@@ -1,0 +1,43 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="($loading()) || !form.dirty" [formGroup]="form">
+    <p class="body-1 description" [innerHTML]="'CHANNELS.SERVER_TRACKING.DESCRIPTION' | translate"></p>
+    <div class="flex flex-col gap-5">
+        <div class="meta-configurations flex flex-col gap-4" formGroupName="meta">
+            <h4 class="mat-subtitle-2">{{ 'CHANNELS.SERVER_TRACKING.META_TITLE' | translate }}</h4>
+
+            <mat-slide-toggle class="ob-slide-toggle" color="primary" formControlName="enabled">
+                {{ 'CHANNELS.SERVER_TRACKING.META_ENABLE'| translate }}
+            </mat-slide-toggle>
+
+            <app-tracking-credentials max="5" [config]="metaConfig" formControlName="credentials" />
+        </div>
+
+        <mat-divider />
+
+        <div class="ga-configurations flex flex-col gap-4" formGroupName="google_analytics">
+            <h4 class="mat-subtitle-2">{{ 'CHANNELS.SERVER_TRACKING.GA_TITLE' | translate }}</h4>
+
+            <mat-slide-toggle class="ob-slide-toggle" color="primary" formControlName="enabled">
+                {{ 'CHANNELS.SERVER_TRACKING.GA_ENABLE'| translate }}
+            </mat-slide-toggle>
+
+            <app-tracking-credentials max="5" [config]="gaConfig" formControlName="credentials" />
+        </div>
+
+        <mat-divider />
+
+        <div class="gateway flex flex-col gap-4" formGroupName="gateway">
+            <h4 class="mat-subtitle-2">{{ 'CHANNELS.SERVER_TRACKING.GATEWAY_TITLE' | translate }}</h4>
+            <div class="description" [innerHTML]="'CHANNELS.SERVER_TRACKING.GATEWAY_DESCRIPTION' | translate"></div>
+
+            <mat-slide-toggle class="ob-slide-toggle" color="primary" formControlName="enabled">
+                {{ 'CHANNELS.SERVER_TRACKING.GATEWAY_ENABLE'| translate }}
+            </mat-slide-toggle>
+        </div>
+    </div>
+</app-form-container>
+
+@if ($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,51 @@
+<app-form-container class="overflow-y-auto" (cancel)="cancel()" (save)="save()" [formGroup]="form"
+    [disabled]="!form.dirty || (isInProgress$ | async)">
+    <div>
+        <form fxFlex="100%" fxLayout="row wrap" fxLayoutGap.gt-sm="40px">
+            <div fxFlex="100%">
+                <p>{{'VENUE.SPACES.DESCRIPTION' | translate }}</p>
+            </div>
+            <!-- Name -->
+            <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 40px)" appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                <input matInput aria-label="name" formControlName="name" [placeholder]="'VENUE.NAME.PLACEHOLDER' | translate">
+                <mat-error [ob-form-errors]="form" field="name"></mat-error>
+            </mat-form-field>
+            <!-- Space ID -->
+            <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 40px)" fxLayout="column">
+                <span class="field-label">{{'FORMS.LABELS.SPACE_ID' | translate}}</span>
+                <span>{{venueSpaceId$ | async}}</span>
+            </div>
+            <!-- Capacity type and value -->
+            <div fxFlex.gt-sm="0 1 calc(50% - 40px)" fxLayout="row" fxLayoutAlign="start start">
+                <mat-radio-group fxFlex="300px" fxLayout="column" formControlName="capacityType">
+                    <span class="ob-label">{{'FORMS.LABELS.MAX_CAPACITY' | translate}} *</span>
+                    <div fxLayout="row" fxFlex fxLayoutGap="15px">
+                        <mat-radio-button class="ob-radio-button inline" [value]="venueSpaceCapacityType.unlimited">
+                            {{'FORMS.OPTIONS.UNLIMITED' | translate}}
+                        </mat-radio-button>
+                    </div>
+                    <div fxLayout="row" fxFlex fxLayoutGap="15px">
+                        <mat-radio-button class="ob-radio-button inline" [value]="venueSpaceCapacityType.fixed">
+                            {{'FORMS.OPTIONS.LIMITED' | translate}}
+                        </mat-radio-button>
+                        <mat-form-field fxFlex="120px" appearance="outline" class="ob-form-field">
+                            <input matInput type="number" placeholder="0" aria-label="capacityValue" formControlName="capacityValue">
+                            <mat-error [ob-form-errors]="form" field="capacityValue"></mat-error>
+                        </mat-form-field>
+                    </div>
+                </mat-radio-group>
+            </div>
+            <!-- Notes -->
+            <mat-form-field fxFlex="100%" fxFlex.gt-md="0 1 calc(50% - 40px)" appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.NOTES' | translate}}</mat-label>
+                <textarea matInput aria-label="notes" [placeholder]="'VENUE.SPACES.NOTES.PLACEHOLDER' | translate" formControlName="notes"
+                    rows="5"></textarea>
+                <mat-error [ob-form-errors]="form" field="notes"></mat-error>
+            </mat-form-field>
+        </form>
+    </div>
+</app-form-container>
+<div class="spinner-container" *ngIf="isInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

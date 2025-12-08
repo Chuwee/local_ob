@@ -1,0 +1,42 @@
+<div fxLayout="column" class="promotion-form-section" [formGroup]="priceTypesForm">
+    <p class="mat-subtitle-2" fxLayoutAlign="start center">
+        {{'EVENTS.PROMOTIONS.PRICE_ZONES_DESCRIPTION' | translate}} *
+        <app-help-button *ngIf="presale" [message]="'EVENTS.PROMOTIONS.PRESALE_PRICE_ZONES_INFO' | translate" />
+    </p>
+    <mat-radio-group formControlName="type" fxLayout="column" [disabled]="presale">
+        <mat-radio-button class="ob-radio-button vertical-list" [value]="promotionPriceTypesScope.all">
+            {{'EVENTS.PROMOTIONS.PRICE_ZONE_OPTS.ALL' | translate}}
+        </mat-radio-button>
+        <mat-radio-button #restrictedRadio class="ob-radio-button vertical-list" [value]="promotionPriceTypesScope.restricted"
+            [disabled]="!((priceTypesGroups$ | async)?.length > 0)"
+            [matTooltip]="'EVENTS.PROMOTIONS.PRICE_ZONE_EMPTY_LIST' | translate"
+            [matTooltipDisabled]="presale || !restrictedRadio.disabled || (loading$ | async)" matTooltipPosition="below"
+            matTooltipClass="no-margin">
+            {{'EVENTS.PROMOTIONS.PRICE_ZONE_OPTS.SELECT' | translate}}
+        </mat-radio-button>
+    </mat-radio-group>
+    <div fxFlex>
+        <div [fxShow]="priceTypesForm.get('type').value === promotionPriceTypesScope.restricted"
+            class="promotion-price-types-container nested-content">
+            <div *ngIf="priceTypesGroups$ | async as priceTypesGroups" fxLayout="row" class="price-types-list-container"
+                [class.field-error]="priceTypesForm.hasError('required', 'ids') && priceTypesForm.get('ids').touched">
+                <mat-selection-list *ngIf="priceTypesGroups.length" fxFlex="100%" class="ob-list price-types-list"
+                    formControlName="ids">
+                    <div *ngFor="let priceTypesGroup of priceTypesGroups; let first = first">
+                        <div matSubheader [ngClass]="{'first-subheader': first}">
+                            {{priceTypesGroup.venueTemplateName}}
+                        </div>
+                        <mat-list-option *ngFor="let priceType of priceTypesGroup.priceTypes" color="primary"
+                            [value]="priceType.id" checkboxPosition="before">
+                            {{priceType.name}}
+                        </mat-list-option>
+                    </div>
+                </mat-selection-list>
+            </div>
+            <span *ngIf="priceTypesForm.hasError('required', 'ids') && priceTypesForm.get('ids').touched"
+                class="error-description">
+                {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+            </span>
+        </div>
+    </div>
+</div>

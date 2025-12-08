@@ -1,0 +1,17 @@
+<app-form-container *ngIf="(requestAccepted$ | async)" hideActionBar>
+    <div class="section-block">
+        <p class="section-description">{{'SEASON_TICKET.CHANNEL.COMMISSIONS.DESCRIPTION' | translate}}</p>
+    </div>
+    <app-season-ticket-channel-commissions-generic class="section-block" [currency]="currency$ | async">
+    </app-season-ticket-channel-commissions-generic>
+    <app-season-ticket-channel-commissions-promotion [currency]="currency$ | async" [hidden]="disabledPromotionRanges$ | async"
+        class="section-block">
+    </app-season-ticket-channel-commissions-promotion>
+</app-form-container>
+<app-empty-state *ngIf="(inProgress$ | async) !== true" [fxShow]="(requestAccepted$ | async) !== true" fxFlex="100%"
+    [title]="'SEASON_TICKET.CHANNEL.COMMISSIONS.REQUEST_NOT_ACCEPTED' | translate">
+</app-empty-state>
+<div class="spinner-container" *ngIf="(inProgress$ | async)">
+    <mat-spinner></mat-spinner>
+</div>
+

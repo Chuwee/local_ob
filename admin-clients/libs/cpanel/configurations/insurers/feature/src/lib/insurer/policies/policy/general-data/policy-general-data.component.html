@@ -1,0 +1,151 @@
+@let policy = $policy();
+@if(policy){
+    <app-form-container layout="main" class="overflow-y-auto" (cancel)="cancel()" (save)="save()"
+        [formGroup]="form" [disabled]="!form.dirty || form.invalid || $isInProgress()">
+        <mat-accordion multi [togglePosition]="'before'">
+            <mat-expansion-panel expanded>
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{'INSURERS.FORMS.MAIN_INFO' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="flex flex-row flex-wrap sm:gap-[40px]">
+                    <div class="flex flex-col basis-full sm:flex-[0_1_calc(50%-40px)] md:flex-[0_1_calc(33.3%-40px)]">
+                        <mat-form-field appearance="outline"
+                            class="ob-form-field field-with-label flex">
+                            <mat-label>{{'INSURERS.FORMS.LABELS.NAME' | translate}}</mat-label>
+                            <input matInput type="text" formControlName="name">
+                        </mat-form-field>
+                    </div>
+                    <div class="details-non-editable-field ob-form-field flex flex-col basis-full
+                            sm:flex-[0_1_calc(50%-40px)] md:flex-[0_1_calc(33.3%-40px)]">
+                        <span class="field-label">{{'INSURERS.FORMS.LABELS.POLICY.NUMBER' | translate}}</span>
+                        <span>{{ policy.policy_number }}</span>
+                    </div>
+                    <div class="details-non-editable-field ob-form-field flex flex-col basis-full
+                            sm:flex-[0_1_calc(50%-40px)] md:flex-[0_1_calc(33.3%-40px)]">
+                        <span class="field-label">{{'INSURERS.FORMS.LABELS.POLICY.ID' | translate}}</span>
+                        <span>{{ policy.id }}</span>
+                    </div>
+                    <div class=" flex flex-col basis-full
+                            sm:flex-[0_1_calc(50%-40px)] md:flex-[0_1_calc(33.3%-40px)]">
+                        <mat-form-field appearance="outline"
+                            class="ob-form-field field-with-label flex">
+                            <mat-label>{{'INSURERS.FORMS.LABELS.POLICY.TAX' | translate}}</mat-label>
+                            <app-percentage-input formControlName="taxes" />
+                        </mat-form-field>
+                    </div>
+
+                </div>
+            </mat-expansion-panel>
+            <mat-expansion-panel expanded>
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{'INSURERS.FORMS.OPERATION' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="flex md:flex-row flex-col flex-wrap md:gap-5 gap-2 ob-form-field md:items-center">
+                    <span>{{'INSURERS.FORMS.INFOS.POLICY.OPERATION_FIRST_TEXT' | translate}}</span>
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label flex">
+                        <input type="number" formControlName="days_ahead_limit" min="0" matInput>
+                    </mat-form-field>
+                    <span>{{'INSURERS.FORMS.INFOS.POLICY.OPERATION_SECOND_TEXT' | translate}}</span>
+                </div>
+            </mat-expansion-panel>
+            <mat-expansion-panel expanded>
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{'INSURERS.FORMS.COMMISSIONS' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="ob-form-field flex flex-col basis-full gap-6">
+                    <div class="flex flex-col">
+                        <span class="field-label">{{'INSURERS.FORMS.LABELS.POLICY.INSURANCE_COMMISSION' | translate}}</span>
+                        <span>{{'INSURERS.FORMS.INFOS.POLICY.INSURANCE_COMMISSION_DESCRIPTION' | translate}}</span>
+                        <mat-radio-group fxLayout="row wrap" formControlName="commission_type_insurer">
+                            <mat-radio-button fxFlex="100%" class="ob-radio-button vertical-list radio-option" [value]="'fix'">
+                                {{'INSURERS.FORMS.INFOS.POLICY.COMMISSION_FIX' | translate}}
+                            </mat-radio-button>
+                            @if(form.controls.commission_type_insurer?.value === 'fix') {
+                                <div
+                                    class="flex md:flex-row flex-col flex-wrap md:gap-5 gap-2 md:items-center nested-content">
+                                    <mat-form-field appearance="outline" class="ob-form-field field-with-label flex">
+                                        <app-currency-input class="currency-input" pattern="\d*\.?\d{0,2}" [currencyFormat]="'narrow'"
+                                            formControlName="insurer_benefits_fix" />
+                                    </mat-form-field>
+                                    <span>{{'INSURERS.FORMS.INFOS.POLICY.INSURANCE_COMMISSION_TEXT' | translate}}</span>
+                                </div>
+                            }
+                            <mat-radio-button fxFlex="100%" class="ob-radio-button vertical-list radio-option" [value]="'percent'">
+                                {{'INSURERS.FORMS.INFOS.POLICY.COMMISSION_PERCENT' | translate}}
+                            </mat-radio-button>
+                            @if(form.controls.commission_type_insurer?.value  === 'percent') {
+                                <div
+                                    class="flex md:flex-row flex-col flex-wrap md:gap-5 gap-2 md:items-center nested-content">
+                                    <mat-form-field appearance="outline" class="ob-form-field field-with-label flex">
+                                        <app-percentage-input formControlName="insurer_benefits_percent" />
+                                    </mat-form-field>
+                                    <span>{{'INSURERS.FORMS.INFOS.POLICY.INSURANCE_COMMISSION_TEXT' | translate}}</span>
+                                </div>
+                            }
+                        </mat-radio-group>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="field-label">{{'INSURERS.FORMS.LABELS.POLICY.BROKER_COMMISSION' | translate}}</span>
+                        <span>{{'INSURERS.FORMS.INFOS.POLICY.BROKER_COMMISSION_DESCRIPTION' | translate}}</span>
+                        <mat-radio-group fxLayout="row wrap" formControlName="commission_type_operator">
+                            <mat-radio-button fxFlex="100%" class="ob-radio-button vertical-list radio-option" [value]="'fix'">
+                                {{'INSURERS.FORMS.INFOS.POLICY.COMMISSION_FIX' | translate}}
+                            </mat-radio-button>
+                            @if(form.controls.commission_type_operator?.value === 'fix') {
+                                <div
+                                    class="flex md:flex-row flex-col flex-wrap md:gap-5 gap-2 md:items-center nested-content">
+                                    <mat-form-field appearance="outline" class="ob-form-field field-with-label flex">
+                                        <app-currency-input class="currency-input" pattern="\d*\.?\d{0,2}" [currencyFormat]="'narrow'"
+                                            formControlName="operator_benefits_fix" />
+                                    </mat-form-field>
+                                    <span>{{'INSURERS.FORMS.INFOS.POLICY.INSURANCE_COMMISSION_TEXT' | translate}}</span>
+                                </div>
+                            }
+                            <mat-radio-button fxFlex="100%" class="ob-radio-button vertical-list radio-option" [value]="'percent'">
+                                {{'INSURERS.FORMS.INFOS.POLICY.COMMISSION_PERCENT' | translate}}
+
+                            </mat-radio-button>
+                            @if(form.controls.commission_type_operator?.value === 'percent') {
+                                <div
+                                    class="flex md:flex-row flex-col flex-wrap md:gap-5 gap-2 md:items-center nested-content">
+                                    <mat-form-field appearance="outline" class="ob-form-field field-with-label flex">
+                                        <app-percentage-input formControlName="operator_benefits_percent" />
+                                    </mat-form-field>
+                                    <span>{{'INSURERS.FORMS.INFOS.POLICY.INSURANCE_COMMISSION_TEXT' | translate}}</span>
+                                </div>
+                            }
+                        </mat-radio-group>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+            <mat-expansion-panel expanded>
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{'INSURERS.TITLES.POLICY_CONFIG' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="ob-form-field flex flex-col basis-full gap-4">
+                    <span>{{'INSURERS.FORMS.INFOS.POLICY.DEFAULTABLE_POLICIES_HELP' | translate }}</span>
+                    <div class="flex align-center">
+                        <mat-icon class="ob-icon small neutral with-text">info</mat-icon>
+                        <span>{{'INSURERS.FORMS.INFOS.POLICY.COMPLIANCE_NOTICE' | translate }}</span>
+                    </div>
+                    <mat-checkbox color="primary" formControlName="default_allowed">
+                        {{'INSURERS.FORMS.LABELS.POLICY.ALLOW_DEFAULT_IN_CHANNELS' | translate}}
+                    </mat-checkbox>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </app-form-container>
+}
+@if ($isInProgress()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

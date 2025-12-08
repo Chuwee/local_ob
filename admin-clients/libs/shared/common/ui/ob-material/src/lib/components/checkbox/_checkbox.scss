@@ -1,0 +1,123 @@
+@use '@angular/material' as mat;
+@mixin checkbox-override($palettes, $colors, $typography) {
+    $grey-light-20: map-get($colors, ob-grey-light-20);
+    $grey: map-get($colors, ob-grey);
+    $ob-bg-3: map-get($colors, ob-bg-3);
+    $ob-error: mat.m2-get-color-from-palette(map-get($palettes, warn));
+
+    .mat-mdc-checkbox {
+        &.mat-primary {
+            --mdc-checkbox-selected-checkmark-color: #fff;
+            --mdc-checkbox-state-layer-size: 24px;
+        }
+
+        .mdc-checkbox .mdc-checkbox__native-control:enabled:indeterminate~.mdc-checkbox__background {
+            --mdc-checkbox-selected-icon-color: var(--ob-theme-color-grey);
+        }
+
+        &.small-touch-area {
+            .mat-mdc-checkbox-touch-target {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                transform: unset;
+            }
+        }
+    }
+
+    mat-checkbox {
+
+        &.mat-mdc-checkbox-disabled {
+            opacity: 0.7;
+
+            .mdc-checkbox__background {
+                background-color: $ob-bg-3;
+            }
+            .mat-mdc-checkbox-frame {
+                border-color: $grey-light-20;
+            }
+        }
+
+        &.mat-mdc-checkbox-indeterminate.mat-primary {
+            .mat-mdc-checkbox-background {
+                background-color: $grey;
+            }
+        }
+
+        .mat-mdc-checkbox-frame {
+            border-color: $grey;
+        }
+
+        &.inline {
+            padding-top: 8px;
+        }
+
+        &.list-header-checkbox {
+            height: 100%;
+
+            label {
+                height: 100%;
+                padding-left: 2px;
+                padding-right: 10px;
+            }
+        }
+
+        &.list-checkbox {
+            height: 100%;
+
+            label {
+                height: 100%;
+                padding-left: 15px;
+                padding-right: 10px;
+
+                .mat-mdc-checkbox-inner-container {
+                    margin-top: 12px;
+                }
+            }
+
+            &.tiny-list {
+                label .mat-mdc-checkbox-inner-container {
+                    margin-top: 6px;
+                }
+            }
+        }
+
+        &.xsmall {
+            .mat-mdc-checkbox-layout {
+                padding-top: 1px;
+            }
+
+            .mat-mdc-checkbox-ripple {
+                left: calc(50% - 13px);
+                top: calc(50% - 13px);
+                height: 26px;
+                width: 26px;
+            }
+        }
+
+        .mat-internal-form-field {
+            .mdc-checkbox {
+                align-self: flex-start;
+            }
+            .mat-mdc-checkbox-label {
+                line-height: 22px; // quitarlo afecta los checkbox de import contents dialog, channels filters...
+                // TODO: investigar diferencias con los checkbox de las secciones 'detail'
+            }
+        }
+        .option-title {
+            font-weight: 700;
+        }
+
+        &.label-with-description {
+            .mat-mdc-checkbox-label {
+                line-height: 18px;
+            }
+        }
+
+        &.nested-field {
+            padding-left: 24px;
+        }
+    }
+}

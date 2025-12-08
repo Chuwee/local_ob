@@ -1,0 +1,115 @@
+<div class="details-container" fxFlex="0 1 100%" fxLayout="column" *ngIf="seasonTicket$ | async as seasonTicket">
+    <div class="heading-container" fxLayoutAlign="start center">
+        <app-go-back defaultPath="/season-tickets" />
+        <h1 class="secondary mat-headline-3">{{ seasonTicket.name }}</h1>
+    </div>
+    <div class="main-content" fxFlex="0 1 100%" fxLayout="column">
+        <div class="top-actions">
+            <app-nav-tabs-menu type="tabMenu" [elements]="[
+                {
+                    label: 'SEASON_TICKET.GENERAL_DATA.TITLE',
+                    id: 'tab_season_ticket_general-data',
+                    param: 'general-data',
+                },
+                {
+                    label: 'SEASON_TICKET.COMMUNICATION.TITLE',
+                    id: 'tab_season_ticket_communication',
+                    param: 'communication',
+                },
+                {
+                    param: 'capacity',
+                    id: 'tab_season_ticket_capacity',
+                    disabled: isGenerationStatusError$ | async,
+                    templateRef: capacity
+                },
+                {
+                    param: 'prices',
+                    id: 'tab_season_ticket_prices',
+                    disabled: isGenerationStatusError$ | async,
+                    templateRef: prices
+                },
+                {
+                    param: 'sessions',
+                    id: 'tab_season_ticket_sessions',
+                    disabled: isGenerationStatusError$ | async,
+                    templateRef: sessions
+                },
+                {
+                    param: 'operative',
+                    id: 'tab_season_ticket_operative',
+                    disabled: isGenerationStatusError$ | async,
+                    templateRef: operative
+                },
+                {
+                    param: 'channels',
+                    id: 'tab_season_ticket_channels',
+                    disabled: isGenerationStatusError$ | async,
+                    templateRef: channels
+                },
+                {
+                    param: 'renewals',
+                    id: 'tab_season_ticket_renewals',
+                    disabled: isGenerationStatusError$ | async,
+                    templateRef: renewals
+                },
+                {
+                    param: 'locality-management',
+                    id: 'tab_season_ticket_locality-management',
+                    disabled: isGenerationStatusError$ | async,
+                    templateRef: localityManagement
+                },
+                {
+                    param: 'promotions',
+                    id: 'tab_season_ticket_promotions',
+                    disabled: isGenerationStatusError$ | async,
+                    templateRef: promotions
+                },
+                {
+                    param: 'b2b-conditions',
+                    id: 'tab_season_ticket_b2b-conditions',
+                    disabled: isGenerationStatusError$ | async,
+                    show: entity$ | async | isB2bEntity,
+                    templateRef: b2bConditions
+                }
+            ]">
+                <ng-template #capacity>
+                    <ng-container *ngTemplateOutlet=" customTab; context: { label: 'SEASON_TICKET.CAPACITY.TITLE' } " />
+                </ng-template>
+                <ng-template #prices>
+                    <ng-container *ngTemplateOutlet=" customTab; context: { label: 'SEASON_TICKET.PRICES' } " />
+                </ng-template>
+                <ng-template #sessions>
+                    <ng-container *ngTemplateOutlet=" customTab; context: { label: 'SEASON_TICKET.SESSIONS' } " />
+                </ng-template>
+                <ng-template #operative>
+                    <ng-container *ngTemplateOutlet=" customTab; context: { label: 'SEASON_TICKET.OPERATIVE.TITLE' } " />
+                </ng-template>
+                <ng-template #channels>
+                    <ng-container *ngTemplateOutlet=" customTab; context: { label: 'SEASON_TICKET.CHANNELS' } " />
+                </ng-template>
+                <ng-template #renewals>
+                    <ng-container *ngTemplateOutlet=" customTab; context: { label: 'SEASON_TICKET.RENEWALS.TITLE' } " />
+                </ng-template>
+                <ng-template #localityManagement>
+                    <ng-container *ngTemplateOutlet=" customTab; context: { label: 'SEASON_TICKET.LOCALITY_MANAGEMENT.TITLE' } " />
+                </ng-template>
+                <ng-template #promotions>
+                    <ng-container *ngTemplateOutlet=" customTab; context: { label: 'SEASON_TICKET.PROMOTIONS.TITLE' } " />
+                </ng-template>
+                <ng-template #b2bConditions>
+                    <ng-container *ngTemplateOutlet=" customTab; context: { label: 'SEASON_TICKET.B2B_CONDITIONS.TITLE' } " />
+                </ng-template>
+            </app-nav-tabs-menu>
+        </div>
+        <router-outlet />
+    </div>
+</div>
+
+<ng-template #customTab let-label="label">
+    <div fxLayout="row" fxLayoutAlign="start center"
+        [fxLayoutGap]=" (isGenerationStatusInProgress$ | async) || (isGenerationStatusError$ | async) ? '4px' : '0px' ">
+        <span>{{ label | translate }}</span>
+        <mat-spinner *ngIf="isGenerationStatusInProgress$ | async" diameter="16" strokeWidth="2" />
+        <mat-icon *ngIf="isGenerationStatusError$ | async" class="ob-icon xsmall error"> error_outline </mat-icon>
+    </div>
+</ng-template>

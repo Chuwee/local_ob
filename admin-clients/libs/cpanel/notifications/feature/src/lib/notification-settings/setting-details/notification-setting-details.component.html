@@ -1,0 +1,53 @@
+<div fxFlex="0 1 100%" fxLayout="column">
+    <div class="heading-container only-title" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">
+                {{'TITLES.NOTIFICATIONS.MY_EMAIL_NOTIFICATIONS_SETTINGS' | translate}}
+                <span [matTooltip]="'INFORMATION_BADGE.BETA_FEATURE_TOOLTIP_INFO' | translate"
+                    class="ob-badge info">
+                    {{'INFORMATION_BADGE.BETA_FEATURE' | translate}}
+                </span>
+            </h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end" fxLayoutGap="10px">
+            <app-entity-filter-button #entityFilterButton
+                [fxShow]="(canReadMultipleEntities$ | async) && (isEntitySelected$ | async)"
+                [getEntitiesRequest]="entitiesRequest">
+            </app-entity-filter-button>
+        </div>
+    </div>
+    <div class="details-container" fxFlex="100%" fxLayout="column">
+        <app-empty-state [fxShow]="(canReadMultipleEntities$ | async) &&
+            ((isEntitySelected$ | async) === null || ((isEntitySelected$ | async) === false))"
+            fxFlex="100%"
+            [title]="'LIST.ENTITY_REQUIRED_TITLE' | translate"
+            [description]="'LIST.ENTITY_REQUIRED_DESCRIPTION' | translate">
+            <button type="button" mat-flat-button class="ob-button medium" color="primary"
+                (click)="entityFilterButton.openEntitySelectionDialog()">
+                {{'ACTIONS.SELECT_ENTITY' | translate}}
+            </button>
+        </app-empty-state>
+        <div [fxShow]="(isEntitySelected$ | async)" class="main-content" fxFlex="0 1 100%"
+            fxLayout="column">
+            <app-form-container layout="main" class="overflow-y-auto"
+                [disabled]="form.pristine || (isLoadingOrSaving$ | async)" (cancel)="cancel()" (save)="save()">
+                <form [formGroup]="form" fxLayout="row wrap">
+                    <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center">
+                        <mat-label>{{'NOTIFICATIONS.EMAIL_NOTIFICATION.SETTINGS.ENTITY_MONTHLY_LIMIT' | translate}}</mat-label>
+                        <mat-form-field appearance="outline" fxFlex="80px" class="ob-form-field inline-field value-field">
+                            <input matInput type="number" formControlName="send_limit" placeholder="0">
+                        </mat-form-field>
+                        <mat-icon class="ob-help-icon" fxFlexAlign="center"
+                            [matTooltip]="'NOTIFICATIONS.EMAIL_NOTIFICATION.SETTINGS.ENTITY_SEND_LIMIT_INFO' | translate">
+                            help_outline
+                        </mat-icon>
+                    </div>
+                </form>
+                <mat-error [ob-form-errors]="form" field="send_limit"></mat-error>
+            </app-form-container>
+            <div class="spinner-container" *ngIf="isLoadingOrSaving$ | async">
+                <mat-spinner></mat-spinner>
+            </div>
+        </div>
+    </div>
+</div>

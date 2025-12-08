@@ -1,0 +1,184 @@
+@let termsConditions = $policyTermsConditions();
+@let language = selectedLanguage$ | async;
+<!-- {} -->
+<app-form-container layout="main" class="overflow-y-auto" (cancel)="cancel()" (save)="save()"
+    [disabled]="!form.dirty || form.invalid || $isLoading()">
+    <app-language-bar [languages]="languageList$ | async" [selected]="selectedLanguage$ | async" slot="outside"
+        [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)" />
+    <form [formGroup]="form" class="flex flex-col overflow-y-auto">
+        <mat-accordion multi [togglePosition]="'before'">
+            <mat-expansion-panel expanded>
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{'INSURERS.FORMS.POLICY.TERMS_CONDITIONS.CHANNEL_CONTENT' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="flex flex-wrap sm:gap-[40px]">
+                    <div class="flex flex-row flex-wrap flex-[0_1_calc(33%-40px)]">
+                        <mat-button-toggle-group vertical [formControl]="selectedComContent"
+                            class="flex flex-1 ob-outline-button-group">
+                            @for (key of ['agreement_text', 'privacy_policy_text']; track key) {
+                                <mat-button-toggle [value]="key">
+                                    {{('INSURERS.FORMS.POLICY.TERMS_CONDITIONS.BUTTONS.'+ key.toUpperCase()) | translate}}
+                                </mat-button-toggle>
+                            }
+                        </mat-button-toggle-group>
+                    </div>
+                    @if(termsConditions.length > 0) {
+                        @if (selectedComContent.value; as selectedKey) {
+                            @let control = form.get(['contentValues', language,  selectedKey]); 
+                            <!-- {} -->
+                            @if (control) {
+                                <div class="flex flex-col flex-[0_1_calc(66%-40px)]">
+                                    <p>{{('INSURERS.FORMS.POLICY.TERMS_CONDITIONS.DESCRIPTION.'+ selectedKey.toUpperCase()) | translate}}
+                                    </p>
+                                    <mat-form-field appearance="outline" class="flex flex-1 ob-form-field no-padding">
+                                        <app-rich-text-area [autoresize]="{min: 380, max: 380}"
+                                            [formControl]="control" class="vertical-stretch"
+                                            [placeholder]="('INSURERS.FORMS.POLICY.TERMS_CONDITIONS.PLACEHOLDER.'+ selectedKey.toUpperCase()) 
+                                            | translate" />
+                                        <mat-error [ob-form-errors]="control" />
+                                        <mat-hint> {{ 'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate
+                                            : { value: (selectedKey === 'agreement_text' ? 13000: 2500) } }}</mat-hint>
+                                    </mat-form-field>
+                                </div>
+                            }
+                        }
+                    } @else {
+                        <div class="flex flex-row justify-center flex-[0_1_calc(66%-40px)]">
+                            <app-empty-state-tiny class="flex-1" [title]="'INSURERS.FORMS.POLICY.NO_RESULTS' | translate" />
+                        </div>
+                    }
+
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+        <mat-accordion multi [togglePosition]="'before'">
+            <mat-expansion-panel expanded>
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>
+                        {{'INSURERS.FORMS.POLICY.TERMS_CONDITIONS.MAIL_CONTENT' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="flex sm:gap-[40px]">
+                    <div class="flex flex-row flex-[0_1_calc(33%-40px)]">
+                        <mat-button-toggle-group vertical [formControl]="selectedMailContent"
+                            class="ob-outline-button-group flex flex-1">
+                            @for (key of ['subject_mail_template', 'mail_template', 'file']; track key) {
+                                <mat-button-toggle [value]="key">
+                                    {{('INSURERS.FORMS.POLICY.TERMS_CONDITIONS.BUTTONS.'+ key.toUpperCase()) | translate}}
+                                </mat-button-toggle>
+                            }
+                        </mat-button-toggle-group>
+                    </div>
+                    @if(termsConditions.length > 0) {
+                        @if (selectedMailContent.value; as selectedKey) {
+                            @let control = form.get(['contentValues', language, selectedKey ]);
+                            <!-- {} -->
+                            @if(selectedKey === 'subject_mail_template' && control){
+                                <div class="flex flex-col flex-[0_1_calc(66%-40px)]">
+                                    <p>{{('INSURERS.FORMS.POLICY.TERMS_CONDITIONS.DESCRIPTION.'+ selectedKey.toUpperCase()) | translate}}
+                                    </p>
+                                    <mat-form-field appearance="outline" class="flex flex-1 ob-form-field">
+                                        <input matInput aria-label="subject_mail_template" [formControl]="control"
+                                            [placeholder]="('INSURERS.FORMS.POLICY.TERMS_CONDITIONS.PLACEHOLDER.'+ selectedKey.toUpperCase())  
+                                            | translate">
+                                    </mat-form-field>
+                                </div>
+                            }
+                            @else if(selectedKey === 'mail_template' && control){
+                                <div class="flex flex-col flex-basis flex-[0_1_calc(66%-40px)]">
+                                    <p>{{('INSURERS.FORMS.POLICY.TERMS_CONDITIONS.DESCRIPTION.'+ selectedKey.toUpperCase()) | translate}}
+                                    </p>
+                                    <mat-form-field appearance="outline" class="flex flex-1 ob-form-field no-padding">
+                                        <app-rich-text-area [formControl]="control" class="vertical-stretch"
+                                            [autoresize]="{min: 380, max: 380}"
+                                            [placeholder]="('INSURERS.FORMS.POLICY.TERMS_CONDITIONS.PLACEHOLDER.'+ selectedKey.toUpperCase())  
+                                            | translate" />
+                                        <mat-error [ob-form-errors]="control" />
+                                        <mat-hint> {{ 'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate
+                                            : { value: 3000 } }}</mat-hint>
+                                    </mat-form-field>
+                                </div>
+                            } @else if(selectedKey === 'file' && control){
+                                <div class="flex flex-col flex-[0_1_calc(66%-40px)] gap-4">
+                                    <p>{{('INSURERS.FORMS.POLICY.TERMS_CONDITIONS.DESCRIPTION.'+ selectedKey.toUpperCase()) | translate}}
+                                    </p>
+                                    <div clas="flex flex-col" class="custom-resources-section">
+                                        <div class="flex justify-end">
+                                            <input #fileUpload type="file" id="fileUpload" class="hidden" (click)="fileUpload.value = null"
+                                                (change)="importFile($event)" accept="application/pdf" />
+                                            <span
+                                                matTooltip="{{ 'INSURERS.FORMS.POLICY.TERMS_CONDITIONS.FILE_DISABLED_REASON' | translate }}"
+                                                [matTooltipDisabled]="!control.value">
+                                                <button mat-stroked-button color="primary" type="button" class="ob-button medium"
+                                                    [attr.aria-label]="'INSURERS.FORMS.POLICY.TERMS_CONDITIONS.FILE_IMPORT' | translate"
+                                                    (click)="fileUpload.click()" [disabled]="control.value">
+                                                    <mat-icon>add</mat-icon>
+                                                    {{'INSURERS.FORMS.POLICY.TERMS_CONDITIONS.FILE_IMPORT' | translate}}
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div>
+
+                                    </div>
+                                    <div clas="flex flex-col" slot="subheader" class="with-action-button">
+                                        <mat-list class="ob-list">
+                                            <div class="flex justify-between flex-[0_1_100%] list-header">
+                                                <span>{{'INSURERS.FORMS.POLICY.TERMS_CONDITIONS.FILE_HEADER' | translate}}</span>
+                                            </div>
+                                            @if(control.value){
+                                                @let urlControl = form.get(['contentValues', language, 'file_url' ]);
+                                                <!-- {} -->
+                                                <div class="list-items-container">
+                                                    <mat-list-item class="hoverable-item desktop-list-actions">
+                                                        <div class="flex flex-row items-center justify-between flex-[0_1_100%]">
+                                                            <div class="flex flex-col text-left">
+                                                                <b>{{control.value}}</b>
+                                                            </div>
+                                                            <div class="flex flex-row items-center action-buttons float-actions-cell"
+                                                                (click)="$event.stopPropagation()">
+                                                                <button
+                                                                    matTooltip="{{'VENUE_TPLS.ELEMENT_INFO.FEATURES_LIST.LINKS_MODAL.TYPE' | translate}}"
+                                                                    class="ob-button small" aria-label="Open"
+                                                                    (click)="openUrl(urlControl?.value)"
+                                                                    [disabled]="!urlControl?.value" mat-icon-button>
+                                                                    <mat-icon>launch</mat-icon>
+                                                                </button>
+                                                                <button matTooltip="{{'FORMS.ACTIONS.EDIT' | translate}}"
+                                                                    mat-icon-button class="ob-button small" aria-label="Edit"
+                                                                    (click)="edit()">
+                                                                    <mat-icon>edit</mat-icon>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </mat-list-item>
+                                                </div>
+
+                                            } @else {
+                                                <app-empty-state-tiny class="flex-1" [title]="'INSURERS.FORMS.POLICY.NO_PDF' | translate"
+                                                    [description]="'INSURERS.FORMS.POLICY.NO_PDF_DESCRIPTION' | translate" />
+                                            }
+
+                                        </mat-list>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    }@else {
+                        <div class="flex flex-row justify-center flex-[0_1_calc(66%-40px)]">
+                            <app-empty-state-tiny class="flex-1" [title]="'INSURERS.FORMS.POLICY.NO_RESULTS' | translate" />
+                        </div>
+                    }
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </form>
+</app-form-container>
+
+@if ($isLoading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

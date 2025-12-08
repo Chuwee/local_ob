@@ -1,0 +1,62 @@
+<form id="producer-basic-details" [formGroup]="basicFormGroup" fxLayout="column">
+    <div fxLayout="row wrap" fxLayoutGap.gt-xs="24px">
+        <!-- Entity Name -->
+        <div class="details-non-editable-field ob-form-field" fxLayout="row wrap" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+            fxFlex.gt-sm="0 1 calc(33.33% - 24px)">
+            <span class="field-label">{{'PRODUCER.ENTITY' | translate}}</span>
+            <span>{{(producer$ | async)?.entity?.name}}</span>
+        </div>
+        <!-- Name -->
+        <mat-form-field fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.33% - 24px)" appearance="outline"
+            class="ob-form-field field-with-label">
+            <mat-label>{{'PRODUCER.NAME' | translate}}</mat-label>
+            <input matInput aria-label="name" [placeholder]="'PRODUCER.NAME' | translate" formControlName="name">
+            <mat-error *ngIf="basicFormGroup.hasError('required', 'name')">
+                {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+            </mat-error>
+            <mat-error *ngIf="basicFormGroup.hasError('maxlength', 'name')">
+                {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value:
+                producerFieldsRestrictions.producerNameLength})}}
+            </mat-error>
+        </mat-form-field>
+        <!-- Social Reason -->
+        <mat-form-field fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.33% - 24px)" appearance="outline"
+            class="ob-form-field field-with-label">
+            <mat-label>{{'PRODUCER.SOCIAL_REASON' | translate}}</mat-label>
+            <input matInput aria-label="social_reason" [placeholder]="'PRODUCER.SOCIAL_REASON' | translate" formControlName="social_reason">
+            <mat-error *ngIf="basicFormGroup.hasError('required', 'social_reason')">
+                {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+            </mat-error>
+            <mat-error *ngIf="basicFormGroup.hasError('maxlength', 'social_reason')">
+                {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value:
+                producerFieldsRestrictions.producerSocialReasonMaxLength})}}
+            </mat-error>
+        </mat-form-field>
+        <!-- TAX ID -->
+        <mat-form-field fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)" fxFlex.gt-sm="0 1 calc(33.33% - 24px)" appearance="outline"
+            class="ob-form-field field-with-label">
+            <mat-label>{{'PRODUCER.TAX_ID' | translate}}</mat-label>
+            <input matInput aria-label="tax_id" [placeholder]="'PRODUCER.TAX_ID' | translate" formControlName="tax_id">
+            <mat-error *ngIf="basicFormGroup.hasError('required', 'tax_id')">
+                {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+            </mat-error>
+            <mat-error *ngIf="basicFormGroup.hasError('maxlength', 'tax_id')">
+                {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value:
+                producerFieldsRestrictions.producerTaxIdMaxLength})}}
+            </mat-error>
+        </mat-form-field>
+        <!-- Default Producer -->
+        <mat-checkbox color="primary" formControlName="default" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+            fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column" fxLayoutAlign="center start">
+            {{( 'PRODUCER.IS_DEFAULT' ) | translate }}
+        </mat-checkbox>
+        <!-- Producer Status -->
+        <mat-form-field hidden-outline class="ob-form-field field-with-label" fxFlex="0 1 calc(50% - 24px)"
+            fxFlex.gt-sm="0 1 calc(33.33% - 24px)">
+            <input matInput hidden />
+            <mat-slide-toggle class="ob-slide-toggle" formControlName="enabled">
+                <span>{{'PRODUCER.STATUS_OPTS.ACTIVE' | translate}}</span>
+            </mat-slide-toggle>
+        </mat-form-field>
+    </div>
+</form>

@@ -1,0 +1,26 @@
+<div class="details-container" fxFlex="0 1 100%" fxLayout="column" *ngIf="saleRequest$ | async as saleRequest">
+    <div class="heading-container" fxLayoutAlign="start center">
+        <app-go-back defaultPath="/sales-requests" />
+        <h1 class="secondary mat-headline-3">{{saleRequest.event.name}} - {{saleRequest.channel.name}}</h1>
+    </div>
+    <div class="main-content" fxFlex="0 1 100%" fxLayout="column">
+        <div class="top-actions">
+            <app-nav-tabs-menu type="tabMenu" [elements]="[
+                {
+                    label: 'SALE_REQUEST.OPERATIVE.TITLE',
+                    param: 'operative'
+                },
+                {
+                    label: 'SALE_REQUEST.GENERAL_DATA.TITLE',
+                    param: 'general-data'
+                },
+                {
+                    label: 'SALE_REQUEST.COMMUNICATION.TITLE',
+                    param: 'communication',
+                    show: channelTypesCommunication.includes(saleRequest.channel.type)
+                }
+            ]" />
+        </div>
+        <router-outlet />
+    </div>
+</div>

@@ -1,0 +1,82 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'VALIDATIONS.TITLE' | prefix | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <form mat-dialog-content [formGroup]="form" fxLayout="column">
+        <span class="conditions-subtext">
+            {{'VALIDATIONS.SUBTEXT' | prefix | translate}}&nbsp;
+            <span class="ob-label">{{ 'FORM_FIELDS.' + keyField.toUpperCase() | prefix | translate }}</span>
+        </span>
+        <ng-container *ngFor="let valRule of availableRules" [formGroupName]="valRule.rule">
+            <mat-checkbox color="primary" formControlName="active">
+                <mat-label>{{'RULES.' + valRule.rule + '.TITLE'| prefix | translate}}</mat-label>
+            </mat-checkbox>
+
+            <div class="rule-value-field" *ngIf="form.get(valRule.rule + '.active').value && valRule.value_required" fxLayout="row">
+                <mat-form-field *ngIf="valRule.rule !== 'REGEX'" fxFlex="0 0 100px" appearance="outline" class="ob-form-field">
+                    <input *ngIf="valRule.value_type === 'INTEGER'" type="number" min="1" matInput
+                        [placeholder]="'RULES.' + valRule.rule + '.INPUT.PLACEHOLDER'| prefix | translate" formControlName="value">
+
+                    <input *ngIf="valRule.value_type !== 'INTEGER'" matInput
+                        [placeholder]="'RULES.' + valRule.rule + '.INPUT.PLACEHOLDER'| prefix | translate" formControlName="value">
+                    <mat-error [ob-form-errors]="form" [field]="[valRule.rule, 'value']"></mat-error>
+                </mat-form-field>
+
+                <div *ngIf="valRule.rule === 'REGEX'" formGroupName="value">
+                    <div fxLayout="row">
+                        <span class="ob-label">{{'VALIDATIONS.REGEX_TYPE.SUBTEXT' | prefix | translate}}</span>
+                        <span [ngClass]="[form.get(valRule.rule + '.value').touched &&
+                        form.get(valRule.rule + '.value').hasError('required') ? 'mat-error' : '']">*</span>
+                    </div>
+                    <ng-container *ngFor="let regexRule of regexOptionsArray" [formGroupName]="regexRule.value">
+                        <mat-checkbox #enableRegexOption fxLayoutAlign="start end" color="primary" formControlName="active">
+                            {{ 'REGEX_OPTIONS.' + regexRule.value + '.TITLE' | prefix | translate }}
+                        </mat-checkbox>
+                        <div *ngIf="enableRegexOption.checked">
+                            <ng-container *ngIf="regexRule.value === regexOptions.limiter">
+                                <mat-form-field fxFlex="0 0 96px" appearance="outline"
+                                    class="ob-form-field no-grid-spacing field-with-label rule-value-field">
+                                    <input type="number" min="1" matInput placeholder="0" formControlName="min">
+                                    <mat-label>{{'RULES.' + valRule.rule + '.INPUT.MIN.TITLE' | prefix | translate}}</mat-label>
+                                    <mat-error [ob-form-errors]="form" [field]="[valRule.rule, 'value', regexRule.value, 'min']">
+                                    </mat-error>
+                                </mat-form-field>
+                                <mat-form-field fxFlex="0 0 96px" appearance="outline"
+                                    class="ob-form-field no-grid-spacing field-with-label rule-value-field">
+                                    <input type="number" min="1" matInput placeholder="0" formControlName="max">
+                                    <mat-label>{{'RULES.' + valRule.rule + '.INPUT.MAX.TITLE' | prefix | translate}}</mat-label>
+                                    <mat-error [ob-form-errors]="form" [field]="[valRule.rule, 'value', regexRule.value, 'max']">
+                                    </mat-error>
+                                </mat-form-field>
+                            </ng-container>
+                            <ng-container *ngIf="regexRule.value === regexOptions.custom">
+                                <mat-form-field appearance="outline" class="ob-form-field no-grid-spacing rule-value-field"
+                                    fxFlex="0 0 200px">
+                                    <input matInput [placeholder]="'RULES.' + valRule.rule + '.INPUT.PLACEHOLDER'| prefix | translate"
+                                        formControlName="value">
+                                    <mat-error [ob-form-errors]="form" [field]="[valRule.rule, 'value', regexRule.value, 'value']">
+                                    </mat-error>
+                                </mat-form-field>
+                            </ng-container>
+                        </div>
+                    </ng-container>
+                    <mat-error [ob-form-errors]="form" [field]="valRule.rule + '.value'"
+                        *ngIf="form.get(valRule.rule + '.value').touched && form.get(valRule.rule + '.value').hasError('required')">
+                    </mat-error>
+                </div>
+            </div>
+        </ng-container>
+    </form>
+
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="submit()" [disabled]="form && !form.dirty">
+            {{'FORMS.ACTIONS.SAVE' | translate}}
+        </button>
+    </div>
+</div>

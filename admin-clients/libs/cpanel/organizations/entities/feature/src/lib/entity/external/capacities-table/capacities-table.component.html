@@ -1,0 +1,135 @@
+<mat-table class="ob-table dense-table" [dataSource]="capacities$ | async" [formGroup]="form" matSort
+    [attr.aria-label]="'ENTITY.EXTERNAL.CAPACITY.TITLE' | translate">
+    <ng-container [matColumnDef]="columns[0]">
+        <mat-header-cell *matHeaderCellDef class="head-cell without-gap" />
+        <mat-cell *matCellDef="let row; index as i" class="without-gap">
+            <div [fxShow]="row.id === defaultCapacity.value">
+                <span class="fake-icon-button">
+                    <mat-icon class="selected">star</mat-icon>
+                </span>
+            </div>
+            <div [fxShow]="row.id !== defaultCapacity.value && (!row.enabled || !row.available || !row.loaded)"
+                [matTooltip]="(!row.enabled ? 'ENTITY.EXTERNAL.CAPACITY.NOT_ENABLED' :
+                    !row.loaded ? 'ENTITY.EXTERNAL.CAPACITY.NOT_LOADED' :
+                    'ENTITY.EXTERNAL.CAPACITY.NO_CONNECTION') | translate">
+                <span class="fake-icon-button">
+                    <mat-icon class="not-selected">star_border</mat-icon>
+                </span>
+            </div>
+            <div [fxShow]="row.id !== defaultCapacity.value && row.enabled && row.available && row.loaded && !form.disabled">
+                <button mat-icon-button aria-label="Set default capacity" class="ob-button medium"
+                    (click)="setDefault(row.id)">
+                    <mat-icon class="not-selected">star_border</mat-icon>
+                </button>
+            </div>
+        </mat-cell>
+    </ng-container>
+    <ng-container [matColumnDef]="columns[1]">
+        <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+            {{'FORMS.LABELS.CONNECTION' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row;">
+            <span [ngClass]="['status-dot', row.available ? 'active' : 'error']"></span>
+        </mat-cell>
+    </ng-container>
+    <ng-container [matColumnDef]="columns[2]">
+        <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+            {{'FORMS.LABELS.ID' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row;">
+            {{row.id}}
+        </mat-cell>
+    </ng-container>
+    <ng-container [matColumnDef]="columns[3]">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{'FORMS.LABELS.NAME' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row;">
+            {{row.name}}
+        </mat-cell>
+    </ng-container>
+    <ng-container [matColumnDef]="columns[4]">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{'FORMS.LABELS.ENABLED' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row;"
+            [matTooltip]="(row.loaded ?
+                'ENTITY.EXTERNAL.CAPACITY.DISABLE_DISABLED' :
+                'ENTITY.EXTERNAL.CAPACITY.ENABLE_DISABLED') | translate"
+            [matTooltipDisabled]="form.get(row.id.toString()).enabled">
+            <mat-slide-toggle class="ob-slide-toggle" #toggle color="primary"
+                [formControlName]="row.id" />
+        </mat-cell>
+    </ng-container>
+    <ng-container [matColumnDef]="columns[5]">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{'FORMS.LABELS.STATUS' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row;">
+            {{( row.loaded ? 'ENTITY.EXTERNAL.CAPACITY.STATUS.LOADED' : 'ENTITY.EXTERNAL.CAPACITY.STATUS.NOT_LOADED') | translate }}
+        </mat-cell>
+    </ng-container>
+    <ng-container [matColumnDef]="columns[6]">
+        <mat-header-cell *matHeaderCellDef class="head-cell">
+            {{'ENTITY.EXTERNAL.CAPACITY.IMPORT_COLUMN' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row; index as i" class="actions-cell"
+            [matTooltip]="'ENTITY.EXTERNAL.CAPACITY.IMPORT_DISABLED' | translate"
+            [matTooltipDisabled]="form.get(row.id.toString())?.value">
+            <button #button [fxShow]="!row.loaded && row.available" mat-stroked-button class="ob-button small" color="primary"
+                [disabled]="!form.get(row.id.toString())?.value"
+                (click)="import(row)">
+                <mat-icon>import_export</mat-icon>
+                {{'ENTITY.EXTERNAL.CAPACITY.IMPORT' | translate}}
+            </button>
+            <button #button [fxShow]="row.loaded && row.available" mat-stroked-button class="ob-button small" color="primary"
+                (click)="refreshCapacity(row.id, row.name)">
+                <mat-icon>refresh</mat-icon>
+                {{'ENTITY.EXTERNAL.CAPACITY.RELOAD' | translate}}
+            </button>
+        </mat-cell>
+    </ng-container>
+    <ng-container [matColumnDef]="columns[7]">
+        <mat-header-cell *matHeaderCellDef class="actions-cell head-cell"
+            [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+            <button mat-button type="button" class="ob-button small only-icon"
+                (click)="reload()" [matTooltip]="'ENTITY.EXTERNAL.CAPACITY.RELOAD_TABLE' | translate">
+                <mat-icon>refresh</mat-icon>
+            </button>
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row; index as i" class="actions-cell" >
+            <div class="action-buttons" (click)="$event.stopPropagation()">
+                <button [fxShow]="row.loaded" mat-icon-button color="tertiary" class="ob-button medium"
+                    [matMenuTriggerFor]="menu">
+                    <mat-icon>more_horiz</mat-icon>
+                </button>
+                <mat-menu #menu="matMenu">
+                    <button mat-menu-item (click)="import(row)">
+                        {{'ENTITY.EXTERNAL.CAPACITY.REIMPORT' | translate}}
+                    </button>
+                    <button mat-menu-item (click)="delete(row)">
+                        {{'ENTITY.EXTERNAL.CAPACITY.DELETE' | translate}}
+                    </button>
+                    <button mat-menu-item (click)="remap(row)">
+                        {{'ENTITY.EXTERNAL.CAPACITY.REMAP' | translate}}
+                    </button>
+                </mat-menu>
+            </div>
+        </mat-cell>
+    </ng-container>
+    <mat-header-row *matHeaderRowDef="columns; sticky: true" class="dense-row" />
+    <mat-row *matRowDef="let row; columns: columns;" class="dense-row" />
+</mat-table>
+
+<ng-container *ngIf="(capacities$ | async)?.length === 0">
+    <div class="context-message-container" fxLayout="row" fxLayoutAlign="center">
+        <div fxFlex="100%" fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="15px">
+            <p class="title">{{'ENTITY.EXTERNAL.CAPACITY.EMPTY_TITLE' | translate}}</p>
+            <p class="body">{{'ENTITY.EXTERNAL.CAPACITY.EMPTY_BODY' | translate}}</p>
+        </div>
+    </div>
+</ng-container>
+
+<div class="spinner-container" *ngIf="loading$ | async">
+    <mat-spinner />
+</div>

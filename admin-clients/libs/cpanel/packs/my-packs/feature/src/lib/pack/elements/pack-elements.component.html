@@ -1,0 +1,174 @@
+@if ($pack(); as pack) {
+    <app-form-container [hideActionBar]="true" layout="main">
+        @if($items(); as packItems) {
+            <!-- We might want to uncomment this code once we have the Manual Packs working
+             <p class="section-description">
+                {{ pack.type === 'AUTOMATIC' ? ('CHANNELS.PACKS.AUTOMATIC_DESCRIPTION' | translate)
+                : ('CHANNELS.PACKS.MANUAL_DESCRIPTION' | translate) }}
+            </p>
+            -->
+            <p class="flex">
+                <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                <span>{{'CHANNELS.PACKS.INFO_DESCRIPTION' | translate}}</span>
+            </p>
+            @if($mainItem(); as mainItem) {
+                <div>
+                    <h3 class="mat-subtitle-2" fxLayoutAlign="start center"> {{'CHANNELS.PACKS.MAIN_SESSION' | translate}} </h3>
+                    <div class="main-session-details flex gap-6 justify-between">
+                        <div class="info-block" fxLayout="column">
+                            <span class="info-block-title"> {{'CHANNELS.PACKS.EVENT' | translate}}</span>
+                            @if(mainItem.type !== 'EVENT') {
+                                <span class="info-block-content">{{mainItem.session_data?.event?.name}}</span>
+                            } @else if(mainItem.type === 'EVENT') {
+                                <span class="info-block-content">{{mainItem.name}}</span>
+                            }
+                            <a aria-label="Go to event" class="ob-link flex items-center gap-1 event-link" target="_blank"
+                                [routerLink]="[
+                                    '/events',
+                                    mainItem.type === 'EVENT' ? mainItem.item_id : mainItem.session_data?.event?.id
+                                ]">
+                                <span>{{'CHANNELS.PACKS.ACTIONS.EVENT_LINK' | translate}} </span>
+                                <mat-icon iconPositionEnd class="ob-icon xsmall">launch</mat-icon>
+                            </a>
+                        </div>
+                        <div class="info-block" fxLayout="column">
+                            <span class="info-block-title"> {{ 'CHANNELS.PACKS.SESSION_TITLE' | translate }}</span>
+                            @if ((loading$ | async) === false) {
+                                @if(mainItem.type !== 'EVENT') {
+                                    <span class="info-block-content">{{mainItem.name}}</span>
+                                }
+                                @if(mainItem.type === 'EVENT' && $packSubItems(); as packSubItems) {
+                                    @if(packSubItems?.length === 1) {
+                                        <span class="info-block-content">{{packSubItems[0].name}}</span>
+                                    } @else if (packSubItems?.length === 0) {
+                                        <span class="info-block-content">{{ 'CHANEL.PACK.ALL_SESSIONS' | translate }}</span>
+                                    } @else if(packSubItems?.length > 1) {
+                                            <span class="info-block-content">{{ 'CHANNELS.PACK.MULTIPLE_SESSIONS' | translate }}</span>
+                                    }
+                                    <span class="ob-link edit-subitems-link"
+                                        tabindex="0"
+                                        role="button"
+                                        (click)="openEditSubItemsDialog(mainItem)"
+                                        (keydown)="handleEditSubItemsKeydown($event, mainItem)">
+                                        {{ 'CHANNELS.PACK.VIEW_EDIT_SESSIONS' | translate }}
+                                    </span>
+                                }
+                            }
+                        </div>
+                        @if(mainItem.type !== 'EVENT') {
+                            <div class="info-block" fxLayout="column">
+                                <span class="info-block-title"> {{'CHANNELS.PACKS.DATE' | translate}}</span>
+                                <span class="info-block-content">
+                                    {{mainItem.session_data.dates.start | dateTime : dateTimeFormats.longDateTime}}
+                                </span>
+                            </div>
+                        }
+                        <div class="info-block" fxLayout="column">
+                            <div class="flex flex-col gap-4">
+                                <div class="flex flex-col">
+                                    <span class="info-block-title"> {{'CHANNELS.PACKS.VENUE' | translate}}</span>
+                                    @if(mainItem.type !== 'EVENT') {
+                                        <span class="info-block-content">{{mainItem.session_data.venue_template.name}}</span>
+                                    } @else if(mainItem.type === 'EVENT') {
+                                        <span class="info-block-content">{{mainItem.event_data.venue_template.name}}</span>
+                                    }
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="info-block-title"> {{'FORMS.LABELS.VENUE' | translate}}</span>
+                                    @if(mainItem.type !== 'EVENT') {
+                                        <span class="info-block-content">{{mainItem.session_data.venue_template.venue.name}}</span>
+                                    } @else if(mainItem.type === 'EVENT') {
+                                        <span class="info-block-content">{{mainItem.event_data.venue_template.venue.name}}</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div>
+                <h3 class="mat-subtitle-2" fxLayoutAlign="start center">
+                    {{pack.type ==='AUTOMATIC' ? ('CHANNELS.PACKS.SECONDARY_ELEMENTS.TITLE' | translate) :
+                    'CHANNELS.PACKS.ELEMENTS.TITLE' | translate}}
+                </h3>
+                <p class="section-description"> {{ 'CHANNELS.PACKS.ELEMENTS.DESCRIPTION' | translate }} </p>
+                @if (!packItems.length && !!!(loading$ | async)) {
+                    <app-empty-state-tiny
+                        [title]="pack.type === 'AUTOMATIC' ?
+                            ('CHANNELS.PACKS.ELEMENTS.NO_SECONDARY_ELEMENTS_TITLE' | translate) :
+                            ('CHANNELS.PACKS.ELEMENTS.NO_ELEMENTS_TITLE' | translate)"
+                        [description]="'CHANNELS.PACKS.ELEMENTS.NO_ELEMENTS_DESCRIPTION' | translate"
+                        [emptyBorder]="true" (click)="openAddPackElementDialog()">
+                        <button mat-stroked-button type="button" class="ob-button medium"
+                            color="primary">
+                            <mat-icon>add</mat-icon>
+                            {{'CHANNELS.PACKS.ELEMENTS.ADD_ELEMENT' | translate}}
+                        </button>
+                    </app-empty-state-tiny>
+                } @else {
+                    <div class="section-box-card" fxLayout="column">
+                        <div fxFlex="60px" fxLayoutAlign="end center">
+                            <button mat-stroked-button color="primary" class="ob-button medium add-button"
+                                [attr.aria-label]="'CHANNELS.PACKS.ELEMENTS.ADD_ELEMENT' | translate"
+                                (click)="openAddPackElementDialog()">
+                                <mat-icon>add</mat-icon>
+                                {{'CHANNELS.PACKS.ELEMENTS.ADD_ELEMENT' | translate}}
+                            </button>
+                        </div>
+                        <mat-accordion [multi]="true" [togglePosition]="'before'" fxLayout="column" displayMode="flat">
+                            @for (item of packItems; track $index) {
+                                <div fxLayout="row" fxLayoutAlign="space-between baseline" fxLayoutGap="16">
+                                    <span class="ob-round-badge" fxFlex="0 1 auto">
+                                        {{$index + 1}}
+                                    </span>
+                                    <mat-expansion-panel #panel class="ob-expansion-card" fxFlex="0 1 100%">
+                                        <mat-expansion-panel-header collapsedHeight="*">
+                                            <mat-panel-title fxLayout="column" fxLayoutAlign="center start">
+                                                <span>{{item.name}}</span>
+                                                <span class="panel-subtitle">{{item.session_data?.event.name}}</span>
+                                            </mat-panel-title>
+                                            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                                                @if(item.type === 'SESSION') {
+                                                    <a aria-label="Go to session" class="ob-link flex items-center gap-1" target="_blank"
+                                                        [routerLink]="['/events', item.session_data?.event?.id, 'sessions', item.item_id]"
+                                                        (click)="$event.stopPropagation()">
+                                                        <span>{{'CHANNELS.PACKS.ACTIONS.SESSION_LINK' | translate}} </span>
+                                                        <mat-icon iconPositionEnd class="ob-icon xsmall">launch</mat-icon>
+                                                    </a>
+                                                } @else if (item.type === 'PRODUCT') {
+                                                    <a aria-label="Go to product" class="ob-link flex items-center gap-1" target="_blank"
+                                                        [routerLink]="['/products', item.item_id]" (click)="$event.stopPropagation()">
+                                                        <span>{{'CHANNELS.PACKS.ACTIONS.PRODUCT_LINK' | translate}} </span>
+                                                        <mat-icon iconPositionEnd class="ob-icon xsmall">launch</mat-icon>
+                                                    </a>
+                                                }
+                                                <span class="pack-item-type">{{item.type}}</span>
+                                                <mat-divider class="header-divider" vertical="true" />
+                                                <button mat-icon-button color="tertiary" class="ob-button small"
+                                                    (click)="delete($event, item)">
+                                                    <mat-icon>delete</mat-icon>
+                                                </button>
+                                            </div>
+                                        </mat-expansion-panel-header>
+                                        @if(item.type === 'SESSION') {
+                                            <app-session-detail [session]="item" [entityId]="pack.entity.id" [packId]="pack.id" />
+                                        } @else if (item.type === 'PRODUCT') {
+                                            <app-product-detail [product]="item" [entityId]="$pack().entity.id" [packId]="$pack().id"
+                                                [packType]="pack.type" />
+                                        }
+                                    </mat-expansion-panel>
+                                </div>
+                            }
+                        </mat-accordion>
+                    </div>
+                }
+            </div>
+        }
+    </app-form-container>
+}
+
+@if(loading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

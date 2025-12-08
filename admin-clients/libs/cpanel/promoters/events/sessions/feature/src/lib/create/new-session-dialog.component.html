@@ -1,0 +1,16 @@
+<ng-container>
+    <div class="spinner-container" *ngIf="(loading$ | async) else create">
+        <mat-spinner></mat-spinner>
+    </div>
+    <ng-template #create>
+        <app-create-session-selector *ngIf="(creationType$ | async) === null" (typeSelection)="setCreationType($event)"
+            (closeDialog)="close()">
+        </app-create-session-selector>
+        <app-create-single-session *ngIf="(creationType$ | async) === sessionCreationTypes.single" [eventId]="eventId"
+            [lastSessionId]="(lastSession$ | async)?.id" (closeDialog)="close($event)">
+        </app-create-single-session>
+        <app-create-multi-session *ngIf="(creationType$ | async) === sessionCreationTypes.multiple" [eventId]="eventId"
+            [lastSessionId]="(lastSession$ | async)?.id" (closeDialog)="close($event)">
+        </app-create-multi-session>
+    </ng-template>
+</ng-container>

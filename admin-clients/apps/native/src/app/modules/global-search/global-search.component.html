@@ -1,0 +1,101 @@
+<ion-header class="ob-layout__header">
+    <ion-toolbar>
+        <div class="global-search__toolbar-content" [ngClass]="qrButtonActivated ? 'qr-activated' : ''">
+            <back-button [manualBackActivated]="false">
+                <ion-input fill="outline" class="ob-input search-bar" legacy="true" clearInput="true"
+                    placeholder="{{ 'GLOBAL-SEARCH.INPUT-PLACEHOLDER' | translate }}" (ionChange)="onSearch($event)"
+                    #searchBarInput></ion-input>
+                <!-- (ionFocus)="toggleQrButtonActivated()" (ionBlur)="toggleQrButtonActivated()" -->
+                <!-- TODO: Uncomment when the barcode scanner works -->
+                <!-- <ion-button class="global-search__qr-btn" fill="clear" (click)="activateQR()">
+                    <ion-icon slot="icon-only" src="./assets/media/icons/qr_code_scanner.svg"></ion-icon>
+                </ion-button> -->
+            </back-button>
+        </div>
+    </ion-toolbar>
+</ion-header>
+<ion-content class="ob-layout__content global-search__content">
+    <static-view
+        *ngIf="(((totalTickets$ | async) + (totalEvents$ | async) + (totalTransactions$ | async)) === 0 && !isFirstLoad$.getValue());
+        else content" [viewContent]="{title:'NO-RESULTS-TITLE', description:'NO-RESULTS-DESCRIPTION'}"></static-view>
+    <ng-template #content>
+        <div *ngIf="(isFirstLoad$ | async) === false">
+            <div class="global-search__result-block">
+                <ion-text class="global-search__result-block-title">
+                    <h3>{{ "GLOBAL-SEARCH.TICKETS" | translate }}</h3>
+                </ion-text>
+                <ion-text *ngIf="(isLoading$ | async) === false" class="global-search__result-block-info"><span>
+                        {{ "GLOBAL-SEARCH.RESULTS" | translate : { number: (totalTickets$ | async) } }}
+                    </span>
+                    <span class="global-search__result-block-clickable" (click)="seeAll('tickets')" *ngIf="(totalTickets$ | async) > 0">
+                        &nbsp;·&nbsp;{{ "GLOBAL-SEARCH.SEE-ALL" | translate }}
+                        <ion-icon class="global-search__result-block-info-icon" name="chevron-forward-outline"></ion-icon>
+                    </span>
+                </ion-text>
+                <ion-list class="global-search__ticket-list" *ngIf="(isLoading$ | async) === false; else skeleton">
+                    <ion-item *ngFor="let ticket of foundTickets$ | async">
+                        <ticket-card class="global-search__ticket-card" [ticket]="ticket"></ticket-card>
+                    </ion-item>
+                </ion-list>
+                <ng-template #skeleton>
+                    <ion-list class="global-search__ticket-list">
+                        <ion-item>
+                            <skeleton-card class="global-search__ticket-card"></skeleton-card>
+                        </ion-item>
+                    </ion-list>
+                </ng-template>
+            </div>
+            <div class="global-search__result-block">
+                <ion-text class="global-search__result-block-title">
+                    <h3>{{ "GLOBAL-SEARCH.EVENTS" | translate }}</h3>
+                </ion-text>
+                <ion-text *ngIf="(isLoading$ | async) === false" class="global-search__result-block-info"><span>
+                        {{ "GLOBAL-SEARCH.RESULTS" | translate : {number: totalEvents$ | async} }}
+                    </span>
+                    <span class="global-search__result-block-clickable" (click)="seeAll('events')" *ngIf="(totalEvents$ | async) > 0">
+                        &nbsp;·&nbsp;{{ "GLOBAL-SEARCH.SEE-ALL" | translate }}
+                        <ion-icon class="global-search__result-block-info-icon" name="chevron-forward-outline"></ion-icon>
+                    </span>
+                </ion-text>
+                <ion-list class="global-search__ticket-list" *ngIf="(isLoading$ | async) === false; else skeleton">
+                    <ion-item *ngFor="let event of foundEvents$ | async">
+                        <event-card class="global-search__ticket-card" [event]="event" (tap)="goToEventDetail($event)"></event-card>
+                    </ion-item>
+                </ion-list>
+                <ng-template #skeleton>
+                    <ion-list class="global-search__ticket-list">
+                        <ion-item>
+                            <skeleton-card class="global-search__ticket-card"></skeleton-card>
+                        </ion-item>
+                    </ion-list>
+                </ng-template>
+            </div>
+            <div class="global-search__result-block">
+                <ion-text class="global-search__result-block-title">
+                    <h3>{{ "GLOBAL-SEARCH.TRANSACTIONS" | translate }}</h3>
+                </ion-text>
+                <ion-text *ngIf="(isLoading$ | async) === false" class="global-search__result-block-info"><span>
+                        {{ "GLOBAL-SEARCH.RESULTS" | translate : {number: totalTransactions$ | async} }}
+                    </span>
+                    <span class="global-search__result-block-clickable" (click)="seeAll('transactions')"
+                        *ngIf="(totalTransactions$ | async) > 0">
+                        &nbsp;·&nbsp;{{ "GLOBAL-SEARCH.SEE-ALL" | translate }}
+                        <ion-icon class="global-search__result-block-info-icon" name="chevron-forward-outline"></ion-icon></span>
+                </ion-text>
+                <ion-list class="global-search__ticket-list" *ngIf="(isLoading$ | async) === false; else skeleton">
+                    <ion-item *ngFor="let transaction of foundTransactions$ | async">
+                        <transaction-card class="global-search__ticket-card" [transaction]="transaction"></transaction-card>
+                    </ion-item>
+                </ion-list>
+                <ng-template #skeleton>
+                    <ion-list class="global-search__ticket-list">
+                        <ion-item>
+                            <skeleton-card class="global-search__ticket-card"></skeleton-card>
+                        </ion-item>
+                    </ion-list>
+                </ng-template>
+            </div>
+        </div>
+    </ng-template>
+</ion-content>
+<ion-footer class="ob-layout__footer"></ion-footer>

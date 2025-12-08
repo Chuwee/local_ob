@@ -1,0 +1,101 @@
+<app-form-container [formGroup]="form" (cancel)="cancel()" (save)="save()" layout="menu"
+    [disabled]="!form.dirty || (isLoading$ | async)">
+    @if (cookies$ | async) {
+        <div fxFlex="0 1 50%" fxLayout="column" fxLayoutGap="16px">
+            <span class="title">
+                {{'ENTITY.COOKIES.COOKIES_CONFIG.TITLE' | translate}} </span>
+            <mat-checkbox color="primary"
+                formControlName="enable_custom_integration" fxLayout="row wrap"
+                fxLayoutAlign="start start"
+                class="app-checkbox-wrap-label custom-integration-checkbox">
+                <div class="title">{{'ENTITY.COOKIES.COOKIES_CONFIG.CUSTOM_INTEGRATION.TITLE' | translate}}</div>
+                <div>{{'ENTITY.COOKIES.COOKIES_CONFIG.CUSTOM_INTEGRATION.BODY' | translate}}
+                </div>
+            </mat-checkbox>
+            <div class="additional-info" fxLayout="column"
+                [fxShow]="form.value.enable_custom_integration" fxLayoutGap="8px">
+                <span class="title">
+                    {{'ENTITY.COOKIES.CHANNELS_OPTS.TITLE' | translate}} </span>
+                <mat-radio-group formControlName="channel_enabling_mode" fxLayout="column"
+                    [class.channels-enabling-modes]="form.get('channel_enabling_mode').value === entityCookiesScope.all">
+                    <mat-radio-button class="ob-radio-button vertical-list" [value]="entityCookiesScope.all">
+                        {{'ENTITY.COOKIES.CHANNELS_OPTS.ALL' | translate}}
+                    </mat-radio-button>
+                    <mat-radio-button class="ob-radio-button vertical-list" [value]="entityCookiesScope.restricted">
+                        {{'ENTITY.COOKIES.CHANNELS_OPTS.SELECT' | translate}}
+                    </mat-radio-button>
+                </mat-radio-group>
+                <div [fxShow]="form.get('channel_enabling_mode').value === entityCookiesScope.restricted"
+                    class="channels-container">
+                    <div fxLayout="column" fxLayoutAlign="start start" class="channels-list-container nested-content">
+                        <div class="channels-list"
+                            [class.field-error]="form.get('custom_integration_channels').invalid && form.get('custom_integration_channels').touched">
+                            <app-searchable-paginated-selection
+                                class="ob-medium-list"
+                                [placeholder]="'FORMS.SEARCH_CHANNEL_FIELD' | translate"
+                                [pageSize]="pageSize" [form]="form.get('custom_integration_channels')"
+                                [loading$]="isLoading$" [data$]="channelsListData$" [metadata$]="metadata$"
+                                (loadData)="reloadChannelsList($event)">
+                                <div slot="filter">
+                                    <mat-form-field fxFlex="200px" appearance="outline" class="ob-form-field field-with-label inline-field">
+                                        <mat-label>{{'CHANNELS.TYPE' | translate}}</mat-label>
+                                        <mat-select [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate"
+                                            [formControl]="typeControl">
+                                            <mat-option>
+                                                {{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}
+                                            </mat-option>
+                                            @for(type of channelType | keyvalue; track type.value) {
+                                                <mat-option [value]="type.value">
+                                                    {{type.value && 'CHANNELS.TYPE_OPTS.' + type.value | translate}}
+                                                </mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                                <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data"
+                                    let-selectionChanged="selectionChanged">
+                                    <app-selection-list [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged"
+                                        class="small-rows">
+                                        <ng-template #optionTemplate let-row>
+                                            <div fxLayoutAlign="space-between">
+                                                <span>{{row.name}}</span>
+                                            </div>
+                                        </ng-template>
+                                    </app-selection-list>
+                                </ng-template>
+                            </app-searchable-paginated-selection>
+                        </div>
+                        @if (form.get('custom_integration_channels').hasError('required') && form.get('custom_integration_channels').touched) {
+                            <span class="error-description">
+                                {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                            </span>
+                        }
+                    </div>
+                </div>
+                <p [innerHTML]="('ENTITY.COOKIES.CUSTOM_INTEGRATION.LEGAL_DESCRIPTION' | translate)">
+                </p>
+                <p fxLayout="row" fxLayoutAlign="start center" class="legal-info">
+                    <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                    <span>
+                        {{'ENTITY.COOKIES.CUSTOM_INTEGRATION.LEGAL_INFO' | translate}}
+                    </span>
+                </p>
+                <p>
+                    {{'ENTITY.COOKIES.CUSTOM_INTEGRATION.NECESSARY_CONDITIONS_INFO' | translate}}
+                </p>
+                <div>
+                    <mat-checkbox formControlName="accept_integration_conditions" color="primary" class="app-checkbox-wrap-label">
+                        {{'ENTITY.COOKIES.CUSTOM_INTEGRATION.NECESSARY_CONDITIONS' | translate}} </mat-checkbox>
+                    @if (form.get('accept_integration_conditions').touched) {
+                        <mat-error [ob-form-errors]="form" field="accept_integration_conditions" />
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</app-form-container>
+@if (reqInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

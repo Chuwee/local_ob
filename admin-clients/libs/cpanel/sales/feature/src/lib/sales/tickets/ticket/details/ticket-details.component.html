@@ -1,0 +1,20 @@
+@if (ticketDetail$ | async; as details) {
+    @let ticket = details.ticket;
+    @let order = details.order;
+    @let isAvet = ticket.allocation.event?.type === eventType.avet;
+    @let barcode = ticket.barcode?.code | obfuscateString : (isAvet ? obfuscatePattern.between : undefined);
+    <!-- {fix indentation} -->
+
+    <div class="details-container flex flex-col">
+        <div class="heading-container only-title flex justify-start items-center">
+            <app-go-back defaultPath="/tickets" [customCopy]="{ copy: 'DETAILS.BACK_TO_ORDER', rule: '/transactions/' }" />
+            <h1 class="secondary mat-headline-3">
+                {{('ENUMS.TYPE_OPTS.' + order.type) | translate}}
+                {{'TITLES.TICKET_DETAILS' | translate: { orderCode: order.code, barcode: barcode } }}
+            </h1>
+        </div>
+        <div class="main-content flex flex-col">
+            <router-outlet />
+        </div>
+    </div>
+}

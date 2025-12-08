@@ -1,0 +1,131 @@
+$white: var(--ob-theme-color-white);
+
+.details-form-container {
+    position: absolute;
+    width: 100%;
+    min-height: 100%;
+    > div {
+        width: 100%; // sin esto el viewport no es responsive y aparece scroll horizontal
+    }
+    .main-content {
+        width: 100%;
+        height: 100%;
+        padding: 32px 24px;
+    }
+}
+
+.bottom-actions-bar {
+    padding: 0 24px;
+    .bottom-action-content {
+        display: flex;
+        flex-direction: row;
+        place-content: center flex-start;
+        align-items: center;
+        box-sizing: border-box;
+        &.main {
+            flex: 0 1 1280px;
+            max-width: 1280px;
+        }
+        &.menu {
+            flex: 0 1 1052px;
+            max-width: 1052px;
+        }
+        &.list {
+            flex: 0 1 1052px;
+            max-width: 1052px;
+        }
+        .bottom-action {
+            flex: 1 1 0;
+            box-sizing: border-box;
+        }
+    }
+}
+
+.with-sidebar {
+    .details-form-container {
+        > .sidebar {
+            padding: 32px 24px;
+            height: 100%;
+            position: sticky;
+            top: 0;
+        }
+    }
+}
+
+.form-details-area {
+    position: relative;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.sticky {
+    position: sticky;
+    z-index: 2;
+    top: 0;
+}
+
+:host {
+    width: 100%;
+    height: 100%;
+}
+:host(.no-top-padding) {
+    .details-form-container {
+        .main-content {
+            padding-top: 0;
+        }
+        .sidebar {
+            padding-top: 0;
+        }
+    }
+}
+:host(.no-padding) {
+    .details-form-container {
+        .main-content {
+            padding: 0;
+        }
+        .sidebar {
+            padding-top: 0;
+        }
+    }
+
+}
+:host(.overflow-y-auto) {
+    .form-details-area {
+        overflow-y: auto;
+    }
+}
+:host(.fit-to-container) {
+    .details-form-container {
+        height: 100%;
+    }
+}
+:host(.not-sticky-sidebar) {
+    .details-form-container {
+        > .sidebar {
+            position: relative;
+        }
+    }
+}
+:host(.list-content) {
+    background-color: $white;
+    margin-top: 10px;
+}
+:host(.handset) {
+    .bottom-actions-bar {
+        @media screen and (max-width: 599.98px) and (orientation: portrait),
+        screen and (max-width: 959.98px) and (orientation: landscape) {
+            height: 104px;
+            min-height: 104px;
+            padding-block: 16px;
+            .bottom-action-content {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 0;
+            }
+            button {
+                margin-inline: 0;
+            }
+        }
+
+    }
+}

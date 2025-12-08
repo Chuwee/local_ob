@@ -1,0 +1,39 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="100%" class="secondary title">{{'NOTES.NEW' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column">
+        <form [formGroup]="form" fxLayout="column" fxLayoutAlign="start stretch">
+            <!-- Note Title -->
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>{{'NOTES.NOTE_TITLE' | translate}}</mat-label>
+                <input matInput aria-label="title" [placeholder]="'NOTES.NOTE_TITLE_PLACEHOLDER' | translate" formControlName="title">
+                <mat-error *ngIf="form.hasError('required', 'title')">
+                    {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                </mat-error>
+                <mat-error *ngIf="form.hasError('maxlength', 'title')">
+                    {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value: textRestrictions.titleMaxLength})}}
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>{{'NOTES.NOTE_DESCRIPTION' | translate}}</mat-label>
+                <textarea matInput [attr.aria-label]="'NOTES.NOTE_DESCRIPTION' | translate"
+                    [placeholder]="'NOTES.NOTE_DESCRIPTION_PLACEHOLDER' | translate" formControlName="description" rows="10">
+                </textarea>
+                <mat-error [ob-form-errors]="form" field="description">
+                </mat-error>
+            </mat-form-field>
+        </form>
+    </div>
+    <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createCustomerNote()" [disabled]="!form.dirty">
+            {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>

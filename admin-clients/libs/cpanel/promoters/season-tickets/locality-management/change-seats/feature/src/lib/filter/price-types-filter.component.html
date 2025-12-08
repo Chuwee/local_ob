@@ -1,0 +1,84 @@
+<button mat-stroked-button color="tertiary" class="ob-button medium" [class.active]="activeFilters$ | async"
+    [matBadge]="(activeFilters$ | async) || ''" [satPopoverAnchor]="filterPopover" (click)="filterPopover.toggle()">
+    {{'FORMS.OPEN_FILTER_BTN' | translate}}
+    <mat-icon iconPositionEnd>
+        filter_list
+    </mat-icon>
+</button>
+<sat-popover #filterPopover hasBackdrop yAlign="below" autoFocus="false" restoreFocus="false">
+    <mat-card class="ob-card">
+        <mat-card-content>
+            <form [formGroup]="form" fxLayout="column">
+                <div class="filter-block" fxLayout="column">
+                    <div class="ob-label">{{'FORMS.LABELS.PRICES.PRICE_TYPES.ORIGIN' | translate}}</div>
+                    <div class="filter-block-input">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <mat-select #selectOrigin formControlName="price_types_origin" multiple
+                                [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                                <mat-option>
+                                    <app-select-search #priceTypeOriginSelectSearch [options$]="priceTypes$" [requireSelection]="true"
+                                        [placeholderLabel]="'FORMS.SEARCH.IN_LIST' | translate" searchField="name">
+                                    </app-select-search>
+                                </mat-option>
+                                <ng-container *ngIf="priceTypeOriginSelectSearch.getFilteredOptions$() | async as originOptions">
+                                    <div class="mat-option" (click)="selectAll(selectOrigin)" *ngIf="originOptions?.length > 0">
+                                        <span class="mat-option-text">
+                                            {{ (allSelected(selectOrigin) ? 'FORMS.ACTIONS.SELECT_ALL' : 'FORMS.ACTIONS.UNSELECT_ALL')
+                                            |translate }}
+                                        </span>
+                                    </div>
+                                    <mat-option *ngFor="let priceType of originOptions"
+                                        [value]="priceType">
+                                        {{priceType && (priceType.name | translate)}}
+                                    </mat-option>
+                                </ng-container>
+
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="filter-block" fxLayout="column">
+                    <div class="ob-label">{{'FORMS.LABELS.PRICES.PRICE_TYPES.TARGET' | translate}}</div>
+                    <div class="filter-block-input">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <mat-select #selectTarget formControlName="price_types_target" multiple
+                                [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                                <mat-option>
+                                    <app-select-search #priceTypeTargetSelectSearch [options$]="priceTypes$" [requireSelection]="true"
+                                        [placeholderLabel]="'FORMS.SEARCH.IN_LIST' | translate" searchField="name">
+                                    </app-select-search>
+                                </mat-option>
+                                <ng-container *ngIf="priceTypeTargetSelectSearch.getFilteredOptions$() | async as targetOptions">
+                                    <div class="mat-option" (click)="selectAll(selectTarget)" *ngIf="targetOptions?.length > 0">
+                                        <span class="mat-option-text">
+                                            {{ (allSelected(selectTarget) ? 'FORMS.ACTIONS.SELECT_ALL' : 'FORMS.ACTIONS.UNSELECT_ALL') |
+                                            translate }}
+                                        </span>
+                                    </div>
+                                    <mat-option *ngFor="let priceType of targetOptions" [value]="priceType">
+                                        {{priceType && (priceType.name | translate)}}
+                                    </mat-option>
+                                </ng-container>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </form>
+        </mat-card-content>
+        <mat-card-footer fxLayoutAlign="start center">
+            <div fxFlex="grow" class="left-actions">
+                <a class="ob-link" #removeLink (click)="clear()">
+                    {{'FORMS.REMOVE_FILTERS_BTN' | translate}}
+                </a>
+            </div>
+            <div fxFlex="none" class="right-actions">
+                <button (click)="close()" mat-button class="ob-button small">
+                    {{'FORMS.CLOSE_FILTER_BTN' | translate}}
+                </button>
+                <button (click)="apply()" mat-flat-button color="primary" class="ob-button small">
+                    {{'FORMS.APPLY_FILTER_BTN' | translate}}
+                </button>
+            </div>
+        </mat-card-footer>
+    </mat-card>
+</sat-popover>

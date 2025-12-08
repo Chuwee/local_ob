@@ -1,0 +1,43 @@
+<div fxLayout="column" fxLayoutGap="16px">
+    @if($isOperator()) {
+        <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button" fxFlexAlign="end"
+            [attr.aria-label]="'EVENTS.RATE_GROUP.NEW_BTN' | translate" (click)="openNewRatesDialog()"
+            [disabled]="isEmptyList$ | async">
+            <mat-icon>add</mat-icon>
+            {{'EVENTS.RATE_GROUP.NEW_BTN' | translate}}
+        </button>
+    }
+    <mat-table class="ob-table" [class.not-touchable]="(isHandsetOrTablet$ | async) !== true" [dataSource]="ratesGroup$">
+        <ng-container matColumnDef="rateName">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'EVENTS.RATE_GROUP.NAME' | translate}}</mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="avetName">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'EVENTS.RATE_GROUP.AVET_NAME' | translate}}</mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.external_description}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="two-actions-cell head-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true" />
+            <mat-cell *matCellDef="let row;" class="two-actions-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                <div class="action-buttons" (click)="$event.stopPropagation()">
+                    <button mat-icon-button [matTooltip]="'EVENTS.RATE_GROUP.EDIT' | translate" aria-label="Edit rate group"
+                        class="ob-button medium" (click)="openEditRateGroup(row)">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    @if (row.default) {
+                        <button
+                            [matTooltip]="'EVENTS.RATE_GROUP.DELETE' | translate" mat-icon-button aria-label="Delete rate group"
+                            class="ob-button medium" (click)="delete(row)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    }
+                </div>
+            </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="$displayedColumns()" class="dense-row" />
+        <mat-row *matRowDef="let row; columns: $displayedColumns();" class="hoverable-row dense-row" />
+    </mat-table>
+    <app-empty-state [fxShow]="isEmptyList$ | async" fxFlex="100%" [title]="'LIST.EMPTY' | translate" />
+</div>

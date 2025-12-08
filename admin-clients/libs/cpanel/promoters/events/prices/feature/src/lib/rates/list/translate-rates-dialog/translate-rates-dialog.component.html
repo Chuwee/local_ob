@@ -1,0 +1,52 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'EVENTS.TRANSLATE_RATES' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <app-tabs-menu type="language" [formGroup]="form">
+        <ng-container *ngFor="let lang of languages">
+            <ng-template appTab [label]="('LANGUAGES.' + lang) | translate">
+                <div mat-dialog-content [formArrayName]="lang">
+                    <mat-table class="ob-table not-touchable" [dataSource]="rates">
+                        <ng-container matColumnDef="rates">
+                            <mat-header-cell *matHeaderCellDef class="head-cell">
+                                {{'EVENTS.RATES' | translate}}
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row;">
+                                {{row.name}}
+                            </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="translation">
+                            <mat-header-cell *matHeaderCellDef class="head-cell input-column">
+                                {{'EVENTS.TRANSLATION' | translate}}
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row; index as i;" class="editable-cell">
+                                <div fxFlex class="write-value">
+                                    <mat-form-field appearance="outline" class="ob-form-field">
+                                        <input matInput id="rate-input-{{lang}}-{{i}}" type="text" [formControlName]="i"
+                                        [placeholder]="row.name" class="rate-translation-input">
+                                    </mat-form-field>
+                                </div>
+                            </mat-cell>
+                        </ng-container>
+                        <mat-header-row *matHeaderRowDef="displayedColumns" class="dense-row">
+                        </mat-header-row>
+                        <mat-row *matRowDef="let row; columns: displayedColumns;" class="dense-row hoverable-row">
+                        </mat-row>
+                    </mat-table>
+                </div>
+            </ng-template>
+        </ng-container>
+    </app-tabs-menu>
+    <div mat-dialog-actions fxFlex="auto" fxLayout="row" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="save()"
+            [disabled]="form && !form.dirty">
+            {{'FORMS.ACTIONS.SAVE' | translate}}
+        </button>
+    </div>
+</div>

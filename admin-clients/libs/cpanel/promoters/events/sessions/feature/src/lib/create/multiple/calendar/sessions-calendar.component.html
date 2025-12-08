@@ -1,0 +1,82 @@
+<div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch"
+    class="sessions-calendar-container dialog-grid-form with-wizard-bar">
+    <div fxLayout="row" class="sessions-info">
+        <span class="sessions-name">
+            {{sessionsName}}
+        </span>
+        <span class="sessions-dates-range">
+            {{firstStartDate | dateTime : dateTimeFormats.shortDate}} -
+            {{lastStartDate | dateTime : dateTimeFormats.shortDate}}
+        </span>
+    </div>
+    <mat-divider fxFlex="100%"></mat-divider>
+    <div fxLayoutAlign="space-between center" class="calendar-header">
+        <div fxFlex fxLayoutAlign="start center" class="btn-group">
+            <button mat-stroked-button color="tertiary" type="button"
+                class="today-btn ob-button mat-stroked-button mat-tertiary medium" mwlCalendarToday
+                [(viewDate)]="viewDate">
+                {{'DATES.TODAY' | translate}}
+            </button>
+            <button mat-button type="button" class="prev-btn ob-button only-icon medium" mwlCalendarPreviousView
+                [view]="view" [(viewDate)]="viewDate">
+                <mat-icon>keyboard_arrow_left</mat-icon>
+            </button>
+            <button mat-button type="button" class="next-btn ob-button only-icon medium" mwlCalendarNextView
+                [view]="view" [(viewDate)]="viewDate">
+                <mat-icon>keyboard_arrow_right</mat-icon>
+            </button>
+            <h2 class="month-and-year">{{ viewDate | calendarDate:(view + 'ViewTitle') : locale }}</h2>
+        </div>
+        <div fxFlex fxLayoutAlign="end center">
+            <span class="ob-link" (click)="selectAllEvents()">{{'EVENTS.SESSIONS.CALENDAR.ALL' | translate}}</span>
+            <mat-divider vertical="true" fxFlexAlign="stretch"></mat-divider>
+            <span class="ob-link" (click)="deselectAllEvents()">{{'EVENTS.SESSIONS.CALENDAR.NONE' | translate}}</span>
+        </div>
+        <!--
+        <div class="btn-group">
+            <div class="btn btn-primary" (click)="setView(CalendarView.Month)"
+                [class.active]="view === CalendarView.Month">
+                Month
+            </div>
+            <div class="btn btn-primary" (click)="setView(CalendarView.Week)"
+                [class.active]="view === CalendarView.Week">
+                Week
+            </div>
+            <div class="btn btn-primary" (click)="setView(CalendarView.Day)" [class.active]="view === CalendarView.Day">
+                Day
+            </div>
+        </div>
+        -->
+    </div>
+    <mat-divider fxFlex="100%"></mat-divider>
+    <div [ngSwitch]="view" class="calendar-body">
+        <mwl-calendar-month-view *ngSwitchCase="'month'" [viewDate]="viewDate" [events]="calendarEvents"
+            [cellTemplate]="customCellTemplate" [locale]="locale">
+        </mwl-calendar-month-view>
+        <mwl-calendar-week-view *ngSwitchCase="'week'" [viewDate]="viewDate" [events]="calendarEvents"
+            [locale]="locale">
+        </mwl-calendar-week-view>
+        <mwl-calendar-day-view *ngSwitchCase="'day'" [viewDate]="viewDate" [events]="calendarEvents" [locale]="locale">
+        </mwl-calendar-day-view>
+    </div>
+</div>
+
+<ng-template #customCellTemplate let-day="day" let-locale="locale">
+    <div class="cal-cell-top" [ngClass]="isFirstDayOfWeek(day.date) ? 'first-cell' : ''">
+        <div *ngIf="isFirstDayOfWeek(day.date)" class="select-week">
+            <mat-checkbox color="primary" (change)="onWeekCheckboxClick($event.checked, day.date)"
+                [checked]="isTotallySelectedWeek(day.date)" [indeterminate]="isPartiallySelectedWeek(day.date)"
+                [disabled]="isUnselectableWeek(day.date)">
+            </mat-checkbox>
+        </div>
+        <div class="select-week-border"></div>
+        <div [ngClass]="isFirstDayOfWeek(day.date) ? 'first-cell-content' : 'cell-content'">
+            <span class="cal-day-number">{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
+            <div *ngFor="let event of day.events" class="calendar-hour">
+                <mat-checkbox color="primary" class="calendar-check" [formControl]="calendarForm.get(event.meta)">
+                    {{event.title}}
+                </mat-checkbox>
+            </div>
+        </div>
+    </div>
+</ng-template>

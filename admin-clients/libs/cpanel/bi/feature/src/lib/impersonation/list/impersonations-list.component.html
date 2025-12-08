@@ -1,0 +1,102 @@
+<div class="list-container" fxFlex="0 1 100%" fxLayout="column">
+    <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">
+                {{'TITLES.IMPERSONATION' | translate}}
+            </h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+            <div class="filter-container" fxFlex="none">
+                <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                    [attr.aria-label]="'BI_REPORTS.MOBILE_USERS.ASSIGN_LICENSE' | translate"
+                    (click)="addImpersonatedLicenseToUser()">
+                    <mat-icon>add</mat-icon>
+                    {{'BI_REPORTS.IMPERSONATION.ASSIGN_LICENSE' | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="heading-container" fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxFlex="50%" fxLayoutGap="20px" fxLayoutAlign="start center">
+            <div class="search-field" fxFlex="100%">
+                <app-search-input [placeholder]="'FORMS.SEARCH.IN_LIST' | translate"></app-search-input>
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            <p *ngIf="usersMetadata$ | async as notificationsMetadata" class="page-summary"
+                [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: notificationsMetadata">
+            </p>
+            <app-paginator [length]="(usersMetadata$ | async)?.total" [pageSize]="25"></app-paginator>
+        </div>
+    </div>
+    <div class="spinner-container" *ngIf="reqInProgress$ | async">
+        <mat-spinner></mat-spinner>
+    </div>
+    <mat-table class="ob-table" [dataSource]="users$ | async" matSort [matSortActive]="initSortCol" [matSortDirection]="initSortDir"
+        matSortDisableClear [class.not-touchable]="(isHandsetOrTablet$ | async) !== true">
+        <ng-container [matColumnDef]="columns[0]">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'FORMS.LABELS.NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row;">
+                {{row.name}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="columns[1]">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'FORMS.LABELS.SURNAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row;">
+                {{row.last_name}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="columns[2]">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                {{'FORMS.LABELS.EMAIL' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row;">
+                {{row.email}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="columns[3]">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'FORMS.LABELS.OPERATOR' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row;">
+                {{row.operator.name}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="columns[4]">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'FORMS.LABELS.ENTITY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row;">
+                {{row.entity.name}}
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="columns[5]">
+            <mat-header-cell *matHeaderCellDef class="actions-cell head-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row; index as i" class="actions-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                <div class="action-buttons" (click)="$event.stopPropagation()">
+                    <button matTooltip="{{'FORMS.ACTIONS.DELETE' | translate}}" mat-icon-button
+                        aria-label="Delete mobile user license" class="ob-button medium"
+                        (click)="openDeleteImpersonatedLicenseDialog(row)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+            </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="columns; sticky: true"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: columns;" class="interactive-row"></mat-row>
+    </mat-table>
+    <div class="context-notification-container" *ngIf="(usersMetadata$ | async)?.total === 0" fxFlex="100%" fxLayout="row"
+        fxLayoutAlign="center start">
+        <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px" fxFlex="80%"
+            fxLayoutAlign="center start">
+            <p>{{'LIST.EMPTY' | translate}}</p>
+        </app-context-notification>
+    </div>
+</div>

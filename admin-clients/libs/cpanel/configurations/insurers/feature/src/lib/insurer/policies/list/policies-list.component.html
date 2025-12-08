@@ -1,0 +1,53 @@
+<div class="left-bar-container">
+    <div class="left-bar flex flex-col justify-between flex-1">
+        <div class="left-sidebar-title flex flex-col">
+            <div class="flex items-center">
+                <h2 class="title">{{'INSURERS.TITLES.POLICIES' | translate}}</h2>
+                <button mat-icon-button type="button"
+                    class="ob-button mat-stroked-button xsmall only-icon" [attr.aria-label]="'TITLES.NEW_POLICY' | translate"
+                    [matTooltip]="'TITLES.NEW_POLICY' | translate" (click)="openNewPolicyDialog()">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+            <p class="results-count">{{('RESULTS.TOTAL' | translate) + ': ' + $totalPolicies()}}</p>
+        </div>
+        <!-- TODO: Once the delete policy request is done, uncomment and finalize the delete policy implementation-->
+        <!--<div class="left-sidebar-header flex justify-end items-center basis-[36px]">
+            <button mat-icon-button aria-label="Delete policy" class="ob-button small"
+                (click)="openDeletePolicyDialog()" [disabled]="(policiesList$ | async)?.length === 0">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </div>-->
+        <mat-divider class="list-divider" />
+        <div class="list-container flex flex-col flex-1">
+            <mat-selection-list (selectionChange)="selectionChangeHandler($event.options[0]?.value)"
+                class="ob-lateral-select-list" [multiple]="false">
+                @for( policy of (policiesList$ | async);  track $index){
+                    <mat-list-option class="with-badge" [value]="policy.id" [id]="'policy-list-option-' + policy.id"
+                        [selected]="selectedPolicyId === policy.id" >
+                        <div class="flex justify-between items-center">
+                            <div class="pack-main-info flex flex-col basis-[calc(100%-48px)]">
+                                <span class="list-item-title" appEllipsify [matTooltip]="policy.name">
+                                    {{policy.name}}
+                                </span>
+                                <span class="list-item-subtitle" appEllipsify> {{ policy.policy_number }}</span>
+                            </div>
+                            <span [matTooltipShowDelay]="800" class="ob-status-badge small-badge" [matTooltip]="
+                                ('EVENTS.PROMOTIONS.STATUS_OPTS.' + (policy.active ? 'ACTIVE' : 'INACTIVE') | translate)" 
+                                [ngClass]="policy.active ? 'active' : 'inactive'">
+                                {{('EVENTS.PROMOTIONS.STATUS_OPTS.' + (policy.active ? 'ACTIVE' : 'INACTIVE') | translate).substring(0,1)}}
+
+                            </span>
+                        </div>
+                    </mat-list-option>
+                }
+            </mat-selection-list>
+        </div>
+    </div>
+</div>
+
+@if ($isLoading()) {
+    <div class="spinner-container">
+        <mat-progress-spinner />
+    </div>
+}

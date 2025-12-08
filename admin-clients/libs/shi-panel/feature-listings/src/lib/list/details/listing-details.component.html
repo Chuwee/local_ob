@@ -1,0 +1,145 @@
+<div *ngIf="listing$ | async as listing">
+    <div class="listing-details">
+        <form id="formListingData" fxFlex="55%" *ngIf="!!!(isLoading$ | async)" appCustomScroll>
+            <h2>{{ 'LISTINGS.SALE_INFO_TITLE' | translate }}</h2>
+            <div fxLayout="row wrap" fxLayoutGap.gt-xs="16px" fxLayoutAlign="flex-start" class="listing-sale-info">
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'LISTINGS.STATUS' | translate}}</span>
+                    <div class="badge-container">
+                        <span class="badge"
+                            [ngClass]="{
+                            'imported': listing.status === listingStatus.imported,
+                            'imported_with_error' : listing.status === listingStatus.importedWithError,
+                            'deleted' : listing.status === listingStatus.deleted
+                        }">
+                            <mat-icon *ngIf="listing.status === listingStatus.importedWithError">
+                                error_outline
+                            </mat-icon>
+                            {{'LISTINGS.STATUS_OPTS.' + listing.status | translate}}
+                        </span>
+                    </div>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'LISTINGS.SPLIT_OPTION' | translate}}</span>
+                    <span>{{'LISTINGS.SPLIT_OPTS.' + listing.split_option | translate}}</span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'LISTINGS.QUANTITY' | translate}}</span>
+                    <span>{{listing.quantity}}</span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'LISTINGS.EXCHANGE_RATE' | translate}}</span>
+                    <span>{{listing.price.exchange_rate || '-'}}</span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'LISTINGS.CURRENCY' | translate}}</span>
+                    <span>{{listing.price.currency || '-' }}</span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'LISTINGS.PAYOUT_PER_PRODUCT' | translate}}</span>
+                    <span>{{listing.price?.payout_per_product || '-'}}</span>
+                </div>
+
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'LISTINGS.BLACKLISTED' | translate}}</span>
+                    <span>{{listing.blacklisted ? ('FORMS.BOOLEAN_VALUES.YES' | translate) : ('FORMS.BOOLEAN_VALUES.NO' | translate)}}</span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'LISTINGS.GENERAL_ADMISSION' | translate}}</span>
+                    <span>
+                        {{listing.general_admission ? ('FORMS.BOOLEAN_VALUES.YES' | translate) : ('FORMS.BOOLEAN_VALUES.NO' | translate)}}
+                    </span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'LISTINGS.SECTION' | translate}}</span>
+                    <span>{{listing.section || '-'}}</span>
+                </div>
+            </div>
+            <div *ngIf="listing.products?.length" class="listing-products-list">
+                <div class="section-title no-margin" fxLayout="row" fxLayoutAlign="start center">
+                    <span>{{ 'LISTINGS.PRODUCTS_TITLE' | translate | uppercase }}</span>
+                </div>
+                <app-listing-details-products />
+            </div>
+            <div class="section-title" fxLayout="row" fxLayoutAlign="start center">
+                <span>{{ 'LISTINGS.DELIVERY_TITLE'| translate | uppercase }}</span>
+            </div>
+            <div fxLayout="row wrap" fxLayoutGap.gt-xs="16px" fxLayoutAlign="flex-start">
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'LISTINGS.STOCK_TYPES' | translate}}</span>
+                    <span class="stock-types flex items-center">
+                        @switch (listing.stock_types) {
+                            @case (stockTypes.pdf) {
+                                <mat-icon class="material-icons-outlined ob-icon xsmall">picture_as_pdf</mat-icon>
+                            }
+                            @case (stockTypes.mobileTransfer) {
+                                <mat-icon class="ob-icon xsmall">mobile_screen_share</mat-icon>
+                            }
+                            @case (stockTypes.mobile) {
+                                <mat-icon class="ob-icon xsmall">smartphone</mat-icon>
+                            }
+                            @case (stockTypes.barcode) {
+                                <mat-icon class="ob-icon xsmall">wallpaper</mat-icon>
+                            }
+                            @case (stockTypes.paper) {
+                                <mat-icon class="material-icons-outlined ob-icon xsmall">confirmation_number</mat-icon>
+                            }
+                        }
+                        <span class="stock-type-name">{{'LISTINGS.STOCK_TYPES_OPTS.' + listing.stock_types | translate}}</span>
+                    </span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'LISTINGS.INHAND' | translate}}</span>
+                    <span>{{listing.inhand ? ('FORMS.BOOLEAN_VALUES.YES' | translate) : ('FORMS.BOOLEAN_VALUES.NO' | translate)}}</span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'LISTINGS.INHAND_DATE' | translate}}</span>
+                    <span>{{listing.inhand_date ? (listing.inhand_date?.toString() | dateTime: dateTimeFormats.shortDateTime) : '-'}}</span>
+                </div>
+            </div>
+            <div *ngIf="listing.comments">
+                <div class="section-title bold" fxLayout="row" fxLayoutAlign="start center">
+                    <span>{{ 'LISTINGS.NOTES_TITLE' | translate | uppercase }}</span>
+                </div>
+                <div fxLayout="row wrap" fxLayoutGap.gt-xs="24px" fxLayoutAlign="flex-start">
+                    <div class="listing-notes-container" fxFlex="100%">{{listing.comments}}</div>
+                </div>
+            </div>
+        </form>
+
+        <div class="transitions" fxFlex="45%" *ngIf="!!!(isLoading$ | async)" appCustomScroll>
+            <h2>{{'LISTINGS.TRANSITIONS' | translate}}</h2>
+            <div class="vertical-timeline">
+                <app-vertical-timeline [timelineElements]="transitions" (showMore)="showMore($event)" />
+            </div>
+        </div>
+    </div>
+
+    <div class="action_button" fxLayoutAlign="end end" *ngIf="!!!(isLoading$ | async) && (hasWritePermissions$ | async)">
+        <div [matTooltip]="'LISTINGS.INFOS.BLACKLIST' | translate"
+            [matTooltipDisabled]="listing.status === listingStatus.importedWithError">
+            <button mat-flat-button color="primary" type="button"
+                [disabled]="listing.status !== listingStatus.importedWithError" class="ob-button medium"
+                (click)="blacklistListing(listing.code, listing.blacklisted)">
+                <mat-icon>{{listing.blacklisted ? 'add_circle_outline' : 'remove_circle_outline'}}</mat-icon>
+                {{(listing.blacklisted ? 'LISTINGS.FORMS.WHITELIST' : 'LISTINGS.FORMS.BLACKLIST') | translate}}
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="spinner-container" *ngIf="isLoading$ | async">
+    <mat-spinner />
+</div>

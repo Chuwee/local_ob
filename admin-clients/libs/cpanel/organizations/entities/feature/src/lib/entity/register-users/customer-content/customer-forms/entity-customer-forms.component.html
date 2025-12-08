@@ -1,0 +1,121 @@
+@if ($customerFormsArray(); as fieldForm) {
+    <ng-container [formGroup]="$form()">
+        <div class="flex flex-col">
+            <ng-container>
+                <mat-table class="ob-table channel-form-table" [dataSource]="fieldForm"
+                    [formGroup]="$form().get('0')">
+                    <ng-container matColumnDef="external_field">
+                        <mat-header-cell *matHeaderCellDef class="head-cell external_field flex-[0_0_19px]" />
+                        <mat-cell *matCellDef="let row" class="external_field flex-[0_0_19px]">
+                            @if(row?.external_field){
+                                <mat-icon class="ob-icon mat-icon neutral xsmall"
+                                    [matTooltip]="'CHANNEL_FORM_CONFIG.FORM_FIELDS.EXTERNAL_FIELD_TOOLTIP' | translate">
+                                    swap_calls
+                                </mat-icon>
+                            }
+                        </mat-cell>
+                    </ng-container>
+                    <!-- Field name column -->
+                    <ng-container matColumnDef="name">
+                        <mat-header-cell *matHeaderCellDef class="head-cell name">
+                            {{ 'CHANNEL_FORM_CONFIG.FORM_FIELDS.HEADER' | translate }}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row" class="name">
+                            {{ 'CHANNEL_FORM_CONFIG.FORM_FIELDS.' + row.key?.toUpperCase() | translate }}
+                        </mat-cell>
+                    </ng-container>
+                    <!-- Visible SigIn checkbox column -->
+                    <ng-container matColumnDef="visible-sign-in">
+                        <mat-header-cell *matHeaderCellDef class="head-cell visible-sign-in checkbox-column justify-center align-center">
+                            {{'CHANNEL_FORM_CONFIG.FORM_FIELDS.VISIBLE_SIGNIN' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row; index as i" [formArrayName]="i"
+                            class="icon-cell visible-sign-in checkbox-column justify-center align-center">
+                            <mat-checkbox color="primary" formControlName="visibleSignIn" />
+                        </mat-cell>
+                    </ng-container>
+                    <!-- Visible Profile checkbox column -->
+                    <ng-container matColumnDef="visible-profile">
+                        <mat-header-cell *matHeaderCellDef class="head-cell visible-profile checkbox-column justify-center align-center">
+                            {{'CHANNEL_FORM_CONFIG.FORM_FIELDS.VISIBLE_PROFILE' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row; index as i" [formArrayName]="i"
+                            class="icon-cell visible-profile checkbox-column justify-center align-center">
+                            <mat-checkbox color="primary" formControlName="visibleProfile" />
+                        </mat-cell>
+                    </ng-container>
+                    <!-- Purchase-required checkbox column -->
+                    <ng-container matColumnDef="required">
+                        <mat-header-cell *matHeaderCellDef class="head-cell purchase-required checkbox-column justify-center align-center">
+                            {{'CHANNEL_FORM_CONFIG.FORM_FIELDS.REQUIRED' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row; index as i" [formArrayName]="i"
+                            class="icon-cell purchase-required checkbox-column justify-center align-center">
+                            <mat-checkbox color="primary" formControlName="mandatory" />
+                        </mat-cell>
+                    </ng-container>
+                    <!-- uneditable checkbox column -->
+                    <ng-container matColumnDef="uneditable">
+                        <mat-header-cell *matHeaderCellDef class="head-cell uneditable checkbox-column gap-1 justify-center align-center">
+                            {{'CHANNEL_FORM_CONFIG.FORM_FIELDS.UNEDITABLE' | translate}}
+                            <mat-icon class="ob-help-icon"
+                                [matTooltip]="'CHANNEL_FORM_CONFIG.FORM_FIELDS.UNEDITABLE_INFO' | translate">
+                                help_outline
+                            </mat-icon>
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row; index as i" [formArrayName]="i"
+                            class="icon-cell uneditable checkbox-column justify-center align-center">
+                            <div [matTooltip]="'CHANNEL_FORM_CONFIG.FORM_FIELDS.UNEDITABLE_TOOLTIP' | translate"
+                                [matTooltipDisabled]="!isCheckboxDisabled('uneditable', i)">
+                                <mat-checkbox color="primary" formControlName="uneditable" />
+                            </div>
+                        </mat-cell>
+                    </ng-container>
+                    <!-- unique checkbox column -->
+                    <ng-container matColumnDef="unique">
+                        <mat-header-cell *matHeaderCellDef class="head-cell checkbox-column gap-1 justify-center align-center">
+                            {{'CHANNEL_FORM_CONFIG.FORM_FIELDS.UNIQUE' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row; index as i" [formArrayName]="i"
+                            class="icon-cell checkbox-column justify-center align-center">
+                            <mat-checkbox color="primary" formControlName="unique" />
+                        </mat-cell>
+                    </ng-container>
+                    <!-- Rules-badge column -->
+                    <ng-container matColumnDef="rules-badge">
+                        <mat-header-cell *matHeaderCellDef class="head-cell rules-badge justify-start align-center">
+                            {{'CHANNEL_FORM_CONFIG.VALIDATIONS.HEADER' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row; index as i" class="rules-badge justify-start align-center">
+                            <div class="badge" [class.hidden]="!$form().get(['0', i, 'rules']).value?.length">
+                                {{'CHANNEL_FORM_CONFIG.FORM_FIELDS.HAS_VALIDATIONS' | translate}}
+                            </div>
+                        </mat-cell>
+                    </ng-container>
+                    <!-- Rules-editor buttons column -->
+                    <ng-container matColumnDef="rules-editor">
+                        <mat-header-cell *matHeaderCellDef class="actions-cell head-cell flex-none basis-[50px]" />
+                        <mat-cell *matCellDef="let row; index as i" class="actions-cell justify-end flex-none basis-[50px]">
+                            @if (row.available_rules?.length) {
+                                <div (click)="$event.stopPropagation()">
+                                    <button mat-icon-button [matMenuTriggerFor]="actionsListMenu" #menuTrigger="matMenuTrigger"
+                                        class="ob-button medium">
+                                        <mat-icon>more_horiz</mat-icon>
+                                    </button>
+                                    <mat-menu #actionsListMenu="matMenu" xPosition="before" (close)="menuTrigger">
+                                        <button mat-menu-item [attr.aria-label]="'CHANNEL_FORM_CONFIG.VALIDATIONS_EDITION' | translate"
+                                            (click)="openRulesEditorDialog('0', row)">
+                                            {{'CHANNEL_FORM_CONFIG.VALIDATIONS_EDITION' | translate}}
+                                        </button>
+                                    </mat-menu>
+                                </div>
+                            }
+                        </mat-cell>
+                    </ng-container>
+                    <mat-header-row *matHeaderRowDef="tableColumns;sticky: true" class="dense-row" />
+                    <mat-row *matRowDef="let row; columns: tableColumns" class="dense-row hoverable-row" />
+                </mat-table>
+            </ng-container>
+        </div>
+    </ng-container>
+}

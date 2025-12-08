@@ -1,0 +1,262 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="!form.dirty" [formGroup]="form">
+    <!-- BARCODES -->
+    <mat-expansion-panel expanded togglePosition="before">
+        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+            <mat-panel-title>{{'ENTITY.BARCODES' | translate}}</mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="flex">
+            <div class="flex flex-col basis-full">
+                <mat-checkbox color="primary" [formControl]="form.controls.barcode">
+                    {{'ENTITY.ENABLE_BARCODES' | translate}}
+                </mat-checkbox>
+                <div class="flex">
+                    <div class="flex flex-col lg:basis-2/5 basis-full">
+                        <mat-form-field appearance="outline" class="ob-form-field entity-configuration-selector field-with-label">
+                            <mat-label>{{'FORMS.LABELS.FORMAT' | translate}}</mat-label>
+                            <mat-select [formControl]="form.controls.barcodeFormat" [placeholder]="'FORMS.ACTIONS.SELECT' | translate">
+                                <mat-option [value]="null">{{'FORMS.ACTIONS.SELECT' | translate}}</mat-option>
+                                @for (format of barcodeFormatsList$ | async; track format.id) {
+                                    <mat-option [value]="format.id">{{format.id}}</mat-option>
+                                }
+                            </mat-select>
+                            <mat-error [ob-form-errors]="form.controls.barcodeFormat" />
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-expansion-panel>
+    <!-- BANKING BENEFITS -->
+    @if (isAllowGatewayBenefitsShown$ | async) {
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'ENTITY.TITLES.BANKING_BENEFITS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex">
+                <div class="flex flex-col basis-full">
+                    <div class="flex gap-2 items-start">
+                        <mat-checkbox color="primary" [formControl]="form.controls.allowGatewayBenefits">
+                            {{'ENTITY.FORMS.LABELS.BANKING_BENEFITS.ALLOW' | translate}}
+                        </mat-checkbox>
+                        <mat-icon class="ob-help-icon" [matTooltip]="'ENTITY.TOOLTIPS.BANKING_BENEFITS_INFO' | translate">
+                            help_outline
+                        </mat-icon>
+                    </div>
+                </div>
+            </div>
+        </mat-expansion-panel>
+    }
+    <!-- HARD TICKET -->
+    <mat-expansion-panel expanded togglePosition="before">
+        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+            <mat-panel-title>{{'ENTITY.TITLES.HARD_TICKET' | translate}}</mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="flex">
+            <div class="flex flex-col basis-full">
+                <div class="flex gap-2 items-start">
+                    <mat-checkbox color="primary" [formControl]="form.controls.allowHardTicket">
+                        {{'ENTITY.FORMS.LABELS.HARD_TICKET.ALLOW' | translate}}
+                    </mat-checkbox>
+                    <mat-icon class="ob-help-icon" [matTooltip]="'ENTITY.TOOLTIPS.HARD_TICKET_INFO' | translate">
+                        help_outline
+                    </mat-icon>
+                </div>
+            </div>
+        </div>
+    </mat-expansion-panel>
+    <!-- LIVE STREAMING -->
+    <mat-expansion-panel expanded togglePosition="before">
+        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+            <mat-panel-title>{{'ENTITY.LIVE_STREAMING' | translate}}</mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="flex">
+            <div class="flex flex-col basis-full">
+                <mat-checkbox color="primary" [formControl]="form.controls.liveStreaming">
+                    {{'ENTITY.ENABLE_LIVE_STREAMING' | translate}}
+                </mat-checkbox>
+                <div class="flex">
+                    <div class="flex flex-col lg:basis-2/5 basis-full">
+                        <mat-form-field appearance="outline" class="ob-form-field entity-configuration-selector field-with-label">
+                            <mat-label>{{'FORMS.LABELS.PLATFORMS' | translate}}</mat-label>
+                            <mat-select [multiple]="true" [formControl]="form.controls.liveStreamVendors"
+                                [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                                @for (vendor of liveStreamVendors | keyvalue; track vendor.value) {
+                                    <mat-option [value]="vendor.value">{{vendor.value}}</mat-option>
+                                }
+                            </mat-select>
+                            <mat-error [ob-form-errors]="form.controls.liveStreamVendors" />
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-expansion-panel>
+    <!-- QUEUES -->
+    @if (isOperatorManager$ | async) {
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'ENTITY.QUEUES.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex">
+                <div class="flex flex-col basis-full">
+                    <p>{{'ENTITY.QUEUES.DESCRIPTION' | translate}}</p>
+                    <mat-radio-group class="flex flex-col gap-4" [formControl]="form.controls.customQueue">
+                        <mat-radio-button class="ob-radio-button" [value]="false">
+                            {{'ENTITY.QUEUES.USE_DEFAULT_QUEUE' | translate}}
+                        </mat-radio-button>
+                        <mat-radio-button class="ob-radio-button" [value]="true">
+                            {{'ENTITY.QUEUES.USE_CUSTOM_QUEUE' | translate}}
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </div>
+            </div>
+        </mat-expansion-panel>
+    }
+    <!-- HIDE PRICES IN BOX OFFICE -->
+    <mat-expansion-panel expanded togglePosition="before">
+        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+            <mat-panel-title>{{'ENTITY.TICKET_PRICE_BOX_OFFICE' | translate}}</mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="flex">
+            <div class="flex flex-col basis-full">
+                <mat-checkbox color="primary" [formControl]="form.controls.allowHidePriceTicket">
+                    {{'ENTITY.ALLOW_HIDE_PRICE_IN_BOX_OFFICE_TICKET' | translate}}
+                </mat-checkbox>
+            </div>
+        </div>
+    </mat-expansion-panel>
+    <!-- DEFAULT END DATE OF SESSIONS -->
+    <mat-expansion-panel expanded togglePosition="before">
+        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+            <mat-panel-title>{{'ENTITY.SESSIONS_DURATION.TITLE' | translate}}</mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="flex">
+            <div class="flex flex-col basis-full">
+                <span>{{'ENTITY.SESSIONS_DURATION.DESCRIPTION' | translate}}</span>
+                <div class="flex items-center">
+                    <div class="flex flex-col w-24">
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                            <input matInput [formControl]="form.controls.sessionDurationInHours" type="number">
+                            <mat-error [ob-form-errors]="form.controls.sessionDurationInHours" />
+                        </mat-form-field>
+                    </div>
+                    <span class="w-full duration_description">
+                        {{'ENTITY.SESSIONS_DURATION.LABEL' | translate}}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </mat-expansion-panel>
+    <!-- ENABLE MASSIVE EMAILS - Hidden until product check -->
+    <!-- <mat-expansion-panel expanded togglePosition="before">
+        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+            <mat-panel-title>
+                {{'ENTITY.MASSIVE_EMAILS' | translate}}
+                <span [matTooltip]="'INFORMATION_BADGE.BETA_FEATURE_TOOLTIP_INFO' | translate"
+                    class="ob-badge info">
+                    {{'INFORMATION_BADGE.BETA_FEATURE' | translate}}
+                </span>
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div fxLayout="column" fxLayoutGap="20px">
+            <mat-checkbox color="primary" formControlName="enableMassiveEmails">
+                {{'ENTITY.ENABLE_MASSIVE_EMAILS' | translate}}
+            </mat-checkbox>
+        </div>
+    </mat-expansion-panel> -->
+    <!-- ENABLE ALLOW CUSTOMIZATION -->
+    <mat-expansion-panel expanded togglePosition="before">
+        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+            <mat-panel-title>{{'ENTITY.ALLOW_CUSTOMIZATION_TITLE' | translate}}</mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="flex">
+            <div class="flex flex-col basis-full">
+                <mat-checkbox color="primary" [formControl]="form.controls.allowCustomization">
+                    {{'ENTITY.ALLOW_CUSTOMIZATION_CHECKBOX' | translate}}
+                </mat-checkbox>
+            </div>
+        </div>
+    </mat-expansion-panel>
+    <!-- ENABLE EXTERNAL NOTIFICATION -->
+    @if (isAllowExternalNotificationShown$ | async) {
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'ENTITY.ALLOW_EXTERNAL_NOTIFICATION_TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex">
+                <div class="flex flex-col basis-full">
+                    <mat-checkbox color="primary" [formControl]="form.controls.allowExternalNotification">
+                        {{'ENTITY.ALLOW_EXTERNAL_NOTIFICATION_CHECKBOX' | translate}}
+                    </mat-checkbox>
+                </div>
+            </div>
+        </mat-expansion-panel>
+    }
+    <!-- DONATIONS -->
+    @if (isAllowDonationsShown$ | async) {
+        <mat-expansion-panel expanded togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'ENTITY.DONATIONS.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex">
+                <div class="flex flex-col basis-full gap-4">
+                    <div>
+                        {{'ENTITY.DONATIONS.DESCRIPTION' | translate}}
+                    </div>
+                    <mat-accordion [multi]="false" [togglePosition]="'before'" [formGroup]="donationsFormGroup">
+                        @for (donationProvider of donationProviders$ | async; track donationProvider.id) {
+                            @if (donationsFormGroup.controls[donationProvider.id]) {
+                                <mat-expansion-panel expanded #panel class="ob-expansion-card">
+                                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                                        <mat-panel-title>{{donationProvider.name}}</mat-panel-title>
+                                        <mat-checkbox class="mat-panel-header-checkbox" (click)="$event.stopPropagation()" color="primary"
+                                            [formControl]="donationsFormGroup.controls[donationProvider.id].controls.enabled">
+                                            {{'ENTITY.DONATIONS.CHECKBOX' | translate}}
+                                        </mat-checkbox>
+                                    </mat-expansion-panel-header>
+                                    <div class="form-box flex flex-col gap-4">
+                                        @if (donationProvider.id === donationProviders.worldcoo) {
+                                            <div class="flex items-center gap-4">
+                                                <span class="flex">
+                                                    <mat-icon class="ob-icon small info with-text"
+                                                        style="display:inline-block">info</mat-icon>
+                                                    {{'ENTITY.DONATIONS.CONTRACT.INFO' | translate}}</span>
+                                                <mat-divider vertical="true" class="self-stretch" />
+                                                <div class="download">
+                                                    <a
+                                                        [href]="'ENTITY.DONATIONS.PROVIDERS.' + donationProvider.id + '.CONTRACT.URL' | translate">
+                                                        {{'ENTITY.DONATIONS.CONTRACT.DOWNLOAD' | translate}}
+                                                        <mat-icon class="ob-icon small download with-text">download-2</mat-icon>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        }
+                                        <mat-divider />
+                                        <div>
+                                            {{'ENTITY.DONATIONS.API_KEY.INFO' | translate}}
+                                        </div>
+                                        <div class="flex">
+                                            <div class="flex flex-col basis-2/5">
+                                                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                                                    <mat-label>{{'ENTITY.DONATIONS.API_KEY.LABEL' | translate}}</mat-label>
+                                                    <input matInput [placeholder]="'ENTITY.DONATIONS.API_KEY.PLACEHOLDER' | translate"
+                                                        [formControl]="donationsFormGroup.controls[donationProvider.id].controls.api_key"
+                                                        aria-label="api_key">
+                                                    <mat-error
+                                                        [ob-form-errors]="donationsFormGroup.controls[donationProvider.id].controls.api_key" />
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </mat-expansion-panel>
+                            }
+                        }
+                    </mat-accordion>
+                </div>
+            </div>
+        </mat-expansion-panel>
+    }
+</app-form-container>
+@if (reqInProgress$ | async) {
+    <div class="spinner-container"><mat-spinner /></div>
+}

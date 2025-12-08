@@ -1,0 +1,27 @@
+<mat-form-field appearance="outline" hidden-outline class="no-padding field-with-label ob-form-field">
+    <mat-label>{{'EVENTS.RATES' | translate}}</mat-label>
+    <input hidden matInput />
+    <mat-list class="ob-list rates-list" role="list">
+        <mat-list-item *ngFor="let rate of rates()" class="rate-item editable-item">
+            <mat-button-toggle
+                *ngIf="!hideDefault"
+                aria-label="Set default rate"
+                class="ob-icon-button-toggle-simple yellow-icon-appearance ob-button medium only-icon"
+                [checked]="rate.default"
+                [disabled]="rate.default"
+                (click)="setDefault(rate)">
+                <mat-icon [ngClass]="rate.default ? 'selected' : 'not-selected'">
+                    {{rate.default ? 'star' : 'star_border'}}
+                </mat-icon>
+            </mat-button-toggle>
+            <span class="name">{{rate.name}}</span>
+            <mat-button-toggle aria-label="Set visible/not visible rate"
+                class="ob-icon-button-toggle-simple ob-button small only-icon"
+                [checked]="rate.visible || rate.default"
+                [disabled]="rate.default"
+                (click)="setVisible(rate)">
+                <mat-icon>visibility</mat-icon>
+            </mat-button-toggle>
+        </mat-list-item>
+    </mat-list>
+</mat-form-field>

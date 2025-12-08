@@ -1,0 +1,32 @@
+<div class="pack-channels-details-container flex flex-col items-stretch grow-0 shrink basis-full">
+    @if (selectedPackChannel$ | async; as packChannel) {
+        <app-nav-tabs-menu type="horizontalSubtab" [elements]="
+        [{
+            label: 'PACK.CHANNELS.DETAIL.GENERAL_DATA.TITLE',
+            id: 'tab_pack_channel_general_data',
+            param: 'general-data',
+        },
+        {
+            label: 'PACK.CHANNELS.DETAIL.OPERATIVE.TITLE',
+            id: 'tab_pack_channel_operative',
+            param: 'operative',
+        },
+        {
+            label: 'PACK.CHANNELS.DETAIL.PREVIEW.TITLE',
+            id: 'tab_pack_channel_preview',
+            param: 'preview',
+            disabled: (packChannel.status.request !== packChannelRequestStatus.accepted || !$pack().active),
+            tooltip: {
+                    text: 'PACK.CHANNELS.DETAIL.REQUEST_REQUIRED',
+                    disabled: ((packChannel.status.request === packChannelRequestStatus.accepted) && $pack().active)
+                },
+            show: $isNotBoxOfficeChannel()
+        }]" />
+    }
+    <router-outlet />
+    @if (isInProgress$ | async) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+</div>

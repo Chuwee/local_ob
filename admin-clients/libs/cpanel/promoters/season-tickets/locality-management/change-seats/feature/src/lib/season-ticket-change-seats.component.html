@@ -1,0 +1,172 @@
+@if ($seasonTicket()) {
+    <div class="status-notifications-container flex items-center">
+        <mat-slide-toggle (change)="handleStatusChange($event.checked)" class="ob-slide-toggle" color="primary"
+            [formControl]="allowChangeSeatForm.controls.allow_change_seat">
+            {{ 'SEASON_TICKET.CHANGE_SEATS.ENABLED'| translate }}
+        </mat-slide-toggle>
+    </div>
+    <app-form-container (save)="save()" (cancel)="cancel()" layout="menu"
+        [disabled]="!form.dirty || (isGenerationStatusReady$ | async) === false">
+        <ng-container [formGroup]="form">
+            @if (isGenerationStatusInProgress$ | async) {
+                <div class="ob-overlay-wrapper flex align-center" slot="overlay">
+                    <div class="ob-overlay-pane pane-sticky">
+                        <app-context-notification class="ob-context-notification basis-5/6" contextType="info">
+                            <p>{{'SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate}}</p>
+                            <mat-progress-bar foot mode="indeterminate" class="ob-progress-bar"
+                                [attr.aria-label]="('SEASON_TICKET.GENERATION_STATUS_IN_PROGRESS_INFO' | translate)" />
+                        </app-context-notification>
+                    </div>
+                </div>
+            }
+            <mat-accordion [multi]="true" [togglePosition]="'before'">
+                <!-- PRODUCTS LIMIT -->
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'SEASON_TICKET.CHANGE_SEATS.MAX_LIMIT_CHANGES' | translate}}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="section-block flex flex-wrap items-center">
+                        <mat-checkbox formControlName="enable_max_value" color="primary">
+                            {{'SEASON_TICKET.CHANGE_SEATS.MAX_LIMIT_CHANGES_CHECK' | translate}}
+                        </mat-checkbox>
+                        <mat-form-field class="ob-form-field inline-field value-field change-seat-input" appearance="outline">
+                            <input matInput type="number" inputmode="numeric" placeholder="1"
+                                formControlName="max_value" min="1" step="1">
+                            <mat-error class="under_error" [ob-form-errors]="form.controls.max_value" />
+                        </mat-form-field>
+                    </div>
+
+                </mat-expansion-panel>
+
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'SEASON_TICKET.CHANGE_SEATS.RELEASED_TICKETS_SETTINGS.TITLE' | translate}}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="flex flex-col" formGroupName="changed_seat_quota">
+                        <p>{{'SEASON_TICKET.CHANGE_SEATS.RELEASED_TICKETS_SETTINGS.DESCRIPTION' | translate}}</p>
+                        <mat-radio-group formControlName="enable" class="flex-[1_1_100%] flex-col">
+                            <mat-radio-button class="ob-radio-button vertical-list" [value]="false">
+                                {{'SEASON_TICKET.CHANGE_SEATS.RELEASED_TICKETS_SETTINGS.DISABLED' | translate}}
+                            </mat-radio-button>
+                            <div class="flex-[1_1_100%] flex-wrap align-center gap-4">
+                                <mat-radio-button class="ob-radio-button vertical-list" [value]="true" #enabledRadio>
+                                    {{'SEASON_TICKET.CHANGE_SEATS.RELEASED_TICKETS_SETTINGS.ENABLED' | translate}}
+                                </mat-radio-button>
+                                @if (enabledRadio.checked) {
+                                    <mat-form-field id="quota-selector" appearance="outline"
+                                        class="ob-form-field inline-field change-seat-select nested-content">
+                                        <mat-select formControlName="id" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                            @for (quota of (quotas$ | async); track quota) {
+                                                <mat-option [value]="quota.id">
+                                                    <div appEllipsify [matTooltip]="quota.name">
+                                                        {{quota.name}}
+                                                    </div>
+                                                </mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                }
+                            </div>
+                        </mat-radio-group>
+                    </div>
+                    <!--TODO: functionality temporarily discarded. it will return -->
+                    <!-- <mat-divider class="ob-divider"></mat-divider>
+                <div fxLayout="column">
+                    <p fxFlex="100%">{{'SEASON_TICKET.CHANGE_SEATS.RELEASED_TICKETS_SETTINGS.STATUS_DESCRIPTION' | translate}}</p>
+                    <div fxLayoutAlign="start center" fxLayout="row" fxLayoutGap="16px">
+                        <mat-form-field id="status-selector" fxFlex="200px" appearance="outline"
+                            class="ob-form-field field-with-label status-select">
+                            <mat-label>{{'SEASON_TICKET.CHANGE_SEATS.RELEASED_TICKETS_SETTINGS.STATUS' | translate}}</mat-label>
+                            <mat-select #statusSelect formControlName="changed_seat_status"
+                                [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                                <mat-option *ngFor="let seatStatus of seatStatuses" [value]="seatStatus">
+                                    <div appEllipsify [matTooltip]="'ENUMS.SEAT_STATUS.' + seatStatus | translate">
+                                        {{'ENUMS.SEAT_STATUS.' + seatStatus | translate}}
+                                    </div>
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field id="reason-selector" fxFlex="200px" *ngIf="statusSelect.value === seatStatus.promotorLocked"
+                            appearance="outline" class="ob-form-field field-with-label">
+                            <mat-label>{{'VENUE_TPLS.BLOCKING_REASON' | translate}}</mat-label>
+                            <mat-select formControlName="changed_seat_block_reason_id"
+                                [placeholder]="'VENUE_TPLS.BLOCKING_REASON' | translate">
+                                <mat-option *ngFor="let reason of (blockingReasons$ | async)" [value]="reason.id">
+                                    <div appEllipsify [matTooltip]="reason.name">
+                                        {{reason.name}}
+                                    </div>
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div> -->
+                </mat-expansion-panel>
+
+                <!--TODO: functionality temporarily discarded. it will return -->
+                <!--<mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'SEASON_TICKET.CHANGE_SEATS.ALLOWED_QUOTAS.TITLE' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div fxLayout="column" formGroupName="limit_change_seat_quotas">
+                    <p fxFlex="100%">{{'SEASON_TICKET.CHANGE_SEATS.ALLOWED_QUOTAS.DESCRIPTION' | translate}}</p>
+                    <mat-radio-group formControlName="enable" fxFlex="100%" fxLayout="column">
+                        <mat-radio-button class="ob-radio-button vertical-list" [value]="false">
+                            {{'SEASON_TICKET.CHANGE_SEATS.ALLOWED_QUOTAS.ALL' | translate}}
+                        </mat-radio-button>
+                        <mat-radio-button class="ob-radio-button vertical-list" [value]="true"
+                                          [disabled]="!((quotas$ | async)?.length > 0)">
+                            {{'SEASON_TICKET.CHANGE_SEATS.ALLOWED_QUOTAS.SELECT' | translate}}
+                        </mat-radio-button>
+                    </mat-radio-group>
+
+                    <div class="quotas-container" fxLayout="column">
+                        <mat-error *ngIf="form.hasError('quotas', 'limit_change_seat_quotas')
+                                    && form.controls.limit_change_seat_quotas.controls.quota_ids.touched">
+                            {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                        </mat-error>
+                        <div [fxShow]="form.controls.limit_change_seat_quotas.controls.enable.value" fxLayout="column"
+                             fxFlex="100%" formGroupName="quota_ids"
+                             [class]="form.hasError('quotas', 'limit_change_seat_quotas')
+                                    && form.controls.limit_change_seat_quotas.controls.quota_ids.touched ?
+                                    'quotas quotas-error' : 'quotas'">
+                            <ng-container *ngFor="let quota of quotas$ | async">
+                                <mat-checkbox formControlName="{{quota.id}}" color="primary" fxLayoutAlign="start center"
+                                    class="quota-checkbox">
+                                    {{ quota.name }}
+                                </mat-checkbox>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+            </mat-expansion-panel> -->
+            </mat-accordion>
+            <mat-accordion [multi]="true" [togglePosition]="'before'">
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'SEASON_TICKET.CHANGE_SEATS.PRICE_ZONES.TITLE' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="flex flex-col gap-6">
+                        <span>{{'SEASON_TICKET.CHANGE_SEATS.PRICE_ZONES.INFO' | translate}}</span>
+                        <div class="flex align-center">
+                            <mat-icon class="ob-icon warning with-text">warning</mat-icon>
+                            <span>{{'SEASON_TICKET.CHANGE_SEATS.PRICE_ZONES.WARNING' | translate}}</span>
+                        </div>
+                        <div>
+                            <app-change-seat-price-zone-matrix (finalPricesData)="setFinalSeasonTicketPricesData($event)"
+                                formGroupName="change_seats_prices_data_form" />
+                        </div>
+                    </div>
+                </mat-expansion-panel>
+            </mat-accordion>
+        </ng-container>
+    </app-form-container>
+    @if (isLoadingOrSaving$ | async) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+}

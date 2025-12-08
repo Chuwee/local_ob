@@ -1,0 +1,95 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="(loading$ | async) || !form.dirty"
+    [formGroup]="form">
+    <mat-accordion [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.MEMBERS_CONFIG.FREE_SEAT' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <p class="section-description">{{ 'CHANNELS.MEMBERS_CONFIG.FREE_SEAT_DESCRIPTION'| translate }}</p>
+            <div class="free-seat-container" fxLayout="column">
+                <mat-slide-toggle class="ob-slide-toggle" formControlName="free_seat">
+                    {{ 'CHANNELS.MEMBERS_CONFIG.ENABLE_FREE_SEAT'| translate }}
+                </mat-slide-toggle>
+            </div>
+            <div fxLayout="row wrap" fxLayoutGap.gt-sm="50px" fxLayoutAlign="flex-start">
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 50px)" fxLayout="column">
+                    <span class="field-label">{{'CHANNELS.MEMBERS_CONFIG.ALLOW_FREE_SEAT_LABEL' | translate}}</span>
+                    <div fxFlex="50px" fxLayout="row" fxLayoutAlign="start center">
+                        <mat-form-field appearance="outline" fxFlex="80px" class="ob-form-field inline-field value-field">
+                            <input matInput type="number" formControlName="allow_free_seat_till" placeholder="0">
+                        </mat-form-field>
+                        {{'CHANNELS.MEMBERS_CONFIG.ALLOW_FREE_SEAT_TILL' | translate}}
+                    </div>
+                    <mat-error [ob-form-errors]="form" field="allow_free_seat_till" />
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 50px)" fxLayout="column">
+                    <span class="field-label">{{'CHANNELS.MEMBERS_CONFIG.ALLOW_RECOVER_SEAT_LABEL' | translate}}</span>
+                    <div fxFlex="50px" fxLayout="row" fxLayoutAlign="start center">
+                        <mat-form-field appearance="outline" fxFlex="80px" class="ob-form-field inline-field value-field">
+                            <input matInput type="number" formControlName="allow_recover_seat_till" placeholder="0">
+                        </mat-form-field>
+                        {{'CHANNELS.MEMBERS_CONFIG.ALLOW_RECOVER_SEAT_TILL' | translate}}
+                    </div>
+                    <mat-error [ob-form-errors]="form" field="allow_recover_seat_till" />
+                </div>
+            </div>
+            <div class="blocked-matches-container">
+                <span class="field-label">{{'CHANNELS.MEMBERS_CONFIG.FREE_SEAT_BLOCKED_MATCHES' | translate}}</span>
+                <app-searchable-paginated-selection #selection [placeholder]="'FORMS.SEARCH.FREE_SEAT_BLOCKED_MATCHES' | translate"
+                    (loadData)="loadPagedNextMatches($event)" [form]="blockedMatches" [data$]="nextMatchesPaged$"
+                    [metadata$]="nextMatchesMetadata$" [loading$]="loading$">
+                    <div slot="filter" class="badge-container" [class.empty]="!(nextMatchesMetadata$ | async)?.total">
+                        {{selectedMatches}} / {{(totalMatches$ | async) || 0}}
+                    </div>
+                    <button slot="filter" type="button" mat-flat-button class="show-selected-only-button ob-button" color="tertiary"
+                        [class.active]="selectedOnly" [disabled]="selectedMatches === 0"
+                        [matTooltip]="'CHANNELS.MEMBERS_CONFIG.SHOW_SELECTED_TOOLTIP' | translate"
+                        (click)="selectedOnly = !selectedOnly; loadPagedNextMatches({offset: 0, q: selection.search})">
+                        <mat-icon>visibility</mat-icon>
+                        {{'CHANNELS.MEMBERS_CONFIG.SHOW_SELECTED' | translate}}
+                    </button>
+                    <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data" let-selectionChanged="selectionChanged">
+                        <app-selection-table [data]="data" [columns]="nextMatchesColumns" [pageForm]="pageForm"
+                            [selectionChanged]="selectionChanged">
+                            <ng-template #selectAllTemplate>
+                                <mat-checkbox #allSelected color="primary"
+                                    [disabled]="selectedOnly || (totalMatches$ | async) === 0"
+                                    [checked]="selectedMatches === (totalMatches$ | async) || selectedOnly || (allSelected$ | async)"
+                                    [indeterminate]="selectedMatches > 0 && selectedMatches < (totalMatches$ | async) && !allSelected.checked"
+                                    (change)="allSelectedClick.emit(allSelected.checked)" />
+                            </ng-template>
+                            <ng-container [matColumnDef]="nextMatchesColumns[1]">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    {{'CHANNELS.MEMBERS_CONFIG.MATCH_NAME' | translate}}
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row">{{row.name}}</mat-cell>
+                            </ng-container>
+                            <ng-container [matColumnDef]="nextMatchesColumns[2]">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    {{'CHANNELS.MEMBERS_CONFIG.MATCH_COMPETITION' | translate}}
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row">{{row.competition}}</mat-cell>
+                            </ng-container>
+                            <ng-container [matColumnDef]="nextMatchesColumns[3]">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    {{'CHANNELS.MEMBERS_CONFIG.MATCH_SEASON' | translate}}
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row">{{row.season}}</mat-cell>
+                            </ng-container>
+                        </app-selection-table>
+                    </ng-template>
+
+                </app-searchable-paginated-selection>
+            </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.MEMBERS_CONFIG.TRANSFER_SEAT' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <p class="section-description">{{ 'CHANNELS.MEMBERS_CONFIG.TRANSFER_SEAT_DESCRIPTION'| translate }}</p>
+            <mat-slide-toggle class="ob-slide-toggle" formControlName="transfer_seat">
+                {{ 'CHANNELS.MEMBERS_CONFIG.ENABLE_TRANSFER_SEAT'| translate }}
+            </mat-slide-toggle>
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>

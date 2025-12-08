@@ -1,0 +1,13 @@
+<div [formGroup]="$form()">
+    <mat-form-field appearance="outline" class="ob-form-field">
+        <mat-label>
+            {{'CHANNELS.PAYMENT_CONFIG.FORMS.LABELS.MIN_AMOUNT' | translate}}
+        </mat-label>
+        @let currency = $form().controls.currency.value;
+        @let placeholder = $firstAmountValue() === null && !valueChanged ? '' : (0 | localCurrency:currency:'narrow');
+        <app-currency-input formControlName="amount"
+            [currencyCode]="currency" [currencyFormat]="'narrow'"
+            [placeholder]="placeholder" />
+        <mat-error [ob-form-errors]="$form()" field="amount" />
+    </mat-form-field>
+</div>

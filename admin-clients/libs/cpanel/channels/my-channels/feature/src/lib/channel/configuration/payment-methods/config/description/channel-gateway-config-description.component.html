@@ -1,0 +1,41 @@
+<div mat-dialog-content class="with-wizard-bar" fxLayout="column">
+    <div fxFlex="100%" fxLayout="row wrap">
+        <p>{{'CHANNELS.PAYMENT_METHODS.CONFIG_INFO' | translate}}</p>
+        <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label no-grid-spacing">
+            <mat-label>{{'FORMS.LABELS.NAME' | translate }}</mat-label>
+            <input matInput autocomplete="off" type="text" [formControl]="extraForm.controls.nameCtrl" data-test="payment-method-name">
+            <mat-error [ob-form-errors]="extraForm.controls.nameCtrl"></mat-error>
+        </mat-form-field>
+        <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field field-with-label no-grid-spacing">
+            <mat-label>{{'FORMS.LABELS.DESCRIPTION' | translate }}</mat-label>
+            <textarea matInput [formControl]="extraForm.controls.descriptionCtrl"></textarea>
+        </mat-form-field>
+        <p>{{'CHANNELS.PAYMENT_METHODS.NAME_INFO' | translate}}</p>
+        <app-tabs-menu fxFlex="100%" type="language" overrideClasses="no-left-padding" #translationTabs
+            [selectedIndex]="defaultLanguageIndex$ | async">
+            <ng-container *ngFor="let language of languages$ | async">
+                <ng-template appTab lazyLoad [label]="('LANGUAGES.' + language) | translate"
+                    [ctrl]="translationsGroup.controls.namesCtrl.controls[language]">
+                    <div fxLayout="column">
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label no-grid-spacing">
+                            <mat-label>
+                                {{'FORMS.LABELS.NAME' | translate }} {{( 'LANGUAGES.' + language ) | translate}}
+                            </mat-label>
+                            <input matInput autocomplete="off" type="text"
+                                [formControl]="translationsGroup.controls.namesCtrl.controls[language]">
+                            <mat-error [ob-form-errors]="translationsGroup.controls.namesCtrl.controls[language]"></mat-error>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label no-grid-spacing description">
+                            <mat-label>
+                                {{'FORMS.LABELS.SUBTITLE' | translate }} {{( 'LANGUAGES.' + language ) | translate}}
+                            </mat-label>
+                            <app-rich-text-area [placeholder]="'FORMS.TEXT_INPUT_AREA_PLACEHOLDER' | translate"
+                                [formControl]="translationsGroup.controls.subtitlesCtrl.controls[language]">
+                            </app-rich-text-area>
+                        </mat-form-field>
+                    </div>
+                </ng-template>
+            </ng-container>
+        </app-tabs-menu>
+    </div>
+</div>

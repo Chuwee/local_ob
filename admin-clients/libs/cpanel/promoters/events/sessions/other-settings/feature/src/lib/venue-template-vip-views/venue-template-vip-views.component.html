@@ -1,0 +1,33 @@
+<app-searchable-paginated-selection #selection fxFlex="0 1 100%" fxLayout="column" (loadData)="loadViews($event)"
+    [data$]="views$" [metadata$]="metadata$" [loading$]="isLoading$" [formGroup]="form">
+    <ng-template #selectionTemplate let-data="data">
+        <mat-table class="ob-table" [dataSource]="data" matSort (matSortChange)="changeSort($event)">
+            <ng-container matColumnDef="name">
+                <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell name">
+                    {{'EVENTS.SESSION.VIP_VIEWS.NAME' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row;" class="name">
+                    {{row.name}}
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="description">
+                <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell description">
+                    {{'EVENTS.SESSION.VIP_VIEWS.DESCRIPTION' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row;" class="description">
+                    {{row.description}}
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="vip">
+                <mat-header-cell *matHeaderCellDef class="head-cell vip">
+                    {{'EVENTS.SESSION.VIP_VIEWS.VIP' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row; index as i" class="vip">
+                    <mat-checkbox [formControlName]="row.id" color="primary"></mat-checkbox>
+                </mat-cell>
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="columns" class="dense-row"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: columns; index as j" class="dense-row"></mat-row>
+        </mat-table>
+    </ng-template>
+</app-searchable-paginated-selection>

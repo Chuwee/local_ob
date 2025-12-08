@@ -1,0 +1,58 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'TERMINALS.TITLES.NEW_TERMINAL' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="dialogRef.close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="row wrap" [formGroup]="form">
+        <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field">
+            <mat-label>{{'FORMS.LABELS.ENTITY' | translate}}</mat-label>
+            <app-select-server-search formControlName="entity" [placeholder]="'FORMS.ACTIONS.SELECT' | translate"
+                [options$]="entities$" [moreOptionsAvailable$]="moreEntitiesAvailable$" (loadOptions)="loadEntities($event)">
+            </app-select-server-search>
+            <mat-error [ob-form-errors]="form" field="entity"></mat-error>
+        </mat-form-field>
+        <mat-form-field fxFlex="50%" appearance="outline" class="ob-form-field">
+            <mat-label>{{'TERMINALS.FORMS.LABELS.TERMINAL_ID' | translate}}</mat-label>
+            <input matInput aria-label="name" [placeholder]="'TERMINALS.FORMS.LABELS.TERMINAL_ID' | translate" formControlName="code">
+            <mat-error [ob-form-errors]="form" field="code"></mat-error>
+        </mat-form-field>
+        <mat-form-field fxFlex="100%" appearance="outline" class="ob-form-field">
+            <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+            <input matInput aria-label="name" [placeholder]="'FORMS.LABELS.NAME' | translate" formControlName="name">
+            <mat-error [ob-form-errors]="form" field="name"></mat-error>
+        </mat-form-field>
+        <mat-form-field fxFlex="50%" appearance="outline" class="ob-form-field">
+            <mat-label>{{'FORMS.LABELS.STATUS' | translate}}</mat-label>
+            <mat-select formControlName="licenseEnabled">
+                <mat-select-trigger>
+                    <ng-container *ngIf="form.controls.licenseEnabled.value else inactive">
+                        <span class="status-dot active"></span>
+                        {{'FORMS.LABELS.ACTIVE'| translate}}
+                    </ng-container>
+                    <ng-template #inactive>
+                        <span class="status-dot inactive"></span>
+                        {{'FORMS.LABELS.INACTIVE'| translate}}
+                    </ng-template>
+                </mat-select-trigger>
+                <mat-option [value]="true">
+                    <span class="status-dot active"></span>
+                    {{'FORMS.LABELS.ACTIVE' | translate}}
+                </mat-option>
+                <mat-option [value]="false">
+                    <span class="status-dot inactive"></span>
+                    {{'FORMS.LABELS.INACTIVE' | translate}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div mat-dialog-actions fxFlex="auto" fxLayout="row no wrap" fxLayoutAlign="end">
+        <button mat-button type="button" class="ob-button" (click)="dialogRef.close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createTerminal()" [disabled]="isSaving$ | async">
+            {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>

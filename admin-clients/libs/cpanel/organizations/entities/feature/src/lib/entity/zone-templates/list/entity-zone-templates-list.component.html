@@ -1,0 +1,60 @@
+<div class="left-bar-container">
+    <div fxFlex class="left-bar" fxLayout="column" fxLayoutAlign="start stretch">
+        <div class="left-sidebar-title" fxLayout="column">
+            <div fxLayout="row" fxLayoutAlign="justify center">
+                <h2 class="title">{{'ENTITY.ZONE_TEMPLATES_TITLE' | translate}}</h2>
+                @if (canWrite$ | async) {
+                    <button mat-icon-button aria-label="new-space" type="button"
+                        class="ob-button mat-stroked-button xsmall" (click)="openAddTemplateDialog()">
+                        <mat-icon>add</mat-icon>
+                    </button>
+                }
+            </div>
+            <div fxFlex>
+                <p class="results-count" [innerHTML]="('RESULTS.TOTAL' | translate) + ': ' + (zoneTemplates$ | async)?.length || 0"></p>
+            </div>
+        </div>
+        <div fxFlex="36px" class="left-sidebar-header" fxLayoutAlign="end center">
+            <!-- @if (canWrite$ | async) {
+                <button mat-icon-button aria-label="delete-space" class="ob-button small"
+                    (click)="openDeleteTemplateDialog()" [disabled]="(zoneTemplates$ | async)?.length === 0">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            } -->
+        </div>
+        <div fxLayout="column" fxFlex class="list-container">
+            <mat-selection-list class="ob-lateral-select-list" appLastPathGuardListener disableRipple [multiple]="false"
+                [currValue]="$selectedZoneTemplateId()" (selectionChange)="selectionChangeHandler($event.options[0]?.value)">
+                @for (item of (zoneTemplates$ | async); track item.id) {
+                    <mat-list-option [value]="item.id"
+                        [selected]="item.id === $selectedZoneTemplateId()" [id]="'zone-templates-list-option-' + item.id">
+                        <div fxFlex="0 0 100%">
+                            <div fxFlex="1 1 calc(100% - 30px)">
+                                <div fxLayout="column" class="item-data">
+                                    <p class="list-item-title" appEllipsify [matTooltip]="item.name">
+                                        {{item.name}}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="badge-container" fxLayoutAlign="center center" fxLayoutGap="5px">
+                                <span [matTooltipShowDelay]="800"
+                                    [matTooltip]="'ENTITY.ZONE_TEMPLATE.STATUS_OPTS.' + item.status | translate"
+                                    class="ob-status-badge small-badge"
+                                    [ngClass]="item.status === 'ENABLED' ? 'active' : 'inactive'">
+                                    {{('ENTITY.ZONE_TEMPLATE.STATUS_OPTS.' + item.status.toUpperCase() | translate).substring(0,1)}}
+                                </span>
+                            </div>
+                        </div>
+                    </mat-list-option>
+                }
+            </mat-selection-list>
+        </div>
+    </div>
+    @if (isLoading$ | async) {
+        <div class="loading-state-container" fxLayoutAlign="center center">
+            <div class="loading-state-background" fxLayout="row" fxLayoutAlign="center center">
+                <mat-spinner />
+            </div>
+        </div>
+    }
+</div>

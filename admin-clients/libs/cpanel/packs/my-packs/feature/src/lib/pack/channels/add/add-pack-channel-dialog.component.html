@@ -1,0 +1,79 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxLayout="row" fxFlex="auto" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'TITLES.SALES_SELECT_CHANNELS' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content class="filter-container">
+        <div fxFlex="100%">
+            <app-searchable-paginated-selection #selection class="event-channels-container"
+                [placeholder]="'FORMS.SEARCH_CHANNEL_FIELD' | translate" (loadData)="loadChannelsList($event)" [pageSize]="pageSize"
+                [form]="selectedForm" [data$]="channelsListData$" [metadata$]="channelsListMetadata$">
+                <mat-form-field slot="filter" fxFlex="200px" appearance="outline" subscriptSizing="dynamic"
+                    class="ob-form-field field-with-label channel-filter no-grid-spacing inline-field">
+                    <mat-label>{{'CHANNELS.TYPE' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate"
+                        (selectionChange)="filterChannels($event.value)">
+                        <mat-option>
+                            {{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}
+                        </mat-option>
+                        @for(type of channelType | keyvalue; track $index) {
+                            <mat-option [value]="type.value">
+                                {{type.value && 'CHANNELS.TYPE_OPTS.' + type.value | translate}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+                <ng-template #selectionTemplate let-data="data" let-pageForm="pageForm"
+                    let-selectionChanged="selectionChanged">
+                    <div fxLayout="row" class="channels-list-container">
+                        <app-selection-list fxFlex="100%" class="boxed-options" [noPadding]="true" [data]="data"
+                            [pageForm]="pageForm" [selectionChanged]="selectionChanged"
+                            [disabledOptionPredicate]="shouldDisableChannel">
+                            <ng-template #optionTemplate let-row>
+                                <div fxFlex fxLayout="row" fxLayoutAlign="start center">
+                                    <span fxFlex class="card-title ellipsify-no-wrap" appEllipsify [matTooltip]="row.name">
+                                        {{row.name}}
+                                    </span>
+                                    @if (row.entity.logo) {
+                                        <img [alt]="row.name" [src]="row.entity.logo" class="thumbnail" />
+                                    } @else {
+                                        <div fxLayoutAlign="center center" class="thumbnail default">
+                                            <mat-icon>image</mat-icon>
+                                        </div>
+                                    }
+                                </div>
+                            </ng-template>
+                        </app-selection-list>
+                    </div>
+                </ng-template>
+            </app-searchable-paginated-selection>
+        </div>
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="center center">
+        <div class="footer-info" fxLayout="column" fxLayoutAlign='start'>
+            <span>{{ 'EVENTS.CHANNEL.SELECTED' | translate : ({canalesSeleccionados: ((channelsSelected$ | async))}) }}</span>
+            @if (selectedForm.value?.length >= maxChannel) {
+                <div class="max-reached-info" fxFlex="100%" fxLayout="row" fxLayoutAlign="start center">
+                    <mat-icon class="ob-icon xsmall info with-text">info</mat-icon>
+                    <span>{{ 'EVENTS.CHANNEL.MAX_CHANNELS_REACHED' | translate }}</span>
+                </div>
+            }
+        </div>
+        <div fxFlex fxLayoutAlign="end">
+            <div fxLayoutAlign="center start">
+                <button type="button" mat-button class="ob-button" (click)="close()" [disabled]="isLoadingOrSaving$ | async">
+                    {{'FORMS.ACTIONS.CANCEL' | translate}}
+                </button>
+                <button mat-flat-button color="primary" type="button" class="ob-button" (click)="addChannels()"
+                    [disabled]="(selectedForm.value?.length === 0) || (isLoadingOrSaving$ | async) || ((channelsSelected$ | async) > 10)">
+                    {{'FORMS.ACTIONS.ADD' | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+@if (isLoadingOrSaving$ | async) {
+    <div class="spinner-container"><mat-spinner /></div>
+}

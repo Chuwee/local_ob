@@ -1,0 +1,41 @@
+<app-form-container [disabled]="!form.dirty || (inProgress$ | async)" (cancel)="cancel()" (save)="save()">
+    <form [formGroup]="form">
+        <div fxLayout="column" class="pack-form-section">
+            <p class="section-description">{{'CHANNELS.PACKS.DESIGN.DESCRIPTION' | translate }}</p>
+            <div class="flex flex-col gap-4">
+                <mat-label class="ob-label">{{'CHANNELS.PACKS.DESIGN.VENUE_TITLE' | translate}}</mat-label>
+                <mat-checkbox color="primary" formControlName="show_main_venue">
+                    {{'CHANNELS.PACKS.DESIGN.SHOW_MAIN_VENUE' | translate}}
+                </mat-checkbox>
+                <mat-label class="ob-label">{{'CHANNELS.PACKS.DESIGN.DATES_TITLE' | translate}}</mat-label>
+                <mat-radio-group formControlName="date_format" fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="center">
+                    <mat-radio-button class="ob-radio-button" [value]="'DEFAULT'">
+                        <div>{{'CHANNELS.PACKS.DESIGN.SHOW_DEFAULT_DATE' | translate}}</div>
+                    </mat-radio-button>
+                    @if (form.value.date_format === 'DEFAULT') {
+                        <mat-checkbox color="primary" formControlName="show_date_time" class="inner-checkbox">
+                            {{'CHANNELS.PACKS.DESIGN.SHOW_DATE_TIME' | translate}}
+                        </mat-checkbox>
+                    }
+                    <mat-radio-button class="ob-radio-button" [value]="'MAIN'">
+                        <div>{{'CHANNELS.PACKS.DESIGN.SHOW_MAIN_DATE' | translate}}</div>
+                    </mat-radio-button>
+                    @if (form.value.date_format === 'MAIN') {
+                        <mat-checkbox color="primary" formControlName="show_date_time" class="inner-checkbox">
+                            {{'CHANNELS.PACKS.DESIGN.SHOW_DATE_TIME' | translate}}
+                        </mat-checkbox>
+                    }
+                    <mat-radio-button class="ob-radio-button" [value]="'NONE'">
+                        <div>{{'CHANNELS.PACKS.DESIGN.HIDE_DATE' | translate}}</div>
+                    </mat-radio-button>
+                </mat-radio-group>
+            </div>
+        </div>
+    </form>
+</app-form-container>
+
+@if (inProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

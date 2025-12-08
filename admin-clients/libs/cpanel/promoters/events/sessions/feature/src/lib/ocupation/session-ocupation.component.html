@@ -1,0 +1,89 @@
+@if ($event() && $session()) {
+    <app-form-container hideActionBar>
+        <div class="flex items-center justify-end gap-2">
+            @if ($session()?.external_reference && $isFeverZoneEnabled()) {
+                <app-fever-zone-plan-link [planId]="$session()?.external_reference" [entityId]="$event()?.entity.id" [type]="type" />
+            }
+            <button mat-icon-button class="ob-button small refresh-button" aria-label="refresh"
+                (click)="refresh()">
+                <mat-icon>autorenew</mat-icon>
+            </button>
+        </div>
+        @for (capacityGroup of $capacityGroups(); track $index) {
+            <div class="capacity-group">
+                <h3 class="section-title">
+                    {{
+                        (capacityGroup.name === 'total' && 'EVENTS.SESSION.OCUPATION.TOTAL_CAPACITY' | translate) ||
+                        (capacityGroup.name === 'group' && 'EVENTS.SESSION.OCUPATION.GROUP_CAPACITY' | translate) ||
+                        capacityGroup.name
+                    }}
+                </h3>
+                <div class="ocupation-table-container">
+                    <table mat-table class="ob-table capacity-table" [dataSource]="capacityGroup.data">
+                        <ng-container matColumnDef="price_type">
+                            <th mat-header-cell *matHeaderCellDef class="head-cell price-type-column">
+                                @if (capacityGroup.name !== 'group') {
+
+                                    <mat-icon (click)="capacityGroup.hidePZ = !capacityGroup.hidePZ">
+                                        {{capacityGroup.hidePZ ? 'expand_more' : 'expand_less'}}
+                                    </mat-icon>
+                                    {{'RESULTS.PRICEZONES' | translate}}
+
+                                }
+                            </th>
+                            <td mat-cell *matCellDef="let row" class="price-type-column" appEllipsify
+                                [matTooltip]="row['price_type']">
+                                {{row['price_type']}}
+                            </td>
+                            <td mat-footer-cell *matFooterCellDef class="price-type-column">
+                                {{('RESULTS.TOTAL' | translate)?.toUpperCase()}}
+                            </td>
+                        </ng-container>
+                        @for (column of breakdownColumns; track column; let i = $index) {
+                            <ng-container [matColumnDef]="column">
+                                <th mat-header-cell *matHeaderCellDef class="head-cell right"
+                                    [class.expanded-column]="busyBreakdownColumns.indexOf(column) >= 0"
+                                    [class.toggle-column]="column === 'busy' || column === 'in_progress'"
+                                    [class.total-column]="column === 'total'" appEllipsify
+                                    [matTooltip]="('EVENTS.SESSION.AVAILABILITY_STATUS.' + column.toUpperCase()) | translate">
+                                    {{('EVENTS.SESSION.AVAILABILITY_STATUS.' + column.toUpperCase()) | translate}}
+                                    @if (column === 'busy' || column === 'in_progress') {
+                                        <mat-icon
+                                            (click)="switchDisplayedColumns(columnsToDisplay)">
+                                            {{column === 'busy' ? 'add_circle_outline' : 'remove_circle_outline'}}
+                                        </mat-icon>
+                                    }
+                                </th>
+                                <td mat-cell *matCellDef="let element" class="right"
+                                    [class.expanded-column]="busyBreakdownColumns.indexOf(column) >= 0"
+                                    [class.toggle-column]="column === 'busy' || column === 'in_progress'"
+                                    [class.total-column]="column === 'total'">
+                                    {{element[column]}}
+                                </td>
+                                <td mat-footer-cell *matFooterCellDef class="right"
+                                    [class.expanded-column]="busyBreakdownColumns.indexOf(column) >= 0"
+                                    [class.toggle-column]="column === 'busy' || column === 'in_progress'"
+                                    [class.total-column]="column === 'total'">
+                                    {{capacityGroup.totals[column] === undefined ?
+                        ('FORMS.OPTIONS.UNLIMITED' | translate) : capacityGroup.totals[column]}}
+                                </td>
+                            </ng-container>
+                        }
+                        <!-- eslint-disable-next-line @angular-eslint/template/prefer-self-closing-tags -->
+                        <tr mat-header-row *matHeaderRowDef="columnsToDisplay" class="dense-row"></tr>
+                        <tr mat-row *matRowDef="let row; columns: columnsToDisplay;" class="dense-row" [fxShow]="!capacityGroup.hidePZ">
+                            <!-- eslint-disable-next-line @angular-eslint/template/prefer-self-closing-tags -->
+                        </tr>
+                        <!-- eslint-disable-next-line @angular-eslint/template/prefer-self-closing-tags -->
+                        <tr mat-footer-row *matFooterRowDef="columnsToDisplay" class="dense-row"></tr>
+                    </table>
+                </div>
+            </div>
+        }
+        <app-tiers-ocupation />
+    </app-form-container>
+} @else if($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

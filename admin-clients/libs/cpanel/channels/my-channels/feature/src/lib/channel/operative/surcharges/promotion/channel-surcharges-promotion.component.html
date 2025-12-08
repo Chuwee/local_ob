@@ -1,0 +1,29 @@
+<div [hidden]="$hidePromotions()">
+    <!--    TODO(MULTICURRENCY): delete ngIf else when the multicurrency functionality is finished-->
+    @if (isMultiCurrency$ | async) {
+        @if ((channelCurrencies$ | async)?.length > 1) {
+            <app-tabs-menu type="invisible" (changeEmitter)="$currencySelectedTabBS().next($event.key)">
+                @for (currency of channelCurrencies$ | async; track currency.id) {
+                    <ng-template appTab [label]="currency.code | localCurrencyPartialTranslation" [key]="currency.code">
+                        <h3 class="section-title">{{'CHANNELS.SURCHARGES.PROMOTIONS' | translate}}</h3>
+                        <app-channel-surcharges-promotion-ranges [userCanWrite]="$userCanWrite()" [currencyCode]="currency.code"
+                            [surchargesRequestCtrl]="$surchargesRequestCtrl()" [enabledRangesCtrl]="$enabledPromotionRangesCtrl()"
+                            [errorCtrl]="errorCtrl" [data]="multiCurrencyData$ | rangeCurrencyInput:currency.code | async"
+                            [(hidePromotions)]="$hidePromotions"/>
+                    </ng-template>
+                }
+            </app-tabs-menu>
+        } @else if ((channelCurrencies$ | async)?.length === 1) {
+            <h3 class="section-title">{{'CHANNELS.SURCHARGES.PROMOTIONS' | translate}}</h3>
+            <app-channel-surcharges-promotion-ranges [userCanWrite]="$userCanWrite()"
+                [currencyCode]="(channelCurrencies$ | async)[0].code"
+                [surchargesRequestCtrl]="$surchargesRequestCtrl()" [enabledRangesCtrl]="$enabledPromotionRangesCtrl()"
+                [errorCtrl]="errorCtrl" [data]="multiCurrencyData$ | rangeCurrencyInput:(channelCurrencies$ | async)[0].code | async"
+                [(hidePromotions)]="$hidePromotions"/>
+        }
+    } @else {
+        <h3 class="section-title">{{'CHANNELS.SURCHARGES.PROMOTIONS' | translate}}</h3>
+        <app-range-table [disabled]="!$userCanWrite()" [form]="promotionForm.controls.promotionRanges"
+            [data]="data$ | async" type="promotion" data-test="promotionSurcharges" />
+    }
+</div>

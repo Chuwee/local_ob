@@ -1,0 +1,81 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="!form.dirty">
+    <div slot="outside">
+        <app-club-code-selector [$formConnection]="form.controls.avet_connection_type"/>
+        <mat-divider />
+    </div>
+    <form [formGroup]="form" fxLayout="column" autocomplete=off>
+        @if(this.form.get('avet_connection_type').value === 'WEBSERVICES'){
+            <p fxLayoutAlign="start center" class="description">
+                <mat-icon class="warning">warning</mat-icon>
+                {{'ENTITY.EXTERNAL.MEMBER_CONNECTION.WARNING' | translate}}
+            </p>
+        }
+
+        <div class="section-block">
+            <mat-slide-toggle class="ob-slide-toggle" #toggle color="primary" formControlName="enabled">
+                {{'ENTITY.EXTERNAL.MEMBER_CONNECTION.ENABLED' | translate}}
+            </mat-slide-toggle>
+        </div>
+
+        <!-- CONNECTION -->
+         @if(this.form.get('avet_connection_type').value === 'WEBSERVICES'){
+            <div fxLayout="row wrap" fxLayoutGap="32px" formGroupName="connection">
+                <mat-form-field id="username" fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 32px)"
+                    class="ob-form-field field-with-label" appearance="outline">
+                    <mat-label>{{'FORMS.LABELS.USERNAME' | translate}}</mat-label>
+                    <input autocomplete=off formControlName="username" matInput
+                        [placeholder]="'FORMS.LABELS.USERNAME' | translate">
+                    <mat-error [ob-form-errors]="form" [field]="['connection', 'username']" />
+                </mat-form-field>
+                <mat-form-field id="password" fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 32px)"
+                    class="ob-form-field field-with-label" appearance="outline">
+                    <mat-label>{{'FORMS.LABELS.PASSWORD' | translate}}</mat-label>
+                    <input autocomplete=off type="password" formControlName="password" matInput
+                        [placeholder]="'FORMS.LABELS.PASSWORD' | translate">
+                    <mat-error [ob-form-errors]="form" [field]="['connection', 'password']" />
+                </mat-form-field>
+                <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(25% - 32px)"
+                    class="ob-form-field field-with-label" appearance="outline">
+                    <mat-label>{{'ENTITY.EXTERNAL.CONNECTION.VERSION' | translate}}</mat-label>
+                    <mat-select formControlName="ws_connection_version"
+                        [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                        @for(version of wsVersions; track version) {
+                            <mat-option [value]="version">
+                                {{('ENTITY.EXTERNAL.CONNECTION.VERSIONS.' + version) | translate}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form" field="connection.ws_connection_version" />
+                </mat-form-field>
+                <mat-form-field id="protocol" fxFlex="100%" fxFlex.gt-sm="0 1 calc(25% - 32px)"
+                    class="ob-form-field field-with-label" appearance="outline">
+                    <mat-label>{{'FORMS.LABELS.PROTOCOL' | translate}}</mat-label>
+                    <mat-select formControlName="protocol" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                        @for(protocol of httpProtocols; track protocol) {
+                            <mat-option [value]="protocol">{{protocol}}</mat-option>
+                        }
+                    </mat-select>
+                    <mat-error [ob-form-errors]="form" [field]="['connection', 'protocol']" />
+                </mat-form-field>
+                <mat-form-field id="port" fxFlex="100%" fxFlex.gt-sm="0 1 calc(25% - 32px)"
+                    class="ob-form-field field-with-label" appearance="outline">
+                    <mat-label>{{'FORMS.LABELS.PORT' | translate}}</mat-label>
+                    <input autocomplete=off formControlName="port" matInput [placeholder]="'FORMS.LABELS.PORT' | translate">
+                    <mat-error [ob-form-errors]="form" [field]="['connection', 'port']" />
+                </mat-form-field>
+                <mat-form-field id="ip" fxFlex="0 1 calc(100% - 32px)" fxFlex.gt-sm="0 1 calc(25% - 32px)"
+                    class="ob-form-field field-with-label" appearance="outline">
+                    <mat-label>{{'FORMS.LABELS.IP' | translate}}</mat-label>
+                    <input autocomplete=off formControlName="ip" matInput [placeholder]="'FORMS.LABELS.IP' | translate">
+                    <mat-error [ob-form-errors]="form" [field]="['connection', 'ip']" />
+                </mat-form-field>
+            </div>
+         }
+    </form>
+</app-form-container>
+
+@if(loading$ | async){
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

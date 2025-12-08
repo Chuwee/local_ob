@@ -1,0 +1,66 @@
+<ion-header class="ob-layout__header">
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <back-button breadcrumbs="true" [viewTitle]="$event()?.name" [isExpandable]="true" />
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="ob-layout__content">
+    @if(isError){
+        <static-view [viewContent]="{ title: 'ERROR-TITLE',  description: 'ERROR-DESCRIPTION', isError: true }" (tap)="reTry()" />
+    }@else {
+        @if(!$isLoading()){
+            <div>
+                <div class="events-detail-page__content-dates-events">
+                    <ion-text class="ob-layout__header__title">
+                        {{'EVENT_DETAIL.START_DATE' | translate}}
+                        <span>{{$event()?.start_date | dateTime:'DD/MM/YYYY'}}</span>
+                    </ion-text>
+                    <ion-text class="ob-layout__header__title">
+                        {{'EVENT_DETAIL.END_DATE' | translate}}
+                        <span>{{$event()?.end_date | dateTime:'DD/MM/YYYY'}}</span>
+                    </ion-text>
+                </div>
+                <div class="events-detail-page__content-tabs">
+                    <ion-segment [value]="index" [scrollable]="true" (ionChange)="changeSegment($event)">
+                        <ion-segment-button value="info">
+                            <ion-label class="events-detail-page__segment-label">{{"EVENT_DETAIL.TABS.INFO" | translate}}</ion-label>
+                        </ion-segment-button>
+                        <ion-segment-button value="sessions">
+                            <ion-label class="events-detail-page__segment-label">{{"EVENT_DETAIL.TABS.SESSIONS" | translate}}</ion-label>
+                        </ion-segment-button>
+                        <ion-segment-button value="session-pack">
+                            <ion-label class="events-detail-page__segment-label">
+                                {{"EVENT_DETAIL.TABS.SESSION_PACKS" | translate}}
+                            </ion-label>
+                        </ion-segment-button>
+                        <ion-segment-button value="channels">
+                            <ion-label class="events-detail-page__segment-label">{{"EVENT_DETAIL.TABS.CHANNELS" | translate}}</ion-label>
+                        </ion-segment-button>
+                        <ion-segment-button value="promotions">
+                            <ion-label class="events-detail-page__segment-label">{{"EVENT_DETAIL.TABS.PROMOTIONS" | translate}}</ion-label>
+                        </ion-segment-button>
+                    </ion-segment>
+                </div>
+                <div class="events-detail-page__content-tabs-content">
+                    <div [style.display]="index === 'info' ? 'block': 'none'">
+                        <events-info-tab [event]="$event()" />
+                    </div>
+                    <div [style.display]="index === 'sessions' ? 'block': 'none'">
+                            <events-sessions-tab [event]="$event()" />
+                    </div>
+                    <div [style.display]="index === 'session-pack' ? 'block': 'none'">
+                            <season-pack-tab [event]="$event()" />
+                    </div>
+                    <div [style.display]="index === 'channels' ? 'block': 'none'">
+                            <events-channels-tab [event]="$event()" />
+                    </div>
+                    <div [style.display]="index === 'promotions' ? 'block': 'none'">
+                            <events-promotions-tab [event]="$event()" />
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</ion-content>

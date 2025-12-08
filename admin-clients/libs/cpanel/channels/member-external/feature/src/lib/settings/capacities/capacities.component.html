@@ -1,0 +1,108 @@
+<app-form-container [formGroup]="form" layout="menu"
+    *ngIf="(error$ | async) !== true && channelCapacities$ | async as channelCapacities"
+    (cancel)="cancel()" (save)="save()" [disabled]="!form.dirty || (loading$ | async)">
+    <p class="section-description">
+        {{'CHANNELS.MEMBER_EXTERNAL.CAPACITIES.DESCRIPTION' | translate}}
+    </p>
+    <div *ngIf="form?.controls?.length else empty" class="capacities-container" fxLayout="column">
+        <div fxFlex="none" fxLayoutAlign="end">
+            <button mat-stroked-button color="primary" class="ob-button medium add-button"
+                [attr.aria-label]="'CHANNELS.MEMBER_EXTERNAL.CAPACITIES.NEW' | translate"
+                (click)="add()">
+                <mat-icon>add</mat-icon>
+                {{'CHANNELS.MEMBER_EXTERNAL.CAPACITIES.NEW' | translate}}
+            </button>
+        </div>
+        <section #section fxLayout="column" *ngFor="let capacity of form.controls; let index = index" [formArrayName]="index">
+            <div class="header" fxLayout="row" fxLayoutAlign="space-between center">
+                <h3 class="section-title">{{'CHANNELS.MEMBER_EXTERNAL.CAPACITIES.ELEM_TITLE' | translate}} {{index + 1}}</h3>
+                <button mat-icon-button [matTooltip]="'FORMS.ACTIONS.DELETE' | translate" *ngIf="!capacity.value.main"
+                    aria-label="Remove" class="ob-button small" (click)="delete(index)">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </div>
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                <input matInput aria-label="name" formControlName="name"
+                    [placeholder]="'FORMS.LABELS.NAME' | translate">
+                <mat-error [ob-form-errors]="form" field="name"></mat-error>
+            </mat-form-field>
+            <div fxLayout="row wrap" fxLayoutGap="16px">
+                <mat-form-field class="ob-form-field field-with-label capacity-avet-id" appearance="outline"
+                    fxFlex="1 1 65%">
+                    <mat-label>{{'CHANNELS.MEMBER_EXTERNAL.CAPACITIES.SELECT_ID' | translate}}</mat-label>
+                    <mat-select id="venue-selector" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                        formControlName="id">
+                        <mat-option *ngFor="let capacity of capacities$ | async" [value]="capacity.id">
+                            {{capacity.id}}: {{capacity.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field fxFlex="1 0 auto" appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'CHANNELS.MEMBER_EXTERNAL.CAPACITIES.VIRTUAL_ZONE' | translate}}</mat-label>
+                    <input matInput aria-label="virtual zone" placeholder="3" formControlName="virtual_zone_id">
+                    <mat-error [ob-form-errors]="form" field="virtual_zone_id"></mat-error>
+                </mat-form-field>
+            </div>
+            <div fxLayout="row" class="main-capacity" fxLayoutAlign=" center" (click)="main(index)">
+                <mat-icon class="mat-icon notranslate material-icons star"
+                    [class.active]="capacity.value.main"
+                    aria-hidden="true" role="img">{{capacity.value.main ? 'star' : 'star_border'}}</mat-icon>
+                <mat-label>{{'CHANNELS.MEMBER_EXTERNAL.CAPACITIES.DEFAULT' | translate}}</mat-label>
+            </div>
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" *ngIf="capacity.value.main">
+                <ng-container *ngIf="(venueTemplates$ | async) as templates">
+                    <mat-form-field *ngIf="templates.length" class="ob-form-field field-with-label venue-tpl-select"
+                        fxFlex="0 1 400px" appearance="outline">
+                        <mat-label>{{'CHANNELS.MEMBER_EXTERNAL.CAPACITIES.SELECT_TEMPLATE' | translate}}</mat-label>
+                        <mat-select id="venue-selector" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                            formControlName="venue_template_id">
+                            <mat-option *ngFor="let venue of templates" [value]="venue.id">
+                                {{venue?.name}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <p *ngIf="!templates.length" class="no-templates-message">
+                        {{'EVENTS.NO_TEMPLATES' | translate}}
+                    </p>
+                </ng-container>
+                <button mat-stroked-button
+                    matTooltip="{{'CHANNELS.MEMBER_EXTERNAL.CAPACITIES.REMAP' | translate}}"
+                    aria-label="ReMap Capacity" class="ob-button medium remap"
+                    [disabled]="form.dirty"
+                    (click)="updateMappings()">
+                    <mat-icon>refresh</mat-icon>
+                    {{'CHANNELS.MEMBER_EXTERNAL.CAPACITIES.REMAP' | translate}}
+                </button>
+            </div>
+        </section>
+    </div>
+</app-form-container>
+
+<ng-container *ngIf="loading$ | async">
+    <div class="spinner-container">
+        <mat-spinner></mat-spinner>
+    </div>
+</ng-container>
+
+<ng-container *ngIf="error$ | async">
+    <div fxFlex="0 1 1080px" fxLayout="column">
+        <div fxFlex="0 0 300px" fxLayoutAlign="center center">
+            <app-context-notification class="ob-context-notification" contextType="warn">
+                {{'CHANNELS.MEMBER_EXTERNAL.CAPACITIES.ERROR' | translate}}
+            </app-context-notification>
+        </div>
+    </div>
+</ng-container>
+
+<ng-template #empty>
+    <div class="context-message-container" fxLayout="row" fxLayoutAlign="center">
+        <div fxFlex="100%" fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="15px">
+            <p class="title">{{'CHANNELS.MEMBER_EXTERNAL.CAPACITIES.EMPTY_TITLE' | translate}}</p>
+            <p class="body">{{'CHANNELS.MEMBER_EXTERNAL.CAPACITIES.CREATE_MESSAGE' | translate}}</p>
+            <button mat-stroked-button class="ob-button" (click)="add()">
+                {{'CHANNELS.MEMBER_EXTERNAL.CAPACITIES.NEW' | translate}}
+            </button>
+        </div>
+    </div>
+</ng-template>

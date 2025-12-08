@@ -1,0 +1,76 @@
+<div class="list-container flex flex-col flex-[0_1_100%]">
+    <!-- Table -->
+    <div class="flex flex-row flex-[0_1_50px] justify-end items-center">
+        <mat-paginator hidePageSize [pageSize]="pageSize" class="with-range-label transparent flex-[0_0_auto]" />
+    </div>
+    <mat-table class="ob-table" [dataSource]="productsWithStatus$ | async"
+        [attr.aria-label]="'CUSTOMER.PRODUCTS' | translate" matSortDisableClear matSort
+        [matSortDirection]="initSortDir" [matSortActive]="initSortCol">
+        <ng-container matColumnDef="event_name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="event_name" class="head-cell">
+                {{'CUSTOMER.PRODUCT_EVENT' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.event?.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="product_name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="product_name" class="head-cell">
+                {{'CUSTOMER.PRODUCT_NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.product?.product?.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="variant">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="variant" class="head-cell">
+                {{'CUSTOMER.PRODUCT_VARIANT' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.product?.variant?.name || '-'}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="session_name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="session_name" class="head-cell">
+                {{'CUSTOMER.PRODUCT_SESSION' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.session?.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="entity">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'CUSTOMER.PRODUCT_ENTITY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.entity?.name || row.product?.entity?.name || '-'}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'CUSTOMER.PRODUCT_TYPE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{'CUSTOMER.PRODUCT_TYPE_OPTS.' + row.event?.type | translate}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="seat">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'CUSTOMER.PRODUCT_SEAT' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.seat?.sector?.name}} | {{row.seat?.not_numbered_area
+      ? row.seat?.not_numbered_area.name : row.seat?.row?.name + ' | ' + row.seat?.seat?.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="price">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'CUSTOMER.PRODUCT_PRICE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.price?.final_price | localCurrency:row.price?.currency}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef class="head-cell">
+                {{'CUSTOMER.PRODUCT_STATUS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="status-cell">
+                @if (row.product_status) {
+                    <span [ngClass]="['status-dot', row.product_status.toLowerCase()]"></span>
+                    <span>{{'CUSTOMER.PRODUCT_STATUS_OPTS.' + row.product_status | translate}}</span>
+                }
+            </mat-cell>
+        </ng-container>
+        <ng-container *matNoDataRow>
+            <app-empty-state-tiny [title]="'CUSTOMER.EMPTY_TITLE.'+ $productType() | translate" />
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns" class="dense-row" />
+        <mat-row *matRowDef="let row; columns: displayedColumns;" class="dense-row" />
+    </mat-table>
+</div>

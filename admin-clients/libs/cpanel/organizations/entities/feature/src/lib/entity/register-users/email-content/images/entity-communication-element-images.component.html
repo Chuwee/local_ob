@@ -1,0 +1,36 @@
+<app-form-container [formGroup]="form" (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="!form.dirty || $loading()">
+    <app-language-bar [languages]="$languages()" [selected]="$selectedLanguage()" slot="outside"
+        [changeGuard]="canChangeLanguage" (changed)="$selectedLanguage.set($event)" />
+
+    <div class="section-block">
+        <h3 class="section-title">
+            {{'ENTITY.EMAIL_CONTENT.IMAGES.HEADER_BANNER.TITLE' | translate}}
+        </h3>
+        <p class="section-description">
+            {{'ENTITY.EMAIL_CONTENT.IMAGES.HEADER_BANNER.INFO' | translate }}
+        </p>
+        <div class="flex flex-col">
+            <div class="flex">
+                <div class="image-uploader basis-[65%]">
+                    <app-image-uploader [imageRestrictions]="imageRestrictions[imageType.headerBanner]"
+                        [showDeleteSuccessMessage]="false" formControlName="headerBanner" />
+                </div>
+            </div>
+
+            <div class="flex">
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label basis-1/2">
+                    <mat-label>{{'ENTITY.EMAIL_CONTENT.IMAGES.HEADER_BANNER.TARGET_URL' | translate}}</mat-label>
+                    <input matInput formControlName="headerBannerUrl"
+                        [placeholder]="'ENTITY.EMAIL_CONTENT.IMAGES.HEADER_BANNER.TARGET_URL' | translate">
+                    <mat-error [ob-form-errors]="form" field="headerBannerUrl" />
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+</app-form-container>
+
+@if($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

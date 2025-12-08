@@ -1,0 +1,22 @@
+@if(!$isLoading() && $totalResultsCounter() === 0){
+    <static-view [viewContent]="{title: 'PROMOTIONS.STILL_NO_PROMOTIONS_CREATED', description: null, isError: false }"/>
+}@else {
+    <ion-list class="promotions-tab__list" #loadedList>
+        @if($isLoading() && !isFirstLoad){
+            <ion-item>
+                <skeleton-card />
+            </ion-item>
+        }@else {
+            @for(promotion of promotions; track $index){
+                <ion-item class="promotion-tab__list-item">
+                    <promotion-card [eventId]="event.id" [promotion]="promotion" />
+                </ion-item>
+            }   
+            <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+                <ion-infinite-scroll-content />
+            </ion-infinite-scroll>
+        }
+    </ion-list>
+}
+
+

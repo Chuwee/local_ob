@@ -1,0 +1,38 @@
+<div class="timeline" *ngIf="timelineElements">
+    <div class="outer">
+        <div class="timeline-element" *ngFor="let element of timelineElements; index as i">
+            <div class="timeline-card" [@inAnimation]="element.grouped">
+                <div class="row">
+                    <span class="title"
+                        [ngClass]="{
+                            'ok': element.status === timelineElementStatus.ok, 'error': element.status === timelineElementStatus.error,
+                            'disabled': element.status === timelineElementStatus.disabled
+                        }">
+                        {{element.title | translate}}
+                    </span>
+                    <span *ngIf="element.elements?.length" class="items-number"> ({{element.elements.length + 1}})</span>
+                    <span class="time"> {{element.date | dateTime : dateTimeFormats.shortDateTime}} </span>
+                    <span *ngIf="element.elements?.length" class="ob-link margin-left flex items-center" (click)="toggleTransitions(element, i)">
+                        <span *ngIf="element.grouped else ungrouped" class="flex items-center">
+                            {{ 'TIMELINE_ELEMENTS.SHOW_MORE' | translate }}
+                            <mat-icon class="ob-icon xsmall">keyboard_arrow_down</mat-icon>
+                        </span>
+                        <ng-template #ungrouped>
+                            {{ 'TIMELINE_ELEMENTS.SHOW_LESS' | translate }}
+                            <mat-icon class="ob-icon xsmall">keyboard_arrow_up</mat-icon>
+                        </ng-template>
+                    </span>
+                </div>
+                @if (element.description) {
+                    <div class="card-info">
+                        <span>{{element.description}}</span>
+                    </div>
+                } @else if (timelineElementTemplateRef) {
+                    <div class="card-info">
+                        <ng-container *ngTemplateOutlet="timelineElementTemplateRef; context: {$implicit: element}"/>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

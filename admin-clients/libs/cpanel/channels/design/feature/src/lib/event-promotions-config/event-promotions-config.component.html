@@ -1,0 +1,49 @@
+<app-form-container layout="menu" [disabled]="!form.dirty" [formGroup]="form" (cancel)="cancel()"
+    (save)="save()">
+    <mat-expansion-panel formGroupName="visualization" expanded togglePosition="before">
+        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+            <mat-panel-title>{{'CHANNELS.EVENT_PROMOTIONS_CONFIG.TITLES.VISUALIZATION' | translate}}</mat-panel-title>
+        </mat-expansion-panel-header>
+        <div fxLayout="column" fxLayoutGap="24px">
+            <span>{{'CHANNELS.EVENT_PROMOTIONS_CONFIG.FORMS.INFOS.PROMOTIONS_MODULE' | translate}}</span>
+            <div fxLayout="column" fxLayoutGap="16px">
+                <mat-checkbox class="app-checkbox-wrap-label label-with-description" color="primary" formControlName="integrated">
+                    <div class="title">{{'CHANNELS.EVENT_PROMOTIONS_CONFIG.FORMS.LABELS.INTEGRATED' | translate}}</div>
+                    <div>{{'CHANNELS.EVENT_PROMOTIONS_CONFIG.FORMS.INFOS.INTEGRATED_GRAPHIC' | translate}}</div>
+                    <div>{{'CHANNELS.EVENT_PROMOTIONS_CONFIG.FORMS.INFOS.INTEGRATED_NOT_GRAPHIC' | translate}}</div>
+                </mat-checkbox>
+                <mat-checkbox class="app-checkbox-wrap-label label-with-description" color="primary" formControlName="additionalStep">
+                    <div class="title">{{'CHANNELS.EVENT_PROMOTIONS_CONFIG.FORMS.LABELS.ADDITIONAL_STEP' | translate}}</div>
+                    <div>{{'CHANNELS.EVENT_PROMOTIONS_CONFIG.FORMS.INFOS.ADDITIONAL_STEP' | translate}}</div>
+                </mat-checkbox>
+            </div>
+            <mat-error *ngIf="form.controls.visualization.touched" fxFlex="100%" [ob-form-errors]="form.controls.visualization" />
+        </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel expanded togglePosition="before">
+        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+            <mat-panel-title>{{'CHANNELS.EVENT_PROMOTIONS_CONFIG.TITLES.APPLY_MODE' | translate}}</mat-panel-title>
+        </mat-expansion-panel-header>
+        <div fxLayout="column" fxLayoutGap="24px">
+            <span>{{'CHANNELS.EVENT_PROMOTIONS_CONFIG.FORMS.INFOS.APPLY_MODE' | translate}}</span>
+            <div fxLayout="column" fxLayoutGap="16px">
+                <mat-radio-group formControlName="applicationConfig" fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="center">
+                    <mat-radio-button fxFlex="0 1 calc(33% - 10px)" fxFlex.lt-md="100%" class="ob-radio-button"
+                        [value]="applicationConfig.auto">
+                        <div class="option-title">{{'CHANNELS.EVENT_PROMOTIONS_CONFIG.FORMS.LABELS.AUTOMATIC' | translate}}</div>
+                        <div>{{'CHANNELS.EVENT_PROMOTIONS_CONFIG.FORMS.INFOS.AUTOMATIC_APPLY' | translate}}</div>
+                    </mat-radio-button>
+                    <mat-radio-button fxFlex="0 1 calc(33% - 10px)" fxFlex.lt-md="100%" class="ob-radio-button"
+                        [value]="applicationConfig.default">
+                        <div class="option-title">{{'CHANNELS.EVENT_PROMOTIONS_CONFIG.FORMS.LABELS.MANUAL' | translate}}</div>
+                        <div>{{'CHANNELS.EVENT_PROMOTIONS_CONFIG.FORMS.INFOS.MANUAL_APPLY' | translate}}</div>
+                    </mat-radio-button>
+                </mat-radio-group>
+            </div>
+        </div>
+    </mat-expansion-panel>
+</app-form-container>
+
+<div class="spinner-container" *ngIf="loading$ | async">
+    <mat-spinner />
+</div>

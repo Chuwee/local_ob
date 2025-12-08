@@ -1,0 +1,39 @@
+<h2 class="summary-section-title">
+    {{'MEMBER_ORDER.PRICE.TITLE' | translate}}
+</h2>
+<div>
+    <div class="summary-price-row" fxLayout="row">
+        <div fxFlex="1 1 auto" fxLayout="column" class="mat-body-strong">
+            {{'MEMBER_ORDER.PRICE.BASE' | translate}}
+        </div>
+        <div fxFlex="0 0 auto" fxLayout="column" class="mat-body-strong">
+            {{order.price?.base | localCurrency:(currency$ | async)}}
+        </div>
+    </div>
+    <div class="summary-price-row" fxLayout="row">
+        <div fxFlex="1 1 auto" fxLayout="column">
+            {{'MEMBER_ORDER.PRICE.PROMOTION' | translate}}
+        </div>
+        <div fxFlex="0 0 auto" fxLayout="column">
+            {{order.price.discounts | absoluteAmount | localCurrency:(currency$ | async) |
+            amountPrefix:order.price.discounts:'subtraction'}}
+        </div>
+    </div>
+    <div class="summary-price-row" fxLayout="row">
+        <div fxFlex="1 1 auto" fxLayout="column">
+            {{'MEMBER_ORDER.PRICE.CHARGES' | translate}}
+        </div>
+        <div fxFlex="0 0 auto" fxLayout="column">
+            {{order.price?.charges | absoluteAmount | localCurrency:(currency$ | async) | amountPrefix:order.price?.charges:'addition'}}
+        </div>
+    </div>
+</div>
+<mat-divider fxFlexAlign="stretch"></mat-divider>
+<div class="summary-price-row summary-price-total" fxLayout="row">
+    <div fxFlex="1 1 auto" fxLayout="column" class="mat-headline-5">
+        {{'FORMS.LABELS.TOTAL' | translate}}
+    </div>
+    <div fxFlex="0 0 auto" fxLayout="column" class="mat-headline-5">
+        {{order.price?.final | localCurrency:(currency$ | async)}}
+    </div>
+</div>

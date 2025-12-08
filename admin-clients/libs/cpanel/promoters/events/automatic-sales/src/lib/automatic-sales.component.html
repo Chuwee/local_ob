@@ -1,0 +1,106 @@
+<app-form-container [hideActionBar]="false">
+    <p>{{'EVENTS.SESSION.AUTOMATIC_SALES.DESCRIPTION' | translate}}</p>
+    @if ($data()?.length === 0 && !$loading()) {
+        <app-empty-state-tiny [title]="'EVENTS.SESSION.AUTOMATIC_SALES.HISTORY.EMPTY.TITLE' | translate"
+            [description]="'EVENTS.SESSION.AUTOMATIC_SALES.HISTORY.EMPTY.DESCRIPTION' | translate">
+            <button mat-stroked-button class="ob-button medium" color="primary" (click)="openDialog()">
+                <mat-icon>add</mat-icon>
+                {{'EVENTS.SESSION.AUTOMATIC_SALES.ADD_BTN' | translate}}
+            </button>
+        </app-empty-state-tiny>
+    } @else {
+        <div fxLayout="row" fxLayoutAlign="end" class="button-on-top">
+            <button mat-stroked-button class="ob-button small" color="primary" (click)="openDialog()">
+                <mat-icon>add</mat-icon>
+                {{'EVENTS.SESSION.AUTOMATIC_SALES.ADD_BTN' | translate}}
+            </button>
+        </div>
+        <table mat-table #table class="ob-table automatic-sales-table" [dataSource]="$data()">
+            <ng-container matColumnDef="warning">
+                <th mat-header-cell *matHeaderCellDef class="head-cell with-status-border">
+                </th>
+                <td mat-cell *matCellDef="let row" class="with-status-border"
+                    [class.alert]="row.non_adjacent_groups?.length > 0"
+                    [matTooltip]="'EVENTS.SESSION.AUTOMATIC_SALES.HISTORY.NON_ADJACENT_GROUPS' | translate"
+                    [matTooltipDisabled]="!row.non_adjacent_groups">
+                    @if (row.non_adjacent_groups?.length > 0) {
+                        <mat-icon class="alert-icon">
+                            warning
+                        </mat-icon>
+                    }
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef class="head-cell capped-size">
+                    {{'EVENTS.SESSION.AUTOMATIC_SALES.HISTORY.NAME' | translate}}
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    {{row.filename}}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="channel">
+                <th mat-header-cell *matHeaderCellDef class="head-cell capped-size">
+                    {{'EVENTS.SESSION.AUTOMATIC_SALES.HISTORY.CHANNEL' | translate}}
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    {{row.channel_name}}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="date">
+                <th mat-header-cell *matHeaderCellDef class="head-cell capped-size">
+                    {{'EVENTS.SESSION.AUTOMATIC_SALES.HISTORY.DATE' | translate}}
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    {{row.start_date | dateTime : dateTimeFormats.longDateTime}}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="details">
+                <th mat-header-cell *matHeaderCellDef class="head-cell capped-size">
+                    <div fxLayout="row" fxLayoutAlign="start center">
+                        <span>
+                            {{'EVENTS.SESSION.AUTOMATIC_SALES.HISTORY.DETAILS' | translate}}
+                        </span>
+                        <app-help-button [message]="'EVENTS.SESSION.AUTOMATIC_SALES.HISTORY.DETAILS_INFO' | translate" />
+                    </div>
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    {{'EVENTS.SESSION.AUTOMATIC_SALES.HISTORY.DETAILS_ROW' | translate: {processed: row.processed, total: row.total} }}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="download">
+                <th mat-header-cell *matHeaderCellDef class="head-cell capped-size">
+                    &nbsp;
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    <button mat-stroked-button class="ob-button small" (click)="openExportDialog(row.filename)">
+                        {{'FORMS.ACTIONS.EXPORT' | translate}}
+                    </button>
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="['warning', 'name', 'channel','date', 'details', 'download']"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['warning', 'name', 'channel','date', 'details', 'download'];"
+                class="hoverable-row" [class.non-adjacent-groups-warning]="row.non_adjacent_groups?.length > 0">
+            </tr>
+        </table>
+    }
+</app-form-container>
+
+@if($progress(); as progress) {
+    <div class="ob-overlay-wrapper">
+        <div class="ob-overlay-pane">
+            <app-context-notification class="ob-context-notification" contextType="info">
+                <p>{{'EVENTS.SESSION.AUTOMATIC_SALES.IN_PROGRESS' | translate}}</p>
+                <div foot class="overlay-actions">
+                    <mat-progress-bar mode="determinate" class="ob-progress-bar info" [value]="progress" />
+                    <button mat-flat-button class="ob-button medium" color="primary" (click)="stop()">
+                        {{'EVENTS.SESSION.AUTOMATIC_SALES.STOP_BTN' | translate}}
+                    </button>
+                </div>
+            </app-context-notification>
+        </div>
+    </div>
+} @else if ($loading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

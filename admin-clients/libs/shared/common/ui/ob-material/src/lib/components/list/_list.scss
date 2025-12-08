@@ -1,0 +1,347 @@
+@use '@angular/material' as mat;
+@mixin list-override($palettes, $colors, $typography) {
+    $primary: map-get($palettes, primary);
+    $white: map-get($colors, ob-white);
+    $black: map-get($colors, ob-black);
+    $light-bg: map-get($colors, ob-bg-1);
+    $bg-grey-light-10: map-get($colors, ob-bg-2);
+    $grey: map-get($colors, ob-grey);
+    $grey-light-10: map-get($colors, ob-grey-light-10);
+    $grey-light-20: map-get($colors, ob-grey-light-20);
+    $error: map-get($palettes, warn);
+
+    .ob-list {
+        &.mat-mdc-list-base {
+            padding: 0;
+            .mat-mdc-subheader {
+                @include mat.m2-typography-level($typography, subheading-1);
+                border-bottom: 1px $bg-grey-light-10 solid;
+                text-transform: uppercase;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+                background-color: $white;
+                &.mat-mdc-list-item{
+                    margin-top: 16px;
+                }
+                .mdc-list-item__primary-text {
+                    color: $grey;
+                }
+            }
+            .mat-mdc-subheader:first-child {
+                margin-top: 16px;
+                &.first-subheader {
+                    margin-top: 0;
+                }
+                &.mat-mdc-list-item{
+                    border-top: 0;
+                }
+            }
+            .mdc-list-item__primary-text {
+                @include mat.m2-typography-level($typography, body-1);
+                line-height: unset;
+            }
+        }
+        .mat-mdc-list-item {
+            @include mat.m2-typography-level($typography, body-1);
+            border-bottom: 1px $bg-grey-light-10 solid;
+            margin: 0;
+            padding: 0;
+            box-sizing: unset;
+            overflow: unset;
+
+            .mdc-list-item__content {
+                height: inherit;
+                pointer-events: inherit;
+                .mat-mdc-list-item-unscoped-content, .mdc-list-item__primary-text {
+                    display: flex;
+                    box-sizing: border-box;
+                    height: inherit;
+                    align-items: center;
+                    padding: 0 16px;
+                }
+            }
+            &:not(.mat-mdc-list-item-interactive) {
+                cursor: auto;
+            }
+            &.mdc-list-item--with-one-line {
+                height: 48px;
+            }
+            &:first-child {
+                border-top: 1px $bg-grey-light-10 solid;
+            }
+            &.editable-item {
+                .mdc-list-item__primary-text {
+                    padding: 10px;
+                }
+                .write-value {
+                    height: 30px;
+                    line-height: 30px;
+                    margin-left: 10px;
+                    margin-right: 10px;
+                    input {
+                        @include mat.m2-typography-level($typography, body-1);
+                        height: 26px;
+                        line-height: 26px;
+                        outline: none;
+                        background-color: $white;
+                        padding: 2px 9px;
+                        width: calc(100% - 18px); // minus borders & paddings
+                        border: none;
+                        &:focus {
+                            padding: 0px 7px;
+                            border: 2px $black solid;
+                            border-radius: 2px;
+                        }
+                        &.invalid {
+                            border: 1px mat.m2-get-color-from-palette($error) solid;
+                        }
+                    }
+                }
+                &:hover {
+                    background-color: $bg-grey-light-10;
+                    .write-value {
+                        input {
+                            &:not(:focus) {
+                                padding: 1px 8px;
+                            }
+                            &:not(.invalid):not(:focus) {
+                                border: 1px $grey-light-10 solid;
+                                &:hover {
+                                    border: 1px #303133 solid;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            &.hoverable-item:hover {
+                background-color: $bg-grey-light-10;
+            }
+            &.card-item {
+                height: 56px;
+                .mdc-list-item__primary-text {
+                    border: 1px solid $grey;
+                    .card-title {
+                        @include mat.m2-typography-level($typography, body-2);
+                        margin: 0;
+                    }
+                    .card-text {
+                        @include mat.m2-typography-level($typography, caption);
+                        line-height: 16px;
+                        margin: 0;
+                    }
+                }
+                &.with-icon {
+                    .mdc-list-item__primary-text {
+                        padding-left: 0;
+                    }
+                }
+            }
+            .mat-mdc-icon-button {
+                transition: background-color 200ms ease-out;
+            }
+            &.content-full > .mdc-list-item__content {
+                width: 100%;
+            }
+            .delete-action {
+                width: 36px;
+                height: 36px;
+            }
+            &:not(:hover) {
+                .delete-action {
+                    button {
+                        display: none;
+                    }
+                }
+                .action-buttons.float-actions-cell {
+                    opacity: 0;
+                }
+                .actions-container > * {
+                    display: none;
+                }
+            }
+            &.cdk-drag {
+                cursor: move;
+            }
+        }
+        &.disabled .mat-mdc-list-item {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        &.read-only .mat-mdc-list-item {
+            pointer-events: none;
+        }
+        &.small-rows .mat-mdc-list-item {
+            height: 40px;
+        }
+        .list-header {
+            position: sticky;
+            @include mat.m2-typography-level($typography, body-2);
+            background-color: $light-bg;
+            top: 0;
+            z-index: 1;
+        }
+        &.mat-mdc-list {
+            .list-header {
+                padding: 8px 16px;
+                &.with-action-button > div {
+                    margin-right: 40px;
+                }
+            }
+            .group-header {
+                padding: 2px 16px 0;
+            }
+        }
+        // Drag & Drop list generic styles
+        &.cdk-drop-list-dragging {
+            .mat-mdc-list-item{
+                &.cdk-drag-placeholder {
+                    opacity: 0;
+                }
+                &:not(.cdk-drag-placeholder) {
+                    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+                }
+            }
+        }
+    }
+
+    mat-list.mat-mdc-list-base {
+        padding-bottom: 0;
+        .mat-mdc-list-item {
+            --mdc-list-list-item-one-line-container-height: 48px;
+
+            .mdc-list-item__primary-text {
+                --mdc-list-list-item-label-text-size: 14px;
+                --mdc-list-list-item-label-text-font: Nunito Sans;
+                p {
+                    margin: 0px;
+                }
+            }
+        }
+        .mat-mdc-subheader {
+            padding: 16px;
+            color: $grey;
+        }
+    }
+
+    // Drag & Drop item generic styles
+    .mat-mdc-list-item {
+        .drag-icon {
+            color: $grey-light-20;
+            padding: 4px;
+            margin-right: 21px;
+        }
+        &.with-position {
+            margin-left: 32px;
+            width: auto;
+            &.editable-item {
+                margin-left: 36px;
+            }
+            .drag-icon {
+                margin-left: 10px;
+            }
+        }
+        &.cdk-drag-preview {
+            @include mat.m2-typography-level($typography, body-1);
+            background-color: $white;
+            border: none;
+            animation-name: shadow-fade-in;
+            animation-duration: 300ms;
+            animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+            animation-delay: 0;
+            animation-iteration-count: 1;
+            animation-fill-mode: forwards;
+            padding: 0;
+            overflow: unset;
+            & > .mdc-list-item__content {
+                height: inherit;
+            }
+            &.cdk-drag-animating {
+                transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+                animation-name: shadow-fade-out;
+                animation-duration: 300ms;
+                animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+                animation-delay: 0;
+                animation-iteration-count: 1;
+                animation-fill-mode: forwards;
+            }
+            .mdc-list-item__primary-text {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                box-sizing: border-box;
+                padding: 0 16px;
+                position: relative;
+                height: inherit;
+            }
+            &.card-item {
+                height: 56px;
+                .mdc-list-item__primary-text {
+                    border: 1px solid $grey;
+                    .card-title {
+                        @include mat.m2-typography-level($typography, body-2);
+                        margin: 0;
+                    }
+                    .card-text {
+                        @include mat.m2-typography-level($typography, caption);
+                        line-height: 16px;
+                        margin: 0;
+                        &.grey {
+                            color: $grey;
+                        }
+                    }
+                }
+                &.with-icon {
+                    .mdc-list-item__primary-text {
+                        padding-left: 0;
+                    }
+                }
+            }
+            &.editable-item {
+                .write-value {
+                    input {
+                        @include mat.m2-typography-level($typography, body-1);
+                        height: 26px;
+                        line-height: 26px;
+                        outline: none;
+                        background-color: $white;
+                        padding: 2px 9px;
+                        width: calc(100% - 18px); // minus borders & paddings
+                        border: none;
+                        &.invalid {
+                            border: 1px mat.m2-get-color-from-palette($error) solid;
+                        }
+                    }
+                }
+            }
+            .delete-action {
+                button {
+                    display: none;
+                }
+            }
+        }
+        &, & > .mdc-list-item__content, & .mdc-list-item__primary-text {
+            overflow: unset;
+        }
+    }
+
+    @keyframes shadow-fade-in {
+        from {
+            box-shadow: none;
+        }
+        to {
+            box-shadow: 0 3px 1px -2px rgba($black, 0.2),
+                0 2px 2px 0 rgba($black, 0.14), 0 1px 5px 0 rgba($black, 0.12);
+        }
+    }
+    @keyframes shadow-fade-out {
+        from {
+            box-shadow: 0 3px 1px -2px rgba($black, 0.2),
+                0 2px 2px 0 rgba($black, 0.14), 0 1px 5px 0 rgba($black, 0.12);
+        }
+        to {
+            box-shadow: none;
+        }
+    }
+}

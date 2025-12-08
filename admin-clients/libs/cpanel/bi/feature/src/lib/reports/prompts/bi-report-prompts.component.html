@@ -1,0 +1,69 @@
+<app-form-container layout="main" class="overflow-y-auto handset" (cancel)="cancel()" [formGroup]="form" (save)="save()"
+    [saveDisabled]="isInProgress$ | async" [cancelDisabled]="!form.dirty || (isInProgress$ | async)"
+    saveButtonText="BI.REPORTS.ACTIONS.EXECUTE">
+    <mat-accordion multi [togglePosition]="'before'">
+        @for (biReportPrompt of vmBiReportPromptsBS | async; track biReportPrompt.id) {
+            @if (biReportPrompt.type === 'ELEMENT' || biReportPrompt.type === 'OBJECT') {
+                <mat-expansion-panel expanded>
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>
+                            {{biReportPrompt.title}}
+                            @if (biReportPrompt.restrictions.required) {
+                                <span>&nbsp;*</span>
+                            }
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    @if (biReportPrompt.canRender) {
+                        <app-bi-report-prompts-selection [biReportPrompt]="biReportPrompt" [form]="form" [biReport]="biReport$ | async"
+                            [requestCtrl]="requestCtrl" (loadingEmitter)="loadingEmitHandler($event)" />
+                    }
+                </mat-expansion-panel>
+            } @else if (biReportPrompt.type === 'DATE') {
+                <mat-expansion-panel expanded>
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>
+                            {{biReportPrompt.title}}
+                            @if (biReportPrompt.restrictions.required) {
+                                <span>&nbsp;*</span>
+                            }
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <app-bi-report-prompts-date [biReportPrompt]="biReportPrompt" [form]="form" [requestCtrl]="requestCtrl" />
+                </mat-expansion-panel>
+            } @else if (biReportPrompt.type === 'DATE_RANGE') {
+                <mat-expansion-panel expanded>
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>
+                            {{biReportPrompt.title}}
+                            @if (biReportPrompt.restrictions.required) {
+                                <span>&nbsp;*</span>
+                            }
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <app-bi-report-prompts-date-range [biReportPrompt]="biReportPrompt" [form]="form" [biReport]="biReport$ | async"
+                        [requestCtrl]="requestCtrl" (loadingEmitter)="loadingEmitHandler($event)"/>
+                </mat-expansion-panel>
+            } @else if (biReportPrompt.type === 'HIERARCHY') {
+                <mat-expansion-panel expanded>
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>
+                            {{biReportPrompt.title}}
+                            @if (biReportPrompt.restrictions.required) {
+                                <span>&nbsp;*</span>
+                            }
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    @if (biReportPrompt.canRender) {
+                        <app-bi-report-prompts-hierarchy [biReportPrompt]="biReportPrompt" [form]="form" [biReport]="biReport$ | async"
+                            [requestCtrl]="requestCtrl" (loadingEmitter)="loadingEmitHandler($event)" />
+                    }
+                </mat-expansion-panel>
+            }
+        }
+    </mat-accordion>
+</app-form-container>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

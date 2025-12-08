@@ -1,0 +1,37 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="100%" class="secondary title">{{'PRODUCT.VARIANTS.ACTIONS.EDIT_VARIANTS' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <app-product-attribute-values [maxSelection]="maxVariantsFromValuesCombination" [maxVariantsReached]="$maxVariantsReached()"
+        action="EDIT" (currentValuesChanged)="currentValuesChanged($event)" (someActionDone)="someActionDone = true">
+    </app-product-attribute-values>
+    <div mat-dialog-actions fxLayoutAlign="space-between center">
+        <div class="footer-info" fxLayout="column" fxLayoutAlign="start">
+            <span>{{('PRODUCT.VARIANTS.FORMS.INFOS.VARIANTS_COUNT' | translate : {
+                current: $variantsToCreate(), max: maxVariantsFromValuesCombination
+            })}}</span>
+            @if ($maxVariantsReached()) {
+                <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center">
+                    <mat-icon class="ob-icon xxsmall info with-text">info</mat-icon>
+                    <span class="info-message">
+                        {{('PRODUCT.VARIANTS.FORMS.INFOS.MAX_VARIANTS_REACHED' | translate : {
+                            max: maxVariantsFromValuesCombination })}}
+                    </span>
+                </div>
+            }
+        </div>
+        <div fxLayoutAlign="end">
+            <button mat-flat-button color="primary" type="button" class="ob-button" (click)="close()" [disabled]="isInProgress$ | async">
+                {{'FORMS.ACTIONS.OK' | translate}}
+            </button>
+        </div>
+    </div>
+</div>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner></mat-spinner>
+    </div>
+}

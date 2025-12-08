@@ -1,0 +1,25 @@
+<div class="details-container" fxFlex="0 1 100%" fxLayout="column" *ngIf="orderDetail$ | async as orderDetail">
+    <div class="heading-container" fxLayoutAlign="start center">
+        <app-go-back defaultPath="/transactions" neverPath="/tickets" [redoPath]="orderDetail.code"
+            [customCopy]="{copy: 'DETAILS.BACK_TO_ORDER', rule: '/transactions/'}">
+        </app-go-back>
+        <h1 class="secondary mat-headline-3">
+            {{('ENUMS.TYPE_OPTS.' + orderDetail.type) | translate}} {{'TITLES.ORDER' | translate: {orderCode: orderDetail.code} }}
+        </h1>
+    </div>
+    <div class="main-content" fxFlex="0 1 100%" fxLayout="column">
+        <div class="top-actions">
+            <app-nav-tabs-menu type="tabMenu" [elements]="[
+                {
+                    label: 'ORDER.GENERAL_DATA',
+                    param: 'general-data',
+                },
+                {
+                    label: 'ORDER.NOTES.TITLE',
+                    param: 'notes',
+                }
+            ]"></app-nav-tabs-menu>
+        </div>
+        <router-outlet></router-outlet>
+    </div>
+</div>

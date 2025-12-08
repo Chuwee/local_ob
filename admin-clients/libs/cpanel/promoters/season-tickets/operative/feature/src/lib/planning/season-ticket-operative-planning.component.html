@@ -1,0 +1,142 @@
+<app-form-container [formGroup]="channelSalesForm" (save)="save()" (cancel)="cancel()" layout="menu" 
+    [disabled]="(isLoadingOrSaving$ | async) ||
+    (isGenerationStatusReady$ | async) === false || !form.dirty">
+    @if (channelSalesForm) {
+        <h3 class="section-title">{{ 'SEASON_TICKET.OPERATIVE.PLANNING.DATES.TITLE' | translate }}</h3>
+        <div class="flex flex-col">
+            <!-- RELEASE DATE -->
+            <div class="flex flex-col section-block">
+                <div class="flex flex-auto flex-col gap-2 operative-form-feature-activation">
+                    <mat-slide-toggle class="ob-slide-toggle" formControlName="channel_publishing_enabled">
+                        {{'SEASON_TICKET.OPERATIVE.CHANNEL_RELEASE' | translate}}
+                    </mat-slide-toggle>
+                    <mat-divider />
+                </div>
+                <p>
+                    {{'SEASON_TICKET.OPERATIVE.CHANNEL_RELEASE_INFO' | translate}}
+                </p>
+                <div class="operative-form-field">
+                    <app-date-time-picker formControlName="channel_publishing_date" required
+                        [label]="'DATES.DATE' | translate" />
+                </div>
+            </div>
+            <!-- SALES DATE -->
+            <div class="flex flex-col section-block">
+                <div class="flex flex-col gap-2 operative-form-feature-activation">
+                    <mat-slide-toggle class="ob-slide-toggle" formControlName="sales_enabled">
+                        {{'SEASON_TICKET.OPERATIVE.SALE_RELEASE' | translate}}
+                    </mat-slide-toggle>
+                    <mat-divider class="operative-form-field" />
+                </div>
+                <p>
+                    {{'SEASON_TICKET.OPERATIVE.SALE_INFO' | translate}}:
+                </p>
+                <div class="flex">
+                    <app-date-time-picker class="flex-1" formControlName="sales_start_date" required
+                        [label]="'DATES.START_DATE' | translate" />
+                    <app-date-time-picker class="flex-1" formControlName="sales_ending_date" required
+                        [label]="'DATES.END_DATE' | translate" />
+
+                </div>
+            </div>
+            <!-- RENEWALS DATES -->
+            <div class="flex flex-col section-block" [formGroup]="renewalForm">
+                <div class="flex flex-col gap-2 operative-form-feature-activation">
+                    <mat-slide-toggle class="ob-slide-toggle" formControlName="enable">
+                        {{'SEASON_TICKET.OPERATIVE.RENEWAL_RELEASE' | translate}}
+                    </mat-slide-toggle>
+                    <mat-divider />
+                </div>
+                <p>
+                    {{'SEASON_TICKET.OPERATIVE.RENEWAL_INFO' | translate}}:
+                </p>
+                <div class="flex">
+                    <app-date-time-picker class="flex-1" formControlName="start_date"
+                        [label]="'DATES.START_DATE' | translate" />
+                    <app-date-time-picker class="flex-1" formControlName="end_date"
+                        [label]="'DATES.END_DATE' | translate" />
+                </div>
+            </div>
+            <!-- CHANGE SEAT DATES -->
+            <div class="flex flex-col section-block" [formGroup]="changeSeatForm">
+                <div class="flex flex-col gap-2 operative-form-feature-activation">
+                    <mat-slide-toggle class="ob-slide-toggle" formControlName="enable">
+                        {{'SEASON_TICKET.OPERATIVE.CHANGE_SEAT_RELEASE' | translate}}
+                    </mat-slide-toggle>
+                    <mat-divider />
+                </div>
+                <p>
+                    {{'SEASON_TICKET.OPERATIVE.CHANGE_SEAT_INFO' | translate}}:
+                </p>
+                <div class="flex">
+                    <app-date-time-picker class="flex-1" formControlName="start_date"
+                        [label]="'DATES.START_DATE' | translate" />
+                    <app-date-time-picker class="flex-1" formControlName="end_date"
+                        [label]="'DATES.END_DATE' | translate" />
+                </div>
+            </div>
+            <!-- BOOKING DATE -->
+             @if(showBookingSettings$ | async) {
+                 <div id="settings.booking.enable" class="flex flex-col section-block" [formGroup]="bookingDatesForm">
+                     <div class="flex flex-col gap-2 operative-form-feature-activation">
+                         <mat-slide-toggle class="ob-slide-toggle operative-form-field" formControlName="enable">
+                             {{'SEASON_TICKET.OPERATIVE.BOOKINGS' | translate}}
+                         </mat-slide-toggle>
+                         <mat-divider />
+                     </div>
+                     <p>
+                         {{'SEASON_TICKET.OPERATIVE.BOOKINGS_INFO' | translate}}
+                     </p>
+                     <div class="flex">
+                         <!-- START BOOKING DATE -->
+                         <app-date-time-picker id="settings.bookingDatesForm.start_date" maxErrors="1"
+                             class="flex-1 session-form-field" formControlName="start_date"
+                             [class.informative-error]="!bookingDatesForm.value.enable &&
+                             !bookingDatesForm.get('start_date').hasError('required')"
+                             [label]="'DATES.START_DATE' | translate" />
+                         <!-- END BOOKING DATE -->
+                         <app-date-time-picker id="settings.bookingDatesForm.end_date" maxErrors="1"
+                             class="flex-1 session-form-field" formControlName="end_date"
+                             [class.informative-error]="!bookingDatesForm.value.enable &&
+                             !bookingDatesForm.get('end_date').hasError('required')"
+                             [label]="'DATES.END_DATE' | translate" />
+                     </div>
+                 </div>
+             }
+            @if($entity()?.settings?.allow_secondary_market){
+                <!-- SECONDARY MARKET DATE -->
+                <div id="settings.secondaryMarketForm.enable" class="flex flex-col session-form-section" [formGroup]="secondaryMarketForm">
+                    <div class="flex flex-col gap-2 operative-form-feature-activation">
+                        <mat-slide-toggle class="ob-slide-toggle ob-form-field session-form-field" formControlName="enable">
+                            {{'SEASON_TICKET.OPERATIVE.SECONDARY_MARKET.ENABLE' | translate}}
+                        </mat-slide-toggle>
+                        <mat-divider />
+                    </div>
+                    <p>
+                        {{'SEASON_TICKET.OPERATIVE.SECONDARY_MARKET.INFO' | translate}}
+                    </p>
+                    <div class="flex">
+                        <!-- START SECONDARY MARKET DATE -->
+                        <app-date-time-picker id="settings.secondaryMarketForm.start_date" maxErrors="1"
+                            class="flex-1 session-form-field" formControlName="start_date"
+                            [class.informative-error]="!secondaryMarketForm.value.enable &&
+                                !secondaryMarketForm.get('start_date').hasError('required')"
+                            [label]="'DATES.START_DATE' | translate" />
+                        <!-- END SECONDARY MARKET DATE -->
+                        <app-date-time-picker id="settings.secondaryMarketForm.end_date" maxErrors="1"
+                            class="flex-1 session-form-field" formControlName="end_date"
+                            [class.informative-error]="!secondaryMarketForm.value.enable &&
+                                !secondaryMarketForm.get('end_date').hasError('required')"
+                            [label]="'DATES.END_DATE' | translate" />
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</app-form-container>
+
+@if(isLoadingOrSaving$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

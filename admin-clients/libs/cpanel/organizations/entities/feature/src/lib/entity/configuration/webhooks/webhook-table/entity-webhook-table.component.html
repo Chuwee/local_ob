@@ -1,0 +1,80 @@
+<mat-table class="ob-table entity-webhooks-table"
+    [dataSource]="$webhooks()"
+    [attr.aria-label]="'TITLES.WEBHOOKS' | translate"
+    [class.not-touchable]="!$isHandsetOrTablet()">
+    <ng-container matColumnDef="notification-url">
+        <mat-header-cell *matHeaderCellDef class="head-cell notification-url md:flex-[0_0_35%] lg:flex-[0_0_45%]"
+            [matTooltip]="'WEBHOOKS.URL_COLUMN' | translate">
+            {{'WEBHOOKS.URL_COLUMN' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row" class="notification-url md:flex-[0_0_35%] lg:flex-[0_0_45%]">
+            {{ row.notification_url }}
+        </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="api-key">
+        <mat-header-cell *matHeaderCellDef class="head-cell api-key" [matTooltip]="'WEBHOOKS.KEY' | translate">
+            {{'WEBHOOKS.KEY' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row" class="api-key">
+            <span class="key-text-wrap">
+                {{ row.api_key }}
+            </span>
+            <app-copy-text class="copy-key-button" [copyText]="row.api_key"
+                [copyOk]="'WEBHOOKS.KEY_COPY_OK' | translate" [copyKo]="'WEBHOOKS.KEY_COPY_KO' | translate"
+                [copyTooltip]="'WEBHOOKS.COPY_KEY' | translate" />
+            <button mat-icon-button class="ob-button medium only-icon refresh-key-button"
+                [matTooltip]="'WEBHOOKS.KEY_REFRESH' | translate" (click)="refreshApiKey(row.id)">
+                <mat-icon fontIcon="autorenew" />
+            </button>
+        </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="id">
+        <mat-header-cell *matHeaderCellDef class="head-cell id" [matTooltip]="'WEBHOOKS.ID' | translate">
+            {{'WEBHOOKS.ID' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row" class="id">
+            <span class="key-text-wrap">
+                {{ row.id }}
+            </span>
+            <app-copy-text class="copy-key-button" [copyText]="row.id"
+                [copyOk]="'WEBHOOKS.ID_COPY_OK' | translate" [copyKo]="'WEBHOOKS.ID_COPY_KO' | translate"
+                [copyTooltip]="'WEBHOOKS.COPY_ID' | translate" />
+        </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="enabled">
+        <mat-header-cell *matHeaderCellDef class="head-cell enabled justify-center flex-[0_0_80px]"
+            [matTooltip]="'FORMS.ACTIONS.ENABLE' | translate">
+            {{'FORMS.ACTIONS.ENABLE' | translate}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row" class="enabled justify-center flex-[0_0_80px]">
+            <mat-slide-toggle class="ob-slide-toggle" [checked]="row.status === 'ACTIVE'"
+                (change)="updateStatusWebhook($event, row)" />
+        </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef class="two-actions-cell head-cell"
+            [class.float-actions-cell]="!$isHandsetOrTablet()" />
+        <mat-cell *matCellDef="let row" class="two-actions-cell"
+            [class.float-actions-cell]="!$isHandsetOrTablet()">
+            <div class="action-buttons" (click)="$event.stopPropagation()">
+                <button mat-icon-button class="ob-button medium"
+                    (click)="openEditWebhookDialog(row.id)"
+                    [matTooltip]="'FORMS.ACTIONS.EDIT' | translate">
+                    <mat-icon fontIcon="edit" />
+                </button>
+                <button mat-icon-button class="ob-button medium"
+                    (click)="openDeleteWebhookDialog(row)"
+                    [matTooltip]="'FORMS.ACTIONS.DELETE' | translate">
+                    <mat-icon fontIcon="delete" />
+                </button>
+            </div>
+        </mat-cell>
+    </ng-container>
+    <mat-header-row *matHeaderRowDef="tableColumns;sticky: true" class="dense-row" />
+    <mat-row *matRowDef="let row; columns: tableColumns" class="dense-row hoverable-row" />
+</mat-table>
+@if($isInProgress() && !$isOpenEditDialog()){
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,35 @@
+<div fxFill>
+    <div fxFlex="0 0 200px" fxLayout="column" class="subtabs-container">
+
+        <mat-button-toggle-group vertical [value]="deepPath$ | async" class="ob-subtab" fxFlex="1 0 100%"
+            appLastPathGuardListener [currValue]="(deepPath$ | async)">
+            @if ((configuration$ | async); as configuration) {
+                <mat-button-toggle routerLink="ticketing" value="ticketing">
+                    {{'ENTITY.EXTERNAL.TICKETING' | translate}}
+                </mat-button-toggle>
+                
+                @if (configuration.avet_connection_type !== 'SOCKET') {
+                    <mat-button-toggle routerLink="members" value="members">
+                        {{'ENTITY.EXTERNAL.MEMBERS.TITLE' | translate}}
+                    </mat-button-toggle>
+                }
+    
+                @if (isSmartBooking$ | async) {
+                    <mat-button-toggle routerLink="smart-booking" value="smart-booking">
+                        {{'ENTITY.EXTERNAL.SMART_BOOKING.TITLE' | translate}}
+                    </mat-button-toggle>
+                }
+
+                @if (configuration?.inventory_providers && configuration?.inventory_providers[0] === 'SGA') {
+                    <mat-button-toggle routerLink="sga" value="sga">
+                        {{'ENTITY.EXTERNAL.SGA.TITLE' | translate}}
+                    </mat-button-toggle>
+                }              
+            }
+        </mat-button-toggle-group>
+
+    </div>
+    <div fxFlex="0 0" fxLayout="column">
+        <router-outlet />
+    </div>
+</div>

@@ -1,0 +1,95 @@
+@if (saleRequest$ | async; as saleRequest) {
+    <app-form-container class="overflow-y-auto" hideActionBar sidebar layout="menu">
+        <mat-accordion multi togglePosition="before">
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'PRODUCTS_SALE_REQUESTS.FORMS.PRINCIPAL_INFO' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="flex flex-row flex-wrap sm:gap-[40px]">
+                    <div class="details-non-editable-field ob-form-field flex flex-col basis-full sm:flex-[0_1_calc(50%-40px)]">
+                        <span class="field-label">{{'PRODUCTS_SALE_REQUESTS.FORMS.LABELS.PRODUCT_ORG' | translate}}</span>
+                        <span>{{ saleRequest.product.entity.name }}</span>
+                    </div>
+                    <div class="details-non-editable-field ob-form-field flex flex-col basis-full sm:flex-[0_1_calc(50%-40px)]">
+                        <span class="field-label">{{'PRODUCTS_SALE_REQUESTS.FORMS.LABELS.PRODUCT_NAME' | translate}}</span>
+                        <span>{{ saleRequest.product.product_name }}</span>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+            @if ($hasContactData()) {
+                @let contactData = saleRequest.product.contact_person;
+                <!-- {} -->
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'PRODUCTS_SALE_REQUESTS.FORMS.CONTACT_DATA' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="flex flex-row flex-wrap sm:gap-[40px]">
+                        <div class="details-non-editable-field ob-form-field flex flex-col basis-full sm:flex-[0_1_calc(50%-40px)]">
+                            <span class="field-label">{{'PRODUCTS_SALE_REQUESTS.FORMS.LABELS.CONTACT_NAME' | translate}}</span>
+                            <span>{{ contactData.name || '-' }}</span>
+                        </div>
+                        <div class="details-non-editable-field ob-form-field flex flex-col basis-full sm:flex-[0_1_calc(50%-40px)]">
+                            <span class="field-label">{{'PRODUCTS_SALE_REQUESTS.FORMS.LABELS.CONTACT_LASTNAME' | translate}}</span>
+                            <span>{{ contactData.surname || '-' }}</span>
+                        </div>
+                        <div class="details-non-editable-field ob-form-field flex flex-col basis-full sm:flex-[0_1_calc(50%-40px)]">
+                            <span class="field-label">{{'PRODUCTS_SALE_REQUESTS.FORMS.LABELS.CONTACT_EMAIL' | translate}}</span>
+                            <span>{{ contactData.email || '-' }}</span>
+                        </div>
+                        <div class="details-non-editable-field ob-form-field flex flex-col basis-full sm:flex-[0_1_calc(50%-40px)]">
+                            <span class="field-label">{{'PRODUCTS_SALE_REQUESTS.FORMS.LABELS.CONTACT_TELEPHONE' | translate}}</span>
+                            <span>{{ contactData.phone || '-' }}</span>
+                        </div>
+                    </div>
+                </mat-expansion-panel>
+            }
+            @if (hasVariants$ | async) {
+                @let metadata = variantsMetadata$ | async;
+                <!-- {} -->
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'PRODUCTS_SALE_REQUESTS.FORMS.PRODUCT_VARIANTS' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="flex flex-col gap-1">
+                        @if (metadata) {
+                            <div class="flex flex-row justify-end items-center gap-1">
+                                <span class="page-summary" [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: metadata"></span>
+                                <mat-paginator [pageSize]="variantsPageSize" hidePageSize (page)="loadVariants($event)"
+                                    [length]="metadata?.total" />
+                            </div>
+                        }
+                        <mat-list class="ob-list small-rows" role="list">
+                            @for (variant of variants$ | async; track variant.id) {
+                                <mat-list-item role="listitem">{{ variant.name }}</mat-list-item>
+                            }
+                        </mat-list>
+                    </div>
+                </mat-expansion-panel>
+            }
+        </mat-accordion>
+        <div slot="sidebar">
+            <div class="flex flex-col gap-4">
+                <div class="sale-request-img-container flex flex-col justify-center">
+                    @if (imageUrl$ | async; as imageUrl) {
+                        <img class="sale-request-image flex-1" alt="sale request product image" [src]="imageUrl" />
+                    } @else {
+                        <div class="flex flex-row justify-center items-center basis-[64px] grow-0 shrink">
+                            <mat-icon class="material-icons">
+                                image
+                            </mat-icon>
+                        </div>
+                    }
+                </div>
+                <div class="flex flex-col">
+                    <span class="sale-request-info-label">{{ 'PRODUCTS_SALE_REQUESTS.FORMS.LABELS.ID' | translate | uppercase}}</span>
+                    <span>{{saleRequest.product.product_id}}</span>
+                </div>
+            </div>
+        </div>
+    </app-form-container>
+}
+@if (isLoading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

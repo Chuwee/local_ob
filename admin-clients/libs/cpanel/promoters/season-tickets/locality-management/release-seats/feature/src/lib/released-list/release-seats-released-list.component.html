@@ -1,0 +1,163 @@
+@if (seasonTicket$ | async; as seasonTicket) {
+    <div class="flex flex-1 flex-col">
+        @if (seasonTicket.settings.operative.allow_release_seat) {
+            <app-form-container [hideActionBar]="true" layout="main">
+                <div class="flex flex-col gap-4">
+                    <div class="flex justify-end">
+                        <button mat-stroked-button color="tertiary" class="ob-button small only-icon"
+                            [matTooltip]="'FORMS.ACTIONS.MORE' | translate" [matMenuTriggerFor]="releasedListMenu">
+                            <mat-icon>more_horiz</mat-icon>
+                        </button>
+                        <mat-menu #releasedListMenu="matMenu" xPosition="before">
+                            <button mat-menu-item (click)="exportReleasedList()">
+                                {{ 'SEASON_TICKET.RELEASE_SEAT.RELEASED_LIST.EXPORT_BTN' | translate }}
+                            </button>
+                        </mat-menu>
+                    </div>
+
+                    <div class="flex flex-col gap-1">
+                        <div class="filter-container flex flex-row gap-5 justify-between items-center">
+                            <app-release-list-filter [form]="form" [request]="request" [sessionLists]="(sessionList$ | async)"
+                                (requestChanged)="requestChangedHandler($event)" />
+                            <div class="flex flex-1 flex-row gap-2 justify-end items-center">
+                                <mat-paginator hidePageSize class="flex flex-initial with-range-label transparent"
+                                    [pageSize]="request.limit" [length]="(releasedListMetadata$ | async)?.total"
+                                    [pageIndex]="request.offset / request.limit" (page)="loadData($event)" />
+                            </div>
+                        </div>
+
+                        <mat-table class="ob-table" [dataSource]="(releasedList$ | async)">
+                            <ng-container matColumnDef="user_data">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    {{ 'SEASON_TICKET.RELEASE_SEAT.RELEASED_LIST.TABLE.USER_DATA' | translate }}
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row" class="flex flex-col items-stretch">
+                                    <span appEllipsify [matTooltip]="row.customer ? (row.customer.name + ' ' + row.customer.surname) : ''"
+                                        matTooltipClass="ob-tooltip-nowrap">
+                                        {{ row.customer ? (row.customer.name + ' ' + row.customer.surname) : '' }}
+                                    </span>
+                                </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="session">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    {{ 'SEASON_TICKET.RELEASE_SEAT.RELEASED_LIST.TABLE.SESSION' | translate }}
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row" class="flex flex-col items-stretch">
+                                    <span appEllipsify [matTooltip]="row.session_name" matTooltipClass="ob-tooltip-nowrap">
+                                        {{ row.session.name }}
+                                    </span>
+                                    <span appEllipsify [matTooltip]="row.session_date" matTooltipClass="ob-tooltip-nowrap">
+                                        {{ row.session.date | dateTime }}
+                                    </span>
+                                </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="ticket_data">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    {{ 'SEASON_TICKET.RELEASE_SEAT.RELEASED_LIST.TABLE.TICKET_DATA' | translate }}
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row" class="flex flex-col items-stretch">
+                                    <span appEllipsify matTooltipClass="ob-tooltip-nowrap">
+                                        {{ row.ticket_data.price_zone + ' | ' + row.ticket_data.row + ' | ' + row.ticket_data.seat }}
+                                    </span>
+                                    <span appEllipsify matTooltipClass="ob-tooltip-nowrap">
+                                        {{ row.ticket_data.sector }}
+                                    </span>
+                                </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="release_date">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    {{ 'SEASON_TICKET.RELEASE_SEAT.RELEASED_LIST.TABLE.RELEASE_DATE' | translate }}
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row">
+                                    <span appEllipsify matTooltipClass="ob-tooltip-nowrap">
+                                        {{ row.release_date | dateTime }}
+                                    </span>
+                                </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="status">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    {{ 'SEASON_TICKET.RELEASE_SEAT.RELEASED_LIST.TABLE.STATUS' | translate }}
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row">
+                                    <span [ngClass]="['status-dot', row.status.toLowerCase()]"></span>
+                                    <span appEllipsify matTooltipClass="ob-tooltip-nowrap">
+                                        <span>{{ 'SEASON_TICKET.RELEASE_SEAT.RELEASED_LIST.STATUS_OPTS.' + row.status | translate }}</span>
+                                    </span>
+                                </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="sold_price">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    {{ 'SEASON_TICKET.RELEASE_SEAT.RELEASED_LIST.TABLE.SOLD_PRICE' | translate }}
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row" class="right">
+                                    @if (row.status === 'SOLD') {
+                                        <span appEllipsify matTooltipClass="ob-tooltip-nowrap">
+                                            <span>{{ row.sold_price | localCurrency }}</span>
+                                        </span>
+                                    }
+                                </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="total_gained">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    {{ 'SEASON_TICKET.RELEASE_SEAT.RELEASED_LIST.TABLE.TOTAL_GAINED' | translate }}
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row" class="right">
+                                    <span appEllipsify matTooltipClass="ob-tooltip-nowrap">
+                                        <span>{{ row.total_gained | localCurrency }}</span>
+                                    </span>
+                                </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="actions">
+                                <mat-header-cell *matHeaderCellDef class="head-cell actions-cell" />
+                                <mat-cell *matCellDef="let row; index as i" class="actions-buttons actions-cell">
+                                    @if (row.status === 'SOLD') {
+                                        <button mat-icon-button color="tertiary" class="ob-button small"
+                                            [matMenuTriggerFor]="actions"
+                                            (click)="$event.stopPropagation()">
+                                            <mat-icon>more_horiz</mat-icon>
+                                        </button>
+                                        <mat-menu #actions="matMenu">
+                                            <button mat-menu-item (click)="viewAssociatedSale(row.order_code)">
+                                                {{ 'SEASON_TICKET.RELEASE_SEAT.RELEASED_LIST.TABLE.ACTIONS.VIEW_ASSOCIATED_SALE' | translate }}
+                                            </button>
+                                        </mat-menu>
+                                    }
+                                </mat-cell>
+                            </ng-container>
+
+                            <mat-header-row *matHeaderRowDef="columns" />
+                            <mat-row *matRowDef="let row; columns: columns;" />
+                        </mat-table>
+                    </div>
+                </div>
+                @if ((loadingData$ | async) === false && !(releasedList$ | async)?.length) {
+                    <div class="flex flex-row justify-center">
+                        @if (request.session_id) {
+                            <app-empty-state-tiny class="flex-1"
+                                [title]="'SEASON_TICKET.RELEASE_SEAT.RELEASED_LIST.EMPTY.TITLE' | translate"
+                                [description]="'SEASON_TICKET.RELEASE_SEAT.RELEASED_LIST.EMPTY.DESCRIPTION' | translate" />
+                        } @else {
+                            <app-empty-state-tiny class="flex-1"
+                                [title]="'SEASON_TICKET.RELEASE_SEAT.RELEASED_LIST.NO_SESSION.TITLE' | translate"
+                                [description]="'SEASON_TICKET.RELEASE_SEAT.RELEASED_LIST.NO_SESSION.DESCRIPTION' | translate" />
+                        }
+                    </div>
+                }
+            </app-form-container>
+        } @else {
+            <app-empty-state class="flex flex-1" [hidden]="(loadingData$ | async) === true"
+                [title]="'SEASON_TICKET.RELEASE_SEAT.DISABLED.TITLE' | translate"
+                [description]="'SEASON_TICKET.RELEASE_SEAT.DISABLED.BODY' | translate">
+                <button mat-flat-button color="primary" type="button" class="ob-button"
+                    [routerLink]="['/season-tickets', seasonTicket.id, 'general-data', 'principal-info']">
+                    {{'SEASON_TICKET.RELEASE_SEAT.REDIRECT' | translate}}
+                </button>
+            </app-empty-state>
+        }
+        @if (loadingData$ | async) {
+            <div class="spinner-container">
+                <mat-spinner />
+            </div>
+        }
+    </div>
+}

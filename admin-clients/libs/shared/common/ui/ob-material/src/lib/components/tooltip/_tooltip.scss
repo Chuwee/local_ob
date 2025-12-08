@@ -1,0 +1,40 @@
+@use '@angular/material' as mat;
+@mixin tooltip-override($palettes, $colors) {
+    $ob-bg-dark-20: map-get($colors, ob-bg-dark-20);
+    $ob-grey-light-10: map-get($colors, ob-grey-light-10);
+    $alert-color: mat.m2-get-color-from-palette(map-get($palettes, warn));
+    $white: map-get($colors, ob-white);
+
+    mat-tooltip-component {
+        .mat-mdc-tooltip {
+            &.no-margin .mdc-tooltip__surface {
+                margin: 0;
+            }
+            &.ob-tooltip-nowrap .mdc-tooltip__surface {
+                text-overflow: revert;
+                white-space: nowrap;
+                max-width: none;
+            }
+            &.ob-tooltip-error .mdc-tooltip__surface {
+                background-color: $alert-color;
+                color: $white;
+            }
+            &.ob-venue-tooltip .mdc-tooltip__surface {
+                text-align: left;
+            }
+            .mdc-tooltip__surface {
+                background-color: $ob-bg-dark-20;
+                color: $ob-grey-light-10;
+                line-height: 18px;
+                padding: 8px 12px;
+                margin: 8px;
+                white-space: pre-line;
+                // Remove caret from tooltip
+                -webkit-user-select: none; /* Chrome all / Safari all */
+                -moz-user-select: none; /* Firefox all */
+                -ms-user-select: none; /* IE 10+ */
+                user-select: none;
+            }
+        }
+    }
+}

@@ -1,0 +1,73 @@
+<app-form-container (cancel)="reload()" (save)="save()" layout="menu" [disabled]="!form.dirty">
+    <div class="edit-categories-button-container flex flex-row justify-end">
+        <button mat-stroked-button color="tertiary" class="ob-button small"
+            [attr.aria-label]="'ENTITY.OWN_CATEGORIES.EDIT_OWN_CATEGORIES' | translate" (click)="openEditCategoriesDialog()">
+            <mat-icon>edit</mat-icon>
+            {{'ENTITY.OWN_CATEGORIES.EDIT_OWN_CATEGORIES' | translate}}
+        </button>
+    </div>
+    <form [formGroup]="form">
+        <mat-table class="ob-table not-touchable flex flex-col" id="gatesTable" [formGroup]="form"
+            [dataSource]="categories">
+            <ng-container matColumnDef="baseCategory">
+                <mat-header-cell *matHeaderCellDef class="head-cell cell-with-left-button">
+                    {{'ENTITY.BASE_CATEGORIES.TITLE' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row;" class="cell-with-left-button">
+                    @if (row.parent_id) {
+                        <span class="subcategory-row">
+                            {{'ENTITY.CATEGORY_OPTS.' + row.code | translate}} ({{row.code}})
+                        </span>
+                        } @else {
+                            <mat-icon class="left-button clickable-label">
+                                {{expandedCategory === row ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}}
+                            </mat-icon>
+                            <span class="clickable-label">{{'ENTITY.CATEGORY_OPTS.' + row.code | translate}}
+                                ({{row.code}})
+                            </span>
+                            }
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="myCategories">
+                <mat-header-cell *matHeaderCellDef class="editable-cell head-cell">
+                    {{'ENTITY.MY_CATEGORIES' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row" class="editable-cell">
+                    <div class="flex flex-1" [class.category-select-disabled]="form.disabled"
+                        [matTooltip]="'ENTITY.NO_CATEGORIES_YET' | translate"
+                        [matTooltipDisabled]="form.enabled">
+                        @if (row.parent_id) {
+                            <div class="flex flex-1">
+                                <mat-form-field appearance="outline" class="ob-form-field ob-form-field-outline">
+                                    <mat-select [formControlName]="row.id" [placeholder]="'FORMS.ACTIONS.SELECT' | translate">
+                                        <mat-option [value]="null">
+                                            {{'FORMS.ACTIONS.SELECT' | translate}}
+                                        </mat-option>
+                                        @for (category of entityCategories; track category.id) {
+                                            <mat-option [value]="category">
+                                                <div [class.subcategory-option]="category.parent_id" appEllipsify
+                                                    [matTooltip]="category.description + ' - (' + category.code + ')'">
+                                                    {{category.description}} ({{category.code}})
+                                                </div>
+                                            </mat-option>
+                                            }
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            }
+                    </div>
+                </mat-cell>
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="columns" class="dense-row" />
+            <mat-row *matRowDef="let row; columns: columns;" class="dense-row" [class.hoverable-row]="row.parent_id"
+                [class.hidden]="row.parent_id && expandedCategory?.id !== row.parent_id"
+                [@parentCategoryExpand]="row.parent_id && expandedCategory?.id !== row.parent_id ? 'collapsed' : 'expanded'"
+                (click)="!row.parent_id && (expandedCategory = expandedCategory === row ? null : row)" />
+        </mat-table>
+    </form>
+</app-form-container>
+@if (reqInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,70 @@
+<div class="list-setting-container">
+    <mat-accordion class="countries-table-container" [togglePosition]="'before'">
+        <mat-expansion-panel #countriesPanel [expanded]="true" class="ob-expansion-card">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*" hideToggle="true">
+                <mat-panel-title>{{title}}</mat-panel-title>
+                @if(countriesPanel.expanded) {
+                    <div class="add-button-container">
+                        <button mat-stroked-button color="primary" [disabled]="!$hasWritePermissions()"
+                            type="button" class="ob-button medium add-button" (click)="$event.stopPropagation(); addElementDialog()">
+                            <mat-icon>add</mat-icon>
+                            {{newElementTitle}}
+                        </button>
+                    </div>
+                }
+            </mat-expansion-panel-header>
+            <div>
+                <div class="filters">
+                    <div class="search-input-container">
+                        <ng-content select="[slot='filter']" />
+                        <app-search-input [placeholder]="placeHolder" (valueChanged)="changeSearchText($event)" class="search-input" />
+                    </div>
+                    <div class="paginator above">
+                        <mat-paginator hidePageSize class="with-range-label transparent"
+                            [pageIndex]="listPage$ | async" [pageSize]="pageLimit"
+                            [length]="(filteredList$ | async)?.length" (page)="changePage($event)" />
+                    </div>
+                </div>
+                @if(!$isLoading()) {
+                    <div class="paginated-list">
+                        <mat-list class="ob-list small-rows">
+                            <div class="list-header">
+                                <span>{{elementTitle}}</span>
+                            </div>
+                            <div class="list-items-container" [class.interactive]="$hasWritePermissions()">
+                                @for(rowElement of (pagedList$ | async); track rowElement) {
+                                    <mat-list-item [class.hoverable-item]="$hasWritePermissions()">
+                                        <div class="row-container">
+                                            <div>
+                                                <span appEllipsify class="o-hidden-text-row" [matTooltip]="rowElement">{{rowElement}}</span>
+                                            </div>
+                                            @if($hasWritePermissions()) {
+                                                <div>
+                                                    <div class="actions-container">
+                                                        <button mat-icon-button aria-label="delete" class="ob-button xsmall"
+                                                            [matTooltip]="deleteTooltip"
+                                                            (click)="deleteElementFromList(rowElement)">
+                                                            <mat-icon>delete</mat-icon>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </mat-list-item>
+                                }
+                            </div>
+                        </mat-list>
+                        @if((filteredList$ | async)?.length === 0) {
+                            <app-empty-state-tiny [title]="'FORMS.SELECT.NO_RESULTS' | translate" />
+                        }
+                    </div>
+                }
+                @if($isLoading()) {
+                    <div class="spinner-container">
+                        <mat-spinner />
+                    </div>
+                }
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+</div>

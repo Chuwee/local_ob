@@ -1,0 +1,75 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="!form.dirty" [formGroup]="form">
+    <app-language-bar [languages]="languageList$ | async" [selected]="language$ | async"
+        [changeGuard]="canChangeLanguage" (changed)="changeLanguage($event)" slot="outside" />
+    <mat-accordion [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'PRODUCT.CHANNEL_CONTENTS.PRODUCT_CONTENT.TITLE' | translate }}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="row wrap">
+                <div class="name-field" fxFlex="100%" fxLayout="row wrap">
+                    <mat-form-field id="name" fxFlex="360px" appearance="outline"
+                        class="ob-form-field field-with-label">
+                        <mat-label>{{'FORMS.LABELS.PRODUCT_NAME' | translate}}</mat-label>
+                        <input formControlName="name" matInput [placeholder]="'FORMS.LABELS.PRODUCT_NAME' | translate">
+                        <mat-error [ob-form-errors]="form" field="name" />
+                    </mat-form-field>
+                </div>
+                <div class="section-block" fxFlex="685px" fxFlex.lt-lg="100%" fxLayout="column">
+                    <span class="field-label">
+                        {{'PRODUCT.CHANNEL_CONTENTS.DESCRIPTION.LABEL' | translate}}
+                    </span>
+                    <p>{{'PRODUCT.CHANNEL_CONTENTS.DESCRIPTION.DESCRIPTION' | translate}}</p>
+                    <mat-form-field appearance="outline" class="ob-form-field no-padding inline-field-bottom">
+                        <app-rich-text-area aria-label="Product Description"
+                            [placeholder]="'PRODUCT.CHANNEL_CONTENTS.DESCRIPTION.PLACEHOLDER' | translate"
+                            formControlName="description" />
+                        <mat-error [ob-form-errors]="form" field="description" />
+                    </mat-form-field>
+                    <span class="field-format">
+                        {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value: fieldsRestrictions.productDescriptionLength})}}
+                    </span>
+                </div>
+                <div fxFlex="100%" fxLayout="column" class="section-block">
+                    <span class="field-label">
+                        {{'PRODUCT.CHANNEL_CONTENTS.IMAGE.SLIDER.LABEL' | translate}}
+                    </span>
+                    <p>{{'PRODUCT.CHANNEL_CONTENTS.IMAGE.SLIDER.DESCRIPTION' | translate}}</p>
+                    <div fxLayout="row">
+                        <app-image-uploader hasAltText fxFlex="calc(50% + 20px)" formControlName="slider1"
+                            [imageRestrictions]="sliderRestrictions" hideLabelText />
+                        <div fxFlex="50%" fxLayout="row wrap">
+                            <app-image-uploader hasAltText fxFlex="50%" formControlName="slider2"
+                                [imageRestrictions]="sliderRestrictions" hideLabelText />
+                            <app-image-uploader hasAltText fxFlex="50%" formControlName="slider3"
+                                [imageRestrictions]="sliderRestrictions" hideLabelText />
+                            <app-image-uploader hasAltText fxFlex="50%" formControlName="slider4"
+                                [imageRestrictions]="sliderRestrictions" hideLabelText />
+                            <app-image-uploader hasAltText fxFlex="50%" formControlName="slider5"
+                                [imageRestrictions]="sliderRestrictions" hideLabelText />
+                        </div>
+                    </div>
+                    <span class="field-format">{{'UPLOAD_IMAGE.FORMAT' | translate: sliderRestrictions}}</span>
+                </div>
+                <div fxFlex="685px" fxFlex.lt-lg="100%" fxLayout="column">
+                    <span class="field-label">
+                        {{'PRODUCT.CHANNEL_CONTENTS.NOTES.LABEL' | translate}}
+                    </span>
+                    <p>{{'PRODUCT.CHANNEL_CONTENTS.NOTES.DESCRIPTION' | translate}}</p>
+                    <mat-form-field appearance="outline" class="ob-form-field no-padding inline-field-bottom">
+                        <app-rich-text-area aria-label="Product Notes"
+                            [placeholder]="'PRODUCT.CHANNEL_CONTENTS.NOTES.PLACEHOLDER' | translate"
+                            formControlName="notes" />
+                        <mat-error [ob-form-errors]="form" field="notes" />
+                    </mat-form-field>
+                    <span class="field-format">
+                        {{'FORMS.ERRORS.MAX_LENGTH_EXCEEDED' | translate : ({value: fieldsRestrictions.productNotesLength})}}
+                    </span>
+                </div>
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+@if (isLoadingOrSaving$ | async) {
+    <div class="spinner-container"><mat-spinner /></div>
+}

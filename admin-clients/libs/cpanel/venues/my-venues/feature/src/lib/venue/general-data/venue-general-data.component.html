@@ -1,0 +1,246 @@
+<app-form-container layout="main" class="overflow-y-auto" (cancel)="cancel()" (save)="save()" [formGroup]="form"
+    [disabled]="!form.dirty || $isInProgress()">
+    <mat-accordion multi [togglePosition]="'before'">
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>
+                    {{'VENUE.MAIN_INFO' | translate}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <form formGroupName="mainInfoGroup" class="grid gap-x-10 lg:grid-cols-2 xl:grid-cols-3">
+                <!-- Name -->
+                <mat-form-field class="ob-form-field field-with-label" appearance="outline">
+                    <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                    <input matInput aria-label="name" formControlName="name" [placeholder]="'VENUE.NAME.PLACEHOLDER' | translate">
+                    <mat-error [ob-form-errors]="form" field="mainInfoGroup.name" />
+                </mat-form-field>
+                <!-- Venue ID -->
+                <div class="details-non-editable-field ob-form-field flex flex-col">
+                    <span class="field-label">{{'FORMS.LABELS.VENUE_ID' | translate}}</span>
+                    <span>{{$venueId()}}</span>
+                </div>
+                <!-- Entity -->
+                <div class="details-non-editable-field ob-form-field flex flex-col">
+                    <span class="field-label">{{'FORMS.LABELS.ENTITY_MANAGEMENT' | translate}}</span>
+                    <span>{{$entityName()}}</span>
+                </div>
+                <!-- Venue type -->
+                <mat-form-field class="ob-form-field field-with-label" appearance="outline">
+                    <mat-label>{{'FORMS.LABELS.TYPE' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="type">
+                        @for (type of venueTypes | keyvalue; track type.value) {
+                            <mat-option [value]="type.value">
+                                {{('VENUE.TYPE_OPTIONS.' + type.value) | translate}}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+                <!-- Calendar -->
+                @if((entityCalendars$ | async)?.length) {
+                    <mat-form-field class="ob-form-field field-with-label" appearance="outline">
+                        <mat-label>{{'FORMS.LABELS.CALENDAR' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="calendar">
+                            <mat-option>
+                                <app-select-search #entityCalendarsSelectSearch [options$]="entityCalendars$"
+                                    [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name"
+                                    requireSelection="true" />
+                            </mat-option>
+                            @for (calendar of entityCalendarsSelectSearch.getFilteredOptions$() | async; track calendar.id) {
+                                <mat-option [value]="calendar.id">
+                                    <div appEllipsify [matTooltip]="calendar.name">
+                                        {{calendar.name}}
+                                    </div>
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                }
+                <!-- External provider venue -->
+                @if(this.$externalProviderVenues()?.length > 0) {
+                    <mat-form-field class="ob-form-field field-with-label" appearance="outline">
+                        <mat-label>{{'FORMS.LABELS.EXTERNAL_PROVIDER_VENUE' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="external_id">
+                            @for (externalVenue of $externalProviderVenues(); track externalVenue.id) {
+                                <mat-option [value]="externalVenue.id">
+                                    {{externalVenue.name}}
+                                </mat-option>
+                            }
+                        </mat-select>
+                        <mat-error [ob-form-errors]="form" field="mainInfoGroup.external_id" />
+                    </mat-form-field>
+                }
+                <!-- Capacity -->
+                <div class="basis-[120px]">
+                    <mat-form-field class="basis-full ob-form-field field-with-label" appearance="outline">
+                        <mat-label>{{'FORMS.LABELS.MAX_CAPACITY' | translate}}</mat-label>
+                        <input matInput type="number" placeholder="0" aria-label="capacity" formControlName="capacity">
+                        <mat-error [ob-form-errors]="form" field="mainInfoGroup.capacity" />
+                    </mat-form-field>
+                </div>
+                <!-- Public -->
+                <mat-checkbox color="primary" formControlName="public" class="basis-full flex flex-col justify-center items-start">
+                    {{'VENUE.PUBLIC_ENABLE' | translate}}
+                </mat-checkbox>
+            </form>
+        </mat-expansion-panel>
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>
+                    {{'VENUE.LOCATION' | translate}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <form formGroupName="locationGroup" class="flex flex-col location-form gap-6">
+                @if (
+                    !form.get('locationGroup').get('googlePlaceId').value &&
+                    !form.get('locationGroup').get('googlePlaceholder').hasError('invalidLocation')
+                ) {
+                    <div class="custom-message flex flex-start align-start">
+                        <mat-icon class="ob-icon xsmall warning with-text">warning</mat-icon>
+                        <span>{{'FORMS.INFOS.GOOGLE_ADDRESS_STATUS_WARNING' | translate}}</span>
+                    </div>
+                }
+                <div class="location-fields-container">
+                    <!-- Address Maps Autocomplete-->
+                    <app-google-place-autocomplete [formGroup]="form.get('locationGroup')" />
+                    @if (!form.get('locationGroup').get('googlePlaceholder').hasError('invalidLocation')) {
+                        <div class="flex basis-full">
+                            <!-- Address -->
+                            <div class="details-non-editable-field ob-form-field flex basis-1/3 flex-col">
+                                <span class="field-label">{{'FORMS.LABELS.ADDRESS' | translate}}</span>
+                                <span>{{form.get('locationGroup').get('googlePlaceId').value ?
+                                $googleAddress() :
+                                (form.get('locationGroup').get('address').value || '-')}}</span>
+                            </div>
+                            <!-- Timezone -->
+                            <div class="details-non-editable-field ob-form-field flex basis-1/3 flex-col">
+                                <span class="field-label">{{'FORMS.LABELS.TIMEZONE' | translate}}</span>
+                                <span>{{$timezone() || '-'}}</span>
+                            </div>
+                            <!-- Country -->
+                            <div class="details-non-editable-field ob-form-field flex basis-1/3 flex-col">
+                                <span class="field-label">{{'FORMS.LABELS.COUNTRY' | translate}}</span>
+                                <span>{{$country() || '-'}}</span>
+                            </div>
+                        </div>
+                        <div class="flex basis-full">
+                            <!-- Province -->
+                            <div class="details-non-editable-field ob-form-field flex basis-1/3 flex-col">
+                                <span class="field-label">{{'FORMS.LABELS.COUNTRY_SUBDIVISION' | translate}}</span>
+                                <span>{{$province() || '-'}}</span>
+                            </div>
+                            <!-- City -->
+                            <div class="details-non-editable-field ob-form-field flex basis-1/3 flex-col">
+                                <span class="field-label">{{'FORMS.LABELS.CITY_MUN' | translate}}</span>
+                                <span>{{form.get('locationGroup').get('city').value || '-'}}</span>
+                            </div>
+                            <!-- Postal Code -->
+                            <div class="details-non-editable-field ob-form-field flex basis-1/3 flex-col">
+                                <span class="field-label">{{'FORMS.LABELS.POSTAL_CODE' | translate}}</span>
+                                <span>{{form.get('locationGroup').get('postalCode').value || '-'}}</span>
+                            </div>
+                        </div>
+                        @if (form.get('locationGroup').get('googlePlaceId').value) {
+                            <!-- Visible Address-->
+                            <div class="flex basis-full flex-col">
+                                <mat-form-field appearance="outline" class="ob-form-field field-with-label flex basis-full">
+                                    <mat-label>{{'FORMS.LABELS.VISIBLE_ADDRESS' | translate}}</mat-label>
+                                    <input matInput aria-label="address" formControlName="address"
+                                        [placeholder]="'VENUE.ADDRESS.PLACEHOLDER' | translate">
+                                    <mat-error [ob-form-errors]="form" field="locationGroup.address" />
+                                </mat-form-field>
+                            </div>
+                        }
+                    }
+                </div>
+            </form>
+        </mat-expansion-panel>
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>
+                    {{'VENUE.COMPANY' | translate}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <form formGroupName="companyGroup" class="grid gap-x-10 lg:grid-cols-2 xl:grid-cols-3">
+                <!-- Venue Manager -->
+                <mat-form-field class="ob-form-field field-with-label"
+                    appearance="outline">
+                    <mat-label>{{'FORMS.LABELS.MANAGER' | translate}}</mat-label>
+                    <input matInput aria-label="manager" formControlName="manager" [placeholder]="'VENUE.MANAGER.PLACEHOLDER' | translate">
+                </mat-form-field>
+                <!-- Venue Owner -->
+                <mat-form-field class="ob-form-field field-with-label" appearance="outline">
+                    <mat-label>{{'FORMS.LABELS.OWNER' | translate}}</mat-label>
+                    <input matInput aria-label="owner" formControlName="owner" [placeholder]="'VENUE.OWNER.PLACEHOLDER' | translate">
+                </mat-form-field>
+                <!-- Venue Website -->
+                <mat-form-field class="ob-form-field field-with-label" appearance="outline">
+                    <mat-label>{{'FORMS.LABELS.WEB' | translate}}</mat-label>
+                    <input matInput aria-label="website" formControlName="website" [placeholder]="'VENUE.WEBSITE.PLACEHOLDER' | translate">
+                </mat-form-field>
+            </form>
+        </mat-expansion-panel>
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>
+                    {{'VENUE.CONTACT' | translate}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <form formGroupName="contactGroup" class="grid gap-x-10 lg:grid-cols-2 xl:grid-cols-3">
+                <!-- Contact Name -->
+                <mat-form-field class="ob-form-field field-with-label" appearance="outline">
+                    <mat-label>{{'FORMS.LABELS.NAME' | translate}}</mat-label>
+                    <input matInput aria-label="contact-name" formControlName="contactName"
+                        [placeholder]="'VENUE.CONTACT_NAME.PLACEHOLDER' | translate">
+                </mat-form-field>
+                <!-- Contact Surname -->
+                <mat-form-field class="ob-form-field field-with-label" appearance="outline">
+                    <mat-label>{{'FORMS.LABELS.SURNAME' | translate}}</mat-label>
+                    <input matInput aria-label="contact-surname" formControlName="contactSurname"
+                        [placeholder]="'VENUE.CONTACT_SURNAME.PLACEHOLDER' | translate">
+                </mat-form-field>
+                <!-- Contact Job -->
+                <mat-form-field class="ob-form-field field-with-label" appearance="outline">
+                    <mat-label>{{'FORMS.LABELS.JOB' | translate}}</mat-label>
+                    <input matInput aria-label="contact-job" formControlName="contactJob"
+                        [placeholder]="'VENUE.CONTACT_JOB.PLACEHOLDER' | translate">
+                </mat-form-field>
+                <!-- Contact Email -->
+                <mat-form-field class="ob-form-field field-with-label" appearance="outline">
+                    <mat-label>{{'FORMS.LABELS.EMAIL_LONG' | translate}}</mat-label>
+                    <input matInput aria-label="contact-email" formControlName="contactEmail"
+                        [placeholder]="'VENUE.CONTACT_EMAIL.PLACEHOLDER' | translate">
+                    <mat-error [ob-form-errors]="form" field="contactGroup.contactEmail" />
+                </mat-form-field>
+                <!-- Contact Phone -->
+                <div class="basis-[120px]">
+                    <mat-form-field class="ob-form-field field-with-label" appearance="outline">
+                        <mat-label>{{'FORMS.LABELS.PHONE' | translate}}</mat-label>
+                        <input matInput aria-label="contact-phone" formControlName="contactPhone"
+                            [placeholder]="'VENUE.CONTACT_PHONE.PLACEHOLDER' | translate">
+                        <mat-error [ob-form-errors]="form" field="contactGroup.contactPhone" />
+                    </mat-form-field>
+                </div>
+            </form>
+        </mat-expansion-panel>
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>
+                    {{'VENUE.WEB_COMMUNICATION' | translate}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <form class="flex flex-wrap gap-4" formGroupName="webComGroup">
+                <!-- Description text -->
+                <span class="basis-full">{{'VENUE.VENUE_IMAGE_DESCRIPTION' |translate}}</span>
+                <!-- Image logo -->
+                <div class="basis-[155px]">
+                    <app-image-uploader formControlName="venueImage" [imageRestrictions]="imageRestrictions" />
+                </div>
+            </form>
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+@if ($isInProgress()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

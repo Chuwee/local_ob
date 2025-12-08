@@ -1,0 +1,46 @@
+<div class="avet-sga-section-container">
+    @if($data(); as data){
+        <div class="flex flex-col">
+            @if(data.length){
+                <div class="flex flex-col gap-4">
+                    <!-- INFO -->
+                    @if($textInfo(); as textInfo){
+                        <div class="flex flex-row justify-start items-center">
+                            <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                            <span>{{ textInfo | translate}}</span>
+                        </div>
+                    }
+                    <!-- CAPACITY SELECTION -->
+                    <div class="capacity-selection-container">
+                        <app-selection-list [data]="data" [pageForm]="$pageForm()" [multiple]="false"
+                            class="small-rows">
+                            <div slot="subheader" class="list-header">
+                                <div class="flex flex-[0_1_100%] gap-6">
+                                    <div class="flex-[0_1_50%]" [class.sga]="sga">
+                                        {{ $columnTitle() | translate}}
+                                    </div>
+                                    <div class="flex-[0_1_50%]">
+                                        {{'VENUES.EXTERNAL_CAPACITY_DESCRIPTION' | translate}}
+                                    </div>
+                                </div>
+                            </div>
+                            <ng-template #optionTemplate let-row>
+                                <div class="flex flex-[0_1_100%] gap-6">
+                                    <div class="flex-[0_1_50%]" [class.sga]="sga">{{row[$rows()[0]]}}</div>
+                                    <div class="flex-[0_1_50%]">{{row[$rows()[1]]}}</div>
+                                </div>
+                            </ng-template>
+                        </app-selection-list>
+                    </div>
+                </div>
+            } @else {
+                <div class="context-notification-container flex flex-row justify-center items-center">
+                    <app-context-notification class="ob-context-notification justify-center items-center"
+                        contextType="info">
+                        {{'VENUES.EXTERNAL_CAPACITY_LIST_EMPTY' | translate}}
+                    </app-context-notification>
+                </div>
+            }
+        </div>
+    }
+</div>

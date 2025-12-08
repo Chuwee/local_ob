@@ -1,0 +1,99 @@
+<div fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="start stretch">
+    <p class="price-simulation-info">{{'SALES_REQUESTS.PRICE_SIMULATION.PRICE_SIMULATION_INFO' | translate}}</p>
+    <div *ngIf="(priceSimulations$ | async) && (priceSimulations$ | async)[venueTplSelected]  as priceSimulationRates" fxFlex="100%"
+        fxLayout="column">
+        <span class="venue-selected-label">{{'SALES_REQUESTS.PRICE_SIMULATION.VENUE_TEMPLATE' | translate}}:</span>
+        <div fxFlex="100%" fxLayout="row">
+            <mat-form-field *ngIf="(venueTpls$ | async).length > 1" appearance="outline" class="ob-form-field ob-form-field-outline"
+                fxFlex="0 1 50%">
+                <mat-select [value]="venueTplSelected" (selectionChange)="changeSelectedVenueTpl($event.value)">
+                    <mat-option [value]="venue.id" *ngFor="let venue of (venueTpls$ | async)">
+                        <div appEllipsify [matTooltip]="venue.name">
+                            {{venue.name}}
+                        </div>
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <p *ngIf="(venueTpls$ | async).length === 1">
+                {{(venueTpls$ | async)[0]?.name}}
+            </p>
+        </div>
+        <p class="mat-subtitle-2 rates-count">
+            {{('SALES_REQUESTS.PRICE_SIMULATION.RATES_COUNT' | translate) + ': ' + priceSimulationRates.length}}
+        </p>
+        <div>
+            <button mat-stroked-button color="tertiary" class="ob-button small export-btn" (click)="exportPriceSimulation()">
+                <mat-icon>file_download</mat-icon>
+                {{'FORMS.ACTIONS.EXPORT' | translate}}
+            </button>
+        </div>
+        <div *ngFor="let rate of priceSimulationRates" class="section-block">
+            <h3 class="section-title">{{rate.rateName | uppercase}}</h3>
+            <mat-table class="ob-table not-touchable" [dataSource]="rate.price_types"
+                [attr.aria-label]="'SALE_REQUEST.PRICE_SIMULATION' | translate">
+                <ng-container matColumnDef="price-type">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'SALE_REQUEST.PRICE_SIMULATION.PRICE_TYPE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{row.priceTypeName}}
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="promotion">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'SALE_REQUEST.PRICE_SIMULATION.PROMOTION_NAME' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        <div class="promotion-name" fxFlex="0 0" fxLayout="column wrap" fxLayoutGap="10px">
+                            <span *ngFor="let promo of row.promotions" fxLayoutAlign="start start">{{promo.name}}</span>
+                        </div>
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="promotion-type">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'SALE_REQUEST.PRICE_SIMULATION.PROMOTION_TYPE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        <div class="promotion-type" fxLayout="column wrap" fxLayoutGap="10px">
+                            <span class="promotion-type-badge" *ngFor="let promo of row.promotions">
+                                {{'EVENTS.PROMOTIONS.TYPE_OPTS.' + promo.type.toUpperCase() + '.SHORT' | translate}}
+                            </span>
+                        </div>
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="base">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'SALE_REQUEST.PRICE_SIMULATION.BASE_PRICE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{row.base | localCurrency:(currency$ | async):'narrow'}}
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="promoter-surcharges">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'SALE_REQUEST.PRICE_SIMULATION.PROMOTER_SURCHARGES' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{row.promoterSurcharges | localCurrency:(currency$ | async):'narrow'}}
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="channel-surcharges">
+                    <mat-header-cell *matHeaderCellDef class="head-cell">
+                        {{'SALE_REQUEST.PRICE_SIMULATION.CHANNEL_SURCHARGES' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{row.channelSurcharges | localCurrency:(currency$ | async):'narrow'}}
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="total">
+                    <mat-header-cell *matHeaderCellDef class="head-cell right total-column">
+                        {{'SALE_REQUEST.PRICE_SIMULATION.TOTAL_PRICE' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row" class="right total-column">{{row.total | localCurrency:(currency$ | async):'narrow'}}
+                    </mat-cell>
+                </ng-container>
+                <mat-header-row *matHeaderRowDef="displayedColumns;"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+            </mat-table>
+        </div>
+    </div>
+</div>
+<div *ngIf="isLoading$ | async" fxFlex="100%" fxLayout="column" fxLayoutAlign="center center" class="spinner-container">
+    <mat-spinner></mat-spinner>
+</div>

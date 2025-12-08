@@ -1,0 +1,122 @@
+@let seasonTicket = $seasonTicket();
+@let seasonTicketStatus = $seasonTicketStatus();
+@let orderDetail = $orderDetail();
+
+<div class="status-bar flex justify-end items-center">
+    <span>
+        <b>{{ 'CUSTOMER.SEASON_TICKETS.GENERAL_DATA.STATUS' | translate }}: </b>
+        @if (seasonTicketStatus?.status) {
+            <span>{{ 'SEASON_TICKET.STATUS_OPTS.' + seasonTicketStatus?.status | translate }}</span>
+        }
+    </span>
+</div>
+<app-form-container layout="main" [hideActionBar]="true">
+    <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+        <!-- PRINCIPAL INFO -->
+        <mat-expansion-panel [expanded]="true" class="section" >
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CUSTOMER.SEASON_TICKETS.GENERAL_DATA.SEASON_TICKET_INFO' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex flex-col gap-6">
+                <div class="flex flex-wrap gap-y-6 justify-between">
+                    <div class="flex flex-col flex-[1_0_50%] gap-2">
+                        <span class="ob-label">{{ 'CUSTOMER.SEASON_TICKETS.GENERAL_DATA.NAME' | translate }}</span>
+                        <span>{{ seasonTicket?.name }}</span>
+                    </div>
+                    <div class="flex flex-col flex-[1_0_50%] gap-2">
+                        <span class="ob-label">{{ 'CUSTOMER.SEASON_TICKETS.GENERAL_DATA.ENTITY' | translate }}</span>
+                        <span>{{ seasonTicket?.entity.name }}</span>
+                    </div>
+                    <div class="flex flex-col flex-[1_0_50%] gap-2">
+                        <span class="ob-label">{{ 'CUSTOMER.SEASON_TICKETS.GENERAL_DATA.PRODUCER' | translate }}</span>
+                        <span>{{ seasonTicket?.producer.name }}</span>
+                    </div>
+                </div>
+                <div>
+                    <a class="ob-link flex items-center gap-1" target="_blank" 
+                        [routerLink]="['/season-tickets', seasonTicket?.id]">
+                        <span>{{ "CUSTOMER.SEASON_TICKETS.GENERAL_DATA.GO_TO_ST" | translate }}</span>
+                        <mat-icon class="ob-icon xsmall" iconPositionEnd>launch</mat-icon>
+                    </a>
+                </div>
+            </div>
+        </mat-expansion-panel >
+        <!-- ALLOCATION_INFO -->
+        <mat-expansion-panel [expanded]="true" class="section" >
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CUSTOMER.SEASON_TICKETS.GENERAL_DATA.ALLOCATION_INFO' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex flex-col gap-6">
+                <div class="flex flex-wrap gap-y-6 justify-between">
+                    <div class="flex flex-col flex-[1_0_50%] gap-2">
+                        <span class="ob-label">{{ 'CUSTOMER.SEASON_TICKETS.GENERAL_DATA.CUSTOMER_NAME' | translate }}</span>
+                        <span>{{ orderDetail?.buyer_data.name }}</span>
+                    </div>
+                    <div class="flex flex-col flex-[1_0_50%] gap-2">
+                        <span class="ob-label">{{ 'CUSTOMER.SEASON_TICKETS.GENERAL_DATA.CUSTOMER_SURNAME' | translate }}</span>
+                        <span>{{ orderDetail?.buyer_data.surname }}</span>
+                    </div>
+                    <div class="flex flex-col flex-[1_0_50%] gap-2">
+                        <span class="ob-label">{{ 'CUSTOMER.SEASON_TICKETS.GENERAL_DATA.RATE' | translate }}</span>
+                        <span>{{ orderDetail?.ticket.rate.name }}</span>
+                    </div>
+                    <div class="flex flex-col flex-[1_0_50%] gap-2">
+                        <span class="ob-label">{{ 'CUSTOMER.SEASON_TICKETS.GENERAL_DATA.ALLOCATION' | translate }}</span>
+                          <span>{{orderDetail?.ticket?.allocation?.sector?.name}}&nbsp;-&nbsp;
+                              {{orderDetail?.ticket?.allocation.type === 'NUMBERED' ? ('FORMS.LABELS.ROW' | translate) + ': ' + orderDetail?.ticket.allocation.row?.name
+                            : ('FORMS.LABELS.ZONE' | translate) + ': ' + orderDetail?.ticket?.allocation.not_numbered_area?.name }}&nbsp;
+                              {{'FORMS.LABELS.SEAT' | translate}}: {{orderDetail?.ticket?.allocation.seat?.name}}
+                          </span>
+                    </div>
+                </div>
+                <div>
+                    <button mat-stroked-button class="ob-button medium" (click)="showTicket()"
+                            [attr.aria-label]="'CUSTOMER.SEASON_TICKETS.GENERAL_DATA.SEE_TICKETS' | translate">
+                        {{'CUSTOMER.SEASON_TICKETS.GENERAL_DATA.SEE_TICKETS' | translate}}
+                    </button>
+                </div>
+            </div>
+        </mat-expansion-panel >
+        <!-- ORDER INFO -->
+        <mat-expansion-panel [expanded]="true" class="section" >
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CUSTOMER.SEASON_TICKETS.GENERAL_DATA.PURCHASE_INFO' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex flex-col gap-6">
+                <div class="flex flex-wrap gap-y-6 justify-between">
+                    <div class="flex flex-col flex-[1_0_50%] gap-2">
+                        <span class="ob-label">{{ 'CUSTOMER.SEASON_TICKETS.GENERAL_DATA.DATE' | translate }}</span>
+                        <span>{{ orderDetail?.order.date | dateTime: dateTimeFormats.shortDate }}</span>
+                    </div>
+                    <div class="flex flex-col flex-[1_0_50%] gap-2">
+                        <span class="ob-label">{{ 'CUSTOMER.SEASON_TICKETS.GENERAL_DATA.CHANNEL' | translate }}</span>
+                        <span>{{ orderDetail?.channel.name }}</span>
+                    </div>
+                    <div class="flex flex-col flex-[1_0_50%] gap-2">
+                        <span class="ob-label">{{ 'CUSTOMER.SEASON_TICKETS.GENERAL_DATA.CODE' | translate }}</span>
+                        <span class="flex items-center">
+                            {{ orderDetail?.order.code }}
+                            <app-copy-text [copyText]="orderDetail?.order.code" class="copy-code-button" />
+                        </span>
+                    </div>
+                    <div class="flex flex-col flex-[1_0_50%] gap-2">
+                        <span class="ob-label">{{ 'CUSTOMER.SEASON_TICKETS.GENERAL_DATA.PRICE' | translate }}</span>
+                        <span>{{ orderDetail?.price.final | localCurrency: orderDetail?.price.currency }}</span>
+                    </div>
+                </div>
+                <div>
+                    <a class="ob-link flex items-center gap-1" target="_blank" 
+                        [routerLink]="['/transactions', orderDetail?.order.code]">
+                        <span>{{ "CUSTOMER.SEASON_TICKETS.GENERAL_DATA.SEE_TRANSACTION" | translate }}</span>
+                        <mat-icon class="ob-icon xsmall" iconPositionEnd>launch</mat-icon>
+                    </a>
+                </div>
+            </div>
+        </mat-expansion-panel >
+    </mat-accordion>
+</app-form-container>
+@if ($isLoading()) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

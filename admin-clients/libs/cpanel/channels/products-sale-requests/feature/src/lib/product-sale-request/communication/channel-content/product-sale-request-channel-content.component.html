@@ -1,0 +1,69 @@
+<app-form-container layout="menu" [formGroup]="form" hideActionBar>
+    <app-language-bar [languages]="languageList$ | async" [selected]="language$ | async"
+        (changed)="changeLanguage($event)" slot="outside" />
+    <mat-accordion [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'PRODUCT.CHANNEL_CONTENTS.PRODUCT_CONTENT.TITLE' | translate }}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex flex-wrap gap-4">
+                <div class="flex flex-wrap basis-full">
+                    <mat-label class="field-label">{{'FORMS.LABELS.PRODUCT_NAME' | translate}}</mat-label>
+                    @if(form.get('name').value){
+                        <span>{{ form.get('name').value}}</span>
+                    }@else {
+                        <span class="content-not-defined-message">
+                            {{('PRODUCT.COMMUNICATION.NOT_DEFINED.NAME' | translate)}}</span>    
+                    }
+                </div>
+                <div class="flex flex-wrap basis-full">
+                    <mat-label class="field-label">{{'PRODUCT.CHANNEL_CONTENTS.DESCRIPTION.LABEL' | translate}}</mat-label>
+                    @if(descriptionSafeHtml){
+                        <div [innerHTML]="descriptionSafeHtml"></div>
+                    }@else {
+                        <span class="content-not-defined-message">
+                            {{('PRODUCT.COMMUNICATION.NOT_DEFINED.DESCRIPTION' | translate)}}</span>    
+                    }
+                </div>
+                <div class="flex flex-wrap basis-full">
+                    <mat-label class="field-label">{{'PRODUCT.CHANNEL_CONTENTS.NOTES.LABEL' | translate }}</mat-label>
+                    @if(notesSafeHtml){
+                        <div [innerHTML]="notesSafeHtml"></div>
+                    }@else {
+                        <span class="content-not-defined-message">{{('PRODUCT.COMMUNICATION.NOT_DEFINED.NOTES' | translate)}}</span>    
+                    }
+                </div>
+                <div class="flex flex-col basis-full section-block">
+                    <span class="field-label">
+                        {{'PRODUCT.CHANNEL_CONTENTS.IMAGE.SLIDER.LABEL' | translate}}
+                    </span>
+                     @if ( form.get('slider1').value || form.get('slider2').value || form.get('slider3').value || 
+                        form.get('slider4').value || form.get('slider5').value ) {
+                        <div class="flex row">
+                            <app-image-uploader hasAltText class="basis-[calc(50%_+_20px)]" formControlName="slider1"
+                                [imageRestrictions]="sliderRestrictions" hideLabelText/>
+                            <div class="flex flex-row flex-wrap basis-1/2 " >
+                                <app-image-uploader hasAltText class="basis-[calc(50%_-_20px)]" formControlName="slider2"
+                                    [imageRestrictions]="sliderRestrictions" hideLabelText />
+                                <app-image-uploader hasAltText class="basis-[calc(50%_-_20px)]" formControlName="slider3"
+                                    [imageRestrictions]="sliderRestrictions" hideLabelText />
+                                <app-image-uploader hasAltText class="basis-[calc(50%_-_20px)]" formControlName="slider4"
+                                    [imageRestrictions]="sliderRestrictions" hideLabelText />
+                                <app-image-uploader hasAltText class="basis-[calc(50%_-_20px)]" formControlName="slider5"
+                                    [imageRestrictions]="sliderRestrictions" hideLabelText />
+                            </div>
+                        </div>
+                    }@else {
+                        <span class="content-not-defined-message">
+                            {{('SALE_REQUEST.COMMUNICATION.TICKET.IMAGE.BODY.NOT_DEFINED' | translate)}}</span>    
+                    }
+                    
+                </div>
+            </div>
+            
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+@if (isLoadingOrSaving$ | async) {
+    <div class="spinner-container"><mat-spinner /></div>
+}

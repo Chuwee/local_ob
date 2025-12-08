@@ -1,0 +1,30 @@
+@let seat = $seat();
+@let session = $session();
+
+<div class="info-block flex flex-col gap-4">
+    @if (session.transferSession?.data) {
+        <app-customer-transfer-dialog-user-info [session]="session" />
+    }
+    <div class="flex flex-row justify-start items-center gap-2">
+        <mat-icon class="ob-icon xsmall">event_seat</mat-icon>
+        <p class="mat-body-2"><b>{{seat.ticket?.allocation?.sector?.name}}</b> - 
+            {{seat.ticket?.allocation.type === 'NUMBERED' ? ('FORMS.LABELS.ROW' | translate) + ': ' + seat.ticket.allocation.row?.name
+      : ('FORMS.LABELS.ZONE' | translate) + ': ' + seat.ticket?.allocation.not_numbered_area?.name }}&nbsp;
+            {{'FORMS.LABELS.SEAT' | translate}}: {{seat.ticket?.allocation.seat?.name}}
+        </p>
+    </div>
+    <div class="flex flex-row justify-start items-center gap-2">
+        <mat-icon class="ob-icon xsmall">location_on</mat-icon>
+        <p class="mat-body-2">{{session.session_name}}</p>
+    </div>
+    <div class="flex flex-row justify-start items-center gap-4">
+        <div class="flex flex-row justify-start items-center gap-2">
+            <mat-icon class="ob-icon xsmall">calendar_today</mat-icon>
+            <p class="mat-body-2">{{session.session_starting_date | dateTime:dateTimeFormats.shortDate}}</p>
+        </div>
+        <div class="flex flex-row justify-start items-center gap-2">
+            <mat-icon class="ob-icon xsmall">access_time</mat-icon>
+            <p class="mat-body-2">{{session.session_starting_date | dateTime:dateTimeFormats.shortTime}}</p>
+        </div>
+    </div>
+</div>

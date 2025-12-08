@@ -1,0 +1,22 @@
+<div class="sale-request-status flex flex-row items-center gap-4 basis-full">
+    @if (label) { <span>{{label | translate}}:</span> }
+    <mat-form-field class="ob-form-field ob-form-field-outline inline-field thin-select-field flex-grow-0 basis-48"
+        appearance="outline">
+        <mat-select [disabled]="disabled" [value]="element[statusFieldName ?? 'status']"
+            (selectionChange)="updateElementStatus(element[idFieldName ?? 'id'], $event.value)">
+            <mat-select-trigger>
+                @if (statusChangeRequested$ | async) {
+                    <span class="status-dot-spinner"><mat-spinner diameter="15" /></span>
+                } @else {
+                    <span [ngClass]="['status-dot', element[statusFieldName ?? 'status'].toLowerCase()]"></span>
+                }
+                <ng-container *ngTemplateOutlet="optionTemplateRef; context: {$implicit: element[statusFieldName ?? 'status']}" />
+            </mat-select-trigger>
+            @for (status of statusList | keyvalue; track status.value) {
+                <mat-option [value]="status.value" [class.hidden]="hiddenStatusList.includes(status.value)">
+                    <ng-container *ngTemplateOutlet="optionTemplateRef; context: {$implicit: status.value}" />
+                </mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+</div>

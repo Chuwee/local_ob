@@ -1,0 +1,75 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">
+            {{(numCollectiveCodes > 1 ? 'TITLES.EDIT_COLLECTIVE_CODE_MULTIPLE' : 'TITLES.EDIT_COLLECTIVE_CODE') |
+            translate}}
+        </h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch" class="dialog-grid-form">
+        <p class="info" *ngIf="numCollectiveCodes > 1">
+            {{'COLLECTIVE.CODES.MULTIPLE_CODES_EDIT_INFO' | translate: { number: numCollectiveCodes} }}
+        </p>
+        <form [formGroup]="form" fxLayout="column" fxLayoutGap="20px grid" fxLayoutAlign="start stretch">
+            <ng-container formGroupName="validity_period">
+                <div fxLayout="row" fxLayoutGap="15px">
+                    <mat-checkbox #fromSelected color="primary"
+                        (change)="enableOrDisableForm(fromSelected.checked, 'validity_period.from')" class="inline">
+                        {{'FORMS.LABELS.COLLECTIVE_CODE_VALIDITY_PERIOD_FROM' | translate}}
+                    </mat-checkbox>
+                    <div fxLayoutAlign="start center">
+                        <mat-form-field fxFlex="180px" appearance="outline" class="ob-form-field inline-field">
+                            <input matInput [matDatepicker]="validityPeriodFromDP" [placeholder]="dateFormat"
+                                formControlName="from" (focus)="validityPeriodFromDP.open()">
+                            <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                            (click)="$event.stopPropagation(); validityPeriodFromDP.open();">
+                                <mat-icon>event</mat-icon>
+                            </button>
+                            <mat-datepicker #validityPeriodFromDP></mat-datepicker>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div fxLayout="row" fxLayoutGap="15px">
+                    <mat-checkbox #toSelected color="primary"
+                        (change)="enableOrDisableForm(toSelected.checked, 'validity_period.to')" class="inline">
+                        {{'FORMS.LABELS.COLLECTIVE_CODE_VALIDITY_PERIOD_TO' | translate}}
+                    </mat-checkbox>
+                    <div fxLayoutAlign="start center">
+                        <mat-form-field fxFlex="180px" appearance="outline" class="ob-form-field inline-field">
+                            <input matInput [matDatepicker]="validityPeriodToDP" [placeholder]="dateFormat"
+                                formControlName="to" (focus)="validityPeriodToDP.open()">
+                            <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                            (click)="$event.stopPropagation(); validityPeriodToDP.open();">
+                                <mat-icon>event</mat-icon>
+                            </button>
+                            <mat-datepicker #validityPeriodToDP></mat-datepicker>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <mat-error *ngIf="form.get('validity_period').errors" [ob-form-errors]="form"
+                    field="validity_period"></mat-error>
+            </ng-container>
+            <div fxLayout="row" fxLayoutGap="15px">
+                <mat-checkbox #limitSelected color="primary"
+                    (change)="enableOrDisableForm(limitSelected.checked, 'usage_limit')" class="inline">
+                    {{'FORMS.LABELS.COLLECTIVE_CODE_USAGE_LIMIT' | translate}}
+                </mat-checkbox>
+                <mat-form-field fxFlex="100px" appearance="outline" class="ob-form-field inline-field">
+                    <input matInput type="number" formControlName="usage_limit" placeholder="0">
+                </mat-form-field>
+                <mat-error [ob-form-errors]="form" field="usage_limit"></mat-error>
+            </div>
+        </form>
+    </div>
+    <div mat-dialog-actions fxFlex="auto" fxLayout="row no wrap" fxLayoutAlign="end">
+        <button mat-button type="button" class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="saveCollectiveCodes()"
+            [disabled]="(isSaving$ | async) || form.disabled">
+            {{'FORMS.ACTIONS.SAVE' | translate}}
+        </button>
+    </div>
+</div>

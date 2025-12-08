@@ -1,0 +1,155 @@
+<div fxLayout="row wrap" [formGroup]="form" class="editor-form">
+    <div fxLayout="row wrap" fxFlex="100%" class="editor-form-section">
+        <span fxFlex="0 1 100%" class="mat-subtitle-2" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.SEATS' | translate">
+            {{'VENUE_TPL_EDITOR.SEATS' | translate}}
+        </span>
+        <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center">
+            <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.TRACKS' | translate">
+                {{'VENUE_TPL_EDITOR.TRACKS' | translate}}
+            </mat-label>
+            <mat-form-field fxFlex="160px" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                <mat-select formControlName="numTracks">
+                    <mat-option [value]="1">
+                        <span fxFlex appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.ONE_TRACK' | translate">
+                            {{'VENUE_TPL_EDITOR.ONE_TRACK' | translate}}
+                        </span>
+                    </mat-option>
+                    <mat-option [value]="2">
+                        <span fxFlex appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.TWO_TRACKS' | translate">
+                            {{'VENUE_TPL_EDITOR.TWO_TRACKS' | translate}}
+                        </span>
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div fxFlex="100%" fxLayoutAlign="start center">
+            <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.RANGE' | translate">
+                {{'VENUE_TPL_EDITOR.RANGE' | translate}}
+            </mat-label>
+            <mat-form-field fxFlex="160px" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                <mat-select formControlName="seatsRange">
+                    <mat-option *ngFor="let range of rangeTypes" [value]="range">
+                        <span fxFlex appEllipsify [matTooltip]="('VENUE_TPL_EDITOR.RANGE_' + range.toUpperCase()) | translate">
+                            {{('VENUE_TPL_EDITOR.RANGE_' + range.toUpperCase()) | translate}}
+                        </span>
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <!-- FIRST TRACK -->
+        <div fxLayout="row wrap" fxFlex="100%" class="editor-form-section" formGroupName="track1">
+            <p *ngIf="form.value?.numTracks > 1" fxFlex="0 1 100%" class="mat-subtitle-2" appEllipsify>
+                {{'VENUE_TPL_EDITOR.FIRST_TRACK' | translate}}
+            </p>
+            <div *ngIf="form.controls.track1.controls.numeration.enabled" fxFlex="100%" fxLayoutAlign="start center">
+                <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.NUMERATION' | translate">
+                    {{'VENUE_TPL_EDITOR.NUMERATION' | translate}}
+                </mat-label>
+                <mat-form-field fxFlex="160px" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                    <mat-select formControlName="numeration">
+                        <mat-option *ngFor="let numeration of numerationTypes" [value]="numeration">
+                        <span fxFlex appEllipsify
+                            [matTooltip]="('VENUE_TPL_EDITOR.NUMERATION_' + numeration.toUpperCase()) | translate">
+                            {{('VENUE_TPL_EDITOR.NUMERATION_' + numeration.toUpperCase()) | translate}}
+                        </span>
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div fxFlex="100%" fxLayoutAlign="start center">
+                <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.DIRECTION' | translate">
+                    {{'VENUE_TPL_EDITOR.DIRECTION' | translate}}
+                </mat-label>
+                <mat-form-field fxFlex="160px" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                    <mat-select formControlName="direction">
+                        <mat-option *ngFor="let direction of seatDirections" [value]="direction">
+                        <span fxFlex appEllipsify
+                            [matTooltip]="('VENUE_TPL_EDITOR.DIRECTION_' + direction.toUpperCase()) | translate">
+                            {{('VENUE_TPL_EDITOR.DIRECTION_' + direction.toUpperCase()) | translate}}
+                        </span>
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center">
+                <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.STARTS_WITH' | translate">
+                    {{'VENUE_TPL_EDITOR.STARTS_WITH' | translate}}
+                </mat-label>
+                <mat-form-field *ngIf="form.controls.track1.controls.numericStartsWith.enabled"
+                    fxFlex="0 0 100px" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                    <input type="number" matInput aria-label="startsWith" formControlName="numericStartsWith">
+                </mat-form-field>
+                <mat-form-field *ngIf="form.controls.track1.controls.alphabeticStartsWith.enabled"
+                    fxFlex="0 0 100px" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                    <input matInput aria-label="startsWith" formControlName="alphabeticStartsWith" [maxLength]="1">
+                </mat-form-field>
+            </div>
+            <div *ngIf="form.value?.numTracks > 1"
+                fxFlex="100%" fxLayout="row" fxLayoutAlign="start center">
+                <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.NUM_SEATS' | translate">
+                    {{'VENUE_TPL_EDITOR.SEATS' | translate}}
+                </mat-label>
+                <mat-form-field fxFlex="0 0 100px" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                    <input type="number" matInput aria-label="numSeats" formControlName="seats">
+                </mat-form-field>
+            </div>
+        </div>
+        <!-- SECOND TRACK -->
+        <div *ngIf="form.value?.numTracks > 1" fxLayout="row wrap" fxFlex="100%" class="editor-form-section" formGroupName="track2">
+            <p fxFlex="0 1 100%" class="mat-subtitle-2" appEllipsify>
+                {{'VENUE_TPL_EDITOR.SECOND_TRACK' | translate}}
+            </p>
+            <div *ngIf="form.controls.track2.controls.numeration.enabled" fxFlex="100%" fxLayoutAlign="start center">
+                <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.NUMERATION' | translate">
+                    {{'VENUE_TPL_EDITOR.NUMERATION' | translate}}
+                </mat-label>
+                <mat-form-field fxFlex="160px" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                    <mat-select formControlName="numeration">
+                        <mat-option *ngFor="let numeration of numerationTypes" [value]="numeration">
+                        <span fxFlex appEllipsify
+                            [matTooltip]="('VENUE_TPL_EDITOR.NUMERATION_' + numeration.toUpperCase()) | translate">
+                            {{('VENUE_TPL_EDITOR.NUMERATION_' + numeration.toUpperCase()) | translate}}
+                        </span>
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div fxFlex="100%" fxLayoutAlign="start center">
+                <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.DIRECTION' | translate">
+                    {{'VENUE_TPL_EDITOR.DIRECTION' | translate}}
+                </mat-label>
+                <mat-form-field fxFlex="160px" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                    <mat-select formControlName="direction">
+                        <mat-option *ngFor="let direction of seatDirections" [value]="direction">
+                        <span fxFlex appEllipsify
+                            [matTooltip]="('VENUE_TPL_EDITOR.DIRECTION_' + direction.toUpperCase()) | translate">
+                            {{('VENUE_TPL_EDITOR.DIRECTION_' + direction.toUpperCase()) | translate}}
+                        </span>
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center">
+                <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.STARTS_WITH' | translate">
+                    {{'VENUE_TPL_EDITOR.STARTS_WITH' | translate}}
+                </mat-label>
+                <mat-form-field *ngIf="form.controls.track2.controls.numericStartsWith.enabled"
+                    fxFlex="0 0 100px" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                    <input type="number" matInput aria-label="startsWith" formControlName="numericStartsWith">
+                </mat-form-field>
+                <mat-form-field *ngIf="form.controls.track2.controls.alphabeticStartsWith.enabled"
+                    fxFlex="0 0 100px" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                    <input matInput aria-label="startsWith" formControlName="alphabeticStartsWith" [maxLength]="1">
+                </mat-form-field>
+            </div>
+            <div fxFlex="100%" fxLayout="row" fxLayoutAlign="start center">
+                <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'VENUE_TPL_EDITOR.NUM_SEATS' | translate">
+                    {{'VENUE_TPL_EDITOR.SEATS' | translate}}
+                </mat-label>
+                <mat-form-field fxFlex="0 0 100px" appearance="outline" class="ob-form-field inline-field editor-form-field">
+                    <input type="number" matInput aria-label="numSeats" formControlName="seats">
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+</div>

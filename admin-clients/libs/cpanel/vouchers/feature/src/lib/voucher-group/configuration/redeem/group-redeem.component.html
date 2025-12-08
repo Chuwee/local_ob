@@ -1,0 +1,69 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="!form.dirty">
+    <form [formGroup]="form">
+        <!-- COMMUNICATION CONTENTS -->
+        <mat-expansion-panel expanded togglePosition="before" class="without-body-padding">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'VOUCHER_GROUP.CHANNELS_COMMUNICATION' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-communication-text-content [form]="form" [restrictions]="fieldRestrictions"
+                [languages$]="languages$" [description]="false" />
+        </mat-expansion-panel>
+        <!-- CHANNELS CONFIG -->
+        <mat-expansion-panel expanded togglePosition="before" formGroupName="channels">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'VOUCHER_GROUP.CHANNELS_SELECTION' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="column">
+                <p class="mat-subtitle-2">{{'VOUCHER_GROUP.CHANNELS_DESC' | translate}}</p>
+                <mat-radio-group formControlName="type" fxLayout="column">
+                    <mat-radio-button class="ob-radio-button vertical-list" [value]="voucherChannelsType.all">
+                        {{'VOUCHER_GROUP.GROUP_OPTS.ALL' | translate}}
+                    </mat-radio-button>
+                    <mat-radio-button class="ob-radio-button vertical-list" [value]="voucherChannelsType.filtered">
+                        {{'VOUCHER_GROUP.GROUP_OPTS.SELECT' | translate}}
+                    </mat-radio-button>
+                </mat-radio-group>
+                <div fxLayout="column" fxLayoutAlign="start start" class="voucher-group-channels-container nested-content">
+                    <div [fxShow]="form.get(['channels', 'type']).value === voucherChannelsType.filtered"
+                        class="channels-list-container" [class.field-error]="selectedForm.invalid && selectedForm.touched">
+                        <app-searchable-paginated-selection class="ob-medium-list" [placeholder]="'FORMS.SEARCH_CHANNEL_FIELD' | translate"
+                            [pageSize]="pageSize" [data$]="channelsListData$" [metadata$]="channelsListMetadata$" [form]="selectedForm"
+                            (loadData)="loadChannelsList($event)">
+                            <div slot="filter">
+                                <mat-form-field fxFlex="200px" appearance="outline" class="ob-form-field inline-field">
+                                    <mat-label>{{'VOUCHER_GROUP.TYPE' | translate}}</mat-label>
+                                    <mat-select [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate"
+                                        (selectionChange)="filterChannels($event.value)">
+                                        <mat-option>
+                                            {{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}
+                                        </mat-option>
+                                        <mat-option *ngFor="let type of channelType | keyvalue" [value]="type.value">
+                                            {{type.value && 'CHANNELS.TYPE_OPTS.' + type.value | translate}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            <ng-template #selectionTemplate let-data="data" let-pageForm="pageForm"
+                                let-selectionChanged="selectionChanged">
+                                <app-selection-list [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged"
+                                    class="small-rows">
+                                    <ng-template #optionTemplate let-row>
+                                        <div fxLayoutAlign="space-between">
+                                            <span>{{row.name}}</span>
+                                        </div>
+                                    </ng-template>
+                                </app-selection-list>
+                            </ng-template>
+                        </app-searchable-paginated-selection>
+                    </div>
+                    <span *ngIf="selectedForm.invalid && selectedForm.touched" class="error-description">
+                        {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                    </span>
+                </div>
+            </div>
+        </mat-expansion-panel>
+    </form>
+</app-form-container>
+<div class="spinner-container" *ngIf="reqInProgress$ | async">
+    <mat-spinner />
+</div>

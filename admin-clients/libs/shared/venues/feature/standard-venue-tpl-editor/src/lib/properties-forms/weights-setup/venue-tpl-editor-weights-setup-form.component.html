@@ -1,0 +1,31 @@
+<div fxFlex="0 0 100%" fxLayout="column" fxLayoutAlign="start stretch">
+    <ng-template #noConfig>
+        <div fxLayoutAlign="center">
+            <h4 class="type-title">{{'VENUE_TPL_EDITOR.WEIGHTS' | translate}}</h4>
+        </div>
+        <p class="help-message" [innerHTML]="'VENUE_TPL_EDITOR.WEIGHTS_SETUP_HELP' | translate"></p>
+        <button mat-stroked-button type="button" class="ob-button" (click)="setWeightsSetupMode()">
+            {{'VENUE_TPL_EDITOR.ENTER_WEIGHTS_SETUP_BTN' | translate}}
+        </button>
+    </ng-template>
+    <ng-container *ngIf="config$ | async as config else noConfig">
+        <div fxLayoutAlign="center">
+            <h4 class="type-title">{{'VENUE_TPL_EDITOR.ASSIGN_WEIGHTS' | translate}}</h4>
+        </div>
+        <div fxFlex="100%" fxLayoutAlign="start center">
+            <mat-label fxFlex="0 1 100%" appEllipsify [matTooltip]="'FORMS.LABELS.TYPE' | translate">
+                {{'FORMS.LABELS.TYPE' | translate}}
+            </mat-label>
+            <mat-form-field fxFlex="160px" appearance="outline" class="ob-form-field inline-field">
+                <mat-select [formControl]="formControl" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                    <mat-option *ngFor="let type of types" [value]="type">
+                        <span fxFlex appEllipsify>{{('VENUE_TPL_EDITOR.WEIGHTS_SETUP_CONF_TYPE_' + type.toUpperCase()) | translate}}</span>
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <p *ngIf="formControl.value" class="help-message"
+            [innerHTML]="'VENUE_TPL_EDITOR.WEIGHTS_SETUP_CONF_TYPE_HELP_' + formControl.value.toUpperCase() | translate">
+        </p>
+    </ng-container>
+</div>

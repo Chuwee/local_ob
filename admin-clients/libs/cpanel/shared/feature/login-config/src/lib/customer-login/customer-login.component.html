@@ -1,0 +1,124 @@
+<div [formGroup]="form">
+    <div class="edition-block flex flex-col gap-6">
+        <div class="flex flex-col gap-6">
+            <span class="title">{{'LOGIN_CONFIG.FORMS.LABELS.USERS' | translate}}</span>
+            <div class="flex flex-col gap-4" formGroupName="socialLogin">
+                <div class="tooltip-container" [matTooltip]="'LOGIN_CONFIG.FORMS.INFOS.SOCIAL_LOGIN_CREATE_TOOLTIP' | translate"
+                    [matTooltipDisabled]="form.controls.socialLogin.controls.enabled.enabled" matTooltipPosition="after">
+                    <mat-checkbox #enabled formControlName="enabled" color="primary">
+                        {{'LOGIN_CONFIG.FORMS.LABELS.ALLOW_SOCIAL_LOGIN' | translate}}
+                        <span class="ob-badge info">
+                            {{'INFORMATION_BADGE.NEW_FEATURE' | translate}}
+                        </span>
+                    </mat-checkbox>
+                </div>
+                @if (enabled.checked) {
+                    <div formGroupName="vendors" class="idented flex flex-col gap-4">
+                        @for (vendor of socialLogins; track vendor) {
+                            <mat-checkbox [formControlName]="vendor" color="primary">
+                                {{'LOGIN_CONFIG.FORMS.LABELS.GOOGLE' | translate}}
+                            </mat-checkbox>
+                        }
+                        @let vendorsCtrl = form.controls.socialLogin.controls.vendors;
+                        @if (vendorsCtrl.hasError('atLeastOneRequired') && vendorsCtrl.touched) {
+                            <mat-error>{{'LOGIN.FORMS.ERRORS.REQUIRED_VENDOR' | translate}}</mat-error>
+                        }
+                        <div class="flex gap-2 subdomain-alert-container">
+                            <mat-icon class="ob-icon xsmall">warning</mat-icon>
+                            <span>
+                                {{'LOGIN_CONFIG.FORMS.INFOS.SUBDOMAIN' | translate}}
+                            </span>
+                        </div>
+                    </div>
+                }
+            </div>
+            <mat-checkbox formControlName="allowGuest" color="primary">
+                {{'LOGIN_CONFIG.FORMS.LABELS.ALLOW_GUEST' | translate}}
+            </mat-checkbox>
+        </div>
+        <div class="tooltip-container" [matTooltip]="'LOGIN_CONFIG.FORMS.INFOS.SOCIAL_LOGIN_CREATE_TOOLTIP' | translate"
+            [matTooltipDisabled]="form.controls.disableCreateAccount.enabled" matTooltipPosition="after">
+            <mat-checkbox class="flex items-center" formControlName="disableCreateAccount" color="primary">
+                <div class="field-label">
+                    <mat-label class="flex items-center">
+                        {{'LOGIN_CONFIG.FORMS.LABELS.DISABLE_CREATE_ACCOUNT' | translate}}
+                        <app-help-button matSuffix [message]="'LOGIN_CONFIG.FORMS.INFOS.DISABLE_CREATE_HELP' | translate" />
+                    </mat-label>
+
+                </div>
+            </mat-checkbox>
+        </div>
+        @let customerTypes = $customerTypes();
+        @if(customerTypes?.length) {
+            <div class="flex flex-col gap-3">
+                <mat-checkbox formControlName="blocked_customer_types_enabled" color="primary">
+                    {{ 'LOGIN_CONFIG_FORMS.LABELS.CUSTOMER_TYPES_ENABLED' | translate }}
+                </mat-checkbox>
+                @if(form.controls.blocked_customer_types_enabled?.value) {
+                    <div class="flex nested-content">
+                        <mat-form-field appearance="outline" class="ob-form-field flex-[0_0_428px]">
+                            <mat-select multiple [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                formControlName="blocked_customer_types">
+                                @for (customerType of customerTypes; track customerType.code) {
+                                    <mat-option [value]="customerType.code">
+                                        {{customerType.name}}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                }
+            </div>
+        }
+        <mat-radio-group formControlName="placement">
+            <div class="flex flex-col gap-4">
+                <span class="title">{{'LOGIN_CONFIG.FORMS.LABELS.VISUALIZATION' | translate}}</span>
+                <span>{{'LOGIN_CONFIG.FORMS.INFOS.VISUALIZATION' | translate}}</span>
+                <mat-radio-button class="inline" [value]="'BEFORE_CHECKOUT'">
+                    {{'LOGIN_CONFIG.FORMS.LABELS.BEFORE_CHECKOUT' | translate}}
+                </mat-radio-button>
+                <mat-radio-button class="inline" [value]="'IMMEDIATELY'">
+                    {{'LOGIN_CONFIG.FORMS.LABELS.IMMEDIATELY' | translate}}
+                </mat-radio-button>
+                <mat-radio-button class="inline" [value]="'BEFORE_SELECT_LOCATION'">
+                    {{'LOGIN_CONFIG.FORMS.LABELS.BEFORE_SELECT_LOCATION' | translate}}
+                </mat-radio-button>
+            </div>
+        </mat-radio-group>
+        @if(!$isChannel()) {
+            <div class="flex flex-col gap-4" [formGroup]="form.controls.counter">
+                <span class="title">{{'LOGIN_CONFIG.FORMS.LABELS.ID_COUNTER' | translate}}</span>
+                <span>{{'LOGIN_CONFIG.FORMS.INFOS.ID_COUNTER' | translate}}</span>
+                <mat-radio-group formControlName="mode">
+                    <div class="flex flex-col gap-4">
+                        <mat-radio-button class="ob-radio-button" value="DEFAULT">
+                            <div class="flex flex-col gap-1">
+                                <span class="ob-label">{{'LOGIN_CONFIG.FORMS.LABELS.MANUAL_COUNTER' | translate}}</span>
+                                <span>{{'LOGIN_CONFIG.FORMS.INFOS.MANUAL_COUNTER' | translate }}</span>
+                            </div>
+                        </mat-radio-button>
+                        <mat-radio-button class="ob-radio-button" value="AUTOINCREMENT">
+                            <div class="flex flex-col gap-1">
+                                <span class="ob-label">{{'LOGIN_CONFIG.FORMS.LABELS.AUTOMATIC_COUNTER' | translate}}</span>
+                                <span>{{'LOGIN_CONFIG.FORMS.INFOS.AUTOMATIC_COUNTER' | translate }}</span>
+                            </div>
+                        </mat-radio-button>
+                    </div>
+                </mat-radio-group>
+                @if (form.controls.counter.controls.mode.value === 'AUTOINCREMENT') {
+                    <div class="flex nested-content">
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label flex-[0_0_176px]">
+                            <mat-label>{{'LOGIN_CONFIG.FORMS.LABELS.COUNTER_ID' | translate}}</mat-label>
+                            <input matInput type="number" formControlName="id">
+                            <mat-icon matSuffix class="ob-help-icon"
+                                [matTooltip]="'LOGIN_CONFIG.FORMS.INFOS.COUNTER_ID_TOOLTIP' | translate">
+                                help_outline
+                            </mat-icon>
+                            <mat-error [ob-form-errors]="form.controls.counter" field="id" />
+                        </mat-form-field>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

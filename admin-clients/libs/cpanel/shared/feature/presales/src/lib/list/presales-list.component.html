@@ -1,0 +1,48 @@
+<div class="flex flex-col gap-4" #presalesContainer>
+    <div class="flex flex-row flex-wrap justify-end action-button">
+        <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+            [attr.aria-label]="'NEW_PRESALE' | prefix | translate" (click)="openNewPresaleDialog()">
+            <mat-icon>add</mat-icon>
+            {{'NEW_PRESALE' | prefix | translate}}
+        </button>
+    </div>
+
+    @if($presales()?.length) {
+        <mat-accordion [multi]="true" [togglePosition]="'before'">
+            @for (presale of $presales(); track presale.id) {
+                <mat-expansion-panel [id]="'presale-expansion-' + presale.id" class="ob-expansion-card"
+                    [expanded]="openedId === presale.id"
+                    (opened)="openedId = presale.id">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{presale.name}}</mat-panel-title>
+                        <span class="self-center presale-status">
+                            <span [class]="'status-dot ' + presale.status.toLowerCase()"></span>
+                            {{'PRESALES.STATUS.' + presale.status | prefix | translate}}
+                        </span>
+                        <button mat-icon-button color="tertiary" class="ob-button small" [matMenuTriggerFor]="actions"
+                            (click)="$event.stopPropagation()">
+                            <mat-icon>more_horiz</mat-icon>
+                        </button>
+                        <mat-menu #actions="matMenu">
+                            <button mat-menu-item (click)="rename(presale)">
+                                {{'PRESALES.EDIT_NAME' | prefix | translate}}
+                            </button>
+                            <button mat-menu-item (click)="remove(presale)">
+                                {{'PRESALES.DELETE' | prefix | translate}}
+                            </button>
+                        </mat-menu>
+                    </mat-expansion-panel-header>
+                    @if (openedId === presale.id) {
+                        <app-presale-detail [presale]="presale" [isAvetEvent]="$isAvetEvent()" [isSmartBooking]="$isSmartBooking()"
+                            [externalInventoryProvider]="$externalInventoryProvider()" />
+                    }
+                </mat-expansion-panel>
+            }
+        </mat-accordion>
+    } @else {
+        <div class="flex flex-row justify-center">
+            <app-empty-state-tiny class="flex-1" [title]="'PRESALES.EMPTY_TITLE' | prefix | translate"
+                [description]="'PRESALES.EMPTY_DESCRIPTION' | prefix | translate" />
+        </div>
+    }
+</div>

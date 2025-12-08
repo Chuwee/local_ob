@@ -1,0 +1,86 @@
+@if (event$ | async; as event) {
+    <div class="details-container flex flex-col basis-full">
+        <div class="heading-container flex items-center">
+            <app-go-back defaultPath="/events" />
+            <h1 class="secondary mat-headline-3">{{ event.name }}</h1>
+            @if (event | isAvetEvent) {
+                <img src="assets/la-liga.svg" alt="la liga" class="logo-la-liga heading-element">
+            }
+            @if (event.archived) {
+                <span class="highlighted-box heading-element">{{'EVENTS.ARCHIVED' | translate}}</span>
+            }
+        </div>
+        <div class="main-content flex flex-col basis-full">
+            <div class="top-actions">
+                <app-nav-tabs-menu type="tabMenu" [elements]="[
+                    {
+                        label: 'EVENTS.GENERAL_DATA',
+                        id: 'tab_event_general-data',
+                        param: 'general-data',
+                    },
+                    {
+                        label: 'EVENTS.VENUE_TEMPLATES',
+                        id: 'tab_event_venue-templates',
+                        param: 'venue-templates',
+                    },
+                    {
+                        label: 'EVENTS.ELEMENTS_INFO.TITLE',
+                        id: 'tab_event_elements-info',
+                        param: 'elements-info',
+                    },
+                    {
+                        label: 'EVENTS.PRICES',
+                        id: 'tab_event_prices',
+                        param: 'prices',
+                    },
+                    {
+                        label: 'SECONDARY_MARKET.NAV_TITLE',
+                        id: 'tab_event_secondary-market',
+                        param: 'secondary-market',
+                        show: secondaryMarketEnabled$ | async
+                    },
+                    {
+                        label: 'EVENTS.SESSIONS.TITLE',
+                        id: 'tab_event_sessions',
+                        param: 'sessions',
+                    },
+                    {
+                        label: 'EVENTS.SESSION_PACKS',
+                        id: 'tab_event_session-packs',
+                        param: 'session-packs',
+                        show: event | isSessionPackEvent
+                    },
+                    {
+                        label: 'EVENTS.TITLES.DESIGN',
+                        id: 'tab_event_design',
+                        param: 'design',
+                        show: v4Enabled$ | async
+                    },
+                    {
+                        label: 'EVENTS.COMMUNICATION.TITLE',
+                        id: 'tab_event_communication',
+                        param: 'communication',
+                    },
+                    {
+                        label: 'EVENTS.CHANNELS',
+                        id: 'tab_event_channels',
+                        param: 'channels',
+                    },
+                    {
+                        label: 'EVENTS.PROMOTIONS.TITLE',
+                        id: 'tab_event_promotions',
+                        param: 'promotions',
+                        dataTest: 'promotionsTab'
+                    },
+                    {
+                        label: 'EVENTS.B2B_CONDITIONS.TITLE',
+                        id: 'tab_event_b2b-conditions',
+                        param: 'b2b-conditions',
+                        show: entity$ | async | isB2bEntity
+                    },
+                ]" />
+            </div>
+            <router-outlet />
+        </div>
+    </div>
+}

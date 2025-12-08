@@ -1,0 +1,92 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="!form.dirty" [formGroup]="form">
+    <!-- ENTITY CONTACT INFO -->
+    <div fxLayout="column">
+        <div fxLayout="row">
+            <!-- ADDRESS -->
+            <mat-form-field id="address" fxFlex="100%" fxFlex.gt-sm="0 1 45%" appearance="outline"
+                class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.ADDRESS' | translate}}</mat-label>
+                <input formControlName="address" matInput [placeholder]="'FORMS.LABELS.ADDRESS' | translate">
+                <mat-error [ob-form-errors]="form" field="address" />
+            </mat-form-field>
+        </div>
+        <div fxLayout="row">
+            <!-- POSTAL CODE -->
+            <mat-form-field id="postalCode" fxFlex="100%" fxFlex.gt-sm="0 1 calc(45% * 0.5)" appearance="outline"
+                class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.POSTAL_CODE' | translate}}</mat-label>
+                <input formControlName="postalCode" matInput
+                    [placeholder]="'FORMS.LABELS.POSTAL_CODE' | translate">
+                <mat-error [ob-form-errors]="form" field="postalCode" />
+            </mat-form-field>
+        </div>
+        <div fxLayout="row">
+            <!-- COUNTRY -->
+            <mat-form-field id="country" fxFlex="100%" fxFlex.gt-sm="0 1 45%" appearance="outline"
+                class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.COUNTRY' | translate}}</mat-label>
+                <mat-select formControlName="country" [placeholder]="'FORMS.ACTIONS.SELECT' | translate">
+                    <mat-option>
+                        <app-select-search #countrySelectSearch [options$]="countries$"
+                            [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name" requireSelection="true" />
+                    </mat-option>
+                    @for (country of countrySelectSearch.getFilteredOptions$() | async; track country.code) {
+                        <mat-option [value]="country.code">
+                            {{country.name}}
+                        </mat-option>
+                    }
+                </mat-select>
+                <mat-error [ob-form-errors]="form" field="country" />
+            </mat-form-field>
+        </div>
+        <div fxLayout="row">
+            <!-- REGION -->
+            <mat-form-field id="region" fxFlex="100%" fxFlex.gt-sm="0 1 45%" appearance="outline"
+                class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.COUNTRY_SUBDIVISION' | translate}}</mat-label>
+                <mat-select formControlName="region" [placeholder]="'FORMS.ACTIONS.SELECT' | translate">
+                    <mat-option [value]="null">{{'FORMS.ACTIONS.SELECT' | translate}}</mat-option>
+                    @for (region of regions$ | async; track region.code) {
+                        <mat-option [value]="region.code">
+                            {{region.name}}
+                        </mat-option>
+                    }
+                </mat-select>
+                <mat-error [ob-form-errors]="form" field="region" />
+            </mat-form-field>
+        </div>
+        <div fxLayout="row">
+            <!-- CITY -->
+            <mat-form-field id="city" fxFlex="100%" fxFlex.gt-sm="0 1 45%" appearance="outline"
+                class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.CITY' | translate}}</mat-label>
+                <input formControlName="city" matInput [placeholder]="'FORMS.LABELS.CITY' | translate">
+                <mat-error [ob-form-errors]="form" field="city" />
+            </mat-form-field>
+        </div>
+        <div fxLayout="row">
+            <!-- PHONE -->
+            <mat-form-field id="phone" fxFlex="100%" fxFlex.gt-sm="0 1 calc(45% * 0.5)" appearance="outline"
+                class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.PHONE' | translate}}</mat-label>
+                <input formControlName="phone" matInput [placeholder]="'FORMS.LABELS.PHONE' | translate">
+                <mat-error [ob-form-errors]="form" field="phone" />
+            </mat-form-field>
+        </div>
+        <div fxLayout="row">
+            <!-- EMAIL -->
+            <mat-form-field id="email" fxFlex="100%" fxFlex.gt-sm="0 1 45%" appearance="outline"
+                class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.GENERIC_EMAIL' | translate}}</mat-label>
+                <input formControlName="email" matInput [placeholder]="'FORMS.LABELS.GENERIC_EMAIL' | translate">
+                <mat-error [ob-form-errors]="form" field="email" />
+                <app-help-button matSuffix [message]="'ENTITY.GENERAL_DATA.CONTACT_GENERIC_EMAIL_HELP' | translate" />
+            </mat-form-field>
+        </div>
+    </div>
+</app-form-container>
+@if (reqInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

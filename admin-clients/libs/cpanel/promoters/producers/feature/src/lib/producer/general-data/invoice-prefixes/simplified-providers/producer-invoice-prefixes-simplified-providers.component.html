@@ -1,0 +1,64 @@
+<div fxLayout="column" fxLayoutGap="24px" [formGroup]="invoicePrefixesFormGroup">
+    <div fxFlex="100%" fxLayout="column">
+        <span class="field-label">{{'PRODUCER.INVOICES.PREFIXES_LABEL' | translate}}</span>
+        <app-producer-invoice-prefixes-list (isInProgress$)="isListInProgressBS.next($event)"
+            [canHaveZeroDefaultInvoicePrefixes]="false" />
+    </div>
+    <div>
+        <div class="invoice-activation-container" fxFlex="100%" fxFlex.gt-sm="65%" fxFlex.gt-lg="55%">
+            <mat-slide-toggle fxFlex="400px" class="ob-slide-toggle" formControlName="simplifiedInvoice"
+                #toggleExternal [matTooltip]="'PRODUCER.INVOICES.ACTIVATION_DISABLED_INFO' | translate"
+                [matTooltipDisabled]="!toggleExternal.disabled || (isInvoiceProviderRequestDone$ | async) === true"
+                (change)="changeSimplifiedInvoices($event.checked)">
+                <span>{{'PRODUCER.INVOICES.ACTIVATION_TOGGLE' | translate}}</span>
+            </mat-slide-toggle>
+        </div>
+    </div>
+    <div>
+        <mat-divider fxFlex="100%" fxFlex.gt-sm="65%" fxFlex.gt-lg="55%" />
+    </div>
+    <div fxLayout="column">
+        <span class="field-label">{{'PRODUCER.INVOICES.PROVIDERS.REQUEST.LABEL' | translate}}</span>
+        <div>
+            <p fxFlex="100%" fxFlex.gt-sm="65%" fxFlex.gt-lg="55%">{{'PRODUCER.INVOICES.PROVIDERS.REQUEST.INFO' | translate}}</p>
+        </div>
+        <div fxFlex="100%" fxFlex.gt-sm="65%" fxFlex.gt-lg="55%" fxLayoutAlign="start baseline"
+            [formGroup]="form" fxLayoutGap="24px">
+            <mat-form-field fxFlex="100%" fxFlex.gt-sm="0 1 calc(45% - 24px)"
+                appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>{{'PRODUCER.INVOICES.PROVIDERS.REQUEST.PROVIDER' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="invoiceProviderOption">
+                    @for(option of (invoiceProviderOptions$ | async); track $index){
+                        <mat-option [value]="option"
+                            [disabled]="option === 'FEVER'">
+                            {{option}}
+                        </mat-option>
+                    }
+                </mat-select>
+                <mat-error [ob-form-errors]="form" field="invoiceProviderOption" />
+            </mat-form-field>
+
+            <div>
+                @if((isInvoiceProviderRequestDone$ | async) === false){
+                    <button mat-stroked-button color="primary" type="button"
+                        class="ob-button medium" [disabled]="!form.valid || (isRequestInvoiceProviderDisabled$ | async)"
+                        (click)="requestInvoiceProvider()">
+                        {{('PRODUCER.INVOICES.PROVIDERS.REQUEST.STATUS.' + (invoiceProviderStatus$ | async)) | translate}}
+                    </button>
+                }
+
+                @if ((isInvoiceProviderRequestDone$ | async) === true) {
+                    <button mat-button type="button" class="ob-button medium" disabled>
+                        {{('PRODUCER.INVOICES.PROVIDERS.REQUEST.STATUS.' + (invoiceProviderStatus$ | async)) | translate}}
+                        @if((invoiceProviderStatus$ | async) === invoiceProviderStatus.requested){
+                            <mat-icon>cached</mat-icon>
+                        }
+                        @if((invoiceProviderStatus$ | async) === invoiceProviderStatus.completed){
+                            <mat-icon>done</mat-icon>
+                        }
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+</div>

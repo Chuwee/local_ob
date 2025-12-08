@@ -1,0 +1,228 @@
+<div mat-dialog-content class="with-wizard-bar flex-col">
+    <p>{{'CHANNELS.PAYMENT_METHODS.TPV_PLACEHOLDER' | translate}}</p>
+    <div class="flex flex-col gap-4">
+        <div class="flex-wrap basis-full flex flex-col" [class.gap-4]="$channelGatewayConfig()">
+            <!--        TODO(MULTICURRENCY): delete when the multicurrency functionality is finished-->
+            @if ((isMultiCurrency$ | async) && (areMultipleChannelCurrencies$ | async)) {
+                @if (!$channelGatewayConfig()) {
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label no-grid-spacing basis-full">
+                        <mat-label>{{'CHANNELS.PAYMENT_METHODS.CURRENCIES_SELECT' | translate}}</mat-label>
+                        <mat-select [formControl]="gatewayCurrenciesCtrl"
+                            [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate" multiple>
+                            @for(currency of channelCurrencies$ | async; track currency.code) {
+                                <mat-option [value]="currency.code"> {{currency.code | localCurrencyFullTranslation}} </mat-option>
+                            }
+                        </mat-select>
+                        <mat-error [ob-form-errors]="gatewayCurrenciesCtrl" />
+                    </mat-form-field>
+                } @else {
+                    <div class="no-grid-spacing flex flex-col basis-full">
+                        <span class="field-label">{{'CHANNELS.PAYMENT_METHODS.ONLY_CURRENCY_SELECTED' | translate}}</span>
+                        <span [textContent]="gatewayCurrenciesCtrl.value | joinedLocalCurrenciesFullTranslation"></span>
+                    </div>
+                }
+            }
+            @if (!$channelGatewayConfig()){
+                <div class="flex">
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label no-grid-spacing basis-full">
+                        <mat-label>{{'CHANNELS.PAYMENT_METHODS.TPV' | translate}}</mat-label>
+                        <mat-select [formControl]="gatewayCtrl" placeholder="{{'FORMS.ACTIONS.SELECT' | translate }}"
+                            [compareWith]="compareEntityGatewayWith" data-test="gateway-select">
+                            @for(entityGateway of entityGateways$ | async; track entityGateway.gateway_sid) {
+                                <div [matTooltip]="'CHANNELS.PAYMENT_METHODS.FORMS.INFOS.NO_ASSOCIATIONS_ACTIVE' | translate"
+                                    [matTooltipDisabled]=" !entityGateway.wallet ||
+                                    (entityGateway.available_gateway_asociation | hasCommonElements: $paymentMethodGatewaySids())
+                                    ">
+                                    <mat-option [value]="entityGateway" [disabled]=" entityGateway.wallet &&
+                                        !(entityGateway.available_gateway_asociation | hasCommonElements: $paymentMethodGatewaySids())
+                                    ">
+                                        {{ entityGateway.name }}
+                                    </mat-option>
+                                </div>
+                            }
+                        </mat-select>
+                        <mat-error [ob-form-errors]="gatewayCtrl" />
+                    </mat-form-field>
+                </div>
+                <div id="warning-messages-container" class="flex flex-col gap-2">
+                    @if ((isMultiCurrency$ | async) && gatewayCtrl.touched) {
+                        <div class="custom-warning-message flex flex-start align-start">
+                            <mat-icon class="ob-icon xsmall warning with-text">warning</mat-icon>
+                            <span>{{'CHANNELS.PAYMENT_METHODS.TPV_CURRENCIES_INFO' | translate}}</span>
+                        </div>
+                    }
+                    @if (gatewayCtrl.value?.wallet) {
+                        <div class="custom-warning-message flex flex-start align-start">
+                            <mat-icon class="ob-icon xsmall warning with-text">warning</mat-icon>
+                            <p>{{'CHANNELS.PAYMENT_METHODS.FORMS.INFOS.DOMAINS_INFO' | translate}}</p>
+                        </div>
+                    }
+                </div>
+            } @else {
+                <div class="no-grid-spacing flex basis-full flex-col">
+                    <span class="field-label">{{'CHANNELS.PAYMENT_METHODS.TPV' | translate}}</span>
+                    <span>{{gatewayCtrl.value?.name}}</span>
+                </div>
+            }
+        </div>
+        <div class="flex-wrap basis-full flex flex-col gap-4">
+            @if (gatewayGroup.controls.attemptsCtrl.enabled || gatewayGroup.controls.fieldValuesRecord.enabled) {
+                <div id="fields-values-container">
+                    @if (gatewayGroup.controls.attemptsCtrl.enabled) {
+                        <div class="flex">
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label no-grid-spacing basis-full">
+                                <mat-label>{{'CHANNELS.PAYMENT_METHODS.RETRIES' | translate}}</mat-label>
+                                <input matInput autocomplete="off" type="number" aria-label="attempts"
+                                    [formControl]="gatewayGroup.controls.attemptsCtrl">
+                                <mat-error [ob-form-errors]="gatewayGroup.controls.attemptsCtrl" />
+                                <mat-hint align="end">
+                                    {{'FORMS.LABELS.MAX' | translate}}: {{gatewayCtrl.value?.retries}}
+                                </mat-hint>
+                            </mat-form-field>
+                        </div>
+                    }
+                    @if (gatewayGroup.controls.fieldValuesRecord.enabled) {
+                        <div class="record-container">
+                            @for(keyValueFieldValuesCtrl of
+                                    gatewayGroup.controls.fieldValuesRecord.controls |
+                                    keyvalue: customOrder; track keyValueFieldValuesCtrl.key
+                                ) {
+                                <div class="flex">
+                                    <mat-form-field appearance="outline" class="ob-form-field field-with-label no-grid-spacing basis-full">
+                                        <mat-label>
+                                            {{('CHANNELS.PAYMENT_METHODS.GATEWAY_FIELDS.' + keyValueFieldValuesCtrl.key) | translate}}
+                                        </mat-label>
+                                        @if (keyValueFieldValuesCtrl.key !== 'GATEWAY_ASSOCIATION_CONFIG_SID' &&
+                                            !PRIVATE_KEYS.includes(keyValueFieldValuesCtrl.key)) {
+                                            <input matInput autocomplete="off" type="text" [formControl]="keyValueFieldValuesCtrl.value">
+                                        }
+                                        @if (keyValueFieldValuesCtrl.key !== 'GATEWAY_ASSOCIATION_CONFIG_SID' &&
+                                            PRIVATE_KEYS.includes(keyValueFieldValuesCtrl.key)) {
+                                            <input matInput autocomplete="new-password" type="password"
+                                                [formControl]="keyValueFieldValuesCtrl.value">
+                                        }
+                                        @if (keyValueFieldValuesCtrl.key === 'GATEWAY_ASSOCIATION_CONFIG_SID') {
+                                            <mat-select
+                                                [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                                                [formControl]="keyValueFieldValuesCtrl.value"
+                                                [disabled]="true">
+                                                @for(method of walletAsociationPaymentMethods$ | async; track method.configuration_sid) {
+                                                    <mat-option
+                                                        [value]="method.configuration_sid">
+                                                        {{method.name}}
+                                                    </mat-option>
+                                                }
+                                            </mat-select>
+                                        }
+                                        <mat-error [ob-form-errors]="keyValueFieldValuesCtrl.value" />
+                                    </mat-form-field>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+            @if (gatewayGroup.controls.refundCtrl.enabled ||
+                 gatewayGroup.controls.forceRiskEvaluationCtrl.enabled ||
+                 gatewayGroup.controls.showBillingFormCtrl.enabled ||
+                 gatewayGroup.controls.saveCardByDefaultCtrl.enabled ||
+                 gatewayGroup.controls.sendAdditionalDataCtrl.enabled ||
+                 gatewayGroup.controls.priceRangeEnabledCtrl.enabled ||
+                 gatewayGroup.controls.allowBenefitsCtrl.enabled
+            ) {
+                <div id="check-configs-container" class="flex flex-col gap-4">
+                    @if (gatewayGroup.controls.refundCtrl.enabled) {
+                        <div class="flex basis-full">
+                            <mat-checkbox color="primary" [formControl]="gatewayGroup.controls.refundCtrl">
+                                {{'CHANNELS.PAYMENT_METHODS.REFUND.GATEWAY_CHECK' | translate}}
+                            </mat-checkbox>
+                        </div>
+                    }
+
+                    @if (gatewayGroup.controls.forceRiskEvaluationCtrl.enabled) {
+                        <div class="flex basis-full">
+                            <mat-checkbox color="primary" [formControl]="gatewayGroup.controls.forceRiskEvaluationCtrl">
+                                {{'CHANNELS.PAYMENT_METHODS.FORMS.INFOS.FORCE_RISK_EVALUATION' | translate}}
+                            </mat-checkbox>
+                        </div>
+                    }
+                    @if (gatewayGroup.controls.allowBenefitsCtrl.enabled) {
+                        <div class="flex basis-full">
+                            <mat-checkbox color="primary" [formControl]="gatewayGroup.controls.allowBenefitsCtrl">
+                                {{'CHANNELS.PAYMENT_METHODS.FORMS.INFOS.ALLOW_BENEFITS' | translate}}
+                            </mat-checkbox>
+                        </div>
+                    }
+
+                    @if (gatewayGroup.controls.showBillingFormCtrl.enabled) {
+                        <div class="flex basis-full">
+                            <mat-checkbox color="primary" [formControl]="gatewayGroup.controls.showBillingFormCtrl">
+                                {{'CHANNELS.PAYMENT_METHODS.FORMS.INFOS.SHOW_BILLING_FORM' | translate}}
+                            </mat-checkbox>
+                        </div>
+                    }
+
+                    @if (gatewayGroup.controls.saveCardByDefaultCtrl.enabled) {
+                        <div class="flex basis-full">
+                            <mat-checkbox color="primary" [formControl]="gatewayGroup.controls.saveCardByDefaultCtrl">
+                                {{'CHANNELS.PAYMENT_METHODS.FORMS.INFOS.SAVE_CARD_BY_DEFAULT' | translate}}
+                            </mat-checkbox>
+                        </div>
+                    }
+
+                    @if (gatewayGroup.controls.sendAdditionalDataCtrl.enabled) {
+                        <div class="flex basis-full">
+                            <mat-checkbox color="primary" [formControl]="gatewayGroup.controls.sendAdditionalDataCtrl">
+                                {{'CHANNELS.PAYMENT_METHODS.RISK_CHECK' | translate}}
+                            </mat-checkbox>
+                        </div>
+                    }
+
+                    @if (gatewayGroup.controls.priceRangeEnabledCtrl.enabled) {
+                        <div class="flex basis-full">
+                            <mat-checkbox color="primary" [formControl]="gatewayGroup.controls.priceRangeEnabledCtrl">
+                                {{'CHANNELS.PAYMENT_METHODS.PRICE_RANGE_ENABLED' | translate}}
+                            </mat-checkbox>
+                        </div>
+                    }
+                </div>
+            }
+            @if (gatewayGroup.controls.priceRangeGroup.enabled) {
+                <div class="flex">
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label no-grid-spacing basis-full">
+                        <mat-label>{{'FORMS.LABELS.PRICE_RANGE.MIN' | translate }}</mat-label>
+                        <input matInput type="number" placeholder="0" autocomplete="off"
+                            [formControl]="gatewayGroup.controls.priceRangeGroup.controls.minCtrl">
+                        <mat-error [ob-form-errors]="gatewayGroup.controls.priceRangeGroup.controls.minCtrl" />
+                    </mat-form-field>
+                </div>
+                <div class="flex">
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label no-grid-spacing basis-full">
+                        <mat-label>{{'FORMS.LABELS.PRICE_RANGE.MAX' | translate }}</mat-label>
+                        <input matInput type="number" placeholder="0" autocomplete="off"
+                            [formControl]="gatewayGroup.controls.priceRangeGroup.controls.maxCtrl">
+                        <mat-error
+                            [ob-form-errors]="gatewayGroup.controls.priceRangeGroup.controls.maxCtrl" />
+                    </mat-form-field>
+                </div>
+            }
+            @if (gatewayGroup.controls.liveCtrl.enabled) {
+                <div class="flex basis-full flex-col">
+                    <p class="mat-subtitle-2">{{'CHANNELS.PAYMENT_METHODS.ENVIROMENT' | translate}}</p>
+                    <mat-radio-group [formControl]="gatewayGroup.controls.liveCtrl" class="flex flex-col gap-4">
+                        <mat-radio-button class="ob-radio-button" [value]="false">
+                            <mat-label>{{'CHANNELS.PAYMENT_METHODS.ENV_TEST' | translate}}</mat-label>
+                        </mat-radio-button>
+                        <mat-radio-button class="ob-radio-button" [value]="true">
+                            <mat-label>{{'CHANNELS.PAYMENT_METHODS.ENV_PROD' | translate}}</mat-label>
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+@if ($isInProgress()) {
+    <div class="spinner-container"> <mat-spinner /> </div>
+}

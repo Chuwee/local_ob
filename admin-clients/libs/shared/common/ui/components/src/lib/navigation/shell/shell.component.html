@@ -1,0 +1,19 @@
+<mat-sidenav-container class="ob-sidenav-container">
+    <mat-sidenav #sidenav class="ob-sidenav" fixedInViewport role="navigation"
+        appMenuMode [rail]="(isHandset$ | async) === false" [isInitiallyOpen]="isSidenavInitiallyOpen">
+        <app-expanded-menu [hidden]="!sidenav.opened"
+            [sectionList]="sectionList"
+            [logo]="expandedMenuLogo" />
+        <app-collapsed-menu [hidden]="sidenav.opened"
+            [sectionList]="sectionList"
+            [logo]="collapsedMenuLogo" />
+        <ng-container [ngTemplateOutlet]="reportsTemplateRef" [ngTemplateOutletContext]="{sidenavOpen: sidenav.opened}" />
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <ng-container [ngTemplateOutlet]="topbarTemplateRef" [ngTemplateOutletContext]="{sidenavToggled}" />
+        <app-breadcrumbs />
+        <div #content class="content-scroll">
+            <router-outlet />
+        </div>
+    </mat-sidenav-content>
+</mat-sidenav-container>

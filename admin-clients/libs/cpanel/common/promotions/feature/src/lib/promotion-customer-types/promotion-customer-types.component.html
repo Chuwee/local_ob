@@ -1,0 +1,36 @@
+@if($customerTypes()?.length) {
+    <div class="flex flex-col">
+        <p class="mat-subtitle-2 flex justify-start items-center">
+            {{'PROMOTIONS.CUSTOMER_TYPES_LABEL' | translate}} *
+            <app-help-button [message]="'PROMOTIONS.CUSTOMER_TYPES_INFO' | translate" />
+        </p>
+        <div class="flex flex-col gap-4">
+            <mat-radio-group class="flex flex-col" [formControl]="$customerTypesForm()?.controls.type">
+                <mat-radio-button class="ob-radio-button vertical-list" [value]="'ALL'">
+                    {{'PROMOTIONS.CUSTOMER_TYPES_OPTS.ALL' | translate}}
+                </mat-radio-button>
+                <mat-radio-button class="ob-radio-button vertical-list" [value]="'RESTRICTED'">
+                    {{'PROMOTIONS.CUSTOMER_TYPES_OPTS.SELECT' | translate}}
+                </mat-radio-button>
+            </mat-radio-group>
+            @if ($customerTypesForm()?.value.type === 'RESTRICTED') {
+                <div class="flex flex-col items-start justify-start customer-types-field">
+                    <div class="flex flex-auto">
+                        <mat-form-field appearance="outline" class="ob-form-field flex-[0_0_558px]">
+                            <mat-select [multiple]="true" [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" 
+                                [formControl]="$customerTypesForm()?.controls.selected">
+                                @for(ct of $customerTypes(); track ct.id) {
+                                    <mat-option [value]="ct.id">
+                                        {{ ct.name }}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                            <mat-error [ob-form-errors]="$customerTypesForm()" field="selected" />
+                        </mat-form-field>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <mat-divider class="ob-divider" />
+}

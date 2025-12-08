@@ -1,0 +1,53 @@
+<div class="dialog-msg-container flex flex-col">
+    <div mat-dialog-title>
+        <div class="flex flex-row justify-between items-center">
+            <h2 class="secondary title">{{'TITLES.NEW_TEMPLATE' | translate}}</h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <app-wizard-bar [steps]="[step1, step2]" />
+    <div mat-dialog-content [formGroup]="form" class="with-wizard-bar flex flex-row flex-wrap">
+        @switch ($currentStep()) {
+            @case (step1) {
+                <app-venue-selection class="flex-1" [form]="venueSelectionForm"
+                    [mode]="mode" [prefixedEntityId]="prefixedEntityId" />
+            }
+            @case (step2) {
+                <app-template-selection class="flex-1" [form]="templateSelectionForm"
+                    [mode]="mode" [venue]="getSelectedVenue()" [event]="event" />
+            }
+        }
+    </div>
+    <div mat-dialog-actions>
+        <div class="flex flex-1 flex-row gap-2 justify-end">
+            <button type="button" mat-button class="ob-button" (click)="close()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button #prevStepBtn mat-stroked-button color="tertiary" type="button" class="ob-button"
+                [disabled]="$currentStep() === step1">
+                <mat-icon>arrow_back</mat-icon>
+                {{'FORMS.ACTIONS.PREVIOUS' | translate}}
+            </button>
+            <div [class.hidden]="$currentStep() !== step1">
+                <button #nextStepBtn mat-flat-button color="primary" type="button"
+                    class="ob-button" [disabled]="!venueSelectionForm?.valid">
+                    {{'FORMS.ACTIONS.NEXT' | translate}}
+                    <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+                </button>
+            </div>
+            <div [class.hidden]="$currentStep() !== step2">
+                <button #saveBtn mat-flat-button color="primary" type="button" class="ob-button"
+                    [disabled]="!form?.valid">
+                    {{'FORMS.ACTIONS.SAVE_FINISH' | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+@if(reqInProgress$ | async){
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

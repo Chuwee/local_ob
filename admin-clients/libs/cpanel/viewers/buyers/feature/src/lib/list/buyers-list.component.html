@@ -1,0 +1,488 @@
+<div fxFlex="0 0 100%" fxLayout="column" fxLayoutAlign="start stretch">
+    <div class="heading-container only-title" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">{{'TITLES.BUYERS' | translate}}</h1>
+        </div>
+        <div [fxShow]="(isEntitySelected$ | async)"
+            class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end" fxLayoutGap="10px">
+            <app-entity-filter-button #entityFilterButton [fxShow]="$canReadMultipleEntities()" [getEntitiesRequest]="entitiesRequest"/>
+            <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                [attr.aria-label]="'BUYERS.NEW' | translate" [disabled]="isLoading$ | async" (click)="openNewBuyerDialog()">
+                <mat-icon>add</mat-icon>
+                {{'BUYERS.NEW' | translate}}
+            </button>
+            @if(isExportEnabled$ | async){
+                <button mat-stroked-button color="tertiary" class="ob-button medium only-icon"
+                    [matMenuTriggerFor]="buyersListMenu">
+                    <mat-icon>more_horiz</mat-icon>
+                </button>
+            }
+            <mat-menu #buyersListMenu="matMenu">
+                <button mat-menu-item [attr.aria-label]="'BUYERS.EXPORT' | translate" [disabled]="isLoading$ | async" (click)="export()">
+                    {{'BUYERS.EXPORT' | translate}}
+                </button>
+            </mat-menu>
+        </div>
+    </div>
+    @if($canReadMultipleEntities() && (isEntitySelected$ | async) === false){
+        <app-empty-state fxFlex="0 1 100%"
+            [title]="'LIST.ENTITY_REQUIRED_TITLE' | translate"
+            [description]="'LIST.ENTITY_REQUIRED_DESCRIPTION' | translate">
+            <button type="button" mat-flat-button class="ob-button medium" color="primary"
+                (click)="entityFilterButton.openEntitySelectionDialog()">
+                {{'ACTIONS.SELECT_ENTITY' | translate}}
+            </button>
+        </app-empty-state>
+    }
+    @if(isEntitySelected$ | async){
+        <mat-drawer-container class="buyers-list-container" fxFlex fxLayout="row" fxLayoutAlign="stretch">
+            <mat-drawer #drawer mode="side" opened fxFlex="0 0 {{(smallDevice$ | async) ? '290px' : '350px'}}">
+                <app-sidebar-filter #filterContainer fxFlex="100%">
+                    <app-buyers-sidebar-filter fxFlex="0 1 100%" #filterContent [isEntityIdNeeded]="$canReadMultipleEntities()" />
+                </app-sidebar-filter>
+            </mat-drawer>
+            <mat-drawer-content fxFlex="0 1 100%">
+                <div class="ob-sidebar-toggle" (click)="drawer.toggle();" [ngClass]="{'collapsed': !drawer.opened}">
+                    <span class="arrow"></span>
+                </div>
+                <div fxFlex="100%" fxLayout="column">
+                    <div fxFlex fxLayout="column" fxLayoutAlign="start stretch" class="list-container">
+                        @if($buyersAggs(); as aggs){
+                            <app-header-summary [collapsedLabel]="'ACTIONS.TOTALS.SHOW' | translate">
+                                <div class="header-summary-detail">
+                                    <span>{{aggs.overall.aggData['totalOrders'].headerKey | translate}}</span>
+                                    <span>{{aggs.overall.aggData['totalOrders'].value | localNumber}}</span>
+                                </div>
+                                <div class="header-summary-detail">
+                                    <span>{{aggs.overall.aggData['totalOrderTickets'].headerKey | translate}}</span>
+                                    <span>{{aggs.overall.aggData['totalOrderTickets'].value | localNumber}}</span>
+                                </div>
+                                <div class="header-summary-detail">
+                                    <span>{{aggs.overall.aggData['totalOrderProducts'].headerKey | translate}}</span>
+                                    <span>{{aggs.overall.aggData['totalOrderProducts'].value | localNumber}}</span>
+                                </div>
+                                <div class="header-summary-detail">
+                                    <span [matTooltip]="aggs.overall.aggData['totalOrderItemsPrice'].headerKey + '_EXTENDED' | translate">
+                                        {{aggs.overall.aggData['totalOrderItemsPrice'].headerKey | translate}}
+                                    </span>
+                                    <span>
+                                        {{aggs.overall.aggData['totalOrderItemsPrice'].value | localCurrency : (currency$ | async)}}
+                                    </span>
+                                </div>
+                                <div class="header-summary-detail">
+                                    <span [matTooltip]="aggs.overall.aggData['avgOrderItemsPrice'].headerKey + '_EXTENDED' | translate">
+                                        {{aggs.overall.aggData['avgOrderItemsPrice'].headerKey | translate}}
+                                    </span>
+                                    <span>
+                                        {{aggs.overall.aggData['avgOrderItemsPrice'].value | localCurrency : (currency$ | async)}}
+                                    </span>
+                                </div>
+                                <div class="header-summary-detail">
+                                    <span [matTooltip]="aggs.overall.aggData['avgPurchaseDays'].headerKey + '_EXTENDED' | translate">
+                                        {{aggs.overall.aggData['avgPurchaseDays'].headerKey | translate}}
+                                    </span>
+                                    <span>{{aggs.overall.aggData['avgPurchaseDays'].value}}</span>
+                                </div>
+                            </app-header-summary>
+                        }
+                        <div fxFlex class="table-container" fxLayout="column" fxLayoutAlign="start stretch">
+                            <div class="paginator-container" fxLayout="row wrap" fxLayoutGap="10px grid" fxLayoutAlign="end center">
+                                <app-buyers-search-keyword-input fxFlex="0 1 500px" />
+                                <span fxFlex></span>
+                                <div [fxShow]="buyersMetadata$ | async" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="10px">
+                                    <p class="page-summary" [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: (buyersMetadata$ | async)"
+                                        [matTooltip]="'TITLES.BUYERS' | translate"></p>
+                                    <app-paginator [length]="(buyersMetadata$ | async)?.total" [pageSize]="PAGE_SIZE" />
+                                </div>
+                            </div>
+                            <div fxFlex="none" [style]="{
+                                width: displayedColumns.length > 8 ? displayedColumns.length * RESERVED_COL_WIDTH + 'px' : '100%'
+                            }">
+                                <mat-table
+                                    cdkDropList (cdkDropListDropped)="dropItem($event)" cdkDropListOrientation="horizontal"
+                                    fxFlex class="ob-table" matSortDisableClear matSort [class.not-touchable]="isDesktop$ | async"
+                                    [dataSource]="buyers$ | async" [matSortDirection]="INIT_SORT_DIR" [matSortActive]="INIT_SORT_COL">
+                                    @if(displayedColumns.includes(buyerListColumns.email)){
+                                        <ng-container [matColumnDef]="buyerListColumns.email">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef mat-sort-header
+                                                class="head-cell ob-draggable-column">
+                                                {{'BUYERS.EMAIL' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row">
+                                                <span appEllipsify [matTooltip]="row.email" matTooltipClass="ob-tooltip-nowrap">
+                                                    {{row.email}}
+                                                </span>
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.name)){
+                                        <ng-container [matColumnDef]="buyerListColumns.name">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef mat-sort-header
+                                                class="head-cell ob-draggable-column">
+                                                {{'BUYERS.NAME' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row">{{row.name}}</mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.surname)){
+                                        <ng-container [matColumnDef]="buyerListColumns.surname">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef mat-sort-header
+                                                class="head-cell ob-draggable-column">
+                                                {{'BUYERS.SURNAME' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row">{{row.surname}}</mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.gender)){
+                                        <ng-container [matColumnDef]="buyerListColumns.gender">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef mat-sort-header
+                                                class="head-cell ob-draggable-column"
+                                                fxFlex="0 0 100px">
+                                                {{'BUYERS.GENDER' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" fxFlex="0 0 100px">
+                                                {{('ENUMS.GENDER_OPTS.' + (row.gender || 'NOT_SPECIFIED')) | translate}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.birthDate)){
+                                        <ng-container [matColumnDef]="buyerListColumns.birthDate">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef class="head-cell ob-draggable-column"
+                                                fxFlex="0 0 100px">
+                                                {{'BUYERS.BIRTHDATE' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" fxFlex="0 0 100px">
+                                                {{row.date_of_birth | dateTime : dateTimeFormats.shortDate}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.fixPhone)){
+                                        <ng-container [matColumnDef]="buyerListColumns.fixPhone">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef
+                                                class="head-cell right ob-draggable-column"
+                                                fxFlex="0 0 100px">
+                                                {{'FORMS.LABELS.PHONE' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" class="right" fxFlex="0 0 100px">
+                                                {{row.phone?.fix}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.mobilePhone)){
+                                        <ng-container [matColumnDef]="buyerListColumns.mobilePhone">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef
+                                                class="head-cell right ob-draggable-column"
+                                                fxFlex="0 0 100px">
+                                                {{'FORMS.LABELS.MOBILE_PHONE' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" class="right" fxFlex="0 0 100px">
+                                                {{row.phone?.mobile}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.country)){
+                                        <ng-container [matColumnDef]="buyerListColumns.country">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef class="head-cell ob-draggable-column"
+                                                fxFlex="0 0 120px">
+                                                {{'FORMS.LABELS.COUNTRY' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" fxFlex="0 0 120px">
+                                                {{row.location?.country?.code}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.countrySubdivision)){
+                                        <ng-container [matColumnDef]="buyerListColumns.countrySubdivision">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef class="head-cell ob-draggable-column">
+                                                {{'FORMS.LABELS.COUNTRY_SUBDIVISION' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row">{{row.location?.country_subdivision?.code}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.city)){
+                                        <ng-container [matColumnDef]="buyerListColumns.city">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef class="head-cell ob-draggable-column">
+                                                {{'FORMS.LABELS.CITY' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row">{{row.location?.city}}</mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.zipCode)){
+                                        <ng-container [matColumnDef]="buyerListColumns.zipCode">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef
+                                                class="head-cell right ob-draggable-column"
+                                                fxFlex="0 0 100px">
+                                                {{'FORMS.LABELS.ZIPCODE' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" class="right" fxFlex="0 0 100px">
+                                                {{row.location?.zip_code}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.address)){
+                                        <ng-container [matColumnDef]="buyerListColumns.address">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef class="head-cell ob-draggable-column">
+                                                {{'FORMS.LABELS.ADDRESS' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row">{{row.location?.address}}</mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.creationDate)){
+                                        <ng-container [matColumnDef]="buyerListColumns.creationDate">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef mat-sort-header
+                                                class="head-cell ob-draggable-column"
+                                                fxFlex="0 0 100px">
+                                                {{'BUYERS.CREATION_DATE' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" fxFlex="0 0 100px">
+                                                {{row.date.create | dateTime : dateTimeFormats.shortDate}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.modificationDate)){
+                                        <ng-container [matColumnDef]="buyerListColumns.modificationDate">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef class="head-cell ob-draggable-column"
+                                                fxFlex="0 0 100px">
+                                                {{'BUYERS.MODIFICATION_DATE' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" fxFlex="0 0 100px">
+                                                {{row.date.last_update | dateTime : dateTimeFormats.shortDate}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.subscriptionList)){
+                                        <ng-container [matColumnDef]="buyerListColumns.subscriptionList">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef class="head-cell ob-draggable-column">
+                                                {{'BUYERS.SUBSCRIPTION_LISTS' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row">
+                                                {{idNameCollectionRenderer(row.subscription_lists)}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.collectives)){
+                                        <ng-container [matColumnDef]="buyerListColumns.collectives">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef class="head-cell ob-draggable-column">
+                                                {{'BUYERS.COLLECTIVES' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row">
+                                                {{idNameCollectionRenderer(row.collectives)}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.channels)){
+                                        <ng-container [matColumnDef]="buyerListColumns.channels">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef class="head-cell ob-draggable-column">
+                                                {{'BUYERS.CHANNELS' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row">
+                                                {{idNameCollectionRenderer(row.channels)}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.allowCommercialMailing)){
+                                        <ng-container [matColumnDef]="buyerListColumns.allowCommercialMailing">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef class="head-cell ob-draggable-column"
+                                                fxFlex="0 0 150px">
+                                                {{'BUYERS.ALLOW_COMMERCIAL_MAILING' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" fxFlex="0 0 150px">
+                                                {{(row.allow_commercial_mailing ? 'FORMS.LABELS.YES' : 'FORMS.LABELS.NO') |
+                                                translate}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.docType)){
+                                        <ng-container [matColumnDef]="buyerListColumns.docType">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef class="head-cell ob-draggable-column"
+                                                fxFlex="0 0 100px">
+                                                {{'BUYERS.CARD_TYPE' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" fxFlex="0 0 100px">
+                                                {{row.identity_card?.type}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.doc)){
+                                        <ng-container [matColumnDef]="buyerListColumns.doc">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef class="head-cell ob-draggable-column"
+                                                fxFlex="0 0 100px">
+                                                {{'BUYERS.ID_CARD' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" fxFlex="0 0 100px">
+                                                {{row.identity_card?.id}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.type)){
+                                        <ng-container [matColumnDef]="buyerListColumns.type">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef class="head-cell ob-draggable-column"
+                                                fxFlex="0 0 100px">
+                                                {{'BUYERS.TYPE' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" fxFlex="0 0 100px">{{row.type}}</mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.purchaseCount)){
+                                        <ng-container [matColumnDef]="buyerListColumns.purchaseCount">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef
+                                                class="head-cell right ob-draggable-column"
+                                                fxFlex="0 0 100px">
+                                                {{'BUYERS.PURCHASE_COUNT' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" class="right" fxFlex="0 0 100px">
+                                                {{row.total_orders | localNumber}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.ticketCount)){
+                                        <ng-container [matColumnDef]="buyerListColumns.ticketCount">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef
+                                                class="head-cell right ob-draggable-column"
+                                                fxFlex="0 0 100px">
+                                                {{'ORDER.TICKETS' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" class="right" fxFlex="0 0 100px">
+                                                {{row.total_order_tickets | localNumber}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.productCount)){
+                                        <ng-container [matColumnDef]="buyerListColumns.productCount">
+                                            <mat-header-cell  cdkDrag cdkDragLockAxis="x" *matHeaderCellDef
+                                                class="head-cell right ob-draggable-column"
+                                                fxFlex="0 0 100px">
+                                                {{'ORDER.PRODUCTS' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" class="right" fxFlex="0 0 100px">
+                                                {{row.total_order_products | localNumber}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.purchaseAmount)){
+                                        <ng-container [matColumnDef]="buyerListColumns.purchaseAmount">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef
+                                                class="head-cell right ob-draggable-column"
+                                                fxFlex="0 0 100px">
+                                                {{'BUYERS.PURCHASE_AMOUNT' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" class="right" fxFlex="0 0 100px">
+                                                {{row.sum_price | localCurrency : (currency$ | async)}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.refundAmount)){
+                                        <ng-container [matColumnDef]="buyerListColumns.refundAmount">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef
+                                                class="head-cell right ob-draggable-column"
+                                                fxFlex="0 0 100px">
+                                                {{'BUYERS.REFUND_AMOUNT' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" class="right" fxFlex="0 0 100px">
+                                                {{row.sum_refunded_price | localCurrency : (currency$ | async)}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.avgAmount)){
+                                        <ng-container [matColumnDef]="buyerListColumns.avgAmount">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef
+                                                class="head-cell right ob-draggable-column"
+                                                fxFlex="0 0 100px">
+                                                {{'BUYERS.AVG_AMOUNT' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" class="right" fxFlex="0 0 100px">
+                                                {{row.avg_price | localCurrency : (currency$ | async)}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.refundedItemsCount)){
+                                        <ng-container [matColumnDef]="buyerListColumns.refundedItemsCount">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef
+                                                class="head-cell right ob-draggable-column"
+                                                fxFlex="0 0 100px">
+                                                {{'BUYERS.REFUND_COUNT' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" class="right" fxFlex="0 0 100px">
+                                                {{row.total_refunded_items | localNumber}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.avgDaysBeforeDateBuyed)){
+                                        <ng-container [matColumnDef]="buyerListColumns.avgDaysBeforeDateBuyed">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef
+                                                class="head-cell right ob-draggable-column"
+                                                fxFlex="0 0 100px">
+                                                {{'BUYERS.AVG_DAYS_BEFORE_BUYED' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" class="right" fxFlex="0 0 100px">
+                                                {{row.avg_days_before_date_buyed | localNumber}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.firstPurchaseDate)){
+                                        <ng-container [matColumnDef]="buyerListColumns.firstPurchaseDate">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef class="head-cell ob-draggable-column"
+                                                fxFlex="0 0 100px">
+                                                {{'BUYERS.FIRST_PURCHASE' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" fxFlex="0 0 100px">
+                                                {{row.first_purchase | dateTime : dateTimeFormats.shortDate}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    @if(displayedColumns.includes(buyerListColumns.lastPurchaseDate)){
+                                        <ng-container [matColumnDef]="buyerListColumns.lastPurchaseDate">
+                                            <mat-header-cell cdkDrag cdkDragLockAxis="x" *matHeaderCellDef class="head-cell ob-draggable-column"
+                                                fxFlex="0 0 100px">
+                                                {{'BUYERS.LAST_PURCHASE' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let row" fxFlex="0 0 100px">
+                                                {{row.last_purchase | dateTime : dateTimeFormats.shortDate}}
+                                            </mat-cell>
+                                        </ng-container>
+                                    }
+                                    <ng-container matColumnDef="actions">
+                                        <mat-header-cell *matHeaderCellDef class="actions-cell head-cell" fxLayoutAlign="center center"
+                                            fxFlex="0 0 60px">
+                                            <button mat-stroked-button color="tertiary" class="ob-button xsmall only-icon"
+                                                [matTooltip]="'BUYERS.SELECT_COLUMNS' | translate" (click)="changeColSelection()">
+                                                <mat-icon>settings</mat-icon>
+                                            </button>
+                                        </mat-header-cell>
+                                        <mat-cell *matCellDef="let row" class="actions-cell" fxFlex="0 0 60px" fxLayoutAlign="end">
+                                            <div class="action-buttons" (click)="$event.stopPropagation()">
+                                                <button fxFlexAlign="start center" mat-icon-button aria-label="Delete buyer"
+                                                    class="ob-button medium" [matTooltip]="'BUYERS.DELETE' | translate"
+                                                    (click)="deleteBuyer(row)">
+                                                    <mat-icon>delete</mat-icon>
+                                                </button>
+                                            </div>
+                                        </mat-cell>
+                                    </ng-container>
+                                    <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="dense-row" />
+                                    <mat-row *matRowDef="let row; columns: displayedColumns;" class="hoverable-row interactive-row"
+                                        [routerLink]="[row.id]" />
+                                </mat-table>
+                            </div>
+                            @if((buyersMetadata$ | async)?.total === 0){
+                                <div class="context-notification-container" fxFlex="0 50 100%"
+                                    fxLayout="row" fxLayoutAlign="center start">
+                                    <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px" fxFlex="80%"
+                                        fxLayoutAlign="center start">
+                                        <p>{{'LIST.EMPTY' | translate}}</p>
+                                    </app-context-notification>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </mat-drawer-content>
+        </mat-drawer-container>
+    }
+    @if(isLoading$ | async){
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+</div>

@@ -1,0 +1,87 @@
+<app-form-container *ngIf="(error$ | async) === null" layout="main" class="overflow-y-auto" [formGroup]="form"
+    [disabled]="!(form?.dirty) || (reqInProgress$ | async)" (cancel)="cancel()" (save)="save()">
+    <div slot="outside" class="header-check-container">
+        <mat-checkbox color="primary" formControlName="allowCommercialMailing">
+            <mat-label>{{'BUYERS.BUYER_ALLOWS_COMMUNICATIONS' | translate}}</mat-label>
+        </mat-checkbox>
+    </div>
+    <div fxLayout="column" fxLayoutAlign="start stretch">
+        <div fxLayout="row wrap" fxLayoutGap="60px grid">
+            <div fxFlex="100%" fxFlex.gt-sm="33%" class="buyer-list-container" fxLayout="column" fxLayoutGap="5px"
+                fxLayoutAlign="start stretch">
+                <div fxLayoutAlign="start center" fxFlex="30px">
+                    <span fxFlex class="mat-subtitle-2" appEllipsify [matTooltip]="'BUYERS.SUBSCRIPTION_LISTS' | translate">
+                        {{'BUYERS.SUBSCRIPTION_LISTS' | translate}}
+                    </span>
+                    <button mat-stroked-button color="primary" type="button" class="ob-button small"
+                        aria-label="'BUYERS.ADD_SUBSCRIPTION_LIST_BTN' | translate" (click)="addSubscriptionList()">
+                        <mat-icon>add</mat-icon>
+                        {{'BUYERS.ADD_SUBSCRIPTION_LIST_BTN' | translate}}
+                    </button>
+                </div>
+                <mat-list *ngIf="subscriptionLists.controls.length" fxFlex class="buyer-details-list ob-list">
+                    <mat-list-item *ngFor="let subscriptionList of subscriptionLists.controls">
+                        <span fxFlex appEllipsify
+                            [matTooltip]="subscriptionList.value?.name">{{subscriptionList.value?.name}}</span>
+                        <button *ngIf="subscriptionList.value?.id" mat-icon-button
+                            aria-label="'BUYERS.DELETE_SUBSCRIPTION_LIST' | translate" class="ob-button small"
+                            (click)="removeSubscriptionList(subscriptionList.value)"
+                            [matTooltip]="'BUYERS.DELETE_SUBSCRIPTION' | translate">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </mat-list-item>
+                    <ng-container *ngIf="subscriptionLists.controls?.length < 5">
+                        <mat-list-item *ngFor="let x of [1,2,3,4,5].slice(0, 5 - subscriptionLists.controls?.length)">
+                        </mat-list-item>
+                    </ng-container>
+                </mat-list>
+                <app-empty-state *ngIf="subscriptionLists.controls.length === 0" fxFlex
+                    [description]="'BUYERS.SUBSCRIPTION_LISTS_EMPTY_MSG' | translate">
+                </app-empty-state>
+            </div>
+            <div fxFlex="100%" fxFlex.gt-sm="33%" class="buyer-list-container" fxLayout="column" fxLayoutGap="5px"
+                fxLayoutAlign="start stretch">
+                <div fxLayoutAlign="start center" fxFlex="30px">
+                    <span class="mat-subtitle-2" appEllipsify [matTooltip]="'BUYERS.SUBSCRIPTION_LISTS' | translate">
+                        {{'BUYERS.CHANNELS' | translate}}
+                    </span>
+                </div>
+                <mat-list *ngIf="(channels$ | async)?.length" fxFlex class="buyer-details-list ob-list">
+                    <mat-list-item *ngFor="let channel of channels$ | async">
+                        {{channel.name}}
+                    </mat-list-item>
+                    <ng-container *ngIf="(channels$ | async)?.length < 5">
+                        <mat-list-item *ngFor="let x of [1,2,3,4,5].slice(0, 5 - (channels$ | async)?.length)">
+                        </mat-list-item>
+                    </ng-container>
+                </mat-list>
+                <app-empty-state *ngIf="(channels$ | async)?.length === 0" fxFlex
+                    [description]="'BUYERS.CHANNELS_EMPTY_MSG' | translate">
+                </app-empty-state>
+            </div>
+            <div fxFlex="100%" fxFlex.gt-sm="33%" class="buyer-list-container" fxLayout="column" fxLayoutGap="5px"
+                fxLayoutAlign="start stretch">
+                <div fxLayoutAlign="start center" fxFlex="30px">
+                    <span class="mat-subtitle-2" appEllipsify [matTooltip]="'BUYERS.SUBSCRIPTION_LISTS' | translate">
+                        {{'BUYERS.COLLECTIVES' | translate}}
+                    </span>
+                </div>
+                <mat-list *ngIf="(collectives$ | async)?.length" fxFlex class="buyer-details-list ob-list">
+                    <mat-list-item *ngFor="let collective of (collectives$ | async)">
+                        {{collective.name}}
+                    </mat-list-item>
+                    <ng-container *ngIf="(collectives$ | async)?.length < 5">
+                        <mat-list-item *ngFor="let x of [1,2,3,4,5].slice(0, 5 - (collectives$ | async)?.length)">
+                        </mat-list-item>
+                    </ng-container>
+                </mat-list>
+                <app-empty-state *ngIf="(collectives$ | async)?.length === 0" fxFlex
+                    [description]="'BUYERS.COLLECTIVES_EMPTY_MSG' | translate">
+                </app-empty-state>
+            </div>
+        </div>
+    </div>
+</app-form-container>
+<div class="spinner-container" *ngIf="reqInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

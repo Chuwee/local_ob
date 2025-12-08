@@ -1,0 +1,127 @@
+<div *ngIf="sale$ | async as sale">
+    <div class="sale-details">
+        <form id="formSaleData" fxFlex="55%" *ngIf="!!!(isLoading$ | async)" appCustomScroll>
+            <h2>{{ 'SALES.SALE_INFO_TITLE' | translate }}</h2>
+            <div fxLayout="row wrap" fxLayoutGap.gt-xs="16px" fxLayoutAlign="flex-start" class="sale-info">
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'SALES.STATUS' | translate}}</span>
+                    <div class="badge-container">
+                        <span class="badge"
+                            [ngClass]="{
+                                'sold': sale.status === saleStatus.sold,
+                                'sold_with_error' : sale.status === saleStatus.soldWithError,
+                                'fulfilled' : sale.status === saleStatus.fulfilled,
+                                'fulfilled_with_error' : sale.status === saleStatus.fulfilledWithError,
+                                'received' : sale.status === saleStatus.received
+                            }">
+                            <mat-icon *ngIf="sale.status === saleStatus.soldWithError || sale.status === saleStatus.fulfilledWithError">
+                                error_outline
+                            </mat-icon>
+                            {{'SALES.STATUS_OPTS.' + sale.status | translate}}
+                        </span>
+                    </div>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'SALES.SALE_ID' | translate}}</span>
+                    <div class="badge-container">
+                        <span class="badge">{{sale.id}}</span>
+                    </div>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'SALES.SUPPLIER' | translate}}</span>
+                    <span>{{sale.supplier | titlecase}}</span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'SALES.EXCHANGE_RATE' | translate}}</span>
+                    <span>
+                        {{sale.price?.exchange_rate || '-'}}
+                    </span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'SALES.CURRENCY' | translate}}</span>
+                    <span>
+                        {{sale.price?.currency || '-'}}
+                    </span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'SALES.PRICE' | translate}}</span>
+                    <span>
+                        {{sale.price?.payout_per_product || '-'}}
+                    </span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'SALES.QUANTITY' | translate}}</span>
+                    <span>{{sale.products?.length || '-'}}</span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'SALES.COUNTRY' | translate}}</span>
+                    <span>{{sale.event?.country_code || '-'}}</span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'SALES.LAST_UPDATE' | translate}}</span>
+                    <span>{{sale.last_update.toString() | dateTime: dateTimeFormats.shortDateTime}}</span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'SALES.GA' | translate}}</span>
+                    <span>
+                        {{sale.general_admission ?
+                        ('FORMS.BOOLEAN_VALUES.YES' | translate) :
+                        ('FORMS.BOOLEAN_VALUES.NO' | translate)}}
+                    </span>
+                </div>
+                <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                    fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                    <span class="field-label">{{'SALES.SECTION' | translate}}</span>
+                    <span>{{sale.section || '-'}}</span>
+                </div>
+            </div>
+            <div *ngIf="sale.products?.length" class="sale-products-list">
+                <div class="section-title no-margin" fxLayout="row" fxLayoutAlign="start center">
+                    <span>{{ 'SALES.PRODUCTS_TITLE' | translate | uppercase }}</span>
+                </div>
+                <app-sale-details-products />
+            </div>
+        </form>
+
+        <div class="transitions" fxFlex="45%" *ngIf="!!!(isLoading$ | async)" appCustomScroll>
+            <h2>{{'SALES.TRANSITIONS' | translate}}</h2>
+            <div class="vertical-timeline">
+                <app-vertical-timeline [timelineElements]="transitions$ | async" />
+            </div>
+        </div>
+    </div>
+
+    <div class="action_button" fxLayoutAlign="end end" *ngIf="!!!(isLoading$ | async) && (hasWritePermissions$ | async)">
+        <button *ngIf="sale.status !== saleStatus.fulfilledWithError" mat-flat-button color="primary" type="button"
+            [disabled]="!sale.actions.retry_confirm" class="ob-button medium"
+            [attr.aria-label]="'SALES.RELAUNCH_BUTTON' | translate" (click)="relaunchSale(sale.id, 'RELAUNCH')"
+            [matTooltip]="'SALES.RELAUNCH_BUTTON.ACTION_NOT_AVAILABLE' | translate"
+            [matTooltipDisabled]="sale.actions.retry_confirm">
+            <mat-icon>replay</mat-icon>
+            {{'SALES.RELAUNCH_BUTTON.RELAUNCH' | translate}}
+        </button>
+        <button *ngIf="sale.status === saleStatus.fulfilledWithError" mat-flat-button color="primary"
+            type="button" class="ob-button medium" [disabled]="!sale.actions.retry_fulfill"
+            [attr.aria-label]="'SALES.RELAUNCH_BUTTON' | translate" (click)="relaunchSale(sale.id, 'FULFILL')"
+            [matTooltip]="'SALES.RELAUNCH_BUTTON.ACTION_NOT_AVAILABLE' | translate"
+            [matTooltipDisabled]="sale.actions.retry_fulfill">
+            <mat-icon>replay</mat-icon>
+            {{'SALES.RELAUNCH_BUTTON.RELAUNCH' | translate}}
+        </button>
+    </div>
+</div>
+
+
+<div class="spinner-container" *ngIf="isLoading$ | async">
+    <mat-spinner />
+</div>

@@ -1,0 +1,38 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="100%" class="secondary title">{{'ACTIONS.SELECT_ENTITY' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column">
+        <form [formGroup]="entityForm" fxLayout="column" fxLayoutAlign="start stretch">
+            <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                <mat-label>{{'FORMS.LABELS.ENTITY' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="entityId">
+                    <mat-option>
+                        <app-select-search #entitySelectSearch [options$]="entities$"
+                            [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name"
+                            requireSelection="true" />
+                    </mat-option>
+                    <mat-option *ngFor="let entity of entitySelectSearch.getFilteredOptions$() | async"
+                        [value]="entity.id">
+                        {{entity.name}}
+                    </mat-option>
+                </mat-select>
+                <mat-error [ob-form-errors]="entityForm.controls.entityId" />
+            </mat-form-field>
+        </form>
+        <div class="spinner-container" *ngIf="isLoading$ | async">
+            <mat-spinner />
+        </div>
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" [disabled]="isLoading$ | async" (click)="selectClick()">
+            {{'FORMS.ACTIONS.SELECT' | translate}}
+        </button>
+    </div>
+</div>

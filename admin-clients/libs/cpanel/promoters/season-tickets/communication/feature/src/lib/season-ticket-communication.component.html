@@ -1,0 +1,21 @@
+<div fxFill class="communication-container">
+    <div fxFlex="0 0 200px" class="subtabs-container">
+        <mat-button-toggle-group vertical [value]="deepPath$ | async" class="ob-subtab" appLastPathGuardListener
+            [currValue]="(deepPath$ | async)" fxFlex="1 0 100%">
+            <mat-button-toggle routerLink="channel-contents" value="channel-contents">
+                {{'SEASON_TICKET.COMMUNICATION.CHANNEL.TITLE' | translate}}
+            </mat-button-toggle>
+            <mat-button-toggle routerLink="ticket-contents" value="ticket-contents">
+                {{'SEASON_TICKET.COMMUNICATION.TICKET.TITLE' | translate}}
+            </mat-button-toggle>
+        </mat-button-toggle-group>
+    </div>
+    <div fxLayout="column" fxFlex="100%">
+        <div *ngIf="isGenerationStatusError$ | async" fxLayoutAlign="center start" class="context-notification-container">
+            <app-context-notification class="ob-context-notification" contextType="warn" fxFlex="50%">
+                {{'SEASON_TICKET.GENERATION_STATUS_ERROR_INFO' | translate}}
+            </app-context-notification>
+        </div>
+        <router-outlet />
+    </div>
+</div>

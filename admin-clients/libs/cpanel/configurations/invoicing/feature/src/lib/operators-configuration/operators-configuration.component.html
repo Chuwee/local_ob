@@ -1,0 +1,82 @@
+<div fxFlex="0 1 100%" fxLayout="column">
+    <app-form-container [formGroup]="form" (cancel)="cancel()" (save)="save()" [disabled]="!form.dirty" layout="main"
+        class="no-top-padding">
+        <div class="form-details-area" fxFlex="grow" fxLayoutAlign="center">
+            <div class="details-container content-wrapper" fxLayout="column" fxFlex="0 1 1280px">
+                <!-- CONFIGURATION -->
+
+                <form [formGroup]="configsArray" fxLayout="column" fxLayoutGap="10px">
+                    <div fxLayout="row wrap">
+                        <div fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="end end">
+                            <button type="button" mat-stroked-button class="ob-button medium add" color="primary"
+                                (click)="openNewConfigDialog()">
+                                <mat-icon>add</mat-icon>
+                                {{'INVOICING.OPERATORS_CONFIGURATION.EVENTS.ACTIONS.NEW' | translate }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="heading-container" fxLayout="row" fxLayoutAlign="space-between center">
+                        <div fxFlex.xs="100%" fxFlex="50%" fxLayoutGap="20px" fxLayoutAlign="start center">
+                            <app-popover appFilter class="filter-container" fxFlex="none">
+                                <app-operators-configuration-filter #filterContent>
+                                </app-operators-configuration-filter>
+                            </app-popover>
+                            <app-search-input [placeholder]="'INVOICING.OPERATORS_CONFIGURATION.INFOS.SEARCH' | translate"
+                                class="search-field"
+                                fxFlex="100%"></app-search-input>
+                        </div>
+                    </div>
+
+                    <div class="heading-container">
+                        <app-chips appFilter></app-chips>
+                    </div>
+
+                    <mat-table class="ob-table" [dataSource]="configs$ | async"
+                        matSort [matSortActive]="'name'" [matSortDirection]="'asc'" matSortDisableClear>
+                        <ng-container matColumnDef="name">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">
+                                {{'INVOICING.OPERATORS_CONFIGURATION.TITLES.OPERATOR' | translate}}
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row" fxLayoutAlign="start center">
+                                <span>{{row.entity.name}}</span>
+                            </mat-cell>
+                        </ng-container>
+
+                        <ng-container matColumnDef="type">
+                            <mat-header-cell *matHeaderCellDef class="head-cell">
+                                {{'INVOICING.OPERATORS_CONFIGURATION.TITLES.TYPE' | translate}}
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row" fxLayoutAlign="start center">
+                                <span class="pill">
+                                    {{('INVOICING.OPERATORS_CONFIGURATION.TITLES.' + row.type) | translate}}
+                                </span>
+                            </mat-cell>
+                        </ng-container>
+
+                        <ng-container [matColumnDef]="column" *ngFor="let column of staticColumns">
+                            <mat-header-cell *matHeaderCellDef class="head-cell">
+                                {{'INVOICING.OPERATORS_CONFIGURATION.TITLES.' + column.toUpperCase() | translate}}
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row" fxLayoutAlign="start center"
+                                class="editable-cell">
+                                <div fxFlex="100%" class="write-value">
+                                    <mat-form-field appearance="outline" class="ob-form-field">
+                                        <input matInput [formControl]="row.ctrl.get(column)" [placeholder]="0" type="number">
+                                    </mat-form-field>
+                                </div>
+                            </mat-cell>
+                        </ng-container>
+
+                        <mat-header-row *matHeaderRowDef="columns; sticky: true" class="dense-row"></mat-header-row>
+                        <mat-row *matRowDef="let row; columns: columns" class="dense-row hoverable-row">
+                        </mat-row>
+                    </mat-table>
+                </form>
+            </div>
+        </div>
+    </app-form-container>
+</div>
+<div class="spinner-container" *ngIf="reqInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

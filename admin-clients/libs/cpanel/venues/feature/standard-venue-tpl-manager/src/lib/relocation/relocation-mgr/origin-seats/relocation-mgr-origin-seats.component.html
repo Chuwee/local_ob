@@ -1,0 +1,43 @@
+<div class="origin-container flex flex-col gap-[24px]">
+    <div>
+        <p class="no-margin">{{'VENUE_TPLS.FORMS.INFOS.SELECT_ORIGIN' | translate}}</p>
+        <p class="total-count no-margin">{{'VENUE_TPLS.FORMS.INFOS.TOTAL_SELECTED' | translate}}: {{$totalSelectedTickets()}}</p>
+    </div>
+    <div class="orders-container flex flex-col gap-[24px]">
+        @for (orderObj of $selectedSeats(); track $index) {
+            <div class="order-row">
+                <p class="no-margin"><strong>{{'VENUE_TPLS.FORMS.LABELS.ORDER_CODE' | translate}} {{orderObj.code}}</strong></p>
+                @if ($showMoreSeatsWarning()[orderObj.code]) {
+                    <div class="flex items-center gap-[8px] warning-message">
+                        <mat-icon class="warning-icon">warning</mat-icon>
+                        <p class="no-margin">{{'VENUE_TPLS.FORMS.INFOS.WARNING_MORE_SEATS' | translate}}</p>
+                    </div>
+                }
+                <mat-divider class="divider" />
+                @for (seatObj of orderObj.venueItems; track seatObj?.seat?.id || $index) {
+                    @let seat = seatObj?.seat;
+                    @let selected = seatObj.selected;
+                    <div class="flex items-center justify-between selected-seat">
+                        <div [class.disabled]="!selected">
+                            <p class="no-margin">{{seat?.sectorName}}</p>
+                            <p class="no-margin">
+                                {{'VENUE_TPLS.FORMS.LABELS.ROW' | translate}} <strong>{{seat?.rowName}}</strong> -
+                                {{'VENUE_TPLS.FORMS.LABELS.SEAT' | translate}} <strong>{{seat?.name}}</strong>
+                            </p>
+                        </div>
+                        @if (selected) {
+                            <button mat-icon-button matSuffix class="ob-button" (click)="selectSeats([seat?.id], true)">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        } @else {
+                            <button type="button" mat-stroked-button class="ob-button" (click)="selectSeats([seat?.id])">
+                                {{'FORMS.ACTIONS.ADD' | translate}}
+                            </button>
+                        }
+                    </div>
+                    <mat-divider class="divider" />
+                }
+            </div>
+        }
+    </div>
+</div>

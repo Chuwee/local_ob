@@ -1,0 +1,139 @@
+{
+  "name": "cpanel-client",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/cpanel-client/src",
+  "prefix": "app",
+  "tags": ["scope:cpanel", "type:app"],
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:application",
+      "outputs": ["{options.outputPath}"],
+      "inputs": ["styled", "^production"],
+      "options": {
+        "outputPath": "dist/apps/cpanel-client",
+        "index": "apps/cpanel-client/src/index.html",
+        "browser": "apps/cpanel-client/src/main.ts",
+        "polyfills": ["apps/cpanel-client/src/polyfills.ts"],
+        "tsConfig": "apps/cpanel-client/tsconfig.app.json",
+        "allowedCommonJsDependencies": [
+          "cropperjs",
+          "moment",
+          "crypto-js",
+          "moment-timezone",
+          "papaparse"
+        ],
+        "assets": [
+          "apps/cpanel-client/src/favicon.ico",
+          "apps/cpanel-client/src/assets",
+          "apps/cpanel-client/src/manifest.webmanifest",
+          "apps/cpanel-client/src/info.json",
+          "apps/cpanel-client/src/environment.js",
+          {
+            "glob": "**/*",
+            "input": "libs/shared/assets",
+            "output": "/assets/"
+          },
+          {
+            "glob": "**/*",
+            "input": "node_modules/tinymce",
+            "output": "/assets/tinymce/",
+            "ignore": [
+              "bower.json",
+              "CHANGELOG.md",
+              "composer.json",
+              "license.txt",
+              "package.json",
+              "README.md"
+            ]
+          }
+        ],
+        "styles": [
+          "node_modules/angular-calendar/css/angular-calendar.css",
+          "apps/cpanel-client/src/styles.scss"
+        ],
+        "stylePreprocessorOptions": {
+          "includePaths": [""]
+        }
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "outputHashing": "all",
+          "sourceMap": false,
+          "namedChunks": false,
+          "extractLicenses": true,
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "2mb",
+              "maximumError": "5mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "6kb"
+            }
+          ],
+          "serviceWorker": "apps/cpanel-client/ngsw-config.json"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "proxyConfig": "apps/cpanel-client/proxy.conf.js",
+          "buildTarget": "cpanel-client:build:production"
+        },
+        "development": {
+          "proxyConfig": "apps/cpanel-client/proxy.conf.js",
+          "buildTarget": "cpanel-client:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/cpanel-client/jest.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "hasTypeAwareRules": true
+      }
+    },
+    "deploy": {
+      "executor": "@OneboxTM/tools:deploy",
+      "options": {
+        "buildOutputPath": "dist/apps/cpanel-client/browser",
+        "environments": "apps/cpanel-client/environments.json",
+        "removeMode": "DEPRECATE"
+      }
+    },
+    "remove": {
+      "executor": "@OneboxTM/tools:remove",
+      "options": {
+        "environments": "apps/cpanel-client/environments.json"
+      }
+    },
+    "info": {
+      "executor": "@OneboxTM/tools:info",
+      "options": {
+        "buildOutputPath": "dist/apps/cpanel-client/browser"
+      }
+    },
+    "environment": {
+      "executor": "@OneboxTM/tools:env"
+    }
+  }
+}

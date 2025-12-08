@@ -1,0 +1,44 @@
+<div fxLayout="row" fxLayoutAlign="space-between">
+    <h3 class="section-title">
+        {{'VENUE_TPLS.ELEMENT_INFO.IMAGES.TITLE' | translate}}
+        <span [matTooltip]="'INFORMATION_BADGE.BETA_FEATURE_TOOLTIP_INFO' | translate" class="ob-badge info">
+            {{'INFORMATION_BADGE.BETA_FEATURE' | translate}}
+        </span>
+    </h3>
+    <div fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="center baseline">
+        <mat-checkbox color="primary" [formControl]="enabledForm">
+            {{ 'VENUE_TPLS.ELEMENT_INFO.ENABLE_IN_PORTAL' | translate }}
+        </mat-checkbox>
+        <mat-divider vertical="true" fxFlexAlign="stretch" />
+        <span class="ob-link" (click)="deleteContentComponent()">
+            {{ 'VENUE_TPLS.ELEMENT_INFO.DELETE_CONTENT' | translate }}
+        </span>
+    </div>
+</div>
+
+<p>{{'VENUE_TPLS.ELEMENT_INFO.IMAGES.DESCRIPTION' | translate}}</p>
+<app-tabs-menu [formGroup]="langFormGroup" type="language" overrideClasses="no-left-padding" #textsTabs>
+    @for (lang of languages; track lang) {
+
+        <ng-template appTab lazyLoad [label]="('LANGUAGES.' + lang) | translate">
+            <div fxFlex="100%" fxLayout="column" class="section-block" [formGroupName]="lang">
+                <div fxLayout="row">
+                    <app-image-uploader hasAltText fxFlex="calc(50% + 20px)" formControlName="slider0"
+                        [imageRestrictions]="sliderRestrictions" hideLabelText />
+                    <div fxFlex="50%" fxLayout="row wrap">
+                        <app-image-uploader hasAltText fxFlex="50%" formControlName="slider1"
+                            [imageRestrictions]="sliderRestrictions" hideLabelText />
+                        <app-image-uploader hasAltText fxFlex="50%" formControlName="slider2"
+                            [imageRestrictions]="sliderRestrictions" hideLabelText />
+                        <app-image-uploader hasAltText fxFlex="50%" formControlName="slider3"
+                            [imageRestrictions]="sliderRestrictions" hideLabelText />
+                        <app-image-uploader hasAltText fxFlex="50%" formControlName="slider4"
+                            [imageRestrictions]="sliderRestrictions" hideLabelText />
+                    </div>
+                </div>
+                <span class="field-format">{{'UPLOAD_IMAGE.FORMAT' | translate: sliderRestrictions}}</span>
+            </div>
+        </ng-template>
+
+    }
+</app-tabs-menu>

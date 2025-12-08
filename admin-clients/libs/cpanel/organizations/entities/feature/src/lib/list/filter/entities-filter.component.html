@@ -1,0 +1,59 @@
+<form [formGroup]="filtersForm" class="flex flex-col gap-6">
+    @if($canSelectOperator()){
+        <div class="filter-block flex flex-row">
+            <div class="ob-label">
+                {{'FORMS.LABELS.OPERATOR' | translate}}
+            </div>
+            <div class="filter-block-input flex flex-[1_1_300px]">
+                <mat-form-field appearance="outline" class="ob-form-field operator-select">
+                    <mat-select formControlName="operator" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate">
+                        <mat-option>
+                            <app-select-search #operatorSelectSearch [options$]="$operators()" searchField="name" />
+                        </mat-option>
+                        @for(operator of (operatorSelectSearch.getFilteredOptions$() | async); track $index){
+                            <mat-option [value]="operator">
+                                <div appEllipsify
+                                    [matTooltip]="operator ? operator.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)">
+                                    {{operator ? operator.name : ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                                </div>
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-divider [inset]="true" />
+    }
+    <div class="filter-block flex flex-row">
+        <div class="ob-label">
+            {{'FORMS.LABELS.TYPE' | translate}}
+        </div>
+        <div class="filter-block-input flex flex-[1_1_300px]">
+            <mat-form-field appearance="outline" class="ob-form-field type-select">
+                <mat-select formControlName="type" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                    <mat-option [value]="null">
+                        {{'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate}}
+                    </mat-option>
+                    @for (type of $types(); track type) {
+                        <mat-option [value]="type">
+                            {{type && type.name | translate}}
+                        </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+    <mat-divider [inset]="true" />
+    <div formGroupName="status" class="filter-block flex flex-row">
+        <div class="ob-label ob-label-checkbox-group inline">
+            {{'FORMS.LABELS.STATUS' | translate}}
+        </div>
+        <div class="filter-block-checkbox grid grid-cols-2 gap-4">
+            @for (status of statuses; track status) {
+                <mat-checkbox [formControlName]="status.key" color="primary" class="app-checkbox-wrap-label">
+                    {{('ENTITY.STATUS_OPTS.' + status.id) | translate}}
+                </mat-checkbox>
+            }
+        </div>
+    </div>
+</form>

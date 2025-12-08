@@ -1,0 +1,89 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="100%" class="secondary title">{{'BUYERS.NEW' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="row wrap" [formGroup]="form">
+        <mat-form-field appearance="outline" fxFlex="100%" class="ob-form-field">
+            <mat-label>{{'BUYERS.EMAIL' | translate}}</mat-label>
+            <input matInput formControlName="email" name="email">
+            <mat-error [ob-form-errors]="form" field="email"></mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline" fxFlex="100%" class="ob-form-field">
+            <mat-label>{{'BUYERS.NAME' | translate}}</mat-label>
+            <input matInput formControlName="name" name="name">
+            <mat-error [ob-form-errors]="form" field="name"></mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline" fxFlex="100%" class="ob-form-field">
+            <mat-label>{{'BUYERS.SURNAME' | translate}}</mat-label>
+            <input matInput formControlName="surname" name="surname">
+            <mat-error [ob-form-errors]="form" field="surname"></mat-error>
+        </mat-form-field>
+        <!-- LANGUAGES -->
+        <mat-form-field appearance="outline" class="ob-form-field field-with-label" fxFlex="100%">
+            <mat-label>{{'FORMS.LABELS.LANGUAGE' | translate}}</mat-label>
+            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="language"
+                aria-label="country">
+                <mat-option>
+                    <app-select-search #languageSelectSearch [options$]="languages$"
+                        [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name">
+                    </app-select-search>
+                </mat-option>
+                <mat-option *ngFor="let language of languageSelectSearch.getFilteredOptions$() | async"
+                    [value]="language?.code">
+                    {{language?.name}}
+                </mat-option>
+            </mat-select>
+            <mat-error [ob-form-errors]="form" field="language"></mat-error>
+        </mat-form-field>
+        <!-- Country -->
+        <mat-form-field appearance="outline" class="ob-form-field field-with-label" fxFlex="100%">
+            <mat-label>{{'FORMS.LABELS.COUNTRY' | translate}}</mat-label>
+            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="country"
+                aria-label="country">
+                <mat-option>
+                    <app-select-search #countrySelectSearch [options$]="countries$"
+                        [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name">
+                    </app-select-search>
+                </mat-option>
+                <mat-option *ngFor="let country of countrySelectSearch.getFilteredOptions$() | async"
+                    [value]="country?.code">
+                    {{country ? country.name : ''}}
+                </mat-option>
+            </mat-select>
+            <mat-error [ob-form-errors]="form" field="country"></mat-error>
+        </mat-form-field>
+        <!-- Province -->
+        <mat-form-field [fxShow]="(provinces$ | async)?.length > 0" appearance="outline"
+            class="ob-form-field field-with-label" fxFlex="100%">
+            <mat-label>{{'FORMS.LABELS.COUNTRY_SUBDIVISION' | translate}}</mat-label>
+            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="countrySubdivision"
+                aria-label="province">
+                <mat-option>
+                    <app-select-search #provincesSelectSearch [options$]="provinces$"
+                        [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name">
+                    </app-select-search>
+                </mat-option>
+                <mat-option *ngFor="let province of provincesSelectSearch.getFilteredOptions$() | async"
+                    [value]="province?.code">
+                    {{province ? province.name : ''}}
+                </mat-option>
+            </mat-select>
+            <mat-error [ob-form-errors]="form" field="countrySubdivision"></mat-error>
+        </mat-form-field>
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" [disabled]="form.invalid"
+            (click)="create()">
+            {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>
+<div class="spinner-container" *ngIf="isCreating$ | async">
+    <mat-spinner></mat-spinner>
+</div>

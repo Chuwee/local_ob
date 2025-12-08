@@ -1,0 +1,95 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'TITLES.NEW_TICKET_PASSBOOK' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <form [formGroup]="form">
+            <div *ngIf="((canSelectEntity$ | async) || (isAvetEntityDigitalSeasonTicket$ | async))"
+                fxLayout="column"
+                fxLayoutAlign="start stretch">
+                <p fxFlex="100%">{{'TICKET_PASSBOOK.TYPES.SELECTION' | translate}}</p>
+                <mat-radio-group formControlName="type" fxFlex="100%" fxLayout.gt-sm="row wrap" fxLayout="column" fxLayoutGap="10px"
+                    fxLayoutAlign="center" (change)="onPassbookTypeChanges()" class="passbook-type-options">
+                    <mat-radio-button fxFlex.gt-sm="0 1 calc(50% - 5px)" class="ob-radio-card-button" [value]="passbookTypes.order">
+                        <div class="option-title">{{'TICKET_PASSBOOK.TYPES.ORDER.TITLE' | translate}}</div>
+                        <div>
+                            {{'TICKET_PASSBOOK.TYPES.ORDER.DESCRIPTION' | translate}}
+                        </div>
+                    </mat-radio-button>
+                    <mat-radio-button fxFlex.gt-sm="0 1 calc(50% - 5px)" class="ob-radio-card-button" [value]="passbookTypes.memberOrder">
+                        <div class="option-title">{{'TICKET_PASSBOOK.TYPES.MEMBER_ORDER.TITLE' | translate}}</div>
+                        <div>
+                            {{'TICKET_PASSBOOK.TYPES.MEMBER_ORDER.DESCRIPTION' | translate}}
+                        </div>
+                    </mat-radio-button>
+                </mat-radio-group>
+            </div>
+            <div *ngIf="(form.get('type').value || ((canSelectEntity$ | async) || (isAvetEntityDigitalSeasonTicket$ | async)) === false)
+            && ((isTicketsPassbookListInProgress$ | async) === false)" fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="24px">
+                <div class="context-notification-container ob-error" fxFlex="100%" fxLayout="row" fxLayoutAlign="center start">
+                    <app-context-notification *ngIf="(canSelectEntity$ | async) && !(entities$ | async).length" contextType="alert"
+                        fxFlex="100%">
+                        {{'TICKET_PASSBOOK.ERROR.NO_ENTITIES' | translate}}
+                    </app-context-notification>
+                </div>
+                <mat-form-field appearance="outline" class="ob-form-field">
+                    <mat-label>{{'TICKET_PASSBOOK.NAME' | translate}}</mat-label>
+                    <input matInput aria-label="name" [placeholder]="'TICKET_PASSBOOK.NAME' | translate" formControlName="name">
+                    <mat-error [ob-form-errors]="form" field="name"></mat-error>
+                </mat-form-field>
+                <div class="entity-passbook" fxFlex.gt-sm="0 1 calc(50% - 5px)">
+                    <mat-form-field *ngIf="canSelectEntity$ | async" appearance="outline" class="ob-form-field ob-form-avet">
+                        <mat-label>{{'TICKET_PASSBOOK.ENTITY' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="entity">
+                            <mat-option>
+                                <app-select-search #entitiesSelectSearch [options$]="entities$" searchField="name" requireSelection="true">
+                                </app-select-search>
+                            </mat-option>
+                            <mat-option *ngFor="let entities of entitiesSelectSearch.getFilteredOptions$() | async" [value]="entities.id">
+                                <div appEllipsify [matTooltip]="entities.name">
+                                    {{entities.name}}
+                                </div>
+                            </mat-option>
+                        </mat-select>
+                        <mat-error [ob-form-errors]="form" field="entity"></mat-error>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="ob-form-field"
+                        [ngClass]="(canSelectEntity$ | async) ? 'ob-form-avet' : 'ob-form-full'">
+                        <mat-label>{{'TICKET_PASSBOOK.BASE_TEMPLATE' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="baseTemplate">
+                            <mat-option>
+                                <app-select-search #ticketPassbookSelectSearch [options$]="ticketPassbookList$" searchField="name"
+                                    requireSelection="true">
+                                </app-select-search>
+                            </mat-option>
+                            <mat-option *ngFor="let ticketPassbook of ticketPassbookSelectSearch.getFilteredOptions$() | async"
+                                [value]="ticketPassbook">
+                                <div appEllipsify [matTooltip]="ticketPassbook.name">
+                                    {{ticketPassbook.name}}
+                                </div>
+                            </mat-option>
+                        </mat-select>
+                        <mat-error [ob-form-errors]="form" field="baseTemplate"></mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="spinner-container" *ngIf="(isTicketsPassbookListInProgress$ | async)">
+                <mat-spinner></mat-spinner>
+            </div>
+        </form>
+    </div>
+    <div mat-dialog-actions fxFlex="auto" fxGrow="1" fxShrink="0" fxLayout="row no wrap" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="createTicketPassbook()"
+            [disabled]="!form.dirty ||
+                (ticketPassbookSaving$ | async) ||
+                ((canSelectEntity$ | async) && ((entities$ | async) === null || !(entities$ | async).length))">
+            {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>

@@ -1,0 +1,94 @@
+$primary-color: var(--ob-theme-color-primary);
+$primary-color-50: var(--ob-theme-color-primary-50);
+$ob-grey-light-20: var(--ob-theme-color-grey-light-20);
+$ob-grey: var(--ob-theme-color-grey);
+$ob-bg1: var(--ob-theme-color-bg-1);
+$ob-black: var(--ob-theme-color-black);
+$ob-error: var(--ob-theme-color-warn);
+
+.ob-image-uploader-main {
+    %base-class {
+        position: relative;
+        background-color: $ob-bg1;
+        border-radius: 2px;
+        .ob-image-image {
+            object-fit: contain;
+        }
+    }
+    .ob-image-uploader-container {
+        @extend %base-class;
+        text-align: center;
+        &:not([disabled]) {
+            transition: background-color 200ms ease-out, border-color 200ms ease-out;
+            border: dashed 2px $ob-grey-light-20;
+            display: flex;
+            cursor: pointer;
+            &:hover {
+                border-color: $primary-color;
+                background-color: $primary-color-50;
+            }
+            .upload-image-icon {
+                color: $primary-color;
+            }
+        }
+        .ob-image-image {
+            opacity: 0.15;
+        }
+        .upload-image-icon {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            color: $ob-grey-light-20;
+            pointer-events: none;
+        }
+    }
+    .ob-image-preview-container {
+        @extend %base-class;
+        padding: 15px 15px 10px 15px;
+        border: solid 2px transparent;
+        text-align: center;
+        background-repeat: no-repeat;
+        background-position-x: center;
+        background-position-y: center;
+        background-size: contain;
+        &:hover:not([disabled]),
+        &.selected:not([disabled]) {
+            border-color: $ob-black;
+            .ob-image-toolbar {
+                visibility: visible;
+                opacity: 1;
+            }
+        }
+        .ob-image-image {
+            box-shadow: 0 5px 8px 1px rgba(0, 0, 0, 0.25);
+        }
+        .ob-image-toolbar {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+            padding: 5px 0;
+            background-color: var(--ob-theme-color-bg-dark-20);
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.5s linear;
+            .image-toolbar-icon {
+                color: var(--ob-theme-color-grey-light-10);
+            }
+        }
+    }
+    &.invalid {
+        .ob-image-uploader-container,
+        .ob-image-preview-container {
+            border-color: $ob-error;
+        }
+    }
+    .ob-image-uploader-legend {
+        font: var(--ob-theme-font-tiny);
+        color: $ob-grey;
+        padding-top: 10px;
+    }
+}

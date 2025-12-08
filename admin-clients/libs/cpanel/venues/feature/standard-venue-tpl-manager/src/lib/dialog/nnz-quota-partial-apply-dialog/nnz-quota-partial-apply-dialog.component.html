@@ -1,0 +1,198 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title class="dialog-header-container">
+        <div class="flex flex-row justify-between items-center">
+            <h2 class="secondary title flex flex-[0_1_100%]">{{'VENUE_TPL_MGR.TITLES.QUOTA_EDITION' | translate}}</h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="cancel()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content class="flex flex-col justify-start items-stretch">
+        <div class="flex">
+            <div class="flex flex-col flex-[0_0_55%]">
+                <div class="summary-container flex flex-col gap-4">
+                    <div class="flex flex-row flex-wrap">
+                        @if (sector$ | async; as sector) {
+                            <div class="ob-summary-value flex flex-col flex-[0_0_33%]">
+                                <p class="label primary">{{'FORMS.LABELS.SECTOR' | translate}}</p>
+                                <p class="value">
+                                    {{sector}}
+                                </p>
+                            </div>
+                        }
+                        @if (nnz$ | async; as nnz) {
+                            <div class="ob-summary-value flex flex-col flex-[0_0_33%]">
+                                <p class="label primary">{{'FORMS.LABELS.ZONE' | translate}}</p>
+                                <p class="value">
+                                    {{nnz}}
+                                </p>
+                            </div>
+                        }
+                        @if (nnzCapacity$ | async; as capacity) {
+                            <div class="ob-summary-value flex flex-col flex-[0_0_33%]">
+                                <p class="label primary">{{'FORMS.LABELS.CAPACITY' | translate}}</p>
+                                <p class="value">
+                                    {{capacity}}
+                                </p>
+                            </div>
+                        }
+                    </div>
+                    <mat-divider class="summary-divider flex flex-[0_0_100%] items-stretch" />
+                </div>
+                <form [formGroup]="form" class="form-container flex flex-col gap-1">
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                        <mat-label>{{'VENUE_TPLS.QUOTA_SOURCES' | translate}} *</mat-label>
+                        <mat-select [formControlName]="formControlNames.quotaCounterSource"
+                            [placeholder]="'FORMS.ACTIONS.SELECT' | translate"
+                            #matSelect>
+                            @if (matSelect.value; as quotaCounterSource) {
+                                <mat-select-trigger>
+                                    <div class="flex justify-start align-center" [style.min-width]="'0'">
+                                        <span appEllipsify>
+                                            {{quotaCounterSource.label.literal || quotaCounterSource.label.literalKey | translate}}&nbsp;
+                                        </span>
+                                        <span>
+                                            {{ ('VENUE_TPLS.QUOTA_SOURCE_OPTIONS' | translate: {
+                                                available: quotaCounterSource.available | localNumber,
+                                                count: quotaCounterSource.count | localNumber
+                                            }) }}
+                                        </span>
+                                    </div>
+                                </mat-select-trigger>
+                            }
+                            <mat-option>
+                                <app-select-search #quotaCountersSelectSearch [options$]="quotaCounterSources$"
+                                    [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="label.literal"
+                                    requireSelection="true" />
+                            </mat-option>
+                            @for (quotaCounterSource of quotaCountersSelectSearch.getFilteredOptions$() | async; track $index) {
+                                <mat-option [value]="quotaCounterSource" [disabled]="quotaCounterSource.disabled">
+                                    <div class="flex justify-start align-center" [style.min-width]="'0'">
+                                    <span appEllipsify [matTooltip]="quotaCounterSource.label.literal ||
+                                          quotaCounterSource.label.literalKey | translate">
+                                        {{quotaCounterSource.label.literal || quotaCounterSource.label.literalKey | translate}}&nbsp;
+                                    </span>
+                                        <span>
+                                        {{ ('VENUE_TPLS.QUOTA_SOURCE_OPTIONS' | translate: {
+                                            available: quotaCounterSource.available | localNumber,
+                                            count: quotaCounterSource.count | localNumber
+                                        }) }}
+                                    </span>
+                                    </div>
+                                </mat-option>
+                            }
+                        </mat-select>
+                        <app-help-button matSuffix [message]="'VENUE_TPLS.QUOTA_SOURCES_HELP' | translate" />
+                    </mat-form-field>
+                    @if (quotaCounterTarget$ | async; as quotaCounterTarget) {
+                        <div class="details-non-editable-field ob-form-field no-grid-spacing flex flex-col">
+                            <span class="field-label">{{'VENUE_TPLS.QUOTA_TARGET' | translate}}</span>
+                            <span>{{ quotaCounterTarget.label.literal || quotaCounterTarget.label.literalKey | translate }}</span>
+                        </div>
+                    }
+                    <div class="flex flex-col gap-2">
+                        <span class="mat-subtitle-2">{{'FORMS.LABELS.APPLY_CHANGES_TO' | translate}} *</span>
+                        <mat-radio-group class="flex flex-col gap-4" [formControlName]="formControlNames.allTickets">
+                            <mat-radio-button class="ob-radio-button" [value]="true">
+                                <mat-label>{{'VENUE_TPL_MGR.FORMS.LABELS.ALL_TICKETS' | translate}}</mat-label>
+                            </mat-radio-button>
+                            <div class="flex justify-start align-center gap-5 items-baseline">
+                                <mat-radio-button class="ob-radio-button" [value]="false">
+                                    <mat-label>{{'VENUE_TPL_MGR.FORMS.LABELS.TICKETS_AMOUNT' | translate}}</mat-label>
+                                </mat-radio-button>
+                                <mat-form-field appearance="outline" class="ob-form-field flex flex-[0_0_92px]">
+                                    <input matInput [formControlName]="formControlNames.count" type="number" min="1" step="1">
+                                    <mat-error [ob-form-errors]="form" [field]="formControlNames.count" />
+                                </mat-form-field>
+                            </div>
+                        </mat-radio-group>
+                    </div>
+                </form>
+                <div>
+                    <button mat-stroked-button color="primary" type="button" class="ob-button medium flex flex-[0_0_30%]"
+                        [attr.aria-label]="'FORMS.ACTIONS.ASSIGN' | translate" (click)="assign()" [disabled]="isAssignDisabled$ | async">
+                        {{'FORMS.ACTIONS.ASSIGN' | translate}}
+                    </button>
+                </div>
+            </div>
+            <mat-divider class="middle-divider flex items-stretch" vertical="true" />
+            <div class="quota-counters-container flex flex-col justify-start items-stretch gap-5 flex-[1_1_45%]">
+                <div>
+                    <h3 class="section-title">{{'VENUE_TPL_MGR.TITLES.QUOTA_TARGET_TO' | translate}}</h3>
+                    @if (quotaCounterTarget$ | async; as quotaCounterTarget) {
+                        <div class="quota-target flex justify-between items-center">
+                            <div class="flex justify-start items-center" [style.min-width]="'0'">
+                                <span class="quota-target-label flex flex-[0_0_10px]"
+                                      [ngStyle]="{'background-color':quotaCounterTarget.label.color}">
+                                </span>
+                                <div class="flex flex-col flex-[0_0_100%]" [style.overflow]="'hidden'">
+                                    <span class="quota-target-title">
+                                        {{'VENUE_TPLS.QUOTA_TARGETS_SEATS_TO' | translate}}
+                                    </span>
+                                    <span appEllipsify class="quota-target-literal" [matTooltip]="quotaCounterTarget.label.literal
+                                        || quotaCounterTarget.label.literalKey | translate">
+                                        {{ quotaCounterTarget.label.literal || quotaCounterTarget.label.literalKey | translate }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="quota-target-count quota-target-title">
+                                    +{{quotaCounterTarget.count | localNumber}}
+                                </span>
+                                    <span class="quota-target-count">
+                                    {{quotaCounterTarget.previousCount | localNumber}}
+                                </span>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div>
+                    <h3 class="section-title">{{'VENUE_TPLS.QUOTA_TARGETS_FROM' | translate}}</h3>
+                    @if (modifiedQuotaCounterSources$ | async; as modifiedQuotaCounterSource) {
+                        <mat-list class="ob-list small-rows quota-counters-list flex flex-col gap-1" role="list">
+                            @for (modifiedQuotaCounterSource of modifiedQuotaCounterSource; track $index) {
+                                <mat-list-item role="listitem" class="quota-source card-item">
+                                    <div class="flex justify-between items-center flex-[0_0_100%]">
+                                        <div class="flex justify-start items-center" [style.min-width]="'0'">
+                                            <span class="quota-source-label flex flex-[0_0_10px]"
+                                                  [ngStyle]="{'background-color':modifiedQuotaCounterSource.label.color}">
+                                            </span>
+                                            <span appEllipsify class="card-text quota-source-literal"
+                                                  [matTooltip]="modifiedQuotaCounterSource.label.literal
+                                                  || modifiedQuotaCounterSource.label.literalKey | translate">
+                                                {{ modifiedQuotaCounterSource.label.literal || modifiedQuotaCounterSource.label.literalKey |
+                                                        translate }}
+                                            </span>
+                                        </div>
+                                        <div class="flex justify-end items-center">
+                                            <span class="card-text grey quota-source-count">
+                                                -{{modifiedQuotaCounterSource.count | localNumber}}
+                                            </span>
+                                            <div class="actions-container flex justify-end items-center">
+                                                <button mat-icon-button aria-label="delete"
+                                                        class="ob-button xsmall" (click)="delete(modifiedQuotaCounterSource)">
+                                                    <mat-icon>delete</mat-icon>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </mat-list-item>
+                            }
+                        </mat-list>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div mat-dialog-actions>
+        <div class="flex flex-auto justify-end">
+            <button type="button" mat-button class="ob-button" (click)="cancel()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button mat-flat-button color="primary" type="button" class="ob-button" [disabled]="isSaveDisabled$ | async"
+                    (click)="save()">
+                {{'FORMS.ACTIONS.OK' | translate}}
+            </button>
+        </div>
+    </div>
+</div>

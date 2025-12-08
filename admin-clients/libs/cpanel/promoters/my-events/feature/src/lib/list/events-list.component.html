@@ -1,0 +1,136 @@
+<div class="list-container" fxFlex="0 1 100%" fxLayout="column">
+
+    <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">{{'TITLES.MY_EVENTS' | translate}}</h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+            <div class="filter-container" fxFlex="none" *ngIf="eventCreationCapability$ | async">
+                <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                    [attr.aria-label]="'EVENTS.NEW_BTN' | translate" (click)="openNewEventDialog()">
+                    <mat-icon>add</mat-icon>
+                    {{'EVENTS.NEW_BTN' | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="heading-container" fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxFlex="70%" fxLayoutGap="20px" fxLayoutAlign="start center">
+            <div class="filter-container" fxFlex="none">
+                <app-popover appFilter>
+                    <app-events-list-filter #filterContent [canSelectEntity$]="canSelectEntity$" />
+                </app-popover>
+            </div>
+            <div class="search-field" fxFlex="100%">
+                <app-search-input [placeholder]="'FORMS.SEARCH.EVENT_LIST' | translate" />
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            <p *ngIf="eventsMetadata$ | async as eventsMetadata" class="page-summary"
+                [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: eventsMetadata">
+            </p>
+            <app-paginator [length]="(eventsMetadata$ | async)?.total" [pageSize]="eventsPageSize" />
+        </div>
+    </div>
+
+    <div class="heading-container heading-divider">
+        <mat-divider />
+    </div>
+
+    <div class="heading-container">
+        <app-chips appFilter />
+    </div>
+
+    <mat-table class="ob-table" [dataSource]="events$ | async" [trackBy]="trackByFn"
+        matSort [matSortActive]="initSortCol" [matSortDirection]="initSortDir" matSortDisableClear
+        [attr.aria-label]="'TITLES.MY_EVENTS' | translate"
+        [class.not-touchable]="(isHandsetOrTablet$ | async) !== true">
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'EVENTS.NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="entity">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'EVENTS.ENTITY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.entity && row.entity.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="producer">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'EVENTS.PRODUCER' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.producer?.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="city">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'EVENTS.CITY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.venue_templates?.city}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="venue">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'EVENTS.VENUE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.venue_templates?.text}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="start_date">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'EVENTS.EVENT_DATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.start_date | localDateTime : dateTimeFormats.shortDate}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'EVENTS.STATUS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="status-cell">
+                <span [class.highlighted-box]="row.archived">
+                    {{(row.archived ? 'EVENTS.ARCHIVED' : 'EVENTS.STATUS_OPTS.' + row.status) | translate}}
+                </span>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'EVENTS.TYPE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="status-cell">
+                <span>{{'EVENTS.TYPE_OPTS.' + row.type | translate}}</span>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="currency">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'EVENTS.CURRENCY.LABEL' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.currency_code | localCurrencyPartialTranslation}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="actions-cell head-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true" />
+            <mat-cell *matCellDef="let row" class="actions-cell" [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                <div class="action-buttons" (click)="$event.stopPropagation()">
+                    <button mat-icon-button aria-label="Delete event" class="ob-button medium"
+                        [matTooltip]="'EVENTS.DELETE_BTN' | translate" (click)="openDeleteEventDialog(row)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+            </mat-cell>
+        </ng-container>
+        @if (displayedColumns$ | async; as displayedColumns) {
+            <ng-container>
+                <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" />
+                <mat-row *matRowDef="let row; columns:displayedColumns;" class="interactive-row"
+                    [routerLink]="[row.id, 'general-data']" />
+            </ng-container>
+        }
+    </mat-table>
+
+    @if(eventsLoading$ | async) {
+        <div class="spinner-container" [class.non-blocking]="canSelectEntity$ | async">
+            <mat-spinner/>
+        </div>
+    }
+
+    @if((eventsMetadata$ | async)?.total === 0) {
+        <div class="context-notification-container" fxFlex="0 50 100%" fxLayout="row" fxLayoutAlign="center start">
+            <app-context-notification class="ob-context-notification" contextType="info"
+                fxFlex.gt-sm="600px" fxFlex="80%" fxLayoutAlign="center start">
+                <p>{{'LIST.EMPTY' | translate}}</p>
+            </app-context-notification>
+        </div>
+    }
+
+</div>

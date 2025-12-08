@@ -1,0 +1,16 @@
+<div>
+    <ion-item>
+        <ion-label data-override-styles="" class="ob-input input-label" position="stacked">{{ label }}</ion-label>
+        <ion-item button (click)="openModal()" class="itemSelect">
+            <ion-label data-override-styles="" class="ob-input">
+                <p>{{getFilterInputText()}}</p>
+            </ion-label>
+            <ion-icon class="select__input-arrow" name="chevron-down-outline" />
+        </ion-item>
+    </ion-item>
+</div>
+<modal modalTitle="{{ label }}" [isOpen]="modalIsOpen" (closeModal)="this.closeModal()">
+    <picker [items]="filterOptions" [selectedItems]="value" *ngIf="modalIsOpen && !isMultiple" (pickEmitter)="onSave($event)" />
+    <checkbox-list-typeahead *ngIf="modalIsOpen && isMultiple" class="ion-page" [searchPlaceHolder]="searchInputPlaceHolder || ''"
+        [items]="filterOptions" [selectedItems]="value" (saveEmitter)="onSave($event)" />
+</modal>

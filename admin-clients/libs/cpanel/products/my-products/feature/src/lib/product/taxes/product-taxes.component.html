@@ -1,0 +1,102 @@
+@if ($product(); as product) {
+    <app-form-container layout="main" [disabled]="!form.dirty || $inProgress()" [formGroup]="form"
+        (cancel)="cancel()" (save)="save()">
+        <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+            <!-- Impuestos -->
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'PRODUCT.TAXES.TITLE' | translate }}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <!--  Calculo de impuestos -->
+                <div class="section-block flex flex-col gap-9">
+                    <!-- TODO: Remove isTestTaxes when  taxes end -->
+                    @if(isTestTaxes){
+                        <div>
+                            <h3 class="section-title">{{'PRODUCT.TAXES.TITLES.CALCULATION' | translate}}</h3>
+                            <p class="section-description">{{'PRODUCT.TAXES.DESCRIPTION' | translate}}</p>
+                            <mat-radio-group #taxDisplay="matRadioGroup" formControlName="tax_mode" class="flex flex-col gap-4">
+                                <div class="flex flex-col gap-4">
+                                    <div class="flex flex-col gap-0">
+                                        <mat-radio-button [value]="productTaxesMode.included">
+                                            <span class="ob-label">{{'PRODUCT.TAXES.FORMS.LABELS.INCLUDED' | translate}}</span>
+                                        </mat-radio-button>
+                                        <span class="radio-content">
+                                            {{'PRODUCT.TAXES.FORMS.INFOS.INCLUDED' | translate}}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col gap-0">
+                                    <mat-radio-button [value]="productTaxesMode.onTop">
+                                        <span class="ob-label">{{'PRODUCT.TAXES.FORMS.LABELS.ON_TOP' | translate}}</span>
+                                    </mat-radio-button>
+                                    <span class="radio-content">
+                                        {{ 'PRODUCT.TAXES.FORMS.INFOS.ON_TOP' | translate }}
+                                    </span>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                    }
+
+                    <!-- Impuestos aplicados  -->
+                    <div class="flex flex-col">
+                        <h3 class="section-title">{{'PRODUCT.TAXES.TITLES.INCLUDED' | translate}}</h3>
+                        <div class="flex">
+                            <mat-form-field class="ob-form-field field-with-label flex" appearance="outline"
+                                [matTooltip]="'PRODUCT.TAXES.FORMS.INFOS.PRODUCT_TAX_DISABLED' | translate"
+                                [matTooltipDisabled]="product.product_state !== productStatus.active">
+                                <mat-label>{{'FORMS.LABELS.PRODUCT_TAX' | translate}}</mat-label>
+                                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="taxes">
+                                    @for (tax of $entityTaxes(); track tax.id) {
+                                        <mat-option [value]="tax.id">
+                                            {{tax.name}}
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex">
+                            <mat-form-field appearance="outline" class="ob-form-field field-with-label flex"
+                                [matTooltip]="'PRODUCT.TAXES.FORMS.INFOS.PRODUCT_SURCHARGES_TAX_DISABLED' | translate"
+                                [matTooltipDisabled]="product.product_state !== productStatus.active">
+                                <mat-label>{{'FORMS.LABELS.PRODUCT_SURCHARGES_TAX' | translate}}</mat-label>
+                                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="surcharges_taxes">
+                                    @for (tax of $entityTaxes(); track tax) {
+                                        <mat-option [value]="tax.id">
+                                            {{tax.name}}
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+            <!-- Recargos -->
+            @if (surcharges$ | async) {
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'PRODUCT.SURCHARGES.TITLE' | translate }}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <p>{{'PRODUCT.SURCHARGES.DESCRIPTION' | translate}}</p>
+                    <div class="section-block">
+                        <h3 class="section-title">{{'PRODUCT.SURCHARGES.GENERICS.TITLE' | translate}}</h3>
+                        <app-range-table [form]="form.controls.surcharges.get(surchargesTypes.generic)"
+                            [data]="surcharges.get(surchargesTypes.generic)"
+                            [disabled]="form.controls.surcharges.controls[surchargesTypes.generic].disabled"
+                            [currency]="$currency()" [currencyFormat]="'narrow'" type="generic" />
+                    </div>
+                    <div class="section-block">
+                        <h3 class="section-title">{{'PRODUCT.SURCHARGES.PROMOTION.TITLE' | translate}}</h3>
+                        <app-range-table [form]="form.controls.surcharges.get(surchargesTypes.promotion)"
+                            [data]="surcharges.get(surchargesTypes.promotion)"
+                            [disabled]="form.controls.surcharges.controls[surchargesTypes.promotion].disabled"
+                            [currency]="$currency()" [currencyFormat]="'narrow'" type="promotion" />
+                    </div>
+                </mat-expansion-panel>
+            }
+        </mat-accordion>
+    </app-form-container>
+}
+@if ($inProgress()) {
+    <div class="spinner-container"><mat-spinner /></div>
+}

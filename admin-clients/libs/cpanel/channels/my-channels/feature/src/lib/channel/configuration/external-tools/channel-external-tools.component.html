@@ -1,0 +1,214 @@
+<app-form-container [disabled]="(inProgress$ | async) || !form.dirty"
+    (cancel)="cancel()" (save)="save()" layout="menu" [formGroup]="form">
+    @if (channel | isV3$ | async) {
+        <div>
+            <p class="mat-subtitle-2">
+                {{ 'CHANNELS.EXTERNAL_TOOLS.INDEXATION.LABEL' | translate }}
+            </p>
+            <mat-checkbox color="primary" formControlName="indexation">
+                {{ 'CHANNELS.EXTERNAL_TOOLS.INDEXATION.ACTIVE'| translate }}
+            </mat-checkbox>
+        </div>
+        <mat-divider class="ob-divider" />
+    }
+    @if (channel?.settings.v4_config_enabled) {
+        <div>
+            <p class="mat-subtitle-2">
+                {{ 'CHANNELS.EXTERNAL_TOOLS.ROBOTS_NO_FOLLOW.LABEL' | translate }}
+            </p>
+            <mat-checkbox color="primary" formControlName="robots_no_follow">
+                {{ 'CHANNELS.EXTERNAL_TOOLS.ROBOTS_NO_FOLLOW.ACTIVE'| translate }}
+            </mat-checkbox>
+        </div>
+        <mat-divider class="ob-divider" />
+    }
+    @if (channel?.settings.v4_config_enabled && channel?.type === channelType.web) {
+        <div formGroupName="virtual_asistance">
+            <p class="mat-subtitle-2">
+                {{ 'CHANNELS.EXTERNAL_TOOLS.VIRTUAL_ASISTANCE.LABEL' | translate }}
+            </p>
+            <div class="flex flex-col gap-4">
+                <mat-checkbox color="primary" formControlName="enabled">
+                    {{ 'CHANNELS.EXTERNAL_TOOLS.VIRTUAL_ASISTANCE.ACTIVE'| translate }}
+                </mat-checkbox>
+                @if (form.controls.virtual_asistance.value.enabled) {
+                    <div class="nested-content">
+                        <mat-radio-group class="flex flex-col gap-4" formControlName="type">
+                            <div class="flex flex-col gap-4">
+                                <mat-radio-button class="ob-radio-button align" [value]="'VOICEFLOW'">
+                                    {{'CHANNELS.EXTERNAL_TOOLS.VIRTUAL_ASISTANCE.VOICEFLOW.ACTIVE' | translate}}
+                                </mat-radio-button>
+                                @if (form.controls.virtual_asistance.value.type === 'VOICEFLOW') {
+                                    <div class="flex flex-col nested-content">
+                                        <div class="flex flex-row">
+                                            <mat-form-field appearance="outline" class="ob-form-field field-with-label flex-[0_0_306px]">
+                                                <mat-label>
+                                                    {{'CHANNELS.EXTERNAL_TOOLS.VIRTUAL_ASISTANCE.VOICEFLOW.CODE' | translate}}
+                                                </mat-label>
+                                                <input matInput formControlName="voiceflow_code"
+                                                    [placeholder]="'CHANNELS.EXTERNAL_TOOLS.VIRTUAL_ASISTANCE.VOICEFLOW.CODE' | translate">
+                                                <mat-error [ob-form-errors]="form" field="virtual_asistance.voiceflow_code" />
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="flex flex-1 items-center">
+                                            <mat-icon class="ob-icon small info with-text">info</mat-icon>
+                                            {{'CHANNELS.EXTERNAL_TOOLS.VIRTUAL_ASISTANCE.VOICEFLOW.INFO' | translate}}
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <mat-radio-button class="ob-radio-button align" [value]="'ZOPIM'">
+                                {{'CHANNELS.EXTERNAL_TOOLS.VIRTUAL_ASISTANCE.ZOPIM.ACTIVE' | translate}}
+                            </mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+                }
+            </div>
+        </div>
+        <mat-divider class="ob-divider" />
+    }
+    <div class="use-datalayer-container" formGroupName="gtm">
+        <p class="mat-subtitle-2">
+            {{ 'CHANNELS.EXTERNAL_TOOLS.GTM.LABEL' | translate }}
+        </p>
+        <mat-slide-toggle class="ob-slide-toggle" color="primary" formControlName="enabled">
+            {{ 'CHANNELS.EXTERNAL_TOOLS.GTM.ACTIVE'| translate }}
+        </mat-slide-toggle>
+        <div>
+            <mat-form-field id="gtmContainerId" fxFlex="100%" fxFlex.gt-xs="50%" fxFlex.gt-sm="30%" appearance="outline"
+                class="ob-form-field field-with-label">
+                <mat-label>{{'CHANNELS.EXTERNAL_TOOLS.GTM.ACCOUNT_LABEL' | translate}}</mat-label>
+                <input formControlName="gtmContainerId" matInput placeholder="GTM-ABCDEF">
+                <mat-error [ob-form-errors]="form" field="gtm.gtmContainerId" />
+            </mat-form-field>
+        </div>
+
+        <p class="mat-subtitle-2">
+            {{ 'CHANNELS.EXTERNAL_TOOLS.GTM.DATALAYER.LABEL' | translate }}
+        </p>
+        <p class="body-1 description">
+            {{ 'CHANNELS.EXTERNAL_TOOLS.GTM.DATALAYER.DESCRIPTION' | translate }}
+        </p>
+        <div class="link-container" [class.datalayer-form-enabled]="isEnabledResetDatalayerGTM">
+            <span (click)="resetDatalayer(externalTool.gtm)">{{'CHANNELS.EXTERNAL_TOOLS.GTM.RESET_DATALAYER.TITLE' | translate}}</span>
+            <mat-divider vertical="true" fxFlexAlign="stretch" />
+            <span (click)="codeEditor(externalTool.gtm)">{{'CHANNELS.EXTERNAL_TOOLS.GTM.DATALAYER.EDIT_JSON.ACTION' | translate}}</span>
+        </div>
+
+    </div>
+    @if(channel | isV3$ | async) {
+        <mat-divider class="ob-form-divider" />
+        <div formGroupName="metaPixel">
+            <p class="mat-subtitle-2">
+                {{'CHANNELS.EXTERNAL_TOOLS.META_PIXEL.LABEL' | translate}}
+            </p>
+            <mat-slide-toggle class="ob-slide-toggle" color="primary" formControlName="enabled">
+                {{'CHANNELS.EXTERNAL_TOOLS.META_PIXEL.ACTIVE'| translate}}
+            </mat-slide-toggle>
+            <div>
+                <mat-form-field id="metaPixelContainerId" fxFlex="100%" fxFlex.gt-xs="50%" fxFlex.gt-sm="30%" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'CHANNELS.EXTERNAL_TOOLS.META_PIXEL.ACCOUNT_LABEL' | translate}}</mat-label>
+                    <input formControlName="metaPixelContainerId" matInput
+                        [placeholder]="'CHANNELS.EXTERNAL_TOOLS.META_PIXEL.ACCOUNT_LABEL' | translate">
+                    <mat-error [ob-form-errors]="form" field="metaPixel.metaPixelContainerId" />
+                </mat-form-field>
+            </div>
+        </div>
+    }
+    @if (channel?.settings.v4_config_enabled) {
+        <div class="use-datalayer-container" formGroupName="adobe">
+            <mat-divider class="ob-form-divider" />
+            <p class="mat-subtitle-2">
+                {{'CHANNELS.EXTERNAL_TOOLS.ADOBE.LABEL' | translate}} <span class="ob-badge info">
+                    {{'INFORMATION_BADGE.BETA_FEATURE' | translate}}
+                </span>
+            </p>
+            <mat-slide-toggle class="ob-slide-toggle" color="primary" formControlName="enabled">
+                {{'CHANNELS.EXTERNAL_TOOLS.ADOBE.ACTIVE'| translate}}
+            </mat-slide-toggle>
+            <div>
+                <mat-form-field id="adobeContainerId" fxFlex="100%" fxFlex.gt-xs="50%" fxFlex.gt-sm="30%" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'CHANNELS.EXTERNAL_TOOLS.ADOBE.ACCOUNT_LABEL' | translate}}</mat-label>
+                    <input formControlName="adobeContainerId" matInput
+                        [placeholder]="'CHANNELS.EXTERNAL_TOOLS.ADOBE.ACCOUNT_LABEL' | translate">
+                    <mat-error [ob-form-errors]="form" field="adobe.adobeContainerId" />
+                </mat-form-field>
+            </div>
+
+            <p class="mat-subtitle-2">
+                {{ 'CHANNELS.EXTERNAL_TOOLS.ADOBE_DTM.DATALAYER.LABEL' | translate }}
+            </p>
+            <p class="body-1 description">
+                {{ 'CHANNELS.EXTERNAL_TOOLS.ADOBE_DTM.DATALAYER.DESCRIPTION' | translate }}
+            </p>
+            <div class="link-container" [class.datalayer-form-enabled]="isEnabledDatalayerAdobe">
+                <span
+                    (click)="resetDatalayer(externalTool.adobe)">
+                    {{'CHANNELS.EXTERNAL_TOOLS.ADOBE_DTM.RESET_DATALAYER.TITLE' | translate}}
+                </span>
+                <mat-divider vertical="true" fxFlexAlign="stretch" />
+                <span
+                    (click)="codeEditor(externalTool.adobe)">
+                    {{'CHANNELS.EXTERNAL_TOOLS.ADOBE_DTM.DATALAYER.EDIT_JSON.ACTION' | translate}}
+                </span>
+            </div>
+        </div>
+    }
+    @if ((channel | isMembersChannel) || (channel?.build === channelBuild.sth)) {
+        <mat-divider class="ob-form-divider" />
+        <div class="use-virtual-queue" formGroupName="virtual_queue">
+            <p class="mat-subtitle-2">
+                {{ 'CHANNELS.EXTERNAL_TOOLS.VIRTUAL_QUEUE.LABEL' | translate }}
+            </p>
+            <mat-slide-toggle class="ob-slide-toggle" color="primary" formControlName="active">
+                {{ 'CHANNELS.EXTERNAL_TOOLS.VIRTUAL_QUEUE.ACTIVE'| translate }}
+            </mat-slide-toggle>
+            <div>
+                <mat-form-field id="virtualQueueAlias" fxFlex="100%" fxFlex.gt-xs="50%" fxFlex.gt-sm="30%" appearance="outline"
+                    class="ob-form-field field-with-label">
+                    <mat-label>{{'CHANNELS.EXTERNAL_TOOLS.VIRTUAL_QUEUE.ALIAS' | translate}}</mat-label>
+                    <input formControlName="alias" matInput placeholder="Alias">
+                    <mat-error [ob-form-errors]="form" field="virtual_queue.alias" />
+                </mat-form-field>
+            </div>
+        </div>
+    }
+    @if (channel | isMembersChannel) {
+        <mat-divider class="ob-form-divider" />
+        <div class="captcha-settings" formGroupName="captcha">
+            <p class="mat-subtitle-2">
+                {{ 'CHANNELS.EXTERNAL_TOOLS.CAPTCHA.LABEL' | translate }}
+            </p>
+            <mat-slide-toggle class="ob-slide-toggle" #toggle color="primary" formControlName="captcha_enabled">
+                {{ 'CHANNELS.EXTERNAL_TOOLS.CAPTCHA.ACTIVE'| translate }}
+            </mat-slide-toggle>
+            <div fxLayout="row" fxLayoutGap="16px">
+                <mat-form-field fxFlex="100%" fxFlex.gt-xs="50%" fxFlex.gt-sm="30%"
+                    appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>Site Key</mat-label>
+                    <input formControlName="captcha_site_key" matInput placeholder="Site Key">
+                    <mat-error [ob-form-errors]="form" field="captcha.captcha_site_key" />
+                </mat-form-field>
+
+                <mat-form-field fxFlex="100%" fxFlex.gt-xs="50%" fxFlex.gt-sm="30%"
+                    appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>Secret Key</mat-label>
+                    <input formControlName="captcha_secret_key" matInput placeholder="Secret Key">
+                    <mat-error [ob-form-errors]="form" field="captcha.captcha_secret_key" />
+                </mat-form-field>
+            </div>
+
+            <a aria-label="Go to link" class="ob-link icon" target="_blank" href="{{'HELP.CAPTCHA_URL' | translate}}">
+                <span>{{'CHANNELS.EXTERNAL_TOOLS.CAPTCHA.HELP_LINK' | translate}}</span>
+            </a>
+
+        </div>
+    }
+</app-form-container>
+@if (inProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

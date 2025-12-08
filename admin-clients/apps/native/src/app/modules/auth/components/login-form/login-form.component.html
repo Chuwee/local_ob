@@ -1,0 +1,154 @@
+<ion-header class="ob-layout__header">
+    @if ($accountBlocked().show) {
+        <ion-toolbar>
+            <ion-buttons slot="start">
+                <ion-icon name="chevron-back-outline" class="account-blocked__back-button"
+                    (click)="$accountBlocked.set({ show: false, type: null })"></ion-icon>
+            </ion-buttons>
+        </ion-toolbar>
+    }
+</ion-header>
+<ion-content class="ob-layout__content">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form">
+        <ion-item lines="none">
+            <ion-img class="login-form__logo" src="assets/media/logos/logo-ob-black.svg" alt="Onebox logo"></ion-img>
+        </ion-item>
+        @if ($contextualAlert().show) {
+            <ion-item>
+                <app-context-notification class="login-form__notification" contextType="warn">
+                    <span>{{'LOGIN.ERRORS.' + $contextualAlert().message | uppercase | translate}}</span>
+                </app-context-notification>
+            </ion-item>
+        }
+        @if (!$accountBlocked().show) {
+            <ion-item lines="none" class="login-form__input">
+                <ion-label for="username" data-override-styles="" class="ob-input input-label" position="stacked">
+                    {{ "INPUTS.USERNAME" | translate }}*
+                </ion-label>
+                <ion-input appAutofill fill="outline" class="ob-input" autocomplete="username" id="username"
+                    [ngClass]="{
+                        error:
+                            usernameCtrl.hasError('invalidEmail') ||
+                            ($submitted() && ((error$ | async)?.code === authErrorCode.INVALID
+                            || (error$ | async)?.code === authErrorCode.WRONG_CREDENTIALS))
+                    }"
+                    data-override-styles="" aria-label="Usernamme" [clearInput]="true" legacy="true" type="email"
+                    (keypress)="validateWhitespaces($event)" formControlName="username">
+                </ion-input>
+            </ion-item>
+            <ion-item lines="none" class="login-form__input login-form__input--password">
+                <ion-label data-override-styles="" class="ob-input input-label" position="stacked" for="password">
+                    {{ "INPUTS.PASSWORD" | translate }}*
+                </ion-label>
+                <ion-input appAutofill fill="outline" data-override-styles="" class="ob-input" aria-label="Password" legacy="true"
+                    [type]="$passIsShowed() ? 'text' : 'password'" formControlName="password" autocomplete="current-password" id="password"
+                    [ngClass]="{
+                        error:
+                            $submitted() &&
+                            ((error$ | async)?.code === authErrorCode.INVALID ||
+                                (error$ | async)?.code ===
+                                    authErrorCode.WRONG_CREDENTIALS)
+                    }">
+                </ion-input>
+                @if (form.get('password').value) {
+                    <ion-button shape="round" (click)="toggleShowPassword()">
+                        <ion-icon slot="icon-only"
+                            [src]="'./assets/media/icons/' + ($passIsShowed() ? 'no-eye.svg' : 'eye.svg')"></ion-icon>
+                    </ion-button>
+                }
+            </ion-item>
+            <ion-nav-link class="form-link" (click)="goToForgotPassword()">
+                <ion-text>
+                    <span>{{ "LOGIN.FORGOT-PASSWORD" | translate }}</span>
+                </ion-text>
+            </ion-nav-link>
+
+            <ion-button data-override-styles="" expand="full" class="ob-btn primary size--medium" type="submit" [disabled]="!form.valid">
+                @if (loading$ | async) {
+                    <ion-spinner name="crescent" class="ob-spinner ob-spinner--white"></ion-spinner>
+                } @else {
+                    {{ "LOGIN.BUTTON" | translate }}
+                }
+            </ion-button>
+        } @else {
+            <ion-text>
+                <h1 data-override-styles class="account-blocked__title">
+                    {{ ('LOGIN.ERRORS.' + $accountBlocked().type) | translate }}
+                </h1>
+            </ion-text>
+            <ion-text>
+                <p data-override-style class="account-blocked__text">
+                    {{ ('LOGIN.ERRORS.' + $accountBlocked().type) + '_DESCRIPTION' | translate }}
+                </p>
+            </ion-text>
+        }
+    </form>
+    <ion-text class="login-form__copy-and-terms">
+        <span>
+            {{ "LOGIN.COPYRIGHT" | translate }}
+        </span>
+        <a class="ob-link terms-conditions" target="_blank" href="{{ 'LOGIN.TERMS-LINK' | translate }}">
+            {{ "LOGIN.TERMS" | translate }}
+        </a>
+    </ion-text>
+</ion-content>
+<ion-footer class="ob-layout__footer"></ion-footer>
+
+<ion-modal [isOpen]="$mfaModalIsOpen()" (willDismiss)="closeMfaModal()">
+    <ng-template>
+        <ion-header class="ob-layout__header">
+            <ion-toolbar>
+                <ion-buttons slot="start">
+                    <back-button [isModal]="true"></back-button>
+                </ion-buttons>
+            </ion-toolbar>
+        </ion-header>
+        <ion-content data-override-styles class="ob-layout__content">
+            <form [formGroup]="form" (ngSubmit)="onSubmit()" class="mfa-form__form">
+                <div class="form-content">
+                    <ion-text>
+                        <h1 data-override-styles class="mfa-form__title"> {{ "LOGIN.TITLES.MFA_CODE" | translate }}</h1>
+                    </ion-text>
+                    <ion-text>
+                        <p data-override-style class="mfa-form__text">
+                            {{ "LOGIN.FORMS.INFOS.MFA_CODE" | translate }}
+                        </p>
+                    </ion-text>
+                    <ion-item lines="none" class="mfa-form__input" formGroupName="mfa">
+                        <ion-label data-override-styles="" class="ob-input input-label"
+                            position="stacked">{{ "INPUTS.CODE" | translate }}*
+                        </ion-label>
+                        <ion-input fill="outline" class="ob-input" type="text" data-override-styles="" aria-label="MFA Code"
+                            placeholder="{{ 'INPUTS.CODE' | translate }}" [clearInput]="true" legacy="true"
+                            formControlName="code"
+                            [ngClass]="{error: form.errors}"></ion-input>
+                    </ion-item>
+                    <ion-nav-link class="form-link" (click)="onResendCode()">
+                        <ion-text>
+                            <span>{{ "LOGIN.ACTIONS.RESEND_CODE" | translate }}</span>
+                        </ion-text>
+                    </ion-nav-link>
+                    <ion-button data-override-styles="" expand="full" class="ob-btn primary size--medium" type="submit"
+                        [disabled]="!form.valid">
+                        @if (loading$ | async) {
+                            <ion-spinner name="crescent" class="ob-spinner ob-spinner--white"></ion-spinner>
+                        } @else {
+                            {{ "BUTTONS.VALIDATE" | translate }}
+                        }
+                    </ion-button>
+                </div>
+
+
+            </form>
+        </ion-content>
+        <ion-footer class="ob-layout__footer"></ion-footer>
+
+    </ng-template>
+</ion-modal>
+
+
+<modal [isOpen]="$modalIsOpen()" modalTitle="{{ 'LOGIN.PICKER' | translate }}" [backdropDismiss]="false" (closeModal)="closeModal()">
+    @if ($modalIsOpen()) {
+        <picker buttonLabel="BUTTONS.CONTINUE" [items]="$pickerdata()" (pickEmitter)="onPick($event)"></picker>
+    }
+</modal>

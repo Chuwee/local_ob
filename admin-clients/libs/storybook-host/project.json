@@ -1,0 +1,63 @@
+{
+  "name": "storybook-host",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/storybook-host/src",
+  "prefix": "admin-clients",
+  "projectType": "library",
+  "tags": ["type:storybook"],
+  "implicitDependencies": [
+    "shared-common-ui-ob-material",
+    "shared-common-ui-components"
+  ],
+  "targets": {
+    "storybook": {
+      "executor": "@storybook/angular:start-storybook",
+      "options": {
+        "port": 4400,
+        "configDir": "libs/storybook-host/.storybook",
+        "browserTarget": "storybook-host:build-storybook-host",
+        "compodoc": false
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
+      }
+    },
+    "build-storybook-host": {
+      "executor": "@storybook/angular:build-storybook",
+      "outputs": ["{options.outputDir}"],
+      "options": {
+        "outputDir": "dist/storybook/storybook-host",
+        "configDir": "libs/storybook-host/.storybook",
+        "browserTarget": "storybook-host:build-storybook-host",
+        "compodoc": false,
+        "styles": ["libs/storybook-host/src/styles.scss"],
+        "webpackStatsJson": true
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
+      }
+    },
+    "static-storybook": {
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "storybook-host:build-storybook-host",
+        "staticFilePath": "dist/storybook/storybook-host"
+      },
+      "configurations": {
+        "ci": {
+          "buildTarget": "storybook-host:build-storybook-host:ci"
+        }
+      }
+    },
+    "deploy-storybook": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx chromatic -t=339dbdbeff28 -d=dist/storybook/storybook-host --only-changed --exit-once-uploaded --auto-accept-changes=master"
+      }
+    }
+  }
+}

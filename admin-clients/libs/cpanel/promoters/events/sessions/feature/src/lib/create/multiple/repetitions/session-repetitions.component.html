@@ -1,0 +1,117 @@
+<div mat-dialog-content class="flex flex-col items-stretch session-repetitions-container dialog-grid-form with-wizard-bar">
+    <form [formGroup]="repetitionsForm">
+        <mat-accordion class="details-form-container" multi [togglePosition]="'before'">
+            <!-- DATES -->
+            <mat-expansion-panel expanded togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.SESSION.DATES' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <p class="dates-description">{{'EVENTS.SESSION.DATES_DESC' | translate}}</p>
+                <div class="dates-container flex" formGroupName="dates">
+                    <mat-form-field appearance="outline" class="grow shrink basis-[150px] ob-form-field field-with-label start-date">
+                        <mat-label>{{'DATES.START_DATE' | translate}}</mat-label>
+                        <input matInput [matDatepicker]="startDateDP" [placeholder]="dateFormat" formControlName="start"
+                            (focus)="startDateDP.open()">
+                        <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                            (click)="$event.stopPropagation(); startDateDP.open();">
+                            <mat-icon>event</mat-icon>
+                        </button>
+                        <mat-datepicker #startDateDP />
+                        @if (repetitionsForm.get('dates.start').hasError('required')) {
+                            <mat-error>
+                                {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                            </mat-error>
+                        }
+                        @if (repetitionsForm.get('dates.start').hasError('startDateAfterEndDate')) {
+                            <mat-error>
+                                {{'FORMS.ERRORS.DATE_AFTER_OR_SAME_THAN_FEMALE' | translate : { date: 'DATES.END_DATE' |
+                            translate | lowercase } }}
+                            </mat-error>
+                        }
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="grow shrink basis-[150px] ob-form-field field-with-label end-date">
+                        <mat-label>{{'DATES.END_DATE' | translate}}</mat-label>
+                        <input matInput [matDatepicker]="endDateDP" [placeholder]="dateFormat" formControlName="end"
+                            (focus)="endDateDP.open()">
+                        <button mat-icon-button matSuffix class="ob-button large no-hover-ripple"
+                            (click)="$event.stopPropagation(); endDateDP.open();">
+                            <mat-icon>event</mat-icon>
+                        </button>
+                        <mat-datepicker #endDateDP />
+                        @if (repetitionsForm.get('dates.end').hasError('required')) {
+                            <mat-error>
+                                {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+                            </mat-error>
+                        }
+                        @if (repetitionsForm.get('dates.end').hasError('endDateBeforeStartDate')) {
+                            <mat-error>
+                                {{'FORMS.ERRORS.DATE_BEFORE_OR_SAME_THAN_FEMALE' | translate : { date: 'DATES.START_DATE' |
+                            translate | lowercase } }}
+                            </mat-error>
+                        }
+                    </mat-form-field>
+                </div>
+            </mat-expansion-panel>
+            <!-- HOURS -->
+            <mat-expansion-panel expanded togglePosition="before">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.SESSION.HOURS' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <p class="hours-description">{{'EVENTS.SESSION.HOURS_DESC' | translate}}</p>
+                <div class="new-hour-container flex justify-end">
+                    <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                        [attr.aria-label]="'EVENTS.SESSION.NEW_HOUR_BTN' | translate"
+                        [matTooltip]="'EVENTS.SESSION.NEW_HOUR_BTN' | translate" (click)="openNewHourDialog()">
+                        <mat-icon>add</mat-icon>
+                        {{'EVENTS.SESSION.NEW_HOUR_BTN' | translate}}
+                    </button>
+                </div>
+                <mat-table class="ob-table session-hours-table not-touchable" [dataSource]="sessionsHour"
+                    formArrayName="hourRows">
+                    <ng-container matColumnDef="weekCheck">
+                        <mat-header-cell *matHeaderCellDef class="flex-[0_0_56px] head-cell without-gap" />
+                        <mat-cell *matCellDef="let row; index as i" class="flex-[0_0_56px] without-gap flex justify-center">
+                            <mat-checkbox color="primary" class="input-column" [indeterminate]="isPartiallySelectedWeek(i)"
+                                [checked]="isTotallySelectedWeek(i)" (change)="onWeekCheckboxClick($event.checked, i)" />
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="hour">
+                        <mat-header-cell *matHeaderCellDef class="head-cell flex-[0_0_65px]">
+                            {{'EVENTS.SESSION.HOUR' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row" class="flex-[0_0_65px]">
+                            {{row | dateTime : dateTimeFormats.shortTime}}
+                        </mat-cell>
+                    </ng-container>
+                    @for (columnName of tableColumns; let i = $index; track i) {
+                        @if (i > 1) {
+                            <ng-container [matColumnDef]="columnName">
+                                <mat-header-cell *matHeaderCellDef class="head-cell">
+                                    <mat-checkbox color="primary" class="input-column" [indeterminate]="isPartiallySelectedDay(columnName)"
+                                        [checked]="isTotallySelectedDay(columnName)"
+                                        (change)="onDayCheckboxClick($event.checked, columnName)"
+                                        [disabled]="disabledWeekaysCodes.includes(columnName)">
+                                        {{weekDays[i-2]}}
+                                    </mat-checkbox>
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let row; index as j" [formGroupName]="j">
+                                    <mat-checkbox color="primary" class="input-column" [formControlName]="columnName" />
+                                    @if (i === tableColumns.length - 1 && sessionsHour.length > 1) {
+                                        <div class="action-buttons">
+                                            <button mat-icon-button aria-label="Delete row" class="ob-button medium"
+                                                (click)="deleteRow(j)">
+                                                <mat-icon>delete</mat-icon>
+                                            </button>
+                                        </div>
+                                    }
+                                </mat-cell>
+                            </ng-container>
+                        }
+                    }
+                    <mat-header-row *matHeaderRowDef="tableColumns" class="dense-row" />
+                    <mat-row *matRowDef="let row; columns: tableColumns" class="dense-row" />
+                </mat-table>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </form>
+</div>

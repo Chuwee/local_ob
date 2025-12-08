@@ -1,0 +1,90 @@
+<div class="aggregated-table-container">
+    <table mat-table class="ob-table aggregated-table" [dataSource]="$typeList()" [style.max-width]="$maxWidth()">
+        <ng-container matColumnDef="metric">
+            <th mat-header-cell *matHeaderCellDef class="head-cell metric-head">
+                @if ($aggData()?.types?.length) {
+                    <button mat-icon-button aria-label="Expand metric types"
+                        class="ob-button small" (click)="isTypesExpanded = !isTypesExpanded">
+                        <mat-icon>{{isTypesExpanded ? 'remove' : 'add'}}</mat-icon>
+                    </button>
+                }
+            </th>
+            <td mat-cell *matCellDef="let row">
+                {{'AGGREGATED_METRIC.METRIC.' + row['metric'] | translate}}
+            </td>
+            <td mat-footer-cell *matFooterCellDef>
+                @if (isTypesExpanded) {
+                    {{$mainMetricLabel() | translate | uppercase}}
+                }
+            </td>
+        </ng-container>
+        @for (column of $columns(); track $index; let last = $last) {
+            @let isLastColumn = column === $lastColumn();
+            <ng-container [matColumnDef]="column">
+                <th mat-header-cell *matHeaderCellDef class="head-cell right"
+                    [class.last-cell]="isLastColumn"
+                    [class.with-actions]="isLastColumn && !!$tableId()"
+                    [class.currency-column]="$aggregationMetrics()[column]?.isCurrency"
+                    [class.small-last-column]="isLastColumn && $columns().length < 3"
+                    [class.total-column]="$aggregationMetrics()[column]?.isTotal"
+                    [class.total-price-column]="$aggregationMetrics()[column]?.isTotalPrice">
+                    {{$aggData()?.overall.aggData[column]?.headerKey | translate | uppercase}}
+        </th>
+        <td mat-cell *matCellDef="let element" class="right" [class.last-cell]="isLastColumn"
+            [class.with-actions]="isLastColumn && !!$tableId()">
+            @if ($aggregationMetrics()[column]?.isCurrency) {
+                {{element.aggData[column]?.value | localCurrency:$currency():$currencyFormat()}}
+            } @else {
+                {{element.aggData[column]?.value | localNumber}}
+            }
+        </td>
+        <td mat-footer-cell *matFooterCellDef class="right"
+            [class.last-cell]="isLastColumn"
+            [class.with-actions]="isLastColumn !!&& $tableId()"
+            [class.currency-column]="$aggregationMetrics()[column]?.isCurrency"
+            [class.total-column]="$aggregationMetrics()[column]?.isTotal"
+            [class.total-price-column]="$aggregationMetrics()[column]?.isTotalPrice">
+            @if ($aggregationMetrics()[column]?.isCurrency) {
+                {{$aggData()?.overall.aggData[column]?.value | localCurrency:$currency():$currencyFormat()}}
+            } @else {
+                @if ($aggregationMetrics()[column]?.isError) {
+                    <mat-icon class="aggregation-error">close</mat-icon>
+                }
+                @if ($aggregationMetrics()[column]?.isOk) {
+                    <mat-icon class="aggregation-ok">done</mat-icon>
+                }
+                @if ($aggregationMetrics()[column]?.isFulfilled) {
+                    <mat-icon class="aggregation-fulfilled material-icons-outlined">
+                        archive
+                    </mat-icon>
+                }
+                {{$aggData()?.overall.aggData[column]?.value | localNumber}}
+                @if ($aggregationMetrics()[column]?.isPercentage) {
+                    <span>%</span>
+                }
+            }
+        </td>
+        </ng-container>
+        }
+        <ng-container stickyEnd [matColumnDef]="'actions'">
+            <th *matHeaderCellDef class="actions-cell head-cell"
+                [class.float-actions-cell]="(isHandsetOrTablet$ | async) !== true">
+                <button mat-stroked-button color="secondary" class="ob-button xsmall only-icon"
+                    [matTooltip]="'ACTIONS.TABLE.SELECT_COLUMNS' | translate" (click)="changeAggDataColSelection()">
+                    <mat-icon>settings</mat-icon>
+                </button>
+            </th>
+            <td *matCellDef="let row" class="actions-cell"></td>
+
+            <td *matFooterCellDef class="actions-cell">
+            </td>
+
+
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="$columnsToDisplay()" [class.expanded]="isTypesExpanded"></tr>
+        <tr mat-row *matRowDef="let row; columns: $columnsToDisplay(); let i = index;"
+            [@inOutAnimation]="isTypesExpanded" [class.hidden]="!isTypesExpanded"
+            [ngClass]="'metric-' + row.metric?.toLowerCase()"></tr>
+        <tr mat-footer-row *matFooterRowDef="$columnsToDisplay()" [class.expanded]="isTypesExpanded"></tr>
+    </table>
+</div>

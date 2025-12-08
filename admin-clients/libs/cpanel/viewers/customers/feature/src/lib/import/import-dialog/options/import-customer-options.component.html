@@ -1,0 +1,127 @@
+<div mat-dialog-content class="with-wizard-bar">
+    <div class="optional-fields-container">
+        <form [formGroup]="$optionsFormGroup()" class="flex flex-col gap-2">
+            <div>
+                @if (canSelectEntity$ | async) {
+                    <div class="flex">
+                        <mat-form-field appearance="outline" class="ob-form-field field-with-label flex-[0_0_100%] sm:flex-[0_0_60%]">
+                            <mat-label>{{'CUSTOMER.ENTITY' | translate}}</mat-label>
+                            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="entity"
+                                [compareWith]="compareById">
+                                <mat-option>
+                                    <app-select-search #entitySelectSearch [options$]="entities$"
+                                        [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name"
+                                        requireSelection="true" />
+                                </mat-option>
+                                @for (entity of entitySelectSearch.getFilteredOptions$() | async; track entity) {
+                                    <mat-option
+                                        [value]="entity">
+                                        {{entity.name}}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                            <mat-error [ob-form-errors]="$optionsFormGroup()" field="entity" />
+                        </mat-form-field>
+                    </div>
+                }
+            </div>
+            <div class="flex flex-col gap-8">
+                <div class="flex flex-col gap-2">
+                    <label class="ob-label flex items-center gap-2">
+                        <span>{{'CUSTOMER.IMPORT_DIALOG.OPTIONS.DATE_FORMAT_TITLE' | translate}}</span>
+                        <mat-icon [matTooltip]="'CUSTOMER.IMPORT_DIALOG.OPTIONS.DATE_FORMAT_TOOLTIP' | translate" class="ob-help-icon">
+                            help_outline
+                        </mat-icon>
+                    </label>
+                    <mat-radio-group [formControlName]="$dateFormatControlName()" class="flex flex-col gap-2">
+                        @for (format of dateFormats; track format) {
+                            <mat-radio-button class="inline" [value]="format">
+                                <mat-label>
+                                    {{'CUSTOMER.IMPORT_DIALOG.OPTIONS.DATE_FORMATS.' + format | translate}}
+                                </mat-label>
+                            </mat-radio-button>
+                        }
+                    </mat-radio-group>
+                </div>
+                <div class="flex flex-col">
+                    <span class="ob-label">{{'CUSTOMER.IMPORT_DIALOG.OPTIONS.CUSTOMER_PRODUCTS' | translate}}</span>
+                    <mat-checkbox color="primary" [formControlName]="$productsControlName()" class="inline">
+                        {{'CUSTOMER.IMPORT_DIALOG.OPTIONS.CUSTOMER_PRODUCTS_INFO' | translate}}
+                    </mat-checkbox>
+                    @if ($optionsFormGroup().get($productsControlName())?.value) {
+                        <div class="product-type flex flex-col gap-2">
+                            <label class="ob-label" [class.disabled]="isProductImportDisabled$ | async">
+                                {{'CUSTOMER.IMPORT_DIALOG.OPTIONS.CUSTOMER_PRODUCTS_TYPES' | translate}}
+                            </label>
+                            <mat-radio-group [formControlName]="$productsTypeControlName()" class="flex flex-col gap-2">
+                                <mat-radio-button class="inline" [value]="productTypeImport.numberedAndNotNumbered">
+                                    <mat-label>
+                                        {{'CUSTOMER.IMPORT_DIALOG.OPTIONS.PRODUCT_TYPE_' + productTypeImport.numberedAndNotNumbered | translate}}
+                                    </mat-label>
+                                </mat-radio-button>
+                                <mat-radio-button class="inline" [value]="productTypeImport.numbered">
+                                    <mat-label>
+                                        {{'CUSTOMER.IMPORT_DIALOG.OPTIONS.PRODUCT_TYPE_' + productTypeImport.numbered | translate}}
+                                    </mat-label>
+                                </mat-radio-button>
+                                <mat-radio-button class="inline" [value]="productTypeImport.notNumbered">
+                                    <mat-label>
+                                        {{'CUSTOMER.IMPORT_DIALOG.OPTIONS.PRODUCT_TYPE_' + productTypeImport.notNumbered | translate}}
+                                    </mat-label>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        </div>
+                    }
+                </div>
+                @let entityVendorConfig = $entityVendorConfig();
+                @if (entityVendorConfig?.enabled) {
+                    <div class="flex flex-col">
+                        <label class="ob-label flex items-center gap-2">
+                            <span>{{'CUSTOMER.IMPORT_DIALOG.OPTIONS.CUSTOMER_PRODUCTS_VENDOR_TITLE' | translate}}</span>
+                            <mat-icon [matTooltip]="'CUSTOMER.IMPORT_DIALOG.OPTIONS.CUSTOMER_PRODUCTS_VENDOR_TOOLTIP' | translate" 
+                                class="ob-help-icon">
+                                help_outline
+                            </mat-icon>
+                        </label>
+                        <mat-checkbox color="primary" class="inline" [formControlName]="$productsWithVendorControlName()">
+                            {{'CUSTOMER.IMPORT_DIALOG.OPTIONS.CUSTOMER_PRODUCTS_VENDOR_ENABLE' | translate}}
+                        </mat-checkbox>
+                        @if ($optionsFormGroup().get($productsWithVendorControlName())?.value) {
+                            <div class="flex flex-col product-vendor-selector">
+                                @if (entityVendorConfig?.vendor_id?.length === 1) {
+                                    <div class="flex flex-col gap-2">
+                                        <span class="ob-label">{{ 'CUSTOMER.EXTERNAL_VENDOR' | translate }}</span>
+                                        <span>{{ entityVendorConfig.vendor_id[0] }}</span>
+                                    </div>
+                                } @else {
+                                    <div class="flex">
+                                        <mat-form-field appearance="outline" class="ob-form-field field-with-label flex-[0_0_100%] sm:flex-[0_0_30%]">
+                                            <mat-label>{{'CUSTOMER.EXTERNAL_VENDOR' | translate}}</mat-label>
+                                            <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" [formControlName]="$productVendorControlName()">
+                                                @for (vendor of entityVendorConfig?.vendor_id || []; track vendor) {
+                                                    <mat-option [value]="vendor"> {{vendor}} </mat-option>
+                                                }
+                                            </mat-select>
+                                            <mat-error [ob-form-errors]="$optionsFormGroup()" [field]="$productVendorControlName()" />
+                                        </mat-form-field>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+                <div class="flex flex-col">
+                    <span class="ob-label">{{'CUSTOMER.IMPORT_DIALOG.OPTIONS.CUSTOMER_OVERRIDE' | translate}}</span>
+                    <mat-checkbox color="primary" [formControlName]="$overrideControlName()" class="inline">
+                        {{'CUSTOMER.IMPORT_DIALOG.OPTIONS.CUSTOMER_OVERRIDE_INFO' | translate}}
+                    </mat-checkbox>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@if (isLoading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

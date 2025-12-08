@@ -1,0 +1,34 @@
+@if (chips$ !== null) {
+    <div class="chips" [class.show]="(chips$ | async)?.length > 0">
+        <div class="chips-content">
+            <div fxLayout="row wrap" fxLayoutAlign="start center">
+                @if (labelText) {
+                    <div class="chips-label">{{labelText | translate}}:</div>
+                }
+                <mat-chip-listbox [attr.aria-label]="labelText | translate" [class]="'ob-chip-list ' + overrideClasses"
+                    [selectable]="false">
+                    @for (chip of chips$ | async; track $index) {
+                        <mat-chip-option [removable]="isRemoveShow" disableRipple="true" (removed)="removeChip(chip)">
+                            <div appEllipsify [matTooltip]="chip | chipLabel" class="chip-content">
+                                {{chip | chipLabel}}
+                            </div>
+                            @if (isRemoveShow) {
+                                <mat-icon matChipRemove>clear</mat-icon>
+                            }
+                        </mat-chip-option>
+                    }
+                </mat-chip-listbox>
+                @if (isRemoveAllShown) {
+                    <div class="remove-chips">
+                        <a class="ob-link" (click)="removeChips()">
+                            {{removeText | translate}}
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+        @if (showDivider) {
+            <mat-divider />
+        }
+    </div>
+}

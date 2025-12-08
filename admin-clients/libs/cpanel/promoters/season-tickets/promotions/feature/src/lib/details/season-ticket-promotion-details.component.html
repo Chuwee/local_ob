@@ -1,0 +1,42 @@
+<div class="season-ticket-promotions-details-container">
+    <div fxFlex="0 1 100%" fxLayout="column" fxLayoutAlign="stretch">
+        <ng-container *ngIf="(promotion$ | async) as promotion">
+            <app-nav-tabs-menu type="horizontalSubtab" [elements]="elements" [disabled]="!promotion"></app-nav-tabs-menu>
+            <!-- PROMOTION STATUS INFO -->
+            <div fxLayout="column" class="status-notifications-container">
+                <div fxLayoutAlign="center">
+                    <div fxFlex="0 1 1004px" fxLayoutAlign="space-between">
+                        <div class="promotion-activation" [class.disabled]="statusCtrl.disabled"
+                            [matTooltip]="'SEASON_TICKET.PROMOTIONS.DISABLED_ACTIVATION_DESC' | translate"
+                            [matTooltipDisabled]="statusCtrl.enabled">
+                            <mat-slide-toggle class="ob-slide-toggle ob-label" [formControl]="statusCtrl"
+                                (change)="handleStatusChange($event.checked)">
+                                {{(statusCtrl.value ?
+                                'SEASON_TICKET.PROMOTIONS.DEACTIVATE_PROMO' :
+                                'SEASON_TICKET.PROMOTIONS.ACTIVATE_PROMO') | translate}}
+                            </mat-slide-toggle>
+                        </div>
+                        <div class="promotion-type">
+                            <span class="promotion-type-label ob-label">
+                                {{'SEASON_TICKET.PROMOTIONS.TYPE' | translate}}:
+                            </span>
+                            <span class="promotion-type-value">
+                                {{'SEASON_TICKET.PROMOTIONS.TYPE_OPTS.' + promotion.type.toUpperCase() + '.LONG' |
+                                translate}}
+                            </span>
+                        </div>
+                        <div class="promotion-status">
+                            <span class="promotion-status-label ob-label">
+                                {{'SEASON_TICKET.PROMOTIONS.STATUS' | translate}}:
+                            </span>
+                            <span class="ob-status-badge" [ngClass]="promotion.status.toLowerCase()">
+                                {{'SEASON_TICKET.PROMOTIONS.STATUS_OPTS.' + promotion.status | translate}}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <router-outlet (activate)="childComponentChange($event)"></router-outlet>
+        </ng-container>
+    </div>
+</div>

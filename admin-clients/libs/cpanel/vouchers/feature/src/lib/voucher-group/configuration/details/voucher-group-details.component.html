@@ -1,0 +1,44 @@
+<div class="details-container" fxFlex="0 1 100%" fxLayout="column"
+    *ngIf="{voucherGroup: (voucherGroup$ | async), voucher: (voucher$ | async)} as aggVoucher">
+    <div class="heading-container" fxLayoutAlign="start center">
+        <ng-container *ngIf="aggVoucher.voucher as voucher else noCode">
+            <app-go-back [defaultPath]="'/vouchers/'+voucher.voucher_group.id+'/voucher-codes'"
+                [customCopy]="{copy: 'DETAILS.BACK_TO_LIST'}"></app-go-back>
+            <h1 class="secondary mat-headline-3">
+                {{aggVoucher.voucherGroup.name}} - {{'VOUCHER.CODE' | translate}} {{voucher.code}}
+            </h1>
+        </ng-container>
+        <ng-template #noCode>
+            <app-go-back *ngIf="aggVoucher.voucherGroup.type !== voucherGroupType.giftCard else noGiftCard"
+                defaultPath="/vouchers" neverPath="/group/"></app-go-back>
+            <ng-template #noGiftCard>
+                <app-go-back defaultPath="/vouchers" neverPath="/gift-card/"></app-go-back>
+            </ng-template>
+            <h1 class="secondary mat-headline-3" #noCode>
+                {{aggVoucher.voucherGroup.name}}
+            </h1>
+        </ng-template>
+    </div>
+    <div class="main-content" fxFlex="0 1 100%" fxLayout="column">
+        <div class="top-actions">
+            <app-nav-tabs-menu type="tabMenu" [elements]="[
+                {
+                    label: 'VOUCHER_GROUP.CONFIGURATION_GROUP.CONFIGURATION',
+                    param: [(aggVoucher.voucherGroup.type === voucherGroupType.giftCard ? 'gift-card' : 'group'), 'configuration'],
+                    active: (deepPath$ | async) === (aggVoucher.voucherGroup.type === voucherGroupType.giftCard ?
+                    'gift-card' : 'group')
+                },
+                {
+                    label: 'VOUCHER_GROUP.CODE_LIST',
+                    param: 'voucher-codes',
+                    active: (deepPath$ | async) === 'voucher-codes' && !aggVoucher.voucher
+                },
+                {
+                     label: 'VOUCHER_GROUP.VOUCHER_DETAIL',
+                     param: ['voucher-codes', aggVoucher.voucher?.code || ''],
+                     show: !!aggVoucher.voucher
+                }]"></app-nav-tabs-menu>
+        </div>
+        <router-outlet></router-outlet>
+    </div>
+</div>

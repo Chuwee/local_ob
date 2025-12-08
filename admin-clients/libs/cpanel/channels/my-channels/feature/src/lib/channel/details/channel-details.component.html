@@ -1,0 +1,80 @@
+@if($channel(); as channel) {
+    <div class="details-container flex flex-col flex-basis-full">
+        <div class="heading-container flex justify-start items-center">
+            <app-go-back defaultPath="/channels" />
+            <h1 class="secondary mat-headline-3">{{channel.name}}</h1>
+        </div>
+        <div class="main-content flex flex-col flex-basis-full">
+            <div class="top-actions">
+                <app-nav-tabs-menu type="tabMenu" [elements]="[
+                    {
+                        label: 'CHANNELS.GENERAL_DATA',
+                        param: 'general-data'
+                    },
+                    {
+                        label: 'CHANNELS.OPERATIVE',
+                        param: 'operative',
+                        show: channelTypesOperative.includes(channel.type) && !$isSuperOperatorUser(),
+                        disabled: $isMultiCurrency() && !channel.currencies?.length,
+                        tooltip: {
+                            text: 'CHANNELS.DISABLED_OPERATIVE_TOOLTIP',
+                            disabled: $isMultiCurrency() === false || !!channel.currencies?.length
+                        }
+                    },
+                    {
+                        label: 'CHANNELS.DESIGN.TITLE',
+                        param: 'design',
+                        show: channelTypesDesign.includes(channel.type) && !$isSuperOperatorUser()
+                    },
+                    {
+                        label: 'CHANNELS.COMMUNICATION.TITLE',
+                        param: (channel | isV3$ | async) ? 'communication/portal-literals' : 'communication',
+                        show: channelTypesCommunication.includes(channel.type) && !$isSuperOperatorUser(),
+                        disabled: !channel.languages?.selected?.length
+                    },
+                    {
+                        label: 'CHANNELS.CONFIGURATION',
+                        param: 'configuration',
+                        dataTest: 'configurationTab',
+                        show: !channelTypesNotConfiguration.includes(channel.type) && $isOperatorUser(),
+                        disabled: $isMultiCurrency() && !channel.currencies?.length,
+                        tooltip: {
+                            text: 'CHANNELS.DISABLED_CONFIGURATION_TOOLTIP',
+                            disabled: $isMultiCurrency() === false || !!channel.currencies?.length
+                        }
+                    },
+                    {
+                        label: 'CHANNELS.MEMBER_EXTERNAL.TITLE',
+                        param: 'members',
+                        show: channelTypesMembers.includes(channel.type) && !$isSuperOperatorUser()
+                    },
+                    {
+                        label: 'CHANNELS.PROMOTIONS.TITLE',
+                        param: 'promotions',
+                        show: channelTypesPromotions.includes(channel.type) && !$isSuperOperatorUser() && !$promotionsNotAvailable(),
+                        disabled: !channel.languages?.selected?.length
+                    },
+                    {
+                        label: 'ADMIN_CHANNEL.CONFIGURATION.TITLE',
+                        param: 'admin-configuration',
+                        dataTest: 'adminConfigurationTab',
+                        show: $isSuperOperatorUser(),
+                    },
+                ]" />
+            </div>
+            <!-- Hide packs at channel level
+            {
+                label: 'CHANNELS.PACKS.TITLE',
+                param: 'packs',
+                show: (
+                    channelTypesPacks.includes(channel.type) ||
+                    (channelTypesWeb.includes(channel.type) && channel.settings.v4_enabled)
+                ) && !$isSuperOperatorUser(),
+                badge: 'INFORMATION_BADGE.BETA_FEATURE',
+                badgeClass: 'blue'
+            }, -->
+            <router-outlet />
+        </div>
+    </div>
+
+}

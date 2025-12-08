@@ -1,0 +1,131 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [formGroup]="form"
+    [disabled]="!form.dirty">
+    <div class="flex flex-col">
+        <mat-expansion-panel [expanded]="true" togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.VENUE_MAP_CONFIG.TITLES.NAVIGATION_TYPE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex flex-col gap-6">
+                <div class="flex flex-col config-option">
+                    <p class="mat-subtitle-2">{{'CHANNELS.VENUE_MAP_CONFIG.FORMS.INFOS.NAVIGATION_TYPE' | translate}}</p>
+                    <div class="flex flex-col gap-4">
+                        <div class="flex">
+                            <mat-icon class="ob-icon xsmall neutral with-text">info</mat-icon>
+                            <div class="flex flex-col">
+                                <span>{{'CHANNELS.VENUE_MAP_CONFIG.FORMS.INFOS.MAP_VIEW' | translate}}</span>
+                            </div>
+                        </div>
+                        <mat-radio-group class="flex flex-wrap gap-8" formControlName="navigation">
+                            <app-radio-image-button [large]="true" [value]="navigationModes.priceZones"
+                                [checked]="$navigationValue() === navigationModes.priceZones"
+                                [control]="form.controls.navigation" [disabled]="form.controls.navigation.disabled"
+                                [imageAlt]="'CHANNELS.VENUE_MAP_CONFIG.FORMS.LABELS.PRICE_ZONE' | translate"
+                                imageUrl="assets/ob-portal-design/venue-config/price-zone.svg">
+                                <div class="option-title">{{'CHANNELS.VENUE_MAP_CONFIG.FORMS.LABELS.PRICE_ZONE' | translate}}</div>
+                                <div>{{'CHANNELS.VENUE_MAP_CONFIG.FORMS.INFOS.PRICE_ZONE_DESCRIPTION' | translate}}</div>
+                            </app-radio-image-button>
+                            <app-radio-image-button [large]="true" [value]="navigationModes.views"
+                                [checked]="$navigationValue() === navigationModes.views"
+                                [control]="form.controls.navigation" [disabled]="form.controls.navigation.disabled"
+                                [imageAlt]="'CHANNELS.VENUE_MAP_CONFIG.FORMS.LABELS.VENUE_VIEW' | translate"
+                                imageUrl="assets/ob-portal-design/venue-config/venue-view.svg">
+                                <div class="option-title">{{'CHANNELS.VENUE_MAP_CONFIG.FORMS.LABELS.VENUE_VIEW' | translate}}</div>
+                                <div>{{'CHANNELS.VENUE_MAP_CONFIG.FORMS.INFOS.VENUE_VIEW_DESCRIPTION' | translate}}</div>
+                            </app-radio-image-button>
+                        </mat-radio-group>
+                    </div>
+                </div>
+                @if($navigationValue() === navigationModes.views) {
+                    <div class="config-option-extra flex flex-col gap-6">
+                        <div class="view-list-config-title">{{'CHANNELS.VENUE_MAP_CONFIG.TITLES.CONTENT_VIEW' | translate }}</div>
+                        <div class="flex flex-col config-option">
+                            <p class="mat-subtitle-2">
+                                {{'CHANNELS.VENUE_MAP_CONFIG.TITLES.SIZE' | translate}}
+                            </p>
+                            <mat-radio-group formControlName="showCompactedViewList" class="flex flex-col gap-4">
+                                <mat-radio-button [value]="false">
+                                    <h4 class="mat-subtitle-2">{{'CHANNELS.VENUE_MAP_CONFIG.FORMS.LABELS.FULL' | translate}}</h4>
+                                    <span>{{'CHANNELS.VENUE_MAP_CONFIG.FORMS.INFOS.FULL_DESCRIPTION' | translate}}</span>
+                                </mat-radio-button>
+                                <mat-radio-button [value]="true" class="ob-radio-button">
+                                    <h4 class="mat-subtitle-2">{{'CHANNELS.VENUE_MAP_CONFIG.FORMS.LABELS.COMPACTED' | translate}}</h4>
+                                    <span>{{'CHANNELS.VENUE_MAP_CONFIG.FORMS.INFOS.COMPACTED_DESCRIPTION' | translate}}</span>
+                                </mat-radio-button>
+
+                            </mat-radio-group>
+                        </div>
+                        <div class="flex flex-col config-option">
+                            <p class="mat-subtitle-2">
+                                {{'CHANNELS.VENUE_MAP_CONFIG.TITLES.CONTENT' | translate}}
+                            </p>
+                            <mat-radio-group formControlName="forceSidePanel" class="flex flex-col gap-4">
+                                <mat-radio-button [value]="false" class="ob-radio-button">
+                                    <h4 class="mat-subtitle-2">{{'CHANNELS.VENUE_MAP_CONFIG.FORMS.LABELS.EXPANDABLE' | translate}}</h4>
+                                    <span>{{'CHANNELS.VENUE_MAP_CONFIG.FORMS.INFOS.EXPANDABLE_DESCRIPTION' | translate}}</span>
+                                </mat-radio-button>
+                                <mat-radio-button [value]="true">
+                                    <h4 class="mat-subtitle-2">{{'CHANNELS.VENUE_MAP_CONFIG.FORMS.LABELS.SIDE_PANEL' | translate}}</h4>
+                                    <span>{{'CHANNELS.VENUE_MAP_CONFIG.FORMS.INFOS.SIDE_PANEL_DESCRIPTION' | translate}}</span>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        </div>
+                        <mat-divider />
+                        <div class="flex flex-col config-option">
+                            <p class="mat-subtitle-2">{{'CHANNELS.VENUE_MAP_CONFIG.TITLES.SHOW_IMAGE_CAROUSEL' | translate}} -
+                                {{'CHANNELS.VENUE_MAP_CONFIG.TITLES.NZ_AND_NNZ' | translate}}
+                            </p>
+                            <p> {{ 'CHANNELS.VENUE_MAP_CONFIG.FORMS.INFOS.SHOW_IMAGE_CAROUSEL' | translate  }} </p>
+                            <img class="config-option-image" src="assets/ob-portal-design/venue-config/carrousel.svg"
+                                [class.checked]="form.get('showImagesCarousel').value"
+                                alt="CHANNEL.VENUE_MAP_CONFIG.TITLES.SHOW_IMAGE_CAROUSEL">
+                            <mat-checkbox color="primary" formControlName="showImagesCarousel">
+                                {{'CHANNELS.VENUE_MAP_CONFIG.FORMS.LABELS.SHOW_IMAGE_CAROUSEL' | translate}}
+                            </mat-checkbox>
+                        </div>
+                    </div>
+                }
+            </div>
+        </mat-expansion-panel>
+
+        <!-- Commented until the backend of channels is implemented -->
+        <!-- <mat-expansion-panel [expanded]="true" togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+              <mat-panel-title>{{'CHANNELS.VENUE_MAP_CONFIG.TITLES.AUTOMATIC_SELECTION' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="config-option">
+                <mat-checkbox color="primary" formControlName="automaticSelection">
+                    {{'CHANNELS.VENUE_MAP_CONFIG.FORMS.LABELS.AUTOMATIC_SELECTION' | translate}}
+                </mat-checkbox>
+                <p class="checkbox-subtitle">{{ 'CHANNELS.VENUE_MAP_CONFIG.FORMS.INFOS.AUTOMATIC_SELECTION' | translate }}</p>
+            </div>
+        </mat-expansion-panel> -->
+
+        <mat-expansion-panel [expanded]="true" togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.VENUE_MAP_CONFIG.TITLES.PRICE_FILTER' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="config-option">
+                <mat-checkbox color="primary" formControlName="priceRange">
+                    {{'CHANNELS.VENUE_MAP_CONFIG.FORMS.LABELS.PRICE_FILTER' | translate}}
+                </mat-checkbox>
+            </div>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel [expanded]="true" togglePosition="before">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'CHANNELS.VENUE_MAP_CONFIG.TITLES.AVAILABLE_TICKETS' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="config-option">
+                <mat-checkbox color="primary" formControlName="availableTickets">
+                    {{'CHANNELS.VENUE_MAP_CONFIG.FORMS.LABELS.AVAILABLE_TICKETS' | translate}}
+                </mat-checkbox>
+            </div>
+        </mat-expansion-panel>
+    </div>
+</app-form-container>
+
+@if(loading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

@@ -1,0 +1,82 @@
+<div class="dialog-msg-container" fxLayout="column nowrap" fxFlex="100%">
+    <div mat-dialog-title fxFlex="auto" fxLayout="row" fxFlexAlign="start">
+        <h2 fxFlex="100%" class="secondary title">{{'TITLES.NEW_USER' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content fxLayout="column" fxLayoutAlign="start stretch">
+        <form [formGroup]="newUserForm" fxLayout="column" fxLayoutAlign="start stretch">
+            <!-- Operator -->
+            <mat-form-field *ngIf="canSelectOperator$ | async" appearance="outline" class="ob-form-field">
+                <mat-label>{{'USER.OPERATOR' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="operator">
+                    <mat-option>
+                        <app-select-search #operatorSelectSearch [options$]="operators$"
+                            [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name"
+                            requireSelection="true">
+                        </app-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let operator of operatorSelectSearch.getFilteredOptions$() | async" [value]="operator">
+                        {{operator.name}}
+                    </mat-option>
+                </mat-select>
+                <mat-error [ob-form-errors]="newUserForm" field="entity"></mat-error>
+            </mat-form-field>
+            <!-- Entity -->
+            <mat-form-field *ngIf="canSelectEntity$ | async" appearance="outline" class="ob-form-field">
+                <mat-label>{{'USER.ENTITY' | translate}}</mat-label>
+                <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" formControlName="entity">
+                    <mat-option>
+                        <app-select-search #entitySelectSearch [options$]="entities$"
+                            [placeholderLabel]="'FORMS.SELECT.PLACE_HOLDER' | translate" searchField="name"
+                            requireSelection="true">
+                        </app-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let entity of entitySelectSearch.getFilteredOptions$() | async" [value]="entity">
+                        {{entity.name}}
+                    </mat-option>
+                </mat-select>
+                <mat-error [ob-form-errors]="newUserForm" field="entity"></mat-error>
+            </mat-form-field>
+            <!-- Name -->
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'USER.NAME' | translate}}</mat-label>
+                <input matInput aria-label="name" [placeholder]="'USER.NAME' | translate" formControlName="name">
+                <mat-error [ob-form-errors]="newUserForm" field="name"></mat-error>
+            </mat-form-field>
+            <!-- Surname -->
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'USER.SURNAME' | translate}}</mat-label>
+                <input matInput aria-label="surname" [placeholder]="'USER.SURNAME' | translate"
+                    formControlName="surname">
+                <mat-error [ob-form-errors]="newUserForm" field="surname"></mat-error>
+            </mat-form-field>
+            <!-- Email -->
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'USER.EMAIL' | translate}}</mat-label>
+                <input matInput aria-label="email" [placeholder]="'USER.EMAIL' | translate" formControlName="email">
+                <mat-error [ob-form-errors]="newUserForm" field="email"></mat-error>
+            </mat-form-field>
+            <!-- Position -->
+            <mat-form-field appearance="outline" class="ob-form-field">
+                <mat-label>{{'USER.POSITION' | translate}}</mat-label>
+                <input matInput aria-label="position" [placeholder]="'USER.POSITION' | translate"
+                    formControlName="position">
+                <mat-error [ob-form-errors]="newUserForm" field="position"></mat-error>
+            </mat-form-field>
+        </form>
+    </div>
+    <div mat-dialog-actions fxLayoutAlign="end">
+        <button mat-button type="button" class="ob-button" [disabled]="isInProgress$ | async" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" [disabled]="isInProgress$ | async"
+            (click)="createUser()">
+            {{'FORMS.ACTIONS.CREATE' | translate}}
+        </button>
+    </div>
+</div>
+<div class="spinner-container" *ngIf="isInProgress$ | async">
+    <mat-spinner></mat-spinner>
+</div>

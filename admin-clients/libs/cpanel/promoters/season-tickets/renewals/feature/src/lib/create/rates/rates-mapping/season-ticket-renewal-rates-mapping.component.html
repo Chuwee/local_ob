@@ -1,0 +1,53 @@
+<div class="info-container" fxLayout="column">
+    <h3 class="section-title step-title">
+        {{'SEASON_TICKET.RENEWALS.DIALOG_RENEWAL_LIST.IMPORT_RATES_TITLE' | translate}}
+    </h3>
+    <span>
+        {{'SEASON_TICKET.RENEWALS.DIALOG_RENEWAL_LIST.IMPORT_RATES_INFO' | translate}}
+    </span>
+</div>
+<div fxLayout="column" class="list-container">
+    <div fxFlex class="table-container" fxLayout="column" [formGroup]="ratesFormGroup">
+        <mat-table class="ob-table" [dataSource]="renewalRates$ | async" [formArrayName]="ratesControlName"
+            aria-label="season ticket renewal dialog rates table">
+            <ng-container matColumnDef="old">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'SEASON_TICKET.RENEWALS.DIALOG_RENEWAL_LIST.OLD_RATES' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    <span appEllipsify [matTooltip]="row.name" matTooltipClass="ob-tooltip-nowrap">
+                        {{row.name}}
+                    </span>
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="new">
+                <mat-header-cell *matHeaderCellDef class="head-cell">
+                    {{'SEASON_TICKET.RENEWALS.DIALOG_RENEWAL_LIST.NEW_RATES' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row; let i = index;" class="editable-cell" (click)="$event.stopPropagation()"
+                    fxLayout="row" fxLayoutAlign="start center">
+                    <mat-form-field appearance="outline" class="ob-form-field ob-form-field-outline">
+                        <mat-select [compareWith]="compareRateById"
+                            [placeholder]="'SEASON_TICKET.RENEWALS.DIALOG_RENEWAL_LIST.SELECT_RATE' | translate"
+                            [formControlName]="i">
+                            <mat-option>
+                                <app-select-search #ratesSelectSearch [options$]="seasonTicketRates$"
+                                    [requireSelection]="true"
+                                    [placeholderLabel]="'SEASON_TICKET.RENEWALS.DIALOG_RENEWAL_LIST.SELECT_RATE' | translate"
+                                    searchField="name">
+                                </app-select-search>
+                            </mat-option>
+                            <mat-option *ngFor="let rate of ratesSelectSearch.getFilteredOptions$() | async"
+                                [value]="{new_rate_id: rate?.id, old_rate_id: row.id}">
+                                {{rate?.name}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </mat-cell>
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;" class="interactive-row">
+            </mat-row>
+        </mat-table>
+    </div>
+</div>

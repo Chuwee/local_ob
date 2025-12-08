@@ -1,0 +1,147 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title>
+        <div class="flex flex-row justify-between items-center">
+            <h2 class="secondary title">
+                {{'TITLES.EDIT_OWN_CATEGORIES' | translate}}
+            </h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content>
+        <div class="flex flex-col gap-4">
+            <div class="flex flex-row justify-end">
+                <button mat-stroked-button color="primary" type="button" class="ob-button small"
+                    [attr.aria-label]="'ENTITY.OWN_CATEGORIES.NEW_OWN_CATEGORY' | translate"
+                    (click)="openCreateOrUpdateCategoryDialog(dialogActions.add)">
+                    <mat-icon>add</mat-icon>
+                    {{'ENTITY.OWN_CATEGORIES.NEW_OWN_CATEGORY' | translate}}
+                </button>
+            </div>
+            <div class="flex flex-col categories-container">
+                <!-- Header -->
+                <div class="categories-header">
+                    <div class="flex-1 grid grid-cols-4">
+                        <div class="without-expandable-button col-span-2">
+                            <span>
+                                {{'ENTITY.OWN_CATEGORIES.NAME' | translate}}
+                            </span>
+                        </div>
+                        <div>
+                            <span>
+                                {{('ENTITY.OWN_CATEGORIES.ID' | translate).toUpperCase()}}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Categories -->
+                @if ((entityCategories$ | async)?.length) {
+                    <mat-tree class="ob-tree-table" [dataSource]="dataSource" [treeControl]="treeControl">
+                        <!-- Category not expandable (may be parent or subcategory) -->
+                        <div class="flex">
+                            <mat-tree-node *matTreeNodeDef="let node" class="hoverable-tree-node" [id]="(node.id).toString()">
+                                <div class="flex-1 grid grid-cols-4 items-center">
+                                    <div class="without-expandable-button col-span-2"
+                                        [class.subcategory]="node.level !== 0" appEllipsify>
+                                        <span appEllipsify [matTooltip]="node.description">{{node.description}}</span>
+                                    </div>
+                                    <div class="col-span-1" appEllipsify>
+                                        <span appEllipsify [matTooltip]="node.code">{{node.code}}</span>
+                                    </div>
+                                    <div class="col-span-1 flex justify-end items-center action-buttons-container">
+                                        @if (node.level === 0) {
+                                            <button mat-icon-button type="button" class="ob-button mat-stroked-button xsmall"
+                                                aria-label="Add category" [matTooltip]="'ENTITY.OWN_CATEGORIES.ADD_SUBCATEGORY' | translate"
+                                                (click)="openCreateOrUpdateCategoryDialog(dialogActions.add, node)">
+                                                <mat-icon>add</mat-icon>
+                                            </button>
+                                        }
+                                        <button mat-icon-button aria-label="Edit category"
+                                            class="ob-button medium action-category-button"
+                                            (click)="openCreateOrUpdateCategoryDialog(dialogActions.update, node)"
+                                            [matTooltip]="'ENTITY.OWN_CATEGORIES.EDIT' | translate">
+                                            <mat-icon>edit</mat-icon>
+                                        </button>
+                                        <div [matTooltip]="node.base_category_id?.length
+                                                ? ('ENTITY.OWN_CATEGORIES.DELETE_NOT_ALLOWED.IS_ASSIGNED' | translate)
+                                                : ('ENTITY.OWN_CATEGORIES.DELETE' | translate)">
+                                            <button mat-icon-button aria-label="Delete category"
+                                                class="ob-button medium action-category-button"
+                                                [disabled]="node.base_category_id?.length"
+                                                (click)="openDeleteCategoryDialog(node)">
+                                                <mat-icon>delete</mat-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-tree-node>
+                        </div>
+                        <!-- Category expandable -->
+                        <mat-tree-node *matTreeNodeDef="let node; when: hasChild" class="hoverable-tree-node"
+                            [id]="(node.id).toString()">
+                            <div class="flex-1 grid grid-cols-4 items-center">
+                                <div class="flex col-span-2 items-center" appEllipsify>
+                                    <button mat-icon-button matTreeNodeToggle class="ob-button medium only-icon"
+                                        [attr.aria-label]="'Toggle ' + node.id">
+                                        <mat-icon class="mat-icon-rtl-mirror">
+                                            {{treeControl.isExpanded(node) ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}}
+                                        </mat-icon>
+                                    </button>
+                                    <span appEllipsify [matTooltip]="node.description">{{node.description}}</span>
+                                </div>
+                                <div class="col-span-1" appEllipsify>
+                                    <span appEllipsify [matTooltip]="node.code">{{node.code}}</span>
+                                </div>
+                                <div class="col-span-1 flex justify-end items-center action-buttons-container">
+                                    <button mat-icon-button type="button" class="ob-button mat-stroked-button xsmall"
+                                        aria-label="Add category" [matTooltip]="'ENTITY.OWN_CATEGORIES.ADD_SUBCATEGORY' | translate"
+                                        (click)="openCreateOrUpdateCategoryDialog(dialogActions.add, node)">
+                                        <mat-icon>add</mat-icon>
+                                    </button>
+                                    <button mat-icon-button aria-label="Edit category"
+                                        class="ob-button medium action-category-button"
+                                        (click)="openCreateOrUpdateCategoryDialog(dialogActions.update, node)"
+                                        [matTooltip]="'ENTITY.OWN_CATEGORIES.EDIT' | translate">
+                                        <mat-icon>edit</mat-icon>
+                                    </button>
+                                    <div [matTooltip]="node.base_category_id?.length
+                                            ? ('ENTITY.OWN_CATEGORIES.DELETE_NOT_ALLOWED.IS_ASSIGNED_AND_HAS_SUBCATEGORIES' | translate)
+                                            : ('ENTITY.OWN_CATEGORIES.DELETE_NOT_ALLOWED.HAS_SUBCATEGORIES' | translate)">
+                                        <button mat-icon-button aria-label="Delete category"
+                                            class="ob-button medium action-category-button"
+                                            disabled (click)="openDeleteCategoryDialog(node)">
+                                            <mat-icon>delete</mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-tree-node>
+                    </mat-tree>
+                } @else {
+                    <!-- Context message -->
+                    <div class="context-message-container">
+                        <p class="title">{{'ENTITY.OWN_CATEGORIES.EMPTY_OWN_CATEGORIES_LIST_TITLE' | translate}}</p>
+                        <div class="desc">{{'ENTITY.OWN_CATEGORIES.EMPTY_OWN_CATEGORIES_LIST_DESCRIPTION' | translate}}</div>
+                        <button mat-stroked-button class="ob-button" (click)="openCreateOrUpdateCategoryDialog(dialogActions.add)">
+                            <mat-icon>add</mat-icon>
+                            {{'ENTITY.OWN_CATEGORIES.NEW_OWN_CATEGORY' | translate}}
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div mat-dialog-actions>
+        <div class="flex flex-1 justify-end">
+            <button mat-flat-button color="primary" type="button" class="ob-button" (click)="close()" [disabled]="isInProgress$ | async">
+                {{'FORMS.ACTIONS.OK' | translate}}
+            </button>
+        </div>
+    </div>
+</div>
+@if (isInProgress$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

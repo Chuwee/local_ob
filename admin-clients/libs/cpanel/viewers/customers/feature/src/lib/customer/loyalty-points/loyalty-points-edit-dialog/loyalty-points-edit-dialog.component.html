@@ -1,0 +1,71 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title class="dialog-title">
+        <h2 class="secondary title full-width-field">
+            {{ 'CUSTOMER.LOYALTY_POINTS_HISTORY.EDIT_MODAL.TITLE' | translate }}
+        </h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <div mat-dialog-content [formGroup]="form">
+        <p>{{ 'CUSTOMER.LOYALTY_POINTS_HISTORY.EDIT_MODAL.DESCRIPTION' | translate }}</p>
+        <div class="operation-summary section-block">
+            <div class="current-amount">
+                <h3 class="label">
+                    {{ 'CUSTOMER.LOYALTY_POINTS_HISTORY.EDIT_MODAL.CURRENT_BALANCE' | translate | uppercase }}
+                </h3>
+                <span class="value">
+                    {{ 'CUSTOMER.LOYALTY_POINTS_HISTORY.EDIT_MODAL.BALANCE_SUFFIX' | translate: { currentAmount: $currentAmount() } }}
+                </span>
+            </div>
+            <div class="new-amount">
+                <h3 class="label">
+                    {{ 'CUSTOMER.LOYALTY_POINTS_HISTORY.EDIT_MODAL.NEW_BALANCE' | translate | uppercase }}
+                </h3>
+                <span class="value">
+                    @if ($newAmount()) {
+                        {{ 'CUSTOMER.LOYALTY_POINTS_HISTORY.EDIT_MODAL.BALANCE_SUFFIX' | translate: { currentAmount: $newAmount() } }}
+                    } @else {
+                        -
+                    }
+                </span>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label" subscriptSizing="dynamic">
+                    <mat-label>{{ 'CUSTOMER.LOYALTY_POINTS_HISTORY.EDIT_MODAL.FORM.AMOUNT' | translate }}</mat-label>
+                    <input matInput aria-label="amount" placeholder="0" [formControl]="form.controls.amount" type="number">
+                    <mat-error [ob-form-errors]="form.controls.amount"></mat-error>
+                </mat-form-field>
+            </div>
+
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label full-width-field" subscriptSizing="dynamic">
+                    <mat-label>{{ 'CUSTOMER.LOYALTY_POINTS_HISTORY.EDIT_MODAL.FORM.DESCRIPTION' | translate }}</mat-label>
+                    <input matInput aria-label="description" [formControl]="form.controls.description"
+                        [placeholder]="'CUSTOMER.LOYALTY_POINTS_HISTORY.EDIT_MODAL.FORM.DESCRIPTION_PLACEHOLDER' | translate">
+                    <mat-error [ob-form-errors]="form.controls.description"></mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+
+    <div mat-dialog-actions class="dialog-actions">
+        <button type="button" mat-button class="ob-button" (click)="close()" [disabled]="$inProgress()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button" (click)="save()"
+            [disabled]="(!form.dirty) || $inProgress()">
+            {{ 'FORMS.ACTIONS.SAVE' | translate }}
+        </button>
+    </div>
+</div>
+
+@if ($inProgress()) {
+    <div class="spinner-container">
+        <mat-spinner></mat-spinner>
+    </div>
+}

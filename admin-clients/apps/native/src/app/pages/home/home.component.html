@@ -1,0 +1,163 @@
+<ion-header class="ob-layout__header">
+    <ion-toolbar>
+        <div class="home-page__header">
+            <h1 class="home-page__header-username">{{ $entity() }}</h1>
+            <div class="home-page__header-circle-monogram" (click)="goToProfile()">
+                <div>{{ initials }}</div>
+            </div>
+        </div>
+    </ion-toolbar>
+</ion-header>
+<ion-content class="ob-layout__content">
+    @if(isMultiCurrency && isRoleSales && !$isNoSales()){
+        <!--Bloque Seleccionar Divida --> 
+        <ob-select [filterOptions]="currenciesPicker" [isMultiple]="false" [value]="currencyRequest"
+        [label]="('HOME.SELECT_CURRENCY' | translate)" (valueChange)="selectCurrency($event)" />
+    } 
+    <div>
+        <!-- <div class="home-page__search-bar" slot="fixed">
+            <ion-searchbar (click)="goToGlobalSearch()" class="home-page__header-search-bar"
+                placeholder="{{ 'GLOBAL-SEARCH.INPUT-PLACEHOLDER' | translate }}"
+                searchIcon="./assets/media/icons/lens.svg"></ion-searchbar> -->
+        <!-- TODO: Uncomment when the barcode scanner works -->
+        <!-- <ion-button class="home-page__qr-btn" fill="clear"
+                [disabled]="!!!(isSupported$ | async) || !!!(isPermissionGranted$ | async)"
+                (click)="activateQR()">
+                <ion-icon slot="icon-only" src="./assets/media/icons/qr_code_scanner.svg"></ion-icon>
+            </ion-button> -->
+        <!-- </div> -->
+
+        <!-- Bloque Ventas -->
+        @if(isRoleSales && !$isNoSales()){       
+            <div class="card-group wrapper">
+                <!--Bloque Ventas Hoy -->
+                <ion-card class="card-primary ion-activatable" (click)="goToTransactions('transactions', 'today')">
+                    <ion-ripple-effect />
+                    <ion-card-header>
+                        <ion-card-title class="text-title">
+                            <ion-icon src="./assets/media/icons/chart.svg" />
+                            {{ "HOME.TODAY-SALES" | translate }}
+                        </ion-card-title>
+                        @if(!$isLoading()) {
+                            <ion-card-subtitle>
+                                <!-- TODO:  Create a new pipeline that allows you to put the currency
+                                in front of or behind the value, applying a different style to the currency and the value-->
+                                <span class="text-amount">{{ todaySales$ | async | localCurrency: ' '}}</span>
+                                <span class="text-currency">{{ currencyRequest | localCurrencySymbol}}</span>
+                            </ion-card-subtitle>
+                        } @else {
+                            <ion-skeleton-text [animated]="true" />
+                        }
+                        <ion-icon class="center-right" name="chevron-forward-outline" />
+                    </ion-card-header>
+                </ion-card>
+
+                <!--Bloque Ventas Ayer -->
+                <ion-card class="ion-activatable" (click)="goToTransactions('transactions','yesterday')">
+                    <ion-ripple-effect />
+                    <ion-card-header>
+                        <ion-card-title>
+                            <ion-icon src="./assets/media/icons/chart.svg" />
+                            {{ "HOME.YESTERDAY-SALES" | translate }}
+                        </ion-card-title>
+                        @if(!$isLoading()) {
+                            <ion-card-subtitle>
+                                <!-- TODO:  Create a new pipeline that allows you to put the currency
+                               in front of or behind the value, applying a different style to the currency and the value-->
+                                <span class="text-amount">{{ yesterdaySales$ | async | localCurrency: ' '}}</span>
+                                <span class="text-currency">{{ currencyRequest | localCurrencySymbol}}</span>
+                            </ion-card-subtitle>
+                        } @else {
+                            <ion-skeleton-text [animated]="true" />
+                        }
+                        <ion-icon class="center-right" name="chevron-forward-outline" />
+                    </ion-card-header>
+                </ion-card>
+
+                <!--Bloque Entradas Ayer -->
+                <ion-card class="ion-activatable" (click)="goToTransactions('tickets','yesterday')">
+                    <ion-ripple-effect />
+                    <ion-card-header>
+                        <ion-card-title>
+                            <ion-icon src="./assets/media/icons/ticket.svg" />
+                            {{ "HOME.YESTERDAY-TICKETS" | translate }}
+                        </ion-card-title>
+                        @if(!$isLoading()) {
+                            <ion-card-subtitle>
+                                <span class="text-amount"> {{ yesterdayTickets$ | async }}</span>
+                                <span class="text-currency">{{ "HOME.TICKETS" | translate }}</span>
+                            </ion-card-subtitle>
+                        } @else {
+                            <ion-skeleton-text [animated]="true" />
+                        }
+                        <ion-icon class="center-right" name="chevron-forward-outline" />
+                    </ion-card-header>
+                </ion-card>
+            </div>
+
+            <!-- Bloque Grafica resumen -->
+            <ion-card (click)="goToWeeklySalesDetail()" class="home-page__chart ion-activatable">
+                <ion-ripple-effect />
+                <div>
+                    <span class="home-page__chart-title">
+                        {{ "HOME.WEEK-SALES" | translate }}
+                    </span>
+                    <ion-icon class="center-right" name="chevron-forward-outline" />
+                </div>
+                @if (!$isLoading() && chartData$ | async; as data) {
+                    <chart [chartData]="data" />
+                } @else {
+                    <ion-spinner
+                        class="ob-spinner home-page__spinner"
+                        name="crescent" />
+                }
+            </ion-card>
+        }
+        @if(isRoleSales && $isNoSales()){
+            <div class="home-page__last-events">
+                <static-view [viewContent]="{
+                    title: 'NO_SALES_LAST_7_DAYS_TITLE', description: 'NO_SALES_LAST_7_DAYS_DESCRIPTION', isSales:true
+                    }" class="home-page__empty-results" />
+            </div>
+        }
+
+        <!-- Bloque Eventos -->
+        @if(isRoleEvent) {
+            <div class="home-page__last-events">
+                <span class="home-page__last-events-title">
+                    {{ "HOME.LAST-VIEWED-EVENTS" | translate }}
+                </span>
+                @if ((events$ | async) !== null) {
+                    <ion-list class="home-page__last-events-list">
+                        @if(!!!(events$ | async)|| (events$ | async)?.length === 0) {
+                            <static-view [viewContent]="{
+                                title: 'NO-RESULTS-LAST-EVENTS-TITLE', description: 'NO-RESULTS-LAST-EVENTS-DESCRIPTION'
+                            }" class="home-page__empty-results" />
+                        } @else {
+                            @for (item of (events$ | async); track item) {
+                                <ion-item>
+                                    <event-card class="home-page__last-events-card"
+                                        [event]="item" (tap)="goToEventDetail($event)" />
+                                </ion-item>
+                            }
+                        }
+                    </ion-list>
+                } @else {
+                    <ion-list class="home-page__last-events-list">
+                        <ion-item>
+                            <skeleton-card class="home-page__last-events-card" />
+                        </ion-item>
+                    </ion-list>
+                }
+            </div>
+        }
+        @if (!isRoleEvent && !isRoleSales) {
+            <div class="home-page__last-events">
+                <static-view [viewContent]="{
+                    title: 'NO_PERMISSIONS_TITLE', description: 'NO_PERMISSIONS_DESCRIPTION',
+                    img:'assets/media/img/pc_picture.svg'
+                    }" class="home-page__empty-results" />
+            </div>
+        }
+    </div>
+</ion-content>

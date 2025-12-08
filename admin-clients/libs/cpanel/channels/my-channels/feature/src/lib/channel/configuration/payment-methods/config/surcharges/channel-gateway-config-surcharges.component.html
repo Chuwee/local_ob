@@ -1,0 +1,183 @@
+<!-- eslint-disable @angular-eslint/template/prefer-self-closing-tags -->
+<div mat-dialog-content class="with-wizard-bar flex flex-col">
+    <div class="basis-full flex flex-wrap">
+        <p>{{'CHANNELS.PAYMENT_METHODS.SURCHARGES_INFO' | translate}}</p>
+        <mat-radio-group [formControl]="surchargesForm.controls.surchargeType" class="flex basis-full">
+            <div class="flex flex-col gap-6 basis-full">
+                <mat-radio-button [value]="'NONE'">
+                    {{'CHANNELS.PAYMENT_METHODS.WITHOUT_SURCHARGE_RADIO' | translate}}
+                </mat-radio-button>
+
+                <!-- Fixed -->
+                <div class="flex flex-col gap-4">
+                    <mat-radio-button [value]="'FIXED'">
+                        {{'CHANNELS.PAYMENT_METHODS.FIXED_SURCHARGE_RADIO' | translate}}
+                    </mat-radio-button>
+                    @if (surchargesForm.controls.surchargeType.value === 'FIXED') {
+                        <div class="gap-2">
+                            <ng-container
+                                [ngTemplateOutlet]="taxes"
+                                [ngTemplateOutletContext]="{ control: surchargesForm.controls.surchargesTaxesFixed }">
+                            </ng-container>
+                            <table mat-table class="ob-table nested-content max-width" [dataSource]="$currencies()">
+                                <ng-container [matColumnDef]="fixedSurchargesDisplayedColumns[0]">
+                                    <th mat-header-cell *matHeaderCellDef class="default-padding head-cell">
+                                        {{'FORMS.LABELS.CURRENCY' | translate}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let currency;" class="default-padding">
+                                        {{currency}}
+                                    </td>
+                                </ng-container>
+                                <ng-container [matColumnDef]="fixedSurchargesDisplayedColumns[1]">
+                                    <th mat-header-cell *matHeaderCellDef class="head-cell right">
+                                        {{'FORMS.LABELS.SURCHARGE' | translate}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let currency;" class="editable-cell right">
+                                        <div class="write-value">
+                                            <mat-form-field appearance="outline" class="ob-form-field">
+                                                @let errorMessage = surchargesForm.controls.surchargesFixedValues.controls[currency]
+                                            | obErrorMessage$
+                                            | async;
+                                        @if (errorMessage) {
+                                                    <mat-icon matPrefix [obErrorIcon]="errorMessage">
+                                                        error_outline
+                                                    </mat-icon>
+                                                }
+                                                <app-currency-input class="table-input"
+                                                    [formControl]="surchargesForm.controls.surchargesFixedValues.controls[currency]"
+                                                    currencyFormat="narrow" [currencyCode]="currency"
+                                                    [placeholder]="0 | localCurrency : currency : 'narrow'" />
+                                            </mat-form-field>
+                                        </div>
+                                    </td>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="fixedSurchargesDisplayedColumns" class="dense-row"></tr>
+                                <tr mat-row *matRowDef="let row; columns: fixedSurchargesDisplayedColumns"
+                                    class="hoverable-row dense-row"></tr>
+                            </table>
+                        </div>
+                    }
+                </div>
+
+                <!-- Percent -->
+                <div class="flex flex-col gap-4">
+                    <mat-radio-button [value]="'PERCENT'">
+                        {{'CHANNELS.PAYMENT_METHODS.PERCENT_SURCHARGE_RADIO' | translate}}
+                    </mat-radio-button>
+                    @if (surchargesForm.controls.surchargeType.value === 'PERCENT') {
+                        <div class="gap-2">
+                            <ng-container
+                                [ngTemplateOutlet]="taxes"
+                                [ngTemplateOutletContext]="{ control: surchargesForm.controls.surchargesTaxesPercent }">
+                            </ng-container>
+                            <table mat-table class="ob-table nested-content max-width" [dataSource]="$currencies()">
+                                <ng-container [matColumnDef]="percentSurchargesDisplayedColumns[0]">
+                                    <th mat-header-cell *matHeaderCellDef class="default-padding head-cell">
+                                        {{'FORMS.LABELS.CURRENCY' | translate}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let currency;" class="default-padding">
+                                        {{currency}}
+                                    </td>
+                                </ng-container>
+                                <ng-container [matColumnDef]="percentSurchargesDisplayedColumns[1]">
+                                    <th mat-header-cell *matHeaderCellDef class="head-cell right">
+                                        {{'FORMS.LABELS.SURCHARGE' | translate}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let currency;" class="editable-cell right">
+                                        <div class="write-value">
+                                            <mat-form-field appearance="outline" class="ob-form-field">
+                                                @let errorMessage = surchargesForm.controls.surchargesPercentValues.controls[currency]
+                                            | obErrorMessage$
+                                            | async;
+                                        @if (errorMessage) {
+                                                    <mat-icon matPrefix [obErrorIcon]="errorMessage">
+                                                        error_outline
+                                                    </mat-icon>
+                                                }
+                                                <app-percentage-input
+                                                    [formControl]="surchargesForm.controls.surchargesPercentValues.controls[currency]"
+                                                    [placeholder]="(0 | localNumber : '1.2-2')" />
+                                            </mat-form-field>
+                                        </div>
+                                    </td>
+                                </ng-container>
+                                <ng-container [matColumnDef]="percentSurchargesDisplayedColumns[2]">
+                                    <th mat-header-cell *matHeaderCellDef class="head-cell right">
+                                        {{'FORMS.LABELS.MIN' | translate}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let currency;" class="editable-cell right">
+                                        <div class="write-value">
+                                            <mat-form-field appearance="outline" class="ob-form-field">
+                                                @let errorMessage = surchargesForm.controls.surchargesPercentMinValues.controls[currency]
+                                            | obErrorMessage$
+                                            | async;
+                                        @if (errorMessage) {
+                                                    <mat-icon matPrefix [obErrorIcon]="errorMessage">
+                                                        error_outline
+                                                    </mat-icon>
+                                                }
+                                                <app-currency-input class="table-input"
+                                                    [formControl]="surchargesForm.controls.surchargesPercentMinValues.controls[currency]"
+                                                    currencyFormat="narrow" [currencyCode]="currency"
+                                                    [placeholder]="0 | localCurrency : currency : 'narrow'" />
+                                            </mat-form-field>
+                                        </div>
+                                    </td>
+                                </ng-container>
+                                <ng-container [matColumnDef]="percentSurchargesDisplayedColumns[3]">
+                                    <th mat-header-cell *matHeaderCellDef class="head-cell right">
+                                        {{'FORMS.LABELS.MAX' | translate}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let currency;" class="editable-cell right">
+                                        <div class="write-value">
+                                            <mat-form-field appearance="outline" class="ob-form-field">
+                                                @let errorMessage = surchargesForm.controls.surchargesPercentMaxValues.controls[currency]
+                                            | obErrorMessage$
+                                            | async;
+                                        @if (errorMessage) {
+                                                    <mat-icon matPrefix [obErrorIcon]="errorMessage">
+                                                        error_outline
+                                                    </mat-icon>
+                                                }
+                                                <app-currency-input class="table-input"
+                                                    [formControl]="surchargesForm.controls.surchargesPercentMaxValues.controls[currency]"
+                                                    currencyFormat="narrow" [currencyCode]="currency"
+                                                    [placeholder]="0 | localCurrency : currency : 'narrow'" />
+                                            </mat-form-field>
+                                        </div>
+                                    </td>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="percentSurchargesDisplayedColumns" class="dense-row"></tr>
+                                <tr mat-row *matRowDef="let row; columns: percentSurchargesDisplayedColumns"
+                                    class="hoverable-row dense-row">
+                                </tr>
+                            </table>
+                        </div>
+
+                    }
+                </div>
+            </div>
+        </mat-radio-group>
+    </div>
+</div>
+
+<ng-template #taxes let-control="control">
+    <mat-form-field appearance="outline" class="ob-form-field field-with-label nested-content max-w-[160px]">
+        <mat-label>{{ 'CHANNELS.PAYMENT_METHODS.TAXES' | translate }}</mat-label>
+        @let errorMessage = control | obErrorMessage$ | async;
+        @if (errorMessage) {
+            <mat-icon matPrefix [obErrorIcon]="errorMessage">
+                error_outline
+            </mat-icon>
+        }
+        <mat-select [formControl]="control"
+            multiple [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+            @for (tax of $taxes(); track tax.id) {
+                <mat-option [value]="tax.id">
+                    {{ tax.name }}
+                </mat-option>
+            }
+        </mat-select>
+        <mat-error [ob-form-errors]="control" />
+    </mat-form-field>
+</ng-template>

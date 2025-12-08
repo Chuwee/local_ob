@@ -1,0 +1,203 @@
+<div mat-dialog-content class="with-wizard-bar flex flex-col" [formGroup]="$form()">
+    <div class="space-name-container grid grid-cols-3 gap-12">
+        <div class="details-non-editable-field ob-form-field flex flex-col">
+            <span class="field-label">{{'VENUES.SELECTED_VENUE' | translate}}</span>
+            <span>{{$venue().name}}</span>
+        </div>
+        <!-- TYPE -->
+        <div class="flex flex-col">
+            @if((availableTemplateTypes$ | async); as availableTemplateTypes){
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'VENUE_TPLS.TYPE' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                        [formControl]="$form().controls.tplType">
+                        @for(type of availableTemplateTypes; track type){
+                            <mat-option [value]="type">
+                                <div>{{('VENUE_TPLS.TYPE_' + type) | translate}}</div>
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            }
+
+            @if ($form().controls.tplType?.value === venueTemplateType.normal) {
+                @if($inventoryProviders()){
+                    <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                        <mat-label>{{'VENUE_TPLS.INVENTORY' | translate}}</mat-label>
+                        <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate"
+                            [formControl]="$form().controls.inventory" (selectionChange)="onInventoryChange($event.value)">
+                            @for(inventory of $inventoryProviders(); track inventory){
+                                <mat-option [value]="inventory">
+                                    <div> {{'VENUES.INVENTORY.'+ inventory | translate}}</div>
+                                </mat-option>
+                            }
+                            <mat-option [value]="'internal'">{{'VENUES.INVENTORY.INTERNAL'| translate}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                }
+            }
+        </div>
+        <!-- SPACE -->
+        <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+            <mat-label>{{'VENUES.SPACE' | translate}}</mat-label>
+            <mat-select [formControl]="$form().controls.venueSpace" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                @for(space of $venueSpaces(); track space.id){
+                    <mat-option [value]="space">
+                        <div appEllipsify [matTooltip]="space.name">
+                            {{space.name}}
+                        </div>
+                    </mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <!-- FROM BASE TEMPLATE OR NEW -->
+    @if($form().controls.inventory?.value !== 'SGA') {
+        <div class="tpl-type-container"
+            [class.hidden]="$mode() === newVenueTemplateDialogMode.venueTemplate
+            || $form().controls.tplType.value !== venueTemplateType.normal && !$event()">
+            <mat-radio-group [formControl]="$form().controls.newVenueTplType"
+                class="type-options flex flex-row gap-2 items-center ">
+                <mat-radio-button class="ob-radio-card-button" [value]="newVenueTplType.base">
+                    <div class="option-title">{{'VENUES.BASE_TPL' | translate}}</div>
+                    <div>
+                        {{'VENUES.BASE_TPL_DESCRIPTION' | translate}}
+                    </div>
+                </mat-radio-button>
+                <mat-radio-button class="ob-radio-card-button" [value]="newVenueTplType.new">
+                    <div class="option-title">{{'VENUES.NEW_TPL' | translate}}</div>
+                    <div>
+                        {{'VENUES.NEW_TPL_DESCRIPTION' | translate}}
+                    </div>
+                </mat-radio-button>
+            </mat-radio-group>
+        </div>
+    }
+    @if($form().controls.newVenueTplType.enabled && $form().controls.newVenueTplType.valid){
+        <div>
+            <!-- FROM BASE CONFIG -->
+            @if($form().controls.selectedTpl.enabled){
+                <div class="flex flex-col tpl-list-container gap-4">
+                    <mat-divider />
+                    <div class="flex flex-col gap-4">
+                        <div class="flex flex-row justify-between">
+                            <app-search-input [placeholder]="'FORMS.SEARCH.VENUE_TEMPLATE_LIST' | translate"
+                                (valueChanged)="changeKeyword($event)" />
+                            @if($venueTplsListMetadata(); as metadata){
+                                <mat-paginator hidePageSize
+                                    class="flex-none venue-paginator with-range-label transparent no-padding"
+                                    [pageIndex]="metadata?.offset / metadata?.limit" [pageSize]="metadata?.limit" [length]="metadata?.total"
+                                    (page)="loadPaginatedList($event)" />
+                            }
+                        </div>
+                        <div>
+                            @if(!$venueTplsListData()?.length){
+                                <div class="context-notification-container flex flex-row items-center justify-center">
+                                    <app-context-notification class="ob-context-notification justify-center items-center">
+                                        {{'LIST.EMPTY' | translate}}
+                                    </app-context-notification>
+                                </div>
+                            }
+                            @if($venueTplsListData()?.length){
+                                <mat-selection-list [formControl]="$form().controls.selectedTpl"
+                                    class="ob-grid-select-list venue-tpl-select-list flex-1"
+                                    [multiple]="false" (selectionChange)="nameInput.focus()">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        @for(venueTpl of $venueTplsListData(); track venueTpl){
+                                            <mat-list-option color="primary" [value]="venueTpl">
+                                                <div class="flex flex-row justify-start items-center">
+                                                    <div class="main">
+                                                        <p class="card-title" appEllipsify [matTooltip]="venueTpl.name">{{venueTpl.name}}
+                                                        </p>
+                                                        @if(venueTpl.type === venueTemplateType.normal
+                                                        || venueTpl.type === venueTemplateType.themePark){
+                                                            <p class="card-text">
+                                                                {{(venueTpl.graphic ? 'VENUES.GRAPHIC_VENUE' : 'VENUES.NO_GRAPHIC_VENUE') | translate}}
+                                                            </p>
+                                                        }
+                                                        <p class="card-text">
+                                                            {{'VENUES.TPL_CREATION_DATE' | translate}}
+                                                            {{venueTpl.creation_date| localDateTime : dateTimeFormats.shortDate}}
+                                                        </p>
+                                                    </div>
+                                                    <div class="ob-summary-value right-side">
+                                                        <p class="label primary">{{'RESULTS.INVENTORY' | translate}}</p>
+                                                        <p class="value grey">{{venueTpl.capacity !== -1 ? (venueTpl.capacity | localNumber) :
+                                                        'FORMS.OPTIONS.UNLIMITED' | translate}}</p>
+                                                    </div>
+                                                </div>
+                                            </mat-list-option>
+                                        }
+                                    </div>
+                                </mat-selection-list>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+            <!-- GRAPHIC OR NOT GRAPHIC -->
+            @if($form().controls.tplViewType.enabled){
+                <div class="tpl-list-container flex flex-col gap-4">
+                    <mat-divider />
+                    <div class="venue-view-type-container">
+                        <mat-radio-group class="flex flex-row flex-wrap justify-center" [formControl]="$form().controls.tplViewType"
+                            (change)="nameInput.focus()">
+                            <mat-radio-button class="ob-radio-button flex-[0_1_350px]" [value]="newVenueViewType.graphic">
+                                <div class="option-title">{{'VENUES.GRAPHIC_VENUE' | translate}}</div>
+                                <div>
+                                    {{'VENUES.GRAPHIC_VENUE_DESCRIPTION' | translate}}
+                                </div>
+                            </mat-radio-button>
+                            <mat-radio-button class="ob-radio-button flex-[0_1_350px]" [value]="newVenueViewType.notGraphic">
+                                <div class="option-title">{{'VENUES.NO_GRAPHIC_VENUE' | translate}}</div>
+                                <div>
+                                    {{'VENUES.NO_GRAPHIC_VENUE_DESCRIPTION' | translate}}
+                                </div>
+                            </mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    <!-- AVET SECTION -->
+    @if($form().controls.tplType.value === venueTemplateType.avet){
+        <app-template-table [data]="$entityExternalCapacities()" [pageForm]="$form().controls.externalCapacity"
+            [textInfo]="'VENUE_TPLS.IMPORT_AVET_TPL_INFO'" [columnTitle]="'VENUES.EXTERNAL_CAPACITY_ID'" [rows]="['code', 'description']" />
+    }
+    <!--SGA-->
+    @if ($form().controls.tplType?.value === venueTemplateType.normal && $form().controls.inventory?.value === 'SGA'){
+        <app-template-table class="sga" [data]="$externalInventories()" [pageForm]="$form().controls.externalInventory"
+            [textInfo]="'VENUE_TPLS.IMPORT_SGA_TPL_INFO'" [columnTitle]="'VENUES.EXTERNAL_INVENTORY_ID'" [rows]="['id', 'name']" />
+    }
+    <!--ITALIAN COMPLIANCE-->
+    @if ($form().controls.inventory?.value === 'ITALIAN_COMPLIANCE'){
+        <app-template-table [data]="$externalVenueTemplates()" [pageForm]="$form().controls.externalInventory"
+            [columnTitle]="'VENUES.EXTERNAL_INVENTORY_ID'" [rows]="['id', 'name']" />
+    }
+    <!-- NAME -->
+    <div class="tpl-name-container flex flex-row">
+        <div class="flex justify-start items-center">
+            <span class="ob-label tpl-name-label">
+                {{'VENUES.TPL_NAME_LABEL' | translate}} *
+            </span>
+        </div>
+        <div class="tpl-name flex justify-start items-center flex-grow">
+            <mat-form-field appearance="outline" class="ob-form-field inline-field">
+                <input #nameInput matInput [placeholder]="'VENUES.NEW_TPL_NAME_PH' | translate"
+                    [formControl]="$form().controls.newTplName" autocomplete="off">
+                @if($form().controls.newTplName.invalid && $form().controls.newTplName.touched){
+                    <mat-icon matSuffix class="warn" matTooltipClass="ob-tooltip-error"
+                        [matTooltip]="$form().controls.newTplName | translateFormError | async">
+                        error_outline
+                    </mat-icon>
+                }
+            </mat-form-field>
+        </div>
+    </div>
+</div>
+@if($reqInProgress()){
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

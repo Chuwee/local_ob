@@ -1,0 +1,468 @@
+@use '@angular/material' as mat;
+@mixin selection-list-override($palettes, $colors, $typography) {
+    $white: map-get($colors, ob-white);
+    $black: map-get($colors, ob-black);
+    $grey: map-get($colors, ob-grey);
+    $grey-light-10: map-get($colors, ob-grey-light-10);
+    $grey-light-20: map-get($colors, ob-grey-light-20);
+    $bg-1: map-get($colors, ob-bg-1);
+    $bg-2: map-get($colors, ob-bg-2);
+    $bg-3: map-get($colors, ob-bg-3);
+    $ob-neutral: map-get($colors, ob-neutral);
+    $primary-palette: map-get($palettes, primary);
+    $primary-dark: mat.m2-get-color-from-palette(
+        map-get($palettes, primary),
+        darker
+    );
+    $accent: map-get($palettes, accent);
+
+    mat-selection-list.mat-mdc-selection-list {
+        .mat-mdc-subheader {
+            margin: 0;
+            padding: 16px;
+            color: #0000008a;
+        }
+        .mat-mdc-list-item {
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+
+            &, &.mdc-list-item--with-one-line {
+                height: 48px;
+                padding-right: 0;
+            }
+            &.mdc-list-item.mdc-list-item--disabled, &.mdc-list-item--non-interactive {
+                background: $bg-2;
+                &::before{
+                    background: $bg-2;
+                }
+            }
+            &.query-option .mdc-list-item__end {
+                display: none;
+            }
+            .mdc-list-item__start {
+                line-height: 18px;
+                padding-left: 16px;
+                margin: 0;
+                > .mdc-checkbox {
+                    padding: 0;
+                    > .mdc-checkbox__background {
+                        top: 0;
+                        left: 0;
+                    }
+                }
+            }
+            .mdc-list-item__content {
+                padding: 0 16px;
+                display: flex;
+                align-items: center;
+                > .mdc-list-item__primary-text {
+                    padding: 0;
+                    display: block;
+                    flex-grow: 1;
+                    height: unset;
+                    text-wrap: wrap;
+                    --mdc-list-list-item-label-text-size: 14px;
+                    --mdc-list-list-item-label-text-font: Nunito Sans;
+                }
+            }
+            .mat-mdc-list-option-checkbox-before {
+                --mdc-checkbox-selected-checkmark-color: #fff;
+            }
+        }
+        &.small-rows > .mat-mdc-list-item, &.small-rows .mat-mdc-list-item  {
+            &.mdc-list-item--with-leading-checkbox, &.mdc-list-item--with-one-line {
+                height: 40px;
+            }
+        }
+    }
+
+    .ob-list {
+        &.mat-mdc-selection-list {
+            &:is(.ng-touched).ng-invalid {
+                border: 1px solid var(--mat-form-field-error-text-color);
+            }
+            .list-header {
+                padding: 8px 16px 8px 0;
+                mat-checkbox {
+                    padding: 0 16px;
+                }
+            }
+            &[aria-multiselectable="false"] {
+                .list-header {
+                    padding: 8px 16px 8px 32px;
+                }
+            }
+            &.export-fields-list {
+                .mat-mdc-subheader {
+                    padding: 0;
+                }
+                .mat-mdc-list-option.indeterminate {
+                    .mdc-checkbox {
+                        .mdc-checkbox__native-control:enabled ~ .mdc-checkbox__background {
+                            border-color: $grey;
+                            background-color: $grey;
+                        }
+                        .mdc-checkbox__mixedmark {
+                            transform: scaleX(1) rotate(0deg);
+                            opacity: 1;
+                        }
+                    }
+                    &:hover .mdc-checkbox .mdc-checkbox__native-control:enabled ~ .mdc-checkbox__background {
+                        border-color: mat.m2-get-color-from-palette($primary-palette);
+                        background-color: mat.m2-get-color-from-palette($primary-palette);
+                    }
+                }
+            }
+            .group-header {
+                padding: 2px 16px 0 48px;
+                background-color: $grey-light-10;
+            }
+            .mat-mdc-list-option {
+                &:hover {
+                    background: $bg-2;
+                    &[aria-selected="true"] {
+                        background: mat.m2-get-color-from-palette($primary-palette, 200);
+                    }
+                }
+                &:not(.mdc-list-item--disabled):focus:not(:hover):not([aria-selected="true"]):not(.mat-mdc-subheader) {
+                    background: none;
+                }
+                &[aria-selected="true"] {
+                    background: mat.m2-get-color-from-palette($primary-palette, 100);
+                }
+            }
+            .mat-mdc-form-field .mat-mdc-form-field-subscript-wrapper {
+                display: none;
+            }
+        }
+    }
+    .left-bar-container {
+        height: 100%;
+        .left-bar {
+            overflow: hidden;
+            background-color: $bg-1;
+            &.detail-bar {
+                background-color: $white;
+                .left-sidebar-title {
+                    background-color: $bg-1;
+                    border-bottom: 1px $grey-light-10 solid;
+                }
+                .left-sidebar-subheader {
+                    padding: 16px 8px 8px 16px;
+                }
+                .item-details {
+                    padding: 8px 8px 8px 16px;
+                    .label {
+                        @include mat.m2-typography-level($typography, caption);
+                        font-weight: bold;
+                        line-height: 20px;
+                        text-transform: uppercase;
+                    }
+                    .value {
+                        color: $grey;
+                    }
+                    .detail-bar-divider {
+                        margin-left: 10px;
+                        margin-right: 10px;
+                    }
+                }
+            }
+            .left-sidebar-header {
+                padding: 0 8px 0 16px;
+                border-bottom: 1px $grey-light-10 solid;
+                .ob-button {
+                    vertical-align: middle;
+                    margin-left: 2px;
+                }
+            }
+            .left-sidebar-title {
+                padding: 8px 16px 0;
+                .title {
+                    margin: 0 8px 0 0;
+                }
+                .results-count {
+                    @include mat.m2-typography-level($typography, body-2);
+                    color: mat.m2-get-color-from-palette($accent, 500);
+                    > span {
+                        padding-left: 8px;
+                    }
+                }
+            }
+            .list-divider {
+                border-color: $grey-light-10;
+            }
+            .list-container {
+                overflow-y: auto;
+                .ob-lateral-select-list {
+                    .mat-mdc-list-option {
+                        user-select: none;
+                        height: 64px;
+                        width: auto;
+                        &:focus {
+                            outline: none;
+                        }
+                    }
+                }
+            }
+        }
+        .loading-state-container {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: inherit;
+            .loading-state-background {
+                height: 100%;
+                width: 100%;
+                background-color: rgba($white, 0.75);
+            }
+        }
+    }
+    .ob-lateral-select-list {
+        &.mat-mdc-list-base {
+            padding-top: 0;
+            padding-bottom: 0;
+            background-color: $bg-1;
+            --mdc-list-list-item-disabled-label-text-opacity: 1;
+            --mdc-list-list-item-label-text-font: "Nunito Sans";
+            --mdc-list-list-item-label-text-color: #8d8d8f;
+            --mdc-list-list-item-label-text-line-height: 18px;
+            --mdc-list-list-item-hover-state-layer-color: transparent;
+            --mdc-list-list-item-hover-label-text-color: #8d8d8f;
+            --mdc-list-list-item-focus-state-layer-color: transparent;
+            .mat-mdc-list-option {
+                height: auto;
+                border-bottom: 1px $grey-light-10 solid;
+                padding-left: 0;
+                overflow: visible;
+                user-select: none;
+                box-sizing: content-box;
+                transition: background-color 200ms ease-out;
+                overflow: hidden;
+                &:focus {
+                    outline: none;
+                }
+                &:hover {
+                    background-color: $bg-2;
+                }
+                &.mat-mdc-list-single-selected-option {
+                    background-color: mat.m2-get-color-from-palette(
+                        $primary-palette,
+                        100
+                    );
+                }
+                .mdc-list-item__end {
+                    display: none;
+                }
+                .mdc-list-item__content {
+                    padding: 10px 5px 10px 16px;
+                    @include mat.m2-typography-level($typography, caption);
+                    color: $grey;
+                    box-sizing: border-box;
+                    width: 100%;
+                    .list-item-title {
+                        color: $black;
+                        @include mat.m2-typography-level($typography, body-1);
+                        line-height: 16px;
+                    }
+                    .list-item-subtitle {
+                        color: $grey;
+                        @include mat.m2-typography-level($typography, caption);
+                        line-height: 14px;
+                    }
+                    .mdc-list-item__primary-text {
+                        display: flex;
+                        flex-direction: column;
+                        width: 100%;
+                    }
+                }
+                &.with-select-button .mdc-list-item__content {
+                    padding-left: 2px;
+                }
+                &.with-badge {
+                    .badge-container {
+                        margin-left: 5px;
+                    }
+                }
+                &.mdc-list-item {
+                    &:not([aria-selected="false"]) {
+                        color: $black;
+                        background-color: $white;
+                        cursor: default;
+                        .list-item-title {
+                            font-weight: bold;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .ob-grid-select-list {
+        &.mat-mdc-selection-list {
+            padding: 0;
+            gap: 10px;
+            &:focus {
+                outline: 0;
+            }
+            &.no-padding .mdc-list-item__primary-text{
+                padding: 0px;
+            }
+            &.no-padding-right .mdc-list-item__content{
+                padding-right: 0px;
+            }
+            .mdc-list-item--selected {
+                .mdc-list-item__primary-text {
+                    color: inherit;
+                }
+            }
+            .mat-mdc-list-option.mat-mdc-list-item-interactive {
+                height: 60px;
+                padding: 0;
+                border: 1px solid $grey;
+                &,
+                &:hover,
+                &:focus {
+                    background: none;
+                }
+                &, &::before {
+                    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+                }
+                &:not([aria-selected="false"]) {
+                    // selected card styles
+                    background-color: mat.m2-get-color-from-palette(
+                        $primary-palette,
+                        100
+                    );
+                    border-color: mat.m2-get-color-from-palette(
+                        $primary-palette
+                    );
+                    &:hover {
+                        background-color: mat.m2-get-color-from-palette(
+                            $primary-palette,
+                            200
+                        );
+                    }
+                    .mat-icon {
+                        &.right-check {
+                            color: mat.m2-get-color-from-palette(
+                                $primary-palette
+                            );
+                        }
+                    }
+                }
+                &.mdc-list-item--disabled {
+                    // disabled card styles
+                    background: none;
+                    background-color: $bg-1;
+                    border: 1px solid $bg-1;
+                    cursor: default;
+                    &:focus {
+                        outline: 0;
+                    }
+                    &::before {
+                        --mdc-list-list-item-focus-state-layer-opacity: 0;
+                    }
+                    .mat-mdc-icon {
+                        color: $grey;
+                        &.right-check {
+                            margin-left: 10px;
+                        }
+                    }
+                    .card-title {
+                        font-weight: normal;
+                    }
+                }
+                .mdc-list-item__end:has(.mdc-radio, .mdc-checkbox) {
+                    display: none;
+                }
+                .mat-mdc-list-item-unscoped-content{
+                    // available card styles
+                    box-sizing: border-box;
+                    .thumbnail {
+                        width: 120px;
+                        height: 100%;
+                        object-fit: contain;
+                        background-color: $white;
+                        &.default {
+                            padding: 8px 0;
+                            text-align: center;
+                            background-color: $grey-light-20;
+                        }
+                    }
+                    .card-title {
+                        @include mat.m2-typography-level($typography, body-2);
+                        margin: 0;
+                    }
+                    .card-text {
+                        @include mat.m2-typography-level($typography, caption);
+                        line-height: 16px;
+                        margin: 0;
+                    }
+                    .promotion-type-badge {
+                        text-transform: uppercase;
+                        padding: 0 4px;
+                        border-radius: 4px;
+                        font-size: 12px;
+                        border: 1px rgba(#607d8b, 0.2) solid;
+                        margin: 0 16px;
+                        color: $ob-neutral;
+                    }
+                    .right-side {
+                        padding-left: 10px;
+                        border-left: 1px solid $grey-light-10;
+                        text-align: center;
+                    }
+                }
+            }
+        }
+    }
+    .ob-tabs-select-list {
+        background-color: $bg-1;
+        &.mat-mdc-list-base {
+            background-color: $bg-1;
+            padding: 0 12px 12px;
+            .selector-list-title {
+                font-weight: bold;
+                padding: 8px 0;
+            }
+            .mat-mdc-list-option {
+                height: auto;
+                user-select: none;
+                transition: background-color 200ms ease-out;
+                padding: 0;
+                &:focus {
+                    outline: none;
+                }
+                &:hover {
+                    background-color: $bg-2;
+                }
+                &[aria-selected="true"] {
+                    &:hover::before, &:focus::before {
+                        background-color: unset;
+                        opacity: unset;
+                    }
+                    color: $primary-dark;
+                    background-color: rgba($white, 0.8);
+                    font-weight: 700;
+                }
+                .mdc-list-item__content {
+                    padding: 6px 6px 6px 10px;
+                }
+                .mat-mdc-list-item-unscoped-content{
+                    line-height: 18px;
+                    padding: 6px 6px 6px 10px;
+                    margin-bottom: 4px;
+                    min-height: 48px;
+                    color: inherit;
+                    font-weight: inherit;
+                }
+                .mdc-list-item__end {
+                    display: none;
+                }
+            }
+        }
+    }
+    app-selection-list {
+        display: inherit;
+    }
+}

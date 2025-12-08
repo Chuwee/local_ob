@@ -1,0 +1,20 @@
+<div fxLayout="column" class="promotion-form-section" [formGroup]="sessionForm">
+    <p class="mat-subtitle-2">{{'CHANNELS.PROMOTIONS.SESSIONS_DESCRIPTION' | translate}} *</p>
+    <mat-radio-group formControlName="type" fxLayout="column">
+        <mat-radio-button class="inline" [value]="scope.all">
+            {{'CHANNELS.PROMOTIONS.SESSIONS_OPTS.ALL' | translate}}
+        </mat-radio-button>
+        <mat-radio-button #restrictedRadio class="inline" [value]="scope.restricted" [disabled]="isSelectionDisabled"
+            [matTooltip]="'CHANNELS.PROMOTIONS.SESSIONS_EMPTY_LIST' | translate" [matTooltipDisabled]="!restrictedRadio.disabled"
+            matTooltipPosition="below" matTooltipClass="no-margin">
+            {{'CHANNELS.PROMOTIONS.SESSIONS_OPTS.SELECT' | translate}}
+        </mat-radio-button>
+    </mat-radio-group>
+    <div fxFlex [fxShow]="sessionForm.get('type').value === scope.restricted && !isSelectionDisabled" class="nested-content">
+        <app-event-session-selector [channelId]="channelId" [form]="sessionForm" [parentEvents$]="events$" />
+        <span *ngIf="sessionForm.hasError('required', 'selected') && sessionForm.get('selected').touched"
+            class="error-description">
+            {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+        </span>
+    </div>
+</div>

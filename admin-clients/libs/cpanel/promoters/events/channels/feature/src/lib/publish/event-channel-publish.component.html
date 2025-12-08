@@ -1,0 +1,51 @@
+<app-form-container class="overflow-y-auto" *ngIf="{data: data$ | async}"
+    (cancel)="cancel()" (save)="save()" [disabled]="(loading$ | async) || (!form.dirty)">
+
+    <p class="body-1 section-block">{{'DESCRIPTION' | prefix | translate}}</p>
+
+    <mat-form-field appearance="outline" class="ob-form-field venue-template-field">
+        <mat-label>{{'VENUE_TEMPLATE' | prefix | translate}}</mat-label>
+        <mat-select [formControl]="venueTplForm" (selectionChange)="changeVenueTpl($event)">
+            <mat-option *ngFor="let venueTpl of venueTemplates$ | async" [value]="venueTpl.id">
+                {{venueTpl.name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field hidden-outline class="ob-form-field">
+        <mat-checkbox color="primary" [formControl]="form.controls.enabled">
+            {{'ENABLED' | prefix | translate}}
+        </mat-checkbox>
+        <input hidden aria-label="refund" matInput>
+    </mat-form-field>
+
+    <div class="publish-options" *ngIf="form.controls?.enabled.value">
+        <div class="target-quota-field">
+            <mat-label>{{'TARGET_QUOTA' | prefix | translate}}</mat-label>
+            <mat-form-field appearance="outline" class="ob-form-field inline-field">
+                <mat-select
+                    [formControl]="form.controls.published_seat_quota_id"
+                    [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+                    <mat-option>
+                        <app-select-search #search
+                            searchField="name"
+                            requireSelection="true"
+                            [options$]="quotas$"
+                            [placeholderLabel]="'FORMS.SEARCH.NAME' | translate">
+                        </app-select-search>
+                    </mat-option>
+                    <mat-option
+                        [value]="quota.id"
+                        *ngFor="let quota of search.getFilteredOptions$() | async">
+                        {{quota.name}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+
+</app-form-container>
+
+<div class="spinner-container" *ngIf="(loading$ | async)">
+    <mat-spinner></mat-spinner>
+</div>

@@ -1,0 +1,143 @@
+<app-form-container layout="menu" hideActionBar>
+    <div class="section-block">
+        <h3 class="section-title">{{'ENTITY.CUSTOMER_TYPES.TITLE' | translate}}</h3>
+        <p>{{ 'ENTITY.CUSTOMER_TYPES.DESCRIPTION' | translate }}</p>
+        @if ($customerTypes()?.length) {
+            <div class="table-actions">
+                <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                [attr.aria-label]="'ENTITY.CUSTOMER_TYPES.NEW_BTN' | translate" (click)="openCreateOrUpdateCustomerTypeDialog()">
+                    <mat-icon>add</mat-icon>
+                    {{'ENTITY.CUSTOMER_TYPES.NEW_BTN' | translate}}
+                </button>
+            </div>
+        }
+        <mat-table class="ob-table" [dataSource]="$customerTypes() || []" matSort [matSortActive]="'name'"
+            [matSortDirection]="'asc'" matSortDisableClear>
+            @for(column of customerTypesColumnsToIterate; track column) {
+                <ng-container [matColumnDef]="column">
+                    <mat-header-cell *matHeaderCellDef class="head-cell input-column">
+                        {{('ENTITY.CUSTOMER_TYPES.FIELD_' + column.toUpperCase()) | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row" class="cell">
+                        <div>
+                            <span>{{ row[column] }} </span>
+                        </div>
+                    </mat-cell>
+                </ng-container>
+            }
+
+            <ng-container [matColumnDef]="'assignation_type'">
+                <mat-header-cell *matHeaderCellDef class="head-cell input-column">
+                    {{ 'ENTITY.CUSTOMER_TYPES.FIELD_ASSIGNATION_TYPE' | translate }}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row" class="cell">
+                    <div>
+                        <span> {{ ('ENTITY.CUSTOMER_TYPES.ASSIGNATION_TYPES.' + row.assignation_type.toUpperCase()) | translate }}</span> 
+                    </div>
+                </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+                <mat-header-cell *matHeaderCellDef class="actions-cell head-cell float-actions-cell" />
+                <mat-cell *matCellDef="let row" class="actions-cell float-actions-cell">
+                    <div class="action-buttons" (click)="$event.stopPropagation()">
+                        <button mat-icon-button aria-label="Delete product" class="ob-button medium"
+                            (click)="openCreateOrUpdateCustomerTypeDialog(row)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                    </div>
+                </mat-cell>
+            </ng-container>
+
+            <ng-container *matNoDataRow>
+                <app-empty-state
+                    [hideImage]="true"
+                    [title]="'ENTITY.CUSTOMER_TYPES.EMPTY_LIST_MESSAGE.TITLE' | translate"
+                    [description]="'ENTITY.CUSTOMER_TYPES.EMPTY_LIST_MESSAGE.DESCRIPTION' | translate">
+                    <button mat-stroked-button class="ob-button" color="primary" (click)="openCreateOrUpdateCustomerTypeDialog()">
+                        <mat-icon>add</mat-icon>
+                        {{'ENTITY.CUSTOMER_TYPES.NEW_BTN' | translate}}
+                    </button>
+                </app-empty-state>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="customerTypesColumns; sticky: true" class="dense-row" />
+            <mat-row *matRowDef="let row; columns: customerTypesColumns" class="dense-row hoverable-row" />
+        </mat-table>
+    </div>
+
+    <div class="section-block">
+        <h3 class="section-title">{{'ENTITY.CUSTOMER_TYPES.RESTRICTIONS.TITLE' | translate}}</h3>
+        <p>{{ 'ENTITY.CUSTOMER_TYPES.RESTRICTIONS.DESCRIPTION' | translate }}</p>
+        @if ($restrictions()?.length) {
+            <div class="table-actions">
+                <button [disabled]="!$restrictionTypesAllowedToCreate().length" 
+                    mat-stroked-button class="ob-button" color="primary" (click)="openCreateOrUpdateCustomerTypeRestrictionDialog()">
+                    <mat-icon>add</mat-icon>
+                    {{'ENTITY.CUSTOMER_TYPES.RESTRICTIONS.NEW_BTN' | translate}}
+                </button>
+            </div>
+        }
+        <mat-table class="ob-table" [dataSource]="$restrictions() || []">
+            <ng-container matColumnDef="key">
+                <mat-header-cell *matHeaderCellDef class="head-cell input-column">
+                    {{'ENTITY.CUSTOMER_TYPES.RESTRICTIONS.FIELD_FUNCTIONALITY' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row" class="cell">
+                    <div>
+                        <span> {{ ('ENTITY.CUSTOMER_TYPES.RESTRICTIONS.TYPES.' + row.key.toUpperCase()) | translate }}</span> 
+                    </div>
+                </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="restricted_custom_types">
+                <mat-header-cell *matHeaderCellDef class="head-cell input-column">
+                    {{'ENTITY.CUSTOMER_TYPES.RESTRICTIONS.FIELD_TYPES_WITH_RESTRICTIONS' | translate}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row" class="cell">
+                    <div>
+                        <span>{{ $restrictionsWithCustomerTypesNamesMap()?.get(row.key) }} </span>
+                    </div>
+                </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+                <mat-header-cell *matHeaderCellDef class="two-actions-cell head-cell float-actions-cell" />
+                <mat-cell *matCellDef="let row" class="two-actions-cell float-actions-cell">
+                    <div class="action-buttons" (click)="$event.stopPropagation()">
+                        <button mat-icon-button aria-label="Update restriction" class="ob-button medium"
+                            (click)="openCreateOrUpdateCustomerTypeRestrictionDialog(row)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button aria-label="Delete restriction" class="ob-button medium"
+                            (click)="openDeleteRestrictionDialog(row.key)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+                </mat-cell>
+            </ng-container>
+
+            <ng-container *matNoDataRow>
+                <app-empty-state
+                    [hideImage]="true"
+                    [title]="'ENTITY.CUSTOMER_TYPES.RESTRICTIONS.EMPTY_LIST_MESSAGE.TITLE' | translate"
+                    [description]="'ENTITY.CUSTOMER_TYPES.RESTRICTIONS.EMPTY_LIST_MESSAGE.DESCRIPTION' | translate">
+                    <button mat-stroked-button [disabled]="!$customerTypes()?.length" class="ob-button" 
+                        color="primary" (click)="openCreateOrUpdateCustomerTypeRestrictionDialog()">
+                        <mat-icon>add</mat-icon>
+                        {{'ENTITY.CUSTOMER_TYPES.RESTRICTIONS.NEW_BTN' | translate}}
+                    </button>
+                </app-empty-state>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="restrictionsColumns; sticky: true" class="dense-row" />
+            <mat-row *matRowDef="let row; columns: restrictionsColumns" class="dense-row hoverable-row" />
+        </mat-table>
+    </div>
+    
+    @if($isLoading()) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+</app-form-container>

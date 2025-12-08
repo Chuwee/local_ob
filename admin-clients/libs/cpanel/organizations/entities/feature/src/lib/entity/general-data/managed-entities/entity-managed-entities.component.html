@@ -1,0 +1,41 @@
+<app-form-container [formGroup]="form" (cancel)="load()" (save)="save()" layout="menu"
+    [disabled]="!form.dirty || (reqInProgress$ | async)">
+    <mat-expansion-panel expanded>
+        <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+            <mat-panel-title>
+                {{'ENTITY.GENERAL_DATA.MANAGED_ENTITIES_TITLE' | translate}}
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        <p>
+            {{'ENTITY.GENERAL_DATA.MANAGED_ENTITIES_INFO' | translate}}
+        </p>
+        <app-searchable-paginated-selection #selection
+            [placeholder]="'FORMS.SEARCH.ENTITY_LIST' | translate" [form]="form.controls.entities"
+            [pageSize]="PAGE_LIMIT" [data$]="entitiesList$" [metadata$]="availableEntitiesMetadata$"
+            (loadData)="filterChangeHandlerAvailableEntities($event)" [loading$]="reqInProgress$">
+            <div slot="filter" class="badge-container">
+                {{form.value.entities?.length}} / {{(availableEntitiesMetadata$ | async)?.total}}
+            </div>
+            <button slot="filter" type="button" mat-icon-button
+                class="show-selected-only-button ob-button flex-none"
+                [class.active]="showSelectedEntitiesOnly$ | async"
+                color="tertiary" (click)="changeVisibleList()"
+                [matTooltip]="'ENTITY.GENERAL_DATA.MANAGED_ENTITIES_SHOW_SELECTED_TOOLTIP' | translate">
+                <mat-icon>visibility</mat-icon>
+            </button>
+            <div slot="filter" class="filter-container" fxFlex="none">
+            </div>
+            <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data"
+                let-selectionChanged="selectionChanged">
+                <app-selection-list [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged"
+                    class="small-rows">
+                    <ng-template #optionTemplate let-row>
+                        <div class="justify-between">
+                            <span>{{row.name}}</span>
+                        </div>
+                    </ng-template>
+                </app-selection-list>
+            </ng-template>
+        </app-searchable-paginated-selection>
+    </mat-expansion-panel>
+</app-form-container>

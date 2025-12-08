@@ -1,0 +1,83 @@
+<div fxLayout="column" class="promotion-form-section" [formGroup]="sessionsForm">
+    <p class="mat-subtitle-2">{{'EVENTS.PROMOTIONS.SESSIONS_DESCRIPTION' | translate}} *</p>
+    <mat-radio-group formControlName="type" fxLayout="column">
+        <mat-radio-button class="ob-radio-button vertical-list" [value]="scope.all">
+            {{'EVENTS.PROMOTIONS.SESSIONS_OPTS.ALL' | translate}}
+        </mat-radio-button>
+        <mat-radio-button #restrictedRadio class="ob-radio-button vertical-list" [value]="scope.restricted"
+            [disabled]="(hasSelectableSessions$ | async) !== true"
+            [matTooltip]="'EVENTS.PROMOTIONS.SESSIONS_EMPTY_LIST' | translate"
+            [matTooltipDisabled]="!restrictedRadio.disabled || (loading$ | async)" matTooltipPosition="below"
+            matTooltipClass="no-margin">
+            {{'EVENTS.PROMOTIONS.SESSIONS_OPTS.SELECT' | translate}}
+        </mat-radio-button>
+    </mat-radio-group>
+    <div fxFlex [fxShow]="sessionsForm.get('type').value === scope.restricted">
+        <div class="promotion-sessions-container nested-content">
+            <div class="sessions-list-container"
+                [class.field-error]="sessionsForm.hasError('required', 'selected') && sessionsForm.get('selected').touched">
+                <app-searchable-paginated-selection
+                    [placeholder]="'FORMS.SEARCH.SESSIONS' | translate" [form]="sessionsForm.get('selected')"
+                    [pageSize]="pageSize" [data$]="sessionsList$" [metadata$]="metadata$" [loading$]="loading$"
+                    (loadData)="filterChangeHandler($event)">
+                    <div slot="filter" class="badge-container">
+                        {{selectedSessions}} / {{(totalSessions$ | async)}}
+                    </div>
+                    <button slot="filter" type="button" mat-icon-button class="show-selected-only-button ob-button"
+                        color="tertiary" fxFlex="none" [class.active]="selectedOnly$ | async"
+                        [matTooltip]="'EVENTS.PROMOTIONS.SHOW_SELECTED_TOOLTIP' | translate"
+                        (click)="showSelectedOnlyClick.emit()">
+                        <mat-icon>visibility</mat-icon>
+                    </button>
+                    <div slot="filter" class="filter-container" fxFlex="none">
+                        <app-sessions-selector-filter (filterChange)="filterChangeHandler($event)" />
+                    </div>
+                    <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data"
+                        let-selectionChanged="selectionChanged">
+                        <app-selection-list [data]="data" [pageForm]="pageForm" [selectionChanged]="selectionChanged"
+                            class="small-rows">
+                            <div slot="subheader" class="list-header">
+                                <div fxLayoutAlign="space-between" fxFlex="0 1 100%">
+                                    <div>
+                                        <mat-checkbox color="primary" [disabled]="(selectedOnly$ | async)"
+                                            [checked]="selectedSessions === (totalSessions$ | async) || (selectedOnly$ | async)"
+                                            [indeterminate]="selectedSessions > 0 && selectedSessions < (totalSessions$ | async)"
+                                            (change)="selectAll($event)" />
+                                        <span>{{'FORMS.LABELS.SESSIONS_AND_PACKS' | translate}}</span>
+                                    </div>
+                                    <div fxFlex="0 1 200px">
+                                        <span>{{'FORMS.LABELS.DATE' | translate}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <ng-template #groupHeaderTemplate let-group>
+                                <div *ngIf="group.value.length && group.key !== 'unknown'" class="group-header">
+                                    {{(group.key === 'sessions' ?
+                                    'EVENTS.SESSIONS.TITLE' : 'EVENTS.SESSION_PACKS') | translate | uppercase}}
+                                </div>
+                            </ng-template>
+                            <ng-template #optionTemplate let-row>
+                                <div fxLayoutAlign="space-between">
+                                    <span>
+                                        @if(row.isSmartBooking) {
+                                            <b>{{ 'FORMS.LABELS.SMART_BOOKING_TYPE' | translate }} | </b>
+                                        }
+                                        {{row.name}}
+                                    </span>
+                                    <div fxFlex="0 1 200px">
+                                        <span>{{row.dates.start | dateTime :
+                                            dateTimeFormats.shortDateTimeWithWeek}}</span>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </app-selection-list>
+                    </ng-template>
+                </app-searchable-paginated-selection>
+            </div>
+            <span *ngIf="sessionsForm.hasError('required', 'selected') && sessionsForm.get('selected').touched"
+                class="error-description">
+                {{'FORMS.ERRORS.REQUIRED_FIELD' | translate}}
+            </span>
+        </div>
+    </div>
+</div>

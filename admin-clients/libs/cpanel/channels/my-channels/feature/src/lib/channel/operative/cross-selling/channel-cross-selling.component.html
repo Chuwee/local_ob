@@ -1,0 +1,82 @@
+<app-form-container [hideActionBar]="true" layout="menu">
+    <div fxFlex="0 1 1" fxLayoutGap="16px">
+        <div fxFlex="100%" fxLayout="column">
+            <p class="section-description">
+                {{'CHANNELS.CROSS_SELLING.DESCRIPTION' | translate}}
+            </p>
+            <div class="buttons-container" fxLayoutAlign="end start">
+                <button mat-stroked-button color="primary" type="button" class="ob-button medium add-button"
+                    (click)="openNewCrossSellingItemDialog()">
+                    <mat-icon>add</mat-icon>
+                    {{'CHANNELS.CROSS_SELLING.ADD_BTN' | translate}}
+                </button>
+            </div>
+            <app-searchable-paginated-list [smallRows]="false" [placeholder]="'CHANNELS.CROSS_SELLING.SEARCH_CART_ELEMENTS' | translate"
+                [pageSize]="pageSize" (loadData)="loadChannelSuggestions($event)" [data$]="suggestions$"
+                [metadata$]="suggestionsMetadata$" [loading$]="isInProgress$" class="table-container" [hoverable]="true"
+                [emptyListTitle]="'CHANNELS.CROSS_SELLING.EMPTY_LIST_TITLE' | translate"
+                [emptyListDescription]="'CHANNELS.CROSS_SELLING.EMPTY_LIST_DESCRIPTION'">
+                <div slot="subheader" class="list-header" fxFlex="0 1 100%">
+                    <span fxFlex="0 1 45%" appEllipsify [matTooltip]="'CHANNELS.CROSS_SELLING.ORIGIN_COLUMN' | translate">
+                        {{'CHANNELS.CROSS_SELLING.ORIGIN_COLUMN' | translate}}
+                    </span>
+                    <span fxFlex="0 0 15%" appEllipsify [matTooltip]="'CHANNELS.CROSS_SELLING.SUGGESTIONS_COUNT_COLUMN' | translate"
+                        fxLayoutAlign="center center">
+                        {{'CHANNELS.CROSS_SELLING.SUGGESTIONS_COUNT_COLUMN' | translate}}
+                    </span>
+                    <span fxFlex="0 1 35%" appEllipsify [matTooltip]="'Sugerencias' | translate">
+                        {{'CHANNELS.CROSS_SELLING.SUGGESTIONS_COLUMN' | translate}}
+                    </span>
+                    <span fxFlex="0 1 5%"></span>
+                </div>
+                <ng-template #optionTemplate let-row>
+                    <div fxFlex="0 1 100%" fxLayoutAlign="start center">
+                        <div fxFlex="0 1 45%" fxLayoutAlign="start center" class="suggestion-row">
+                            <span fxFlex="0 1 15%" class="pill">
+                                {{(row.source.type === channelSuggestionType.event) ? ('CHANNELS.CROSS_SELLING.EVENT' | translate)
+                                : ('CHANNELS.CROSS_SELLING.SESSION' | translate)}}
+                            </span>
+                            <div fxFlex="0 1 85%" fxLayout="column" class="label-container">
+                                <span appEllipsify [matTooltip]="row.source.name">{{row.source.name}}</span>
+                                @if (row.source.type === channelSuggestionType.session) {
+                                    <span appEllipsify
+                                        [matTooltip]="(row.source.start_date | dateTime : dateFormat) + ' - ' + row.source.parent_name">
+                                        {{row.source.start_date | dateTime : dateFormat }}
+                                        <span class="parent-name"> - {{row.source.parent_name}} </span>
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                        <div fxFlex="0 0 15%" fxLayoutAlign="center center" class="suggestion-row" (click)="open(row)">
+                            <span>{{row.targets.length}}</span>
+                        </div>
+                        <div fxFlex="0 1 35%" fxLayoutAlign="start center" class="suggestion-row" (click)="open(row)"
+                            [matTooltip]="generateTooltipContent(row.targets)">
+                            <div fxFlex="0 1 100%" fxLayout="column" class="label-container">
+                                <span appEllipsify>{{row.targets[0]?.name}}</span>
+                                @if (row.targets[0]?.parent_name) {
+                                    <span appEllipsify>
+                                        {{row.targets[0]?.start_date | dateTime : dateFormat }}
+                                        <span class="parent-name"> - {{row.targets[0]?.parent_name}} </span>
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                        <div fxFlex="0 1 5%" class="action-buttons" fxLayoutAlign="end center" [class.float-actions-cell]="true"
+                            (click)="$event.stopPropagation()">
+                            <button mat-icon-button aria-label="Delete targets" class="ob-button medium"
+                                [matTooltip]="'CHANNELS.CROSS_SELLING.DELETE_TARGETS_BTN' | translate"
+                                (click)="openDeleteSourceTargetsDialog(row)">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                            <button mat-icon-button aria-label="Delete targets" class="ob-button medium"
+                                (click)="open(row)">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                </ng-template>
+            </app-searchable-paginated-list>
+        </div>
+    </div>
+</app-form-container>

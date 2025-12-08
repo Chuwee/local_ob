@@ -1,0 +1,38 @@
+<div [formGroup]="form" fxLayout="column">
+    <app-language-bar slot="outside" [languages]="languages$ | async" [selected]="selectedLanguage"
+        [changeGuard]="canChangeLanguage" (changed)="changedLanguage.emit($event)" />
+    <ng-content />
+    <app-search-table [filter]="filter" [dataSource]="literals$" [columns]="columns" [formGroupName]="name" [trackBy]="trackByFn">
+        <ng-container [matColumnDef]="columns[0]">
+            <mat-header-cell *matHeaderCellDef class="head-cell no-margin">
+                {{'CHANNELS.LITERALS.TABLE_HEAD_KEY' | translate}}
+            </mat-header-cell>
+            <mat-cell class="no-margin" *matCellDef="let row">{{row.key}}</mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="columns[1]">
+            <mat-header-cell *matHeaderCellDef class="head-cell input-column no-margin">
+                {{'CHANNELS.LITERALS.TABLE_HEAD_VALUE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="editable-cell no-margin">
+                <mat-form-field appearance="outline" class="ob-form-field" subscriptSizing="dynamic">
+                    <input matInput
+                        [placeholder]="'CHANNELS.LITERALS.TABLE_VALUE_PLACEHOLDER' | translate"
+                        [formControlName]="row.key">
+                </mat-form-field>
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="columns[2]">
+            <mat-header-cell *matHeaderCellDef class="actions-cell head-cell no-margin" fxFlex="40px"
+                [class.float-actions-cell]="showActionsOnHover$ | async" />
+            <mat-cell *matCellDef="let row" class="actions-cell no-margin" fxFlex="40px"
+                [class.float-actions-cell]="showActionsOnHover$ | async">
+                <div class="action-buttons" (click)="$event.stopPropagation()">
+                    <button matTooltip="{{'FORMS.ACTIONS.EDIT' | translate}}" mat-icon-button
+                        aria-label="Edit literal value" class="ob-button small" (click)="edit(row)">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                </div>
+            </mat-cell>
+        </ng-container>
+    </app-search-table>
+</div>

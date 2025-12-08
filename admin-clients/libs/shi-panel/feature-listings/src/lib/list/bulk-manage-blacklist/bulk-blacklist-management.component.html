@@ -1,0 +1,106 @@
+<div class="dialog-msg-container">
+    <div mat-dialog-title fxLayout="row">
+        <h2 fxFlex="100%" class="secondary title">{{'LISTINGS.TITLES.BULK_MANAGE_BLACKLIST_TITLE' | translate}}</h2>
+        <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content>
+        <div class="form-container" fxLayout="column">
+            <p class="padding-elements">{{'LISTINGS.FORMS.INFOS.BULK_MANAGE_BLACKLIST_DESC' | translate}}</p>
+            <div class="blacklist-management-container" fxLayout="row" fxLayoutGap="24px" fxLayoutAlign="start center">
+                <mat-form-field fxFlex="0 1" appearance="outline" class="ob-form-field no-grid-spacing inline-field">
+                    <mat-label>{{'LISTINGS.FORMS.ACTION' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" [formControl]="form.controls.action">
+                        <mat-option [value]="'BLACKLIST'">{{'LISTINGS.FORMS.BLACKLIST' | translate}}</mat-option>
+                        <mat-option [value]="'WHITELIST'">{{'LISTINGS.FORMS.WHITELIST' | translate}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field fxFlex="0 1" appearance="outline" class="ob-form-field no-grid-spacing inline-field">
+                    <mat-label>{{'LISTINGS.FORMS.LEVEL' | translate}}</mat-label>
+                    <mat-select [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate" [formControl]="form.controls.level"
+                        [disabled]="true">
+                        <mat-option [value]="'EVENT'">{{'LISTINGS.FORMS.EVENT' | translate}}</mat-option>
+                        <mat-option [value]="'CODE'">{{'LISTINGS.FORMS.CODE' | translate}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <mat-radio-group fxLayout="row" fxLayoutGap="24px" fxLayoutAlign="start center"
+                [formControl]="form.controls.uploadManually" class="radio-group-container padding-elements">
+                <mat-radio-button class="ob-radio-card-button" [value]="true" fxFlex="50%">
+                    <div class="option-title">
+                        {{ (form.value.level === 'EVENT' ? 'LISTINGS.TITLES.UPLOAD_IDS_MANUALLY' :
+                        'LISTINGS.TITLES.UPLOAD_CODES_MANUALLY') | translate }}
+                    </div>
+                    <div>
+                        {{ (form.value.level === 'EVENT' ? 'LISTINGS.INFOS.UPLOAD_IDS_MANUALLY_DESC' :
+                        'LISTINGS.INFOS.UPLOAD_CODES_MANUALLY_DESC' ) | translate }}
+                    </div>
+                </mat-radio-button>
+                <div fxFlex="50%">
+                    <mat-radio-button *ngIf="form.value.level === 'CODE'" class="ob-radio-card-button" [value]="false"
+                        fxFlex="1 1 100%">
+                        <div class="option-title">{{"LISTINGS.TITLES.UPLOAD_CSV" | translate}}</div>
+                        <div>
+                            {{"LISTINGS.INFOS.UPLOAD_CSV_DESC" | translate}}
+                        </div>
+                    </mat-radio-button>
+                </div>
+            </mat-radio-group>
+            <ng-container *ngIf="form.controls.uploadManually.valid && !form.value.uploadManually">
+                <app-import-selection [formGroup]="form" [selectionFormGroup]="csvSelectionForm" class="padding-elements"
+                    (updateCodesToManage)="updateCodesToChangeHandler($event)">
+                </app-import-selection>
+            </ng-container>
+            <ng-container *ngIf="form.controls.uploadManually.valid && form.value.uploadManually">
+                <div fxLayout="column" class="padding-elements">
+                    <div fxFlex="row" fxLayoutGap="16px" class="add-id-container">
+                        <div fxFlex fxLayout="column">
+                            <mat-form-field appearance="outline" class="ob-form-field" fxFlex="100%">
+                                <input matInput
+                                    [placeholder]="(form.value.level === 'EVENT' ? 'LISTINGS.INFOS.MANAGE_BLACKLIST_EVENT_ID' : 'LISTINGS.INFOS.MANAGE_BLACKLIST_CODE') | translate"
+                                    [formControl]="form.value.level === 'EVENT' ? form.controls.manuallyEventIdInput : form.controls.manuallyCodeInput"
+                                    (keyup.enter)="addChipByLevel(form.value.level)">
+                            </mat-form-field>
+                            <mat-error
+                                *ngIf="!form.controls.manuallyCodeInput.valid || !form.controls.manuallyEventIdInput.valid"
+                                class="mat-error">
+                                {{(form.value.level === 'EVENT' ? 'LISTINGS.INFOS.MANAGE_BLACKLIST_ID_FORMAT_ERROR' :
+                                'LISTINGS.INFOS.MANAGE_BLACKLIST_CODE_FORMAT_ERROR') | translate}}
+                            </mat-error>
+                        </div>
+                        <button mat-stroked-button color="primary" type="button"
+                            class="ob-button medium add-button" (click)="addChipByLevel(form.value.level)"
+                            [disabled]="form.value.level === 'EVENT' ?
+                            (form.value.eventIdsToChange.length === maxToChange || !form.controls.manuallyEventIdInput.valid || !form.value.manuallyEventIdInput) :
+                            (form.value.codesToChange.length === maxToChange || !form.controls.manuallyCodeInput.valid || !form.value.manuallyCodeInput)">
+                            {{(form.value.level === 'EVENT' ? 'LISTINGS.ACTIONS.ADD_ID' : 'LISTINGS.ACTIONS.ADD_CODE') | translate}}
+                        </button>
+                    </div>
+                    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" class="badge-with-text-container">
+                        <div class="badge-container" [class.empty]="(chipsIdsToChange$ | async)?.length === 0">
+                            {{(chipsIdsToChange$ | async).length}} / {{maxToChange}}
+                        </div>
+                        <span class="elements-to-manage">
+                            {{(form.value.level === 'EVENT' ? 'LISTINGS.INFOS.IDS_ADDED' : 'LISTINGS.INFOS.CODES_ADDED') | translate}}
+                        </span>
+                    </div>
+                    <app-chips [chips$]="chipsIdsToChange$"
+                        class="ellipsified-chips without-max-height chips-padding" overrideClasses="handset"
+                        (removeEmitter)="removeChip($event)">
+                    </app-chips>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+    <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end">
+        <button type="button" mat-button class="ob-button" (click)="close()">
+            {{'FORMS.ACTIONS.CANCEL' | translate}}
+        </button>
+        <button mat-flat-button color="primary" type="button" class="ob-button"
+            [disabled]="!form.controls.uploadManually.valid || !((form.value.eventIdsToChange.length > 0) || (form.value.codesToChange.length > 0))"
+            (click)="change()">
+            {{'LISTINGS.ACTIONS.MANAGE_BLACKLIST_UPDATE' | translate}}
+        </button>
+    </div>
+</div>

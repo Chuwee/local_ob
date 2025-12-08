@@ -1,0 +1,60 @@
+<div class="dialog-msg-container flex flex-col flex-wrap">
+    <div mat-dialog-title>
+        <div class="flex flex-row items-center">
+            <h2 class="secondary title basis-full">
+                {{'SALE_REQUESTS.PAYMENT_METHODS.BENEFITS.TITLES.SHOW_MORE_BINS' | translate}}
+            </h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="dialogRef.close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content>
+        <app-searchable-paginated-selection #selection
+            [placeholder]="'SALE_REQUESTS.PAYMENT_METHODS.BENEFITS.FORMS.LABELS.SEARCH_BINS_PLACEHOLDER' | translate"
+            (loadData)="load($event)" [form]="selectedCtrl" [data$]="nextPaged$" [metadata$]="nextMetadata$">
+            <div slot="filter" class="badge-container" [class.empty]="(total$ | async) === 0">
+                {{selected}} / {{(total$ | async)}}
+            </div>
+            <button slot="filter" type="button" mat-flat-button class="ob-button medium only-icon" color="tertiary"
+                [class.active]="selectedOnly" [disabled]="selected === 0"
+                [matTooltip]="'CHANNELS.MEMBERS_CONFIG.SHOW_SELECTED_TOOLTIP' | translate"
+                (click)="selectedOnly = !selectedOnly; load({offset: 0, q: selection.search})">
+                <mat-icon>visibility</mat-icon>
+            </button>
+            <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data" let-selectionChanged="selectionChanged">
+                <app-selection-table [data]="data" [columns]="columns" [pageForm]="pageForm"
+                    [selectionChanged]="selectionChanged">
+                    <ng-template #selectAllTemplate>
+                        <mat-checkbox #allSelected color="primary"
+                            [disabled]="selectedOnly || (total$ | async) === 0"
+                            [checked]="selected === (total$ | async) || selectedOnly || (allSelected$ | async)"
+                            [indeterminate]="selected > 0 && selected < (total$ | async) && !allSelected.checked"
+                            (change)="allSelectedClick.emit(allSelected.checked)" />
+                    </ng-template>
+                    <ng-container [matColumnDef]="columns[1]">
+                        <mat-header-cell *matHeaderCellDef class="head-cell">
+                            {{'SALE_REQUESTS.PAYMENT_METHODS.BENEFITS.LISTS.COL_BIN_NAME' | translate}}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row;">
+                            <span appEllipsify [matTooltip]="row.id">{{row.id}}</span>
+                        </mat-cell>
+                    </ng-container>
+                </app-selection-table>
+            </ng-template>
+        </app-searchable-paginated-selection>
+    </div>
+    @if (!data.isDisabled) {
+        <div mat-dialog-actions>
+            <div class="flex flex-row flex-nowrap justify-end basis-full">
+                <button mat-button type="button" class="ob-button" (click)="dialogRef.close()">
+                    {{'FORMS.ACTIONS.CANCEL' | translate}}
+                </button>
+                <button mat-flat-button color="primary" type="button" class="ob-button"
+                    [disabled]="!selectedCtrl.value.length" (click)="delete()">
+                    {{'FORMS.ACTIONS.DELETE' | translate}}
+                </button>
+            </div>
+        </div>
+    }
+</div>

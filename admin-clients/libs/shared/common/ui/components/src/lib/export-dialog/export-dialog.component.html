@@ -1,0 +1,76 @@
+<div class="dialog-msg-container flex flex-col grow shrink basis-full">
+    <div mat-dialog-title class="self-start">
+        <div class="flex grow justify-between items-center">
+            <h2 class="secondary title grow">{{'TITLES.EXPORT' | translate}}</h2>
+            <button mat-icon-button type="button" class="ob-button small" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div mat-dialog-content>
+        <div class="content-info">
+            <div class="flex flex-col">
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>{{'EXPORT.EMAIL_INFO' | translate}}</mat-label>
+                    <input matInput aria-label="email" [formControl]="email" [placeholder]="'EXPORT.EMAIL_PLACEHOLDER' | translate">
+                    <mat-error [ob-form-errors]="email" />
+                </mat-form-field>
+            </div>
+            <p class="info">{{'EXPORT.INFO' | translate}}</p>
+            <mat-checkbox color="primary"
+                [checked]="selectionList?.selectedOptions?.selected?.length === selectionList?.options?.length"
+                [indeterminate]="selectionList?.selectedOptions?.selected?.length > 0 &&
+                    selectionList?.selectedOptions?.selected?.length < selectionList?.options?.length"
+                (change)="$event.checked ? selectAll() : deselectAll()">
+                {{'FORMS.ACTIONS.SELECT_ALL' | translate}}
+            </mat-checkbox>
+        </div>
+        <mat-divider />
+        <div class="content-list">
+            <mat-selection-list #selectionList class="flex-1 flex flex-row flex-wrap ob-list export-fields-list"
+                (selectionChange)="selectionChange($event)">
+                @for (exportDataField of exportDataFields; track exportDataField.field; let first = $first) {
+                    <div class="flex-1 flex flex-row flex-wrap">
+                        @if (exportDataFields.length > 1) {
+                            <mat-list-option matSubheader color="primary"
+                                [class.first-subheader]="first"
+                                [class.indeterminate]="$groupStates().get(exportDataField.field)"
+                                [value]="exportDataField"
+                                [selected]="selectedFields?.includes(exportDataField)"
+                                checkboxPosition="before">
+                                {{exportDataField.fieldKey | translate | uppercase}}
+                            </mat-list-option>
+                        }
+                        @for (field of exportDataField.fields; track field.field) {
+                            <mat-list-option color="primary" class="child-column" [value]="field"
+                                [selected]="selectedFields?.includes(field)" checkboxPosition="before">
+                                {{field.fieldKey | translate}}
+                            </mat-list-option>
+                        }
+                    </div>
+                }
+            </mat-selection-list>
+        </div>
+        @if (!selectionList?.selectedOptions?.selected?.length) {
+            <div class="error-description">
+                <span>{{'FORMS.ERRORS.AT_LEAST_ONE' | translate}}</span>
+            </div>
+        }
+    </div>
+    <div mat-dialog-actions class="flex justify-between items-center">
+        <div class="left-actions">
+            <a class="ob-link" (click)="defaultSelection()">
+                {{'FORMS.ACTIONS.DEFAULT_SELECTION' | translate}}
+            </a>
+        </div>
+        <div class="right-actions flex grow justify-end">
+            <button type="button" mat-button class="ob-button" (click)="close()">
+                {{'FORMS.ACTIONS.CANCEL' | translate}}
+            </button>
+            <button mat-flat-button color="primary" type="button" class="ob-button" (click)="exportList()"
+                [disabled]="!selectionList?.selectedOptions?.selected?.length || email.invalid">
+                {{'FORMS.ACTIONS.EXPORT' | translate}}
+            </button>
+        </div>
+    </div>
+</div>

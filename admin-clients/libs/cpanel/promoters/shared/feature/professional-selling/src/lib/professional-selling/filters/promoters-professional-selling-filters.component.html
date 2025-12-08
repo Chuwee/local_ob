@@ -1,0 +1,45 @@
+<ng-container [formGroup]="form">
+    <mat-form-field appearance="outline" class="ob-form-field inline-field filter">
+        <mat-label>{{'PROFESSIONAL_SELLING.CLIENTS' | translate}}</mat-label>
+        <mat-select [multiple]="true" formControlName='clients'
+            [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+            <mat-option>
+                <app-select-search #searchClient searchField="name" autofocus
+                    [requireSelection]="true" [options$]="clients$"
+                    [placeholderLabel]="'FORMS.SEARCH.NAME' | translate" />
+            </mat-option>
+            @if (!searchClient.search) {
+                <div class="mat-option" (click)="reset('clients')">
+                    {{ 'FORMS.ACTIONS.UNSELECT_ALL' | translate }}
+                </div>
+            }
+            @for (option of searchClient.getFilteredOptions$() | async; track option) {
+                <mat-option [value]="option.id">
+                    {{option.name}}
+                </mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="ob-form-field inline-field filter">
+        <mat-label>{{'PROFESSIONAL_SELLING.QUOTAS' | translate}}</mat-label>
+        <mat-select [multiple]="true"
+            formControlName="quotas"
+            [placeholder]="'FORMS.SELECT.PLACE_HOLDER' | translate">
+            <mat-option>
+                <app-select-search #searchQuota searchField="name" autofocus
+                    [requireSelection]="true" [options$]="quotas$"
+                    [placeholderLabel]="'FORMS.SEARCH.NAME' | translate" />
+            </mat-option>
+            @if (!searchQuota.search) {
+                <div class="mat-option" (click)="reset('quotas')">
+                    {{ 'FORMS.ACTIONS.UNSELECT_ALL' | translate }}
+                </div>
+            }
+            @for (option of searchQuota.getFilteredOptions$() | async; track option) {
+                <mat-option [value]="option.id">
+                    {{option.name}}
+                </mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+</ng-container>

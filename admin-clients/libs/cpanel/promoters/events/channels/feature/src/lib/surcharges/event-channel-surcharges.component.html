@@ -1,0 +1,36 @@
+<app-form-container (cancel)="cancel()" (save)="save()" [disabled]="$isInProgress() || !form.dirty">
+    <mat-accordion [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'EVENTS.CHANNEL.PROMOTER_SURCHARGES.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-event-channel-surcharges-promoter [form]="form" [surchargesRequestCtrl]="surchargesRequestCtrl"
+                [currency]="$currency()" [channel]="$channel()" />
+        </mat-expansion-panel>
+
+
+        @if($requestAccepted()){
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'EVENTS.CHANNEL.CHANNEL_SURCHARGES.TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-event-channel-surcharges-channel [currency]="$currency()" [channel]="$channel()" />
+            </mat-expansion-panel>
+            <!-- TODO: Remove isTestTaxes when  taxes end -->
+            @if(isTestTaxes ? ($event()?.settings?.tax_mode && $event()?.settings?.tax_mode !== taxesMode.onTop) : true){
+                <mat-expansion-panel (afterExpand)="simulationExpanded = true" (afterCollapse)="simulationExpanded = false">
+                    <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                        <mat-panel-title>{{'SALE_REQUEST.PRICE_SIMULATION.TITLE' | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <app-event-channel-price-simulation [expanded]="simulationExpanded" />
+                </mat-expansion-panel>
+            }
+        }
+    </mat-accordion>
+    <app-archived-event-mgr slot="actions-bar" [disabled]="form.dirty" />
+</app-form-container>
+@if($isInProgress()){
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

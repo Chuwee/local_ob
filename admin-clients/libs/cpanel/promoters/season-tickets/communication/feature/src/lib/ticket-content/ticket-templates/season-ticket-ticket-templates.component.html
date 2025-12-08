@@ -1,0 +1,86 @@
+<form id="templates" class="templates-form" [formGroup]="templatesForm" fxLayout="column">
+    <div class="templates-row" fxFlex="100%" fxLayout="row" fxLayoutAlign="start center">
+        <div class="templates-type" fxFlex="125px" *ngIf="allowGroups">
+            {{'SEASON_TICKET.COMMUNICATION.INDIVIDUAL.TITLE' | translate}}
+        </div>
+        <mat-form-field appearance="outline" class="ob-form-field inline-field field-with-label" fxFlex="200px">
+            <mat-label class="template-label">{{'SEASON_TICKET.COMMUNICATION.TEMPLATE_PDF' | translate}}</mat-label>
+            <mat-icon matPrefix class="ob-icon small" svgIcon="ticket-pdf"></mat-icon>
+            <mat-select
+                [placeholder]="(templatesPdf.length === 0 ? 'SEASON_TICKET.PROMOTIONS.EMPTY_LIST_MESSAGE' : 'FORMS.SELECT.PLACE_HOLDER') | translate"
+                formControlName="singlePdfTemplate">
+                <mat-option *ngFor="let template of templatesPdf" [value]="template.id" fxLayout="row" fxLayoutGap="8px">
+                    <span fxFlex appEllipsify [matTooltip]="template.name">{{template.name}}</span>
+                    <mat-icon svgIcon="star-icon" class="no-margin mat-icon-no-color star"
+                        *ngIf="template.default">
+                    </mat-icon>
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="ob-form-field inline-field" fxFlex="200px">
+            <mat-label class="template-label">{{'SEASON_TICKET.COMMUNICATION.TEMPLATE_TICKET' | translate}}</mat-label>
+            <mat-icon matPrefix class="ob-icon small" svgIcon="ticket-printer"></mat-icon>
+            <mat-select
+                [placeholder]="(templatesPrinter.length === 0 ? 'SEASON_TICKET.PROMOTIONS.EMPTY_LIST_MESSAGE' : 'FORMS.SELECT.PLACE_HOLDER') | translate"
+                formControlName="singlePrinterTemplate">
+                <mat-option *ngFor="let template of templatesPrinter" [value]="template.id" fxLayout="row" fxLayoutGap="8px">
+                    <span fxFlex appEllipsify [matTooltip]="template.name">{{template.name}}</span>
+                    <mat-icon svgIcon="star-icon" class="no-margin mat-icon-no-color star"
+                        *ngIf="template.default">
+                    </mat-icon>
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <ng-container *ngIf="passbookEnabled">
+            <mat-form-field appearance="outline" class="ob-form-field inline-field" fxFlex="200px">
+                <mat-label class="template-label">{{'SEASON_TICKET.COMMUNICATION.TEMPLATE_PASSBOOK' | translate}}
+                </mat-label>
+                <mat-icon matPrefix class="ob-icon small" svgIcon="ticket-passbook"></mat-icon>
+                <mat-select
+                    [placeholder]="(templatesPassbook.length === 0 ? 'SEASON_TICKET.PROMOTIONS.EMPTY_LIST_MESSAGE' : 'FORMS.SELECT.PLACE_HOLDER') | translate"
+                    formControlName="seasonPackPassbookTemplate">
+                    <mat-option *ngFor="let template of templatesPassbook" [value]="template.code" fxLayout="row" fxLayoutGap="8px">
+                        <span fxFlex appEllipsify [matTooltip]="template.name">{{template.name}}</span>
+                        <mat-icon svgIcon="star-icon" class="no-margin mat-icon-no-color star"
+                            *ngIf="template.default_passbook">
+                        </mat-icon>
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </ng-container>
+    </div>
+    <mat-divider *ngIf="allowGroups"></mat-divider>
+    <div *ngIf="allowGroups" class="templates-row" fxFlex="100%" fxLayout="row" fxLayoutAlign="start center">
+        <div class="templates-type" fxFlex="125px">
+            {{'SEASON_TICKET.COMMUNICATION.GROUP.TITLE' | translate}}
+        </div>
+        <mat-form-field appearance="outline" class="ob-form-field inline-field" fxFlex="200px">
+            <mat-label class="template-label">{{'SEASON_TICKET.COMMUNICATION.TEMPLATE_PDF' | translate}}</mat-label>
+            <mat-icon matPrefix class="ob-icon small" svgIcon="ticket-pdf"></mat-icon>
+            <mat-select
+                [placeholder]="(templatesPdf.length === 0 ? 'SEASON_TICKET.PROMOTIONS.EMPTY_LIST_MESSAGE' : 'FORMS.SELECT.PLACE_HOLDER') | translate"
+                formControlName="groupPdfTemplate">
+                <mat-option *ngFor="let template of templatesPdf" [value]="template.id" fxLayout="row" fxLayoutGap="8px">
+                    <span fxFlex appEllipsify [matTooltip]="template.name">{{template.name}}</span>
+                    <mat-icon svgIcon="star-icon" class="no-margin mat-icon-no-color star"
+                        *ngIf="template.default">
+                    </mat-icon>
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="ob-form-field inline-field" fxFlex="200px">
+            <mat-label class="template-label">{{'SEASON_TICKET.COMMUNICATION.TEMPLATE_TICKET' | translate}}</mat-label>
+            <mat-icon matPrefix class="ob-icon small" svgIcon="ticket-printer"></mat-icon>
+            <mat-select
+                [placeholder]="(templatesPrinter.length === 0 ? 'SEASON_TICKET.PROMOTIONS.EMPTY_LIST_MESSAGE' : 'FORMS.SELECT.PLACE_HOLDER') | translate"
+                formControlName="groupPrinterTemplate">
+                <mat-option *ngFor="let template of templatesPrinter" [value]="template.id" fxLayout="row" fxLayoutGap="8px">
+                    <span fxFlex appEllipsify [matTooltip]="template.name">{{template.name}}</span>
+                    <mat-icon svgIcon="star-icon" class="no-margin mat-icon-no-color star"
+                        *ngIf="template.default">
+                    </mat-icon>
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+</form>

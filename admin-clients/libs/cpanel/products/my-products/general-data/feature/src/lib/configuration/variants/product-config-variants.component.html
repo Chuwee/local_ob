@@ -1,0 +1,144 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu"
+    [disabled]="(canWrite$ | async) !== true || !form.dirty || (isLoadingOrSaving$ | async)">
+    @if ((canWrite$ | async)) {
+        <div fxLayout="row wrap" fxLayoutAlign="end">
+            <div [matTooltip]="$productIsActive() ? ('PRODUCT.VARIANTS.CREATE_DISABLED_INFO' | translate) :
+            ('PRODUCT.VARIANTS.FORMS.INFOS.MAX_VARIANTS_REACHED' | translate : { max: maxVariantsFromValuesCombination } )"
+                [matTooltipDisabled]="!$productIsActive() && $variants().length < maxVariantsFromValuesCombination"
+                [class.edit-variants-disabled]="$variants().length === maxVariantsFromValuesCombination">
+                <button mat-stroked-button color="primary" type="button" class="edit-variants ob-button medium"
+                    [disabled]="$productIsActive() || $variants().length >= maxVariantsFromValuesCombination"
+                    [attr.aria-label]="'PRODUCT.VARIANTS.ACTIONS.EDIT_VARIANTS' | translate" (click)="openEditProductVariantsDialog()">
+                    <mat-icon>edit</mat-icon>
+                    {{'PRODUCT.VARIANTS.ACTIONS.EDIT_VARIANTS' | translate}}
+                </button>
+            </div>
+        </div>
+    }
+    <app-searchable-paginated-selection [placeholder]="'FORMS.SEARCH.VARIANTS' | translate" class="boxed-options"
+        (loadData)="loadVariants($event)" [form]="selected" [pageSize]="pageSize" [data$]="variantsTableList$"
+        [metadata$]="metadata$">
+
+        <div slot="filter" class="badge-container" [class.empty]="(totalVariantsInTable$ | async) === 0">
+            {{((allSelected$ | async) ? (totalVariantsInTable$ | async) : selectedVariants)}} / {{totalVariantsInTable$ | async}}
+        </div>
+        <button slot="filter" type="button" mat-icon-button class="ob-button medium" color="tertiary"
+            [class.active]="!!(selectedOnly$ | async)" [disabled]="selectedVariants === 0 || (allSelected$ | async)"
+            [matTooltip]="'PRODUCT.VARIANTS.SHOW_SELECTED_TOOLTIP' | translate" (click)="clickShowSelected()">
+            <mat-icon>visibility</mat-icon>
+        </button>
+        <div slot="filter" [matTooltip]="'PRODUCT.VARIANTS.EDIT_DISABLED_INFO' | translate" [matTooltipDisabled]="!$productIsActive()"
+            [class.edit-variants-disabled]="$productIsActive()">
+            <button type="button" mat-button class="ob-button medium" color="tertiary" fxFlex="160px"
+                [disabled]="(selectedVariants === 0 && (allSelected$ | async) === false) || $productIsActive()" (click)="editBulkPrices()">
+                <mat-icon>edit</mat-icon>
+                {{'TITLES.EDIT_PRICES' | translate}}
+            </button>
+        </div>
+        <div slot="filter" class="filter-push" fxFlex="none">
+            <app-config-variants-filter (filterChange)="loadVariants($event)" />
+        </div>
+        <ng-template #selectionTemplate let-pageForm="pageForm" let-data="data" let-selectionChanged="selectionChanged">
+            <app-selection-table [data]="data" [columns]="columns" [pageForm]="pageForm" [selectionChanged]="selectionChanged"
+                [selectionDisabled]="(allSelected$ | async)" [class.some-selected]="selectedVariants > 0 || (allSelected$ | async)">
+                <ng-template #selectAllTemplate>
+                    <mat-checkbox #allSelected color="primary" [disabled]="(selectedOnly$ | async) || (totalVariantsInTable$ | async) === 0"
+                        [checked]="selectedVariants === (totalVariantsInTable$ | async) ||
+                            (selectedOnly$ | async) || (allSelected$ | async)"
+                        [indeterminate]="selectedVariants > 0 &&
+                            selectedVariants < (totalVariantsInTable$ | async) &&
+                            !allSelected.checked"
+                        (change)="allSelectedClick.emit(allSelected.checked)" />
+                </ng-template>
+                <ng-container matColumnDef="name">
+                    <mat-header-cell *matHeaderCellDef fxFlex="1 0 240px" class="head-cell">
+                        {{'PRODUCT.VARIANTS.VARIANTS' | translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row;" fxFlex="1 0 240px">
+                        <span appEllipsify>
+                            {{ row.name }}
+                        </span>
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="price">
+                    <mat-header-cell *matHeaderCellDef class="head-cell price-column" fxFlex="1 0 152px">
+                        {{ 'PRODUCT.VARIANTS.VARIANT_PRICE' | translate }}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row;" class="price-column" [class.editable-cell]="true" fxFlex="1 0 152px"
+                        [matTooltip]="'PRODUCT.VARIANTS.EDIT_DISABLED_INFO' | translate"
+                        [matTooltipDisabled]="!$productIsActive()">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            @let errorMessage = form.get([row.id, 'price']) | obErrorMessage$ | async;
+                            @if (errorMessage) {
+                                <mat-icon matIconPrefix [obErrorIcon]="errorMessage">
+                                    error_outline
+                                </mat-icon>
+                            }
+                            <app-currency-input [formControl]="form.get([row.id, 'price'])" class="table-input"
+                                [currencyCode]="$currency()" [currencyFormat]="'narrow'"
+                                [placeholder]="0 | localCurrency : $currency() : 'narrow'"
+                                (click)="$event.stopPropagation()" />
+                        </mat-form-field>
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="stock">
+                    <mat-header-cell *matHeaderCellDef class="head-cell" fxFlex="1 0 128px">
+                        {{ 'PRODUCT.VARIANTS.VARIANT_STOCK' | translate }}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row;" [class.editable-cell]="true" fxFlex="1 0 128px"
+                        [matTooltip]="'PRODUCT.VARIANTS.EDIT_DISABLED_INFO' | translate"
+                        [matTooltipDisabled]="!$productIsActive()">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <input matInput type="number" [placeholder]="0" [formControl]="form.get([row.id, 'stock'])"
+                                (click)="$event.stopPropagation()">
+                        </mat-form-field>
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="sku">
+                    <mat-header-cell *matHeaderCellDef class="head-cell" fxFlex="1 0 152px">
+                        {{ 'PRODUCT.VARIANTS.SKU' | translate }}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row" [class.editable-cell]="true" fxFlex="1 0 152px">
+                        <mat-form-field appearance="outline" class="ob-form-field">
+                            <input matInput [placeholder]="0" [formControl]="form.get([row.id, 'sku'])"
+                                (click)="$event.stopPropagation()">
+                        </mat-form-field>
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="status">
+                    <mat-header-cell *matHeaderCellDef class="head-cell" fxFlex="1 0 152px">
+                        {{ 'PRODUCT.VARIANTS.STATUS' | translate }}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row;" (click)="$event.stopPropagation()" [class.editable-cell]="true"
+                        [matTooltip]="'PRODUCT.VARIANTS.EDIT_DISABLED_INFO' | translate"
+                        [matTooltipDisabled]="!$productIsActive()" fxFlex="1 0 152px">
+                        <mat-form-field appearance="outline" class="ob-form-field ob-form-field-outline inline-field thin-select-field">
+                            <mat-select [value]="row.status" [formControl]="form.get([row.id, 'status'])">
+                                <mat-select-trigger>
+                                    <span [ngClass]="['status-dot', form.get([row.id, 'status']).value.toLowerCase()]"></span>
+                                    {{ 'PRODUCT.VARIANTS.STATUS_OPTS.' + form.get([row.id, 'status']).value | translate }}
+                                </mat-select-trigger>
+                                @for (status of statusList | keyvalue; track status) {
+
+                                    <mat-option [value]="status.value">
+                                        {{ 'PRODUCT.VARIANTS.STATUS_OPTS.' + status.value | translate }}
+                                    </mat-option>
+
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </mat-cell>
+                </ng-container>
+                <ng-template #noResultsTemplate>
+                    <div class="context-message-container">
+                        <div fxFlex="100%" fxLayout="row" fxLayoutAlign="center">
+                            <div fxFlex="100%" fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="15px">
+                                <p class="title">{{'PRODUCT.VARIANTS.EMPTY_LIST_MESSAGE' | translate}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </app-selection-table>
+        </ng-template>
+    </app-searchable-paginated-selection>
+</app-form-container>

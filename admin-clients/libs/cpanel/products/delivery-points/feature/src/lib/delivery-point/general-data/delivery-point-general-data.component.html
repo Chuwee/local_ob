@@ -1,0 +1,133 @@
+@if (deliveryPoint$ | async; as deliveryPoint) {
+    <app-form-container [formGroup]="form"
+        [disabled]="(canWrite$ | async) !== true || !form.dirty|| (isLoadingOrSaving$ | async)"
+        layout="main" class="overflow-y-auto" (cancel)="cancel()" (save)="save()">
+        <mat-accordion class="details-form-container" [multi]="true" [togglePosition]="'before'">
+            <!-- PRINCIPAL-INFO -->
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'DELIVERY_POINT.PRINCIPAL_INFO_TITLE' | translate }}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div fxLayout="row wrap" fxLayoutGap="0" fxLayoutGap.gt-sm="40px">
+                    <!-- Name  -->
+                    <div fxFlex="100%">
+                        <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                            fxFlex.gt-sm="0 1 calc(33.33% - 24px)" appearance="outline">
+                            <mat-label>{{'DELIVERY_POINT.NAME' | translate}}</mat-label>
+                            <input matInput aria-label="name" [placeholder]="'DELIVERY_POINT.NAME' | translate"
+                                formControlName="name">
+                            <mat-error [ob-form-errors]="form.get('name')" />
+                        </mat-form-field>
+                    </div>
+                    <div fxFlex="100%">
+                        <!-- DP_id  -->
+                        <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                            fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                            <span class="field-label">{{'DELIVERY_POINT.ID' | translate}}</span>
+                            <span>{{ deliveryPoint.id }}</span>
+                        </div>
+                        <!-- Entity  -->
+                        <div class="details-non-editable-field ob-form-field" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                            fxFlex.gt-sm="0 1 calc(33.33% - 24px)" fxLayout="column">
+                            <span class="field-label">{{'DELIVERY_POINT.ENTITY' | translate}}</span>
+                            <span>{{deliveryPoint.entity.name}}</span>
+                        </div>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+            <!-- LOCATION -->
+            <mat-expansion-panel [expanded]="true" class="location_container">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'DELIVERY_POINT.LOCATION_INFO_TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div fxLayout="row wrap" fxLayoutGap.gt-xs="24px">
+                    <!-- Country -->
+                    <mat-form-field fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                        fxFlex.gt-sm="0 1 calc(33.33% - 24px)" appearance="outline" class="ob-form-field field-with-label">
+                        <mat-label>{{'DELIVERY_POINT.COUNTRY' | translate}}</mat-label>
+                        <mat-select formControlName="country" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                            <mat-option>
+                                <app-select-search #searchCountry searchField="name"
+                                    [requireSelection]="true" [options$]="countries$"
+                                    [placeholderLabel]="'FORMS.SEARCH.NAME' | translate" />
+                            </mat-option>
+                            @for (country of searchCountry.getFilteredOptions$() | async; track country) {
+                                <mat-option [value]="country.code">
+                                    <div appEllipsify>
+                                        {{ country.name }}
+                                    </div>
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                    <!-- Country_subdivision -->
+                    <mat-form-field fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                        fxFlex.gt-sm="0 1 calc(33.33% - 24px)" appearance="outline" class="ob-form-field field-with-label">
+                        <mat-label>{{'DELIVERY_POINT.COUNTRY_SUBDIVISION' | translate}}</mat-label>
+                        <mat-select formControlName="country_subdivision"
+                            [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_MALE' | translate">
+                            <mat-option>
+                                <app-select-search #searchCountrySubdivision searchField="name"
+                                    [requireSelection]="true" [options$]="regions$"
+                                    [placeholderLabel]="'FORMS.SEARCH.NAME' | translate" />
+                            </mat-option>
+                            @for (region of searchCountrySubdivision.getFilteredOptions$() | async; track region) {
+                                <mat-option [value]="region.code">
+                                    <div appEllipsify>
+                                        {{ region.name }}
+                                    </div>
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                    <!-- City -->
+                    <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                        fxFlex.gt-sm="0 1 calc(33.33% - 24px)" appearance="outline">
+                        <mat-label>{{'DELIVERY_POINT.CITY' | translate}}</mat-label>
+                        <input matInput aria-label="city" [placeholder]="'DELIVERY_POINT.CITY' | translate"
+                            formControlName="city">
+                        <mat-error [ob-form-errors]="form.get('city')" />
+                    </mat-form-field>
+                    <!-- Address -->
+                    <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" fxFlex.gt-xs="0 1 calc(50% - 24px)"
+                        fxFlex.gt-sm="0 1 calc(33.33% - 24px)" appearance="outline">
+                        <mat-label>{{'DELIVERY_POINT.ADDRESS' | translate}}</mat-label>
+                        <input matInput aria-label="address" [placeholder]="'DELIVERY_POINT.ADDRESS' | translate"
+                            formControlName="address">
+                        <mat-error [ob-form-errors]="form.get('address')" />
+                    </mat-form-field>
+                    <!-- Zip_code -->
+                    <mat-form-field class="ob-form-field field-with-label" fxFlex="100%" fxFlex.gt-xs="0 1 calc(16% - 24px)"
+                        fxFlex.gt-sm="0 1 calc(16% - 24px)" appearance="outline">
+                        <mat-label>{{'DELIVERY_POINT.ZIP_CODE' | translate}}</mat-label>
+                        <input matInput aria-label="zip_code" [placeholder]="'DELIVERY_POINT.ZIP_CODE' | translate"
+                            type="text" formControlName="zip_code">
+                        <mat-error [ob-form-errors]="form.get('zip_code')" />
+                    </mat-form-field>
+                </div>
+            </mat-expansion-panel>
+            <!-- ADDITIONAL-INFO -->
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                    <mat-panel-title>{{'DELIVERY_POINT.ADDITIONAL_INFO_TITLE' | translate}}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <!-- Notes  -->
+                <div fxLayout="column" fxFlex="min(650px, 90%)" fxLayoutGap="16px">
+                    <span class="ob-label">{{ 'DELIVERY_POINT.NOTES' | translate }}</span>
+                    <span>{{ 'DELIVERY_POINT.NOTES_DESCRIPTION' | translate }}</span>
+                    <mat-form-field appearance="outline" class="ob-form-field">
+                        <textarea matInput formControlName="notes" rows="6"
+                            placeholder="{{ 'DELIVERY_POINT.NOTES_PLACEHOLDER' | translate }}">
+                    </textarea>
+                    </mat-form-field>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </app-form-container>
+}
+
+@if (isLoadingOrSaving$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

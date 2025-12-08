@@ -1,0 +1,19 @@
+<!-- style min height for scroll issues with tabs when in the bottom -->
+<app-tabs-menu type="language" overrideClasses="no-left-padding" #translationTabs
+    [selectedIndex]="defaultLanguageIndex$()">
+    @for (language of languages$(); track $index) {
+        <ng-template appTab lazyLoad [label]="('LANGUAGES.' + language) | translate"
+            [ctrl]="descriptionsCtrl.controls[language]">
+            <div class="flex flex-col">
+                <mat-form-field appearance="outline" class="ob-form-field field-with-label">
+                    <mat-label>
+                        {{'FORMS.LABELS.DESCRIPTION' | translate }} {{( 'LANGUAGES.' + language ) | translate}}
+                    </mat-label>
+                    <!-- NOTE: disabling descriptionsCtrl is not enough -->
+                    <app-rich-text-area [placeholder]="'FORMS.TEXT_INPUT_AREA_PLACEHOLDER' | translate"
+                        [formControl]="descriptionsCtrl.controls[language]" [disabled]="!$vmSaleRequestGatewayBenefit().beingModified" />
+                </mat-form-field>
+            </div>
+        </ng-template>
+    }
+</app-tabs-menu>

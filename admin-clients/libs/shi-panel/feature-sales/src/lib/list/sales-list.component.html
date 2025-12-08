@@ -1,0 +1,237 @@
+<div class="list-container" fxFlex="0 1 100%" fxLayout="column">
+    <div class="heading-container" fxLayout="row wrap" fxLayoutAlign="space-between start">
+        <div>
+            <h1 class="secondary mat-headline-3">
+                {{'TITLES.SALES.SALES_LIST_TITLE' | translate}}
+            </h1>
+        </div>
+        <div class="actions-container" fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="end">
+            <div class="filter-container" fxFlex="none">
+                <button mat-icon-button class="ob-button medium" aria-label="refresh" (click)="refresh()">
+                    <mat-icon>autorenew</mat-icon>
+                </button>
+            </div>
+            <div class="filter-container" fxFlex="none">
+                <button mat-stroked-button color="tertiary" class="ob-button medium only-icon" (click)="openExportSaleslistDialog()"
+                    [disabled]="isExportLoading$ | async" [matTooltip]="'SALES.OPEN_EXPORT_SALES_LIST_DIALOG'  | translate">
+                    <mat-icon>file_download</mat-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="heading-container" fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxFlex="80%" fxLayoutGap="20px" fxLayoutAlign="start center">
+            <div class="filter-container" fxFlex="none">
+                <app-popover-date-range-picker-filter [matTooltip]="'SALES.SALES_LIST_FILTER.SALE_DATE' | translate" />
+            </div>
+            <div class="filter-container" fxFlex="none" data-test="filterBtn">
+                <app-popover appFilter>
+                    <app-sales-list-filter #filterContent />
+                </app-popover>
+            </div>
+            <div class="search-field" fxFlex="100%">
+                <app-search-input [placeholder]="'FORMS.SEARCH.SALES_LIST' | translate" />
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            @if (salesMetadata$ | async; as salesMetadata) {
+                <p class="page-summary"
+                    [innerHTML]="'PAGINATION.PAGE_SUMMARY' | translate: salesMetadata">
+                </p>
+            }
+            <app-paginator [length]="(salesMetadata$ | async)?.total" [pageSize]="salesPageSize" />
+        </div>
+    </div>
+    <div class="heading-container">
+        <app-chips appFilter class="long-ellipsified-chips" />
+    </div>
+    <div class="heading-container heading-aggregated">
+        <app-aggregated-data [aggregatedData]="salesAggregatedData$ | async" [aggregationMetrics]="aggDataSales" />
+    </div>
+    @if (loadingData$ | async) {
+        <div class="spinner-container">
+            <mat-spinner />
+        </div>
+    }
+    <mat-table class="ob-table" [dataSource]="sales$ | async" matSort [matSortActive]="initSortCol" [matSortDirection]="initSortDir"
+        matSortDisableClear [attr.aria-label]="'TITLES.SALES.SALES_LIST_TITLE' | translate"
+        [class.not-touchable]="(isHandsetOrTablet$ | async) !== true">
+        <ng-container matColumnDef="id">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'SALES.SALE_ID' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="badge-container">
+                <span class="badge" appEllipsify [matTooltip]="row.id" matTooltipClass="ob-tooltip-nowrap">
+                    {{row.id}}
+                </span>
+                <app-copy-text [copyText]="row.id" class="copy-button" />
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="listing_id">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'SALES.LISTING_ID' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <!-- Redirect to searched listing id on click -->
+                <span class="ob-link" appEllipsify [matTooltip]="row.listing_id" matTooltipClass="ob-tooltip-nowrap"
+                    (click)="searchId(row.listing_id, '/listings')">
+                    {{row.listing_id}}
+                </span>
+                <app-copy-text [copyText]="row.listing_id" class="copy-button" />
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="created">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'SALES.SALE_DATE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.created | dateTime : dateTimeFormats.shortDateTime}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef class="head-cell status-cell">
+                {{'SALES.STATUS' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="badge-container status-cell">
+                <span class="badge" [class.sold]="row.status === saleStatus.sold"
+                    [class.sold_with_error]="row.status === saleStatus.soldWithError"
+                    [class.fulfilled]="row.status === saleStatus.fulfilled" [class.shipped]="row.status === saleStatus.shipped"
+                    [class.fulfilled_with_error]="row.status === saleStatus.fulfilledWithError"
+                    [class.partially_fulfilled]="row.status === saleStatus.partiallyFulfilled"
+                    [class.received]="row.status === saleStatus.received"
+                    [appHoverOverlay]="content"
+                    [overlayDisabled]="row.status !== saleStatus.soldWithError && row.status !== saleStatus.fulfilledWithError">
+                    @if (row.status === saleStatus.soldWithError || row.status === saleStatus.fulfilledWithError) {
+                        <mat-icon>error_outline</mat-icon>
+                    }
+                    {{'SALES.STATUS_OPTS.' + row.status | translate}}
+                </span>
+                <ng-template #content>
+                    <app-error-card [row]="row" [unknownErrorDefault]="'SALES.SALES_LIST.UNKNOWN_ERROR_DEFAULT_MESSAGE' | translate" />
+                </ng-template>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="delivery_method">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell small-cell">
+                {{'SALES.FULFILLMENT' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="ff small-cell">
+                @switch (row.delivery_method) {
+                    @case (deliveryMethods.electronic) {
+                        <span [matTooltip]="'SALES.DELIVERY_OPTS.' + row.delivery_method | translate">
+                            <mat-icon class="material-icons-outlined">picture_as_pdf</mat-icon>
+                        </span>
+                    }
+                    @case (deliveryMethods.mobileTransfer) {
+                        <span [matTooltip]="'SALES.DELIVERY_OPTS.' + row.delivery_method | translate">
+                            <mat-icon>mobile_screen_share</mat-icon>
+                        </span>
+                    }
+                    @case (deliveryMethods.mobile) {
+                        <span [matTooltip]="'SALES.DELIVERY_OPTS.' + row.delivery_method | translate">
+                            <mat-icon>smartphone</mat-icon>
+                        </span>
+                    }
+                    @case (deliveryMethods.screenshots) {
+                        <span [matTooltip]="'SALES.DELIVERY_OPTS.' + row.delivery_method | translate">
+                            <mat-icon>wallpaper</mat-icon>
+                        </span>
+                    }
+                    @case (deliveryMethods.paper) {
+                        <span [matTooltip]="'SALES.DELIVERY_OPTS.' + row.delivery_method | translate">
+                            <mat-icon class="material-icons-outlined">confirmation_number</mat-icon>
+                        </span>
+                    }
+                    @case (null) {
+                        <span> - </span>
+                    }
+                }
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="products">
+            <mat-header-cell *matHeaderCellDef class="head-cell small-cell">{{'SALES.QUANTITY' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="small-cell">{{row.products?.length ?? '-'}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="payout_per_product">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'SALES.PRICE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                {{row.price?.currency ?
+                ((row.price?.payout_per_product | localCurrency: row.price?.currency) ?? '-') : (row.price?.payout_per_product ?? '-') }}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="total_price">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell with-divider">{{'SALES.TOTAL_PRICE' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="with-divider">
+                {{row.price?.currency ?
+                ((row.price?.total_price | localCurrency: row.price?.currency) ?? '-') : (row.price?.total_price ?? '-') }}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="event.name">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'SALES.EVENT_NAME' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span appEllipsify [matTooltip]="row.event.name" matTooltipClass="ob-tooltip-nowrap">
+                    {{row.event.name ?? '-'}}
+                </span>
+                @if (row.event.name) {
+                    <app-copy-text [copyText]="row.event.name" class="copy-button" />
+                }
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="event.id">
+            <mat-header-cell *matHeaderCellDef class="head-cell with-divider">{{'SALES.EVENT_ID' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef=" let row" class="with-divider">
+                <span class="ob-link" appEllipsify [matTooltip]="row.event.id" matTooltipClass="ob-tooltip-nowrap"
+                    (click)="searchId(row.event.id, '/mappings')">
+                    {{row.event.id}}
+                </span>
+                @if (row.event.id) {
+                    <app-copy-text [copyText]="row.event.id" class="copy-button" />
+                }
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="supplier">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="head-cell">{{'SALES.SUPPLIER' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                {{(row.supplier | titlecase) ?? '-'}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="supplier_id">
+            <mat-header-cell *matHeaderCellDef class="head-cell">{{'SALES.SUPPLIER_SALE_ID' | translate}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <span appEllipsify [matTooltip]="row.supplier_id" matTooltipClass="ob-tooltip-nowrap">
+                    {{row.supplier_id ?? '-'}}
+                </span>
+                @if (row.supplier_id) {
+                    <app-copy-text [copyText]="row.supplier_id" class="copy-button" />
+                }
+            </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" />
+        <mat-row *matRowDef="let row; columns: displayedColumns;" class="interactive-row" matRipple
+            (click)="open(row)" [class.ob-row-selected]="(clickedRow$ | async) === row" />
+    </mat-table>
+    @if ((salesMetadata$ | async)?.total === 0) {
+        <div class="context-notification-container" fxFlex="0 50 100%" fxLayout="row"
+            fxLayoutAlign="center start">
+            @if ((salesMetadata$ | async)?.total === 0) {
+                <app-context-notification class="ob-context-notification" contextType="info" fxFlex.gt-sm="600px" fxFlex="80%"
+                    fxLayoutAlign="center start">
+                    @if (emptyListWithWordAndFilters$ | async) {
+                        <div fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="20px">
+                            <p>{{'LIST.EMPTY_LIST_WITH_KEYWORD' | translate}}</p>
+                            <button mat-stroked-button color="primary" type="button" class="ob-button medium"
+                                [attr.aria-label]="'LIST.REMOVE_FILTERS' | translate"
+                                (click)="removeFilters()">
+                                {{'LIST.REMOVE_FILTERS_BTN' | translate}}
+                            </button>
+                        </div>
+                    } @else {
+                        <p>{{'LIST.EMPTY' | translate}}</p>
+                    }
+                </app-context-notification>
+            }
+        </div>
+    }
+</div>

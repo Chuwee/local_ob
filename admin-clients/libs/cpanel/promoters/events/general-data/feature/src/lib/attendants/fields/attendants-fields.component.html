@@ -1,0 +1,50 @@
+<div fxFlex fxLayout="row" [ngClass]="{'disabled': isDisabled}">
+    <div fxFlex="0 1 340px" class="available-list">
+        <h4>{{'EVENTS.ATTENDANTS_FIELDS.AVAILABLE' | translate}}</h4>
+        <mat-list fxLayout="column" cdkDropList id="available-list" #availableList="cdkDropList"
+            [cdkDropListData]="fields$ | async" [cdkDropListConnectedTo]="[selectionList]"
+            (cdkDropListDropped)="dropItem($event) "
+            class="ob-list small-rows">
+            <mat-list-item cdkDrag [cdkDragDisabled]="isDisabled"
+                *ngFor="let field of fields$ | async" color="primary" class="content-full">
+                <mat-icon [fxShow]="!isDisabled" class="drag">drag_indicator</mat-icon>
+                <span>
+                    {{'ATTENDANT_FIELD.' + field.sid | translate}}
+                </span>
+            </mat-list-item>
+            <div fxFlex fxLayoutAlign="center center" *ngIf="isLoadingOrSaving$ | async">
+                <mat-spinner></mat-spinner>
+            </div>
+        </mat-list>
+    </div>
+    <div fxFlex="1 1 80px" fxFlex.lt-md="0 1 50px" fxLayoutAlign="center center" class="swap">
+        <mat-icon>swap_horiz</mat-icon>
+    </div>
+    <div fxFlex="0 1 340px" class="selected-list">
+        <h4>{{'EVENTS.ATTENDANTS_FIELDS.SELECTED' | translate}}</h4>
+        <mat-list fxLayout="column" cdkDropList id="selected-list" #selectionList="cdkDropList" class="ob-list small-rows"
+            [cdkDropListData]="value" [cdkDropListConnectedTo]="[availableList]"
+            (cdkDropListDropped)="dropItem($event)">
+            <mat-list-item cdkDrag [cdkDragDisabled]="isDisabled" *ngFor="let field of value" role="listitem">
+                <mat-icon [fxShow]="!isDisabled" class="drag">drag_indicator</mat-icon>
+                <div fxFlex fxLayoutAlign="space-between center">
+                    <span class="field-name">{{'ATTENDANT_FIELD.' + field.sid | translate}}</span>
+                    <div fxLayoutAlign="end center">
+                        <mat-button-toggle
+                            class="ob-icon-button-toggle-simple ob-button small only-icon"
+                            [checked]="field.mandatory"
+                            [disabled]="isDisabled"
+                            [matTooltip]="'EVENTS.ATTENDANTS_FIELDS.MANDATORY' | translate"
+                            (click)="$event.stopPropagation(); toggleMandatory(field)">
+                            <mat-icon color="primary" [fxShow]="field.mandatory">check_box</mat-icon>
+                            <mat-icon [fxShow]="!field.mandatory">check_box_outline_blank</mat-icon>
+                        </mat-button-toggle>
+                    </div>
+                </div>
+            </mat-list-item>
+            <div *ngIf="!value || value.length === 0" fxFlex fxLayoutAlign="center center">
+                <p class="hint">{{'EVENTS.ATTENDANTS_FIELDS.DRAG_HINT' | translate}}</p>
+            </div>
+        </mat-list>
+    </div>
+</div>

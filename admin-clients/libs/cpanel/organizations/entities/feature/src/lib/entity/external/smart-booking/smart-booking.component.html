@@ -1,0 +1,43 @@
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="!form.dirty">
+    <div class="smart-booking-status-container" slot="outside">
+        <mat-slide-toggle class="ob-slide-toggle" color="primary" [class.disabled]="statusCtrl.disabled"
+            [matTooltip]="'ENTITY.EXTERNAL.SMART_BOOKING.DISABLED_ACTIVATION_DESC' | translate"
+            [matTooltipDisabled]="statusCtrl.enabled" [formControl]="statusCtrl"
+            (change)="saveSmartBookingStatus($event.checked)">
+            {{'ENTITY.EXTERNAL.SMART_BOOKING.ENABLED' | translate}}
+        </mat-slide-toggle>
+    </div>
+    <form [formGroup]="form" fxLayout="column" autocomplete=off>
+       <span class="field-label no-margin">
+           {{'ENTITY.EXTERNAL.SMART_BOOKING.LABEL' | translate}}
+       </span>
+        <div fxLayout="row wrap" fxLayoutGap="32px">
+            <mat-form-field id="url" fxFlex="100%" fxFlex.gt-sm="0 1 calc(75% - 32px)"
+                   class="ob-form-field field-with-label" appearance="outline">
+                <mat-label>{{'FORMS.LABELS.URL' | translate}}</mat-label>
+                <input autocomplete=off formControlName="url" matInput [placeholder]="'FORMS.LABELS.URL' | translate">
+                <mat-error [ob-form-errors]="form" [field]="['connection', 'url']"></mat-error>
+            </mat-form-field>
+            <ng-container formGroupName="credentials">
+                <mat-form-field id="username" fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 32px)"
+                       class="ob-form-field field-with-label" appearance="outline">
+                    <mat-label>{{'FORMS.LABELS.USERNAME' | translate}}</mat-label>
+                    <input autocomplete=off formControlName="username" matInput
+                        [placeholder]="'FORMS.LABELS.USERNAME' | translate">
+                    <mat-error [ob-form-errors]="form" [field]="['connection', 'username']"></mat-error>
+                </mat-form-field>
+                <mat-form-field id="password" fxFlex="100%" fxFlex.gt-sm="0 1 calc(50% - 32px)"
+                        class="ob-form-field field-with-label" appearance="outline">
+                    <mat-label>{{'FORMS.LABELS.PASSWORD' | translate}}</mat-label>
+                    <input autocomplete=off type="password" formControlName="password" matInput
+                        [placeholder]="'FORMS.LABELS.PASSWORD' | translate">
+                    <mat-error [ob-form-errors]="form" [field]="['connection', 'password']"></mat-error>
+                </mat-form-field>
+            </ng-container>
+        </div>
+    </form>
+</app-form-container>
+
+<div class="spinner-container" *ngIf="loading$ | async">
+    <mat-spinner></mat-spinner>
+</div>

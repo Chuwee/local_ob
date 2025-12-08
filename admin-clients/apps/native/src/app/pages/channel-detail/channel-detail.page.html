@@ -1,0 +1,118 @@
+<ion-header class="ob-layout__header">
+    <ion-toolbar *ngIf="!!!(isLoading$| async); else skeleton_header">
+        <back-button [breadcrumbs]=" true" [viewTitle]="channel?.channel.name ?? ''"
+            [titleIcon]="channel.channel.favorite ? './assets/media/icons/star.svg' : ''"></back-button>
+    </ion-toolbar>
+    <ng-template #skeleton_header>
+        <ion-toolbar>
+            <back-button [breadcrumbs]=" true" viewTitle=""></back-button>
+        </ion-toolbar>
+    </ng-template>
+</ion-header>
+
+<ion-content class="ob-layout__content">
+    <static-view
+        [viewContent]="{
+            title: 'ERROR-TITLE',
+            description: 'ERROR-DESCRIPTION',
+            isError: true
+        }"
+        (tap)="reTry()" *ngIf="isError$ | async; else content" />
+    <ng-template #content>
+        <div *ngIf="!!!(isLoading$ | async); else skeleton_content">
+            <ion-accordion-group mode="ios" class="ob-accordion-group">
+                <ion-accordion class="ob-accordion channel-detail-page__accordion">
+                    <ion-item id="channel-dates" class="ob-accordion__title channel-detail-page__accordion-title" slot="header"
+                        (click)="toggleActivatedClass($event)">
+                        <span>{{"CHANNEL_DETAIL.DATES.TITLE" | translate}}</span>
+                    </ion-item>
+                    <div class="ob-accordion__content channel-detail-page__accordion-content" slot="content">
+                        <div class="channel-detail-page__accordion-text-block">
+                            <ion-list>
+                                <ion-item class="channel-detail-page__accordion-list-item">
+                                    <div class="channel-detail-page__accordion-list-item-text-container">
+                                        <ion-label class="channel-detail-page__accordion-list-item-text">
+                                            {{"CHANNEL_DETAIL.DATES.OPERATIVE_EVENT" | translate}}</ion-label>
+                                    </div>
+                                    <div class="channel-detail-page__accordion-list-item-toggle-container">
+                                        <ion-toggle class="ob-toggle" [checked]="channel?.settings.use_event_dates"
+                                            (ionChange)="changeStatusSession('use_event_dates')" />
+                                    </div>
+                                </ion-item>
+                                <ion-item class="channel-detail-page__accordion-list-item">
+                                    <div class="channel-detail-page__accordion-list-item-text-container">
+                                        <ion-label class="channel-detail-page__accordion-list-item-text">
+                                            {{"CHANNEL_DETAIL.DATES.RELEASE" | translate}}</ion-label>
+                                        <span class="channel-detail-page__accordion-list-item-text">
+                                            <b> {{"CHANNEL_DETAIL.DATES.DATE" | translate}}:</b>
+                                            {{channel?.settings.release.date | dateTime: dateTimeFormats.shortDateTime}}
+                                        </span>
+                                    </div>
+                                    <div class="channel-detail-page__accordion-list-item-toggle-container">
+                                        <ion-toggle class="ob-toggle" [checked]="channel?.settings.release.enabled"
+                                            (ionChange)="changeStatusSession('release')" />
+                                    </div>
+                                </ion-item>
+                                <ion-item class="channel-detail-page__accordion-list-item">
+                                    <div class="channel-detail-page__accordion-list-item-text-container">
+                                        <ion-label class="channel-detail-page__accordion-list-item-text">
+                                            {{"CHANNEL_DETAIL.DATES.SALE" | translate}}</ion-label>
+                                        <span class="channel-detail-page__accordion-list-item-text">
+                                            <b>{{"CHANNEL_DETAIL.DATES.INIT" | translate}}:</b>
+                                            {{channel?.settings.sale.start_date | dateTime: dateTimeFormats.shortDateTime}}
+                                        </span>
+                                        <span class="channel-detail-page__accordion-list-item-text">
+                                            <b>{{"CHANNEL_DETAIL.DATES.END" | translate}}:</b>
+                                            {{channel?.settings.sale.end_date | dateTime: dateTimeFormats.shortDateTime}}
+                                        </span>
+                                    </div>
+                                    <div class="channel-detail-page__accordion-list-item-toggle-container">
+                                        <ion-toggle class="ob-toggle" [checked]="channel?.settings.sale.enabled"
+                                            (ionChange)="changeStatusSession('sale')"></ion-toggle>
+                                    </div>
+                                </ion-item>
+                            </ion-list>
+                        </div>
+                    </div>
+                </ion-accordion>
+                <ion-accordion class="ob-accordion channel-detail-page__accordion">
+                    <ion-item id="session-dates" class="ob-accordion__title channel-detail-page__accordion-title" slot="header"
+                        (click)="toggleActivatedClass($event)">
+                        <span>{{"CHANNEL_DETAIL.DATES.GROUP_SALE" | translate}}</span>
+                    </ion-item>
+                    <div class="ob-accordion__content channel-detail-page__accordion-content" slot="content">
+                        <div class="channel-detail-page__accordion-text-block">
+                            <span class="channel-detail-page__accordion-list-item-text">
+                                <b>{{ 'CHANNEL_DETAIL.GROUP_SALE.TOTAL_TITLE' | translate }}:</b>
+                            </span>
+                            <div *ngIf="!channel.quotas.length; else quotas">
+                                {{ 'CHANNEL_DETAIL.GROUP_SALE.ALL_CAPACITY' | translate }}
+                            </div>
+                            <ng-template #quotas>
+                                <div *ngFor="let quota of channel.parsedQuotas"
+                                    class="channel-detail-page__accordion-list-item-quota-template">
+                                    <div class="channel-detail-page__accordion-list-item__template-name">
+                                        {{quota.template_name}}
+                                    </div>
+                                    <div *ngFor="let opt of quota.quotas; let i = index"
+                                        class="channel-detail-page__accordion-list-item-text channel-detail-page__accordion-list-item-quota-template-option">
+                                        {{'CHANNEL_DETAIL.GROUP_SALE.CAPACITY' | translate}} {{' ' + (i+1) +': ' + opt.description}}
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </div>
+                    </div>
+                </ion-accordion>
+            </ion-accordion-group>
+        </div>
+        <ng-template #skeleton_content>
+            <ion-accordion-group mode="ios" class="ob-accordion-group channel-detail-page__accordion-group">
+                <ion-accordion class="ob-accordion channel-detail-page__accordion">
+                    <ion-item class="ob-accordion__title channel-detail-page__accordion-title" slot="header">
+                        <ion-skeleton-text class="skeleton__accordion" [animated]="true"></ion-skeleton-text>
+                    </ion-item>
+                </ion-accordion>
+            </ion-accordion-group>
+        </ng-template>
+    </ng-template>
+</ion-content>

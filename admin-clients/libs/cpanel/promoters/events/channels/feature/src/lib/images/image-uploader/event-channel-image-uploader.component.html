@@ -1,0 +1,28 @@
+@let form = $form();
+@let emptyImages = form.hasError('atLeastOneRequired') && form.touched;
+<div class="event-channel-image-uploader flex flex-col gap-1">
+    <form [formGroup]="form" class="flex flex-col gap-2" [class.empty-images]="emptyImages">
+        <div class="grid grid-cols-4 grid-rows-2 gap-4 uploader-grid">
+            @for (uploader of uploaders; track uploader.control) {
+                <div [class]="uploader.class + ($first ? ' main-image' : ' secondary-image')">
+                    <app-image-uploader [formControl]="form?.get(uploader.control)" [imageRestrictions]="sliderImageRestrictions"
+                       [showDeleteSuccessMessage]="false" hideLabelText />
+                </div>
+            }
+        </div>
+        <span class="field-format">
+            {{ 'EVENTS.CHANNEL.SQUARE_IMAGES.FORMAT' | translate:
+                {
+                    width: sliderImageRestrictions.width,
+                    height: sliderImageRestrictions.height
+                }
+            }}
+        </span>
+    </form>
+    @if (emptyImages) {
+        <span class="ob-error-message flex gap-1">
+            <mat-icon class="ob-icon xxsmall">error</mat-icon>
+            {{ 'FORMS.ERRORS.REQUIRED_FIELD' | translate }}
+        </span>
+    }
+</div>

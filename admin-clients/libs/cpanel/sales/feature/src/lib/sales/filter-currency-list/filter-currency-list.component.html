@@ -1,0 +1,28 @@
+<div fxLayout="row" class="filter-block">
+    <div class="ob-label" fxFlex="120px">
+        {{'FORMS.LABELS.CURRENCY' | translate}}
+    </div>
+    <div class="filter-block-input" fxFlex="183px">
+        <mat-form-field appearance="outline" class="ob-form-field status-select">
+            <mat-select [formControl]="formControl" [placeholder]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate"
+                [compareWith]="compareWith" (openedChange)="loadCurrencies($event)">
+                <mat-option>
+                    <app-select-search #currenciesSearch [options$]="currencies$ | currencyFilterItemsFullTranslation$"
+                        [placeholderLabel]="'FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate" searchField="description" />
+                </mat-option>
+                @if (!$isCurrenciesInProgress()) {
+                    @for (currency of currenciesSearch.getFilteredOptions$() | async; track currency?.id) {
+                        <mat-option [value]="currency"
+                                [class.options-loader]="$isCurrenciesInProgress()">
+                            {{currency?.description ?? ('FORMS.SELECT.ALL_ELEMENTS_FEMALE' | translate)}}
+                        </mat-option>
+                    }
+                } @else {
+                    <div fxLayoutAlign="center center">
+                        <mat-progress-spinner mode="indeterminate" diameter="32" />
+                    </div>
+                }
+            </mat-select>
+        </mat-form-field>
+    </div>
+</div>

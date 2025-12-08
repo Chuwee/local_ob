@@ -1,0 +1,352 @@
+<ion-header class="ob-layout__header transaction-detail__header">
+    @if(!$isLoading()){
+        <ion-toolbar>
+            <back-button [breadcrumbs]=" true"
+                viewTitle="{{ 'TRANSACTIONS.TRANSACTION-CODE'| translate: {code: transactionCode} }}" />
+            @if(!$isError()){
+                <div class="transaction-detail__header-info">
+                    <div class="transaction-detail__header-price" (click)="openPriceModal()">
+                        <span>
+                            {{ 'TRANSACTIONS.TRANSACTION-PRICE'| translate:
+                                {amount: this.transaction.price.final | localCurrency: transaction.price.currency} }}
+                        </span>
+                        <ion-icon name="chevron-down-outline" />
+                    </div>
+                </div>
+            }
+            @if(!$isError()){
+                <div class="transaction-detail__header-interactions">
+                    <ion-button class="ob-btn transaction-detail__text-ellipsis secondary transaction-detail__header-btn"
+                        (click)="showAll()">
+                        <ion-icon class="transaction-detail__header-btn-icon" src="./assets/media/icons/eye.svg" />
+                        <ion-label>{{ 'TRANSACTIONS.TRANSACTION-SEE' | translate }}</ion-label>
+                    </ion-button>
+                    <ion-button class="ob-btn transaction-detail__text-ellipsis secondary transaction-detail__header-btn"
+                        (click)="openResendModal()">
+                        <ion-icon class="transaction-detail__header-btn-icon" src="./assets/media/icons/redo.svg" />
+                        <ion-label>{{ 'TRANSACTIONS.TRANSACTION-RESEND' | translate }}</ion-label>
+                    </ion-button>
+                </div>
+            }
+
+        </ion-toolbar>
+    } @else {
+        <ion-toolbar>
+            <back-button [breadcrumbs]=" true"
+                viewTitle="{{ 'TRANSACTIONS.TRANSACTION-CODE'| translate: {code: this.transactionCode} }}" />
+            <div class="transaction-detail__header-info">
+                <ion-skeleton-text class="skeleton__header-info" [animated]="true" />
+                <ion-skeleton-text class="skeleton__header-info" [animated]="true" />
+            </div>
+        </ion-toolbar>
+    }
+
+
+</ion-header>
+
+<ion-content class="ob-layout__content transaction-detail__content">
+    @if($isError()){
+        <static-view [viewContent]="{    title: 'ERROR-TITLE', description: 'ERROR-DESCRIPTION',isError: true}"
+            (tap)="reTry()" />
+    } @else {
+        @if(!$isLoading()){
+            <div>
+                <ion-accordion-group mode="ios" class="ob-accordion-group transaction-detail__accordion-group">
+                    <ion-accordion class="ob-accordion transaction-detail__accordion">
+                        <ion-item id="accordion-transactions" class="ob-accordion__title transaction-detail__accordion-title" slot="header"
+                            (click)="toggleActivatedClass($event)">
+                            <ion-label>{{"TRANSACTIONS.ACCORDION-TRANSACTION" | translate}}</ion-label>
+                        </ion-item>
+                        <div class="ob-accordion__content transaction-detail__accordion-content" slot="content">
+                            <div class="transaction-detail__accordion-text-block">
+                                <span class="transaction-detail__accordion-text--title">
+                                    {{"TRANSACTIONS.ACCORDION-TRANSACTION-TYPE" | translate}}
+                                </span>
+                                <span class="transaction-detail__accordion-text--value">
+                                    {{"TRANSACTIONS.ACCORDION-TRANSACTION-TYPE-" + this.transaction.type | translate }}
+                                </span>
+                            </div>
+                            <div class="transaction-detail__accordion-text-block">
+                                <span class="transaction-detail__accordion-text--title">
+                                    {{"TRANSACTIONS.ACCORDION-TRANSACTION-POINT-OF-SALE" | translate}}
+                                </span>
+                                <span class="transaction-detail__accordion-text--value">{{this.transaction.point_of_sale.name}}</span>
+                            </div>
+                            <div class="transaction-detail__accordion-text-block">
+                                <span class="transaction-detail__accordion-text--title">
+                                    {{"TRANSACTIONS.ACCORDION-TRANSACTION-CODE" | translate}}
+                                </span>
+                                <span class="transaction-detail__accordion-text--value">{{this.transaction.code}}</span>
+                            </div>
+                            <div class="transaction-detail__accordion-text-block">
+                                <span class="transaction-detail__accordion-text--title">
+                                    {{"TRANSACTIONS.ACCORDION-TRANSACTION-ENTITY" | translate}}
+                                </span>
+                                <span class="transaction-detail__accordion-text--value">{{this.transaction.channel.entity.name}}</span>
+                            </div>
+                            <div class="transaction-detail__accordion-text-block">
+                                <span class="transaction-detail__accordion-text--title">
+                                    {{"TRANSACTIONS.ACCORDION-TRANSACTION-TERMINAL" | translate}}
+                                </span>
+                                <span class="transaction-detail__accordion-text--value">{{this.transaction.terminal.name}}</span>
+                            </div>
+                            <div class="transaction-detail__accordion-text-block">
+                                <span class="transaction-detail__accordion-text--title">
+                                    {{"TRANSACTIONS.ACCORDION-TRANSACTION-CHANNEL" | translate}}
+                                </span>
+                                <span class="transaction-detail__accordion-text--value">{{this.transaction.channel.name}}</span>
+                            </div>
+                            <div class="transaction-detail__accordion-text-block">
+                                <span class="transaction-detail__accordion-text--title">
+                                    {{"TRANSACTIONS.ACCORDION-TRANSACTION-USER" | translate}}
+                                </span>
+                                <span class="transaction-detail__accordion-text--value">{{this.transaction.user.name}}</span>
+                            </div>
+                            <div class="transaction-detail__accordion-text-block">
+                                <span class="transaction-detail__accordion-text--title">
+                                    {{"TRANSACTIONS.ACCORDION-TRANSACTION-DATE" | translate}}</span>
+                                <span class="transaction-detail__accordion-text--value">
+                                    {{this.getFormattedDate(this.transaction.date)}}
+                                </span>
+                            </div>
+                        </div>
+                    </ion-accordion>
+                    <ion-accordion class="ob-accordion transaction-detail__accordion">
+                        <ion-item id="accordion-client" class="ob-accordion__title transaction-detail__accordion-title" slot="header"
+                            (click)="toggleActivatedClass($event)">
+                            <ion-label>{{"TRANSACTIONS.ACCORDION-CLIENT" | translate}}</ion-label>
+                        </ion-item>
+                        <div class="ob-accordion__content transaction-detail__accordion-content" slot="content">
+                            <div class="transaction-detail__accordion-text-block">
+                                <span class="transaction-detail__accordion-text--title">
+                                    {{"TRANSACTIONS.ACCORDION-TRANSACTION-TYPE" | translate}}
+                                </span>
+                                <span class="transaction-detail__accordion-text--value">{{this.transaction.client_type}}</span>
+                            </div>
+                            <div class="transaction-detail__accordion-text-block">
+                                <span class="transaction-detail__accordion-text--title">
+                                    {{"TRANSACTIONS.ACCORDION-TRANSACTION-EMAIL" | translate}}
+                                </span>
+                                <span class="transaction-detail__accordion-text--value">{{this.transaction.buyer_data.email}}</span>
+                            </div>
+                            <div class="transaction-detail__accordion-text-block">
+                                <span class="transaction-detail__accordion-text--title">
+                                    {{"TRANSACTIONS.ACCORDION-TRANSACTION-NAME" | translate}}
+                                </span>
+                                <span class="transaction-detail__accordion-text--value">{{this.transaction.buyer_data.name}}</span>
+                            </div>
+                            <div class="transaction-detail__accordion-text-block">
+                                <span class="transaction-detail__accordion-text--title">
+                                    {{"TRANSACTIONS.ACCORDION-TRANSACTION-SURNAME" | translate}}
+                                </span>
+                                <span class="transaction-detail__accordion-text--value">{{this.transaction.buyer_data.surname}}</span>
+                            </div>
+                            <div class="transaction-detail__accordion-text-block">
+                                <span class="transaction-detail__accordion-text--title">
+                                    {{"TRANSACTIONS.ACCORDION-TRANSACTION-PHONE" | translate}}
+                                </span>
+                                <span class="transaction-detail__accordion-text--value">{{this.transaction.buyer_data.phone}}</span>
+                            </div>
+                        </div>
+                    </ion-accordion>
+                    <ion-accordion class="ob-accordion transaction-detail__accordion">
+                        <ion-item id="accordion-tickets-breakdown" class="ob-accordion__title transaction-detail__accordion-title"
+                            slot="header" (click)="toggleActivatedClass($event)">
+                            <ion-label>{{"TRANSACTIONS.ACCORDION-TICKETS-BREAKDOWN" | translate}}</ion-label>
+                        </ion-item>
+                        <div class="ob-accordion__content transaction-detail__accordion-content" slot="content">
+                            <span class="transaction-detail__accordion-text-total">
+                                {{"TRANSACTIONS.ACCORDION-TRANSACTION-TICKET-TOTAL" | translate : {value: this.transaction.tickets_count} }}
+                            </span>
+                            <ion-list class="transaction-detail__accordion-ticket-list">
+                                @for(item of tickets; track $index){
+                                    <ion-item class="transaction-detail__accordion-ticket-list-item">
+                                        <ticket-detail-card class="transaction-detail__accordion-ticket-detail-card" [ticket]="item" />
+                                    </ion-item>
+                                }
+                            </ion-list>
+                        </div>
+                    </ion-accordion>
+                    @if(this.products){
+                        <ion-accordion class="ob-accordion transaction-detail__accordion">
+                            <ion-item id="accordion-tickets-breakdown" class="ob-accordion__title transaction-detail__accordion-title"
+                                slot="header"
+                                (click)="toggleActivatedClass($event)">
+                                <ion-label>{{"TRANSACTIONS.ACCORDION-PRODUCTS-BREAKDOWN" | translate}}</ion-label>
+                            </ion-item>
+                            <div class="ob-accordion__content transaction-detail__accordion-content" slot="content">
+                                <span class="transaction-detail__accordion-text-total">
+                                    {{"TRANSACTIONS.ACCORDION-TRANSACTION-PRODUCTS-TOTAL" | translate :
+                                     {value: this.transaction.products_count} }}
+                                </span>
+                                <ion-list class="transaction-detail__accordion-ticket-list">
+                                    @for(product of products; track $index){
+                                        <ion-item class="transaction-detail__accordion-ticket-list-item">
+                                            <ticket-detail-card class="transaction-detail__accordion-ticket-detail-card"
+                                                [ticket]="product" />
+                                        </ion-item>
+                                    }
+                                </ion-list>
+                            </div>
+                        </ion-accordion>
+                    }
+                    <ion-accordion class="ob-accordion transaction-detail__accordion">
+                        <ion-item id="accordion-cash-movements" class="ob-accordion__title transaction-detail__accordion-title"
+                            slot="header" (click)="toggleActivatedClass($event)">
+                            <ion-label>{{"TRANSACTIONS.ACCORDION-CASH-MOVEMENTS" | translate}}</ion-label>
+                        </ion-item>
+                        <div class="ob-accordion__content transaction-detail__accordion-content transaction-detail__accordion-content--list"
+                            slot="content">
+                            @for(item of getLastTenItemsFromList(transaction.payment_data); track $index){
+                                <div class="transaction-detail__accordion-list-item">
+                                    <div class="transaction-detail__accordion-text-block">
+                                        <span class="transaction-detail__accordion-text--title">
+                                            {{"TRANSACTIONS.ACCORDION-TRANSACTION-DATE" | translate}}
+                                        </span>
+                                        <span class="transaction-detail__accordion-text--value">{{getFormattedDate(item.date)}}</span>
+                                    </div>
+                                    <div class="transaction-detail__accordion-text-block">
+                                        <span class="transaction-detail__accordion-text--title">
+                                            {{"TRANSACTIONS.ACCORDION-TRANSACTION-PAYMENT-METHOD" | translate}}
+                                        </span>
+                                        <span class="transaction-detail__accordion-text--value">
+                                            {{"TRANSACTIONS.ACCORDION-TRANSACTION-PAYMENT-METHOD-" + item.type | translate }}
+                                        </span>
+                                    </div>
+                                    <div class="transaction-detail__accordion-text-block">
+                                        <span class="transaction-detail__accordion-text--title">
+                                            {{"TRANSACTIONS.ACCORDION-TRANSACTION-DESCRIPTION" | translate}}
+                                        </span>
+                                        <span class="transaction-detail__accordion-text--value">
+                                            {{"TRANSACTIONS.ACCORDION-TRANSACTION-DESCRIPTION-REF" | translate: {value: item.reference} }}
+                                        </span>
+                                    </div>
+                                    <div class="transaction-detail__accordion-text-block">
+                                        <span class="transaction-detail__accordion-text--title">
+                                            {{"TRANSACTIONS.ACCORDION-TRANSACTION-IMPORT" | translate}}
+                                        </span>
+                                        <span class="transaction-detail__accordion-text--value">
+                                            {{"TRANSACTIONS.ACCORDION-TRANSACTION-IMPORT-AMOUNT" | translate:
+                                             {value: item.value | localCurrency: transaction.price.currency} }}
+                                        </span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </ion-accordion>
+                </ion-accordion-group>
+            </div>
+        } @else {
+            <ion-accordion-group mode="ios" class="ob-accordion-group transaction-detail__accordion-group">
+                <ion-accordion class="ob-accordion transaction-detail__accordion">
+                    <ion-item class="ob-accordion__title transaction-detail__accordion-title" slot="header">
+                        <ion-skeleton-text class="skeleton__accordion" [animated]="true" />
+                    </ion-item>
+                </ion-accordion>
+            </ion-accordion-group>
+        }
+    }
+</ion-content>
+
+@if(!$isLoading()){
+    <modal [isOpen]="priceModalOpen" (closeModal)="closePriceModal()" [position]="'top'">
+        <div class="transaction-detail__price-modal">
+            <h3 class="transaction-detail__price-title">
+                {{"TRANSACTIONS.MODAL-PRICE-TITLE" | translate}}
+            </h3>
+            <div class="transaction-detail__price-amount">
+                <span> {{"TRANSACTIONS.MODAL-BASE" | translate}}</span>
+                <span>{{transaction.price.base | localCurrency: transaction.price.currency}}</span>
+            </div>
+            @if(channelCharges){
+                <div class="transaction-detail__price-amount">
+                    <span> {{"TRANSACTIONS.MODAL-CHANNEL" | translate}}</span>
+                    <span>{{channelCharges | localCurrency: transaction.price.currency}}</span>
+                </div>
+            }
+            <div class="transaction-detail__price-amount">
+                <span> {{"TRANSACTIONS.MODAL-RECHARGE" | translate}}</span>
+                <span>{{transaction.price.charges.promoter | localCurrency: transaction.price.currency}}</span>
+            </div>
+            @if(transaction.price.delivery){
+                <div class="transaction-detail__price-amount">
+                    <span>{{"TRANSACTIONS.MODAL-DELIVERY" | translate }}</span>
+                    <span>{{transaction.price.delivery | localCurrency: transaction.price.currency}}</span>
+                </div>
+            }
+            @if(transaction.delivery){
+                <div class="transaction-detail__price-amount">
+                    <span>
+                        {{"TRANSACTIONS.MODAL-DELIVERY" | translate }}
+                        {{"TRANSACTIONS.MODAL-DELIVERY-" + transaction.delivery | translate}}
+                    </span>
+                </div>
+            }
+            @if(transaction.price.gateway){
+                <div class="transaction-detail__price-amount">
+                    <span>
+                        {{"TRANSACTIONS.MODAL-GATEWAY" | translate }}
+                        {{transaction.payment_detail.gateway}}
+                    </span>
+                    <span>{{transaction.price.gateway | localCurrency: transaction.price.currency}}</span>
+                </div>
+            }
+            @if(transaction.price.insurance){
+                <div class="transaction-detail__price-amount">
+                    <span>{{"TRANSACTIONS.MODAL-INSURANCE" | translate }}</span>
+                    <span>{{transaction.price.insurance | localCurrency: transaction.price.currency}}</span>
+                </div>
+            }
+            @if(transaction.price.donation){
+                <div class="transaction-detail__price-amount">
+                    <span>{{"TRANSACTIONS.MODAL-DONATION" | translate }}</span>
+                    <span>{{transaction.price.donation | localCurrency: transaction.price.currency}}</span>
+                </div>
+            }
+            <div class="transaction-detail__price-total">
+                <span> {{"TRANSACTIONS.MODAL-PRICE-TITLE" | translate}}</span>
+                <span>{{transaction.price.final | localCurrency:transaction.price.currency}}</span>
+            </div>
+        </div>
+    </modal>
+
+    <modal [isOpen]="resendModalOpen" (closeModal)="closeResendModal()" [position]="'bottom'"
+        [modalTitle]='"TRANSACTIONS.RESEND-TICKETS" | translate'>
+        <div class="resend-modal-content">
+            <form [formGroup]="form" (ngSubmit)="resend()">
+                <ion-item lines="none" class="login-form__input">
+                    <ion-label data-override-styles="" class="ob-input input-label" position="stacked">
+                        {{ "INPUTS.EMAIL" | translate }}
+                    </ion-label>
+                    <ion-input fill="outline" class="ob-input" [ngClass]="{error: this.emailCtrl.hasError('invalidEmail')}"
+                        data-override-styles="" aria-label="Email" [clearInput]="true" legacy="true" type="email"
+                        (keypress)="validateWhitespaces($event)" formControlName="email" />
+                </ion-item>
+                <ion-item lines="none" class="login-form__input">
+                    <ion-label data-override-styles="" class="ob-input input-label" position="stacked">
+                        {{ "INPUTS.SUBJECT" | translate }}
+                    </ion-label>
+                    <ion-input fill="outline" class="ob-input" data-override-styles="" aria-label="Subject"
+                        [clearInput]="true" legacy="true" type="text" (keypress)="validateWhitespaces($event)" formControlName="subject" />
+                </ion-item>
+                <ion-item>
+                    <ion-label data-override-styles class="ob-input input-label" position="stacked">
+                        {{ "INPUTS.BODY" | translate }}
+                    </ion-label>
+                    <ion-textarea fill="outline" class="ob-input" aria-label="body" legacy="true" rows="4" [clearOnEdit]="true"
+                        formControlName="body" />
+                </ion-item>
+                <div class="resend-modal-content__buttons">
+                    <ion-button data-override-styles="" expand="full" class="ob-btn ghost size--medium resend-modal-content__btn"
+                        (click)="closeResendModal()">
+                        {{ "BUTTONS.CANCEL" | translate }}
+                    </ion-button>
+                    <ion-button data-override-styles="" expand="full" class="ob-btn primary size--medium resend-modal-content__btn"
+                        type="submit" [disabled]="!form.valid">
+                        {{ "BUTTONS.RESEND" | translate }}
+                    </ion-button>
+                </div>
+            </form>
+        </div>
+    </modal>
+}

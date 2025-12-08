@@ -1,0 +1,29 @@
+<div class="status-notifications-container flex items-center">
+    <mat-slide-toggle (change)="handleStatusChange($event.checked)" class="ob-slide-toggle" color="primary"
+        [formControl]="config.form.controls.enabled">
+        {{ 'SECONDARY_MARKET.ENABLED'| translate }}
+    </mat-slide-toggle>
+</div>
+<app-form-container (cancel)="cancel()" (save)="save()" layout="menu" [disabled]="!config.form.dirty || (loading$ | async)">
+    <ob-secondary-market-configuration #config [isSeasonTicket]="true" />
+    <mat-accordion [multi]="true" [togglePosition]="'before'">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="*" collapsedHeight="*">
+                <mat-panel-title>{{'SECONDARY_MARKET.PAYOUT_METHODS.TITLE' | translate}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="section-block" [formGroup]="form.controls.additional_settings">
+                <p class="section-description">
+                    <mat-checkbox color="primary" formControlName="pay_to_balance">
+                        {{'SECONDARY_MARKET.PAYOUT_METHODS.PAY_TO_BALANCE' | translate}}
+                    </mat-checkbox>
+                </p>
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+</app-form-container>
+
+@if (loading$ | async) {
+    <div class="spinner-container">
+        <mat-spinner />
+    </div>
+}

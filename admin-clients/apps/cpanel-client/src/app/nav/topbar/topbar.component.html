@@ -1,0 +1,22 @@
+<mat-toolbar class="ob-toolbar">
+    <!-- Adding ID to sidenav toggle button to be able to track it in GTM -->
+    <button id="sidenavToggleButton" mat-icon-button aria-label="Toggle sidenav" class="toolbar-item ob-button large"
+        (click)="sidenavToggle($event)">
+        <mat-icon>menu</mat-icon>
+    </button>
+    <span class="toolbar-title toolbar-item">
+        {{$user()?.entity.name}}
+    </span>
+    @defer (when (isLowEnv)) {
+        @if ($isHandset() === false) {
+            <span class="toolbar-item toolbar-version">
+                <ob-version-management />
+            </span>
+        }
+    }
+    <a mat-icon-button [matTooltip]="'TITLES.KNOWLEDGE_BASE' | translate" aria-label="Knowledge Base"
+        class="toolbar-item ob-button large" [href]="$knowledgeBaseLink()" target="_blank">
+        <mat-icon>help_outline</mat-icon>
+    </a>
+    <app-popover-user class="toolbar-item" />
+</mat-toolbar>
