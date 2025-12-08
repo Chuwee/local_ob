@@ -122,6 +122,8 @@ export class EventChannelDestinationComponent implements OnInit, OnDestroy, Writ
                 // Load provider plan settings
                 if (eventChannel.provider_plan_settings) {
                     this.providerPlanSettingsForm.patchValue(eventChannel.provider_plan_settings);
+                } else {
+                    this.providerPlanSettingsForm.reset();
                 }
             });
     }
@@ -191,6 +193,8 @@ export class EventChannelDestinationComponent implements OnInit, OnDestroy, Writ
                 // Reload provider plan settings
                 if (eventChannel.provider_plan_settings) {
                     this.providerPlanSettingsForm.patchValue(eventChannel.provider_plan_settings);
+                } else {
+                    this.providerPlanSettingsForm.reset();
                 }
                 
                 this.#eventChannelsSrv.loadEventChannelSurcharges(eventChannel.event.id, eventChannel.channel.id);
