@@ -121,10 +121,11 @@ export class EventChannelDestinationComponent implements OnInit, OnDestroy, Writ
                 
                 // Load provider plan settings
                 if (eventChannel.provider_plan_settings) {
-                    this.providerPlanSettingsForm.patchValue(eventChannel.provider_plan_settings);
+                    this.providerPlanSettingsForm.patchValue(eventChannel.provider_plan_settings, { emitEvent: false });
                 } else {
-                    this.providerPlanSettingsForm.reset();
+                    this.providerPlanSettingsForm.reset({}, { emitEvent: false });
                 }
+                this.providerPlanSettingsForm.markAsPristine();
             });
     }
 
@@ -150,7 +151,11 @@ export class EventChannelDestinationComponent implements OnInit, OnDestroy, Writ
                 .pipe(
                     first(),
                     switchMap(eventChannel => {
-                        const providerPlanSettings: ProviderPlanSettings = this.providerPlanSettingsForm.getRawValue();
+                        // Only include provider_plan_settings if the form is dirty
+                        const providerPlanSettings: ProviderPlanSettings | undefined = 
+                            this.providerPlanSettingsForm.dirty 
+                                ? this.providerPlanSettingsForm.getRawValue() 
+                                : eventChannel.provider_plan_settings;
                         
                         return this.#eventChannelsSrv.updateEventChannel(
                             eventChannel.event.id,
@@ -192,10 +197,11 @@ export class EventChannelDestinationComponent implements OnInit, OnDestroy, Writ
                 
                 // Reload provider plan settings
                 if (eventChannel.provider_plan_settings) {
-                    this.providerPlanSettingsForm.patchValue(eventChannel.provider_plan_settings);
+                    this.providerPlanSettingsForm.patchValue(eventChannel.provider_plan_settings, { emitEvent: false });
                 } else {
-                    this.providerPlanSettingsForm.reset();
+                    this.providerPlanSettingsForm.reset({}, { emitEvent: false });
                 }
+                this.providerPlanSettingsForm.markAsPristine();
                 
                 this.#eventChannelsSrv.loadEventChannelSurcharges(eventChannel.event.id, eventChannel.channel.id);
             });
