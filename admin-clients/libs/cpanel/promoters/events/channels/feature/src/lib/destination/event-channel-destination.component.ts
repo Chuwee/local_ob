@@ -57,6 +57,9 @@ export class EventChannelDestinationComponent implements OnInit, OnDestroy, Writ
         .pipe(filter(Boolean), map(event => event.channel)));
 
     readonly $event = toSignal(this.#eventsSrv.event.get$());
+    
+    readonly $channelsList = toSignal(this.#eventChannelsSrv.eventChannelsList.getData$()
+        .pipe(map(channels => channels || [])));
 
     readonly $isInProgress = toSignal(booleanOrMerge([
         this.#eventChannelsSrv.eventChannel.inProgress$(),
