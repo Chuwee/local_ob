@@ -20,7 +20,7 @@ import {
     ViewChildren
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Observable, Subject, switchMap, throwError } from 'rxjs';
@@ -34,6 +34,7 @@ import { filter, first, map, takeUntil, tap } from 'rxjs/operators';
         TranslatePipe,
         CommonModule,
         ArchivedEventMgrComponent,
+        ReactiveFormsModule,
     ],
     selector: 'app-event-channel-destination',
     templateUrl: './event-channel-destination.component.html',
