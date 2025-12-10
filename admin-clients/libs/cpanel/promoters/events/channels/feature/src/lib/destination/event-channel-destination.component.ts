@@ -58,9 +58,6 @@ export class EventChannelDestinationComponent implements OnInit, OnDestroy, Writ
         .pipe(filter(Boolean), map(event => event.channel)));
 
     readonly $event = toSignal(this.#eventsSrv.event.get$());
-    
-    readonly $channelsList = toSignal(this.#eventChannelsSrv.eventChannelsList.getData$()
-        .pipe(map(channels => channels || [])));
 
     readonly $isInProgress = toSignal(booleanOrMerge([
         this.#eventChannelsSrv.eventChannel.inProgress$(),
@@ -77,28 +74,17 @@ export class EventChannelDestinationComponent implements OnInit, OnDestroy, Writ
         round_prices_up: [false],
         sync_session_labels: [false],
         sync_session_pics: [false],
-        sync_session_key_dates: [false],
         sync_session_type_ordering: [false],
         sync_hidden_status: [false],
         sync_session_type_details: [false],
-        sync_billing_terms: [false],
-        sync_allowed_num_tickets: [false],
-        sync_instructions: [false],
 
         // Cancellation
-        enforce_cancellation: [false],
         price_modifier: [0],
-        session_price_comes_with_taxes: [false],
 
-        // Real-Time & Availability
-        enable_real_time: [false],
-        sync_available_tickets: [false],
-        sync_sold_out_status: [false],
-
-        // Session Types
-        sync_session_type: [false],
-        use_real_time_api: [false],
-        channels_to_autopublish_session_types: [[] as number[]]
+        // Main Plan
+        sync_main_plan_title: [false],
+        sync_main_plan_description: [false],
+        sync_main_plan_images: [false]
     });
 
     readonly form = this.#fb.nonNullable.group({
