@@ -1,3 +1,5 @@
+import { ProviderPlanSettings } from './provider-plan-settings.model';
+
 export enum HttpProtocol {
     http = 'HTTP',
     https = 'HTTPS'
@@ -23,8 +25,6 @@ export enum CapacityNameType {
     shortName = 'SHORT_NAME',
     fullName = 'FULL_NAME'
 }
-
-import { ProviderPlanSettings } from './provider-plan-settings.model';
 
 export interface ExternalEntityConfiguration {
     club_code: string;
