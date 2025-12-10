@@ -78,9 +78,6 @@ export class EventChannelDestinationComponent implements OnInit, OnDestroy, Writ
         sync_hidden_status: [false],
         sync_session_type_details: [false],
 
-        // Cancellation
-        price_modifier: [0],
-
         // Main Plan
         sync_main_plan_title: [false],
         sync_main_plan_description: [false],

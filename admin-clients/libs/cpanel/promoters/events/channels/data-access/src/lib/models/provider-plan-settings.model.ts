@@ -10,9 +10,6 @@ export interface ProviderPlanSettings {
     sync_hidden_status: boolean;
     sync_session_type_details: boolean;
 
-    // Cancellation
-    price_modifier: number;
-
     // Main Plan
     sync_main_plan_title: boolean;
     sync_main_plan_description: boolean;
