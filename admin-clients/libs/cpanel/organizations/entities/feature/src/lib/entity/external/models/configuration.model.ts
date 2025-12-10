@@ -24,11 +24,14 @@ export enum CapacityNameType {
     fullName = 'FULL_NAME'
 }
 
+import { ProviderPlanSettings } from './provider-plan-settings.model';
+
 export interface ExternalEntityConfiguration {
     club_code: string;
     entity_id: number;
     avet_ws_environment?: Environment;
     avet_connection_type: 'SOCKET' | 'WEBSERVICES' | 'APIM';
+    provider_plan_settings?: ProviderPlanSettings;
     ticketing?: {
         connection?: {
             name?: string;

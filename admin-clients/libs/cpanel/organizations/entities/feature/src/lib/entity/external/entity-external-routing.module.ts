@@ -5,6 +5,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { EntityExternalComponent } from './container/entity-external-component.component';
 import { EntityExternalMembersComponent } from './members/members.component';
+import { ProviderPlanSettingsComponent } from './provider-plan-settings/provider-plan-settings.component';
 import { SGAComponent } from './sga/sga.component';
 import { SmartBookingComponent } from './smart-booking/smart-booking.component';
 import { EntityExternalTicketingComponent } from './ticketing/ticketing.component';
@@ -63,6 +64,17 @@ const routes: Routes = [{
             pathMatch: 'full',
             data: {
                 breadcrumb: 'ENTITY.EXTERNAL.SGA.TITLE',
+                roles: [UserRoles.OPR_MGR]
+            }
+        },
+        {
+            path: 'provider-plan-settings',
+            component: ProviderPlanSettingsComponent,
+            canDeactivate: [unsavedChangesGuard()],
+            canActivate: [roleGuard],
+            pathMatch: 'full',
+            data: {
+                breadcrumb: 'ENTITY.EXTERNAL.PROVIDER_PLAN_SETTINGS.TITLE',
                 roles: [UserRoles.OPR_MGR]
             }
         }
