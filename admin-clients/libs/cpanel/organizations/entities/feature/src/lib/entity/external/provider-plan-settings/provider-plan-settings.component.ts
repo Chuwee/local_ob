@@ -56,7 +56,7 @@ export class ProviderPlanSettingsComponent implements OnInit {
 
     get entityIdPath(): number | undefined {
         const allRouteParams = Object.assign({}, ...this.#activatedRoute.snapshot.pathFromRoot.map(path => path.params));
-        return parseInt(allRouteParams.entityId);
+        return parseInt(allRouteParams.entityId, 10);
     }
 
     save(): void {
