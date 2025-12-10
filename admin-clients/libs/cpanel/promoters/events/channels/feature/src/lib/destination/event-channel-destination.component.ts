@@ -69,13 +69,10 @@ export class EventChannelDestinationComponent implements OnInit, OnDestroy, Writ
     readonly providerPlanSettingsForm = this.#fb.nonNullable.group({
         // General Sync Settings
         sync_sessions_as_hidden: [false],
-        sync_prices: [false],
         sync_surcharges: [false],
-        round_prices_up: [false],
         sync_session_labels: [false],
         sync_session_pics: [false],
         sync_session_type_ordering: [false],
-        sync_hidden_status: [false],
         sync_session_type_details: [false],
 
         // Main Plan
