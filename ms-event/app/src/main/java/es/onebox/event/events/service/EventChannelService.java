@@ -424,7 +424,9 @@ public class EventChannelService {
             updateSecondaryMarketEnabled(eventId, channelId, record, updateData.getSettings(), channelEntityRecord);
             
             // Send notification to MS-NOTIFICATION for provider_plan_settings updates
-            // This includes both setting new values and clearing (null) the settings
+            // Note: This is sent on every update to keep MS-NOTIFICATION in sync with the database,
+            // as the converter unconditionally updates the provider_plan_settings field.
+            // This includes both setting new values and clearing (null) the settings.
             providerPlanSettingsNotificationService.sendProviderPlanSettingsNotification(
                 eventId, 
                 channelId, 
