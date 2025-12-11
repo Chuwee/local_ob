@@ -1,0 +1,68 @@
+delete:
+  x-internal: true
+  summary: Delete venue template image
+  description: Delete a venue template image
+  security:
+    - OAuth2: [ 'ROLE_REC_MGR', 'ROLE_EVN_MGR', 'ROLE_OPR_MGR', 'ROLE_REC_EDI' ]
+  tags:
+    - Template Images
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: venueTemplateId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Venue Template ID
+    - in: path
+      name: imageId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Venue Template Image ID
+  responses:
+    '204':
+      description: Deleted successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: invalid token
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '412':
+      description: precondition failed
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

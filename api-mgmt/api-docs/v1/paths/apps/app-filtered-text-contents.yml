@@ -1,0 +1,71 @@
+get:
+  x-internal: true
+  summary: Get channel filtered text contents
+  description: 'Obtain a list of filtered key/value pair for channel literals by selected key'
+  security:
+    - OAuth2: ['ROLE_SYS_MGR', 'ROLE_SYS_ANS']
+  tags:
+    - Application Contents
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: name
+      schema:
+        type: string
+        format: int64
+      required: true
+      description: Application name
+    - in: path
+      name: languageId
+      schema:
+        type: string
+      required: true
+      description: Language ID
+    - in: path
+      name: key
+      schema:
+        type: string
+      required: true
+      description: Key value used to filter
+  responses:
+    '200':
+      description: 'Array of filtered key/value pair'
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/channels/channel-text-contents.yml      
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

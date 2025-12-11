@@ -1,0 +1,185 @@
+get:
+  x-internal: true
+  summary: Get channel FAQs item by key
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - FAQs
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: path
+      name: key
+      schema:
+        type: string
+      required: true
+      description: FAQ identifier
+  responses:
+    '200':
+      description: 'Successful response'
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/channels/channel-faq.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  x-internal: true
+  summary: Update an item FAQ
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - FAQs
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Channel ID
+    - in: path
+      name: key
+      schema:
+        type: string
+      required: true
+      description: FAQ identifier
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/channels/channel-faq-upsert-request.yml
+  responses:
+    '204':
+      description: Content updated
+    '400':
+      description: bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '401':
+      description: Invalid token
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error-auth.yml'
+    '403':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+
+delete:
+  x-internal: true
+  summary: Delete an item FAQ
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - FAQs
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Channel ID
+    - in: path
+      name: key
+      schema:
+        type: string
+      required: true
+      description: FAQ identifier
+  responses:
+    '204':
+      description: Content deleted
+    '400':
+      description: bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '401':
+      description: invalid token
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error-auth.yml'
+    '403':
+      description: unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'

@@ -1,0 +1,68 @@
+get:
+  x-internal: true
+  summary: Get venue template sector not numbered zones
+  description: Get items for tag 'not numbered zone' of venue template sector
+  security:
+    - OAuth2: ['ROLE_REC_MGR', 'ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS', 'ROLE_REC_EDI']
+  tags:
+    - Template Sectors
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: venueTemplateId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Venue Template ID
+    - in: path
+      name: sectorId
+      schema:
+       type: integer
+       format: int64
+      required: true
+      description: sector ID
+  responses:
+    '200':
+      description: Array of not numbered zones
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../../models/venue-template/not-numbered-zone.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

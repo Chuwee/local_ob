@@ -1,0 +1,111 @@
+post:
+   summary: Export a voucher list
+   x-internal: true
+   description: ''
+   security:
+     - OAuth2: ['ROLE_CNL_MGR', 'ROLE_ENT_ANS', 'ROLE_ENT_MGR', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+   tags:
+   - Vouchers
+   parameters:
+     - in: header
+       name: Authorization
+       description: Bearer Token
+       schema:
+         type: string
+       required: true
+     - in: path
+       name: voucherGroupId
+       schema:
+         type: integer
+         format: int64
+       required: true
+       description: Voucher Group ID
+   requestBody:
+      content:
+         application/json:
+            schema:
+               type: object
+               required:
+               - fields
+               - format
+               properties:
+                  fields:
+                     type: array
+                     items:
+                        type: object
+                        required:
+                        - field
+                        properties:
+                           field:
+                              type: string
+                              enum:
+                              - code
+                              - status
+                              - pin
+                              - email
+                              - balance
+                              - expiration
+                              - usages.used
+                              - usages.limit
+                              - consolidated_balance
+                           name:
+                              type: string
+                              description: Custom header name
+                  format:
+                     type: string
+                     enum:
+                     - CSV
+                  delivery:
+                     type: object
+                     properties:
+                        type:
+                           type: string
+                           enum:
+                           - EMAIL
+                        properties:
+                          description: |
+                            Fields required by the delivery type.
+
+                            Valid properties to **EMAIL** type:
+                              - address: Email where report will be sent. Optional. Authenticated username will be used if address is not informed.
+                          type: object
+                          additionalProperties: { }
+                          example:
+                            address: 'user@email.com'
+                  translations:
+                    type: array
+                    items:
+                      $ref: ../../models/exports/translation.yml
+   responses:
+    '202':
+      $ref: ../../models/exports/export-response.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

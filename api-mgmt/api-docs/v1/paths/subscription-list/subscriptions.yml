@@ -1,0 +1,142 @@
+get:
+  summary: Get subscription lists
+  description: Obtain all the subscription lists of an entity
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS', 'ROLE_CNL_MGR', 'ROLE_CNL_SAC', 'ROLE_OPR_CALL', 'ROLE_CRM_MGR', 'ROLE_CRM_DLIST']
+  tags:
+    - Entity subscription lists
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: entity_id
+      description: The entity Id to search the lists from
+      schema:
+        type: integer
+    - in: query
+      name: status
+      description: The subscription is active or inactive
+      schema:
+        $ref: ../../models/subscription-list/subscription-list-status.yml
+    - in: query
+      name: q
+      description: Free search for subscriptions by name
+      schema:
+        type: string
+    - in: query
+      name: entity_admin_id
+      description: The entity admin id
+      x-internal: true
+      schema:
+        type: integer
+  responses:
+    '200':
+      description: A list of subscription lists
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../../models/subscription-list/subscription.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  x-internal: true
+  summary: New subscription lists
+  description: Entity subscription lists
+  security:
+    - OAuth2: ['ROLE_ENT_MGR', 'ROLE_OPR_MGR', 'ROLE_EVN_MGR', 'ROLE_CNL_MGR', 'ROLE_CRM_MGR', 'ROLE_CRM_DLIST']
+  tags:
+    - Entity subscription lists
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - name
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            entity_id:
+              type: integer
+              description: If you are ``ROLE_OPR_MGR``, the entity id is mandatory
+  responses:
+    '201':
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+    '400':
+      description: bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '401':
+      description: invalid token
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error-auth.yml'
+    '403':
+      description: unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'

@@ -1,0 +1,67 @@
+get:
+  x-internal: true
+  summary: Get avet competitions for a given venue template
+  security:
+    - OAuth2: ['ROLE_REC_MGR', 'ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_ENT_MGR', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Templates
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: venueTemplateId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Venue Template ID
+    - in: query
+      name: event_entity_id
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Event Entity Id
+    - in: query
+      name: skip_used
+      schema:
+        type: boolean
+      required: false
+      description: Filter out used competitions flag
+  responses:
+    '200':
+      description: Array of avet competitions for a given venue template
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../../models/venue-template/venue-template-avet-competition.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

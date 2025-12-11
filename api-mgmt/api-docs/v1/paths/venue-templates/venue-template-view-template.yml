@@ -1,0 +1,69 @@
+put:
+  x-internal: true
+  summary: Update venue template view template
+  description: Update venue template view template
+  security:
+    - OAuth2: ['ROLE_REC_MGR', 'ROLE_EVN_MGR', 'ROLE_OPR_MGR', 'ROLE_REC_EDI']
+  tags:
+    - Template Views
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: venueTemplateId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Venue Template ID
+    - in: path
+      name: viewId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: View ID
+  requestBody:
+    content:
+      text/plain:
+        schema:
+          type: string
+          description: New SVG template of this view in standard format (no Onebox custom tags). Length limit is 2 million characters.
+          example: <svg contentScriptType="text/ecmascript" xmlns:svg="http://www.w3.org/2000/svg (...)> <circle transform="matrix(1,0,0,1,83,37)" class="interactive" id="186131159" cy="240"/> (...)
+  responses:
+    '204':
+      description: Saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: invalid token
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

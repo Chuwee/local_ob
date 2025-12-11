@@ -1,0 +1,48 @@
+additionalProperties: false
+type: object
+properties:
+  print_refund_price_in_ticket:
+    type: boolean
+    description: wherher the refund price or the total price is shown in each individual ticket when printing multiple tickets
+  refunded_seat_status:
+    $ref: ./session-refund-conditions-ticket-status.yml
+    description: status that a refunded seat will addopt
+  refunded_seat_block_reason_id:
+    type: number
+    format: int64
+    description: the blocking reason that a refunded seat will addopt (only if refunded_seat_block_status is set to blocking)
+  refunded_seat_quota:
+    description: the quota that a refunded seat will belong to
+    type: object
+    properties:
+      enabled:
+        type: boolean
+      id:
+        type: number
+        format: int64
+  session_pack_automatically_calculate_conditions:
+    type: boolean
+    description: whether the refund percentage is calculated automatically or manually
+  session_pack_refund_conditions:
+    type: array
+    items:
+      type: object
+      properties:
+        session_id:
+          type: number
+          format: int64
+        price_percentage_values:
+          type: array
+          items:
+            type: object
+            properties:
+              price_type_id:
+                type: number
+                format: int64
+              rate_id:
+                type: number
+                format: int64
+              value:
+                type: number
+                format: double
+

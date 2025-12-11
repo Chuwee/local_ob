@@ -1,0 +1,64 @@
+get:
+  x-internal: true
+  summary: Get sale request ticket Printer text contents
+  description: 'Retrieves a list of sale request ticket Printer texts'
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Catalog Sale Requests
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: saleRequestId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Sale Request ID
+    - in: query
+      name: language
+      schema:
+        type: string
+      description: IETF language tag standard
+  responses:
+    '200':
+      description: 'Successfully retrieves the texts'
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/channels/catalog-sale-requests/ticket-contents/texts/ticket-text-contents.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error.yml

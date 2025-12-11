@@ -1,0 +1,78 @@
+delete:
+  summary: Delete price type ticket passbook images contents
+  description: ''
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Price type contents
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: venueTemplateId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Venue Template ID
+    - in: path
+      name: priceTypeId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Price Type ID
+    - in: path
+      name: language
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: type
+      schema:
+        $ref: ../../models/comm-element/ticket-contents-passbook-image-type.yml
+      required: true
+  responses:
+    '204':
+      description: Deleted successfully
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

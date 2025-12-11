@@ -1,0 +1,192 @@
+get:
+  x-internal: true
+  summary: Get producer
+  description: Get producer by id
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Producers
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: producerId
+      schema:
+        type: integer
+      required: true
+      description: Producer ID
+  responses:
+    '200':
+      description: Get info of producer
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/entities/producer.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  x-internal: true
+  summary: Update producer
+  description: Update producer of id
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Producers
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: producerId
+      schema:
+        type: integer
+      required: true
+      description: Producer ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            nif:
+              type: string
+            social_reason:
+              type: string
+            status:
+              $ref: '../../models/entities/producer-status.yml'
+              description: Only editable for not default producer for entity
+            default:
+              type: boolean
+              description: Only activable for not active not default producers
+            use_simplified_invoice:
+              type: boolean
+              description: wheter the producer uses simplified functionality or not
+            contact:
+              $ref: '../../models/entities/producer-contact.yml'
+  responses:
+    '204':
+      description: Producer updated successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+delete:
+  x-internal: true
+  summary: Delete producer
+  description: Delete producer by id
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Producers
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: producerId
+      schema:
+        type: integer
+      required: true
+      description: Producer ID
+  responses:
+    '204':
+      description: Producer deleted successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+

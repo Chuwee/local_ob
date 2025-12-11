@@ -1,0 +1,104 @@
+get:
+  x-internal: true
+  summary: Get Onebox Invoice entities configuration
+  description: Get Onebox Invoice entities configuration
+  security:
+    - OAuth2: ['ROLE_SYS_MGR', 'ROLE_SYS_ANS']
+  tags:
+    - Onebox Invoicing
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: q
+      description: Search by entity name
+      schema:
+        type: string
+    - in: query
+      name: type
+      description: Filter by operator type
+      schema:
+        type: string
+        enum:
+          - UNDEFINED
+          - CHANNEL
+          - EVENT
+    - in: query
+      name: sort
+      schema:
+        type: string
+        enum:
+          - name
+  responses:
+    '200':
+      description: Get list of the configuration of the invoicing of entities
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                entity:
+                  type: object
+                  required:
+                    - id
+                    - name
+                  properties:
+                    id:
+                      type: number
+                    name:
+                      type: string
+                fixed:
+                  type: number
+                variable:
+                  type: number
+                min:
+                  type: number
+                max:
+                  type: number
+                invitation:
+                  type: number
+                refund:
+                  type: number
+                type:
+                  type: string
+                  enum:
+                    - UNDEFINED
+                    - CHANNEL
+                    - EVENT
+
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

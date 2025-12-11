@@ -1,0 +1,309 @@
+get:
+  summary: 'Search template elements info'
+  description: 'Get a list of ```views``` or ```not numbered zone```or both if the venue template is ```DEFAULT```or
+   ```AVET``` type, or return a list of ```price types``` if the venue template is ```ACTIVITY``` with
+   the element info associated to each item of the list.'
+  security:
+    - OAuth2: ['ROLE_REC_MGR', 'ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Template Elements Info
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: venueTemplateId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Venue Template ID
+    - in: query
+      name: offset
+      schema:
+       type: integer
+      description: Offset (default 0)
+    - in: query
+      name: limit
+      schema:
+       type: integer
+      description: Limit (default 50)
+    - in: query
+      name: type
+      schema:
+       type: string
+       enum:
+         - NNZ
+         - VIEW
+         - PRICE_TYPE
+       description: Type of items of template to filter
+    - in: query
+      name: q
+      schema:
+        type: string
+      description: Free search by name of ```[view, nnz, priceType]``` or tags
+  responses:
+    '200':
+      description: Search response
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/venue-template/elements-info/elements-info-search-response.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+
+post:
+  summary: 'Create a new template element info'
+  description: 'Create a new template info with template ID, type and ID.'
+  security:
+    - OAuth2: ['ROLE_REC_MGR', 'ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Template Elements Info
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: venueTemplateId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: 'Venue Template ID'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../../models/venue-template/elements-info/template-info-create-dto.yml'
+  responses:
+    '201':
+      description: Created
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+
+put:
+  summary: 'Bulk edit of template elements info'
+  description: 'Do a bulk edit of template elements info'
+  security:
+    - OAuth2: ['ROLE_REC_MGR', 'ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Template Elements Info
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: venueTemplateId
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: query
+      name: type
+      schema:
+        type: string
+        enum:
+          - NNZ
+          - VIEW
+          - PRICE_TYPE
+        description: 'Type of template element info. Works only with ```update_all_elements_info``` body request property.'
+    - in: query
+      name: q
+      schema:
+        type: string
+      description: 'Free search by name of ```[view, nnz, priceType]``` or tags. Works only with ```update_all_elements_info``` body request property.'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../../models/venue-template/elements-info/template-element-info-bulk-request.yml'
+  responses:
+    '204':
+      description: No content
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+
+delete:
+  summary: Delete all or selected template element info
+  description: delete all or selected a template info
+  security:
+    - OAuth2: ['ROLE_REC_MGR', 'ROLE_EVN_MGR',  'ROLE_OPR_MGR']
+  tags:
+    - Template Elements Info
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: venueTemplateId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Venue Template ID
+    - in: query
+      name: type
+      schema:
+       type: string
+       enum:
+         - NNZ
+         - VIEW
+         - PRICE_TYPE
+       description: 'Type of template element info. Works only with ```all_elements``` param.'
+    - in: query
+      name: q
+      schema:
+       type: string
+      description: 'Free search by name of ```[view, nnz, priceType]``` or tags. Works only with ```all_elements``` param.'
+    - in: query
+      name: all_elements
+      schema:
+        type: boolean
+      required: false
+      description: 'Delete all template elements info.'
+    - in: query
+      name: elements
+      schema:
+        type: array
+        items:
+          type: string
+      required: false
+      example: 'priceType_1234,priceType_5432'
+      description: 'Delete by selected template elements info. List of template info key: ```{type}_{id}```. ```type``` must be one of ```[view, nnz, priceType]``` and ```id``` must be ID of ```type``` in data base. Example: ```priceType_123```'
+  responses:
+    '204':
+      description: No content
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml

@@ -1,0 +1,220 @@
+post:
+  summary: Export a renewals list
+  x-internal: true
+  description: 'List of renewals matching the selected filters'
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Season Ticket Renewals
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+      description: SeasonTicket id
+      required: true
+    - in: query
+      name: mapping_status
+      description: The status of the mapping between seats
+      schema:
+        type: string
+        enum:
+          - NOT_MAPPED
+          - MAPPED
+    - in: query
+      name: renewal_status
+      description: The status of the renewal
+      schema:
+        type: string
+        enum:
+          - NOT_RENEWED
+          - RENEWED
+          - REFUNDED
+          - CANCELED
+    - in: query
+      name: q
+      description: Free search for renewals by name, surname, email and member id
+      schema:
+        type: string
+    - in: query
+      name: sort
+      description: Sorting of enum fields with format field:[asc|desc]. For example 'name:desc'
+      schema:
+        type: string
+        enum:
+          - mapping_status
+          - name
+          - surname
+          - birthday
+    - in: query
+      name: limit
+      schema:
+        type: integer
+      description: Limit (default 50, max 1000)
+    - in: query
+      name: entity_id
+      schema:
+        type: integer
+      description: Entity Id
+    - in: query
+      name: offset
+      schema:
+        type: integer
+      description: Offset (default 0)
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - fields
+            - format
+          properties:
+            fields:
+              type: array
+              items:
+                type: object
+                required:
+                  - field
+                  - delivery
+                properties:
+                  field:
+                    type: string
+                    enum:
+                      - id
+                      - user_id
+                      - member_id
+                      - product_client_id
+                      - email
+                      - name
+                      - surname
+                      - birthday
+                      - phone_number
+                      - season_ticket_id
+                      - season_ticket_name
+                      - postal_code
+                      - gender
+                      - language
+                      - country
+                      - country_subdivision
+                      - city
+                      - id_card
+                      - sign_up_date
+                      - address
+                      - entity_id
+                      - historic_seat.seat_type
+                      - historic_seat.not_numbered_zone_id
+                      - historic_seat.sector_id
+                      - historic_seat.row_id
+                      - historic_seat.seat_id
+                      - historic_seat.sector
+                      - historic_seat.row
+                      - historic_seat.seat
+                      - historic_seat.price_zone
+                      - historic_seat.not_numbered_zone
+                      - historic_rate
+                      - historic_rate_id
+                      - actual_seat.seat_type
+                      - actual_seat.not_numbered_zone_id
+                      - actual_seat.sector_id
+                      - actual_seat.row_id
+                      - actual_seat.seat_id
+                      - actual_seat.sector
+                      - actual_seat.row
+                      - actual_seat.seat
+                      - actual_seat.price_zone
+                      - actual_seat.not_numbered_zone
+                      - actual_rate
+                      - actual_rate_id
+                      - mapping_status
+                      - renewal_status
+                      - renewal_settings.enable
+                      - renewal_settings.start_date
+                      - renewal_settings.end_date
+                      - renewal_settings.in_process
+                      - balance
+                  name:
+                    type: string
+            format:
+              type: string
+              enum:
+                - JSON
+                - CSV
+            delivery:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - EMAIL
+                properties:
+                  description: |
+                    Fields required by the delivery type.
+
+                    Valid properties to **EMAIL** type:
+                      - address: Email where report will send. Optional. Authenticated username will be used if address is not informed.
+                  type: object
+                  additionalProperties: {}
+                  example:
+                    address: 'user@email.com'
+            translations:
+              type: array
+              items:
+                $ref: ../../models/exports/translation.yml
+            settings:
+              type: object
+              properties:
+                charset_encoding:
+                  type: string
+                  enum:
+                    - UTF_8
+                    - UTF_8_BOM
+                csv_separator_format:
+                  type: string
+                  enum:
+                    - COMMA
+                    - SEMICOLON
+                csv_fraction_digits_format:
+                  type: string
+                  enum:
+                    - POINT
+                    - COMMA
+  responses:
+    '202':
+      $ref: ../../models/exports/export-response.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

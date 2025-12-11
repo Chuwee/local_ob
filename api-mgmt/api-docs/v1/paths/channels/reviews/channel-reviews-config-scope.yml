@@ -1,0 +1,72 @@
+put:
+  x-internal: true
+  summary: Upsert bulk channel reviews config
+  description: Upsert bulk channel reviews config
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Channel Reviews
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+      required: true
+      description: Channel ID
+    - in: path
+      name: scope
+      schema:
+        type: string
+      required: true
+      description: Type scope
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../../models/channels/reviews/channel-reviews-scope-update.yml
+  responses:
+    '204':
+      description: Saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml

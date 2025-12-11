@@ -1,0 +1,143 @@
+get:
+  x-internal: true
+  summary: Get sale request ticket Printer image contents
+  description: 'Retrieves a list of sale request ticket Printer images'
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Catalog Sale Requests
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: saleRequestId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Sale Request ID
+    - in: query
+      name: language
+      schema:
+        type: string
+      description: IETF language tag standard
+  responses:
+    '200':
+      description: 'successfully retrieves the images'
+      content:
+        application/json:
+          schema:
+            $ref: '../../../../../models/channels/catalog-sale-requests/ticket-contents/images/ticket-image-contents.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error.yml
+    '405':
+      description: unsupported operation for this kind of channel
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error.yml
+    '412':
+      description: Precondition failed
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error.yml
+post:
+  x-internal: true
+  summary: Create or update PRINTER ticket images for sale request
+  description: ''
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Catalog Sale Requests
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: saleRequestId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Sale request ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../../../../models/channels/catalog-sale-requests/ticket-contents/images/ticket-printer-image-contents-update.yml'
+  responses:
+    '204':
+      description: Sale request PRINTER ticket images updated successfuly.
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error.yml
+    '412':
+      description: Precondition failed
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error.yml

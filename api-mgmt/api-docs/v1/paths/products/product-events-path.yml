@@ -1,0 +1,151 @@
+get:
+  x-internal: true
+  summary: Get Product events by product ID
+  description: Get product events by product id
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Products
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: productId
+      schema:
+        type: integer
+      required: true
+      description: Product ID
+    - in: query
+      name: event_status
+      description: Response will contain only the event status specified
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../models/event/event-status.yml
+      required: false
+    - in: query
+      name: product_event_status
+      description: Filter by product status relative to the event
+      schema:
+        type: string
+        enum:
+          - DELETED
+          - ACTIVE
+          - INACTIVE
+      required: false
+    - in: query
+      name: start_date
+      description: Event start date
+      schema:
+        type: string
+        format: date-time
+      required: false
+  responses:
+    '200':
+      description: Get list of product events
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/products/product-events.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  x-internal: true
+  summary: Add product events
+  description: Add product events
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Products
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: productId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Product ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/products/add-product-events.yml
+  responses:
+    '200':
+      description: List of product events added
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/products/product-events.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+

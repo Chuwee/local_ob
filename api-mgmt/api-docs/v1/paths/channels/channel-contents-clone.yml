@@ -1,0 +1,60 @@
+post:
+  x-internal: true
+  summary: Clone all the channel contents
+  description: 'Clone all the channel contents'
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Channel Contents
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Channel ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+           $ref: ../../models/channels/channel-contents-clone.yml
+  responses:
+    '201':
+      description: Contents cloned
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/channels/channel-contents-clone-errors.yml
+    '400':
+      description: bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '401':
+      description: invalid token
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error-auth.yml'
+    '403':
+      description: unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'

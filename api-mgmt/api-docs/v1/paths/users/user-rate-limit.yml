@@ -1,0 +1,161 @@
+get:
+  summary: Search User Rate Limit
+  security:
+    - OAuth2: [ 'ROLE_SYS_ANS', 'ROLE_SYS_MGR' ]
+  tags:
+    - Users
+  operationId: get
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: userId
+      description: User Id
+      schema:
+        type: integer
+      required: true
+  responses:
+    '200':
+      description: User Rate Limit Found
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            properties:
+              unlimited:
+                type: boolean
+              rules:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    pattern:
+                      type: string
+                    quotas:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          time_unit:
+                            type: string
+                          period:
+                            type: integer
+                          limit:
+                            type: integer
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  summary: Upsert User Rate Limit
+  security:
+    - OAuth2: ['ROLE_SYS_MGR']
+  tags:
+    - Users
+  operationId: upsert
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: userId
+      schema:
+        type: integer
+      required: true
+      description: User Id
+  requestBody:
+    description: Body
+    content:
+      application/json:
+        schema:
+          additionalProperties: false
+          type: object
+          properties:
+            unlimited:
+              type: boolean
+            rules:
+              type: array
+              items:
+                type: object
+                properties:
+                  pattern:
+                    type: string
+                  quotas:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        time_unit:
+                          type: string
+                        period:
+                          type: integer
+                        limit:
+                          type: integer
+  responses:
+    '202':
+      description: User Rate Limit Upsert
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

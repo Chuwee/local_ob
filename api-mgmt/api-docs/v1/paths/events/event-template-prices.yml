@@ -1,0 +1,181 @@
+get:
+  summary: Get event venue template prices
+  description: ''
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Prices
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: path
+      name: templateId
+      schema:
+        type: integer
+      required: true
+      description: Event venue template ID
+    - in: query
+      name: session_id
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+      required: false
+      description: List of Session IDs
+    - in: query
+      name: rate_group_id
+      schema:
+        type: array
+        items:
+          type: integer
+      required: false
+      description: List of rate group IDs. Only for AVET or SGA events.
+    - in: query
+      name: rate_group_product_id
+      schema:
+        type: array
+        items:
+          type: integer
+      required: false
+      description: List of rate group IDs (products). Only SGA events.
+
+  responses:
+    '200':
+      description: 'Array of event venue template prices'
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/event/event-template-prices.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  summary: Update event venue template prices
+  description: To update event prices. Event must be in status IN_PROGRAMMING
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Prices
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: path
+      name: templateId
+      schema:
+        type: integer
+      required: true
+      description: Event venue template ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            type: object
+            required:
+              - price_type_id
+              - rate_id
+              - value
+            properties:
+              price_type_id:
+                type: number
+                format: int64
+              rate_id:
+                type: number
+                format: int64
+              ticket_type:
+                description: Required for venue-templates of type ``ACTIVITY`` or ``THEME_PARK``
+                $ref: ../../models/venue-template/ticket_type.yml
+              value:
+                type: number
+                format: double
+  responses:
+    '204':
+      description: Saved successfully
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+

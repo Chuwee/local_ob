@@ -1,0 +1,77 @@
+get:
+  summary: Get client B2B conditions
+  description: 'Get client conditions for a group condition type'
+  tags:
+    - Conditions
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: groupType
+      schema:
+        type: string
+        enum:
+          - ENTITY
+          - EVENT
+      required: true
+      description: Group condition type
+    - in: path
+      name: clientId
+      schema:
+        type: number
+        format: int64
+      required: true
+      description: Client id
+    - in: query
+      name: event_id
+      schema:
+        type: number
+        format: int64
+      description: The event id required for EVENT conditions
+    - in: query
+      name: entity_id
+      schema:
+        type: number
+        format: int64
+      description: The entity id required for ENTITY conditions, only applies for operators
+  responses:
+    '200':
+      description: B2B conditions
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/b2b/client-conditions-data.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

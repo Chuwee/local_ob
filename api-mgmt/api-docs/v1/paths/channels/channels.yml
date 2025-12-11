@@ -1,0 +1,209 @@
+get:
+  x-internal: true
+  summary: Search channels
+  description: ''
+  security:
+    - OAuth2: ['ROLE_SYS_ANS', 'ROLE_SYS_MGR', 'ROLE_CNL_MGR', 'ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Channels
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: entity_id
+      schema:
+        type: integer
+        format: int64
+      description: Entity ID (only for user ``ROLE_OPR_MGR``)
+    - in: query
+      name: entity_admin_id
+      x-internal: true
+      schema:
+        type: integer
+        format: int64
+      description: Entity Admin Id (only for user ``ROLE_OPR_MGR``)
+    - in: query
+      name: operator_id
+      schema:
+        type: integer
+        format: int64
+      description: Operator ID (only useful for multioperator users)
+    - in: query
+      name: type
+      schema:
+        $ref: ../../models/channels/channel-type.yml
+      description: Channel Type
+    - in: query
+      name: status
+      schema:
+        $ref: ../../models/channels/channel-status-filter.yml
+      description: Channel Status
+    - in: query
+      name: name
+      schema:
+        type: string
+      description: Name of the channel (can be partial)
+    - in: query
+      name: include_third_party_channels
+      description: Flag to include channels from other entities with visibility
+      schema:
+        type: boolean
+    - in: query
+      name: sort
+      schema:
+        type: string
+        enum: [id, name, status]
+      description: Sorting of enum fields with format field:[asc|desc]. For example 'name:desc'
+    - in: query
+      name: offset
+      schema:
+        type: integer
+    - in: query
+      name: limit
+      schema:
+        type: integer
+  responses:
+    '200':
+      description: 'Successful response'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - metadata
+              - data
+            properties:
+              metadata:
+                $ref: ./../../models/common/responses/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: ./../../models/channels/channel.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+post:
+  x-internal: true
+  summary: New channel
+  description: ''
+  security:
+    - OAuth2: ['ROLE_OPR_MGR']
+  tags:
+    - Channels
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - name
+            - type
+          properties:
+            name:
+              type: string
+            type:
+              $ref: ../../models/channels/channel-type.yml
+            entity_id:
+              type: integer
+              format: int64
+              description: Entity ID (Only required for user ``ROLE_OPR_MGR``)
+            url:
+              type: string
+              description: Url (Required for channel types WEB, WEB_BOX_OFFICE, WEB_SUBSCRIBERS and WEB_B2B). Only letters, numbers, '_', '-' and '.' are accepted.
+            collective_id:
+              type: integer
+              description: Parameter required for channel type PORTAL_SUBSCRIBERS
+  responses:
+    '201':
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: integer
+                format: int64
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '412':
+      description: Precondition failed
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '501':
+      description: Not implemented
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

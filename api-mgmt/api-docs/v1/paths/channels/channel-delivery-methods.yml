@@ -1,0 +1,136 @@
+get:
+  x-internal: true
+  summary: Get channel delivery methods
+  description: Get all delivery methods of a channel
+  security:
+    - OAuth2:
+        - 'ROLE_CNL_MGR'
+        - 'ROLE_OPR_MGR'
+        - 'ROLE_ENT_ANS'
+        - 'ROLE_OPR_ANS'
+  tags:
+    - Delivery Methods
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+      required: true
+      description: Channel ID
+  responses:
+    '200':
+      description: Get channel delivery methods
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/channels/channel-delivery-methods.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '405':
+      description: Method not allowed
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+put:
+  x-internal: true
+  summary: Update channel delivery methods
+  description: Update channel delivery methods for a given channel
+  security:
+    - OAuth2:
+        - 'ROLE_CNL_MGR'
+        - 'ROLE_OPR_MGR'
+  tags:
+    - Delivery Methods
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+      required: true
+      description: Channel ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../models/channels/channel-delivery-methods-put.yml'
+  responses:
+    '204':
+      description: Delivery methods updated successfuly.
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '405':
+      description: Method not allowed
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

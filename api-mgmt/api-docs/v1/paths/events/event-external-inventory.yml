@@ -1,0 +1,61 @@
+put:
+  x-internal: true
+  summary: Refresh external inventory
+  description: Update external availability, prices and information
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - External provider events
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Event ID
+  responses:
+    '204':
+      description: Update proccess started
+    '400':
+      description: bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: invalid token
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

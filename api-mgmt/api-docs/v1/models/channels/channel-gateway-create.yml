@@ -1,0 +1,88 @@
+additionalProperties: false
+type: object
+properties:
+  name:
+    type: string
+  translations:
+    type: object
+    properties:
+      name:
+        type: object
+        description: At least one translation is required
+        additionalProperties:
+          type: string
+        example:
+          es-ES: Efectivo
+          en-US: Cash
+      subtitle:
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          es-ES: Método de pago en metálico
+          en-US: Cash payment method
+  description:
+    type: string
+  send_additional_data:
+    type: boolean
+  price_range_enabled:
+    type: boolean
+  price_range:
+    type: object
+    properties:
+      max:
+        type: number
+      min:
+        type: number
+  live:
+    type: boolean
+  refund:
+    type: boolean
+  show_billing_form:
+    type: boolean
+  save_card_by_default:
+    type: boolean
+  force_risk_evaluation:
+    type: boolean
+  allow_benefits:
+    type: boolean
+  attempts:
+    type: integer
+    description: Required if the gateway allows retries
+  field_values:
+    type: object
+    description: Fields required by the gateway must be supplied
+    additionalProperties:
+      type: string
+    example:
+      GATEWAY_FIELD_1: Value for field 1
+      GATEWAY_FIELD_2: Value for field 2
+  currency_codes:
+    type: array
+    items:
+      type: string
+  surcharges:
+    type: array
+    items:
+      type: object
+      properties:
+        currency:
+          type: string
+        type:
+          type: string
+          enum:
+            - PERCENT
+            - FIXED
+        value:
+          type: number
+        max_value:
+          type: number
+        min_value:
+          type: number
+  taxes:
+    type: array
+    items:
+      type: object
+      properties:
+        id:
+          type: integer

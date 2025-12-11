@@ -1,0 +1,29 @@
+package es.onebox.mgmt.seasontickets.dto.rates;
+
+import jakarta.validation.Valid;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class UpdateSeasonTicketRatesDTO extends ArrayList<UpdateSeasonTicketRateDTO> {
+
+    private static final long serialVersionUID = 1L;
+
+    @Valid
+    public List<UpdateSeasonTicketRateDTO> getRates() {
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return EqualsBuilder.reflectionEquals(this, obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+}

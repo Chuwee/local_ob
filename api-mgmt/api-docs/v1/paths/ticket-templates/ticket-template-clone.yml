@@ -1,0 +1,87 @@
+post:
+  x-internal: true
+  summary: Clone ticket template
+  description: 'Clone a ticket template'
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Ticket templates
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: ticketTemplateId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Ticket Template ID      
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - name
+          properties:
+            name:
+              type: string
+            entity_id:
+              type: integer
+              format: int64
+              description: Only for operator users
+  responses:
+    '201':
+      description: Ticket template cloned correctly
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: integer
+                description: the id of the newly created ticket template
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '412':
+      description: Precondition failed
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

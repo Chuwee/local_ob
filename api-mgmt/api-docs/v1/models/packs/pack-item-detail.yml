@@ -1,0 +1,143 @@
+additionalProperties: false
+type: object
+required:
+  - id
+  - item_id
+  - name
+  - type
+  - main
+properties:
+  id:
+    type: integer
+  item_id:
+    type: integer
+  name:
+    type: string
+  type:
+    type: string
+    enum:
+      - EVENT
+      - SESSION
+      - PRODUCT
+  main:
+    description: Only for `AUTOMATIC` pack type
+    type: boolean
+  display_item_in_channels:
+    description: When true, the item will be shown in the pack in channels
+    type: boolean
+  informative_price:
+    description: No available for main item
+    type: number
+    format: double
+  event_data:
+    description: Only for `EVENT` main pack item type and `AUTOMATIC` pack type
+    type: object
+    required:
+      - venue_template
+    properties:
+      venue_template:
+        type: object
+        required:
+          - id
+          - name
+          - venue
+        properties:
+          id:
+            type: integer
+          name:
+            type: string
+          venue:
+            $ref: ../../models/common/idname.yml
+  session_data:
+    description: Only for `SESSION` pack item type
+    type: object
+    required:
+      - event
+      - dates
+      - venue_template
+    properties:
+      event:
+        $ref: ../../models/common/idname.yml
+      dates:
+        type: object
+        required:
+          - start
+          - end
+        properties:
+          start:
+            type: string
+            format: date-time
+          end:
+            type: string
+            format: date-time
+      venue_template:
+        type: object
+        required:
+          - id
+          - name
+          - venue
+        properties:
+          id:
+            type: integer
+          name:
+            type: string
+          venue:
+            $ref: ../../models/common/idname.yml
+      price_type:
+        description: Only for no main items from `AUTOMATIC` pack type
+        type: object
+        required:
+          - id
+          - name
+        properties:
+          id:
+            type: integer
+            format: int64
+          name:
+            type: string
+      price_type_mapping:
+        description: Only for no main items from `AUTOMATIC` pack type when custom mapping enabled on creation
+        items:
+          type: object
+          description: All source price_type_id must be defined and mapped at least to 1 target price_type_id
+          properties:
+            source_price_type:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  format: int64
+                name:
+                  type: string
+            target_price_type:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                  name:
+                    type: string
+  product_data:
+    description: Only for `PRODUCT` pack item type and `AUTOMATIC` pack type
+    type: object
+    required:
+      - delivery_point
+      - shared_barcode
+    properties:
+      variant:
+        type: object
+        required:
+          - id
+          - name
+        properties:
+          id:
+            type: integer
+            format: int64
+          name:
+            type: string
+      delivery_point:
+        $ref: ../../models/common/idname.yml
+      shared_barcode:
+        type: boolean

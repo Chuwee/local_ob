@@ -1,0 +1,208 @@
+get:
+  x-internal: true
+  summary: Get channel gateway configuration
+  description: Get the details of a specific channel gateway configuration
+  security:
+    - OAuth2:
+        - 'ROLE_OPR_MGR'
+        - 'ROLE_OPR_ANS'
+  tags:
+    - Gateways
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+      required: true
+      description: Channel ID
+    - in: path
+      name: gatewaySid
+      schema:
+        type: string
+      required: true
+      description: Gateway ID
+    - in: path
+      name: configSid
+      schema:
+        type: string
+      required: true
+      description: Configuration ID
+  responses:
+    '200':
+      description: Get channel gateway config
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/channels/channel-gateway-detail.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+delete:
+  x-internal: true
+  summary: Delete channel gateway configuration
+  description: Delete a channel gateway configuration
+  security:
+    - OAuth2: ['ROLE_OPR_MGR']
+  tags:
+    - Gateways
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+      required: true
+    - in: path
+      name: gatewaySid
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: configSid
+      schema:
+        type: string
+      required: true
+  responses:
+    '204':
+      description: No content
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+put:
+  x-internal: true
+  summary: Update channel gateway configuration
+  description: Update a channel gateway configuration
+  security:
+    - OAuth2:
+        - 'ROLE_OPR_MGR'
+  tags:
+    - Gateways
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+      required: true
+      description: Channel ID
+    - in: path
+      name: gatewaySid
+      schema:
+        type: string
+      required: true
+      description: Gateway ID
+    - in: path
+      name: configSid
+      schema:
+        type: string
+      required: true
+      description: Configuration ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/channels/channel-gateway-create.yml
+  responses:
+    '204':
+      description: Updated successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

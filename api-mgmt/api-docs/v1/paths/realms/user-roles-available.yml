@@ -1,0 +1,60 @@
+get:
+  x-internal: true
+  summary: Get available roles of user
+  description: Get available roles of user
+  security:
+    - OAuth2: ['ROLE_ENT_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS', 'ROLE_SYS_ANS, ROLE_SYS_MGR']
+  tags:
+    - Roles
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: userId
+      schema:
+        type: integer
+      required: true
+  responses:
+    '200':
+      description: Get available user roles
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: array
+            items:
+              $ref: ./../../models/realms/role.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

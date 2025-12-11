@@ -1,0 +1,73 @@
+additionalProperties: false
+type: object
+nullable: true
+properties:
+  texts:
+    type: object
+    description: 'text info with multi languages'
+    nullable: true
+    additionalProperties: true
+    example:
+      en-EN: ["Family Block", "Only soft drinks", "No smoke"]
+      es-ES: ["Grada familiar", "No alcohol", "Zona sin humos"]
+  feature_list:
+    type: object
+    description: 'list of features with multi languages.'
+    nullable: true
+    additionalProperties:
+      type: array
+      items:
+        type: object
+        properties:
+          lang:
+            type: string
+          links:
+            type: array
+            items:
+              $ref: feature-dto.yml
+    example:
+      en-EN:
+        - url: 'www.proticketing.com'
+          action: MODAL
+          text: 'example text'
+          type: LINK
+        - text: 'example text 2'
+          type: TEXT
+      es-ES:
+        - url: 'www.proticketing.es'
+          action: MODAL
+          text: 'texto de ejemplo'
+          type: LINK
+        - text: 'texto de ejemplo 2'
+          type: TEXT
+  name:
+    type: object
+    description: 'allow override the name any of ```view```, ```nnz```, ```priceType``` in different languages'
+    nullable: false
+    additionalProperties:
+      type: string
+    example:
+      en-EN: Block 41
+      es-ES: Grada 41
+  description:
+    type: object
+    description: 'allow override the name any of ```view```, ```nnz```, ```priceType``` in different languages'
+    nullable: false
+    additionalProperties:
+      type: string
+    example:
+      en-EN: <p> More view info </p>
+      es-ES: <p> Mas información de la vista </p>
+  config_3D:
+    $ref: 'template-info-3d-config.yml'
+  image_settings:
+    $ref: 'image-settings-upsert.yml'
+  badge:
+    $ref: 'badge.yml'
+  restriction:
+    $ref: 'restriction.yml'
+  templates_zones_ids:
+    type: array
+    items:
+      type: integer
+      description: List of the templates zones ids

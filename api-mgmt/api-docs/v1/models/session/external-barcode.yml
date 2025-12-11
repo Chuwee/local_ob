@@ -1,0 +1,77 @@
+additionalProperties: false
+type: object
+required:
+  - barcode
+  - locator
+  - status
+  - event
+  - session
+  - seat_data
+properties:
+  barcode:
+    type: string
+  locator:
+    type: string
+  status:
+    type: string
+    enum:
+      - INVALID
+      - NOT_VALIDATED
+      - VALIDATED
+      - VALIDATED_OUT
+      - LOCKED
+  event:
+    $ref: ../../models/common/idname.yml
+  session:
+    type: object
+    required:
+      - id
+      - name
+      - start
+    properties:
+      id:
+        type: number
+      name:
+        type: string
+      start:
+        type: string
+        format: date-time
+  price_zone:
+    $ref: ../../models/common/idname.yml
+  seat_data:
+    type: object
+    properties:
+      access:
+        $ref: ../../models/common/idname.yml
+      sector:
+        $ref: ../../models/common/idname.yml
+      row:
+        type: object
+        required:
+          - name
+        properties:
+          id:
+            type: number
+          name:
+            type: string
+      not_numbered_area:
+        type: object
+        properties:
+          id:
+            type: number
+          name:
+            type: string
+      seat:
+        type: object
+        required:
+          - name
+        properties:
+          id:
+            type: number
+          name:
+            type: string
+      type:
+        type: string
+        enum:
+          - NUMBERED
+          - NOT_NUMBERED

@@ -1,0 +1,67 @@
+post:
+  x-internal: true
+  summary: Link external configuration to code
+  description: Links the existing external configuration of an AVET entity to a club code. The given club code can't be already linked by this or another entity.
+  security:
+      - OAuth2: [ 'ROLE_OPR_MGR' ]
+  tags:
+    - External Entity configurations
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Entity ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../../models/entities/external-configuration-link.yml
+  responses:
+    '204':
+      description: Successful response
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '412':
+      description: Precondition failed
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml

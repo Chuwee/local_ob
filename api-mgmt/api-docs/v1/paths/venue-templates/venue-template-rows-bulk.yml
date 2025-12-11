@@ -1,0 +1,82 @@
+post:
+  x-internal: true
+  summary: Create venue template rows (Bulk)
+  description: Create venue template rows in bulk
+  security:
+    - OAuth2: ['ROLE_REC_MGR', 'ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Template Rows
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: venueTemplateId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Venue Template ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: ../../models/venue-template/venue-template-row-create.yml
+  responses:
+    '201':
+      description: Venue template rows created correctly
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              additionalProperties: false
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: integer
+                  description: the IDs of the newly created venue template rows
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: invalid token
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: precondition failed
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

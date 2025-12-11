@@ -1,0 +1,115 @@
+get:
+  x-internal: true
+  summary: Get channel domains settings
+  description: Get channel custom domains settings by ID
+  security:
+    - OAuth2: ['ROLE_SYS_MGR', 'ROLE_SYS_ANS']
+  tags:
+    - Domain Settings
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      description: Channel ID
+      schema:
+        type: integer
+        format: int64
+      required: true
+  responses:
+    '200':
+      description: Successfully response
+      content:
+        application/json:
+          schema:
+            $ref: "../../../models/channels/domain-settings/domain-setting.yml"
+    '404':
+      description: Channel or cors config not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+post:
+  x-internal: true
+  summary: Upsert channel domain settings
+  description: Create or update channel custom domain settings by ID
+  security:
+    - OAuth2: ['ROLE_SYS_MGR']
+  tags:
+    - Domain Settings
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      description: Channel ID
+      schema:
+        type: integer
+        format: int64
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../../models/channels/domain-settings/domain-setting.yml"
+  responses:
+    '204':
+      description: Channel domain settings created or updated successfully
+    '400':
+      description: Bad parameter
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Channel not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+delete:
+  x-internal: true
+  summary: Disable domain settings
+  description: Disable domain setting by ID
+  security:
+    - OAuth2: ['ROLE_SYS_MGR']
+  tags:
+    - Domain Settings
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      description: Channel ID
+      schema:
+        type: integer
+        format: int64
+      required: true
+  responses:
+    '204':
+      description: Channel domain settings disabled successfully
+    '400':
+      description: Bad parameter
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Channel not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml

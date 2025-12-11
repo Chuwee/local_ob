@@ -1,0 +1,73 @@
+get:
+  x-internal: true
+  summary: Get external inventories from an external provider for an entity
+  description: Get external inventories from an external provider for an entity
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - External Capacities
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Entity ID. Must be an AVET entity.
+    - in: path
+      name: providerId
+      schema:
+        type: string
+      required: true
+      description: Provider Id. Must be a valid provider Id.
+    - in: query
+      name: skip_used
+      schema:
+        type: boolean
+      required: false
+      description: Filter out used inventories flag
+  responses:
+    '200':
+      description: A JSON with event inventories information
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../../models/entities/external-inventories.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

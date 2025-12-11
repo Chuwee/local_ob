@@ -1,0 +1,68 @@
+additionalProperties: false
+type: object
+required:
+  - id
+  - name
+  - active
+  - type
+  - channel_id
+properties:
+  id:
+    type: integer
+  name:
+    type: string
+  active:
+    type: boolean
+  type:
+    type: string
+    enum:
+      - MANUAL
+      - AUTOMATIC
+  channel_id:
+    type: integer
+  promotion:
+    type: object
+    properties:
+      enabled:
+        type: boolean
+      promotion_id:
+        type: integer
+  pack_period:
+    type: object
+    properties:
+      type:
+        type: string
+        enum:
+          - AUTOMATIC
+          - CUSTOM
+      start_date:
+        type: string
+        format: date-time
+      end_date:
+        type: string
+        format: date-time
+  pricing:
+    type: object
+    properties:
+      type:
+        type: string
+        enum:
+          - COMBINED
+          - INCREMENTAL
+          - NEW_PRICE
+      price_increment:
+        type: integer
+  has_sales:
+    type: boolean
+  ui_settings:
+    $ref: channel-pack-ui-settings.yml
+  settings:
+    type: object
+    properties:
+      categories:
+        type: object
+        properties:
+          base:
+            $ref: ../../categories/category.yml
+          custom:
+            $ref: ../../categories/category.yml

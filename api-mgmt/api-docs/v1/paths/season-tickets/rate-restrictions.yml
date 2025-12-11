@@ -1,0 +1,187 @@
+get:
+  summary:  Get season ticket rate restrictions
+  description: 'Gets the specified season ticket rate restrictions'
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Rates
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+      required: true
+      description: Season Ticket ID
+    - in: path
+      name: rateId
+      schema:
+        type: integer
+      required: true
+      description: Rate ID
+  responses:
+    '200':
+      description: 'SeasonTicket rate restrictions'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/season-ticket/season-ticket-rate-restrictions.yml'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '412':
+      description: Precondition failed
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+post:
+  summary: Upsert season ticket rate restrictions
+  description: 'Upsert an season ticket rate restrictions'
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Rates
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+      required: true
+      description: Season Ticket ID
+    - in: path
+      name: rateId
+      schema:
+        type: integer
+      required: true
+      description: Rate ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../models/season-ticket/season-ticket-rate-restrictions.yml'
+  responses:
+    '204':
+      description: Saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '412':
+      description: Precondition failed
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+delete:
+  summary: Delete season ticket rate restrictions
+  description: 'Delete an existing season ticket rate restrictions'
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Rates
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+      required: true
+      description: Season Ticket ID
+    - in: path
+      name: rateId
+      schema:
+        type: integer
+      required: true
+      description: Rate ID
+  responses:
+    '204':
+      description: Deleted successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '412':
+      description: Precondition failed
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

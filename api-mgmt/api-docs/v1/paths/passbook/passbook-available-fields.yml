@@ -1,0 +1,41 @@
+get:
+  summary: Get available passbook fields
+  description: Retrieve the list of avilable fields for a passbook
+  tags:
+    - Passbook
+  parameters:
+    - in: query
+      name: type
+      description: Type of the template fields are valid for
+      schema:
+        $ref: ../../models/passbook/passbook-template-type.yml
+  responses:
+    '200':
+      description: An array of available fields to compose a passbook
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                key:
+                  type: string
+                type:
+                  $ref: ../../models/passbook/passbook-template-type.yml
+                group:
+                  type: string
+                label:
+                  type: array
+                  items:
+                    type: string
+                value:
+                  type: array
+                  items:
+                    type: string
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml

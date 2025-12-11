@@ -1,0 +1,121 @@
+get:
+  x-internal: true
+  summary: Get entity communication element images by entity ID
+  description: Get entity communication element images by entity id
+  security:
+    - OAuth2: ['ROLE_ENT_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Entity Communication Elements
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      schema:
+        type: integer
+      required: true
+      description: Entity ID
+  responses:
+    '200':
+      description: Get list of entity languages
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/entities/entity-communication-elements-images.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  x-internal: true
+  summary: Create entity communication element images
+  description: Create entity communication element images
+  security:
+    - OAuth2: ['ROLE_ENT_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Entity Communication Elements
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Entity ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/entities/create-entity-communication-elements-images.yml
+  responses:
+    '204':
+      description: Entity communication element images created or updated
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+

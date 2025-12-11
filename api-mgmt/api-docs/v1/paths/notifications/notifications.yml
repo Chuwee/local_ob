@@ -1,0 +1,177 @@
+get:
+  summary: Get filtered webhook configurations
+  description: 'Get filtered webhook configurations'
+  security:
+    - OAuth2: ['ROLE_OPR_MGR', 'ROLE_ENT_MGR', 'ROLE_SYS_MGR', 'ROLE_SYS_ANS', 'ROLE_OPR_ANS', 'ROLE_ENT_ANS']
+  tags:
+    - Configuration
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: entity_id
+      schema:
+        type: integer
+        format: int64
+      description: Webhook configurations entity filter (Only required for user ROLE_OPR_MGR)
+    - in: query
+      name: channel_id
+      schema:
+        type: integer
+        format: int64
+      description: Webhook configurations channel filter (Only required when scope equals CHANNEL)
+    - in: query
+      name: status
+      schema:
+        $ref: ../../models/notifications/notification-config-status-enum.yml
+      description: Webhook configurations status filter
+    - in: query
+      name: scope
+      schema:
+        type: array
+        items:
+          $ref: ../../models/notifications/notification-config-scope-enum.yml
+      description: Webhook configurations scope filter
+    - in: query
+      name: visible
+      schema:
+        $ref: ../../models/notifications/notification-config-visible-enum.yml
+      description: Webhook configurations visible filter
+    - in: query
+      name: limit
+      schema:
+        type: integer
+        format: int64
+      description: Limit results to return. Default value 20 results, max value 20 results
+    - in: query
+      name: offset
+      schema:
+        type: integer
+        format: int64
+      description: Number of offset items. Default value 0 items
+    - in: query
+      name: sort
+      schema:
+          type: string
+      description: |
+        Sorting valid fields with format field:[asc|desc]'
+
+        Valid fields to sort:
+        <ul>
+          <li>entity</li>
+          <li>operator</li>
+          <id>id</id>
+        </ul>
+
+        For example:
+        <ul>
+          <li>entity:asc</li>
+          <li>entity:desc</li>
+          <li>...</li>
+        </ul>
+  responses:
+    '200':
+      description: 'Webhook configurations'
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            properties:
+              metadata:
+                $ref: ../../models/common/responses/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: '../../models/notifications/notification-config.yml'
+    '401':
+      description: 'Unauthorized'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error-auth.yml'
+    '403':
+      description: 'Forbidden'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '404':
+      description: 'Not found'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '500':
+      description: 'Internal server error'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+post:
+  summary: New webhook configuration
+  description: 'New webhook configuration'
+  security:
+    - OAuth2: ['ROLE_OPR_MGR', 'ROLE_ENT_MGR']
+  tags:
+    - Configuration
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/notifications/create-notification-config.yml
+  responses:
+    '200':
+      description: 'Created successfully'
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/notifications/notification-config.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

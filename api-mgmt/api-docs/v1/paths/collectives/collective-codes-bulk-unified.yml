@@ -1,0 +1,68 @@
+put:
+  x-internal: true
+  summary: Update collective codes (Bulk Unified)
+  description: |
+    Update a list of codes or all collection codes belonging to a collective with the same values.
+    This is a partial update, only the recieved fields in the request with value or null will be updated.
+  security:
+    - OAuth2: ['ROLE_OPR_MGR', 'ROLE_COL_MGR']
+  tags:
+    - Collective codes
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: collectiveId
+      schema:
+        type: integer
+        format: int64
+      description: Collective ID
+      required: true
+    - in: query
+      name: q
+      description: Update filtering by collective code pattern when list of codes in request body is null.
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/collectives/collective-code-bulk-unified-update.yml
+  responses:
+    '204':
+      description: Codes successfully updated
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

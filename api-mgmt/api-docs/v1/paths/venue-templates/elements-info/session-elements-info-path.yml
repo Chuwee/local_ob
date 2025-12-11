@@ -1,0 +1,240 @@
+get:
+  summary: 'Search Session template elements info'
+  description: 'Get a list of ```views``` or ```not numbered zone```or both if the venue template is ```DEFAULT```or
+   ```AVET``` type, or return a list of ```price types``` if the venue template is ```ACTIVITY``` with
+   the element info associated to each item of the list by session.'
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Template Elements Info
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: sessionId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Session ID
+    - in: query
+      name: offset
+      schema:
+       type: integer
+      description: Offset (default 0)
+    - in: query
+      name: limit
+      schema:
+       type: integer
+      description: Limit (default 50)
+    - in: query
+      name: type
+      schema:
+       type: string
+       enum:
+         - NNZ
+         - VIEW
+         - PRICE_TYPE
+       description: Type of items of template to filter
+    - in: query
+      name: status
+      schema:
+        type: string
+        enum:
+          - ENABLED
+          - DISABLED
+        description: Status of session template element info
+    - in: query
+      name: q
+      schema:
+        type: string
+      description: Free search by name of ```[view, nnz, priceType]``` or tags
+  responses:
+    '200':
+      description: Search response
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/venue-template/elements-info/session-elements-info-search-response.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+
+post:
+  summary: 'Create session template element info'
+  description: 'Create an override of a default template element info'
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Template Elements Info
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: sessionId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Session ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../../models/venue-template/elements-info/session-template-info-create-dto.yml'
+  responses:
+    '201':
+      description: Created
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+
+put:
+  summary: 'Bulk edit of session''s template elements info'
+  description: 'Do a bulk edit of session''s template elements info'
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Template Elements Info
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: sessionId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Session ID
+    - in: query
+      name: type
+      schema:
+        type: string
+        enum:
+          - NNZ
+          - VIEW
+          - PRICE_TYPE
+        description: 'Type of items of template to filter. Works only with ```update_all_elements_info``` body request property.'
+    - in: query
+      name: q
+      schema:
+        type: string
+      description: 'Free search by name of ```[view, nnz, priceType]``` or tags.  Works only with ```update_all_elements_info``` body request property.'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../../models/venue-template/elements-info/session-template-element-info-bulk-request.yml'
+  responses:
+    '204':
+      description: No content
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml

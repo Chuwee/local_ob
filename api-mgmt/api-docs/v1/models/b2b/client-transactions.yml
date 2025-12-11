@@ -1,0 +1,71 @@
+additionalProperties: false
+type: object
+required:
+  - metadata
+  - data
+properties:
+  metadata:
+    $ref: ../common/responses/metadata.yml
+  data:
+    type: array
+    items:
+      type: object
+      required:
+        - id
+        - created
+        - channel
+        - user
+        - notes
+        - amount
+        - credit
+        - balance
+        - debt
+        - previous_balance
+      properties:
+        id:
+          type: string
+          description: movement ID
+        transaction_code:
+          type: string
+          description: transaction code
+        order_code:
+          type: string
+          description: order_code
+        created:
+          type: string
+        channel:
+          type: string
+        user:
+          type: string
+        notes:
+          type: string
+        transaction_type:
+          type: string
+          enum:
+            - PURCHASE
+            - CREDIT_LIMIT
+            - CASH_ADJUSTMENT
+            - REFUND
+            - DEPOSIT
+        deposit_type:
+          type: string
+          description: Type of deposit, only applies for transaction_type DEPOSIT
+          enum:
+            - CASH
+            - TRANSFER
+            - CHECK
+        previous_balance:
+          type: number
+          description: Balance before transaction
+        amount:
+          type: number
+          description: Transaction amount
+        balance:
+          type: number
+          description: Current balance
+        credit:
+          type: number
+          description: Current credit
+        debt:
+          type: number
+          description: Current debt

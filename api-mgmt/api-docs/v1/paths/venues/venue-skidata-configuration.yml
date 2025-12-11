@@ -1,0 +1,264 @@
+get:
+  x-internal: true
+  summary: Get skidata configuration
+  description: Get skidata specific configuration for the given venue
+  security:
+    - OAuth2: ['ROLE_ENT_MGR', 'ROLE_OPR_MGR', 'ROLE_REC_MGR']
+  tags:
+    - Skidata configuration
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: venueId
+      schema:
+        type: integer
+      required: true
+    - in: path
+      name: skidataVariant
+      description: One of te skidata variants availables for configuration
+      schema:
+        type: string
+        enum:
+          - skidata-ifema
+          - skidata-mmo
+          - skidata-flc
+      required: true
+  responses:
+    '200':
+      description: The existing configuration for skidata
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/venue/skidata-venue-config.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+post:
+  x-internal: true
+  summary: Create skidata configuration
+  description: Create skidata specific configuration for the given venue
+  security:
+    - OAuth2: ['ROLE_ENT_MGR', 'ROLE_OPR_MGR', 'ROLE_REC_MGR']
+  tags:
+    - Skidata configuration
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: venueId
+      schema:
+        type: integer
+      required: true
+    - in: path
+      name: skidataVariant
+      description: One of te skidata variants availables for configuration
+      schema:
+        type: string
+        enum:
+          - skidata-ws
+          - skidata-mmo
+          - skidata-flc
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/venue/skidata-venue-config.yml
+  responses:
+    '201':
+      description: The configuration was sucessfuly created
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  x-internal: true
+  summary: Modify skidata configuration
+  description: Modify skidata specific configuration for the given venue
+  security:
+    - OAuth2: ['ROLE_ENT_MGR', 'ROLE_OPR_MGR', 'ROLE_REC_MGR']
+  tags:
+    - Skidata configuration
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: venueId
+      schema:
+        type: integer
+      required: true
+    - in: path
+      name: skidataVariant
+      description: One of te skidata variants availables for configuration
+      schema:
+        type: string
+        enum:
+          - skidata-ws
+          - skidata-mmo
+          - skidata-flc
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/venue/skidata-venue-config.yml
+  responses:
+    '200':
+      description: The configuration was sucessfuly modified
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+delete:
+  x-internal: true
+  summary: Delete skidata configuration
+  description: Delete skidata specific configuration for the given venue
+  security:
+    - OAuth2: ['ROLE_ENT_MGR', 'ROLE_OPR_MGR', 'ROLE_REC_MGR']
+  tags:
+    - Skidata configuration
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: venueId
+      schema:
+        type: integer
+      required: true
+    - in: path
+      name: skidataVariant
+      description: One of te skidata variants availables for configuration
+      schema:
+        type: string
+        enum:
+          - skidata-ws
+          - skidata-mmo
+          - skidata-flc
+      required: true
+  responses:
+    '204':
+      description: Empty response
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

@@ -1,0 +1,82 @@
+get:
+  x-internal: true
+  summary: List Events with sessions compatible to Season Tickets
+  description: ''
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Season Ticket Sessions
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Season Ticket ID
+    - in: query
+      name: q
+      description: Free search field to search by event name or event ID
+      schema:
+        type: string
+    - in: query
+      name: limit
+      schema:
+        type: integer
+      description: Limit (default 20, max 1000)
+    - in: query
+      name: offset
+      schema:
+        type: integer
+      description: Offset (default 0)
+  responses:
+    '200':
+      description: Object with pagination description and an array of events
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../models/common/responses/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: ../../models/season-ticket/season-ticket-session-event.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+

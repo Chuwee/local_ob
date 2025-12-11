@@ -1,0 +1,114 @@
+additionalProperties: false
+type: object
+required:
+  - name
+  - venue_template_id
+  - dates
+properties:
+  name:
+    type: string
+  venue_template_id:
+    type: integer
+    format: int64
+  automatic_taxes:
+    type: boolean
+  tax_ticket_id:
+    type: integer
+    format: int64
+  tax_charges_id:
+    type: integer
+    format: int64
+  dates:
+    type: object
+    required:
+      - start
+      - channels
+      - sales_start
+      - sales_end
+    properties:
+      start:
+        type: string
+        format: date-time
+      end:
+        type: string
+        format: date-time
+      channels:
+        type: string
+        format: date-time
+      sales_start:
+        type: string
+        format: date-time
+      sales_end:
+        type: string
+        format: date-time
+      bookings_start:
+        type: string
+        format: date-time
+        description: Required when event has bookings enabled
+      bookings_end:
+        type: string
+        format: date-time
+        description: Required when event has bookings enabled
+      secondary_market_sale_start:
+        type: string
+        format: date-time
+      secondary_market_sale_end:
+        type: string
+        format: date-time
+  rates:
+    type: array
+    description: All rates on array will be marked as visible. One default rate is `mandatory` except for AVET event.
+    items:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        default:
+          type: boolean
+  activity_sale_type:
+    $ref: session-activity-sale-type.yml
+    description: For ``ACTIVITY`` event type sales-type is required
+  pack_config:
+    type: object
+    description: To create pack of sessions, fill related session ids
+    properties:
+      session_ids:
+        type: array
+        description: For any session pack type, pack session ids to link to pack is required
+        items:
+          type: integer
+      blocking_actions:
+        type: array
+        description: Optional actions to handle seats for pack from related sessions with defined blocking_reason
+        items:
+          type: object
+          properties:
+            id:
+              type: integer
+            action:
+              type: string
+              enum:
+                - RELEASE
+                - KEEP
+      color:
+        description: Color asociated with the session pack as HEX value without ``#``.
+        type: string
+      allow_partial_refund:
+        description: whether the session pack allows partial refunds or not. By default is false. Only available for unrestricted season pack type.
+        type: boolean
+  additional_config:
+    x-internal: true
+    $ref: ../../models/session/create-session-additional-config.yml
+  reference:
+    type: string
+  enable_smart_booking:
+    type: boolean
+  loyalty_points_config:
+    $ref: ../../models/loyalty-points/sessions/create-loyalty-points.yml
+  settings:
+    type: object
+    properties:
+      enable_orphan_seats:
+        type: boolean
+        description: Enable protection against orphan seats in a sales channel

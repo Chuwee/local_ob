@@ -1,0 +1,102 @@
+get:
+  x-internal: true
+  summary: Get channel suggestions
+  description: 'Get channel suggestions'
+  security:
+    - OAuth2: [ 'ROLE_CNL_MGR', 'ROLE_OPR_MGR' ]
+  tags:
+    - Suggestions
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      description: Channel Id
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: query
+      name: offset
+      schema:
+        type: integer
+    - in: query
+      name: limit
+      schema:
+        type: integer
+    - in: query
+      name: q
+      schema:
+        type: string
+        description: Search by name
+    - in: query
+      name: session_id
+      style: form
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+        description: Session ID of the source
+    - in: query
+      name: event_id
+      style: form
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+        description: Event ID of the source
+    - in: query
+      name: published
+      schema:
+        type: boolean
+      description: Filter published
+    - in: query
+      name: source_type
+      schema:
+        type: string
+        enum:
+          - EVENT
+          - SESSION
+  responses:
+    '200':
+      description: Array of Channel Suggestions
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/channels/suggestions/channel-suggestions-response.yml'
+    '400':
+      description: Bad parameter
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error-auth.yml'
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '404':
+      description: Channel suggestions not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'

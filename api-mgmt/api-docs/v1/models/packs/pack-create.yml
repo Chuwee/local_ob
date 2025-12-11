@@ -1,0 +1,52 @@
+additionalProperties: false
+type: object
+required:
+  - entity_id
+  - name
+  - type
+  - tax_id
+properties:
+  entity_id:
+    type: integer
+    format: int64
+  name:
+    type: string
+  type:
+    type: string
+    enum:
+      - AUTOMATIC
+  main_item:
+    description: Only `AUTOMATIC` type packs have `main_item`
+    oneOf:
+      - description: Main item of type EVENT (can have sub_item_ids)
+        type: object
+        required:
+          - type
+          - item_id
+        properties:
+          type:
+            type: string
+            enum: [EVENT]
+          item_id:
+            type: integer
+          venue_template_id:
+            type: integer
+          sub_item_ids:
+            type: array
+            items:
+              type: integer
+            maxItems: 50
+            description: The sub_item_ids list cannot contain more than 50 items
+      - description: Main item of type SESSION (cannot have sub_item_ids)
+        type: object
+        required:
+          - type
+          - item_id
+        properties:
+          type:
+            type: string
+            enum: [SESSION]
+          item_id:
+            type: integer
+  tax_id:
+    type: integer

@@ -1,0 +1,119 @@
+get:
+  x-internal: true
+  summary: Get authenticated user info
+  description: Get authenticated user info
+  tags:
+    - Myself
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+  responses:
+    '200':
+      description: Get info of authenticated user
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/users/user-myself.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+put:
+  x-internal: true
+  summary: Update authenticated user info
+  description: Update authenticated user info
+  tags:
+    - Myself
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            last_name:
+              type: string
+            job_title:
+              type: string
+            language:
+              type: string
+              description: IETF language tag standard
+              example: es-ES
+            notes:
+              type: string
+            contact:
+              type: object
+              properties:
+                primary_phone:
+                  type: string
+                secondary_phone:
+                  type: string
+                fax:
+                  type: string
+            location:
+              type: object
+              properties:
+                address:
+                  type: string
+                city:
+                  type: string
+                postal_code:
+                  type: string
+                country:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                      description: ISO 3166 codes
+                    name:
+                      type: string
+                country_subdivision:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                      description: ISO 3166 codes
+                    name:
+                      type: string
+  responses:
+    '204':
+      description: User updated successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

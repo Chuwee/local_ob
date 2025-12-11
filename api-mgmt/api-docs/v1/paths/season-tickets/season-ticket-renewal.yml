@@ -1,0 +1,60 @@
+delete:
+  x-internal: true
+  summary: Delete a renewal from a season ticket
+  description: ''
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Season Ticket Renewals
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+      required: true
+      description: Season ticket ID
+    - in: path
+      name: renewalId
+      schema:
+        type: string
+      required: true
+      description: Season ticket renewal ID
+  responses:
+    '204':
+      description: Season ticket renewal deleted successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

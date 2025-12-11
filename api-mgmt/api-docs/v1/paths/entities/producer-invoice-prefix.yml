@@ -1,0 +1,67 @@
+put:
+  x-internal: true
+  summary: Update invoice prefix
+  description: Updates producer invoice prefix
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Producers
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: producerId
+      description: The producer ID
+      schema:
+        type: integer
+      required: true
+    - in: path
+      name: invoicePrefixId
+      description: The invoicePrefix ID
+      schema:
+        type: integer
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - default
+          properties:
+            default:
+              type: boolean
+              description: Set prefix by default
+  responses:
+    '202':
+      description: Successful response
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '401':
+      description: Invalid token
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error-auth.yml'
+    '403':
+      description: unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'

@@ -1,0 +1,93 @@
+additionalProperties: false
+type: object
+required:
+  - id
+  - status
+  - date
+  - channel
+  - event
+properties:
+  id:
+    type: integer
+    format: int64
+  status:
+    $ref: sale-request-status.yml
+  date:
+    type: string
+    format: date-time
+  channel:
+    type: object
+    required:
+      - id
+      - name
+      - type
+      - entity
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      type:
+        $ref: ../channel-type.yml
+      entity:
+        type: object
+        required:
+          - id
+          - name
+        properties:
+          id:
+            type: integer
+            format: int64
+          name:
+            type: string
+  event:
+    type: object
+    required:
+      - id
+      - name
+      - entity
+      - venues
+      - event_type
+      - start_date
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      start_date:
+        type: string
+        format: date-time
+      entity:
+        type: object
+        required:
+          - id
+          - name
+        properties:
+          id:
+            type: integer
+            format: int64
+          name:
+            type: string
+      venues:
+        type: array
+        items:
+          type: object
+          required:
+            - id
+            - name
+            - location
+          properties:
+            id:
+              type: integer
+              format: int64
+            name:
+              type: string
+            location:
+              type: object
+              properties:
+                city:
+                  type: string
+      event_type:
+        $ref: sale-request-event-type.yml

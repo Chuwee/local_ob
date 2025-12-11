@@ -1,0 +1,105 @@
+get:
+  x-internal: true
+  summary: Get season ticket renewals for a season ticket
+  description: ''
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Season Ticket Renewals
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: mapping_status
+      description: The status of the mapping between seats
+      schema:
+        type: string
+        enum:
+          - NOT_MAPPED
+          - MAPPED
+    - in: query
+      name: renewal_status
+      description: The status of the renewal
+      schema:
+        type: string
+        enum:
+          - NOT_RENEWED
+          - RENEWED
+          - REFUNDED
+          - CANCELED
+    - in: query
+      name: q
+      description: Free search for renewals by name, surname, email and member id
+      schema:
+        type: string
+    - in: query
+      name: sort
+      description: Sorting of enum fields with format field:[asc|desc]. For example 'name:desc'
+      schema:
+        type: string
+        enum:
+          - mapping_status
+          - name
+          - surname
+          - birthday
+    - in: query
+      name: limit
+      schema:
+        type: integer
+      description: Limit (default 50, max 1000)
+    - in: query
+      name: season_ticket_id
+      schema:
+        type: integer
+      description: SeasonTicket id
+    - in: query
+      name: entity_id
+      schema:
+        type: integer
+      description: Entity Id
+    - in: query
+      name: offset
+      schema:
+        type: integer
+      description: Offset (default 0)
+  responses:
+    '200':
+      description: Object with pagination description and an array of season ticket renewals
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/season-ticket/season-ticket-renewals.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

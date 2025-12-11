@@ -1,0 +1,182 @@
+get:
+  x-internal: true
+  summary: Search product ticket templates
+  description: 'Gets the specified product ticket templates list'
+  security:
+    - OAuth2: [ 'ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS' ]
+  tags:
+    - Product ticket templates
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: q
+      description: Free search for product ticket templates by name
+      schema:
+        type: string
+    - in: query
+      name: model_type
+      schema:
+        $ref: ../../models/product-ticket-templates/product-ticket-model-type.yml
+    - in: query
+      name: limit
+      schema:
+        type: integer
+      description: Limit (default 50, max 1000)
+    - in: query
+      name: offset
+      schema:
+        type: integer
+      description: Offset (default 0)
+    - in: query
+      name: sort
+      description: |
+        Sorting valid fields with format field:[asc|desc]'
+
+        Valid fields to sort:
+        <ul>
+          <li>name</li>
+        </ul>
+
+        For example:
+        <ul>
+          <li>name:asc</li>
+          <li>name:desc</li>
+          <li>...</li>
+        </ul>
+      schema:
+        type: string
+  responses:
+    '200':
+      description: 'Array of product ticket templates'
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            required:
+              - metadata
+              - data
+            properties:
+              metadata:
+                $ref: ../../models/common/responses/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: ../../models/product-ticket-templates/product-ticket-template-search.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+post:
+  x-internal: true
+  summary: Create product ticket template
+  description: 'Creates a new product ticket template'
+  security:
+    - OAuth2: [ 'ROLE_EVN_MGR', 'ROLE_OPR_MGR' ]
+  tags:
+    - Product ticket templates
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - name
+            - entity_id
+            - model_id
+          properties:
+            name:
+              type: string
+              maxLength: 50
+              description: Template name. Can only contain letters, numbers, spaces, -, () and []
+            entity_id:
+              type: integer
+              minimum: 1
+              description: Entity ID where the template will be created
+            model_id:
+              type: integer
+              minimum: 1
+              description: Product ticket model ID
+  responses:
+    '201':
+      description: The ticket template was added correctly
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: integer
+                description: the id of the newly created product ticket template
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '412':
+      description: Precondition failed
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

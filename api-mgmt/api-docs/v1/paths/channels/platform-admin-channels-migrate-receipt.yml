@@ -1,0 +1,67 @@
+put:
+  x-internal: true
+  summary: Enabled v2 receipt template
+  description: Enabled v2 receipt template
+  security:
+    - OAuth2: [ 'ROLE_SYS_MGR', 'ROLE_SYS_ANS' ]
+  tags:
+    - Channels
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Channel Id
+    - in: query
+      name: migrate_receipt_template
+      schema:
+        type: boolean
+      required: true
+      description: If true, enabled the purchase receipt template from V1 to V2
+  responses:
+    '200':
+      description: 'Successful request'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

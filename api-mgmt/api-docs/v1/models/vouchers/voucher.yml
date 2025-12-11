@@ -1,0 +1,55 @@
+additionalProperties: false
+type: object
+properties:
+  code:
+    type: string
+  voucher_group:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+  status:
+    $ref: status.yml
+  pin:
+    description: Personal Identification Number
+    type: string
+  email:
+    type: string
+  balance:
+    type: number
+  consolidated_balance:
+    type: number
+  usage:
+    type: object
+    properties:
+      used:
+        type: integer
+      limit:
+        $ref: ../common/limitless-value.yml
+  expiration:
+    $ref: voucher-expiration.yml
+  transactions:
+    type: array
+    items:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+        amount:
+          type: number
+        balance:
+          type: number
+        type:
+          type: string
+          enum:
+            - CREATION
+            - REDEEM
+            - MANUAL_MODIFICATION
+            - REFUND_TO_VOUCHER
+            - RESET
+        code:
+          type: string
+          description: Code of related transaction order

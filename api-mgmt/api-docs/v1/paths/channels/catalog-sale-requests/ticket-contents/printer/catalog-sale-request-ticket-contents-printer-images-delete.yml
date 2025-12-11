@@ -1,0 +1,72 @@
+delete:
+  x-internal: true
+  summary: Delete PRINTER ticket image for sale request
+  description: ''
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Catalog Sale Requests
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: saleRequestId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Sale request ID
+    - in: path
+      name: language
+      description: IETF language tag standard
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: type
+      schema:
+        $ref: '../../../../../models/channels/catalog-sale-requests/ticket-contents/images/ticket-printer-image-content-type-update.yml'
+      required: true
+  responses:
+    '204':
+      description: Sale request PRINTER ticket image deleted successfuly.
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error.yml
+    '412':
+      description: Precondition failed
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../models/common/error.yml

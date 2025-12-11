@@ -1,0 +1,81 @@
+get:
+  x-internal: true
+  summary: Retrieve donation campaigns for a provider
+  security:
+    - OAuth2: [ 'ROLE_OPR_MGR','ROLE_OPR_ANS', 'ROLE_CNL_MGR' ]
+  tags:
+    - Entities
+  parameters:
+    - in: path
+      name: entityId
+      description: Unique identifier of the entity
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: path
+      name: providerId
+      description: Unique identifier of the donation provider
+      schema:
+        type: integer
+        format: int64
+      required: true
+  responses:
+    '200':
+      description: Array of donation campaigns associated with the provider
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  description: Unique identifier of the campaign
+                name:
+                  type: string
+                  description: Name of the campaign
+                foundation:
+                  type: string
+                  description: Name of the foundation
+                currency_code:
+                  type: string
+                  description: Currency code accepted by the campaign
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

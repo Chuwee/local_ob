@@ -1,0 +1,46 @@
+get:
+  x-internal: true
+  summary: Get an entity's configuration of external barcode valid values
+  description: Get an entity's external barcode values
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Entities
+  parameters:
+    - in: path
+      name: entityId
+      description: the entity ID
+      schema:
+        type: integer
+      required: true
+  responses:
+    '200':
+      description: All the possible values for each fragment of their external barcodes
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/entities/external-barcodes-by-entity.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: the entity was not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: No configured barcode values for this entity
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

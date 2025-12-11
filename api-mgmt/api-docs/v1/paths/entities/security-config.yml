@@ -1,0 +1,119 @@
+get:
+  x-internal: true
+  summary: 'Get entity security config'
+  description: 'Get the security configuration of an entity'
+  security:
+    - OAuth2: ['ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Entity Security Config
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      schema:
+        type: integer
+      required: true
+  responses:
+    '200':
+      description: 'Entity security Configuration'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/entities/security-config.yml'
+    '400':
+      description: 'Bad request'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '401':
+      description: 'Unauthorized'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error-auth.yml'
+    '403':
+      description: 'Forbidden'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '404':
+      description: 'Not found'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '500':
+      description: 'Internal server error'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+put:
+  x-internal: true
+  summary: 'Update entity security config'
+  description: 'Update the security configuration of an entity'
+  security:
+    - OAuth2: ['ROLE_OPR_MGR']
+  tags:
+    - Entity Security Config
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      schema:
+        type: integer
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            password_config:
+              $ref: '../../models/entities/password_config.yml'
+  responses:
+    '204':
+      description: 'Entity security configuration updated'
+    '400':
+      description: 'Bad request'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '401':
+      description: 'Unauthorized'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error-auth.yml'
+    '403':
+      description: 'Forbidden'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '404':
+      description: 'Not found'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '500':
+      description: 'Internal server error'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'

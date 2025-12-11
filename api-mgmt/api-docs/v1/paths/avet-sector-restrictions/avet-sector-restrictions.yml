@@ -1,0 +1,131 @@
+post:
+  x-internal: true
+  summary: Create an event restriction
+  description: ''
+  security:
+    - OAuth2: [ 'ROLE_EVN_MGR', 'ROLE_OPR_MGR' ]
+  tags:
+    - Avet Sector Restrictions
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: eventId
+      description: Find by event id
+      schema:
+        type: number
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/avet-sector-restrictions/new-avet-sector-restriction.yml
+  responses:
+    '201':
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - code
+            properties:
+              code:
+                type: string
+                format: UUID
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+get:
+  x-internal: true
+  summary: Get avet sector restrictions list
+  description: ''
+  security:
+    - OAuth2: [ 'ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS' ]
+  tags:
+    - Avet Sector Restrictions
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: eventId
+      description: Find by event id
+      schema:
+        type: number
+      required: true
+  responses:
+    '200':
+      description: Avet sector restrictions list
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../../models/avet-sector-restrictions/avet-sector-restrictions.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

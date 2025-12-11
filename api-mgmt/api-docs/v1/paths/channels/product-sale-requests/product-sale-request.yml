@@ -1,0 +1,181 @@
+get:
+  x-internal: true
+  summary: Get product sale request
+  description: ''
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Product Sale Requests
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: saleRequestId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Sale request ID
+  responses:
+    '200':
+      description: 'Get product sale request detail'
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/channels/product-sale-requests/products-sale-requests-detail.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+delete:
+  x-internal: true
+  summary: Delete product sale request
+  description: Delete product sale request by ID
+  security:
+    - OAuth2:
+        - 'ROLE_CNL_MGR'
+        - 'ROLE_OPR_MGR'
+  tags:
+    - Product Sale Requests
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: saleRequestId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Sale request ID
+  responses:
+    '204':
+      description: Product deleted successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+put:
+  x-internal: true
+  summary: Update product sale request status
+  tags:
+    - Product Sale Requests
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: saleRequestId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Sale request ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+          properties:
+            status:
+              $ref: '../../../models/channels/product-sale-requests/sale-request-status.yml'
+  responses:
+    '200':
+      description: Product sale request successfully updated
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            properties:
+              status:
+                $ref: '../../../models/channels/product-sale-requests/sale-request-status.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '404':
+      description: Sale Request not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'

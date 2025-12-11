@@ -1,0 +1,153 @@
+get:
+  x-internal: true
+  summary: Get B2B Seat Publishing Configuration
+  security:
+    - OAuth2: [ 'ROLE_ENT_MGR', 'ROLE_OPR_MGR', 'ROLE_EVN_MGR' ]
+  tags:
+    - B2B Seat publishing
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Event ID
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Channel ID
+    - in: path
+      name: venueTemplateId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Venue Template ID
+  responses:
+    '200':
+      description: ''
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/event/b2b-seat-publishing-config.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+put:
+  x-internal: true
+  summary: Update B2B Seat Publishing Configuration
+  description: 'This endpoint allows authorised users to update the B2B seat publishing settings for a specific event, channel and venue template'
+  security:
+    - OAuth2: [ 'ROLE_ENT_MGR', 'ROLE_OPR_MGR', 'ROLE_EVN_MGR' ]
+  tags:
+    - B2B Seat publishing
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Event ID
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Channel ID
+    - in: path
+      name: venueTemplateId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Venue Template ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/event/b2b-seat-publishing-config-request.yml
+  responses:
+    '204':
+      description: Saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '412':
+      description: Precondition failed
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

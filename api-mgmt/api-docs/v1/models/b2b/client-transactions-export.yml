@@ -1,0 +1,102 @@
+additionalProperties: false
+type: object
+required:
+  - filter
+  - fields
+  - format
+  - delivery
+properties:
+  entity_id:
+    type: integer
+  filter:
+    type: object
+    required:
+      - transaction_date_from
+      - transaction_date_to
+    properties:
+      transaction_date_from:
+        description: Filter transactions date with date-time format.
+        type: string
+      transaction_date_to:
+        description: Filter transactions date with date-time format.
+        type: string
+      currency_code:
+        type: string
+      q:
+        description: Search by transaction id, user or notes.
+        type: string
+      type:
+        description: The operation type
+        type: string
+        enum:
+          - PURCHASE
+          - CREDIT_LIMIT
+          - CASH_ADJUSTMENT
+          - REFUND
+          - DEPOSIT
+  fields:
+    type: array
+    items:
+      type: object
+      required:
+        - field
+        - name
+      properties:
+        field:
+          type: string
+          enum:
+            - id
+            - transaction_code
+            - order_code
+            - date
+            - time
+            - channel
+            - user
+            - notes
+            - transaction_type
+            - deposit_type
+            - previous_balance
+            - amount
+            - credit
+            - balance
+            - debt
+        name:
+          type: string
+          description: Custom header name
+  format:
+    type: string
+    enum:
+      - CSV
+  delivery:
+    type: object
+    required:
+      - type
+    properties:
+      type:
+        type: string
+        enum:
+          - EMAIL
+      properties:
+        description: |
+          Fields required by the delivery type.         
+          Valid properties to **EMAIL** type:
+            - address: Email where report will be sent. Optional. Authenticated username will be used if address is not informed.
+        type: object
+        additionalProperties: {}
+        example:
+          address: 'user@email.com'
+  translations:
+    type: array
+    description: |
+      - Valid keys to *transaction_type* translation:
+        - PURCHASE
+        - CREDIT_LIMIT
+        - CASH_ADJUSTMENT
+        - REFUND
+        - DEPOSIT
+      - Valid keys to *deposit_type* translation:
+        - CHECK
+        - TRANSFER
+        - CASH
+    items:
+      $ref: ../../models/exports/translation.yml

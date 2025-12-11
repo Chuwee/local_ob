@@ -1,0 +1,72 @@
+post:
+   x-internal: true
+   summary: Clone event promotion
+   description: ''
+   security:
+   -  OAuth2:
+      - ROLE_EVN_MGR
+      - ROLE_OPR_MGR
+   tags:
+   - Promotions
+   parameters:
+   -  in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+         type: string
+      required: true
+   -  in: path
+      name: eventId
+      schema:
+         type: integer
+         format: int64
+      required: true
+      description: Event ID
+   -  in: path
+      name: promotionId
+      schema:
+         type: integer
+         format: int64
+      required: true
+      description: Promotion ID
+   responses:
+    '201':
+      description: The cloned event promotion was added correctly and it's being processed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: the id of the newly created event promotion
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

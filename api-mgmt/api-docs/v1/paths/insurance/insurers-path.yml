@@ -1,0 +1,134 @@
+get:
+  x-internal: true
+  summary: Search Insurers
+  description: 'Search insurers with pagination, filters and search criteria'
+  security:
+    - OAuth2: ['ROLE_SYS_MGR', 'ROLE_SYS_ANS']
+  tags:
+    - Insurers
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: q
+      description: Search by name, tax name (razón social), email or phone
+      schema:
+        type: string
+      required: false
+    - in: query
+      name: operator_id
+      description: Filter by operator ID
+      schema:
+        type: integer
+        format: int64
+      required: false
+    - in: query
+      name: limit
+      description: The pagination limit
+      schema:
+        type: integer
+      required: false
+    - in: query
+      name: offset
+      description: The pagination offset
+      schema:
+        type: integer
+      required: false
+    - in: query
+      name: sort
+      description: Sorting by name with format field:[asc|desc]. For example 'name:asc'
+      schema:
+        type: string
+      required: false
+  responses:
+    '200':
+      description: Search results with paginated list of insurers
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/insurance/insurers.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+post:
+  x-internal: true
+  summary: Returns an object with created insurer information
+  description: 'Post an insurer'
+  security:
+    - OAuth2: ['ROLE_SYS_MGR']
+  tags:
+    - Insurers
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/insurance/insurer-create.yml
+  responses:
+    '200':
+      description: A JSON with insurer information
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/insurance/insurer.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

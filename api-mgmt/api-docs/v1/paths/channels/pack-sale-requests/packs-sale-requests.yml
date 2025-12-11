@@ -1,0 +1,86 @@
+get:
+  x-internal: true
+  summary: Search product sale requests
+  description: ''
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Pack Sale Requests
+  parameters:
+    - in: query
+      name: status
+      schema:
+        type: array
+        items:
+          $ref: ../../../models/channels/pack-sale-requests/sale-request-status.yml
+      description: Current pack sale request status
+    - in: query
+      name: q
+      description: Keyword to filter by pack name
+      schema:
+        type: string
+    - in: query
+      name: date
+      schema:
+        type: string
+      description: Filter of enum fields with format field:[eq|ne|lt|lte|gt|gte]. For example 'gt:2019-10-14T15:34:46.111Z'
+    - in: query
+      name: limit
+      schema:
+        type: integer
+        maximum: 50
+        minimum: 0
+        default: 50
+      description: Limit
+    - in: query
+      name: offset
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Offset
+  responses:
+    '200':
+      description: 'Array of pack sales requests'
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            properties:
+              metadata:
+                $ref: ../../../models/common/responses/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: ../../../models/channels/pack-sale-requests/base-pack-sale-request.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml

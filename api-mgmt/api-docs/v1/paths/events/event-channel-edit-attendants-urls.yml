@@ -1,0 +1,70 @@
+get:
+  x-internal: true
+  summary: Get edit attendant channel urls
+  description: Get edit attendants landing urls in every language
+  security:
+    - OAuth2:
+        - 'ROLE_EVN_MGR'
+        - 'ROLE_OPR_MGR'
+        - 'ROLE_ENT_ANS'
+        - 'ROLE_OPR_ANS'
+  tags:
+    - Event channels
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Event ID
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Channel ID
+  responses:
+    '200':
+      description: Get EventChannel edit attendants urls
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/base-link.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

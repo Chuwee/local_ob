@@ -1,0 +1,86 @@
+get:
+  x-internal: true
+  summary: Filters for catalog sale requests
+  description: ''
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Catalog Sale Requests
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: filter
+      schema:
+        type: string
+        enum:
+          - channels
+          - channel-entities
+          - event-entities
+      required: true
+      description: channel-entities filter type only for user ``ROLE_OPR_MGR``
+    - in: query
+      name: q
+      schema:
+        type: string
+      description: Free search by name and id of selected filter
+    - in: query
+      name: limit
+      schema:
+        type: integer
+        maximum: 500
+        minimum: 0
+        default: 500
+      description: Limit results to return
+  responses:
+    '200':
+      description: 'Array of sales requests'
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            required:
+              - metadata
+              - data
+            properties:
+              metadata:
+                $ref: ../../../models/common/responses/base-metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: ../../../models/common/idname.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml

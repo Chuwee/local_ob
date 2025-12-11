@@ -1,0 +1,76 @@
+get:
+  summary:  Get restricted season ticket rates
+  description: 'Gets the specified list of restricted season ticket rates'
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Rates
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+      required: true
+      description: Season Ticket ID
+  responses:
+    '200':
+      description: 'Restricted Season Ticket rates'
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            properties:
+              metadata:
+                type: object
+                properties:
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+                  total:
+                    type: integer
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    rate:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                    restrictions:
+                      $ref: '../../models/season-ticket/season-ticket-rate-restrictions.yml'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

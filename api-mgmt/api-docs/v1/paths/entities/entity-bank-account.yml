@@ -1,0 +1,185 @@
+get:
+  summary: Get entity bank account
+  description: Get a specific bank account by ID
+  security:
+    - OAuth2:
+        - 'ROLE_ENT_MGR'
+        - 'ROLE_OPR_MGR'
+        - 'ROLE_OPR_ANS'
+        - 'ROLE_ENT_ANS'
+  tags:
+    - Bank Accounts
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Entity ID
+    - in: path
+      name: bankAccountId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Bank Account ID
+  responses:
+    '200':
+      description: Bank account details
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/entities/entity-bank-account.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Entity or bank account not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  summary: Update entity bank account
+  description: Update an existing bank account
+  security:
+    - OAuth2:
+        - 'ROLE_ENT_MGR'
+        - 'ROLE_OPR_MGR'
+  tags:
+    - Bank Accounts
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Entity ID
+    - in: path
+      name: bankAccountId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Bank Account ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../models/entities/update-entity-bank-account.yml'
+  responses:
+    '204':
+      description: Bank account updated successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Entity or bank account not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+delete:
+  summary: Delete entity bank account
+  description: Delete a bank account
+  security:
+    - OAuth2:
+        - 'ROLE_ENT_MGR'
+        - 'ROLE_OPR_MGR'
+  tags:
+    - Bank Accounts
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Entity ID
+    - in: path
+      name: bankAccountId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Bank Account ID
+  responses:
+    '204':
+      description: Bank account deleted successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Entity or bank account not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml 

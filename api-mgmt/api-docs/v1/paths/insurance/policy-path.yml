@@ -1,0 +1,215 @@
+get:
+  x-internal: true
+  summary: Returns an object with policy information
+  description: 'Get a policy'
+  security:
+    - OAuth2: ['ROLE_SYS_MGR', 'ROLE_SYS_ANS']
+  tags:
+    - Policies
+  parameters:
+    - in: path
+      name: insurerId
+      schema:
+        type: integer
+      required: true
+      description: Insurer ID
+    - in: path
+      name: policyId
+      schema:
+        type: integer
+      required: true
+      description: Policy ID
+  responses:
+    '200':
+      description: A policy detail
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/insurance/policy.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+put:
+  x-internal: true
+  summary: Update Policy
+  description: 'Update policy by id'
+  security:
+    - OAuth2: [ 'ROLE_SYS_MGR' ]
+  tags:
+    - Policies
+  parameters:
+    - in: path
+      name: insurerId
+      schema:
+        type: integer
+      required: true
+      description: Insurer ID
+    - in: path
+      name: policyId
+      schema:
+        type: integer
+      required: true
+      description: Policy ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            active:
+              type: boolean
+            description:
+              type: string
+            days_ahead_limit:
+              type: integer
+              format: int32
+            taxes:
+              type: number
+              format: double
+            insurer_benefits_fix:
+              type: number
+              format: double
+            insurer_benefits_percent:
+              type: number
+              format: double
+            operator_benefits_fix:
+              type: number
+              format: double
+            operator_benefits_percent:
+              type: number
+              format: double
+            external_provider:
+              type: string
+            default_allowed:
+              type: boolean
+            languages:
+              type: object
+              properties:
+                default:
+                  type: string
+                  description: IETF language tag standard (automatically converted to internal format)
+                  example: es-ES
+                selected:
+                  type: array
+                  items:
+                    type: string
+                    description: IETF language tag standard (automatically converted to internal format)
+                    example: es-ES
+              description: Language configuration for the policy
+  responses:
+    '204':
+      description: Saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+delete:
+  x-internal: true
+  summary: Delete Policy
+  description: 'Delete policy by id'
+  security:
+    - OAuth2: [ 'ROLE_SYS_MGR' ]
+  tags:
+    - Policies
+  parameters:
+    - in: path
+      name: insurerId
+      schema:
+        type: integer
+      required: true
+      description: Insurer ID
+    - in: path
+      name: policyId
+      schema:
+        type: integer
+      required: true
+      description: Policy ID
+  responses:
+    '204':
+      description: Deleted successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

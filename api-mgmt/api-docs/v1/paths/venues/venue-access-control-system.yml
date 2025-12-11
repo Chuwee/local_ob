@@ -1,0 +1,58 @@
+delete:
+  x-internal: true
+  summary: Unassign an access control systems to a venue
+  description: Unassign an access control system to a venue
+  security:
+    - OAuth2: ['ROLE_ENT_MGR', 'ROLE_OPR_MGR', 'ROLE_REC_MGR']
+  tags:
+    - Venue access control systems
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: venueId
+      schema:
+        type: integer
+      required: true
+    - in: path
+      name: accessControlSystemName
+      schema:
+        type: string
+      required: true
+  responses:
+    '204':
+      description: Empty response
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

@@ -1,0 +1,223 @@
+get:
+  summary: Search vouchers of voucher-group
+  description: Vouchers list sort by creation date
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_ENT_ANS', 'ROLE_ENT_MGR', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Vouchers
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: voucherGroupId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Voucher Group ID
+    - in: query
+      name: status
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../models/vouchers/status.yml
+    - in: query
+      name: pin
+      schema:
+        type: string
+    - in: query
+      name: email
+      schema:
+        type: string
+    - in: query
+      name: aggs
+      description: Add aggregation_data to response for filtered query
+      schema:
+        type: boolean
+    - in: query
+      name: limit
+      schema:
+        type: integer
+        maximum: 100
+        minimum: 0
+        default: 50
+    - in: query
+      name: offset
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+  responses:
+    '200':
+      description: ''
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../models/common/responses/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: ../../models/vouchers/voucher.yml
+              aggregated_data:
+                type: object
+                description: Aggregations of filtered response if ``aggs`` flag is enabled.
+                properties:
+                  overall:
+                    type: array
+                    description: Summary of totals
+                    items:
+                      $ref: ../../models/common/aggregation-metric.yml
+                  type:
+                    type: array
+                    description: Totals segmented data by type of aggregation
+                    items:
+                      type: object
+                      properties:
+                        agg_value:
+                          description: Aggregation term value
+                          type: string
+                          enum:
+                            - ACTIVE
+                            - ACTIVE_WITH_REDEEMS
+                            - ACTIVE_WITHOUT_REDEEMS
+                            - INACTIVE
+                            - INACTIVE_WITH_REDEEMS
+                            - INACTIVE_WITHOUT_REDEEMS
+                        agg_metric:
+                          type: array
+                          description: Summary of totals by agg_value
+                          items:
+                            $ref: ../../models/common/aggregation-metric.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+post:
+  x-internal: true
+  summary: New voucher
+  description: Only available for voucher-group of type ``MANUAL``
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Vouchers
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: voucherGroupId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Voucher Group ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - balance
+            - expiration
+          properties:
+            balance:
+              type: number
+            expiration:
+              type: string
+              format: date-time
+            usage_limit:
+              type: number
+            pin:
+              type: string
+            email:
+              type: string
+  responses:
+    '201':
+      description: 'Created successfully'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: string
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

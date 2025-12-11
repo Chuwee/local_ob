@@ -1,0 +1,218 @@
+get:
+  summary: Search collectives
+  description: ''
+  security:
+    - OAuth2: ['ROLE_OPR_MGR', 'ROLE_OPR_ANS', 'ROLE_COL_MGR', 'ROLE_EVN_MGR']
+  tags:
+    - Collectives
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: id
+      schema:
+        type: integer
+        format: int64
+      description: ID
+    - in: query
+      name: entity_id
+      schema:
+        type: integer
+        format: int64
+      description: Entity ID (only for user ``ROLE_OPR_MGR`` or `ROLE_OPR_ANS`)
+    - in: query
+      name: type
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../models/collectives/type.yml
+    - in: query
+      name: validation_method
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../models/collectives/validation-method.yml
+    - in: query
+      name: q
+      schema:
+        type: string
+    - in: query
+      name: sort
+      description: |
+        Sorting of valid fields with format field:[asc|desc]. For example 'name:desc'
+
+        Valid fields to sort:
+        <ul>
+          <li>name</li>
+          <li>type</li>
+          <li>subtype</li>
+        </ul>
+
+        For example:
+        <ul>
+          <li>name:desc</li>
+          <li>type:asc</li>
+          <li>subtype:desc</li>
+          <li>...</li>
+        </ul>
+      schema:
+        type: string
+    - in: query
+      name: limit
+      schema:
+        type: integer
+        maximum: 50
+        minimum: 0
+        default: 50
+    - in: query
+      name: offset
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+  responses:
+    '200':
+      description: 'Successful response'
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            required:
+              - metadata
+              - data
+            properties:
+              metadata:
+                $ref: ./../../models/common/responses/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: ./../../models/collectives/collective.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+post:
+  x-internal: true
+  summary: New collective
+  description: ''
+  security:
+    - OAuth2: ['ROLE_OPR_MGR', 'ROLE_COL_MGR']
+  tags:
+    - Collectives
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - name
+            - type
+            - validation_method
+          properties:
+            name:
+              type: string
+              minLength: 1
+              maxLength: 50
+            type:
+              $ref: '../../models/collectives/type.yml'
+            validation_method:
+              $ref: '../../models/collectives/validation-method.yml'
+            description:
+              type: string
+              maxLength: 250
+            entity_id:
+              type: integer
+              format: int64
+            external_validator:
+              type: string
+  responses:
+    '201':
+      description: 'Created successfully'
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: integer
+                format: int64
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

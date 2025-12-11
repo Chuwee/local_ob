@@ -1,0 +1,81 @@
+post:
+  x-internal: true
+  summary: Create onebox invoice entity configuration
+  description: Create onebox invoice entity configuration
+  security:
+    - OAuth2: ['ROLE_SYS_MGR']
+  tags:
+    - Onebox Invoicing
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      description: Entity Id
+      schema:
+        type: number
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - fixed
+            - variable
+            - min
+            - max
+            - invitation
+            - refund
+          properties:
+            fixed:
+              type: number
+            variable:
+              type: number
+            min:
+              type: number
+            max:
+              type: number
+            invitation:
+              type: number
+            refund:
+              type: number
+            type:
+              type: string
+              enum:
+                - UNDEFINED
+                - CHANNEL
+                - EVENT
+  responses:
+    '200':
+      description: Successful response
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '401':
+      description: Invalid token
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error-auth.yml'
+    '403':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'

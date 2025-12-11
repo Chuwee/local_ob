@@ -1,0 +1,118 @@
+additionalProperties: false
+type: object
+required:
+  - id
+  - name
+  - type
+  - status
+  - entity
+  - producer
+  - venue_templates
+  - contact
+  - settings
+  - archived
+  - has_sales
+properties:
+  id:
+    type: integer
+    format: int64
+  name:
+    type: string
+  reference:
+    type: string
+  type:
+    $ref: event-type.yml
+  status:
+    $ref: event-status.yml
+  start_date:
+    type: string
+    format: date-time
+  end_date:
+    type: string
+    format: date-time
+  entity:
+    type: object
+    required:
+      - id
+      - name
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+  producer:
+    type: object
+    required:
+      - id
+      - name
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+  external_reference:
+    type: string
+  venue_templates:
+    type: array
+    items:
+      type: object
+      required:
+        - id
+        - name
+        - venue
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        venue:
+          type: object
+          required:
+            - id
+            - name
+            - city
+            - country
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            city:
+              type: string
+            country:
+              type: string
+              description: ISO 3166 codes
+            google_place_id:
+              type: string
+              description: Google place ID
+            access_control_systems:
+              type: array
+              items:
+                $ref: ../../models/common/name.yml
+  contact:
+    $ref: event-contact.yml
+  settings:
+    $ref: event-settings.yml
+  currency_code:
+    x-internal: true
+    type: string
+  additional_config:
+    x-internal: true
+    $ref: ../../models/event/event-additional-config.yml
+  archived:
+    type: boolean
+  has_sales:
+    type: boolean
+  has_sales_request:
+    type: boolean
+  external_data:
+    type: object
+    properties:
+      competition_id:
+        type: integer
+      competition_name:
+        type: string
+  phone_verification_required:
+    type: boolean
+  attendant_verification_required:
+    type: boolean

@@ -1,0 +1,140 @@
+get:
+  x-internal: true
+  summary: Get dates filter
+  description: ''
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Member Config
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      description: Find by channel id
+      schema:
+        type: number
+      required: true
+    - in: path
+      name: type
+      description: Member period type
+      schema:
+        type: string
+        enum:
+          - RENEWAL
+          - CHANGE_SEAT
+          - BUY_SEAT
+          - NEW_MEMBER
+      required: true
+  responses:
+    '200':
+      description: Dates filter
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/members-config/member-dates-filter.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+put:
+  x-internal: true
+  summary: Update dates filter
+  description: ''
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Member Config
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      description: Find by channel id
+      schema:
+        type: number
+      required: true
+    - in: path
+      name: type
+      description: Member period type
+      schema:
+        type: string
+        enum:
+          - RENEWAL
+          - CHANGE_SEAT
+          - BUY_SEAT
+          - NEW_MEMBER
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/members-config/update-dates-filter.yml
+  responses:
+    '204':
+      description: Successful response
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

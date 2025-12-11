@@ -1,0 +1,148 @@
+put:
+  x-internal: true
+  summary: Update season ticket rate
+  description: 'Update an existing Season Ticket rate'
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Season Ticket Rates
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+      required: true
+      description: Season Ticket ID
+    - in: path
+      name: rateId
+      schema:
+        type: integer
+      required: true
+      description: Rate ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+              maxLength: 50
+            default:
+              type: boolean
+            restrictive_access:
+              type: boolean
+            enabled:
+              type: boolean
+            texts:
+              type: object
+              properties:
+                name:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: Key-Value with key IETF language tag standard and value with the text
+                  example:
+                    en-US: Adult
+                    es-ES: Adulto
+  responses:
+    '204':
+      description: Saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '412':
+      description: Precondition failed
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+delete:
+  x-internal: true
+  summary: Delete season ticket rate
+  description: Delete season ticket rate by season ticket and rate ids
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Season Ticket Rates
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+      required: true
+      description: Season Ticket ID
+    - in: path
+      name: rateId
+      schema:
+        type: integer
+      required: true
+      description: Rate ID
+  responses:
+    '204':
+      description: Season ticket rate deleted successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+

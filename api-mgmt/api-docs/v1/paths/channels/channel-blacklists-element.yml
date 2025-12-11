@@ -1,0 +1,138 @@
+get:
+  x-internal: true
+  summary: Get a channel blacklist element
+  description: 'Retrieves a channel blacklist element'
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Channel Blacklists
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Channel ID
+    - in: path
+      name: type
+      description: Blacklist Type
+      schema:
+        $ref: ../../models/channels/channel-blacklist-type.yml
+      required: true
+    - in: path
+      name: value
+      description: Blacklist item value
+      schema:
+        type: string
+      required: true
+  responses:
+    '200':
+      description: 'Successful response'
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/channels/channel-blacklist.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+delete:
+  x-internal: true
+  summary: Delete a channel blacklist item
+  description: 'Delete a channel blacklist item'
+  security:
+    - OAuth2: ['ROLE_OPR_MGR']
+  tags:
+    - Channel Blacklists
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Channel ID
+    - in: path
+      name: type
+      description: Blacklist Type
+      schema:
+        $ref: ../../models/channels/channel-blacklist-type.yml
+      required: true
+    - in: path
+      name: value
+      description: Blacklist item value
+      schema:
+        type: string
+      required: true
+  responses:
+    '204':
+      description: Deleted successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

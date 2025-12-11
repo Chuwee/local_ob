@@ -1,0 +1,198 @@
+put:
+  x-internal: true
+  summary: Update a product channel
+  security:
+    - OAuth2: [ 'ROLE_EVN_MGR', 'ROLE_OPR_MGR' ]
+  tags:
+    - Product channels
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: productId
+      schema:
+        type: integer
+      required: true
+      description: Product ID
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+      required: true
+      description: Channel ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            checkout_suggestion_enabled:
+              type: boolean
+            standalone_enabled:
+              type: boolean
+  responses:
+    '204':
+      description: Product channel updated successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+delete:
+  x-internal: true
+  summary: Delete product channel
+  description: Delete product channel
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Product channels
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: productId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Product ID
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Channel ID
+  responses:
+    '204':
+      description: Product channels have been deleted successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+get:
+  summary: Get product channel
+  description: Returns detailed information about a specific product-channel configuration.
+  security:
+    - OAuth2: [ 'ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS' ]
+  tags:
+    - Product channels
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      required: true
+      schema:
+        type: string
+    - in: path
+      name: productId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Product ID
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Channel ID
+  responses:
+    '200':
+      description: Product channel found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/products/product-channel-dto.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Product channel not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

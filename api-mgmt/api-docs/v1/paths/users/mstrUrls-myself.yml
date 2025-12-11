@@ -1,0 +1,47 @@
+get:
+  x-internal: true
+  summary: Get mstr urls
+  description: get mstr urls by user id
+  tags:
+    - Myself
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: query
+      x-internal: true
+      name: impersonated_user_id
+      description: Id of the user to impersonate
+      schema:
+        type: number
+      required: false
+  responses:
+    '200':
+      description: Get urls to redirect to the BI service
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            properties:
+              login:
+                type: string
+              logout:
+                type: string
+              load:
+                type: string
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

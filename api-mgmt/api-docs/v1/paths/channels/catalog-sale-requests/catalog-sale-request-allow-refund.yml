@@ -1,0 +1,126 @@
+get:
+  x-internal: true
+  summary: Get allow refund flag of the sale request
+  description: Flag that allows to enable or disable the refund action of a channel for a given sale request
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Catalog Sale Requests
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: saleRequestId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Sale request ID
+  responses:
+    '200':
+      description: Get allow refund flag of the sale request
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            properties:
+             allow_refund:
+               type: boolean
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+post:
+  x-internal: true
+  summary: Set allow refund flag of the sale request
+  description: Update flag that allows to enable or disable the refund action of a channel for a given sale request
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Catalog Sale Requests
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: saleRequestId
+      schema:
+        type: integer
+      required: true
+      description: Sale request ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+           allow_refund:
+             type: boolean
+  responses:
+    '204':
+      description: Allow refund flag successfuly updated for the sale request.
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error-auth.yml'
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'

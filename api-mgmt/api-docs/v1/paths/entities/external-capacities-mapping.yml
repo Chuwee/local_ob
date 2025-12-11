@@ -1,0 +1,62 @@
+post:
+  x-internal: true
+  summary: Create capacity mappings
+  description: Creates mappings for all sessions of the given external capacity from an AVET entity
+  security:
+    - OAuth2: ['ROLE_OPR_MGR']
+  tags:
+    - External Capacities
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Entity ID. Must be an AVET entity.
+    - in: path
+      name: capacityId
+      schema:
+        type: integer
+        format: int32
+      required: true
+      description: External capacity ID
+  responses:
+    '200':
+      description: Successful response
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

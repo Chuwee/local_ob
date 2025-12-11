@@ -1,0 +1,80 @@
+post:
+  x-internal: true
+  summary: Clone venue template not numbered zone
+  description: Clones a not numbered zone
+  security:
+    - OAuth2: ['ROLE_REC_MGR', 'ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Template Not Numbered Zones
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: venueTemplateId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Venue Template ID
+    - in: path
+      name: notNumberedZoneId
+      schema:
+       type: integer
+       format: int64
+      required: true
+      description: Not numbered zone ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - name
+          properties:
+            name:
+              type: string
+            sector_id:
+              type: number
+            view_id:
+              type: number
+  responses:
+    '201':
+      description: Venue template not numbered zone cloned correctly
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: invalid token
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

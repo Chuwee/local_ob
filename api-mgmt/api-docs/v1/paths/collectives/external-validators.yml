@@ -1,0 +1,41 @@
+get:
+  x-internal: true
+  summary: Search external validators
+  security:
+    - OAuth2: ['ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Collectives
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+  responses:
+    '200':
+      description: List of external validators
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ./../../models/collectives/external-validators.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

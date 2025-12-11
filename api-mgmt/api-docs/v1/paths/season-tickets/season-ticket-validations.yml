@@ -1,0 +1,86 @@
+get:
+  summary: Get validations info about a season ticket
+  description: 'Get validations info about a season ticket'
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Season Tickets
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: query
+      name: has_linkable_seats
+      description: Set to true if info about linkable seats is needed
+      example: true
+      schema:
+        type: boolean
+    - in: query
+      name: has_assigned_sessions
+      description: Set to true if info about assigned sessions is needed
+      example: true
+      schema:
+        type: boolean
+    - in: query
+      name: has_pending_renewals
+      description: Set to true if info about pending renewals is needed
+      example: true
+      schema:
+        type: boolean
+  responses:
+    '200':
+      description: Info about validations
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              has_linkable_seats:
+                type: boolean
+                description: Return true if the season ticket has almost one linkable seat
+              has_assigned_sessions:
+                type: boolean
+                description: Return true if the season ticket has almost one assigned session
+              has_pending_renewals:
+                type: boolean
+                description: Return true if the season ticket has almost one pending renewal
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

@@ -1,0 +1,126 @@
+put:
+  summary: Update entity categories
+  description: Update entity categories. Map between entity categories and base categories. See service GET /base-categories
+  deprecated: true
+  security:
+    - OAuth2: ['ROLE_ENT_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Entity categories
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      description: The entity of the result categories, only required for operator users
+      schema:
+        type: integer
+      required: true
+    - in: path
+      name: categoryId
+      description: Category id to update
+      schema:
+        type: integer
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/categories/category-post.yml
+  responses:
+    '204':
+      description: Entity category updated
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+delete:
+  summary: Delete entity category
+  description: Delete entity category
+  deprecated: true
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Entity categories
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      description: The entity of the result categories, only required for operator users
+      schema:
+        type: integer
+      required: true
+    - in: path
+      name: categoryId
+      description: Category id to update
+      schema:
+        type: integer
+      required: true
+  responses:
+    '204':
+      description: Deleted entity category
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

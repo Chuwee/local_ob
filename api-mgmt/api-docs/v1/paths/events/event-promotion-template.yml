@@ -1,0 +1,169 @@
+get:
+   x-internal: true
+   summary: Get event promotion template
+   description: 'Get event promotion template'
+   security:
+     - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+   tags:
+     - Promotion Templates
+   parameters:
+     - in: header
+       name: Authorization
+       description: Bearer Token
+       schema:
+         type: string
+       required: true
+     - in: path
+       name: promotionTemplateId
+       description: Promotion ID
+       schema:
+         type: integer
+         format: int64
+       required: true
+   responses:
+      '200':
+         description: 'Event promotion template details'
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/promotions/promotion-template-detail.yml
+      '400':
+         description: Bad request
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error.yml
+      '401':
+         description: Unauthorized
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error-auth.yml
+      '403':
+         description: Forbidden
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error.yml
+      '404':
+         description: Not found
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error.yml
+      '500':
+         description: Internal server error
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error.yml
+put:
+   x-internal: true
+   summary: Update event promotion template
+   description: ''
+   security:
+     - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR', 'ROLE_ENT_MGR']
+   tags:
+     - Promotion Templates
+   parameters:
+     - in: header
+       name: Authorization
+       description: Bearer Token
+       required: true
+       schema:
+         type: string
+     - in: path
+       name: promotionTemplateId
+       required: true
+       description: Promotion ID
+       schema:
+         type: integer
+         format: int64
+   requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/promotions/event-promotion-template-update.yml
+   responses:
+      '204':
+         description: Event promotion template update succesfully.
+      '400':
+         description: Bad request
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error.yml
+      '401':
+         description: Unauthorized
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error-auth.yml
+      '403':
+         description: Forbidden
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error.yml
+      '404':
+         description: Not found
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error.yml
+      '500':
+         description: Internal server error
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error.yml
+delete:
+   x-internal: true
+   summary: Delete promotion template
+   description: ''
+   security:
+     - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR', 'ROLE_ENT_MGR']
+   tags:
+     - Promotion Templates
+   parameters:
+     - in: header
+       name: Authorization
+       description: Bearer Token
+       schema:
+         type: string
+       required: true
+     - in: path
+       name: promotionTemplateId
+       description: Promotion ID
+       schema:
+         type: integer
+         format: int64
+       required: true
+   responses:
+      '204':
+         description: Promotion template deleted
+      '400':
+         description: bad request
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error.yml
+      '401':
+         description: invalid token
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error-auth.yml
+      '403':
+         description: unauthorized
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error.yml
+      '500':
+         description: Internal server error
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error.yml

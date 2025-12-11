@@ -1,0 +1,107 @@
+additionalProperties: false
+type: object
+properties:
+  avet_ws_environment:
+    $ref: 'avet-environment.yml'
+  ticketing:
+    type: object
+    properties:
+      connection:
+        type: object
+        properties:
+          name:
+            type: string
+          username:
+            type: string
+          password:
+            type: string
+          protocol:
+            $ref: 'protocol-type.yml'
+          ip:
+            type: string
+          port:
+            type: integer
+          ping_requests_blocked:
+            type: boolean
+          ws_connection_version:
+            $ref: 'avet-ws-connection-version.yml'
+      capacity:
+        type: object
+        properties:
+          capacity_name_type:
+            $ref: 'capacity-name-type.yml'
+          capacities:
+            type: array
+            items:
+              type: integer
+          season:
+            type: string
+          members_capacity_id:
+            type: number
+      operative:
+        type: object
+        properties:
+          partner_validation_type:
+            $ref: 'partner-validation-type.yml'
+          payment_method:
+            type: integer
+          generate_partner_ticket:
+            type: boolean
+          scheduled:
+            type: boolean
+          fixed_delay_ms:
+            type: integer
+          check_partner_grant:
+            type: boolean
+          partner_grant_capacities:
+            type: array
+            items:
+              type: integer
+          check_partner_pin_regexp:
+            type: boolean
+          partner_pin_regexp:
+            type: string
+          send_id_number:
+            type: boolean
+          id_number_max_length:
+            type: integer
+          digital_ticket_mode:
+            type: string
+            enum:
+              - DISABLED
+              - PASSBOOK_FILE
+              - WALLET_NFC
+              - WALLET
+  members:
+    type: object
+    properties:
+      enabled:
+        type: boolean
+        description: if disabled, the values in connection won't take effect
+      connection:
+        type: object
+        properties:
+          ip:
+            type: string
+          port:
+            type: integer
+          protocol:
+            $ref: 'protocol-type.yml'
+          username:
+            type: string
+          password:
+            type: string
+          ws_connection_version:
+            $ref: 'avet-ws-connection-version.yml'
+  smart_booking:
+    $ref: 'smart-booking-config.yml'
+  sga:
+    $ref: 'sga-config.yml'
+  avet_connection_type:
+    type: string
+    enum:
+      - SOCKET
+      - WEBSERVICES
+      - APIM
+  sectors_validation:
+    type: boolean

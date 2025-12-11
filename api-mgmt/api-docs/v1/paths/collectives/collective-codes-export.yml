@@ -1,0 +1,126 @@
+post:
+   summary: Export collective codes
+   x-internal: true
+   description: ''
+   security:
+    - OAuth2: ['ROLE_OPR_MGR', 'ROLE_OPR_ANS', 'ROLE_COL_MGR']
+   tags:
+     - Collective codes
+   parameters:
+   -  in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+   -  in: path
+      name: collectiveId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Collective ID
+   - in: query
+     name: q
+     description: Search by collective code
+     schema:
+       type: string
+   requestBody:
+      content:
+         application/json:
+            schema:
+               type: object
+               required:
+               - fields
+               - format
+               - delivery
+               properties:
+                  fields:
+                     type: array
+                     items:
+                        type: object
+                        required:
+                        - field
+                        properties:
+                           field:
+                              type: string
+                              enum:
+                              - code
+                              - key
+                              - validation_method
+                              - validity_period.from
+                              - validity_period.to
+                              - usage.limit
+                              - usage.current
+                           name:
+                              type: string
+                              description: Custom header name
+                     example:
+                       - field: 'code'
+                         name: 'Code'
+                       - field: 'key'
+                         name: 'Password'
+                       - field: 'validation_method'
+                         name: 'Validation Method'
+                       - field: 'validity_period.from'
+                         name: 'Start Date'
+                       - field: 'validity_period.to'
+                         name: 'End Date'
+                       - field: 'usage.limit'
+                         name: 'Usage limit'
+                       - field: 'usage.current'
+                         name: 'Usages'
+                  format:
+                     type: string
+                     enum:
+                     - CSV
+                  delivery:
+                     type: object
+                     required:
+                       - type
+                     properties:
+                        type:
+                           type: string
+                           enum:
+                           - EMAIL
+                        properties:
+                          description: |
+                            Fields required by the delivery type.
+
+                            Valid properties to **EMAIL** type:
+                              - address: Email where report will be sent. Optional. Authenticated username will be used if address is not informed.
+                          type: object
+                          additionalProperties: {}
+                          example:
+                            address: 'user@email.com'
+                  translations:
+                     type: array
+                     items:
+                        $ref: ../../models/exports/translation.yml
+   responses:
+    '202':
+      $ref: ../../models/exports/export-response.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

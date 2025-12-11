@@ -1,0 +1,125 @@
+get:
+  x-internal: true
+  summary: Get domain settings
+  description: Get domain settings
+  security:
+    - OAuth2: ['ROLE_SYS_ANS', 'ROLE_SYS_MGR']
+  tags:
+    - Domain Settings
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: domain
+      schema:
+        type: string
+      required: true
+      description: Domain
+  responses:
+    '200':
+      description: Get subdomain config
+      content:
+        application/json:
+          schema:
+            $ref: "../../models/channels/domain-config.yml"
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+put:
+  x-internal: true
+  summary: Update domain config
+  description: Update domain config
+  security:
+    - OAuth2:
+        - 'ROLE_SYS_MGR'
+  tags:
+    - Channels
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: domain
+      schema:
+        type: string
+      required: true
+      description: Domain
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../models/channels/domain-config.yml"
+  responses:
+    '204':
+      description: Channel updated successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

@@ -1,0 +1,90 @@
+get:
+  x-internal: true
+  summary: Get events
+  description: Get events
+  security:
+    - OAuth2: ['ROLE_SYS_MGR', 'ROLE_SYS_ANS']
+  tags:
+    - Onebox Invoicing
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      description: The entity of the event
+      schema:
+        type: integer
+    - in: query
+      name: status
+      description: The status of the event
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../models/event/event-status.yml
+    - in: query
+      name: q
+      description: Free search for events by name
+      schema:
+        type: string
+    - in: query
+      name: limit
+      schema:
+        type: integer
+    - in: query
+      name: offset
+      schema:
+        type: integer
+  responses:
+    '200':
+      description: Get list of the events
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../models/common/responses/metadata.yml
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

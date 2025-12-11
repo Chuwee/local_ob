@@ -1,0 +1,247 @@
+get:
+  summary: Search events
+  description: 'Search events'
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Events
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: entity_id
+      description: The entity of the event
+      schema:
+        type: integer
+    - in: query
+      name: entity_admin_id
+      description: The entity admin id
+      x-internal: true
+      schema:
+          type: integer
+    - in: query
+      name: status
+      description: The status of the event
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../models/event/event-status.yml
+    - in: query
+      name: type
+      description: The type of the event
+      style: form
+      schema:
+        type: array
+        items:
+           $ref: ../../models/event/event-type.yml
+    - in: query
+      name: start_date
+      description: Filter events for start_date with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as ``%3A``). Supported operators are ``eq``, ``ne``, ``gt``, ``gte``, ``lt``, ``lte``
+      example: eq:2019-01-01T08:00:00Z
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: end_date
+      description: Filter events for end_date with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as ``%3A``). Supported operators are ``eq``, ``ne``, ``gt``, ``gte``, ``lt``, ``lte``
+      example: gte:2019-01-01T08:00:00Z
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: producer_id
+      description: The producer of the event
+      schema:
+        type: integer
+    - in: query
+      name: venue_id
+      description: The venue of the event
+      schema:
+        type: integer
+    - in: query
+      name: country
+      description: The country code of the event venue. ISO 3166 codes
+      schema:
+        type: string
+    - in: query
+      name: city
+      schema:
+        type: string
+    - in: query
+      name: currency_code
+      description: The currency_code of the event
+      x-internal: true
+      schema:
+        type: string
+    - in: query
+      name: include_archived
+      description: Set to true if want to include in search archived events
+      schema:
+        type: boolean
+    - in: query
+      name: q
+      description: Free search for events by name
+      schema:
+        type: string
+    - in: query
+      name: fields
+      description: Response will contain only the id and the selected fields
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../models/event/event-filter-field.yml
+    - in: query
+      name: sort
+      description: Sorting of enum fields with format field:[asc|desc]. For example 'name:desc'
+      schema:
+        $ref: ../../models/event/event-sort-field.yml
+    - in: query
+      name: limit
+      schema:
+        type: integer
+      description: Limit (default 50, max 1000)
+    - in: query
+      name: offset
+      schema:
+        type: integer
+      description: Offset (default 0)
+  responses:
+    '200':
+      description: Object with pagination description and an array of events
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/event/events.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+post:
+  summary: New event
+  description: ''
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Events
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - name
+            - type
+            - producer_id
+            - category_id
+          properties:
+            name:
+              type: string
+            reference:
+              type: string
+            type:
+              $ref: ../../models/event/event-type.yml
+            entity_id:
+              type: integer
+              format: int64
+              description: Entity ID of the templates owner (Only required for user ``ROLE_OPR_MGR``)
+            producer_id:
+              type: integer
+            category_id:
+              type: integer
+            currency_code:
+              x-internal: true
+              type: string
+            additional_config:
+              x-internal: true
+              $ref: ../../models/event/event-additional-config.yml
+  responses:
+    '201':
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

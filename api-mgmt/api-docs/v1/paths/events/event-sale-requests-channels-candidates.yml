@@ -1,0 +1,94 @@
+get:
+  summary: Get candidate channels for sale requests
+  description: 'Get candidate channels for sale requests'
+  x-internal: true
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Event channels
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Event ID
+    - in: query
+      name: type
+      description: Channel types
+      schema:
+        type: array
+        items:
+          $ref: ../../models/channels/channel-type.yml
+    - in: query
+      name: name
+      description: Search by channel name
+      schema:
+        type: string
+    - in: query
+      name: include_third_party_channels
+      description: Flag to include channels from other entities with visibility
+      schema:
+        type: boolean
+    - in: query
+      name: offset
+      schema:
+        type: integer
+    - in: query
+      name: limit
+      schema:
+        type: integer
+  responses:
+    '200':
+      description: 'Successful response'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - metadata
+              - data
+            properties:
+              metadata:
+                $ref: ./../../models/common/responses/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: ./../../models/channels/channel.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

@@ -1,0 +1,143 @@
+get:
+  x-internal: true
+  summary: Get the member config role communications
+  description: ''
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR', 'ROLE_ENT_MGR', 'ROLE_ENT_ANS']
+  tags:
+    - Member Config
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      description: Find by channel id
+      schema:
+        type: number
+      required: true
+    - in: path
+      name: roleId
+      description: Find by role id
+      schema:
+        type: number
+      required: true
+  responses:
+    '200':
+      description: The member config roles communication elements
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/members-config/translations-list.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  x-internal: true
+  summary: Update a member config role communications
+  description: ''
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR', 'ROLE_ENT_MGR']
+  tags:
+    - Member Config
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      description: Find by channel id
+      schema:
+        type: number
+      required: true
+    - in: path
+      name: roleId
+      description: Find by role id
+      schema:
+        type: number
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../models/members-config/translations-list.yml'
+  responses:
+    '204':
+      description: Successful response
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

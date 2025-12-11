@@ -1,0 +1,76 @@
+put:
+  summary: Update collective external validator properties
+  description: ''
+  security:
+    - OAuth2: ['ROLE_OPR_MGR', 'ROLE_COL_MGR']
+  tags:
+    - Collectives
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: collectiveId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Collective ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - external_validator_properties
+          properties:
+            entity_id:
+              type: number
+              description: (only returned for Operator role)
+            external_validator_properties:
+              type: object
+              required:
+                - user
+                - password
+              properties:
+                user:
+                  type: string
+                password:
+                  type: string
+  responses:
+    '204':
+      description: 'Saved successfully'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

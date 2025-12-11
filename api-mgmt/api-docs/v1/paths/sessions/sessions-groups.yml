@@ -1,0 +1,157 @@
+get:
+  summary: Search sessions groups
+  description: ''
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Sessions
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Event ID
+    - in: query
+      name: id
+      style: form
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+      description: Id of a session
+    - in: query
+      name: status
+      description: The status of the session
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../models/session/session-status.yml
+    - in: query
+      name: type
+      description: The type of the event
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../models/session/session-type.yml
+    - in: query
+      name: venue_template_id
+      schema:
+        type: integer
+        format: int64
+      description: Venue template ID
+    - in: query
+      name: start_date
+      description: Filter sessions for start_date with date-time format. Optional operators could be used as prefix of value with ':' separator (url encoded as ``%3A``). Supported operators are ``eq``, ``ne``, ``gt``, ``gte``, ``lt``, ``lte``
+      example: eq:2019-01-01T08:00:00Z
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: end_date
+      description: Filter sessions for end_date with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as ``%3A``). Supported operators are ``eq``, ``ne``, ``gt``, ``gte``, ``lt``, ``lte``
+      example: gte:2019-01-01T08:00:00Z
+      schema:
+        type: string
+    - in: query
+      name: day_of_week
+      description: Filter session by the day of week of the session's beggining date.
+      example: TUESDAY,FRIDAY,SUNDAY
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../models/session/day-of-week.yml
+    - in: query
+      name: timezone
+      description: Provides the time zone reference for day_of_week filter.
+      example: Europe/Brussels
+      schema:
+          type: string
+    - in: query
+      name: hour_range
+      description: |
+        Filter sessions by defining a range for the session's beggining date.
+        <p>Hour ranges available with the specific format [time from]::[time to]</p>
+        <ul>
+        <li>  time: The format for the time of day correponds to the ISO 8601. Is mandatory to include the timezone.</li>
+        </ul>
+      example: 10:30:00+01:00::14:50:00+01:00
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: q
+      description: Free search for sessions by name
+      schema:
+        type: string
+    - in: query
+      name: sort
+      description: Sorting value with format field:[asc|desc]. For example 'start_date:desc'
+      schema:
+        type: string
+        enum:
+          - start_date
+    - in: query
+      name: group_type
+      required: true
+      schema:
+        type: string
+        enum:
+          - DAY
+          - WEEK
+          - MONTH
+      description: The group type
+  responses:
+    '200':
+      description: Array of sessions groups
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../../models/session/sessions-groups.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

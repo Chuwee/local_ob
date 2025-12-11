@@ -1,0 +1,52 @@
+post:
+  x-internal: true
+  summary: Refresh the user apikey
+  description: Refresh the user apikey
+  security:
+    - OAuth2: [ 'ROLE_ENT_MGR', 'ROLE_OPR_MGR' ]
+  tags:
+    - Users
+  parameters:
+    - in: path
+      name: userId
+      schema:
+        type: integer
+      required: true
+      description: User ID
+  responses:
+    '200':
+      description: Apikey successfully refreshed
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            required:
+              - apikey
+            properties:
+              apikey:
+                type: string
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

@@ -1,0 +1,146 @@
+get:
+  x-internal: true
+  summary: Get channel surcharges taxes configuration
+  description: Get channel surcharges taxes configuration of a channel
+  security:
+    - OAuth2:
+        - 'ROLE_SYS_ANS'
+        - 'ROLE_SYS_MGR'
+        - 'ROLE_CNL_MGR'
+        - 'ROLE_ENT_MGR'
+        - 'ROLE_ENT_ANS'
+        - 'ROLE_OPR_MGR'
+        - 'ROLE_OPR_ANS'
+  tags:
+    - Surcharges
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+      required: true
+      description: Channel ID
+  responses:
+    '200':
+      description: Channel surcharges taxes configuration
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/tax/channel-surcharge-taxes.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  x-internal: true
+  summary: Update channel surcharges taxes
+  security:
+    - OAuth2:
+        - 'ROLE_CNL_MGR'
+        - 'ROLE_OPR_MGR'
+  tags:
+    - Surcharges
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+      required: true
+      description: Channel ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            origin:
+              type: string
+              enum:
+                - EVENT
+                - CHANNEL
+            taxes:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+  responses:
+    '201':
+      description: Surcharge taxes configuration updated successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

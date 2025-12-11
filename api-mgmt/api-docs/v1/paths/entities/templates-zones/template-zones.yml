@@ -1,0 +1,216 @@
+get:
+  summary: Get template zones by id
+  description: Get template zones by template zones id
+  security:
+    - OAuth2: ['ROLE_OPR_MGR', 'ROLE_OPR_ANS', 'ROLE_SYS_MGR', 'ROLE_SYS_ANS', 'ROLE_ENT_ADMIN', 'ROLE_EVN_MGR']
+  tags:
+    - Templates Zones
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      schema:
+        type: integer
+      required: true
+      description: Entity ID
+    - in: path
+      name: templateZonesId
+      schema:
+        type: integer
+      required: true
+      description: Template zone ID
+  responses:
+    '200':
+      description: Return a template zones
+      content:
+        application/json:
+         schema:
+              $ref: ../../../models/entities/templates-zones/template-zones.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+put:
+  summary: Update template zones
+  description: Update template zones
+  security:
+    - OAuth2: ['ROLE_OPR_MGR', 'ROLE_ENT_MGR']
+  tags:
+    - Templates Zones
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      schema:
+        type: integer
+      required: true
+      description: Entity ID
+    - in: path
+      name: templateZonesId
+      schema:
+        type: integer
+      required: true
+      description: Template zone ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            status:
+              type: string
+              enum:
+                - ENABLED
+                - DISABLED
+            content_texts:
+              type: array
+              items:
+                properties:
+                  type:
+                    type: string
+                    enum:
+                      - NAME
+                      - DESCRIPTION
+                  value:
+                    type: string
+                    description: Element value
+                  language:
+                    type: string
+                    example: 'es-ES'
+  responses:
+    '204':
+      description: Updated successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+delete:
+  summary: Delete template zones
+  description: Delete template zones
+  security:
+    - OAuth2: ['ROLE_OPR_MGR', 'ROLE_ENT_MGR']
+  tags:
+    - Templates Zones
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      schema:
+        type: integer
+      required: true
+      description: Entity ID
+    - in: path
+      name: templateZonesId
+      schema:
+        type: integer
+      required: true
+      description: Template zone ID
+  responses:
+    '204':
+      description: Deleted successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml

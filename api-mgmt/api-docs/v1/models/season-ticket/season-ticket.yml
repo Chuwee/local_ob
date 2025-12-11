@@ -1,0 +1,96 @@
+additionalProperties: false
+type: object
+required:
+  - id
+  - name
+  - entity
+  - producer
+  - contact
+  - settings
+  - venue_templates
+  - has_sales
+properties:
+  id:
+    type: integer
+    format: int64
+  name:
+    type: string
+  reference:
+    type: string
+  start_date:
+    type: string
+    format: date-time
+  end_date:
+    type: string
+    format: date-time
+  entity:
+    type: object
+    required:
+      - id
+      - name
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+  producer:
+    type: object
+    required:
+      - id
+      - name
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+  venue_templates:
+    type: array
+    items:
+      type: object
+      required:
+        - id
+        - name
+        - venue
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        venue:
+          type: object
+          required:
+            - id
+            - name
+            - city
+            - country
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            city:
+              type: string
+            country:
+              type: string
+              description: ISO 3166 codes
+            access_control_systems:
+              type: array
+              items:
+                $ref: ../../models/common/name.yml
+  contact:
+    $ref: ../../models/event/event-contact.yml
+  currency_code:
+    x-internal: true
+    type: string
+  settings:
+    $ref: season-ticket-settings.yml
+  has_sales:
+    type: boolean
+  has_sales_request:
+    type: boolean
+  session_id:
+    type: integer
+  updating_capacity:
+    type: boolean
+  generating_capacity:
+    type: boolean

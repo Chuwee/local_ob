@@ -1,0 +1,86 @@
+get:
+  x-internal: true
+  summary: Venue templates filter options
+  description: Get available options of a filter of venue templates data.
+  security:
+    - OAuth2: ['ROLE_REC_MGR', 'ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Templates
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: filter
+      schema:
+        type: string
+        enum:
+          - venue-entities
+          - venue-countries
+          - venue-cities
+      required: true
+    - in: query
+      name: event_id
+      schema:
+        type: integer
+        format: int64
+      required: false
+      description: Event ID of the template (Only for event templates)
+    - in: query
+      name: scope
+      description: Scope of the template (will be ignored when filtering by eventId)
+      required: false
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../models/venue-template/venue-template-scope.yml
+    - in: query
+      name: offset
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    - in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        minimum: 0
+        default: 50
+  responses:
+    '200':
+      description: Array of venue templates filter options
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/responses/filter-options.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

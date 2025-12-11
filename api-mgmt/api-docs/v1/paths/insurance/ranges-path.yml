@@ -1,0 +1,129 @@
+get:
+  x-internal: true
+  summary: Returns an object with an array of ranges
+  description: 'Get a list of range by policy id'
+  security:
+    - OAuth2: ['ROLE_SYS_MGR', 'ROLE_SYS_ANS']
+  tags:
+    - Ranges
+  parameters:
+    - in: path
+      name: insurerId
+      schema:
+        type: integer
+      required: true
+      description: Insurer ID
+    - in: path
+      name: policyId
+      schema:
+        type: integer
+      required: true
+      description: Policy ID
+  responses:
+    '200':
+      description: List of ranges
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../../models/insurance/range.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+
+post:
+  x-internal: true
+  summary: Returns an object with an array of ranges
+  description: 'Update a list of range by policy id'
+  security:
+    - OAuth2: [ 'ROLE_SYS_MGR' ]
+  tags:
+    - Ranges
+  parameters:
+    - in: path
+      name: insurerId
+      schema:
+        type: integer
+      required: true
+      description: Insurer ID
+    - in: path
+      name: policyId
+      schema:
+        type: integer
+      required: true
+      description: Policy ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          $ref: ../../models/insurance/range-request.yml
+  responses:
+    '200':
+      description: List of ranges
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../../models/insurance/range.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

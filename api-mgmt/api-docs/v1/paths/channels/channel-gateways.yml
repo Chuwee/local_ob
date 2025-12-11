@@ -1,0 +1,147 @@
+get:
+  x-internal: true
+  summary: Get channel gateways
+  description: Get all gateway configurations of a channel
+  security:
+    - OAuth2:
+        - 'ROLE_OPR_MGR'
+        - 'ROLE_OPR_ANS'
+        - 'ROLE_CNL_MGR'
+  tags:
+    - Gateways
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+      required: true
+      description: Channel ID
+  responses:
+    '200':
+      description: Get channel gateways
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../../models/channels/channel-gateway.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  x-internal: true
+  summary: Update channel gateways
+  description: Update Active or Default channels
+  security:
+    - OAuth2:
+        - 'ROLE_OPR_MGR'
+  tags:
+    - Gateways
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+      required: true
+      description: Channel ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            type: object
+            required:
+              - configuration_sid
+              - gateway_sid
+              - active
+              - default
+            properties:
+              configuration_sid:
+                type: string
+              gateway_sid:
+                type: string
+              active:
+                type: boolean
+              default:
+                type: boolean
+  responses:
+    '204':
+      description: Gateway updated successfully.
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

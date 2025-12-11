@@ -1,0 +1,222 @@
+get:
+  x-internal: true
+  summary: Get user
+  description: Get user by id
+  security:
+    - OAuth2: ['ROLE_ENT_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS', 'ROLE_SYS_MGR', 'ROLE_SYS_ANS']
+  tags:
+    - Users
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: userId
+      schema:
+        type: integer
+      required: true
+      description: User ID
+  responses:
+    '200':
+      description: User details
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            $ref: ../../models/users/user.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  x-internal: true
+  summary: Update user
+  description: Update user of id
+  tags:
+    - Users
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: userId
+      schema:
+        type: integer
+      required: true
+      description: User ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            entity_id:
+              type: integer
+            name:
+              type: string
+            last_name:
+              type: string
+            job_title:
+              type: string
+            status:
+              $ref: ../../models/users/user-status.yml
+            language:
+              type: string
+              description: IETF language tag standard
+              example: es-ES
+            notes:
+              type: string
+            contact:
+              type: object
+              properties:
+                primary_phone:
+                  type: string
+                secondary_phone:
+                  type: string
+                fax:
+                  type: string
+            location:
+              type: object
+              properties:
+                address:
+                  type: string
+                city:
+                  type: string
+                postal_code:
+                  type: string
+                country:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                      description: ISO 3166 codes
+                    name:
+                      type: string
+                country_subdivision:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                      description: ISO 3166 codes
+                    name:
+                      type: string
+  responses:
+    '204':
+      description: User updated successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+delete:
+  x-internal: true
+  summary: Delete user
+  description: Delete user by id
+  tags:
+    - Users
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: userId
+      schema:
+        type: integer
+      required: true
+      description: User ID
+  responses:
+    '204':
+      description: User deleted successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+

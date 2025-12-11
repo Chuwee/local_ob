@@ -1,0 +1,201 @@
+get:
+  summary: Get voucher group
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_ENT_ANS', 'ROLE_ENT_MGR', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Vouchers
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: voucherGroupId
+      schema:
+        type: integer
+      required: true
+      description: Voucher Group ID
+  responses:
+    '200':
+      description: Get info of voucher group
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/vouchers/voucher-group.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+put:
+  x-internal: true
+  summary: Update voucher group
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Vouchers
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: voucherGroupId
+      schema:
+        type: integer
+      required: true
+      description: Voucher Group ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+              minLength: 1
+              maxLength: 50
+            description:
+              type: string
+              maxLength: 200
+            status:
+              $ref: ../../models/vouchers/status.yml
+            validation_method:
+              $ref: ../../models/vouchers/validation-methods.yml
+            expiration:
+              $ref: ../../models/vouchers/voucher-group-expiration.yml
+            usage_limit:
+              $ref: ../../models/common/limitless-value.yml
+              description: "Set a default maximum number of uses for a voucher"
+            channels:
+              description: "Channels allowed reedeem vouchers linked to this voucher group"
+              type: object
+              properties:
+                scope:
+                  $ref: ../../models/vouchers/channel-scope.yml
+                ids:
+                  type: array
+                  items:
+                    type: number
+  responses:
+    '204':
+      description: ''
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+delete:
+  x-internal: true
+  summary: Delete voucher group
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Vouchers
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: voucherGroupId
+      schema:
+        type: integer
+      required: true
+      description: Voucher Group ID
+  responses:
+    '204':
+      description: ''
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

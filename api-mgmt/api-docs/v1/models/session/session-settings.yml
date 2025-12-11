@@ -1,0 +1,323 @@
+additionalProperties: false
+type: object
+required:
+  - taxes
+  - release
+  - booking
+  - sale
+  - access_control
+  - enable_captcha
+  - enable_orphan_seats
+  - use_venue_template_capacity_config
+  - attendant_tickets
+  - limits
+  - channels
+  - subscription_list
+  - enable_presale
+properties:
+  rates:
+    type: array
+    items:
+      type: object
+      required:
+        - id
+        - name
+        - default
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        default:
+          type: boolean
+  taxes:
+    type: object
+    properties:
+      ticket:
+        type: object
+        required:
+          - id
+          - name
+        properties:
+          id:
+            type: integer
+          name:
+            type: string
+      ticketTaxes:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+      charges:
+        type: object
+        properties:
+          id:
+            type: integer
+          name:
+            type: string
+      chargesTaxes:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+      data:
+        type: object
+        required:
+          - type
+        properties:
+          type:
+            type: string
+            description: Defines from where the tax data is obtained.
+            enum:
+              - EVENT
+              - PRODUCER
+          producer_id:
+            description: When type is PRODUCER this field indicated the id of the Producer.
+            type: integer
+          invoice_prefix_id:
+            description: When type is PRODUCER this field indicated the id of the invoice prefix.
+            type: integer
+  release:
+    type: object
+    required:
+      - enable
+    properties:
+      enable:
+        type: boolean
+      date:
+        type: string
+        format: date-time
+  booking:
+    type: object
+    required:
+      - enable
+    properties:
+      enable:
+        type: boolean
+      start_date:
+        type: string
+        format: date-time
+      end_date:
+        type: string
+        format: date-time
+  sale:
+    type: object
+    required:
+      - enable
+    properties:
+      enable:
+        type: boolean
+      start_date:
+        type: string
+        format: date-time
+      end_date:
+        type: string
+        format: date-time
+  access_control:
+    type: object
+    required:
+      - admission_dates
+      - space
+    properties:
+      admission_dates:
+        type: object
+        required:
+          - override
+        properties:
+          override:
+            type: boolean
+          start:
+            type: string
+            format: date-time
+          end:
+            type: string
+            format: date-time
+      space:
+        type: object
+        required:
+          - override
+        properties:
+          override:
+            type: boolean
+          id:
+            type: integer
+  live_streaming:
+    type: object
+    required:
+      - enable
+    properties:
+      enable:
+        type: boolean
+      vendor:
+        $ref: streaming-vendor.yml
+      value:
+        type: string
+  enable_captcha:
+    type: boolean
+  enable_orphan_seats:
+    type: boolean
+  activity_sale_type:
+    $ref: session-activity-sale-type.yml
+  use_venue_template_capacity_config:
+    type: boolean
+    description: Define if load predefined capacity config from venue-template, only applicable for type ``ACTIVITY``
+  use_venue_template_access:
+    type: boolean
+    description: Define if use predefined venue template gates from venue-template, only applicable for type ``ACTIVITY``
+  attendant_tickets:
+    type: object
+    required:
+      - status
+    properties:
+      status:
+        $ref: attendant-tickets-session-status.yml
+      channels_scope:
+        $ref: ../common/attendant-tickets-channels-scope.yml
+      autofill:
+        type: boolean
+        description: Fill attendance info automatically. Only compatible with AVET Sockets.
+      edit_autofill:
+        type: boolean
+        description: Allows edit the filled fields. Only compatible with AVET Sockets.
+  session_pack:
+    type: object
+    properties:
+      color:
+        description: Color asociated with the session pack as HEX value without ``#``.
+        type: string
+      allow_partial_refund:
+        description: Whether the session pack allows partial refunds or not
+        type: boolean
+  channels:
+    type: object
+    required:
+      - show_date
+      - show_time
+    properties:
+      show_date:
+        description: Show date in sale channels.
+        type: boolean
+      show_time:
+        description: Show time of day in sale channels.
+        type: boolean
+      show_unconfirmed_date:
+        description: Show unconfirmed date day in sale channels.
+        type: boolean
+  virtual_queue:
+    type: object
+    required:
+      - enable
+    properties:
+      enable:
+        type: boolean
+      alias:
+        type: string
+        description: Name of the virtual queue.
+      skip_token:
+        type: string
+        description: Token to skip the virtual queue.
+      version:
+        type: string
+        description: Version of virtual queue.
+        enum:
+          - V3
+  country_filter:
+    type: object
+    properties:
+      enable:
+        type: boolean
+      countries:
+        type: array
+        description: Country codes in ISO-3166 alpha-2
+        items:
+          example: 'ES'
+          type: string
+  subscription_list:
+    type: object
+    required:
+      - scope
+    properties:
+      scope:
+        type: string
+        enum:
+          - EVENT
+          - SESSION
+      id:
+        type: number
+        format: integer
+        description: Subscription list Id. Applies when SESSION scope is informed
+  limits:
+    type: object
+    properties:
+      tickets:
+        type: object
+        properties:
+          enable:
+            type: boolean
+          max:
+            type: integer
+            description: The maximum number of ticket per sale per session allowed
+      members_logins:
+        type: object
+        properties:
+          enable:
+            type: boolean
+          max:
+            type: integer
+            description: The maximum number of members logged-in simultaneously allowed
+  enable_presale:
+    type: boolean
+    description: Presales can be configured in this session
+  high_demand:
+    type: boolean
+    description: Define whether it is a high-demand session
+  use_dynamic_prices:
+    type: boolean
+    description: Define whether use dynamic prices
+  smart_booking:
+    type: object
+    properties:
+      type:
+        type: string
+        enum:
+          - SEAT_SELECTION
+          - SMART_BOOKING
+      related_id:
+        type: integer
+  secondary_market_sale:
+    type: object
+    required:
+      - enable
+    properties:
+      enable:
+        type: boolean
+      start_date:
+        type: string
+        format: date-time
+      end_date:
+        type: string
+        format: date-time
+  presales_redirection_policy:
+    type: object
+    properties:
+      mode:
+        type: string
+        description: Defines the mode for redirection.
+        enum:
+          - CATALOG
+          - CUSTOM
+      value:
+        type: object
+        additionalProperties:
+          type: string
+        description: A map of redirection values with string keys and values.
+  session_external_config:
+    $ref: 'session-external-config.yml'

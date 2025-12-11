@@ -1,0 +1,225 @@
+additionalProperties: false
+type: object
+required:
+  - types
+  - languages
+  - categories
+  - notifications
+  - corporate_color
+  - enable_multievent_cart
+  - allow_activity_events
+  - allow_avet_integration
+  - allow_secondary_market
+  - allow_attributes
+  - enable_B2B
+  - interactive_venue
+  - allow_data_protection_fields
+  - allow_members
+  - allow_digital_season_ticket
+  - allow_loyalty_points
+  - bi_users
+properties:
+  types:
+    type: array
+    items:
+      $ref: 'entity-type.yml'
+  languages:
+    type: object
+    properties:
+      default:
+        type: string
+        description: IETF language tag standard
+        example: es-ES
+      available:
+        type: array
+        items:
+          type: string
+          description: IETF language tag standard
+          example: es-ES
+  categories:
+    type: object
+    properties:
+      allow_custom_categories:
+        type: boolean
+        description: Is allowed to use custom categories
+      selected:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: base categories identifiers. Service GET /base-categories
+  live_streaming:
+    type: object
+    properties:
+      enabled:
+        type: boolean
+      vendors:
+        type: array
+        description: List of available vendors for entity
+        items:
+          $ref: streaming-vendor.yml
+  corporate_color:
+    type: string
+    description: Hex color code without ``#``
+  external_integration:
+    x-internal: true
+    $ref: 'entity-external-integration.yml'
+  enable_multievent_cart:
+    description: cannot be disabled if enable_B2B is active
+    type: boolean
+  enable_B2B:
+    x-internal: true
+    description: can only be active while enable_multievent_cart is active
+    type: boolean
+  allow_B2B_publishing:
+    x-internal: true
+    description: can only be active while enable_B2B is active
+    type: boolean
+  allow_invitations:
+    x-internal: true
+    description: can only be active for channel type entities
+    type: boolean
+  allow_multi_avet_cart:
+    x-internal: true
+    description: can only be active while enable_multievent_cart is active
+    type: boolean
+  allow_activity_events:
+    type: boolean
+  allow_avet_integration:
+    x-internal: true
+    type: boolean
+  allow_secondary_market:
+    x-internal: true
+    type: boolean
+  allow_attributes:
+    type: boolean
+    description: This is enable when the entity has attributes defined
+  allow_vip_views:
+    type: boolean
+    description: This flag allows vip views for graphic venues    
+  interactive_venue:
+    type: object
+    properties:
+      enabled:
+        type: boolean
+      allowed_venues:
+        type: array
+        description: List of available types of interactive venues for entity
+        items:
+          $ref: ../common/interactive-venue/interactive-venue-type.yml
+  allow_data_protection_fields:
+    type: boolean
+    description: This field allows to enable or disable Data Protection flag. Only for user ``ROLE_OPR_MGR``.
+  allow_members:
+    description: Allows an entity to manage members
+    type: boolean
+  allow_digital_season_ticket:
+    description: Allows entity to generate digital season tickets (allow_avet_integration is required to activate this setting)
+    type: boolean
+  allow_loyalty_points:
+    type: boolean
+  allow_ticket_hide_price:
+    x-internal: true
+    description: Allows to hide the ticket prices when selling through box office
+    type: boolean
+  allow_hard_ticket_pdf:
+    type: boolean
+    description: Allows hard ticket PDF generation
+  allow_config_multiple_templates:
+    type: boolean
+    description: Allows configuring multiple templates
+  notifications:
+    $ref: entity-notifications-settings.yml
+  customization:
+    x-internal: true
+    $ref: entity-customization-settings.yml
+  bi_users:
+    x-internal: true
+    type: object
+    required:
+      - advanced_permissions_limit
+      - basic_permissions_limit
+    properties:
+      advanced_permissions_limit:
+        description: Number of possible advanced BI users in the entity
+        type: number
+      basic_permissions_limit:
+        description: Number of possible basic BI users in the entity
+        type: number
+  managed_entities:
+    x-internal: true
+    type: array
+    items:
+      $ref: ../../models/common/idname.yml
+  accommodations:
+    x-internal: true
+    $ref: accommodations-entity-config.yml
+  whatsapp:
+    x-internal: true
+    type: object
+    required:
+      - enabled
+    properties:
+      enabled:
+        type: boolean
+      whatsapp_template:
+        type: integer
+  enable_v4_configs:
+    x-internal: true
+    type: boolean
+    description: Allows entity to work with v4 configurations
+  donations:
+    x-internal: true
+    type: array
+    items:
+      type: object
+      required:
+        - enabled
+      properties:
+        enabled:
+          type: boolean
+        api_key:
+          type: string
+        provider_id:
+          type: integer
+  allow_friends:
+    type: boolean
+  allow_png_conversion:
+    type: boolean
+  session_duration:
+    $ref: ./session-duration.yml
+  queue_provider:
+    $ref: ./entity-queue-provider.yml
+  account:
+    x-internal: true
+    type: object
+    properties:
+      queue_config:
+        type: object
+        properties:
+          active:
+            type: boolean
+          alias:
+            type: string
+  allow_fever_zone:
+    type: boolean
+  post_booking_questions:
+    $ref: ./post-booking-questions.yml
+  allow_gateway_benefits:
+    type: boolean
+  member_id_generation:
+    type: string
+    enum:
+      - DEFAULT
+      - AUTOINCREMENT
+  customers_domain_settings:
+    type: object
+    description: Customer domain settings
+  customers:
+    type: object
+    properties:
+      auto_assign_orders:
+        type: boolean
+        description: Assign orders automatically to customer after customer creation or commit order using the email on the buyer data

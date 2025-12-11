@@ -1,0 +1,104 @@
+get:
+  summary: Get B2B user transactions
+  description: ''
+  security:
+    - OAuth2: ['ROLE_ENT_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Balance
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: clientId
+      schema:
+        type: number
+      required: true
+    - in: query
+      name: entity_id
+      description: Search by entity id
+      schema:
+        type: number
+    - in: query
+      name: transaction_date_from
+      description: Filter transactions date with date-time format.
+      schema:
+        type: string
+    - in: query
+      name: transaction_date_to
+      description: Filter transactions date with date-time format.
+      schema:
+        type: string
+    - in: query
+      name: q
+      description: Search by transaction id, user or notes
+      schema:
+        type: string
+    - in: query
+      name: type
+      description: Transaction type (also referred as "concept")
+      schema:
+        type: string
+        enum:
+          - PURCHASE
+          - CREDIT_LIMIT
+          - CASH_ADJUSTMENT
+          - REFUND
+          - DEPOSIT
+      required: false
+    - in: query
+      name: limit
+      description: Limit results to return
+      schema:
+        type: integer
+    - in: query
+      name: offset
+      description: Number of offset items
+      schema:
+        type: integer
+  responses:
+    '200':
+      description: Array of clients transactions
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/b2b/client-transactions.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

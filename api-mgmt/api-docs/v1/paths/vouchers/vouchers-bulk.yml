@@ -1,0 +1,166 @@
+post:
+  x-internal: true
+  summary: New vouchers (Bulk)
+  description: Bulk creation. Limited to 50000 items.
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Vouchers
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: voucherGroupId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Voucher Group ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            type: object
+            required:
+              - balance
+              - expiration
+            properties:
+              balance:
+                type: number
+              expiration:
+                type: string
+                format: date-time
+              usage_limit:
+                $ref: ../../models/common/limitless-value.yml
+              pin:
+                type: string
+              email:
+                type: string
+  responses:
+    '201':
+      description: 'Created successfully'
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: string
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+put:
+  x-internal: true
+  summary: Update multiple vouchers
+  description: Bulk update. Limited to 50000 items.
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Vouchers
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: voucherGroupId
+      schema:
+        type: integer
+      required: true
+      description: Voucher Group ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            codes:
+              type: array
+              items:
+                type: string
+                description: codes to update
+            status:
+              $ref: ../../models/vouchers/status.yml
+            usage:
+              type: object
+              properties:
+                limit:
+                  $ref: ../../models/common/limitless-value.yml
+            expiration:
+              type: string
+              format: date-time
+  responses:
+    '204':
+      description: ''
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

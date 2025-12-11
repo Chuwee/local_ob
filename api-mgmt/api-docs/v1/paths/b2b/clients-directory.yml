@@ -1,0 +1,158 @@
+get:
+  summary: Get B2B clients from directory
+  description: ''
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Clients
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: entity_id
+      description: Search by entity id, only required for operator users
+      schema:
+        type: number
+    - in: query
+      name: q
+      description: Search by name or taxId
+      schema:
+        type: string
+    - in: query
+      name: limit
+      description: Limit results to return
+      schema:
+        type: integer
+    - in: query
+      name: offset
+      description: Number of offset items
+      schema:
+        type: integer
+    - in: query
+      name: sort
+      description: |
+        Sorting of valid fields with format field:[asc|desc]. For example 'name:desc'
+
+        Valid fields to sort:
+        <ul>
+          <li>name</li>
+          <li>created_at</li>
+        </ul>
+
+        For example:
+        <ul>
+          <li>name:desc</li>
+          <li>created_at:desc</li>
+          <li>...</li>
+        </ul>
+      schema:
+        type: string
+
+  responses:
+    '200':
+      description: Array of b2b clients
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/b2b/directory-clients.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  x-internal: true
+  summary: Add B2B clients to directory
+  description: ''
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Clients
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/b2b/create-directory-client.yml
+  responses:
+    '201':
+      description: Successful response
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '501':
+      description: Not implemented
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

@@ -1,0 +1,177 @@
+type: object
+properties:
+  languages:
+    type: object
+    properties:
+      default:
+        type: string
+        description: IETF language tag standard
+        example: es-ES
+      available:
+        type: array
+        items:
+          type: string
+          description: IETF language tag standard
+          example: es-ES
+  external_integration:
+    x-internal: true
+    $ref: ../../models/entities/entity-external-integration.yml
+  live_streaming:
+    type: object
+    properties:
+      enabled:
+        type: boolean
+      vendors:
+        type: array
+        description: List of available vendors for entity
+        items:
+          $ref: ../../models/entities/streaming-vendor.yml
+  corporate_color:
+    type: string
+    description: Hex color code without ``#``
+  categories:
+    type: object
+    properties:
+      allow_custom_categories:
+        type: boolean
+        description: Is allowed to use custom categories
+      selected:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: base categories identifiers. Service GET /base-categories
+  enable_multievent_cart:
+    type: boolean
+    description: Only modifiable by ROLE_OPR_MGR role
+  enable_B2B:
+    x-internal: true
+    type: boolean
+    description: Only modifiable by ROLE_OPR_MGR role
+  allow_B2B_publishing:
+    x-internal: true
+    type: boolean
+    description: Only modifiable by ROLE_OPR_MGR role
+  allow_invitations:
+    x-internal: true
+    type: boolean
+    description: Only modifiable by ROLE_OPR_MGR role
+  allow_activity_events:
+    type: boolean
+    description: Only modifiable by ROLE_OPR_MGR role
+  allow_secondary_market:
+    x-internal: true
+    type: boolean
+    description: Only modifiable by ROLE_OPR_MGR role
+  interactive_venue:
+    type: object
+    properties:
+      enabled:
+        type: boolean
+      allowed_venues:
+        type: array
+        description: List of available types of interactive venues for entity
+        items:
+          $ref: ../../models/common/interactive-venue/interactive-venue-type.yml
+  allow_data_protection_fields:
+    type: boolean
+    description: This field allows to enable or disable Data Protection flag.  Only for user ``ROLE_OPR_MGR``.
+  allow_members:
+    description: Allows an entity to manage members
+    type: boolean
+  allow_digital_season_ticket:
+    description: Allows entity to generate digital season tickets (allow_avet_integration is required to activate this setting)
+    type: boolean
+  notifications:
+    $ref: ../../models/entities/entity-notifications-settings.yml
+  customization:
+    x-internal: true
+    $ref: ../../models/entities/entity-customization-settings.yml
+  bi_users:
+    x-internal: true
+    type: object
+    properties:
+      advanced_permissions_limit:
+        description: Number of possible advanced BI users in the entity
+        type: number
+      basic_permissions_limit:
+        description: Number of possible basic BI users in the entity
+        type: number
+  managed_entities:
+    x-internal: true
+    type: array
+    items:
+      $ref: ../../models/common/idname.yml
+  accommodations:
+    x-internal: true
+    $ref: ../../models/entities/accommodations-entity-config.yml
+  whatsapp:
+    x-internal: true
+    type: object
+    description: Only modifiable by ROLE_OPR_MGR role
+    required:
+      - enabled
+    properties:
+      enabled:
+        type: boolean
+      whatsapp_template:
+        type: integer
+  enable_v4_configs:
+    x-internal: true
+    type: boolean
+    description: Allows entity to work with v4 configurations
+  allow_loyalty_points:
+    type: boolean
+  queue_provider:
+    $ref: ../../models/entities/entity-queue-provider.yml
+  donations:
+    x-internal: true
+    type: array
+    items:
+      type: object
+      required:
+        - enabled
+      properties:
+        enabled:
+          type: boolean
+        api_key:
+          type: string
+        provider_id:
+          type: integer
+  allow_friends:
+    type: boolean
+  allow_png_conversion:
+    type: boolean
+  account:
+    x-internal: true
+    type: object
+    properties:
+      queue_config:
+        type: object
+        properties:
+          active:
+            type: boolean
+          alias:
+            type: string
+  tax_mode:
+    type: string
+    enum:
+      - INCLUDED
+      - ON_TOP
+  allow_gateway_benefits:
+    type: boolean
+  allow_hard_ticket_pdf:
+    type: boolean
+  member_id_generation:
+    type: string
+    enum:
+      - DEFAULT
+      - AUTOINCREMENT
+  customers:
+    type: object
+    properties:
+      auto_assign_orders:
+        type: boolean
+        description: Assign orders automatically to customer after customer creation or commit order using the email on the buyer data
