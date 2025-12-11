@@ -1,0 +1,178 @@
+get:
+  summary: Returns an object with an array of season ticket sessions
+  description: ''
+  tags:
+    - Season Tickets
+  parameters:
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+      required: true
+      description: Season Ticket ID
+    - in: query
+      name: eventId
+      schema:
+        type: integer
+      description: Event ID
+    - in: query
+      name: assignationStatus
+      description: Filter by the assignation status of a session
+      schema:
+        type: string
+        enum:
+          - ASSIGNED
+          - NOT_ASSIGNED
+    - in: query
+      name: startDate
+      description: Filter events for start_date with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as ``%3A``). Supported operators are ``gte``, ``lte``
+      example: gte:2020-05-09T22:00:00Z,lte:2020-05-12T21:59:59Z
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: freeSearch
+      schema:
+        type: string
+      description: Free search field by session name
+    - in: query
+      name: offset
+      schema:
+        type: integer
+      description: Offset (default 0)
+    - in: query
+      name: limit
+      schema:
+        type: integer
+      description: Limit (default 20)
+    - in: query
+      name: sort
+      description: Sorting of enum fields with format field:[asc|desc]. For example 'name:desc'
+      schema:
+        type: string
+        enum:
+          - event_name
+          - session_name
+          - session_starting_date
+  responses:
+    '200':
+      description: A JSON array of sessions
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/season-tickets/search-sessions.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  summary: Assign a session to a Season Ticket
+  description: Assign a session to a Season Ticket
+  tags:
+    - Season Tickets
+  parameters:
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+      required: true
+      description: Season Ticket ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            sessionId:
+              type: integer
+              description: Season ID to be assigned to the Season Ticket
+            updateBarcodes:
+              type: boolean
+              description: If true or null, update sold season ticket barcodes
+  responses:
+    '200':
+      description: The result of the assignation
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              result:
+                type: boolean
+                description: Result of the assignation, true if the session is assigned, false if the session is not assigned
+              reason:
+                type: string
+                description: If the session is not assigned, describes the reason why this session is not assigned
+                enum:
+                  - SEASON_TICKET_GENERATION_STATUS_NOT_VALID
+                  - SESSION_TYPE_INVALID
+                  - DIFFERENT_ENTITY_IDS
+                  - DIFFERENT_VENUE_IDS
+                  - EVENT_OR_SESSION_STATUS_NOT_VALID
+                  - ORIGIN_SESSION_NOT_LINKABLE_SEATS
+                  - ONE_SECTOR_MIN_NOT_FOUND_IN_TARGET
+                  - ONE_LINKABLE_SEAT_NOT_FOUND_IN_TARGET
+                  - AT_LEAST_ONE_SEAT_IS_NOT_FOUND_IN_TARGET_SESSION
+                  - ASSIGN_SESSION_GENERIC_ERROR
+                  - SEASON_TICKET_SESSION_ALREADY_ASSIGNED
+                  - SEASON_TICKET_SESSION_RESTRICTED
+                  - ONE_NNZ_MIN_NOT_FOUND_IN_TARGET
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

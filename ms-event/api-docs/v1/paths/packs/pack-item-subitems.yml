@@ -1,0 +1,138 @@
+get:
+  summary: Get pack item subitems
+  description: Get subitems for a pack item. Only for main item type ```EVENT```
+  tags:
+    - Packs
+  parameters:
+    - in: path
+      name: packId
+      schema:
+        type: integer
+      required: true
+      description: Pack ID
+    - in: path
+      name: packItemId
+      schema:
+        type: integer
+      required: true
+      description: Pack Item ID
+    - in: query
+      name: offset
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+      required: false
+      description: Number of items to skip
+    - in: query
+      name: limit
+      schema:
+        type: integer
+        default: 50
+        minimum: 1
+        maximum: 50
+      required: false
+      description: Maximum number of items to return
+  responses:
+    '200':
+      description: Array of subitems
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../models/common/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: ../../models/packs/pack-item-subitems-response.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+put:
+  summary: Update pack item subitems
+  description:  Update subitems for a pack item. The request must contain ALL subitem IDs that the pack item should have after the operation. Subitems not included in the request will be removed. Only for main item type ```EVENT```
+  tags:
+    - Packs
+  parameters:
+    - in: path
+      name: packId
+      schema:
+        type: integer
+      required: true
+      description: Pack ID
+    - in: path
+      name: packItemId
+      schema:
+        type: integer
+      required: true
+      description: Pack Item ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/packs/pack-item-subitems-request.yml
+  responses:
+    '204':
+      description: Subitems updated successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+

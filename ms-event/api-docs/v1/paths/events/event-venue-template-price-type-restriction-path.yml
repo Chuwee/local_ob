@@ -1,0 +1,213 @@
+get:
+  summary: Get price type restrictions
+  security:
+    - OAuth2: [ 'ROLE_EVN_MGR', 'ROLE_OPR_MGR' ]
+  tags:
+    - Templates
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: path
+      name: templateId
+      schema:
+        type: integer
+      required: true
+      description: Template ID
+    - in: path
+      name: priceTypeId
+      schema:
+        type: integer
+      required: true
+      description: Price type ID
+  responses:
+    '200':
+      description: A JSON with the price type restrictions
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              lockedPriceType:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: the id of the locked price type
+                  name:
+                    type: string
+                    description: the name of the locked price type
+              requiredPriceTypes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: the id of the required price type
+                    name:
+                      type: string
+                      description: the name of the required price type
+              requiredTicketsNumber:
+                type: integer
+                description: number of tickets on the required price type to unlock the locked price type (mutually exclusive with "locked_tickets_number")
+              lockedTicketsNumber:
+                type: integer
+                description: number of tickets on the locked price type allowed to purchase once unlocked (mutually exclusive with "required_tickets_number")
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  summary: create or update price type restrictions
+  security:
+    - OAuth2: [ 'ROLE_EVN_MGR', 'ROLE_OPR_MGR' ]
+  tags:
+    - Templates
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: path
+      name: templateId
+      schema:
+        type: integer
+      required: true
+      description: Template ID
+    - in: path
+      name: priceTypeId
+      schema:
+        type: integer
+      required: true
+      description: Price type ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            requiredPriceTypeIds:
+              type: array
+              items:
+                type: integer
+              description: list of the ids of the required price type
+            requiredTicketsNumber:
+              type: integer
+              description: number of tickets on the required price type to unlock the locked price type (mutually exclusive with "locked_tickets_number")
+            lockedTicketsNumber:
+              type: integer
+              description: number of tickets on the locked price type allowed to purchase once unlocked (mutually exclusive with "required_tickets_number")
+  responses:
+    '204':
+      description: the comm element is created/updated
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+delete:
+  summary: delete current price type restrictions
+  security:
+    - OAuth2: [ 'ROLE_EVN_MGR', 'ROLE_OPR_MGR' ]
+  tags:
+    - Templates
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: path
+      name: templateId
+      schema:
+        type: integer
+      required: true
+      description: Template ID
+    - in: path
+      name: priceTypeId
+      schema:
+        type: integer
+      required: true
+      description: Price type ID
+  responses:
+    '204':
+      description: the restriction has been deleted
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

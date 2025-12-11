@@ -1,0 +1,285 @@
+get:
+  summary: Get season ticket renewals for a season ticket
+  tags:
+    - Season Tickets
+  parameters:
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+      required: true
+      description: The season ticket ID
+    - in: query
+      name: mappingStatus
+      description: The status of the renewal
+      schema:
+        type: string
+        enum:
+          - NOT_MAPPED
+          - MAPPED
+    - in: query
+      name: freeSearch
+      description: Free search for renewals by name, surname, email and member id
+      schema:
+        type: string
+    - in: query
+      name: sort
+      description: Sorting of enum fields with format field:[asc|desc]. For example 'name:desc'
+      schema:
+        type: string
+        enum:
+          - mapping_status
+          - name
+          - surname
+    - in: query
+      name: limit
+      schema:
+        type: integer
+      description: Limit (default 50, max 1000)
+    - in: query
+      name: offset
+      schema:
+        type: integer
+      description: Offset (default 0)
+  responses:
+    '200':
+      description: A JSON with season ticket information
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/season-tickets/season-ticket-renewal-list.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  summary: Set season ticket renewals
+  tags:
+    - Season Tickets
+  parameters:
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+      required: true
+      description: The season ticket ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - renewalSeasonTicket
+          properties:
+            renewalSeasonTicket:
+              type: number
+              format: int64
+            rates:
+              type: array
+              items:
+                type: object
+                required:
+                  - oldRateId
+                  - newRateId
+                properties:
+                  oldRateId:
+                    type: integer
+                    format: int64
+                  newRateId:
+                    type: integer
+                    format: int64
+  responses:
+    '200':
+      description: A JSON with season ticket information
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  summary: Update a renewal for a season ticket
+  tags:
+    - Season Tickets
+  parameters:
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+      required: true
+      description: The season ticket ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '../../models/season-tickets/season-ticket-renewal-update-request-item.yml'
+  responses:
+    '200':
+      description: A JSON with season ticket information
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - items
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '../../models/season-tickets/season-ticket-renewal-update-response-item.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+delete:
+  summary: Delete multiple renewals from a season ticket
+  tags:
+    - Season Tickets
+  parameters:
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+      required: true
+      description: The season ticket ID
+    - in: query
+      name: renewalIds
+      description: List of renewals
+      required: true
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+  responses:
+    '200':
+      description: Renewals delete response with a result
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - items
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '../../models/season-tickets/season-ticket-renewal-delete-response-item.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

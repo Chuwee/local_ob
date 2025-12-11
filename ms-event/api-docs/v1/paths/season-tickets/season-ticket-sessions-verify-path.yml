@@ -1,0 +1,83 @@
+get:
+  summary: Validate if a session is compatible to a Season Tickets
+  description: ''
+  tags:
+    - Season Tickets
+  parameters:
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Season Ticket ID
+    - in: path
+      name: sessionId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Session ID
+    - in: query
+      name: includeSeats
+      schema:
+        type: boolean
+      description: Flag that indicates if the process must include seats or not
+  responses:
+    '200':
+      description: Result of the validation
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              result:
+                type: boolean
+                description: Result of the validation``:`` true if the session is valid, false if the session is not valid
+              reason:
+                type: string
+                description: Error code
+                enum:
+                  - SEASON_TICKET_GENERATION_STATUS_NOT_VALID
+                  - SESSION_TYPE_INVALID
+                  - DIFFERENT_ENTITY_IDS
+                  - DIFFERENT_VENUE_IDS
+                  - EVENT_OR_SESSION_STATUS_NOT_VALID
+                  - ORIGIN_SESSION_NOT_LINKABLE_SEATS
+                  - ONE_SECTOR_MIN_NOT_FOUND_IN_TARGET
+                  - ONE_LINKABLE_SEAT_NOT_FOUND_IN_TARGET
+                  - AT_LEAST_ONE_SEAT_IS_NOT_FOUND_IN_TARGET_SESSION
+                  - ONE_NNZ_MIN_NOT_FOUND_IN_TARGET
+                  - SEASON_TICKET_SESSION_ALREADY_ASSIGNED
+                  - SEASON_TICKET_SESSION_RESTRICTED
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+

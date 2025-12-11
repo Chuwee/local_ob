@@ -1,0 +1,168 @@
+get:
+  summary: Get ticket template
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: ticketTemplateId
+      description: TicketTemplates ID
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: query
+      name: entityAdminId
+      schema:
+        type: integer
+      description: Entity Admin ID
+  responses:
+    '200':
+      description: Ticket template
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/tickettemplates/ticket-template.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  summary: Update ticket template
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: ticketTemplateId
+      schema:
+        type: integer
+      required: true
+      description: Ticket template ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            default:
+              type: boolean
+            design:
+              type: object
+              properties:
+                id:
+                  type: integer
+            defaultLanguage:
+              type: integer
+            selectedLanguageIds:
+              type: array
+              description: If changes selectedLanguageIds, defaultLanguage is required and must be contained in it
+              items:
+                type: integer
+  responses:
+    '200':
+      description: Saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+
+delete:
+  summary: Delete ticket template
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: ticketTemplateId
+      schema:
+        type: integer
+      required: true
+      description: Ticket template ID
+  responses:
+    '200':
+      description: Saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

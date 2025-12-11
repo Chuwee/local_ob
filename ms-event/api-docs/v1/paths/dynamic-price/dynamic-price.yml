@@ -1,0 +1,121 @@
+get:
+  x-internal: true
+  summary: Get session dynamic price
+  description: ''
+  tags:
+  - Session Dynamic Prices
+  parameters:
+  - in: path
+    name: eventId
+    schema:
+      type: integer
+    required: true
+    description: Event ID
+  - in: path
+    name: sessionId
+    schema:
+      type: integer
+    required: true
+    description: Session ID
+  - in: query
+    name: initialize
+    schema:
+      type: boolean
+    required: false
+    description: Flag to initialize the configuration if it doesn't exist
+  responses:
+    '200':
+      description: Dynamic price config
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/dynamic-price/dynamic-price-config.yml
+    '401':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  x-internal: true
+  summary: Update session dynamic price
+  description: ''
+  tags:
+  - Session Dynamic Prices
+  parameters:
+  - in: path
+    name: eventId
+    schema:
+      type: integer
+    required: true
+    description: Event ID
+  - in: path
+    name: sessionId
+    schema:
+      type: integer
+    required: true
+    description: Session ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: boolean
+              description: Status of the dynamic price
+          required:
+          - status
+  responses:
+    '200':
+      description: Save successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

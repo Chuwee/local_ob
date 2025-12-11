@@ -1,0 +1,179 @@
+get:
+  summary: Returns an object with an array of ticket templates
+  description: ''
+  tags:
+    - Events
+  parameters:
+    - in: query
+      name: operatorId
+      schema:
+        type: integer
+      required: true
+      description: Operator ID
+    - in: query
+      name: entityId
+      schema:
+        type: integer
+      description: Entity ID
+    - in: query
+      name: format
+      schema:
+        type: integer
+      description: Template Format ID
+    - in: query
+      name: designId
+      schema:
+        type: integer
+      description: Design ID
+    - in: query
+      name: printer
+      schema:
+        type: string
+      description: Printer
+    - in: query
+      name: paperType
+      schema:
+        type: string
+      description: Printer paper type
+    - in: query
+      name: freeSearch
+      schema:
+        type: string
+      description: Free search by name
+    - in: query
+      name: offset
+      schema:
+        type: integer
+      description: Offset (default 0)
+    - in: query
+      name: limit
+      schema:
+        type: integer
+      description: Limit (default 100)
+    - in: query
+      name: sort
+      schema:
+        type: string
+      example:
+        - name:asc
+        - name:desc
+    - in: query
+      name: designType
+      schema:
+        $ref: ../../models/tickettemplates/design-type.yml
+  responses:
+    '200':
+      description: A JSON array of ticket templates
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../models/common/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: ../../models/tickettemplates/ticket-template.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  summary: Create new ticket template for entity
+  description: Creates a new ticket template to be used in the given entity
+  tags:
+    - Events
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - name
+            - entity
+            - design
+          properties:
+            name:
+              type: string
+              description: the name of the ticket template
+            entity:
+              type: object
+              properties:
+                id:
+                  type: integer
+            design:
+              type: object
+              properties:
+                id:
+                  type: integer
+            defaultLanguage:
+              type: integer
+  responses:
+    '201':
+      description: the id of the newly created ticket template
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

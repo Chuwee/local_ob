@@ -1,0 +1,104 @@
+get:
+  summary: Get product
+  description: Get a product
+  tags:
+    - Products
+  parameters:
+    - in: path
+      name: productId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Product ID
+  responses:
+    '200':
+      description: 'Product details'
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/products/product.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+put:
+  summary: Update product
+  description: Update a product
+  tags:
+    - Products
+  parameters:
+    - in: path
+      name: productId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Product ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/products/update-products.yml
+  responses:
+    '204':
+      description: Saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+delete:
+  summary: Delete a product
+  tags:
+    - Products
+  parameters:
+    - in: path
+      name: productId
+      schema:
+        type: integer
+      required: true
+      description: Product ID
+  responses:
+    '204':
+      description: Deleted successfully
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

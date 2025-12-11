@@ -1,0 +1,222 @@
+get:
+   summary: Get event-channel relationships
+   tags:
+   - Events
+   parameters:
+   -  in: path
+      name: eventId
+      schema:
+         type: integer
+         format: int64
+      required: true
+      description: Event ID
+   -  in: query
+      name: limit
+      schema:
+         type: number
+         format: int64
+      description: Limit the amount of results
+   -  in: query
+      name: offset
+      schema:
+         type: number
+         format: int64
+      description: Offset of the results
+   -  in: query
+      name: subtype
+      schema:
+         type: array
+         items:
+            type: string
+            enum:
+            - WEB
+            - PORTAL_WEB
+            - BOX_OFFICE_ONEBOX
+            - BOX_OFFICE_WEB
+            - PORTAL_COLLECTIVE
+            - PORTAL_SUBSCRIBERS
+            - PORTAL_B2B
+            - AVET
+   -  in: query
+      name: sort
+      schema:
+         type: string
+      example:
+      - name:asc
+      - name:desc
+      description: A string separated by commas with the format [sortableField]:[sortingCriteria]
+   -  in: query
+      name: entityId
+      schema:
+         type: integer
+      description: Channel entity id
+   -  in: query
+      name: q
+      schema:
+         type: string
+      description: Free search by channel name
+   -  in: query
+      name: requestStatus
+      x-internal: true
+      schema:
+         type: array
+         items:
+            type: string
+            enum:
+               - WEB
+               - REJECTED
+               - PENDING
+               - ACCEPTED
+               - PENDING_REQUEST
+   -  in: query
+      name: saleStatus
+      x-internal: true
+      schema:
+         type: array
+         items:
+            type: string
+            enum:
+               - PENDING_RELATIONSHIP
+               - PLANNED
+               - IN_PROGRAMMING
+               - SALE_PENDING
+               - SALE
+               - SALE_CANCELLED
+               - RELEASE_FINISHED
+               - RELEASE_CANCELLED
+               - CANCELLED
+               - NOT_ACCOMPLISHED
+               - REJECTED
+   -  in: query
+      name: releaseStatus
+      x-internal: true
+      schema:
+         type: array
+         items:
+            type: string
+            enum:
+               - PENDING_RELATIONSHIP
+               - PLANNED
+               - IN_PROGRAMMING
+               - RELEASE_PENDING
+               - RELEASED
+               - RELEASE_CANCELLED
+               - RELEASE_FINISHED
+               - CANCELLED
+               - NOT_ACCOMPLISHED
+               - REJECTED
+   responses:
+      '200':
+         description: A JSON array of channels
+         content:
+            application/json:
+               schema:
+                  type: array
+                  items:
+                     type: object
+                     properties:
+                        channel:
+                           type: object
+                           properties:
+                              id:
+                                 type: integer
+                              name:
+                                 type: string
+                              type:
+                                 $ref: ../../models/events/channel-type.yml
+                              entityId:
+                                 type: integer
+                              entityName:
+                                 type: string
+                        status:
+                           $ref: ../../models/events/event-channel-status.yml
+                        settings:
+                           $ref: ../../models/events/event-channel-settings.yml
+      '400':
+         description: Bad request
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error.yml
+      '401':
+         description: Unauthorized
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error-auth.yml
+      '403':
+         description: Forbidden
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error.yml
+      '404':
+         description: Configuration not found
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error.yml
+      '500':
+         description: Internal server error
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error.yml
+
+post:
+   summary: Create event-channel relation
+   tags:
+   - Events
+   parameters:
+   -  in: path
+      name: eventId
+      schema:
+         type: integer
+         format: int64
+      required: true
+      description: Event ID
+   requestBody:
+      required: true
+      content:
+         application/json:
+            schema:
+               type: object
+               required:
+               - channel_id
+               properties:
+                  channel_id:
+                     type: integer
+                     description: Channel id
+   responses:
+      '201':
+         description: Relation created
+      '400':
+         description: Bad request
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error.yml
+      '401':
+         description: Unauthorized
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error-auth.yml
+      '403':
+         description: Forbidden
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error.yml
+      '404':
+         description: Configuration not found
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error.yml
+      '500':
+         description: Internal server error
+         content:
+            application/json:
+               schema:
+                  $ref: ../../models/common/error.yml

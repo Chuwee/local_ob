@@ -1,0 +1,63 @@
+post:
+  summary: Assign a session to a Season Ticket
+  description: Assign a session to a Season Ticket
+  tags:
+    - Season Tickets
+  parameters:
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+      required: true
+      description: Season Ticket ID
+    - in: path
+      name: sessionId
+      schema:
+        type: integer
+      required: true
+      description: Season ID to be assigned to the Season Ticket
+  responses:
+    '200':
+      description: The result of the assignation
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              result:
+                type: boolean
+                description: Result of the assignation, true if the session is assigned, false if the session is not assigned
+              reason:
+                type: string
+                description: If the session is not assigned, describes the reason why this session is not assigned
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
