@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 public class ProviderPlanSettingsNotificationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProviderPlanSettingsNotificationService.class);
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     @Qualifier("providerPlanSettingsNotificationProducer")
@@ -27,7 +29,7 @@ public class ProviderPlanSettingsNotificationService {
         try {
             // Serialize settings to JSON, or set to null if settings are null (to signal clearing)
             String settingsJson = providerPlanSettings != null 
-                ? OBJECT_MAPPER.writeValueAsString(providerPlanSettings) 
+                ? objectMapper.writeValueAsString(providerPlanSettings) 
                 : null;
             message.setProviderPlanSettings(settingsJson);
             
