@@ -211,9 +211,8 @@ public class EventChannelRecordConverter {
         if (updateData.getTicketTemplates() != null && updateData.getTicketTemplates().getIndividualTicketPdfTemplateId() != null) {
             record.setIdplantillaticket(updateData.getTicketTemplates().getIndividualTicketPdfTemplateId().intValue());
         }
-        if (updateData.getProviderPlanSettings() != null) {
-            record.setConfiguracionplanproveedor(serializeProviderPlanSettings(updateData.getProviderPlanSettings()));
-        }
+        // Always set providerPlanSettings to allow clearing the field (even when null)
+        record.setConfiguracionplanproveedor(serializeProviderPlanSettings(updateData.getProviderPlanSettings()));
         return record;
     }
 
