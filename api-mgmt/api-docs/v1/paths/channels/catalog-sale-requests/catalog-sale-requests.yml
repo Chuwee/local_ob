@@ -1,0 +1,157 @@
+get:
+  x-internal: true
+  summary: Search catalog sale requests
+  description: ''
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Catalog Sale Requests
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: channel_entity_id
+      style: form
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+      description: Channel entity ID (only for user ``ROLE_OPR_MGR``)
+    - in: query
+      name: event_entity_id
+      style: form
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+      description: Event entity ID
+    - in: query
+      name: event_status
+      description: Response will contain only the event status specified
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../../models/event/event-status.yml
+    - in: query
+      name: channel_id
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+      description: Channel ID
+    - in: query
+      name: status
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../../models/channels/catalog-sale-requests/sale-request-status.yml
+      description: Current sale request status
+    - in: query
+      name: include_archived
+      schema:
+        type: boolean
+    - in: query
+      name: include_third_party_entity_events
+      description: Flag to include events from other entities with channel visibility
+      schema:
+        type: boolean
+    - in: query
+      name: date
+      description: Filter by request date with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as ``%3A``). Supported operators are ``eq``, ``ne``, ``gt``, ``gte``, ``lt``, ``lte``
+      example: eq:2019-01-01T08:00:00Z
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: fields
+      description: Response will contain only the id and the selected fields
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../../models/channels/catalog-sale-requests/catalog-sale-request-filter-field.yml
+    - in: query
+      name: sort
+      description: Sorting of enum fields with format field:[asc|desc]. For example 'date:desc'
+      schema:
+        type: string
+        enum:
+          - date
+          - event.name
+          - event.start_date
+    - in: query
+      name: q
+      description: Free search by event, channel, promoter or venue name fields.
+      schema:
+        type: string
+    - in: query
+      name: limit
+      schema:
+        type: integer
+        maximum: 50
+        minimum: 0
+        default: 50
+      description: Limit
+    - in: query
+      name: offset
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Offset
+  responses:
+    '200':
+      description: 'Array of sales requests'
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            properties:
+              metadata:
+                $ref: ../../../models/common/responses/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: ../../../models/channels/catalog-sale-requests/base-sale-request.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml

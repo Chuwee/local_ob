@@ -1,0 +1,48 @@
+put:
+  x-internal: true
+  summary: Update sale request subscription list
+  security:
+    - OAuth2: [ 'ROLE_CNL_MGR', 'ROLE_OPR_MGR' ]
+  tags:
+    - Catalog Sale Requests
+  parameters:
+    - in: path
+      name: saleRequestId
+      description: Sale request ID
+      schema:
+        type: integer
+        format: int64
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../../models/channels/catalog-sale-requests/sale-request-subscription-list.yml'
+  responses:
+    '204':
+      description: Sale request subscription list successfully updated
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '404':
+      description: Sale Request not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'

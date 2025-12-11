@@ -1,0 +1,79 @@
+additionalProperties: false
+type: object
+required:
+  - id
+properties:
+  id:
+    type: integer
+    format: int64
+  price_type:
+    type: integer
+    format: int64
+  visibility:
+    $ref: ../../models/venue-template/visibility-type.yml
+  accessibility:
+    $ref: ../../models/venue-template/accessibility-type.yml
+  gate:
+    type: integer
+    format: int64
+  gate_update_type:
+    $ref: ../../models/session/gate-update-type.yml
+  status:
+    type: integer
+    format: int64
+    description: Zone status, could not be defined with status_counters
+  blocking_reason:
+    type: integer
+    format: int64
+    description: Zone blocking reason, could not be defined with blocking_reason_counters
+  quota:
+    type: integer
+    format: int64
+    description: Zone quota, could not be defined with quota_counters
+  status_counters:
+    type: array
+    items:
+      type: object
+      properties:
+        source:
+          type: string
+          description: Source with enough capacity for count value from status ``FREE``, ``KILL`` or id of existing blocking_reason
+          example: KILL
+        status:
+          type: string
+          description: Target status
+          example: FREE
+          enum:
+            - FREE
+            - KILL
+        count:
+          type: integer
+  blocking_reason_counters:
+    type: array
+    items:
+      type: object
+      properties:
+        source:
+          type: string
+          description: Source with enough capacity for count value from status ``FREE``, ``KILL`` or id of existing blocking_reason
+          example: 55
+        blocking_reason:
+          type: integer
+          description: Target blocking_reason
+        count:
+          type: integer
+  quota_counters:
+    type: array
+    items:
+      type: object
+      properties:
+        source:
+          type: string
+          description: Source quota with enough available seats
+          example: 55
+        quota:
+          type: integer
+          format: int64
+          description: Target quota
+        count:
+          type: integer

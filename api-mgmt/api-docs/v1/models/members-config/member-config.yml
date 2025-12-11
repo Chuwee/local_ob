@@ -1,0 +1,156 @@
+additionalProperties: false
+type: object
+required:
+  - free_seat
+  - member_enabled
+  - max_additional_members
+  - member_operation_periods
+  - change_pin
+  - remember_pin
+  - user_area
+  - show_role
+  - show_subscription_mode
+  - show_previous_seat
+  - force_regenerate_passbook
+properties:
+  free_seat:
+    type: boolean
+  member_enabled:
+    type: boolean
+  max_additional_members:
+    type: number
+  subscription_modes:
+    type: array
+    items:
+      $ref: ./subscription-mode.yml
+  member_operation_periods:
+    type: object
+    additionalProperties:
+      $ref: ./member-operation-period.yml
+      description: Key-Value with key Period type and value with the information related to that period
+    example:
+      CHANGE_SEAT: {
+        "active": false,
+        "ignored_steps": [
+            "PARTNER_MODE"
+        ],
+        "orphan_seats_enabled": false
+      }
+      RENEWAL: {
+        "active": false,
+        "ignored_steps": [
+            "PARTNER_MODE"
+        ],
+        "orphan_seats_enabled": false,
+        "show_update_partner_user": true,
+        "skip_periodicity_module": false,
+        "aforo_renew_partner": 1,
+        "payment_mode": 1,
+        "emission_reason": 4
+      }
+      NEW_MEMBER: {
+        "active": false,
+        "charge": 0,
+        "new_member_id": 30,
+        "new_member_flow": "AUTOLOGIN",
+        "avatar": {
+          enabled: true,
+          "mandatory": false
+        }
+      }
+      BUY_SEAT: {
+        "active": true,
+        "orphan_seats_enabled": true
+      }
+  change_pin:
+    type: boolean
+  remember_pin:
+    type: boolean
+  blocked_matches:
+    type: array
+    items:
+      type: number
+  allow_free_seat_till:
+    type: integer
+  allow_recover_seat_till:
+    type: integer
+  user_area:
+    type: boolean
+  prices_batch_enabled:
+    type: boolean
+  show_role:
+    type: boolean
+  show_subscription_mode:
+    type: boolean
+  show_previous_seat:
+    type: boolean
+  force_regenerate_passbook:
+    type: boolean
+  expiration_date_passbook:
+    type: string
+    format: date-time
+  open_additional_members:
+    type: boolean
+  signup_email:
+    type: boolean
+  allow_cross_purchases:
+    type: boolean
+  allow_tutor_form:
+    type: boolean
+  tutee_max_age:
+    type: number
+  buy_url:
+    type: string
+  captcha_site_key:
+    type: string
+  captcha_enabled:
+    type: boolean
+  captcha_secret_key:
+    type: string
+  public_availability_enabled:
+    type: boolean
+  landing_button_url:
+    type: string
+  transfer_seat:
+    type: boolean
+  membership_term_id:
+    type: number
+  membership_periodicity_id:
+    type: number
+  download_passbook_permissions:
+    type: array
+    items:
+      type: string
+      enum:
+        - NO_TICKETS
+        - PENDING_APPROVAL
+        - LEAVE
+        - PENDING_ISSUE
+        - ALLOWED_PASSAGE
+        - DENIED_PASSAGE
+    description: List of permissions that allow the member to download their passbook
+  buy_seat_permission:
+    type: string
+    enum:
+      - NO_TICKETS
+      - PENDING_APPROVAL
+      - LEAVE
+      - PENDING_ISSUE
+      - ALLOWED_PASSAGE
+      - DENIED_PASSAGE
+  new_member_permission:
+    type: string
+    enum:
+      - NO_TICKETS
+      - PENDING_APPROVAL
+      - LEAVE
+      - PENDING_ISSUE
+      - ALLOWED_PASSAGE
+      - DENIED_PASSAGE
+  members_card_image:
+    type: object
+    properties:
+      image_url:
+        type: string
+        format: uri
+        description: URL pointing to the image

@@ -1,0 +1,147 @@
+get:
+  x-internal: true
+  summary: Get channel surcharges taxes configuration for a sale request
+  description: Get the channel surcharges taxes configuration of a sale request
+  security:
+    - OAuth2:
+        - 'ROLE_SYS_ANS'
+        - 'ROLE_SYS_MGR'
+        - 'ROLE_CNL_MGR'
+        - 'ROLE_ENT_MGR'
+        - 'ROLE_ENT_ANS'
+        - 'ROLE_OPR_MGR'
+        - 'ROLE_OPR_ANS'
+  tags:
+    - Surcharges
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: saleRequestId
+      schema:
+        type: integer
+      required: true
+      description: Sale request ID
+  responses:
+    '200':
+      description: Sale request surcharges taxes configuration
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/tax/sale-request-surcharge-taxes.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+
+put:
+  x-internal: true
+  summary: Update sale request surcharges taxes configuration
+  security:
+    - OAuth2:
+        - 'ROLE_CNL_MGR'
+        - 'ROLE_OPR_MGR'
+  tags:
+    - Surcharges
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: saleRequestId
+      schema:
+        type: integer
+      required: true
+      description: Sale request ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            origin:
+              type: string
+              enum:
+                - EVENT
+                - CHANNEL
+                - SALE_REQUEST
+            taxes:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+  responses:
+    '201':
+      description: Surcharge taxes added successfully.
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml

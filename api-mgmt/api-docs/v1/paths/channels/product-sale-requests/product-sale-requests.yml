@@ -1,0 +1,115 @@
+get:
+  x-internal: true
+  summary: Search product sale requests
+  description: ''
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Product Sale Requests
+  parameters:
+    - in: query
+      name: status
+      schema:
+        type: array
+        items:
+          $ref: ../../../models/channels/product-sale-requests/sale-request-status.yml
+      description: Current product sale request status
+    - in: query
+      name: channel_entity_id
+      style: form
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+      description: Channel entity ID (only for user ``ROLE_OPR_MGR``)
+    - in: query
+      name: product_entity_id
+      style: form
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+      description: Product entity ID
+    - in: query
+      name: q
+      description: Free search by event, channel, promoter or venue name fields.
+      schema:
+        type: string
+    - in: query
+      name: sort
+      description: Sorting of enum fields with format field:[asc|desc]. For example 'request_date:desc'
+      schema:
+        type: string
+        enum:
+          - request_date
+          - request_date:asc
+          - request_date:desc
+    - in: query
+      name: fields
+      description: Response will contain only the id and the selected fields
+      schema:
+        type: array
+        items:
+          $ref: ../../../models/channels/product-sale-requests/product-sale-request-filter.yml
+    - in: query
+      name: limit
+      schema:
+        type: integer
+        maximum: 50
+        minimum: 0
+        default: 50
+      description: Limit
+    - in: query
+      name: offset
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Offset
+  responses:
+    '200':
+      description: 'Array of product sales requests'
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            properties:
+              metadata:
+                $ref: ../../../models/common/responses/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: ../../../models/channels/product-sale-requests/base-product-sale-request.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml

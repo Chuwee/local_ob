@@ -1,0 +1,65 @@
+get:
+  summary: Returns a list of sga private presales
+  description: Returns a list of sga private presales from sga
+  security:
+    - OAuth2: [ 'ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS' ]
+  tags:
+    - External provider season tickets presales
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - name: seasonTicketId
+      in: path
+      required: true
+      schema:
+        type: integer
+    - name: skip_used
+      in: query
+      description: decorator to skip imported external season ticket presales
+      required: false
+      schema:
+        type: boolean
+        default: false
+  responses:
+    '200':
+      description: A JSON array of external presales
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../../models/season-ticket/season-ticket-external-presales.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

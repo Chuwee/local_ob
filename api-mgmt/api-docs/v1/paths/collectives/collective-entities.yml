@@ -1,0 +1,149 @@
+get:
+  x-internal: true
+  summary: Get entities assgined to collective (operator only)
+  description: ''
+  security:
+    - OAuth2: ['ROLE_OPR_MGR']
+  tags:
+    - Collectives
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: collectiveId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Collective ID
+  responses:
+    '200':
+      description: 'List of entities assigned to the collective '
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              required:
+                - id
+                - name
+                - enabled
+              properties:
+                id:
+                  type: integer
+                  format: int64
+                name:
+                  type: string
+                enabled:
+                  type: boolean
+                external_validator_properties:
+                  type: object
+                  required:
+                    - user
+                    - password
+                  properties:
+                    user:
+                      type: string
+                    password:
+                      type: string
+    '401':
+      description: 'Unauthorized'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error-auth.yml'
+    '403':
+      description: 'Forbidden'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '404':
+      description: 'Not found'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '500':
+      description: 'Internal server error'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+put:
+  x-internal: true
+  summary: Assign/Unassign entities to the collective (only operator)
+  description: 'A list will be sent with the entities that you want to assign to the collective. All the entities that were previously assigned and are not in this list will be unassigned.'
+  security:
+    - OAuth2: ['ROLE_OPR_MGR']
+  tags:
+    - Collectives
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: collectiveId
+      schema:
+        type: integer
+        format: int64
+      description: Collective ID
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - entities
+          properties:
+            entity_admin_id:
+              x-internal: true
+              type: integer
+            entities:
+              type: array
+              items:
+                type: integer
+                format: int64
+  responses:
+    '204':
+      description: 'Entities assigned to the collective successfully'
+    '400':
+      description: 'Bad request'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '401':
+      description: 'Unauthorized'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error-auth.yml'
+    '403':
+      description: 'Forbidden'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '404':
+      description: 'Not found'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '500':
+      description: 'Internal server error'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'

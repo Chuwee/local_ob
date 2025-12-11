@@ -1,0 +1,139 @@
+post:
+  summary: Create terminal
+  x-internal: true
+  security:
+    - OAuth2: [ 'ROLE_OPR_MGR' ]
+  tags:
+    - Terminals
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+  requestBody:
+    required: true
+    description: Body
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/terminals/terminal-create.yml
+  responses:
+    '201':
+      description: Terminal created
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/id.yml
+    '400':
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+get:
+  summary: Search terminals
+  x-internal: true
+  security:
+    - OAuth2: [ 'ROLE_OPR_MGR' ]
+  tags:
+    - Terminals
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: entity_id
+      schema:
+        type: array
+        items:
+          type: integer
+    - in: query
+      name: type
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - BOX_OFFICE
+            - ACCESS_CONTROL
+            - INTEGRATION
+    - in: query
+      name: license_enabled
+      schema:
+        type: boolean
+    - in: query
+      name: q
+      description: Free search by name
+      schema:
+        type: string
+    - in: query
+      name: limit
+      schema:
+        type: integer
+      description: Default <code>1000</code>
+    - in: query
+      name: offset
+      schema:
+        type: integer
+      description: Default <code>0</code>
+  responses:
+    '200':
+      description: Terminals List
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/terminals/terminal-search-response.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

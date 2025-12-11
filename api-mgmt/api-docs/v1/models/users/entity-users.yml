@@ -1,0 +1,240 @@
+additionalProperties: false
+type: object
+required:
+  - id
+  - name
+  - short_name
+  - social_reason
+  - status
+  - operator
+  - contact
+  - settings
+properties:
+  id:
+    type: integer
+    format: int64
+  name:
+    type: string
+  short_name:
+    type: string
+  reference:
+    type: string
+  nif:
+    type: string
+  social_reason:
+    type: string
+  notes:
+    type: string
+  status:
+    $ref: '../entities/entity-status.yml'
+  operator:
+    type: object
+    required:
+      - id
+      - name
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+        nullable: true
+  contact:
+    $ref: '../entities/entity-contact.yml'
+  invoice_data:
+    $ref: '../entities/entity-invoice-data.yml'
+  external_reference:
+    type: string
+  inventory_providers:
+      type: array
+      items:
+        $ref: ../entities/provider.yml
+  settings:
+    type: object
+    required:
+      - types
+      - notifications
+      - corporate_color
+      - enable_multievent_cart
+      - allow_activity_events
+      - allow_avet_integration
+      - live_streaming
+      - allow_secondary_market
+      - enable_B2B
+      - interactive_venue
+      - allow_data_protection_fields
+      - allow_members
+      - allow_digital_season_ticket
+      - bi_users
+    properties:
+      types:
+        type: array
+        items:
+          $ref: '../entities/entity-type.yml'
+      languages:
+        type: object
+        required:
+          - default
+          - available
+        properties:
+          default:
+            type: string
+            description: IETF language tag standard
+            example: es-ES
+          available:
+            type: array
+            items:
+              type: string
+              description: IETF language tag standard
+              example: es-ES
+      categories:
+        type: object
+        required:
+          - allow_custom_categories
+          - selected
+        properties:
+          allow_custom_categories:
+            type: boolean
+            description: Is allowed to use custom categories
+          selected:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: base categories identifiers. Service GET /base-categories
+      live_streaming:
+        x-internal: true
+        type: object
+        required:
+          - enabled
+        properties:
+          enabled:
+            type: boolean
+          vendors:
+            type: array
+            description: List of available vendors for entity
+            items:
+              $ref: ../entities/streaming-vendor.yml
+      corporate_color:
+        x-internal: true
+        type: string
+        description: Hex color code without ``#``
+      external_integration:
+        x-internal: true
+        $ref: '../entities/entity-external-integration.yml'
+      enable_multievent_cart:
+        type: boolean
+      enable_B2B:
+        x-internal: true
+        type: boolean
+      allow_B2B_publishing:
+        x-internal: true
+        type: boolean
+      allow_invitations:
+        x-internal: true
+        type: boolean
+      allow_multi_avet_cart:
+        x-internal: true
+        type: boolean
+      allow_activity_events:
+        type: boolean
+      allow_avet_integration:
+        x-internal: true
+        type: boolean
+      allow_secondary_market:
+        x-internal: true
+        type: boolean
+      allow_vip_views:
+       x-internal: true
+       type: boolean
+       description: This flag allows vip views for graphic venues
+      allow_attributes:
+        x-internal: true
+        type: boolean
+        description: This is enable when the entity has attributes defined
+      interactive_venue:
+        x-internal: true
+        type: object
+        required:
+          - enabled
+        properties:
+          enabled:
+            type: boolean
+          allowed_venues:
+            type: array
+            description: List of available types of interactive venues for entity
+            items:
+              $ref: ../common/interactive-venue/interactive-venue-type.yml
+      allow_data_protection_fields:
+        type: boolean
+        description: This field allows to enable or disable Data Protection flag. Only for user ``ROLE_OPR_MGR``.
+      allow_members:
+        type: boolean
+      allow_digital_season_ticket:
+        description: Allows entity to generate digital season tickets (allow_avet_integration is required to activate this setting)
+        type: boolean
+      allow_ticket_hide_price:
+        x-internal: true
+        description: Allows to hide the ticket prices when selling through box office
+        type: boolean
+      allow_hard_ticket_pdf:
+        x-internal: true
+        description: Allows use designs of ticket template with Hard Ticket PDF format.
+        type: boolean
+      allow_loyalty_points:
+        type: boolean
+      notifications:
+        $ref: ../entities/entity-notifications-settings.yml
+      customization:
+        x-internal: true
+        $ref: ../entities/entity-customization-settings.yml
+      bi_users:
+        x-internal: true
+        type: object
+        required:
+          - advanced_permissions_limit
+          - basic_permissions_limit
+        properties:
+          advanced_permissions_limit:
+            description: Number of possible advanced BI users in the entity
+            type: number
+          basic_permissions_limit:
+            description: Number of possible basic BI users in the entity
+            type: number
+      managed_entities:
+        x-internal: true
+        type: array
+        items:
+          $ref: ../common/idname.yml
+      accommodations:
+        x-internal: true
+        $ref: ../entities/accommodations-entity-config.yml
+      whatsapp:
+        x-internal: true
+        type: object
+        required:
+          - enabled
+        properties:
+          enabled:
+            type: boolean
+          whatsapp_template:
+            type: integer
+      enable_v4_configs:
+        x-internal: true
+        type: boolean
+        description: Allows entity to work with v4 configurations
+      donations:
+        x-internal: true
+        type: array
+        items:
+          type: object
+          required:
+            - enabled
+          properties:
+            enabled:
+              type: boolean
+            api_key:
+              type: string
+            provider_id:
+              type: integer

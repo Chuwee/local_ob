@@ -1,0 +1,67 @@
+delete:
+  x-internal: true
+  summary: Delete payment benefit tags for sale request
+  description: ''
+  security:
+    - OAuth2: [ 'ROLE_CNL_MGR', 'ROLE_OPR_MGR' ]
+  tags:
+    - Catalog Sale Requests
+  parameters:
+    - in: header
+      name: Authorization
+      schema:
+        type: string
+      required: true
+      description: Bearer Token
+    - in: path
+      name: saleRequestId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Sale request ID
+    - in: path
+      name: language
+      schema:
+        type: string
+      required: true
+      description: Language of the tag
+    - in: path
+      name: type
+      schema:
+        $ref: "../../../models/channels/catalog-sale-requests/sale-request-payment-benefit-tag-content-type.yml"
+      required: true
+      description: Type of the tag
+  responses:
+    '204':
+      description: 'Payment benefit tags deleted successfully'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml

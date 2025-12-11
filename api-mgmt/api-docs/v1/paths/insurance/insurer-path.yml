@@ -1,0 +1,111 @@
+get:
+  x-internal: true
+  summary: Returns an object with insurer information
+  description: 'Get a insurer'
+  security:
+    - OAuth2: ['ROLE_SYS_MGR', 'ROLE_SYS_ANS']
+  tags:
+    - Insurers
+  parameters:
+    - in: path
+      name: insurerId
+      schema:
+        type: integer
+      required: true
+      description: Insurer ID
+  responses:
+    '200':
+      description: A JSON with insurer information
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/insurance/insurer.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  x-internal: true
+  summary: Returns an object with updated insurer information
+  description: 'Put an insurer'
+  security:
+    - OAuth2: ['ROLE_SYS_MGR']
+  tags:
+    - Insurers
+  parameters:
+    - in: path
+      name: insurerId
+      schema:
+        type: integer
+      required: true
+      description: Insurer ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/insurance/insurer-request.yml
+  responses:
+    '200':
+      description: A JSON with insurer information
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/insurance/insurer.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

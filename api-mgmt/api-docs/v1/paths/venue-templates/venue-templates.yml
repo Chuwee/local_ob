@@ -1,0 +1,280 @@
+get:
+  summary: Get venue templates
+  description: The available templates for a venue. Dependening on filtering could obtain at venue scope (ARCHETYPE), promoter (STANDARD) or event.
+  security:
+    - OAuth2: ['ROLE_REC_MGR', 'ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS', 'ROLE_CNL_MGR', 'ROLE_ENT_MGR']
+  tags:
+    - Templates
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: venue_id
+      description: Venue ID of the venue that the templates are based in
+      schema:
+        type: integer
+    - in: query
+      name: entity_id
+      description: Entity ID of the templates owner (Only for user ``ROLE_OPR_MGR``)
+      schema:
+        type: integer
+    - in: query
+      name: venue_entity_id
+      description: Entity ID of the venue associated to template
+      schema:
+        type: integer
+    - in: query
+      name: venue_city
+      description: City name of the venue associated to template
+      schema:
+        type: string
+    - in: query
+      name: venue_country
+      description: Country name of the venue associated to template
+      schema:
+        type: string        
+    - in: query
+      name: event_id
+      schema:
+        type: integer
+        format: int64
+      required: false
+      description: Event ID of the template (Only for event templates)
+    - in: query
+      name: scope
+      description: Scope of the template (will be ignored when filtering by eventId)
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../models/venue-template/venue-template-scope.yml
+    - in: query
+      name: type
+      description: Type of the template
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../models/venue-template/venue-template-type.yml
+    - in: query
+      name: status
+      description: status of the template
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../models/venue-template/venue-template-status.yml
+    - in: query
+      name: public
+      description: Whether the template can be seen by others
+      schema:
+        type: boolean
+    - in: query
+      name: include_third_party_templates
+      description: Flag to include public templates from other entities with visibility
+      schema:
+        type: boolean
+    - in: query
+      name: graphic
+      description: Whether the template has a graphical representation or not, doesn't apply to activity templates.
+      schema:
+        type: boolean
+    - in: query
+      name: inventory_provider
+      description: inventory provider identifier.
+      schema:
+        type: string
+    - in: query
+      name: has_avet_mapping
+      description: Whether the template has been mapped to avet
+      schema:
+        type: boolean
+    - in: query
+      name: q
+      description: Free search for venue templates by name
+      schema:
+        type: string
+    - in: query
+      name: entity_admin_id
+      x-internal: true
+      schema:
+        type: integer
+      description: Entity admin Id
+    - in: query
+      name: fields
+      description: Response will contain only the id and the selected fields
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../models/venue-template/venue-template-filter-field.yml
+    - in: query
+      name: sort
+      description: Sorting of enum fields with format field:[asc|desc]. For example 'name:desc'
+      schema:
+        $ref: ../../models/venue-template/venue-template-sort-field.yml
+    - in: query
+      name: limit
+      schema:
+        type: integer
+      description: Limit (default 50, max 1000)
+    - in: query
+      name: offset
+      schema:
+        type: integer
+      description: Offset (default 0)
+  responses:
+    '200':
+      description: Array of venue templates
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/venue-template/venue-templates.yml
+    '400':
+      description: Array of venue templates
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  summary: New venue template
+  description: Creates a venue template by copying an existing venue template or defining a new one from scratch
+  security:
+    - OAuth2: ['ROLE_REC_MGR', 'ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Templates
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+              nullable: true
+              description: Required when creating a new template
+            venue_id:
+              type: integer
+              nullable: true
+              description: Required when creating a new template
+            space_id:
+              type: integer
+              nullable: true
+              description: Required when creating a new template
+            event_id:
+              type: integer
+              nullable: true
+              description: Optional event_id when creating a new event venue template
+            entity_id:
+              type: integer
+              nullable: true
+              description: Optional entity_id when creating a new promoter venue template
+            scope:
+              $ref: ../../models/venue-template/venue-template-scope.yml
+              nullable: true
+              description: Optional scope when creating new template for venue or promoter (will be ignored when event_id is defined)
+            type:
+              $ref: ../../models/venue-template/venue-template-type_create.yml
+              nullable: true
+              description: Optional type when creating new template for STANDARD scope (anyway will be ignored)
+            graphic:
+              type: boolean
+              nullable: true
+              description: Required in NORMAL type events
+            from_template_id:
+              type: integer
+              nullable: true
+              description: Venue config template to create from
+            image:
+              type: string
+              nullable: true
+              description: Binary value encoded on base64. Its dimensions must be 550x340px and its size must not exceed 150KB.
+            additional_config:
+              x-internal: true
+              nullable: true
+              $ref: ../../models/venue-template/venue-template-additional-config.yml
+  responses:
+    '201':
+      description: The venue template was added correctly and it's being processed
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            properties:
+              id:
+                type: integer
+                description: the id of the newly created venue template
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

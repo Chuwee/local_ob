@@ -1,0 +1,69 @@
+delete:
+  summary: Delete images of templateInfo
+  description: Delete images of templateInfo by imageType, language and position
+  security:
+    - OAuth2: [ 'ROLE_REC_MGR', 'ROLE_EVN_MGR', 'ROLE_OPR_MGR' ]
+  tags:
+    - Venue Template info
+  parameters:
+    - in: path
+      name: venueTemplateId
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: path
+      name: elementType
+      schema:
+        type: string
+        enum:
+          - VIEW
+          - NNZ
+          - PRICE_TYPE
+      required: true
+    - in: path
+      name: elementId
+      schema:
+        type: number
+      required: true
+    - in: path
+      name: imageType
+      schema:
+        type: string
+        enum:
+          - SLIDER
+      required: true
+    - in: path
+      name: language
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: position
+      description: 'When is used, all position-matching images will be deleted. If not, all images will be deleted'
+      schema:
+        type: array
+        items:
+          type: number
+          format: int64
+  responses:
+    '204':
+      description: 'Images deleted'
+    '400':
+      description: 'Bad request'
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '404':
+      description: 'Not found'
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '500':
+      description: 'Internal server error'
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'

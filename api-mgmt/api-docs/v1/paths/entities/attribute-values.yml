@@ -1,0 +1,73 @@
+post:
+  x-internal: true
+  summary: Add value for existing attribute
+  description: Creates new value for attribute
+  security:
+    - OAuth2: ['ROLE_OPR_MGR']
+  tags:
+    - Attributes
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      schema:
+        type: integer
+      required: true
+    - in: path
+      name: attributeId
+      schema:
+        type: integer
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            en-US: Attribute value
+            es-ES: Valor atributo
+  responses:
+    '201':
+      description: Created value for attribute
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '401':
+      description: Invalid token
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error-auth.yml'
+    '403':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'

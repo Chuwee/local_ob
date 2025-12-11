@@ -1,0 +1,132 @@
+post:
+  summary: Export price simulation list
+  x-internal: true
+  description: 'List of price simulation given sale request id'
+  security:
+    - OAuth2: ['ROLE_ENT_MGR', 'ROLE_CNL_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Catalog Sale Requests
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: saleRequestId
+      schema:
+        type: integer
+        format: int64
+      description: Sale request ID
+      required: true
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - fields
+            - format
+          properties:
+            fields:
+              type: array
+              items:
+                type: object
+                required:
+                  - field
+                properties:
+                  field:
+                    type: string
+                    enum:
+                      - VENUE_CONFIG_ID
+                      - VENUE_CONFIG_NAME
+                      - RATE_ID
+                      - RATE_NAME
+                      - RATE_PRICE_TYPE_ID
+                      - RATE_PRICE_TYPE_NAME
+                      - RATE_PRICE_TYPE_SIMULATION_PRICE_BASE
+                      - RATE_PRICE_TYPE_SIMULATION_PRICE_TOTAL
+                      - RATE_PRICE_TYPE_SIMULATION_PRICE_SURCHARGE_VALUE
+                      - RATE_PRICE_TYPE_SIMULATION_PRICE_SURCHARGE_TYPE
+                      - RATE_PRICE_TYPE_SIMULATION_PRICE_PROMOTION_ID
+                      - RATE_PRICE_TYPE_SIMULATION_PRICE_PROMOTION_NAME
+                      - RATE_PRICE_TYPE_SIMULATION_PRICE_PROMOTION_TYPE
+                  name:
+                    type: string
+            format:
+              type: string
+              enum:
+                - JSON
+                - CSV
+            delivery:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - EMAIL
+                properties:
+                  description: |
+                    Fields required by the delivery type.
+                    Valid properties to **EMAIL** type:
+                      - address: Email where report will send. Optional. Authenticated username will be used if address is not informed.
+                  type: object
+                  additionalProperties: {}
+                  example:
+                    address: 'user@email.com'
+            translations:
+              type: array
+              items:
+                $ref: ../../../models/exports/translation.yml
+            settings:
+              type: object
+              properties:
+                charset_encoding:
+                  type: string
+                  enum:
+                    - UTF_8
+                    - UTF_8_BOM
+                csv_separator_format:
+                  type: string
+                  enum:
+                    - COMMA
+                    - SEMICOLON
+                csv_fraction_digits_format:
+                    type: string
+                    enum:
+                    - POINT
+                    - COMMA
+  responses:
+    '202':
+      $ref: ../../../models/exports/export-response.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml

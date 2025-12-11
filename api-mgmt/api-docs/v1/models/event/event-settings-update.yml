@@ -1,0 +1,129 @@
+additionalProperties: false
+type: object
+properties:
+  categories:
+    type: object
+    properties:
+      base:
+        $ref: ../categories/category.yml
+      custom:
+        $ref: ../categories/category.yml
+  sales_goal:
+    type: object
+    properties:
+      tickets:
+        type: integer
+      revenue:
+        type: number
+  bookings:
+    $ref: event-settings-booking.yml
+  languages:
+    type: object
+    properties:
+      default:
+        type: string
+        description: IETF language tag standard
+        example: es-ES
+      selected:
+        type: array
+        items:
+          type: string
+          description: IETF language tag standard
+          example: es-ES
+  tour:
+    type: object
+    properties:
+      enable:
+        type: boolean
+        description: If enable, links event to tour and tour_id must be defined
+      id:
+        type: integer
+    description: If defined, links event to corresponding tour
+  session_pack:
+    type: string
+    enum:
+      - DISABLED
+      - RESTRICTED
+      - UNRESTRICTED
+  allow_venue_reports:
+    type: boolean
+  use_producer_fiscal_data:
+    type: boolean
+  festival:
+    type: boolean
+  use_tiered_pricing:
+    type: boolean
+    description: Allow the event to configure different tiers for every pricezone, the event must have one rate and no sessions. Once active, if any session or tier is created, it cannot be deactivated
+  invitation_use_ticket_template:
+    type: boolean
+    description: Informs that the invitation ticket contents will be the same as the general ticket content
+  subscription_list:
+    type: object
+    properties:
+      enable:
+        type: boolean
+      id:
+        type: number
+        format: integer
+        description: Subscription list Id
+  groups:
+    type: object
+    description: Only for events of type ``ACTIVITY`` or ``THEME_PARK``
+    properties:
+      allowed:
+        type: boolean
+      price_policy:
+        type: string
+        description: If groups are allowed, definition of ``FIXED`` price for all group or ``INDIVIDUAL`` by attendant/companion
+        enum:
+          - FIXED
+          - INDIVIDUAL
+      companions_payment:
+        type: boolean
+        description: For price_policy ``INDIVIDUAL``, definition of companion individual payment
+  attendant_tickets:
+    type: object
+    properties:
+      status:
+        $ref: attendant-tickets-event-status.yml
+      channels_scope:
+        $ref: ../common/attendant-tickets-channels-scope-put.yml
+      autofill:
+        type: boolean
+        description: Fill attendance info automatically. Only compatible with AVET Sockets.
+      edit_autofill:
+        type: boolean
+        description: Allows edit attendance info only if autofill is true. Only compatible with AVET Sockets.
+      edit_attendant:
+        type: boolean
+        description: Allows ticket attendant data edition
+      edit_autofill_disallowed_sectors:
+        description: List of sectors with autofill modifications disallowed
+        type: array
+        items:
+          type: number
+  interactive_venue:
+    x-internal: true
+    $ref: event-settings-interactive-venue.yml
+  simplified_invoice_prefix:
+    x-internal: true
+    type: integer
+  accommodations:
+    x-internal: true
+    $ref: event-settings-accommodations-config.yml
+  whitelabel_settings:
+    x-internal: true
+    $ref: "event-whitelabel-settings.yml"
+  event_external_config:
+    $ref: 'event-external-config.yml'
+  change_seat_settings:
+    x-internal: true
+    $ref: 'update-event-change-seat-settings.yml'
+  transfer_settings:
+    x-internal: true
+    $ref: 'event-transfer-ticket.yml'
+  tax_mode:
+    type: string
+    enum:
+      - INCLUDED
+      - ON_TOP

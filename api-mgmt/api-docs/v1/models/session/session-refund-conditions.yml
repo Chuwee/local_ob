@@ -1,0 +1,67 @@
+additionalProperties: false
+type: object
+properties:
+  print_refund_price_in_ticket:
+    type: boolean
+    description: wherher the refund price or the total price is shown in each individual ticket when printing multiple tickets
+  refunded_seat_status:
+    $ref: ./session-refund-conditions-ticket-status.yml
+    description: status that a refunded seat will addopt
+  refunded_seat_block_reason_id:
+    type: number
+    format: int64
+    description: the blocking reason that a refunded seat will addopt (only if refunded_seat_block_status is set to blocking)
+  refunded_seat_quota:
+    description: the quota that a refunded seat will belong to
+    type: object
+    properties:
+      enabled:
+        type: boolean
+      id:
+        type: number
+        format: int64
+  session_pack_automatically_calculate_conditions:
+    type: boolean
+    description: whether the refund percentage is calculated automatically or manually
+  session_pack_refund_conditions:
+    type: array
+    items:
+      type: object
+      properties:
+        session_id:
+          type: number
+          format: int64
+          description: id of the session that belongs to the session pack
+        session_name:
+          type: string
+          description: name of the session that belongs to the session pack
+        session_start_date:
+          type: string
+          format: date-time
+          description: date of the session that belongs to the session pack
+        price_percentage_values:
+          type: array
+          items:
+            type: object
+            properties:
+              price_type:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    format: int64
+                  name:
+                    type: string
+              rate:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    format: int64
+                  name:
+                    type: string
+                  default:
+                    type: boolean
+              value:
+                type: number
+                format: double

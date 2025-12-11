@@ -1,0 +1,66 @@
+get:
+  x-internal: true
+  summary: Get product delivery point relation
+  description: Get product delivery point relation by id
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Products
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: productId
+      schema:
+        type: integer
+      required: true
+      description: Product ID
+    - in: path
+      name: deliveryPointId
+      schema:
+        type: integer
+      required: true
+      description: Product delivery point relation ID
+  responses:
+    '200':
+      description: Get info of a product delivery point relation
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            $ref: ../../models/products/product-delivery-point-relation.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+

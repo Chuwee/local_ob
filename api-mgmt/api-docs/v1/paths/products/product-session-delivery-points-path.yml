@@ -1,0 +1,207 @@
+get:
+  x-internal: true
+  summary: Get product session delivery points
+  description: Get product session delivery points
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Products
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: productId
+      schema:
+        type: integer
+      required: true
+      description: Product ID
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: query
+      name: start_date
+      schema:
+        type: string
+        format: date-time
+      description: Session start date
+    - in: query
+      name: end_date
+      schema:
+        type: string
+        format: date-time
+      description: Session end date
+    - in: query
+      name: days_of_week
+      schema:
+        type: string
+        enum:
+          - "MONDAY"
+          - "TUESDAY"
+          - "WEDNESDAY"
+          - "THURSDAY"
+          - "FRIDAY"
+          - "SATURDAY"
+          - "SUNDAY"
+      description: Sessions start days of the week
+    - in: query
+      name: timezone
+      schema:
+        type: string
+        example: "Europe/Madrid"
+    - in: query
+      name: q
+      schema:
+        type: string
+      description: Free text search query
+    - in: query
+      name: status
+      description: The status of the session
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../models/session/session-status.yml
+    - in: query
+      name: limit
+      schema:
+        type: integer
+      description: Limit (default 50, max 1000)
+    - in: query
+      name: offset
+      schema:
+        type: integer
+      description: Offset (default 0)
+  responses:
+    '200':
+      description: Get list of product session delivery points
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              metadata:
+                $ref: ../../models/common/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: ../../models/products/product-session-delivery-point.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  x-internal: true
+  summary: Update product session delivery points
+  description: Update product session delivery points
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Products
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: productId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Product ID
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Event ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/products/update-product-session-delivery-points.yml
+  responses:
+    '200':
+      description: Product session delivery points has been updated successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              metadata:
+                $ref: ../../models/common/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: ../../models/products/product-session-delivery-point.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+

@@ -1,0 +1,66 @@
+get:
+  summary: Get the list of AVET permissions
+  description: ''
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR', 'ROLE_ENT_MGR', 'ROLE_ENT_ANS']
+  tags:
+    - Members Contents
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      description: Find by channel id
+      schema:
+        type: number
+      required: true
+  responses:
+    '200':
+      description: List of AVET permissions
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - NO_TICKETS
+                - PENDING_APPROVAL
+                - LEAVE
+                - PENDING_ISSUE
+                - ALLOWED_PASSAGE
+                - DENIED_PASSAGE
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

@@ -1,0 +1,65 @@
+additionalProperties: false
+type: object
+required:
+  - id
+properties:
+  id:
+    type: integer
+    format: int64
+  price_type:
+    type: integer
+    format: int64
+  visibility:
+    $ref: ../../models/venue-template/visibility-type.yml
+  accessibility:
+    $ref: ../../models/venue-template/accessibility-type.yml
+  gate:
+    type: integer
+    format: int64
+  dynamic_tag1:
+    type: integer
+    format: int64
+  dynamic_tag2:
+    type: integer
+    format: int64
+  status_counters:
+    type: array
+    description: At venue-template level, array only should contains 1 item with total count for not numbered zone capacity. This field will be ignored when the requested VenueTemplate hasn't got a VENUE SCOPE.
+    items:
+      type: object
+      properties:
+        status:
+          $ref: ../../models/venue-template/venuetag-status.yml
+          description: Target status
+          example: FREE
+        count:
+          type: integer
+          description: Optional field. If its defined, value will be validated with the zone capacity
+  blocking_reason_counters:
+    type: array
+    description: At venue-template level, array only should contains 1 item with total count for not numbered zone capacity. This field will be ignored when the requested VenueTemplate hasn't got a VENUE SCOPE.
+    items:
+      type: object
+      properties:
+        blocking_reason:
+          type: integer
+          description: Target blocking_reason. If its defined, status ``PROMOTOR_LOCKED`` must be defined on status_counters
+        count:
+          type: integer
+          description: Optional field. If its defined, value will be validated with the zone capacity
+  quota_counters:
+    type: array
+    description: The amount of seats to be removed from a zone. This field will be ignored when the requested VenueTemplate hasn't got a VENUE SCOPE.
+    items:
+      type: object
+      properties:
+        source:
+          type: string
+          description: Source quota with enough available seats
+          example: 55
+        quota:
+          type: integer
+          format: int64
+          description: Target quota
+        count:
+          type: integer

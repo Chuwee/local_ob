@@ -1,0 +1,183 @@
+get:
+  summary: Get a collective
+  description: ''
+  security:
+    - OAuth2: ['ROLE_OPR_MGR', 'ROLE_OPR_ANS', 'ROLE_COL_MGR']
+  tags:
+    - Collectives
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: collectiveId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Collective ID
+  responses:
+    '200':
+      description: 'Collective detail'
+      content:
+        application/json:
+          schema:
+            $ref: './../../models/collectives/collective-detail.yml'
+    '401':
+      description: 'Unauthorized'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error-auth.yml'
+    '403':
+      description: 'Forbidden'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '404':
+      description: 'Not found'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '500':
+      description: 'Internal server error'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+put:
+  summary: Update collective
+  description: ''
+  security:
+    - OAuth2: ['ROLE_OPR_MGR', 'ROLE_COL_MGR']
+  tags:
+    - Collectives
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: collectiveId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Collective ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              minLength: 1
+              maxLength: 50
+            description:
+              type: string
+              maxLength: 250
+            user_max_length:
+              type: integer
+            cipher_policy:
+              $ref: ../../models/collectives/cipher-policy.yml
+            show_usages:
+              type: boolean
+              description: Show usages in portal. Only available with internal collectives.
+  responses:
+    '204':
+      description: 'Update'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+delete:
+  summary: Delete collective
+  description: ''
+  security:
+    - OAuth2: ['ROLE_OPR_MGR', 'ROLE_COL_MGR']
+  tags:
+    - Collectives
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: collectiveId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Collective ID
+  responses:
+    '204':
+      description: 'Collective successfully deleted'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

@@ -1,0 +1,145 @@
+get:
+  x-internal: true
+  summary: Get pack item price types
+  description: Get price types for a pack item. Only for main item type ```SESSION``` or ```EVENT```
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Channel Packs
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: packId
+      schema:
+        type: integer
+      required: true
+      description: Pack ID
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Channel ID
+    - in: path
+      name: packItemId
+      schema:
+        type: integer
+      required: true
+      description: Pack Item ID
+  responses:
+    '200':
+      description: Price types retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/channels/packs/channel-pack-item-price-types-response.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+
+put:
+  x-internal: true
+  summary: Update pack item price types
+  description: Update price types for a pack item. Only for main item type ```SESSION``` or ```EVENT```
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Channel Packs
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Channel ID
+    - in: path
+      name: packId
+      schema:
+        type: integer
+      required: true
+      description: Pack ID
+    - in: path
+      name: packItemId
+      schema:
+        type: integer
+      required: true
+      description: Pack Item ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../../models/channels/packs/channel-pack-item-price-types-request.yml
+  responses:
+    '204':
+      description: Price types updated successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml 

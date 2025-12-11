@@ -1,0 +1,69 @@
+delete:
+  x-internal: true
+  summary: Delete venue template view link
+  description: Delete the link between two existing venue template views. A recalculation of the total venue template capacity will be triggered.
+  security:
+    - OAuth2: ['ROLE_REC_MGR', 'ROLE_EVN_MGR', 'ROLE_OPR_MGR', 'ROLE_REC_EDI']
+  tags:
+    - Template Views
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: venueTemplateId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Venue Template ID
+    - in: path
+      name: viewId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: ID of the origin or parent view
+    - in: path
+      name: linkId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Internal ID of the link
+  responses:
+    '204':
+      description: Deleted successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: invalid token
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

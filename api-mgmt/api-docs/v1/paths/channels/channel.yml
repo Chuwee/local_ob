@@ -1,0 +1,234 @@
+get:
+  x-internal: true
+  summary: Get channel
+  description: Get channel by ID
+  security:
+    - OAuth2: ['ROLE_SYS_ANS', 'ROLE_SYS_MGR', 'ROLE_CNL_MGR', 'ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Channels
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+      required: true
+      description: Channel ID
+  responses:
+    '200':
+      description: Get channel detail
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/channels/channel-detail.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+delete:
+  x-internal: true
+  summary: Delete channel
+  description: Delete channel by ID
+  security:
+    - OAuth2:
+        - 'ROLE_CNL_MGR'
+        - 'ROLE_OPR_MGR'
+  tags:
+    - Channels
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+      required: true
+      description: Channel ID
+  responses:
+    '204':
+      description: Channel deleted successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+put:
+  x-internal: true
+  summary: Update channel
+  description: Update channel
+  security:
+    - OAuth2:
+        - 'ROLE_CNL_MGR'
+        - 'ROLE_OPR_MGR'
+  tags:
+    - Channels
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+      required: true
+      description: Channel ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            public:
+              type: boolean
+            build:
+              $ref: ../../models/channels/channel-update-build.yml
+              description: Only for user ``ROLE_OPR_MGR``
+            status:
+              $ref: ../../models/channels/channel-update-status.yml
+            languages:
+              $ref: ../../models/channels/channel-update-language.yml
+            currency_codes:
+              type: array
+              description: Channel currencies
+              items:
+                type: string
+            contact:
+              $ref: ../../models/channels/channel-contact.yml
+            settings:
+              $ref: ../../models/channels/channel-settings-update.yml
+            limits:
+              $ref: ../../models/channels/channel-limits.yml
+            virtual_queue:
+              type: object
+              description: Queue configuration for channels type PORTAL_SUBSCRIBERS (with portal build STH) and AVET
+              properties:
+                active:
+                  type: boolean
+                alias:
+                  type: string
+            domain:
+              description: The domain of the channel can be changed only when it is an external whitelabel
+              type: string
+            whitelabel_path:
+              description: The whitelabel path of the channel can be changed only when it is an external whitelabel
+              type: string
+            force_square_pictures:
+              description: Flag that indicates whether it is mandatory to use square images (only for external whitelabels)
+              type: boolean
+  responses:
+    '204':
+      description: Channel updated successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '412':
+      description: Precondition failed
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

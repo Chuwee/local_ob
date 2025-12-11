@@ -1,0 +1,1887 @@
+openapi: 3.0.1
+info:
+  title: MANAGEMENT API REFERENCE
+  version: v1
+  contact:
+    name: 'API Support contact'
+    url: https://oneboxtds.atlassian.net/servicedesk/customer/portals
+    email: 'api-support@oneboxtds.com'
+  x-logo:
+    url: 'http://onebox-api-docs.s3.amazonaws.com/assets/img/logoob.svg'
+  description: |
+    # Introduction
+    Welcome to the Onebox management API reference.
+    # Authentication
+    As a consumer, you need an **OAUTH2** token to access and interact with this API. To obtain it, you need a **valid event and channels manager token**. Then, you have to request a token via our authentication server using the following data: <a href="https://developer.oneboxtds.com/docs/authentication/event-and-channel-managers" target="_blank">developer site</a>.
+security: []
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      description: This API uses OAuth 2 with password and client credentials grant flow.
+      flows:
+        clientCredentials:
+          tokenUrl: https://oauth2.oneboxtds.com/oauth/token
+          scopes:
+            ROLE_EVN_MGR: Event Manager
+            ROLE_ENT_MGR: Entity Manager
+            ROLE_ENT_ANS: Entity Analyst (Read only)
+            ROLE_OPR_MGR: Operator Manager
+            ROLE_OPR_ANS: Operator Analyst (Read only)
+            ROLE_OPR_CALL: Operator call center
+            ROLE_CNL_MGR: Channel Manager
+            ROLE_CNL_SAC: Channel Customer Service (Read only)
+            ROLE_CRM_MGR: CRM Manager
+            ROLE_COL_MGR: Collective Manager
+            ROLE_REC_MGR: Venue Manager
+            ROLE_FV_REPORTING: Access to fever zone
+            
+servers:
+  - url: 'https://api.oneboxtds.com/mgmt-api/v1'
+    description: 'Production server'
+  - url: 'https://api.oneboxtds.net/mgmt-api/v1'
+    description: 'Test server'
+x-tagGroups:
+  - name: Account administration
+    tags:
+      - General
+      - Producers
+      - Ticket templates
+      - Product ticket templates
+      - Passbook
+  - name: Events
+    tags:
+      - Events
+      - Sessions
+      - Session capacity
+      - Session activity capacity
+      - Session attributes
+      - Session dynamic price
+      - Session channel contents
+      - Rates
+      - Rates group
+      - Prices
+      - Venue templates
+      - FAQs
+      - Event channels
+      - Event surcharges
+      - Promotions
+      - Promotion Templates
+      - Event attributes
+      - Ticket contents
+      - Tours
+      - Tiers
+      - External barcodes
+      - External provider events
+      - External provider sessions
+      - External provider presales
+      - External provider season tickets presales
+      - Event Fields
+      - B2B Seat publishing
+      - Avet Sector Restrictions
+      - Event Catalog UI Settings
+      - Tags
+      - Secondary Market Config
+      - Session contents
+      - Event ticket contents
+      - Event ticket template contents
+      - Event invitation contents
+      - Event channel contents
+      - Post Booking Questions
+      - Event Post Booking Questions
+  - name: Operators
+    tags:
+      - Operators
+      - Operator taxes
+      - Operator currencies
+  - name: Entities
+    tags:
+      - Entities
+      - Bank Accounts
+      - Types
+      - Attributes
+      - Calendars
+      - Entity surcharges
+      - Cookies
+      - Categories
+      - Entity categories
+      - Entity contents
+      - Entity Communication Elements
+      - Entity subscription lists
+      - Entity promotion templates
+      - Entity access control systems
+      - Entity profiles
+      - External Entity configurations
+      - Entity Custom Contents
+      - Terminals
+      - Entity Whatsapp templates
+      - Entity Security Config
+      - Customer Types
+      - Customer Type Triggers
+      - Customers
+      - Templates Zones
+  - name: Users
+    tags:
+      - Myself
+      - Users
+      - Roles
+      - Notifications
+      - Rate Limit
+  - name: Venues
+    tags:
+      - Venues
+      - Venue Spaces
+      - Venue access control systems
+      - Templates
+      - Template Views
+      - Template Sectors
+      - Template Not Numbered Zones
+      - Template Rows
+      - Template Seats
+      - Template Price Types
+      - Template Quotas
+      - Template Gates
+      - Template Interactive Venues
+      - Template Images
+      - Template Elements Info
+      - Skidata configuration
+  - name: Applications
+    tags:
+      - Application Contents
+  - name: Channels
+    tags:
+      - Channels
+      - Catalog
+      - Suggestions
+      - Channel Custom Resources
+      - Channel Contents
+      - Ticket Contents
+      - Purchase Contents
+      - Members Contents
+      - Member Config
+      - Channel Pack
+      - Channel Pack Contents
+      - Surcharges
+      - Gateways
+      - Delivery Methods
+      - Commissions
+      - Bookings Settings
+      - Catalog Sale Requests
+      - Product Sale Requests
+      - Pack Sale Requests
+      - Channel Notifications
+      - External Tools
+      - Purchase Config
+      - Channel Promotions
+      - Channel Blacklists
+      - Cancellation Services
+      - Vouchers
+      - Auth Vendors
+      - Event sale restrictions
+      - Loyalty Points
+      - Domain Settings
+      - Channel Reviews
+      - Domain Configs
+  - name: Integrations
+    tags:
+      - Authentication vendors
+      - Barcodes
+  - name: Season Tickets
+    x-internal: true
+    tags:
+      - Season Tickets
+      - Season Ticket Channels
+      - Season Ticket Rates
+      - Season Ticket Prices
+      - Season Ticket Surcharges
+      - Season Ticket Capacity
+      - Season Ticket Sessions
+      - Season Ticket Communication
+      - Season Ticket Renewals
+      - Season Ticket Change Seats
+      - Season Ticket Redemption
+      - Season Ticket Release Seat
+      - Season Ticket Promotions
+      - Season Ticket Loyalty Points
+      - Season Ticket Presales
+      - Season Ticket Taxes
+  - name: Access Control Systems
+    x-internal: true
+    tags:
+      - Access Control Systems
+  - name: Collectives
+    tags:
+      - Collectives
+      - Collective codes
+  - name: Webhooks
+    tags:
+      - Configuration
+  - name: External Events
+    tags:
+      - External Events
+  - name: External Barcodes
+    tags:
+      - External Barcodes
+  - name: External Capacities
+    x-internal: true
+    tags:
+      - External Capacities
+  - name: B2B
+    tags:
+      - Clients
+      - Client users
+      - Balance
+      - Conditions
+      - B2B Publishing
+  - name: Invoicing
+    tags:
+      - Onebox Invoicing
+  - name: Products
+    tags:
+      - Products
+      - Product Promotions
+      - Product Ticket Contents
+      - Product ticket templates
+      - Product surcharges
+      - Product channels
+  - name: Forms
+    tags:
+      - Forms
+  - name: Loyalty Points
+    tags:
+      - Loyalty Points
+  - name: Price Types
+    tags:
+      - Price type contents
+  - name: Insurance
+    tags:
+      - Insurers
+      - Policies
+      - Ranges
+      - Terms Conditions
+  - name: Packs
+    tags:
+      - Packs
+      - Pack Contents
+      - Pack Channels
+paths:
+  /base-categories:
+    $ref: paths/categories/base-categories.yml
+  /languages:
+    $ref: paths/languages/languages.yml
+  /countries:
+    $ref: paths/countries/countries.yml
+  /countries/{countryId}/subdivisions:
+    $ref: paths/countries/country-subdivisions.yml
+  /international_phone_prefixes:
+    $ref: paths/international-phone-prefixes/international-phone-prefixes.yml
+  /timezones:
+    $ref: paths/timezones/timezones.yml
+  /roles:
+    $ref: paths/realms/roles.yml
+  /resource-servers:
+    $ref: paths/realms/resource-servers.yml    
+  /document-types:
+    $ref: paths/document-types/document-types.yml
+  /channels/{channelId}/auth-config:
+    $ref: paths/channels/customers-auth-config.yml
+  /currencies:
+    $ref: paths/currencies/currencies.yml
+  /operators:
+    $ref: paths/operators/operators.yml
+  /operators/{operatorId}:
+    $ref: paths/operators/operator.yml
+  /operators/{operatorId}/currencies:
+    x-internal: true
+    $ref: paths/operators/operator-currencies.yml
+  /operators/{operatorId}/taxes:
+    $ref: paths/operators/operator-taxes.yml
+  /entities:
+    $ref: paths/entities/entities.yml
+  /entities/user-limits:
+    $ref: paths/entities/entities-user-limits.yml
+  /entities/{entityId}:
+    $ref: paths/entities/entity.yml
+  /entities/{entityId}/access-control-systems:
+    $ref: paths/entities/entity-access-control-systems.yml
+  /entities/{entityId}/access-control-systems/{accessControlSystemName}:
+    $ref: paths/entities/entity-access-control-system.yml
+  /entities/{entityId}/auth-config:
+    $ref: paths/entities/customers-auth-config.yml
+  /entities/{entityId}/forms/customer:
+    $ref: paths/entities/entity-forms-name.yml
+  /entities/{entityId}/forms/customer-sign-in:
+    $ref: paths/entities/entity-forms-name.yml
+  /entities/{entityId}/forms/admincustomer:
+    $ref: paths/entities/entity-forms-name.yml
+  /entities/{entityId}/forms/admincustomer-sign-in:
+    $ref: paths/entities/entity-forms-name.yml
+  /entities/{entityId}/forms/payout:
+    $ref: paths/entities/entity-forms-name.yml
+  /entities/{entityId}/loyalty-program/config:
+    $ref: paths/loyalty-points/entities/loyalty-program-config.yml
+  /entities/{entityId}/loyalty-program/reset:
+    $ref: paths/loyalty-points/entities/reset-loyalty-program.yml
+  /entities/{entityId}/types:
+    $ref: paths/entities/entity-types.yml
+  /entities/{entityId}/managed-entities:
+    $ref: paths/entities/entity-managed-entities.yml
+  /entities/{entityId}/types/available:
+    $ref: paths/entities/entity-types-available.yml
+  /entities/{entityId}/types/{entityType}:
+    $ref: paths/entities/entity-type.yml
+  /entities/{entityId}/taxes:
+    $ref: paths/entities/entity-taxes.yml
+  /entities/{entityId}/text-contents/languages/{languageId}:
+    $ref: paths/entities/entity-text-contents.yml
+  /entities/{entityId}/categories:
+    $ref: paths/entities/entity-categories-deprecated.yml
+  /entities/{entityId}/categories/{categoryId}:
+    $ref: paths/entities/entity-category-deprecated.yml
+  /entities/{entityId}/calendars:
+    $ref: paths/entities/calendars.yml
+  /entities/{entityId}/calendars/{calendarId}:
+    $ref: paths/entities/calendar.yml
+  /entities/{entityId}/calendars/{calendarId}/day-types:
+    $ref: paths/entities/calendar-day-types.yml
+  /entities/{entityId}/calendars/{calendarId}/day-types/{dayTypeId}:
+    $ref: paths/entities/calendar-day-type.yml
+  /entities/{entityId}/attributes:
+    $ref: paths/entities/attributes.yml
+  /entities/{entityId}/attributes/{attributeId}:
+    $ref: paths/entities/attribute.yml
+  /entities/{entityId}/attributes/{attributeId}/values:
+    $ref: paths/entities/attribute-values.yml
+  /entities/{entityId}/attributes/{attributeId}/values/{valueId}:
+    $ref: paths/entities/attribute-value.yml
+  /entities/{entityId}/gateways:
+    $ref: paths/entities/gateways.yml
+  /entities/{entityId}/gateways/config:
+    $ref: paths/entities/gateways-config.yml
+  /entities/{entityId}/surcharges:
+    $ref: paths/entities/entity-surcharges.yml
+  /entities/{entityId}/profiles:
+    $ref: paths/entities/entity-profiles.yml
+  /entities/{entityId}/profiles/{profileId}:
+    $ref: paths/entities/entity-profile.yml
+  /entities/{entityId}/visibility:
+    $ref: paths/entities/entity-visibilities.yml
+  /entities/{entityId}/cookies:
+    $ref: paths/entities/entity-cookies.yml
+  /entities/{entityId}/custom-contents:
+    $ref: paths/entities/entity-custom-contents.yml
+  /entities/{entityId}/custom-contents/{tag}:
+    $ref: paths/entities/entity-custom-contents-tag.yml
+  /entity-categories:
+    $ref: paths/entities/entity-categories.yml
+  /entity-categories/mapping:
+    $ref: paths/entities/entity-category-mapping.yml
+  /entity-categories/{categoryId}:
+    $ref: paths/entities/entity-category.yml
+  /entities/{entityId}/loaded-external-capacities:
+    $ref: paths/entities/external-capacities-loaded.yml
+  /entities/{entityId}/provider/{providerId}/external-inventories:
+    $ref: paths/entities/external-inventories.yml
+    x-internal: true
+  /entities/{entityId}/external-capacities:
+    $ref: paths/entities/external-capacities.yml
+  /entities/{entityId}/external-capacities/refresh:
+    $ref: paths/entities/external-capacities-refresh.yml
+  /entities/{entityId}/external-capacities/{capacityId}:
+    $ref: paths/entities/external-capacity.yml
+  /entities/{entityId}/external-capacities/{capacityId}/refresh:
+    $ref: paths/entities/external-capacity-refresh.yml
+  /entities/{entityId}/external-capacities/{capacityId}/mapping:
+    $ref: paths/entities/external-capacities-mapping.yml
+  /entities/{entityId}/external-periodicities:
+    $ref: paths/entities/external-periodicities-path.yml
+  /entities/{entityId}/external-terms:
+    $ref: paths/entities/external-terms-path.yml
+  /entities/{entityId}/external-roles:
+    $ref: paths/entities/external-roles-path.yml
+  /entities/external-barcodes/{entityId}:
+    $ref: paths/entities/external-barcodes-by-entity.yml
+  /entities/{entityId}/external-configurations:
+    $ref: paths/entities/external-configurations/external-configuration.yml
+  /entities/{entityId}/external-configurations/link:
+    $ref: paths/entities/external-configurations/external-configuration-link.yml
+  /entities/{entityId}/external-configurations/unlink:
+    $ref: paths/entities/external-configurations/external-configuration-unlink.yml
+  /entities/{entityId}/inventory-providers:
+    $ref: paths/entities/external-configurations/inventory-providers.yml
+  /entities/{entityId}/donation-providers:
+    $ref: paths/entities/entity-donation-providers-path.yml
+  /entities/{entityId}/donation-providers/{providerId}/campaigns:
+    $ref: paths/entities/donation-provider-campaigns.yml
+  /entities/{entityId}/whatsapp-templates:
+    $ref: paths/entities/whatsapp-templates.yml
+  /entities/{entityId}/security-config:
+    $ref: paths/entities/security-config.yml
+  /entities/{entityId}/customer-types:
+    $ref: paths/entities/customer-types.yml
+  /entities/{entityId}/customer-types/{customerTypeId}:
+    $ref: paths/entities/customer-type.yml
+  /entities/{entityId}/customer-config:
+    $ref: paths/entities/customer-config.yml
+  /entities/{entityId}/member-counter:
+    $ref: paths/entities/member-counter.yml
+  /entities/{entityId}/friends:
+    $ref: paths/entities/friends-config.yml
+  /entities/{entityId}/bank-accounts:
+    $ref: paths/entities/entity-bank-accounts.yml
+  /entities/{entityId}/bank-accounts/{bankAccountId}:
+    $ref: paths/entities/entity-bank-account.yml
+  /entities/external-configurations/codes/available:
+    $ref: paths/entities/external-configurations/available-codes.yml
+  /entities/{entityId}/contents/{category}:
+    $ref: paths/entities/entity-contents.yml
+  /entities/{entityId}/communication-elements/images:
+    $ref: paths/entities/communication-elements-images-path.yml
+  /entities/{entityId}/communication-elements/texts:
+    $ref: paths/entities/communication-elements-texts-path.yml
+  /entities/{entityId}/communication-elements/images/languages/{language}/types/{type}:
+    $ref: paths/entities/communication-elements-image-path.yml
+  /entities/{entityId}/templates-zones:
+    $ref: paths/entities/templates-zones/templates-zones.yml
+  /entities/{entityId}/templates-zones/{templateZonesId}:
+    $ref: paths/entities/templates-zones/template-zones.yml
+  /entities/{entityId}/templates-zones/{templateZonesId}/contents/{category}:
+    $ref: paths/entities/templates-zones/template-zones-id-contents.yml
+  /masterdata/customer-type-triggers:
+    $ref: paths/entities/customer-type-triggers.yml
+  /producers:
+    $ref: paths/entities/producers.yml
+  /producers/{producerId}:
+    $ref: paths/entities/producer.yml
+  /producers/{producerId}/invoice-prefixes:
+    $ref: paths/entities/producer-invoice-prefixes.yml
+  /producers/{producerId}/invoice-prefixes/{invoicePrefixId}:
+    $ref: paths/entities/producer-invoice-prefix.yml
+  /producers/{producerId}/invoice-providers:
+    $ref: paths/entities/producer-invoice-providers.yml
+  /producers/{producerId}/invoice-providers/options:
+    $ref: paths/entities/producer-invoice-providers-options.yml
+  /ticket-templates:
+    $ref: paths/ticket-templates/ticket-templates.yml
+  /ticket-templates/{ticketTemplateId}:
+    $ref: paths/ticket-templates/ticket-template.yml
+  /ticket-templates/{ticketTemplateId}/preview:
+    $ref: paths/ticket-templates/ticket-template-preview.yml
+  /ticket-templates/{ticketTemplateId}/clone:
+    $ref: paths/ticket-templates/ticket-template-clone.yml
+  /ticket-templates/{ticketTemplateId}/ticket-contents/PDF/images:
+    $ref: paths/ticket-templates/ticket-template-contents-pdf-images.yml
+  /ticket-templates/{ticketTemplateId}/ticket-contents/PDF/images/languages/{language}/types/{type}:
+    $ref: paths/ticket-templates/ticket-template-contents-pdf-image.yml
+  /ticket-templates/{ticketTemplateId}/ticket-contents/PRINTER/images:
+    $ref: paths/ticket-templates/ticket-template-contents-printer-images.yml
+  /ticket-templates/{ticketTemplateId}/ticket-contents/PRINTER/images/languages/{language}/types/{type}:
+    $ref: paths/ticket-templates/ticket-template-contents-printer-image.yml
+  /ticket-templates/{ticketTemplateId}/ticket-contents/literals:
+    $ref: paths/ticket-templates/ticket-template-contents-literals.yml
+  /ticket-templates/{ticketTemplateId}/ticket-contents/texts:
+    $ref: paths/ticket-templates/ticket-template-contents-texts.yml
+  /ticket-templates/designs:
+    $ref: paths/ticket-templates/ticket-templates-designs.yml
+  /ticket-templates/printers:
+    $ref: paths/ticket-templates/ticket-templates-printers.yml
+  /ticket-templates/paper-types:
+    $ref: paths/ticket-templates/ticket-templates-paper-types.yml
+  /product-ticket-templates:
+    $ref: paths/product-ticket-templates/product-ticket-templates.yml
+  /product-ticket-templates/models:
+    $ref: paths/product-ticket-templates/product-ticket-templates-models.yml
+  /product-ticket-templates/{templateId}:
+    $ref: paths/product-ticket-templates/product-ticket-template.yml
+  /product-ticket-templates/{templateId}/languages:
+    $ref: paths/product-ticket-templates/product-ticket-template-languages.yml
+  /product-ticket-templates/{templateId}/clone:
+    $ref: paths/product-ticket-templates/product-ticket-template-clone.yml
+  /events:
+    $ref: paths/events/events.yml
+  /events/{eventId}:
+    $ref: paths/events/event.yml
+  /event-types:
+    $ref: paths/events/event-types.yml
+  /events/{eventId}/attributes:
+    $ref: paths/events/event-attributes.yml
+  /event-promotion-templates:
+    $ref: paths/events/event-promotion-templates.yml
+  /event-promotion-templates/{promotionTemplateId}:
+    $ref: paths/events/event-promotion-template.yml
+  /event-promotion-templates/{promotionTemplateId}/channels:
+    $ref: paths/events/event-promotion-template-channels.yml
+  /event-promotion-templates/{promotionTemplateId}/channel-contents/texts:
+    $ref: paths/events/event-promotion-template-channel-contents-texts.yml
+  /events/{eventId}/promotions:
+    $ref: paths/events/event-promotions.yml
+  /events/{eventId}/promotions/{promotionId}:
+    $ref: paths/events/event-promotion.yml
+  /events/{eventId}/promotions/{promotionId}/clone:
+    $ref: paths/events/event-promotion-clone.yml
+  /events/{eventId}/promotions/{promotionId}/channels:
+    $ref: paths/events/event-promotion-channels.yml
+  /events/{eventId}/promotions/{promotionId}/sessions:
+    $ref: paths/events/event-promotion-sessions.yml
+  /events/{eventId}/promotions/{promotionId}/price-types:
+    $ref: paths/events/event-promotion-price-types.yml
+  /events/{eventId}/promotions/{promotionId}/rates:
+    $ref: paths/events/event-promotion-rates.yml
+  /events/{eventId}/promotions/{promotionId}/packs:
+    $ref: paths/events/event-promotion-packs.yml
+  /events/{eventId}/promotions/{promotionId}/channel-contents/texts:
+    $ref: paths/events/event-promotions-channel-contents-texts.yml
+  /events/{eventId}/channels:
+    $ref: paths/events/event-channels.yml
+  /events/{eventId}/channels/{channelId}:
+    $ref: paths/events/event-channel.yml
+  /events/{eventId}/channels/{channelId}/request-approval:
+    $ref: paths/events/event-channel-request.yml
+  /events/{eventId}/channels/{channelId}/surcharges:
+    $ref: paths/events/event-channel-promoter-surcharges.yml
+  /events/{eventId}/channels/{channelId}/channel-surcharges:
+    $ref: paths/events/event-channel-channel-surcharges.yml
+  /events/{eventId}/channels/{channelId}/channel-commissions:
+    $ref: paths/events/event-channel-channel-commissions.yml
+  /events/{eventId}/channels/{channelId}/price-simulation:
+    $ref: paths/events/event-channel-prices-simulation.yml
+  /events/{eventId}/channels/{channelId}/funnel-urls:
+    $ref: paths/events/event-channel-funnel-urls.yml
+  /events/{eventId}/channels/{channelId}/language/{language}/session-links:
+    $ref: paths/events/event-channel-session-links.yml
+  /events/{eventId}/channels/{channelId}/channel-contents/images:
+    $ref: paths/events/channel-event-contents-images.yml
+  /events/{eventId}/channels/{channelId}/channel-contents/images-config:
+    $ref: paths/events/channel-event-images-config.yml
+  /events/{eventId}/channels/{channelId}/channel-contents/images/languages/{language}/types/{type}:
+    $ref: paths/events/channel-event-contents-image.yml
+  /events/{eventId}/channels/{channelId}/edit-attendants-urls:
+    $ref: paths/events/event-channel-edit-attendants-urls.yml
+  /events/{eventId}/channels/{channelId}/ticket-template/preview:
+    $ref: paths/events/event-channel-ticket-template-preview.yml
+  /events/{eventId}/channels/{channelId}/favorite:
+    $ref: paths/events/favorite-channel.yml
+  /events/{eventId}/channels/{channelId}/b2b/assignations:
+    $ref: paths/events/event-channel-assignations.yml
+  /events/{eventId}/channel-contents/texts:
+    $ref: paths/events/event-channel-contents-texts.yml
+  /events/{eventId}/secondary-market:
+    $ref: paths/secondary-market/event-secondary-market-config.yml
+  /season-tickets/{eventId}/secondary-market:
+    $ref: paths/secondary-market/season-tickets-secondary-market-config.yml
+  /events/{eventId}/channel-contents/images:
+    $ref: paths/events/event-channel-contents-images.yml
+  /events/{eventId}/channel-contents/images/languages/{language}/types/{type}:
+    $ref: paths/events/event-channel-contents-image.yml
+  /events/{eventId}/ticket-contents/PDF/texts:
+    $ref: paths/events/event-ticket-contents-pdf-texts.yml
+  /post-booking-questions:
+    $ref: paths/events/post-booking-questions.yml
+  /events/{eventId}/post-booking-questions:
+    $ref: paths/events/event-channels-post-booking-questions.yml
+  /venue-templates/{venueTemplateId}/price-types/{priceTypeId}/ticket-contents/PDF/texts:
+    $ref: paths/priceType/price-type-ticket-contents-pdf-texts.yml
+  /venue-templates/{venueTemplateId}/price-types/{priceTypeId}/ticket-contents/PRINTER/texts:
+    $ref: paths/priceType/price-type-ticket-contents-printer-texts.yml
+  /venue-templates/{venueTemplateId}/price-types/{priceTypeId}/ticket-contents/PASSBOOK/texts:
+    $ref: paths/priceType/price-type-ticket-contents-passbook-texts.yml
+  /venue-templates/{venueTemplateId}/price-types/{priceTypeId}/ticket-contents/PDF/images:
+    $ref: paths/priceType/price-type-ticket-contents-pdf-images.yml
+  /venue-templates/{venueTemplateId}/price-types/{priceTypeId}/ticket-contents/PDF/images/languages/{language}/types/{type}:
+    $ref: paths/priceType/price-type-ticket-contents-pdf-images-delete.yml
+  /venue-templates/{venueTemplateId}/price-types/{priceTypeId}/ticket-contents/PRINTER/images:
+    $ref: paths/priceType/price-type-ticket-contents-printer-images.yml
+  /venue-templates/{venueTemplateId}/price-types/{priceTypeId}/ticket-contents/PRINTER/images/languages/{language}/types/{type}:
+    $ref: paths/priceType/price-type-ticket-contents-printer-images-delete.yml
+  /venue-templates/{venueTemplateId}/price-types/{priceTypeId}/ticket-contents/PASSBOOK/images:
+    $ref: paths/priceType/price-type-ticket-contents-passbook-images.yml
+  /venue-templates/{venueTemplateId}/price-types/{priceTypeId}/ticket-contents/PASSBOOK/images/languages/{language}/types/{type}:
+    $ref: paths/priceType/price-type-ticket-contents-passbook-images-delete.yml
+  /venue-templates/{venueTemplateId}/elements-info:
+    $ref: paths/venue-templates/elements-info/elements-info-path.yml
+  /venue-templates/{venueTemplateId}/elements-info/{elementType}/{elementId}:
+    $ref: paths/venue-templates/elements-info/elements-info-item-path.yml
+  /venue-templates/{venueTemplateId}/elements-info/{elementType}/{elementId}/images/{imageType}/languages/{language}:
+    $ref: paths/venue-templates/elements-info/elements-info-item-images-delete-path.yml
+  /sessions/{sessionId}/venue-template-elements-info:
+      $ref: paths/venue-templates/elements-info/session-elements-info-path.yml
+  /sessions/{sessionId}/venue-template-elements-info/{elementType}/{elementId}:
+    $ref: paths/venue-templates/elements-info/session-elements-info-item-path.yml
+  /sessions/{sessionId}/venue-template-elements-info/{elementType}/{elementId}/status:
+    $ref: paths/venue-templates/elements-info/session-elements-info-item-status-path.yml
+  /sessions/{sessionId}/venue-template-elements-info/{elementType}/{elementId}/images/{imageType}/languages/{language}:
+    $ref: paths/venue-templates/elements-info/session-elements-info-item-images-delete-path.yml
+  /sessions/{sessionId}/secondary-market:
+    $ref: paths/secondary-market/session-secondary-market-config.yml
+  /venue-templates/{venueTemplateId}/ticket-contents/changed-price-types:
+    $ref: paths/priceType/price-type-changed-ticket-contents.yml
+  /events/{eventId}/ticket-contents/PDF/images:
+    $ref: paths/events/event-ticket-contents-pdf-images.yml
+  /events/{eventId}/ticket-contents/PDF/images/languages/{language}/types/{type}:
+    $ref: paths/events/event-ticket-contents-pdf-image-delete.yml
+  /events/{eventId}/ticket-contents/PRINTER/texts:
+    $ref: paths/events/event-ticket-contents-printer-texts.yml
+  /events/{eventId}/ticket-contents/PRINTER/images:
+    $ref: paths/events/event-ticket-contents-printer-images.yml
+  /events/{eventId}/ticket-contents/PRINTER/images/languages/{language}/types/{type}:
+    $ref: paths/events/event-ticket-contents-printer-image-delete.yml
+  /events/{eventId}/ticket-contents/PASSBOOK/images:
+    $ref: paths/events/event-ticket-contents-passbook-images.yml
+  /events/{eventId}/ticket-contents/PASSBOOK/texts:
+    $ref: paths/events/event-ticket-contents-passbook-texts.yml
+  /events/{eventId}/ticket-contents/PASSBOOK/images/languages/{language}/types/{type}:
+    $ref: paths/events/event-ticket-contents-passbook-image-delete.yml
+  /events/{eventId}/ticket-invitation-contents/PDF/texts:
+    $ref: paths/events/event-ticket-invitation-contents-pdf-texts.yml
+  /events/{eventId}/ticket-invitation-contents/PDF/images:
+    $ref: paths/events/event-ticket-invitation-contents-pdf-images.yml
+  /events/{eventId}/ticket-invitation-contents/PDF/images/languages/{language}/types/{type}:
+    $ref: paths/events/event-ticket-invitation-contents-pdf-image-delete.yml
+  /events/{eventId}/ticket-invitation-contents/PRINTER/texts:
+    $ref: paths/events/event-ticket-invitation-contents-printer-texts.yml
+  /events/{eventId}/ticket-invitation-contents/PRINTER/images:
+    $ref: paths/events/event-ticket-invitation-contents-printer-images.yml
+  /events/{eventId}/ticket-invitation-contents/PRINTER/images/languages/{language}/types/{type}:
+    $ref: paths/events/event-ticket-invitation-contents-printer-image-delete.yml
+  /events/{eventId}/ticket-templates:
+    $ref: paths/events/event-ticket-templates.yml
+  /events/{eventId}/ticket-templates/passbook/preview:
+    $ref: paths/events/event-ticket-templates-passbook-preview.yml
+  /events/{eventId}/ticket-templates/{ticketType}/preview:
+    $ref: paths/events/event-ticket-templates-preview.yml
+  /events/{eventId}/ticket-templates/{ticketType}/{templateFormat}:
+    $ref: paths/events/event-ticket-templates-atomic.yml
+  /events/{eventId}/ticket-templates/{ticketType}/PASSBOOK:
+    $ref: paths/events/event-ticket-passbook-template.yml
+  /events/{eventId}/venue-templates/{templateId}/prices:
+    $ref: paths/events/event-template-prices.yml
+  /events/{eventId}/rates:
+    $ref: paths/events/rates.yml
+  /events/{eventId}/rates-group:
+    $ref: paths/events/rates-group.yml
+  /events/{eventId}/rates/{rateId}:
+    $ref: paths/events/rate.yml
+  /events/{eventId}/rates/{rateId}/restrictions:
+    $ref: paths/events/rate-restrictions.yml
+  /events/{eventId}/rates/restrictions:
+    $ref: paths/events/restricted-rates.yml
+  /events/{eventId}/rates-group/{rateGroupId}:
+    $ref: paths/events/rate-group.yml
+  /events/{eventId}/customer-types:
+    $ref: paths/events/event-customer-types.yml
+  /events/{eventId}/sessions/{sessionId}/rates:
+    $ref: paths/sessions/rates.yml
+  /events/{eventId}/sessions/{sessionId}/rates/restrictions:
+    $ref: paths/sessions/rates-restrictions.yml
+  /events/{eventId}/sessions/{sessionId}/rates/{rateId}/restrictions:
+    $ref: paths/sessions/rate-restrictions.yml
+  /events/{eventId}/sessions/{sessionId}/loyalty-points:
+    $ref: paths/loyalty-points/sessions/loyalty-points.yml
+  /events/{eventId}/additional-config:
+    $ref: paths/events/event-additional-config.yml
+  /events/{eventId}/sessions:
+    $ref: paths/sessions/sessions.yml
+  /events/{eventId}/sessions/bulk:
+    $ref: paths/sessions/sessions-bulk.yml
+  /events/{eventId}/sessions/groups:
+    $ref: paths/sessions/sessions-groups.yml
+  /events/{eventId}/sessions/{sessionId}:
+    $ref: paths/sessions/session.yml
+  /events/{eventId}/sessions/{sessionId}/clone:
+    $ref: paths/sessions/session-clone.yml
+  /events/{eventId}/sessions/{sessionId}/mapping:
+    $ref: paths/sessions/session-mapping.yml
+  /events/{eventId}/sessions/{sessionId}/additional-config:
+    $ref: paths/sessions/session-additional-config.yml
+  /events/{eventId}/sessions/{sessionId}/price-types:
+    $ref: paths/sessions/session-price-types.yml
+  /events/{eventId}/sessions/{sessionId}/price-types/{priceTypeId}:
+    $ref: paths/sessions/session-price-type.yml
+  /events/{eventId}/sessions/{sessionId}/price-types/{priceTypeId}/restrictions:
+    $ref: paths/sessions/session-sale-price-type-restrictions.yml
+  /events/{eventId}/sessions/{sessionId}/external-session-config:
+    $ref: paths/sessions/session-external-session-config.yml
+  /events/{eventId}/sessions/{sessionId}/sale-constraints:
+    $ref: paths/sessions/session-sale-constraints.yml
+  /events/{eventId}/sessions/{sessionId}/presales:
+    $ref: paths/sessions/session-presales-path.yml
+  /events/{eventId}/sessions/{sessionId}/presales/{presaleId}:
+    $ref: paths/sessions/session-presale-path.yml
+  /events/{eventId}/sessions/{sessionId}/groups:
+    $ref: paths/sessions/session-groups-path.yml
+  /events/{eventId}/sessions/{sessionId}/attributes:
+    $ref: paths/events/session-attributes.yml
+  /events/{eventId}/sessions/{sessionId}/linked-sessions:
+    $ref: paths/sessions/linked-sessions.yml
+  /events/{eventId}/sessions/{sessionId}/availability:
+    $ref: paths/sessions/session-availability.yml
+  /events/{eventId}/sessions/{sessionId}/availability/price-types:
+    $ref: paths/sessions/session-availability-price-types.yml
+  /events/{eventId}/sessions/{sessionId}/availability/tiers:
+    $ref: paths/sessions/session-tiers-availability.yml
+  /events/{eventId}/sessions/{sessionId}/external-inventory:
+    $ref: paths/sessions/session-capacity-external-availability.yml
+  /events/{eventId}/sessions/{sessionId}/capacity:
+    $ref: paths/sessions/session-capacity.yml
+  /events/{eventId}/sessions/{sessionId}/capacity/exports:
+    $ref: paths/sessions/session-capacity-export.yml
+  /events/{eventId}/sessions/{sessionId}/capacity/exports/{exportId}:
+    $ref: paths/sessions/session-capacity-export-status.yml
+  /events/{eventId}/sessions/{sessionId}/capacity/seats:
+    $ref: paths/sessions/session-capacity-seats.yml
+  /events/{eventId}/sessions/capacity/seats/bulk:
+    $ref: paths/sessions/session-capacity-seats-bulk.yml
+  /events/{eventId}/sessions/{sessionId}/capacity/not-numbered-zones:
+    $ref: paths/sessions/session-capacity-not-numbered-zones.yml
+  /events/{eventId}/sessions/capacity/not-numbered-zones/bulk:
+    $ref: paths/sessions/session-capacity-not-numbered-zones-bulk.yml
+  /events/{eventId}/sessions/{sessionId}/capacity/quotas:
+    $ref: paths/sessions/session-capacity-quotas.yml
+  /events/{eventId}/sessions/{sessionId}/capacity/seats/link:
+    $ref: paths/sessions/session-capacity-seats-link.yml
+  /events/{eventId}/sessions/{sessionId}/capacity/seats/unlink:
+    $ref: paths/sessions/session-capacity-seats-unlink.yml
+  /events/{eventId}/sessions/{sessionId}/capacity/not-numbered-zones/link:
+    $ref: paths/sessions/session-capacity-not-numbered-zones-link.yml
+  /events/{eventId}/sessions/{sessionId}/capacity/not-numbered-zones/unlink:
+    $ref: paths/sessions/session-capacity-not-numbered-zones-unlink.yml
+  /events/{eventId}/sessions/{sessionId}/capacity/relocation:
+    $ref: paths/sessions/session-capacity-relocation.yml
+  /events/{eventId}/sessions/{sessionId}/refund-conditions:
+    $ref: paths/sessions/session-refund-conditions.yml
+  /events/{eventId}/sessions/{sessionId}/channel-contents/texts:
+    $ref: paths/sessions/session-channel-contents-texts.yml
+  /events/{eventId}/sessions/channel-contents/texts:
+    $ref: paths/sessions/session-channel-contents-texts-bulk.yml
+  /events/{eventId}/sessions/{sessionId}/channel-contents/images:
+    $ref: paths/sessions/session-channel-contents-images.yml
+  /events/{eventId}/sessions/channel-contents/images:
+    $ref: paths/sessions/session-channel-contents-images-bulk.yml
+  /events/{eventId}/sessions/{sessionId}/channel-contents/images/languages/{language}/types/{type}:
+    $ref: paths/sessions/session-channel-contents-image.yml
+  /events/{eventId}/sessions/channel-contents/images/languages/{language}/types/{type}:
+    $ref: paths/sessions/session-channel-contents-images-type-delete-bulk.yml
+  /events/{eventId}/sessions/channel-contents/images/languages/{language}:
+    $ref: paths/sessions/session-channel-contents-images-delete-bulk.yml
+  /events/{eventId}/sessions/{sessionId}/channels/{channelId}/channel-contents/images:
+    $ref: paths/sessions/channel-session-contents-images.yml
+  /events/{eventId}/sessions/{sessionId}/channels/{channelId}/channel-contents/images/languages/{language}/types/{type}:
+    $ref: paths/sessions/channel-session-contents-image.yml
+  /events/{eventId}/sessions/{sessionId}/ticket-contents/PASSBOOK/texts:
+    $ref: paths/sessions/session-ticket-contents-passbook.yml
+  /events/{eventId}/sessions/{sessionId}/ticket-contents/PASSBOOK/images:
+    $ref: paths/sessions/session-ticket-contents-passbook-images.yml
+  /events/{eventId}/sessions/ticket-contents/PASSBOOK/texts:
+    $ref: paths/sessions/session-ticket-contents-passbook-bulk.yml
+  /events/{eventId}/sessions/ticket-contents/PASSBOOK/images:
+    $ref: paths/sessions/session-ticket-contents-passbook-images-bulk.yml
+  /events/{eventId}/sessions/{sessionId}/ticket-contents/PASSBOOK/images/languages/{language}/types/{type}:
+    $ref: paths/sessions/session-ticket-contents-passbook-image-delete.yml
+  /events/{eventId}/sessions/ticket-contents/PASSBOOK/images/languages/{language}/types/{type}:
+    $ref: paths/sessions/session-ticket-contents-passbook-images-type-delete-bulk.yml
+  /events/{eventId}/sessions/ticket-contents/PASSBOOK/images/languages/{language}:
+    $ref: paths/sessions/session-ticket-contents-passbook-images-delete-bulk.yml
+  /events/{eventId}/sessions/{sessionId}/ticket-contents/PDF/texts:
+    $ref: paths/sessions/session-ticket-contents-pdf-texts.yml
+  /events/{eventId}/sessions/{sessionId}/ticket-contents/PDF/images:
+    $ref: paths/sessions/session-ticket-contents-pdf-images.yml
+  /events/{eventId}/sessions/ticket-contents/PDF/texts:
+    $ref: paths/sessions/session-ticket-contents-pdf-texts-bulk.yml
+  /events/{eventId}/sessions/ticket-contents/PDF/images:
+    $ref: paths/sessions/session-ticket-contents-pdf-images-bulk.yml
+  /events/{eventId}/sessions/{sessionId}/ticket-contents/PDF/images/languages/{language}/types/{type}:
+    $ref: paths/sessions/session-ticket-contents-pdf-images-delete.yml
+  /events/{eventId}/sessions/ticket-contents/PDF/images/languages/{language}/types/{type}:
+    $ref: paths/sessions/session-ticket-contents-pdf-images-type-delete-bulk.yml
+  /events/{eventId}/sessions/ticket-contents/PDF/images/languages/{language}:
+    $ref: paths/sessions/session-ticket-contents-pdf-images-delete-bulk.yml
+  /events/{eventId}/sessions/{sessionId}/ticket-contents/PRINTER/texts:
+    $ref: paths/sessions/session-ticket-contents-printer-texts.yml
+  /events/{eventId}/sessions/{sessionId}/ticket-contents/PRINTER/images:
+    $ref: paths/sessions/session-ticket-contents-printer-images.yml
+  /events/{eventId}/sessions/ticket-contents/PRINTER/texts:
+    $ref: paths/sessions/session-ticket-contents-printer-texts-bulk.yml
+  /events/{eventId}/sessions/ticket-contents/PRINTER/images:
+    $ref: paths/sessions/session-ticket-contents-printer-images-bulk.yml
+  /events/{eventId}/sessions/{sessionId}/ticket-contents/PRINTER/images/languages/{language}/types/{type}:
+    $ref: paths/sessions/session-ticket-contents-printer-images-delete.yml
+  /events/{eventId}/sessions/ticket-contents/PRINTER/images/languages/{language}/types/{type}:
+    $ref: paths/sessions/session-ticket-contents-printer-images-type-delete-bulk.yml
+  /events/{eventId}/sessions/ticket-contents/PRINTER/images/languages/{language}:
+    $ref: paths/sessions/session-ticket-contents-printer-images-delete-bulk.yml
+  /events/{eventId}/sessions/{sessionId}/ticket-templates/passbook/preview:
+    $ref: paths/sessions/session-passbook-preview.yml
+  /events/{eventId}/sessions/{sessionId}/whitelist:
+    $ref: paths/sessions/session-whitelist.yml
+  /events/{eventId}/sessions/{sessionId}/whitelist/exports:
+    $ref: paths/sessions/session-whitelist-export.yml
+  /events/{eventId}/sessions/{sessionId}/whitelist/exports/{exportId}:
+    $ref: paths/sessions/session-whitelist-export-status.yml
+  /events/{eventId}/sessions/{sessionId}/external-barcodes:
+    $ref: paths/sessions/session-external-barcodes.yml
+  /events/{eventId}/sessions/{sessionId}/external-barcodes/exports:
+    $ref: paths/sessions/session-external-barcodes-export.yml
+  /events/{eventId}/sessions/{sessionId}/external-barcodes/exports/{exportId}:
+    $ref: paths/sessions/session-external-barcodes-export-status.yml
+  /events/{eventId}/sessions/{sessionId}/external-barcodes/import:
+    $ref: paths/sessions/session-import-external-barcodes.yml
+  /events/{eventId}/sessions/{sessionId}/external-barcodes/import/status:
+    $ref: paths/sessions/pending-external-barcodes.yml
+  /events/{eventId}/sessions/{sessionId}/external-barcodes/config:
+    $ref: paths/sessions/session-external-barcodes-config.yml
+  /events/{eventId}/sessions/{sessionId}/tags:
+    $ref: paths/sessions/session-tags.yml
+  /events/{eventId}/sessions/{sessionId}/tags/{positionId}:
+    $ref: paths/sessions/session-tags-position.yml
+  /events/{eventId}/sessions/{sessionId}/dynamic-prices:
+    $ref: paths/dynamic-price/dynamic-price.yml
+  /events/{eventId}/sessions/{sessionId}/dynamic-prices/price-zones/{idPriceZone}:
+    $ref: paths/dynamic-price/dynamic-price-zone.yml
+  /events/{eventId}/sessions/{sessionId}/dynamic-prices/price-zones/{idPriceZone}/rates:
+    $ref: paths/dynamic-price/dynamic-price-rates.yml
+  /events/{eventId}/sessions/{sessionId}/dynamic-prices/price-zones/{idPriceZone}/zone/{orderId}:
+    $ref: paths/dynamic-price/dynamic-price-zone-id.yml
+  /events/{eventId}/surcharges:
+    $ref: paths/events/event-surcharges.yml
+  /events/{eventId}/tiers:
+    $ref: paths/events/tiers.yml
+  /events/{eventId}/tiers/{tierId}:
+    $ref: paths/events/tier.yml
+  /events/{eventId}/tiers/{tierId}/channel-contents:
+    $ref: paths/events/tier-channel-contents.yml
+  /events/{eventId}/tiers/{tierId}/limit:
+    $ref: paths/events/tier-limit.yml
+  /events/{eventId}/tiers/{tierId}/quotas:
+    $ref: paths/events/tier-quotas.yml
+  /events/{eventId}/tiers/{tierId}/quotas/{quotaId}:
+    $ref: paths/events/tier-quota.yml
+  /events/{eventId}/external-barcodes/config:
+    $ref: paths/events/event-external-barcodes-config.yml
+  /events/{eventId}/channels/{channelId}/b2b/venue-templates/{venueTemplateId}/publishing-config:
+    $ref: paths/events/b2b-seat-publishing-config.yml
+  /events/{eventId}/catalog-ui-settings:
+    $ref: paths/events/event-catalog-ui-settings.yml
+  /events/{eventId}/sale-requests/channels-candidates:
+    $ref: paths/events/event-sale-requests-channels-candidates.yml
+  /external-provider-events:
+    $ref: paths/events/external-provider-events.yml
+  /external-provider-sessions:
+    $ref: paths/sessions/external-provider-sessions.yml
+  /external-provider-presales/events/{eventId}/sessions/{sessionId}/external-presales:
+    $ref: paths/sessions/external-presales-path.yml
+  /external-provider-presales/season-tickets/{seasonTicketId}/external-presales:
+    $ref: paths/season-tickets/external-season-ticket-presales-path.yml
+  /events/tours:
+    $ref: paths/tours/tours.yml
+  /events/tours/{tourId}:
+    $ref: paths/tours/tour.yml
+  /events/tours/{tourId}/channel-contents/texts:
+    $ref: paths/tours/tour-channel-contents-texts.yml
+  /events/tours/{tourId}/channel-contents/images:
+    $ref: paths/tours/tour-channel-contents-images.yml
+  /events/tours/{tourId}/channel-contents/images/languages/{language}/types/{type}:
+    $ref: paths/tours/tour-channel-contents-image.yml
+  /users:
+    $ref: paths/users/users.yml
+  /users/{userId}:
+    $ref: paths/users/user.yml
+  /users/{userId}/password:
+    $ref: paths/users/password.yml
+  /users/forgot-password:
+    $ref: paths/users/forgot-password.yml
+  /users/forgot-password/recover:
+    $ref: paths/users/forgot-password-recover.yml
+  /users/{userId}/resource-servers:
+    $ref: paths/realms/available-resource-servers.yml
+  /users/{userId}/roles:
+    $ref: paths/realms/user-roles.yml
+  /users/{userId}/roles/available:
+    $ref: paths/realms/user-roles-available.yml
+  /users/{userId}/roles/{roleCode}:
+    $ref: paths/realms/user-role-code.yml
+  /users/{userId}/roles/{roleCode}/permissions/{permissionCode}:
+    $ref: paths/realms/user-role-code-permission.yml
+  /users/{userId}/notifications:
+    $ref: paths/notifications/user-notifications.yml
+  /users/{userId}/apikey/refresh:
+    $ref: paths/users/user-apikey-refresh.yml
+  /users/{userId}/visibility:
+    $ref: paths/users/user-visibility.yml
+  /users/{userId}/rate-limit:
+    $ref: paths/users/user-rate-limit.yml
+  /users/myself:
+    $ref: paths/users/user-myself.yml
+  /users/myself/password:
+    $ref: paths/users/password-myself.yml
+  /users/myself/apikey/refresh:
+    $ref: paths/users/user-apikey-refresh-myself.yml
+  /users/myself/notifications:
+    $ref: paths/notifications/notifications-myself.yml
+  /users/myself/mstrUrls:
+    $ref: paths/users/mstrUrls-myself.yml
+  /users/myself/mfa-activation-send:
+    $ref: paths/users/mfa-activation-send.yml
+  /users/myself/mfa-activation-confirm:
+    $ref: paths/users/mfa-activation-confirm.yml
+  /venues:
+    $ref: paths/venues/venues.yml
+  /venues/{venueId}:
+    $ref: paths/venues/venue.yml
+  /venues/{venueId}/spaces:
+    $ref: paths/venues/spaces/venue-spaces.yml
+  /venues/{venueId}/spaces/{spaceId}:
+    $ref: paths/venues/spaces/venue-space.yml
+  /venues/{venueId}/access-control-systems:
+    $ref: paths/venues/venue-access-control-systems.yml
+  /venues/{venueId}/access-control-systems/{accessControlSystemName}:
+    $ref: paths/venues/venue-access-control-system.yml
+  /venues/{venueId}/access-control-systems/{skidataVariant}/config:
+    $ref: paths/venues/venue-skidata-configuration.yml
+  /venues/all/cities:
+    $ref: paths/venues/cities.yml
+  /venues/all/countries:
+    $ref: paths/venues/countries.yml
+  /entities/{entityId}/external-venues:
+    $ref: paths/external-venues/external-venues.yml
+  /entities/{entityId}/external-venues/{externalVenueId}/external-venue-templates:
+    $ref: paths/external-venues/external-venue-templates.yml
+  /venue-templates:
+    $ref: paths/venue-templates/venue-templates.yml
+  /venue-templates/{venueTemplateId}:
+    $ref: paths/venue-templates/venue-template.yml
+  /venue-templates/{venueTemplateId}/clone:
+    $ref: paths/venue-templates/venue-template-clone.yml
+  /venue-templates/{venueTemplateId}/map:
+    $ref: paths/venue-templates/venue-template-map.yml
+  /venue-templates/{venueTemplateId}/views:
+    $ref: paths/venue-templates/venue-template-views.yml
+  /venue-templates/{venueTemplateId}/views/vip:
+    $ref: paths/venue-templates/venue-template-views-vip.yml
+  /venue-templates/{venueTemplateId}/views/root:
+    $ref: paths/venue-templates/venue-template-view-root.yml
+  /venue-templates/{venueTemplateId}/views/{viewId}:
+    $ref: paths/venue-templates/venue-template-view.yml
+  /venue-templates/{venueTemplateId}/views/{viewId}/links:
+    $ref: paths/venue-templates/venue-template-view-links.yml
+  /venue-templates/{venueTemplateId}/views/{viewId}/links/{linkId}:
+    $ref: paths/venue-templates/venue-template-view-link.yml
+  /venue-templates/{venueTemplateId}/views/{viewId}/template:
+    $ref: paths/venue-templates/venue-template-view-template.yml
+  /venue-templates/{venueTemplateId}/sectors:
+    $ref: paths/venue-templates/venue-template-sectors.yml
+  /venue-templates/{venueTemplateId}/sectors/{sectorId}:
+    $ref: paths/venue-templates/venue-template-sector.yml
+  /venue-templates/{venueTemplateId}/sectors/{sectorId}/not-numbered-zones:
+    $ref: paths/venue-templates/venue-template-sector-not-numbered-zones.yml
+  /venue-templates/{venueTemplateId}/sectors/{sectorId}/clone:
+    $ref: paths/venue-templates/venue-template-sector-clone.yml
+  /venue-templates/{venueTemplateId}/not-numbered-zones:
+    $ref: paths/venue-templates/venue-template-not-numbered-zones.yml
+  /venue-templates/{venueTemplateId}/not-numbered-zones/bulk:
+    $ref: paths/venue-templates/venue-template-not-numbered-zones-bulk.yml
+  /venue-templates/{venueTemplateId}/not-numbered-zones/{notNumberedZoneId}:
+    $ref: paths/venue-templates/venue-template-not-numbered-zone.yml
+  /venue-templates/{venueTemplateId}/not-numbered-zones/{notNumberedZoneId}/clone:
+    $ref: paths/venue-templates/venue-template-not-numbered-zone-clone.yml
+  /venue-templates/{venueTemplateId}/rows:
+    $ref: paths/venue-templates/venue-template-rows.yml
+  /venue-templates/{venueTemplateId}/rows/bulk:
+    $ref: paths/venue-templates/venue-template-rows-bulk.yml
+  /venue-templates/{venueTemplateId}/rows/{rowId}:
+    $ref: paths/venue-templates/venue-template-row.yml
+  /venue-templates/{venueTemplateId}/seats:
+    $ref: paths/venue-templates/venue-template-seats.yml
+  /venue-templates/{venueTemplateId}/seats/{seatId}:
+    $ref: paths/venue-templates/venue-template-seat.yml
+  /venue-templates/{venueTemplateId}/blocking-reasons:
+    $ref: paths/venue-templates/venue-template-blocking-reasons.yml
+  /venue-templates/{venueTemplateId}/blocking-reasons/{blockingReasonId}:
+    $ref: paths/venue-templates/venue-template-blocking-reason.yml
+  /venue-templates/{venueTemplateId}/price-types:
+    $ref: paths/venue-templates/venue-template-price-types.yml
+  /venue-templates/{venueTemplateId}/price-types/{priceTypeId}:
+    $ref: paths/venue-templates/venue-template-price-type.yml
+  /venue-templates/{venueTemplateId}/price-types/{priceTypeId}/channel-contents:
+    $ref: paths/venue-templates/price-type-comm-elements.yml
+  /venue-templates/{venueTemplateId}/price-types/{priceTypeId}/restrictions:
+    $ref: paths/venue-templates/price-type-restrictions.yml
+  /venue-templates/{venueTemplateId}/quotas:
+    $ref: paths/venue-templates/venue-template-quotas.yml
+  /venue-templates/{venueTemplateId}/quotas/{quotaId}:
+    $ref: paths/venue-templates/venue-template-quota.yml
+  /venue-templates/{venueTemplateId}/gates:
+    $ref: paths/venue-templates/venue-template-gates.yml
+  /venue-templates/{venueTemplateId}/gates/{gateId}:
+    $ref: paths/venue-templates/venue-template-gate.yml
+  /venue-templates/{venueTemplateId}/dynamic-tag-groups:
+    $ref: paths/venue-templates/venue-template-dynamic-tag-groups.yml
+  /venue-templates/{venueTemplateId}/dynamic-tag-groups/{tagGroupId}:
+    $ref: paths/venue-templates/venue-template-dynamic-tag-group.yml
+  /venue-templates/{venueTemplateId}/dynamic-tag-groups/{tagGroupId}/tags:
+    $ref: paths/venue-templates/venue-template-dynamic-tag-group-tags.yml
+  /venue-templates/{venueTemplateId}/dynamic-tag-groups/{tagGroupId}/tags/{tagId}:
+    $ref: paths/venue-templates/venue-template-dynamic-tag-group-tag.yml
+  /venue-templates/{venueTemplateId}/avet-competitions:
+    $ref: paths/venue-templates/venue-template-avet-competitions.yml
+  /venue-templates/{venueTemplateId}/capacity/quotas:
+    $ref: paths/venue-templates/venue-template-quotas-capacity.yml
+  /venue-templates/{venueTemplateId}/interactive-venue:
+    $ref: paths/venue-templates/venue-template-interactive-venue.yml
+  /venue-templates/{venueTemplateId}/images:
+    $ref: paths/venue-templates/venue-template-images.yml
+  /venue-templates/{venueTemplateId}/images/{imageId}:
+    $ref: paths/venue-templates/venue-template-image.yml
+  /venue-templates/{venueTemplateId}/exports/sectors:
+    $ref: paths/venue-templates/venue-template-export-sectors.yml
+  /venue-templates/{venueTemplateId}/exports/seats:
+    $ref: paths/venue-templates/venue-template-export-seats.yml
+  /venue-templates/{venueTemplateId}/exports/views:
+    $ref: paths/venue-templates/venue-template-export-views.yml
+  /venue-templates/{venueTemplateId}/exports/{type}/{exportId}:
+    $ref: paths/venue-templates/venue-template-export-status.yml
+  /venue-templates/{venueTemplateId}/external-capacity:
+    $ref: paths/venue-templates/venue-template-external-capacity.yml
+  /venue-templates/filters/{filter}:
+    $ref: paths/venue-templates/venue-templates-filters.yml
+  /platform-admin-channels:
+    $ref: paths/channels/platform-admin-channels.yml
+  /platform-admin-channels/{channelId}/migration:
+    $ref: paths/channels/platform-admin-channels-migration.yml
+  /platform-admin-channels/{channelId}/migrate-receipt:
+    $ref: paths/channels/platform-admin-channels-migrate-receipt.yml
+  /platform-admin-channels/{channelId}/whitelabel-type:
+    $ref: paths/channels/platform-admin-channels-whitelabel-type.yml
+  /channels:
+    $ref: paths/channels/channels.yml
+  /channels/{channelId}:
+    $ref: paths/channels/channel.yml
+  /channels/{channelId}/vouchers:
+    $ref: paths/channels/channel-vouchers.yml
+  /channels/{channelId}/loyalty-points:
+    $ref: paths/channels/channel-loyalty-points.yml
+  /channels/{channelId}/booking-settings:
+    $ref: paths/channels/channel-booking-settings.yml
+  /channels/{channelId}/domain-settings:
+    $ref: paths/channels/domain-settings/channel-domain-settings.yml
+  /channels/{channelId}/cors-settings:
+    $ref: paths/channels/domain-settings/channel-cors-settings.yml
+  /entities/{entityId}/customers-domain-settings:
+    $ref: paths/custom-domains/customers/domain-settings/customer-domain-setting.yml
+  /channels/{channelId}/gateways:
+    $ref: paths/channels/channel-gateways.yml
+  /channels/{channelId}/gateways/{gatewaySid}/configurations/{configSid}:
+    $ref: paths/channels/channel-gateway-detail.yml
+  /channels/{channelId}/gateways/{gatewaySid}/configurations:
+    $ref: paths/channels/channel-gateway-create.yml
+  /channels/{channelId}/surcharges:
+    $ref: paths/channels/channel-surcharges.yml
+  /channels/{channelId}/surcharges-taxes:
+    $ref: paths/channels/channel-surcharges-taxes.yml
+  /channels/{channelId}/commissions:
+    $ref: paths/channels/channel-commissions.yml
+  /channels/{channelId}/delivery:
+    $ref: paths/channels/channel-delivery-methods.yml
+  /channels/{channelId}/buyer-data-forms:
+    $ref: paths/channels/channel-forms.yml
+  /channels/{channelId}/data-protection-forms:
+    $ref: paths/channels/channel-data-protection-forms.yml
+  /channels/{channelId}/additional-agreements:
+    $ref: paths/channels/channel-agreements.yml
+  /channels/{channelId}/additional-agreements/{agreementId}:
+    $ref: paths/channels/channel-agreement.yml
+  /apps/{name}/text-contents/master-languages/{languageId}:
+    $ref: paths/apps/app-text-contents.yml
+  /apps/{name}/text-contents/master-languages/{languageId}/{key}:
+    $ref: paths/apps/app-filtered-text-contents.yml
+  /channels/{channelId}/text-contents/languages/{languageId}:
+    $ref: paths/channels/channel-text-contents.yml
+  /channels/{channelId}/text-contents/languages/{languageId}/{key}:
+    $ref: paths/channels/channel-filtered-text-contents.yml
+  /channels/{channelId}/custom-resources:
+    $ref: paths/channels/channel-custom-resources.yml
+  /channels/{channelId}/custom-resources/assets:
+    $ref: paths/channels/channel-custom-resources-assets.yml
+  /channels/{channelId}/custom-resources/assets/{filename}:
+    $ref: paths/channels/channel-custom-resources-assets-filename.yml
+  /channels/{channelId}/contents/{category}:
+    $ref: paths/channels/channel-contents.yml
+  /channels/{channelId}/contents/{contentId}/historical:
+    $ref: paths/channels/channel-contents-historical.yml
+  /channels/{channelId}/contents/{contentId}/profiles:
+    $ref: paths/channels/channel-contents-profiled.yml
+  /channels/{channelId}/contents/clone:
+    $ref: paths/channels/channel-contents-clone.yml
+  /channels/{channelId}/faqs:
+    $ref: paths/channels/channel-faqs.yml
+  /channels/{channelId}/faqs/{key}:
+    $ref: paths/channels/channel-faqs-item.yml
+  /channels/{channelId}/promotions:
+    $ref: paths/channels/channel-promotions.yml
+  /channels/{channelId}/promotions/{promotionId}:
+    $ref: paths/channels/channel-promotion.yml
+  /channels/{channelId}/promotions/{promotionId}/clone:
+    $ref: paths/channels/channel-promotion-clone.yml
+  /channels/{channelId}/promotions/{promotionId}/channel-contents/texts:
+    $ref: paths/channels/channel-promotion-channel-contents-texts.yml
+  /channels/{channelId}/promotions/{promotionId}/events:
+    $ref: paths/channels/channel-promotion-events.yml
+  /channels/{channelId}/promotions/{promotionId}/sessions:
+    $ref: paths/channels/channel-promotion-sessions.yml
+  /channels/{channelId}/promotions/{promotionId}/price-types:
+    $ref: paths/channels/channel-promotion-price-types.yml
+  /channels/{channelId}/cancellation-services:
+    $ref: paths/channels/channel-cancellation-services.yml
+  /channels/{channelId}/notifications/email/templates:
+    $ref: paths/channels/channel-email-templates.yml
+  /channels/{channelId}/notifications/email/server:
+    $ref: paths/channels/channel-email-server.yml
+  /channels/{channelId}/notifications/email/server/test:
+    $ref: paths/channels/channel-email-server-test.yml
+  /channels/{channelId}/external-tools:
+    $ref: paths/channels/channel-external-tools.yml
+  /channels/{channelId}/ticket-contents/PDF/images:
+    $ref: paths/channels/channel-ticket-pdf-image-contents.yml
+  /channels/{channelId}/ticket-contents/PDF/images/languages/{language}/types/{type}:
+    $ref: paths/channels/channel-ticket-pdf-contents-delete.yml
+  /channels/{channelId}/ticket-contents/PASSBOOK/images:
+    $ref: paths/channels/channel-ticket-passbook-image-contents.yml
+  /channels/{channelId}/ticket-contents/PASSBOOK/images/languages/{language}/types/{type}:
+    $ref: paths/channels/channel-ticket-passbook-contents-delete.yml
+  /channels/{channelId}/ticket-contents/PASSBOOK/texts:
+    $ref: paths/channels/channel-ticket-passbook-text-contents.yml
+  /channels/{channelId}/ticket-contents/PRINTER/images:
+    $ref: paths/channels/channel-ticket-printer-image-contents.yml
+  /channels/{channelId}/ticket-contents/PRINTER/images/languages/{language}/types/{type}:
+    $ref: paths/channels/channel-ticket-printer-contents-delete.yml
+  /channels/{channelId}/purchase-contents/images:
+    $ref: paths/channels/purchase-contents/channel-purchase-image-contents.yml
+  /channels/{channelId}/purchase-contents/images/languages/{language}/types/{type}:
+    $ref: paths/channels/purchase-contents/channel-purchase-image-contents-delete.yml
+  /channels/{channelId}/purchase-contents/texts:
+    $ref: paths/channels/purchase-contents/channel-purchase-text-contents.yml
+  /channels/{channelId}/external-tools/{toolName}:
+    $ref: paths/channels/channel-external-tool.yml
+  /channels/{channelId}/external-tools/{toolName}/reset:
+    $ref: paths/channels/channel-external-tool-reset.yml
+  /channels/{channelId}/purchase-config:
+    $ref: paths/channels/channel-purchase-config.yml
+  /channels/{channelId}/blacklists/{type}/status:
+    $ref: paths/channels/channel-blacklists-status.yml
+  /channels/{channelId}/blacklists/{type}:
+    $ref: paths/channels/channel-blacklists.yml
+  /channels/{channelId}/blacklists/{type}/{value}:
+    $ref: paths/channels/channel-blacklists-element.yml
+  /channels/{channelId}/events:
+    $ref: paths/channels/channel-events.yml
+  /channels/{channelId}/events/{eventId}:
+    $ref: paths/channels/channel-event.yml
+  /channels/{channelId}/events/{eventId}/sessions:
+    $ref: paths/channels/channel-sessions.yml
+  /channels/{channelId}/auth-vendors/user-data:
+    $ref: paths/channels/channel-auth-vendors-user-data.yml
+  /channels/{channelId}/auth-vendors/sso:
+    $ref: paths/channels/channel-auth-vendors-sso.yml
+  /channels/{channelId}/ticket-templates/{ticketType}/PASSBOOK:
+    $ref: paths/channels/channel-passbook-ticket-templates.yml
+  /channels/{channelId}/ticket-templates:
+    $ref: paths/channels/channel-ticket-templates.yml
+  /channels/{channelId}/event-sale-restrictions:
+    $ref: paths/channels/event-sale-restrictions/channel-event-sale-restrictions.yml
+  /channels/{channelId}/whitelabel-settings:
+    $ref: paths/channels/whitelabel-settings.yml
+  /channels/member-config/dynamic-configuration:
+    $ref: paths/channels/dynamic-configuration/member-configuration-structure.yml
+  /channels/{channelId}/member-config/dynamic-configuration:
+    $ref: paths/channels/dynamic-configuration/channel-member-configuration-structure.yml
+  /channels/{channelId}/member-config/dynamic-configuration/{operationName}:
+    $ref: paths/channels/dynamic-configuration/put-channel-member-configuration-structure.yml
+  /channels/member-config/restrictions-dynamic-configuration:
+    $ref: paths/channels/restrictions/member-restriction-structure.yml
+  /channels/{channelId}/periodicities:
+    $ref: paths/channels/channel-periodicities.yml
+  /channels/{channelId}/terms:
+    $ref: paths/channels/channel-terms.yml
+  /channels/{channelId}/roles:
+    $ref: paths/channels/channel-roles.yml
+  /channels/{channelId}/capacities:
+    $ref: paths/channels/channel-aforos.yml
+  /channels/{channelId}/next-matches:
+    $ref: paths/channels/channel-next-matches.yml
+  /channels/{channelId}/permissions:
+    $ref: paths/channels/channel-avet-permissions.yml
+  /channels/{channelId}/members-batch-prices:
+    $ref: paths/channels/members-batch-prices.yml
+  /channels/{channelId}/sharing:
+    $ref: paths/channels/channel-sharing.yml
+  /channels/{channelId}/suggestions:
+    $ref: paths/channels/suggestions/channel-suggestions.yml
+  /channels/{channelId}/suggestions/{SOURCE_TYPE}/{sourceId}:
+    $ref: paths/channels/suggestions/channel-suggestions-type.yml
+  /channels/{channelId}/suggestions/{SOURCE_TYPE}/{sourceId}/targets/{TARGET_TYPE}/{targetId}:
+    $ref: paths/channels/suggestions/channel-suggestions-type-target.yml
+  /channels/{channelId}/packs:
+    $ref: paths/channels/packs/channel-packs.yml
+  /channels/{channelId}/packs/{packId}:
+    $ref: paths/channels/packs/channel-pack.yml
+  /channels/{channelId}/packs/{packId}/items:
+    $ref: paths/channels/packs/channel-pack-items.yml
+  /channels/{channelId}/packs/{packId}/items/{packItemId}:
+    $ref: paths/channels/packs/channel-pack-item.yml
+  /channels/{channelId}/packs/{packId}/items/{packItemId}/price-types:
+    $ref: paths/channels/packs/channel-pack-item-price-types.yml
+  /channels/{channelId}/packs/{packId}/rates:
+    $ref: paths/channels/packs/channel-pack-rates.yml
+  /channels/{channelId}/packs/{packId}/rates/refresh:
+    $ref: paths/channels/packs/channel-pack-rates-refresh.yml
+  /channels/{channelId}/packs/{packId}/rates/{rateId}:
+    $ref: paths/channels/packs/channel-pack-rate.yml
+  /channels/{channelId}/packs/{packId}/prices:
+    $ref: paths/channels/packs/channel-pack-prices.yml
+  /channels/{channelId}/packs/{packId}/contents/texts:
+    $ref: paths/channels/packs/channel-pack-contents-texts.yml
+  /channels/{channelId}/packs/{packId}/contents/images:
+    $ref: paths/channels/packs/channel-pack-contents-images.yml
+  /channels/{channelId}/packs/{packId}/contents/images/languages/{language}/types/{type}:
+    $ref: paths/channels/packs/channel-pack-contents-image.yml
+  /channels/{channelId}/packs/{packId}/ticket-contents/PDF/texts:
+    $ref: paths/channels/packs/channel-pack-ticket-contents-texts.yml
+  /channels/{channelId}/packs/{packId}/ticket-contents/PDF/images:
+    $ref: paths/channels/packs/channel-pack-ticket-contents-PDF-images.yml
+  /channels/{channelId}/packs/{packId}/ticket-contents/PDF/images/languages/{language}/types/{type}:
+    $ref: paths/channels/packs/channel-pack-ticket-contents-PDF-image.yml
+  /channels/{channelId}/packs/{packId}/ticket-contents/Printer/texts:
+    $ref: paths/channels/packs/channel-pack-ticket-contents-texts.yml
+  /channels/{channelId}/packs/{packId}/ticket-contents/Printer/images:
+    $ref: paths/channels/packs/channel-pack-ticket-contents-PRINTER-images.yml
+  /channels/{channelId}/packs/{packId}/ticket-contents/Printer/images/languages/{language}/types/{type}:
+    $ref: paths/channels/packs/channel-pack-ticket-contents-PRINTER-image.yml
+  /channels/{channelId}/packs/{packId}/funnel-urls:
+    $ref: paths/channels/packs/channel-pack-funnel-urls.yml
+  /packs-sale-requests:
+    $ref: paths/channels/pack-sale-requests/packs-sale-requests.yml
+  /packs-sale-requests/{saleRequestId}/status:
+    $ref: paths/channels/pack-sale-requests/packs-sale-request-status.yml
+  /domains-config/{domain}:
+    $ref: paths/channels/domains-config.yml
+  /catalog-sale-requests:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-requests.yml
+  /catalog-sale-requests/{saleRequestId}:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request.yml
+  /catalog-sale-requests/{saleRequestId}/sessions:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-sessions.yml
+  /catalog-sale-requests/{saleRequestId}/surcharges-taxes:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-surcharges-taxes.yml
+  /catalog-sale-requests/{saleRequestId}/promotions:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-promotions.yml
+  /catalog-sale-requests/{saleRequestId}/price-types:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-price-types.yml
+  /catalog-sale-requests/filters/{filter}:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-requests-filter.yml
+  /catalog-sale-requests/{saleRequestId}/surcharges:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-surcharges.yml
+  /catalog-sale-requests/{saleRequestId}/commissions:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-commissions.yml
+  /catalog-sale-requests/{saleRequestId}/additional-agreements:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-additional-agreements.yml
+  /catalog-sale-requests/{saleRequestId}/additional-agreements/{agreementId}:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-additional-agreement.yml           
+  /catalog-sale-requests/{saleRequestId}/channel-contents/texts:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-channel-contents-texts.yml
+  /catalog-sale-requests/{saleRequestId}/channel-contents/links:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-channel-contents-links.yml
+  /catalog-sale-requests/{saleRequestId}/channel-contents/language/{language}/session-links:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-channel-contents-session-links.yml
+  /catalog-sale-requests/{saleRequestId}/purchase-contents/images:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-purchase-contents-images.yml
+  /catalog-sale-requests/{saleRequestId}/purchase-contents/images/languages/{language}/types/{type}:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-purchase-contents-images-delete.yml
+  /catalog-sale-requests/{saleRequestId}/purchase-contents/links:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-purchase-contents-links.yml
+  /catalog-sale-requests/{saleRequestId}/purchase-contents/texts:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-purchase-contents-texts.yml    
+  /catalog-sale-requests/{saleRequestId}/payment-benefits-contents/tags:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-payment-benefits-tags.yml
+  /catalog-sale-requests/{saleRequestId}/payment-benefits-contents/tags/languages/{language}/types/{type}:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-payment-benefits-tags-delete.yml
+  /catalog-sale-requests/{saleRequestId}/config/allow-refund:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-allow-refund.yml
+  /catalog-sale-requests/{saleRequestId}/config/event-category:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-event-category.yml
+  /catalog-sale-requests/{saleRequestId}/status:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-status.yml
+  /catalog-sale-requests/{saleRequestId}/config/subscription-list:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-subscription-list.yml
+  /catalog-sale-requests/{saleRequestId}/price-simulation:
+    $ref: paths/channels/catalog-sale-requests/prices-simulation.yml
+  /catalog-sale-requests/{saleRequestId}/price-simulation/exports:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-price-simulation-export.yml
+  /catalog-sale-requests/price-simulation/exports/{exportId}:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-price-simulation-export-status.yml
+  /catalog-sale-requests/{saleRequestId}/gateways:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-gateways.yml
+  /catalog-sale-requests/{saleRequestId}/gateways/benefits:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-gateway-benefits-list.yml
+  /catalog-sale-requests/{saleRequestId}/gateways/{gatewaySid}/configs/{confSid}/benefits:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-gateway-benefits.yml
+  /catalog-sale-requests/{saleRequestId}/delivery:
+    $ref: paths/channels/catalog-sale-requests/catalog-sale-request-delivery.yml
+  /catalog-sale-requests/{saleRequestId}/ticket-contents/PDF/images:
+    $ref: paths/channels/catalog-sale-requests/ticket-contents/pdf/sale-request-ticket-contents-pdf-images.yml
+  /catalog-sale-requests/{saleRequestId}/ticket-contents/PDF/images/languages/{language}/types/{type}:
+    $ref: paths/channels/catalog-sale-requests/ticket-contents/pdf/catalog-sale-request-ticket-contents-pdf-images-delete.yml
+  /catalog-sale-requests/{saleRequestId}/ticket-contents/PDF/texts:
+    $ref: paths/channels/catalog-sale-requests/ticket-contents/pdf/sale-request-ticket-contents-pdf-texts.yml
+  /catalog-sale-requests/{saleRequestId}/ticket-contents/PRINTER/images:
+    $ref: paths/channels/catalog-sale-requests/ticket-contents/printer/sale-request-ticket-contents-printer-images.yml
+  /catalog-sale-requests/{saleRequestId}/ticket-contents/PRINTER/images/languages/{language}/types/{type}:
+    $ref: paths/channels/catalog-sale-requests/ticket-contents/printer/catalog-sale-request-ticket-contents-printer-images-delete.yml
+  /catalog-sale-requests/{saleRequestId}/ticket-contents/PRINTER/texts:
+    $ref: paths/channels/catalog-sale-requests/ticket-contents/printer/sale-request-ticket-contents-printer-texts.yml
+  /catalog-sale-requests/{saleRequestId}/ticket-contents/PDF/preview:
+    $ref: paths/channels/catalog-sale-requests/ticket-contents/pdf/catalog-sale-request-ticket-contents-pdf-preview.yml
+  /catalog-sale-requests/{saleRequestId}/ticket-contents/PDF/ticket-template:
+    $ref: paths/channels/catalog-sale-requests/ticket-contents/pdf/catalog-sale-request-ticket-contents-pdf-template.yml
+  /catalog-sale-requests/{saleRequestId}/ticket-contents/PRINTER/ticket-template:
+    $ref: paths/channels/catalog-sale-requests/ticket-contents/printer/catalog-sale-request-ticket-contents-printer-template.yml
+  /voucher-groups:
+    $ref: paths/vouchers/voucher-groups.yml
+  /voucher-groups/{voucherGroupId}:
+    $ref: paths/vouchers/voucher-group.yml
+  /voucher-groups/{voucherGroupId}/gift-card-config:
+    $ref: paths/vouchers/voucher-group-gift-card-config.yml
+  /voucher-groups/{voucherGroupId}/vouchers:
+    $ref: paths/vouchers/vouchers.yml
+  /voucher-groups/{voucherGroupId}/vouchers/bulk:
+    $ref: paths/vouchers/vouchers-bulk.yml
+  /voucher-groups/{voucherGroupId}/vouchers/{code}:
+    $ref: paths/vouchers/voucher.yml
+  /voucher-groups/{voucherGroupId}/vouchers/{code}/balance:
+    $ref: paths/vouchers/voucher-balance.yml
+  /voucher-groups/{voucherGroupId}/vouchers/{code}/send-email:
+    $ref: paths/vouchers/voucher-send-email.yml
+  /voucher-groups/{voucherGroupId}/vouchers/exports:
+    $ref: paths/vouchers/vouchers-export.yml
+  /voucher-groups/{voucherGroupId}/vouchers/exports/{exportId}:
+    $ref: paths/vouchers/vouchers-export-status.yml
+  /voucher-groups/{voucherGroupId}/channel-contents/texts:
+    $ref: paths/vouchers/voucher-channel-contents-texts.yml
+  /voucher-groups/{voucherGroupId}/gift-card-contents/texts:
+    $ref: paths/vouchers/voucher-gift-card-contents-texts.yml
+  /voucher-groups/{voucherGroupId}/gift-card-contents/images:
+    $ref: paths/vouchers/voucher-gift-card-contents-images.yml
+  /voucher-groups/{voucherGroupId}/gift-card-contents/images/languages/{language}/types/{type}:
+    $ref: paths/vouchers/voucher-gift-card-contents-image.yml
+  /season-tickets:
+    $ref: paths/season-tickets/season-tickets.yml
+  /season-tickets/releases/exports/{exportId}:
+    $ref: paths/season-tickets/season-ticket-releases-export-status.yml
+  /season-tickets/{seasonTicketId}:
+    $ref: paths/season-tickets/season-ticket.yml
+  /season-tickets/{seasonTicketId}/channels:
+    $ref: paths/season-tickets/season-ticket-channels.yml
+  /season-tickets/{seasonTicketId}/change-seats:
+    $ref: paths/season-tickets/season-ticket-change-seat.yml
+  /season-tickets/{seasonTicketId}/redemption:
+    $ref: paths/season-tickets/season-ticket-redemption.yml
+  /season-tickets/{seasonTicketId}/channels/{channelId}:
+    $ref: paths/season-tickets/season-ticket-channel.yml
+  /season-tickets/{seasonTicketId}/channels/{channelId}/request-approval:
+    $ref: paths/season-tickets/season-ticket-channel-request.yml
+  /season-tickets/{seasonTicketId}/channels/{channelId}/funnel-urls:
+    $ref: paths/season-tickets/season-ticket-channel-funnel-urls.yml
+  /season-tickets/{seasonTicketId}/channels/{channelId}/surcharges:
+    $ref: paths/season-tickets/season-ticket-channel-promoter-surcharges.yml
+  /season-tickets/{seasonTicketId}/channels/{channelId}/channel-surcharges:
+    $ref: paths/season-tickets/season-ticket-channel-channel-surcharges.yml
+  /season-tickets/{seasonTicketId}/channels/{channelId}/price-simulation:
+    $ref: paths/season-tickets/season-ticket-channel-prices-simulation.yml
+  /season-tickets/{seasonTicketId}/channels/{channelId}/channel-commissions:
+    $ref: paths/season-tickets/season-ticket-channel-channel-commissions.yml
+  /season-tickets/{seasonTicketId}/channels/{channelId}/ticket-template/preview:
+    $ref: paths/season-tickets/season-ticket-channel-ticket-template-preview.yml
+  /season-tickets/{seasonTicketId}/channels/{channelId}/b2b/assignations:
+    $ref: paths/season-tickets/season-ticket-channel-assignations.yml
+  /season-tickets/{seasonTicketId}/forms/sepa:
+    $ref: paths/season-tickets/season-ticket-forms-sepa.yml
+  /season-tickets/{seasonTicketId}/rates:
+    $ref: paths/season-tickets/season-tickets-rates.yml
+  /season-tickets/{seasonTicketId}/rates/{rateId}:
+    $ref: paths/season-tickets/season-ticket-rate.yml
+  /season-tickets/{seasonTicketId}/release-seat:
+    $ref: paths/season-tickets/season-ticket-release-seat.yml
+  /season-tickets/{seasonTicketId}/loyalty-points:
+    $ref: paths/season-tickets/season-ticket-loyalty-points.yml
+  /season-tickets/{seasonTicketId}/status:
+    $ref: paths/season-tickets/season-ticket-status.yml
+  /season-tickets/{seasonTicketId}/prices:
+    $ref: paths/season-tickets/season-ticket-prices.yml
+  /season-tickets/{seasonTicketId}/capacity:
+    $ref: paths/season-tickets/season-ticket-capacity.yml
+  /season-tickets/{seasonTicketId}/capacity/seats:
+    $ref: paths/season-tickets/season-ticket-capacity-seats.yml
+  /season-tickets/{seasonTicketId}/capacity/seats/link:
+    $ref: paths/season-tickets/season-ticket-capacity-seats-link.yml
+  /season-tickets/{seasonTicketId}/capacity/seats/unlink:
+    $ref: paths/season-tickets/season-ticket-capacity-seats-unlink.yml
+  /season-tickets/{seasonTicketId}/capacity/not-numbered-zones/link:
+    $ref: paths/season-tickets/season-ticket-capacity-not-numbered-zones-link.yml
+  /season-tickets/{seasonTicketId}/capacity/not-numbered-zones/unlink:
+    $ref: paths/season-tickets/season-ticket-capacity-not-numbered-zones-unlink.yml
+  /season-tickets/{seasonTicketId}/capacity/not-numbered-zones:
+    $ref: paths/season-tickets/season-ticket-capacity-not-numbered-zones.yml
+  /season-tickets/{seasonTicketId}/external-inventory:
+    $ref: paths/season-tickets/season-ticket-external-inventory.yml
+  /season-tickets/{seasonTicketId}/release-seat/releases:
+    $ref: paths/season-tickets/season-ticket-releases.yml
+  /season-tickets/{seasonTicketId}/releases/exports:
+    $ref: paths/season-tickets/season-ticket-releases-export.yml
+  /season-tickets/{seasonTicketId}/sessions:
+    $ref: paths/season-tickets/season-ticket-sessions.yml
+  /season-tickets/{seasonTicketId}/sessions/{sessionId}:
+    $ref: paths/season-tickets/season-ticket-session.yml
+  /season-tickets/{seasonTicketId}/sessions/events:
+    $ref: paths/season-tickets/season-ticket-sessions-events.yml
+  /season-tickets/{seasonTicketId}/sessions/update-barcodes:
+    $ref: paths/season-tickets/season-ticket-sessions-update-barcodes.yml
+  /season-tickets/{seasonTicketId}/sessions/validations:
+    $ref: paths/season-tickets/season-ticket-sessions-verify.yml
+  /season-tickets/{seasonTicketId}/channel-contents/texts:
+    $ref: paths/season-tickets/season-ticket-channel-contents-texts.yml
+  /season-tickets/{seasonTicketId}/channel-contents/images:
+    $ref: paths/season-tickets/season-ticket-channel-contents-images.yml
+  /season-tickets/{seasonTicketId}/channel-contents/images/languages/{language}/types/{type}:
+    $ref: paths/season-tickets/season-ticket-channel-contents-image.yml
+  /season-tickets/{seasonTicketId}/ticket-contents/PDF/texts:
+    $ref: paths/season-tickets/season-ticket-ticket-contents-pdf-texts.yml
+  /season-tickets/{seasonTicketId}/ticket-contents/PDF/images:
+    $ref: paths/season-tickets/season-ticket-ticket-contents-pdf-images.yml
+  /season-tickets/{seasonTicketId}/ticket-contents/PDF/images/languages/{language}/types/{type}:
+    $ref: paths/season-tickets/season-ticket-ticket-contents-pdf-image-delete.yml
+  /season-tickets/{seasonTicketId}/ticket-templates:
+    $ref: paths/season-tickets/season-ticket-ticket-templates.yml
+  /season-tickets/{seasonTicketId}/ticket-templates/{ticketType}/preview:
+    $ref: paths/season-tickets/season-ticket-ticket-templates-preview.yml
+  /season-tickets/{seasonTicketId}/ticket-templates/passbook/preview:
+    $ref: paths/season-tickets/season-ticket-ticket-templates-passbook-preview.yml
+  /season-tickets/{seasonTicketId}/ticket-templates/{ticketType}/{templateFormat}:
+    $ref: paths/season-tickets/season-ticket-ticket-templates-atomic.yml
+  /season-tickets/{seasonTicketId}/ticket-templates/{ticketType}/PASSBOOK:
+    $ref: paths/season-tickets/season-ticket-passbook-template.yml
+  /season-tickets/{seasonTicketId}/ticket-contents/PRINTER/texts:
+    $ref: paths/season-tickets/season-ticket-ticket-contents-printer-texts.yml
+  /season-tickets/{seasonTicketId}/ticket-contents/PRINTER/images:
+    $ref: paths/season-tickets/season-ticket-ticket-contents-printer-images.yml
+  /season-tickets/{seasonTicketId}/ticket-contents/PRINTER/images/languages/{language}/types/{type}:
+    $ref: paths/season-tickets/season-ticket-ticket-contents-printer-image-delete.yml
+  /season-tickets/{seasonTicketId}/ticket-contents/PASSBOOK/texts:
+    $ref: paths/season-tickets/season-ticket-ticket-contents-passbook-texts.yml
+  /season-tickets/{seasonTicketId}/ticket-contents/PASSBOOK/images:
+    $ref: paths/season-tickets/season-ticket-ticket-contents-passbook-images.yml
+  /season-tickets/{seasonTicketId}/ticket-contents/PASSBOOK/images/languages/{language}/types/{type}:
+    $ref: paths/season-tickets/season-ticket-ticket-contents-passbook-image-delete.yml
+  /season-tickets/{seasonTicketId}/ticket-invitation-contents/PDF/texts:
+    $ref: paths/season-tickets/season-ticket-ticket-invitation-contents-pdf-texts.yml
+  /season-tickets/{seasonTicketId}/ticket-invitation-contents/PDF/images:
+    $ref: paths/season-tickets/season-ticket-ticket-invitation-contents-pdf-images.yml
+  /season-tickets/{seasonTicketId}/ticket-invitation-contents/PDF/images/languages/{language}/types/{type}:
+    $ref: paths/season-tickets/season-ticket-ticket-invitation-contents-pdf-image-delete.yml
+  /season-tickets/{seasonTicketId}/ticket-invitation-contents/PRINTER/texts:
+    $ref: paths/season-tickets/season-ticket-ticket-invitation-contents-printer-texts.yml
+  /season-tickets/{seasonTicketId}/ticket-invitation-contents/PRINTER/images:
+    $ref: paths/season-tickets/season-ticket-ticket-invitation-contents-printer-images.yml
+  /season-tickets/{seasonTicketId}/ticket-invitation-contents/PRINTER/images/languages/{language}/types/{type}:
+    $ref: paths/season-tickets/season-ticket-ticket-invitation-contents-printer-image-delete.yml
+  /season-tickets/{seasonTicketId}/surcharges:
+    $ref: paths/season-tickets/season-ticket-surcharges.yml
+  /season-tickets/renewals:
+    $ref: paths/season-tickets/season-ticket-entity-renewals.yml
+  /season-tickets/{seasonTicketId}/renewals/exports:
+    $ref: paths/season-tickets/season-ticket-renewals-export.yml
+  /season-tickets/renewals/exports/{exportId}:
+    $ref: paths/season-tickets/season-ticket-renewals-export-status.yml
+  /season-tickets/{seasonTicketId}/renewals:
+    $ref: paths/season-tickets/season-ticket-renewals.yml
+  /season-tickets/{seasonTicketId}/renewal-entities:
+    $ref: paths/season-tickets/season-ticket-renewal-entities.yml
+  /season-tickets/{seasonTicketId}/renewals/capacity-tree:
+    $ref: paths/season-tickets/season-ticket-renewals-capacity-tree.yml
+  /season-tickets/{seasonTicketId}/renewals/row/{rowId}/available-seats:
+    $ref: paths/season-tickets/season-ticket-renewals-row-available-seats.yml
+  /season-tickets/{seasonTicketId}/renewals/not-numbered-zone/{notNumberedZoneId}/available-seats:
+    $ref: paths/season-tickets/season-ticket-renewals-nnz-available-seats.yml
+  /season-tickets/{seasonTicketId}/renewal-candidates:
+    $ref: paths/season-tickets/season-ticket-renewal-candidates.yml
+  /season-tickets/{seasonTicketId}/renewals/{renewalId}:
+    $ref: paths/season-tickets/season-ticket-renewal.yml
+  /season-tickets/{seasonTicketId}/renewals/purge:
+    $ref: paths/season-tickets/season-ticket-renewals-purge.yml
+  /season-tickets/{seasonTicketId}/change-seats/prices:
+    $ref: paths/season-tickets/season-ticket-change-seats-prices.yml
+  /season-tickets/{seasonTicketId}/promotions:
+    $ref: paths/season-tickets/season-ticket-promotions.yml
+  /season-tickets/{seasonTicketId}/promotions/{promotionId}:
+    $ref: paths/season-tickets/season-ticket-promotion.yml
+  /season-tickets/{seasonTicketId}/promotions/{promotionId}/clone:
+    $ref: paths/season-tickets/season-ticket-promotion-clone.yml
+  /season-tickets/{seasonTicketId}/promotions/{promotionId}/channels:
+    $ref: paths/season-tickets/season-ticket-promotion-channels.yml
+  /season-tickets/{seasonTicketId}/promotions/{promotionId}/price-types:
+    $ref: paths/season-tickets/season-ticket-promotion-price-types.yml
+  /season-tickets/{seasonTicketId}/promotions/{promotionId}/rates:
+    $ref: paths/season-tickets/season-ticket-promotion-rates.yml
+  /season-tickets/{seasonTicketId}/promotions/{promotionId}/channel-contents/texts:
+    $ref: paths/season-tickets/season-ticket-promotions-channel-contents-texts.yml
+  /season-tickets/{seasonTicketId}/validations:
+    $ref: paths/season-tickets/season-ticket-validations.yml
+  /season-tickets/{seasonTicketId}/presales:
+    $ref: paths/season-tickets/season-ticket-presales.yml
+  /season-tickets/{seasonTicketId}/presales/{presaleId}:
+    $ref: paths/season-tickets/season-ticket-presale.yml
+  /season-tickets/{seasonTicketId}/rates/{rateId}/restrictions:
+    $ref: paths/season-tickets/rate-restrictions.yml
+  /season-tickets/{seasonTicketId}/rates/restrictions:
+    $ref: paths/season-tickets/restricted-rates.yml
+  /season-tickets/{seasonTicketId}/transfer-seat:
+    $ref: paths/season-tickets/transfer-seat.yml
+  /season-tickets/{seasonTicketId}/taxes:
+    $ref: paths/season-tickets/season-ticket-taxes.yml
+  /gateways:
+    $ref: paths/gateways/gateways.yml
+  /gateways/{gatewaySid}:
+    $ref: paths/gateways/gateway.yml
+  /integrations/auth-vendors:
+    $ref: paths/integrations/auth-vendors/auth-vendors.yml
+  /integrations/barcodes:
+    $ref: paths/integrations/barcodes/barcodes.yml
+  /passbook-templates:
+    $ref: paths/passbook/passbook-templates.yml
+  /passbook-templates/available-fields:
+    $ref: paths/passbook/passbook-available-fields.yml
+  /passbook-templates/available-data-placeholders:
+    $ref: paths/passbook/passbook-available-data-placeholders.yml
+  /passbook-templates/available-literals:
+    $ref: paths/passbook/passbook-available-literals.yml
+  /passbook-templates/{code}:
+    $ref: paths/passbook/passbook-template.yml
+  /passbook-templates/{code}/literals/{langCode}:
+    $ref: paths/passbook/passbook-template-literals.yml
+  /passbook-templates/{code}/preview:
+    $ref: paths/passbook/passbook-preview.yml
+  /access-control-systems:
+    $ref: paths/access-control-systems/access-control-systems.yml
+  /webhooks:
+    $ref: paths/notifications/notifications.yml
+  /webhooks/{documentId}:
+    $ref: paths/notifications/notification.yml
+  /webhooks/{documentId}/apikey/regenerate:
+    $ref: paths/notifications/notification-apikey.yml
+  /collectives:
+    $ref: paths/collectives/collectives.yml
+  /collectives/{collectiveId}:
+    $ref: paths/collectives/collective.yml
+  /collectives/{collectiveId}/external-validators:
+    $ref: paths/collectives/collective-external-validator.yml
+  /collectives/{collectiveId}/status:
+    $ref: paths/collectives/collective-status.yml
+  /collectives/{collectiveId}/entities:
+    $ref: paths/collectives/collective-entities.yml
+  /collectives/{collectiveId}/codes:
+    $ref: paths/collectives/collective-codes.yml
+  /collectives/{collectiveId}/codes/{code}:
+    $ref: paths/collectives/collective-code.yml
+  /collectives/{collectiveId}/codes/bulk:
+    $ref: paths/collectives/collective-codes-bulk.yml
+  /collectives/{collectiveId}/codes/bulk-unified:
+    $ref: paths/collectives/collective-codes-bulk-unified.yml
+  /collectives/{collectiveId}/codes/bulk-delete:
+    $ref: paths/collectives/collective-codes-bulk-delete.yml
+  /collectives/{collectiveId}/codes/exports:
+    $ref: paths/collectives/collective-codes-export.yml
+  /collectives/{collectiveId}/codes/exports/{exportId}:
+    $ref: paths/collectives/collective-codes-export-status.yml
+  /collectives/external-validators:
+    $ref: paths/collectives/external-validators.yml
+  /subscription-lists:
+    $ref: paths/subscription-list/subscriptions.yml
+  /subscription-lists/{subscriptionListId}:
+    $ref: paths/subscription-list/subscription.yml
+  /attendants-available-fields:
+    $ref: paths/events/event-available-fields.yml
+  /events/{eventId}/fields:
+    $ref: paths/events/event-fields.yml
+  /events/{eventId}/sessions/{sessionId}/restricted-price-types:
+    $ref: paths/sessions/session-restricted-price-types.yml
+  /venue-templates/{venueTemplateId}/restricted-price-types:
+    $ref: paths/venue-templates/venue-template-restricted-price-types.yml
+  /external-events:
+    $ref: paths/external-events/external-events-path.yml
+  /external-events/{internalId}/rates:
+    $ref: paths/external-events/external-event-rates-path.yml
+  /b2b/conditions/{groupType}:
+    $ref: paths/b2b/conditions.yml
+  /b2b/conditions/{groupType}/clients:
+    $ref: paths/b2b/clients-conditions.yml
+  /b2b/conditions/{groupType}/clients/{clientId}:
+    $ref: paths/b2b/client-conditions.yml
+  /b2b/clients:
+    $ref: paths/b2b/clients.yml
+  /b2b/clients/directory:
+    $ref: paths/b2b/clients-directory.yml
+  /b2b/clients/{clientId}:
+    $ref: paths/b2b/client.yml
+  /b2b/clients/{clientId}/balance:
+    $ref: paths/b2b/client-balance.yml
+  /b2b/clients/{clientId}/balance/transactions:
+    $ref: paths/b2b/client-transactions.yml
+  /b2b/clients/{clientId}/balance/transactions/exports:
+    $ref: paths/b2b/client-transactions-export.yml
+  /b2b/clients/{clientId}/balance/transactions/exports/{exportId}:
+    $ref: paths/b2b/client-transactions-export-check.yml
+  /b2b/clients/{clientId}/balance/operations/{operationType}:
+    $ref: paths/b2b/client-balance-operations.yml
+  /b2b/clients/{clientId}/users:
+    $ref: paths/b2b/client-users.yml
+  /b2b/clients/{clientId}/users/{clientUserId}:
+    $ref: paths/b2b/client-user.yml
+  /b2b/clients/{clientId}/users/{clientUserId}/apikey/refresh:
+    $ref: paths/b2b/client-user-apikey-refresh.yml
+  /b2b/clients/{clientId}/users/{clientUserId}/reset-password:
+    $ref: paths/b2b/client-user-reset-password.yml
+  /b2b/publishing/seats:
+    $ref: paths/b2b/publishing-seats.yml
+  /b2b/publishing/seats/{id}:
+    $ref: paths/b2b/publishing-seat.yml
+  /b2b/publishing/seats/filters/{filter}:
+    $ref: paths/b2b/publishing-seat-filter.yml
+  /b2b/publishing/seats/filters/sessions:
+    $ref: paths/b2b/publishing-seat-session-filter.yml
+  /b2b/publishing/seats/exports:
+    $ref: paths/b2b/publishing-seats-export.yml
+  /b2b/publishing/seats/exports/{exportId}:
+    $ref: paths/b2b/publishing-seats-export-status.yml
+  /channels/{channelId}/member-config:
+    $ref: paths/members-config/members-config.yml
+  /channels/{channelId}/member-config-charges:
+    $ref: paths/members-config/members-config-charges.yml
+  /channels/{channelId}/member-config/restrictions:
+    $ref: paths/members-config/restrictions.yml
+  /channels/{channelId}/member-config/restrictions/{sid}:
+    $ref: paths/members-config/restriction.yml
+  /channels/{channelId}/member-config/subscription-modes:
+    $ref: paths/members-config/subscription-modes.yml
+  /channels/{channelId}/member-config/subscription-modes/{sid}:
+    $ref: paths/members-config/subscription-mode.yml
+  /channels/{channelId}/member-config/subscription-modes/{sid}/communications:
+    $ref: paths/members-config/subscription-modes-communications.yml
+  /channels/{channelId}/member-config/membership:
+    $ref: paths/members-config/membership.yml
+  /channels/{channelId}/member-config/periodicities/{periodicityId}/communications:
+    $ref: paths/members-config/periodicity-communication.yml
+  /channels/{channelId}/member-config/roles/{roleId}/communications:
+    $ref: paths/members-config/role-communication.yml
+  /channels/{channelId}/member-config/capacities:
+    $ref: paths/members-config/capacities.yml
+  /channels/{channelId}/member-config/capacities/{id}:
+    $ref: paths/members-config/capacity.yml
+  /channels/{channelId}/member-config/emission-reasons:
+    $ref: paths/members-config/emission-reasons.yml
+  /channels/{channelId}/member-config/payment-modes:
+    $ref: paths/members-config/payment-modes.yml
+  /channels/{channelId}/capacity-mapping:
+    $ref: paths/members-config/entity-mapping.yml
+  /channels/{channelId}/member-config/dates-filter/{type}:
+    $ref: paths/members-config/dates-filter.yml
+  /onebox-invoicing:
+    $ref: paths/onebox-invoicing/onebox-invoicing.yml
+  /onebox-invoicing/entities-filter:
+    $ref: paths/onebox-invoicing/onebox-invoicing-entities-filter.yml
+  /onebox-invoicing/entities:
+    $ref: paths/onebox-invoicing/onebox-invoicing-entities.yml
+  /onebox-invoicing/entities/{entityId}:
+    $ref: paths/onebox-invoicing/onebox-invoicing-entity.yml
+  /onebox-invoicing/entities/{entityId}/type/{type}:
+    $ref: paths/onebox-invoicing/onebox-invoicing-entity-type.yml
+  /onebox-invoicing/entities/{entityId}/events:
+    $ref: paths/onebox-invoicing/onebox-invoicing-events.yml
+  /products:
+    $ref: paths/products/products-path.yml
+  /products/{productId}:
+    $ref: paths/products/product-path.yml
+  /products/{productId}/variants:
+    $ref: paths/products/product-variants-path.yml
+  /products/{productId}/variants/prices:
+    $ref: paths/products/update-product-variant-prices-path.yml
+  /products/{productId}/variants/{variantId}:
+    $ref: paths/products/product-variant-path.yml
+  /products-delivery-points:
+    $ref: paths/products/delivery-points-path.yml
+  /products-delivery-points/{deliveryPointId}:
+    $ref: paths/products/delivery-point-path.yml
+  /products/{productId}/languages:
+    $ref: paths/products/product-languages-path.yml
+  /products/{productId}/communication-elements/texts:
+    $ref: paths/products/product-communication-elements-texts-path.yml
+  /products/{productId}/communication-elements/images:
+    $ref: paths/products/product-communication-elements-images-path.yml
+  /products/{productId}/ticket-contents/PDF/texts:
+    $ref: paths/products/product-ticket-contents-pdf-texts-path.yml
+  /products/{productId}/ticket-contents/PDF/images:
+    $ref: paths/products/product-ticket-contents-pdf-images-path.yml
+  /products/{productId}/ticket-contents/PDF/images/languages/{language}:
+    $ref: paths/products/product-ticket-contents-pdf-image-delete-path.yml
+  /products/{productId}/ticket-contents/PASSBOOK/texts:
+    $ref: paths/products/product-ticket-contents-passbook-texts-path.yml
+  /products/{productId}/ticket-contents/PASSBOOK/images:
+    $ref: paths/products/product-ticket-contents-passbook-images-path.yml
+  /products/{productId}/ticket-contents/PASSBOOK/images/languages/{language}:
+    $ref: paths/products/product-ticket-contents-passbook-image-delete-path.yml
+  /product-ticket-templates/{productTicketTemplateId}/literals:
+    $ref: paths/products/product-ticket-templates-literals.yml
+  /products/{productId}/communication-elements/images/languages/{language}/types/{type}/positions/{position}:
+    $ref: paths/products/product-communication-elements-image-path.yml
+  /products/{productId}/channels:
+    $ref: paths/products/product-channels-path.yml
+  /products/{productId}/channels/{channelId}:
+    $ref: paths/products/product-channel-path.yml
+  /products/{productId}/channels/{channelId}/language/{language}/product-links:
+    $ref: paths/products/product-channel-language-product-links-path.yml
+  /products/{productId}/channels/{channelId}/request-approval:
+    $ref: paths/products/product-channel-request.yml
+  /products-sale-requests:
+    $ref: paths/channels/product-sale-requests/product-sale-requests.yml
+  /products-sale-requests/{saleRequestId}:
+    $ref: paths/channels/product-sale-requests/product-sale-request.yml
+  /products/{productId}/delivery:
+    $ref: paths/products/product-delivery-path.yml
+  /products/{productId}/events:
+    $ref: paths/products/product-events-path.yml
+  /products/{productId}/events/{eventId}:
+    $ref: paths/products/product-event-path.yml
+  /products/{productId}/events/{eventId}/publishing-sessions:
+    $ref: paths/products/product-publishing-sessions-path.yml
+  /products/{productId}/events/{eventId}/sessions:
+    $ref: paths/products/product-sessions-path.yml
+  /products/{productId}/events/{eventId}/sessions/{sessionId}:
+    $ref: paths/products/product-session-path.yml
+  /products/{productId}/delivery-points:
+    $ref: paths/products/product-delivery-point-relations-path.yml
+  /products/{productId}/delivery-points/{deliveryPointId}:
+    $ref: paths/products/product-delivery-point-relation-path.yml
+  /products/{productId}/attributes:
+    $ref: paths/products/product-attributes-path.yml
+  /products/{productId}/attributes/{attributeId}:
+    $ref: paths/products/product-attribute-path.yml
+  /products/{productId}/attributes/{attributeId}/values:
+    $ref: paths/products/product-attribute-values-path.yml
+  /products/{productId}/attributes/{attributeId}/values/{valueId}:
+    $ref: paths/products/product-attribute-value-path.yml
+  /products/{productId}/events/{eventId}/delivery-points:
+    $ref: paths/products/product-event-delivery-points-path.yml
+  /products/{productId}/events/{eventId}/session-delivery-points:
+    $ref: paths/products/product-session-delivery-points-path.yml
+  /products/{productId}/attributes/{attributeId}/channel-contents/texts:
+    $ref: paths/products/product-attribute-contents-path.yml
+  /products/{productId}/attributes/{attributeId}/values/{valueId}/channel-contents/texts:
+    $ref: paths/products/product-value-contents-path.yml
+  /products/{productId}/attributes/{attributeId}/values/channel-contents/texts:
+    $ref: paths/products/product-bulk-value-contents-path.yml
+  /products/{productId}/ticket-contents/languages/{language}:
+    $ref: paths/products/product-ticket-contents-path.yml
+  /products/{productId}/ticket-contents/languages/{language}/{key}:
+    $ref: paths/products/product-content-path.yml
+  /products/{productId}/promotions:
+    $ref: paths/products/product-promotions.yml
+  /products/{productId}/promotions/{promotionId}:
+    $ref: paths/products/product-promotion.yml
+  /products/{productId}/surcharges:
+    $ref: paths/products/product-surcharges.yml
+  /products/{productId}/ticket-templates:
+    $ref: paths/products/product-ticket-templates.yml
+  /products/{productId}/ticket-templates/{ticketType}/{templateFormat}:
+    $ref: paths/products/product-ticket-templates-atomic.yml
+  /events/{eventId}/avet-sector-restrictions:
+    $ref: paths/avet-sector-restrictions/avet-sector-restrictions.yml
+  /events/{eventId}/avet-sector-restrictions/{sid}:
+    $ref: paths/avet-sector-restrictions/avet-sector-restriction.yml
+  /events/{eventId}/avet-restrictions-dynamic-configuration:
+    $ref: paths/avet-sector-restrictions/restrictions-dynamic-configuration.yml
+  /terminals:
+    $ref: paths/terminals/terminals-path.yml
+  /terminals/{terminalId}:
+    $ref: paths/terminals/terminal-path.yml
+  /terminals/{terminalId}/regenerate-license:
+    $ref: paths/terminals/terminal-regenerate-license-path.yml
+  /donation-providers:
+    $ref: paths/donation-providers/donation-providers-path.yml
+  /season-tickets/{seasonTicketId}/customer-types:
+    $ref: paths/season-tickets/season-ticket-customer-types.yml
+  /insurers:
+    $ref: paths/insurance/insurers-path.yml
+  /insurers/{insurerId}:
+    $ref: paths/insurance/insurer-path.yml
+  /insurers/{insurerId}/policies:
+    $ref: paths/insurance/policies-path.yml
+  /insurers/{insurerId}/policies/{policyId}:
+    $ref: paths/insurance/policy-path.yml
+  /insurers/{insurerId}/policies/{policyId}/ranges:
+    $ref: paths/insurance/ranges-path.yml
+  /insurers/{insurerId}/policies/{policyId}/terms-conditions:
+    $ref: paths/insurance/terms-conditions-path.yml
+  /insurers/{insurerId}/policies/{policyId}/terms-conditions/{termsId}:
+    $ref: paths/insurance/term-condition-path.yml
+  /insurers/{insurerId}/policies/{policyId}/terms-conditions/{termsId}/file-content:
+    $ref: paths/insurance/terms-conditions-file-content-path.yml
+  /packs:
+    $ref: paths/packs/packs.yml
+  /packs/{packId}:
+    $ref: paths/packs/pack.yml
+  /packs/{packId}/items:
+    $ref: paths/packs/pack-items.yml
+  /packs/{packId}/items/{packItemId}:
+    $ref: paths/packs/pack-item.yml
+  /packs/{packId}/items/{packItemId}/price-types:
+    $ref: paths/packs/pack-item-price-types.yml
+  /packs/{packId}/items/{packItemId}/subitems:
+    $ref: paths/packs/pack-item-subitems.yml
+  /packs/{packId}/rates:
+    $ref: paths/packs/pack-rates.yml
+  /packs/{packId}/rates/refresh:
+    $ref: paths/packs/pack-rates-refresh.yml
+  /packs/{packId}/rates/{rateId}:
+    $ref: paths/packs/pack-rate.yml
+  /packs/{packId}/prices:
+    $ref: paths/packs/pack-prices.yml
+  /packs/{packId}/contents/texts:
+    $ref: paths/packs/pack-contents-texts.yml
+  /packs/{packId}/contents/images:
+    $ref: paths/packs/pack-contents-images.yml
+  /packs/{packId}/contents/images/languages/{language}/types/{type}:
+    $ref: paths/packs/pack-contents-image.yml
+  /packs/{packId}/ticket-contents/PDF/texts:
+    $ref: paths/packs/pack-ticket-contents-texts.yml
+  /packs/{packId}/ticket-contents/PDF/images:
+    $ref: paths/packs/pack-ticket-contents-PDF-images.yml
+  /packs/{packId}/ticket-contents/PDF/images/languages/{language}/types/{type}:
+    $ref: paths/packs/pack-ticket-contents-PDF-image.yml
+  /packs/{packId}/ticket-contents/Printer/texts:
+    $ref: paths/packs/pack-ticket-contents-texts.yml
+  /packs/{packId}/ticket-contents/Printer/images:
+    $ref: paths/packs/pack-ticket-contents-PRINTER-images.yml
+  /packs/{packId}/ticket-contents/Printer/images/languages/{language}/types/{type}:
+    $ref: paths/packs/pack-ticket-contents-PRINTER-image.yml
+  /packs/{packId}/channels:
+    $ref: paths/packs/pack-channels.yml
+  /packs/{packId}/channels/{channelId}:
+    $ref: paths/packs/pack-channel.yml
+  /packs/{packId}/channels/{channelId}/request-approval:
+    $ref: paths/packs/pack-channel-request.yml
+  /packs/{packId}/channels/{channelId}/funnel-urls:
+    $ref: paths/packs/pack-funnel-urls.yml
+  /channels/{channelId}/reviews:
+    $ref: paths/channels/reviews/channel-reviews.yml
+  /channels/{channelId}/reviews/config:
+    $ref: paths/channels/reviews/channel-reviews-config.yml
+  /channels/{channelId}/reviews/config/{scope}:
+    $ref: paths/channels/reviews/channel-reviews-config-scope.yml
+  /channels/{channelId}/reviews/config/{scope}/{scopeId}:
+    $ref: paths/channels/reviews/channel-reviews-config-scope-id.yml

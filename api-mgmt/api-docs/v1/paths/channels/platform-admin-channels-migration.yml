@@ -1,0 +1,67 @@
+post:
+  x-internal: true
+  summary: Migrate a portal to channels
+  description: ''
+  security:
+    - OAuth2: ['ROLE_SYS_MGR', 'ROLE_SYS_ANS']
+  tags:
+    - Channels
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Channel Id
+    - in: query
+      name: migrate_to_channels
+      x-internal: true
+      schema:
+        type: boolean
+      required: true
+      description: If false only configures the needed settings, if true migrates the channel too.
+    - in: query
+      name: stripe_hook_checked
+      schema:
+        type: boolean
+      description: if there is striped configured is necessary to confirm that the new hook has been created
+  responses:
+    '200':
+      description: 'Successful request'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

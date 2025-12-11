@@ -1,0 +1,202 @@
+get:
+  x-internal: true
+  summary: Get a venue space
+  description: 'Fetches a venue space by its ID'
+  security:
+    - OAuth2: ['ROLE_REC_MGR', 'ROLE_EVN_MGR', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Venue Spaces
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: venueId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Venue ID
+    - in: path
+      name: spaceId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Space ID
+  responses:
+    '200':
+      description: 'Success: Retrieves the requested venue space'
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/venue/space/venue-space-detail.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+put:
+  x-internal: true
+  summary: Update a venue space
+  description: 'Updates an existing venue space'
+  security:
+    - OAuth2: ['ROLE_REC_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Venue Spaces
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: venueId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Venue ID
+    - in: path
+      name: spaceId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Space ID
+  requestBody:
+    required : true
+    content:
+      application/json:
+        schema:
+          $ref: ../../../models/venue/space/venue-space-edition.yml
+  responses:
+    '204':
+      description: 'venue space updated successfully'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+delete:
+  x-internal: true
+  summary: Delete a venue space
+  description: 'Deletes a space by venue and ID'
+  security:
+    - OAuth2: ['ROLE_REC_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Venue Spaces
+  parameters:
+    - in: header
+      name: Authorization
+      schema:
+        type: string
+      required: true
+      description: Bearer Token
+    - in: path
+      name: venueId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Venue ID
+    - in: path
+      name: spaceId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Space ID
+  responses:
+    '204':
+      description: venue space successfully deleted
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml

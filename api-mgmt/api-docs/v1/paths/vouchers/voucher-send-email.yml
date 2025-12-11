@@ -1,0 +1,92 @@
+post:
+  x-internal: true
+  summary: Send voucher via email
+  description: Send information via email about the voucher (Only types Manual and Refund)
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Vouchers
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: voucherGroupId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Voucher Group ID
+    - in: path
+      name: code
+      schema:
+        type: string
+      required: true
+      description: Voucher Code
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            type:
+              type: string
+              description: Required in voucher group type refund
+              enum:
+                - BASIC
+                - REFUND
+            email:
+              type: string
+              description: If null type REFUND will get it from the refund order and BASIC from the voucher data
+            subject:
+              type: string
+              description: Only available and required in type Basic
+            body:
+              description: Only available and required in type Basic
+              type: string
+            language:
+              description: Only available and required in type Basic. IETF language tag standard
+              type: string
+  responses:
+    '204':
+      description: 'Send successfully'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

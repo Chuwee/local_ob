@@ -1,0 +1,95 @@
+get:
+  x-internal: true
+  summary: Get sale request price types
+  description: Get sale request price types by sale request ID
+  security:
+    - OAuth2: [ 'ROLE_CNL_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS' ]
+  tags:
+    - Catalog Sale Requests
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: saleRequestId
+      schema:
+        type: number
+        format: int64
+      required: true
+      description: Sale request ID
+    - in: query
+      name: limit
+      schema:
+        type: integer
+        maximum: 100
+        minimum: 0
+        default: 50
+      description: Limit
+    - in: query
+      name: offset
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Offset
+    - in: query
+      name: sort
+      description: Sorting of enum fields with format field:[asc|desc]. For example 'venue_template_name:desc'
+      schema:
+        type: string
+        enum:
+          - price_type_name
+          - venue_template_name
+    - in: query
+      name: q
+      schema:
+        type: string
+      description: Free search by price type name and venue template name
+  responses:
+    '200':
+      description: Array of price types
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            properties:
+              metadata:
+                $ref: ../../../models/common/responses/metadata.yml
+              data:
+                  type: array
+                  items:
+                    $ref: ../../../models/channels/catalog-sale-requests/sale-request-price-type.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml

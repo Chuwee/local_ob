@@ -1,0 +1,80 @@
+get:
+  x-internal: true
+  summary: Get channel filtered text contents
+  description: 'Obtain a list of filtered key/value pair for channel literals by selected key'
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Channel Contents
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: path
+      name: languageId
+      schema:
+        type: string
+      required: true      
+      description: Language ID
+    - in: path
+      name: key
+      schema:
+        type: string
+      required: true
+      description: Key value used to filter
+    - in: query
+      x-internal: true
+      name: channelVersion
+      schema:
+        type: string
+        enum:
+          - V1
+          - V2
+      required: false
+      description: In type Portal select old or new literals
+  responses:
+    '200':
+      description: 'Successful response'
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/channels/channel-text-contents.yml      
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

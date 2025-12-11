@@ -1,0 +1,124 @@
+post:
+   summary: Export session capacity
+   x-internal: true
+   description: 'Export session capacity'
+   security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']   
+   tags:
+   - Sessions
+   parameters:
+   -  in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Event ID
+   -  in: path
+      name: sessionId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Session ID
+   -  in: query
+      name: sector_ids
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+   -  in: query
+      name: view_ids
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+
+   requestBody:
+      content:
+         application/json:
+            schema:
+               type: object
+               required:
+               - fields
+               - format
+               properties:
+                  fields:
+                     type: array
+                     items:
+                        type: object
+                        required:
+                        - field
+                        properties:
+                           field:
+                              type: string
+                              enum:
+                              - row_map.seat_map.id
+                              - row_map.seat_map.status
+                              - row_map.seat_map.blocking_reason
+                              - row_map.sector
+                              - row_map.name
+                              - row_map.seat_map.name
+                              - not_numbered_zone_map.name
+                              - row_map.seat_map.price_type
+                              - row_map.seat_map.quota
+                              - row_map.seat_map.visibility
+                              - row_map.seat_map.accessibility
+                              - row_map.seat_map.gate
+                           name:
+                              type: string
+                              description: Custom header name
+                  format:
+                     type: string
+                     enum:
+                     - CSV
+                  delivery:
+                     type: object
+                     properties:
+                        type:
+                           type: string
+                           enum:
+                           - EMAIL
+                        properties:
+                          description: |
+                            Fields required by the delivery type.
+
+                            Valid properties to **EMAIL** type:
+                              - address: Email where report will be sent. Optional. Authenticated username will be used if address is not informed.
+                          type: object
+                          additionalProperties: { }
+                          example:
+                            address: 'user@email.com'
+                  translations:
+                    type: array
+                    items:
+                      $ref: ../../models/exports/translation.yml
+   responses:
+    '202':
+      $ref: ../../models/exports/export-response.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

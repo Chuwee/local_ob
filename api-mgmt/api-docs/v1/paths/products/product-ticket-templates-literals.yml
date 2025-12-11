@@ -1,0 +1,175 @@
+get:
+  summary: Get product ticket template literals
+  description: Returns the localized literals for a product ticket template. Defaults are merged with template-specific overrides.
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Product ticket templates
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: productTicketTemplateId
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      required: true
+      description: Product Ticket Template ID
+    - in: query
+      name: type
+      schema:
+        type: string
+      required: false
+      description: Literal element type to filter
+    - in: query
+      name: language
+      schema:
+        type: string
+      description: IETF language tag standard
+      required: false
+  responses:
+    '200':
+      description: Product ticket template literals
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/product-ticket-template/product-ticket-template-literals.yml
+          examples:
+            sample:
+              summary: Example literals
+              value:
+                title: "Entrada General"
+                gate: "Puerta 3"
+                date: "2025-10-07"
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '412':
+      description: Precondition Failed
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+post:
+  x-internal: true
+  summary: Create or update product ticket template literal contents
+  description: Create or update literal contents based on composed key between language and type
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Product ticket templates
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: productTicketTemplateId
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      required: true
+      description: Product Ticket Template ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            type: object
+            required:
+              - language
+              - type
+              - value
+            properties:
+              language:
+                type: string
+                description: IETF language tag standard
+                example: 'es-ES'
+              type:
+                type: string
+                description: Literal element type
+              value:
+                type: string
+                description: Element value
+  responses:
+    '204':
+      description: Saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '412':
+      description: Precondition failed
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

@@ -1,0 +1,32 @@
+package es.onebox.mgmt.datasources.ms.channel.salerequests.dto;
+
+import es.onebox.mgmt.salerequests.delivery.dto.TicketHandlingType;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.io.Serializable;
+
+public class SaleRequestDelivery implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private TicketHandlingType ticketHandling;
+
+    public TicketHandlingType getTicketHandling() {
+        return ticketHandling;
+    }
+
+    public void setTicketHandling(TicketHandlingType ticketHandling) {
+        this.ticketHandling = ticketHandling;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return EqualsBuilder.reflectionEquals(this, obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+}

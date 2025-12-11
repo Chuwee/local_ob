@@ -1,0 +1,85 @@
+post:
+  x-internal: true
+  summary: Unlink seats from a season ticket
+  description: Set selected seats as not linkable for a Season Ticket.
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Season Ticket Capacity
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Season Ticket ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            ids:
+              type: array
+              items:
+                type: integer
+                description: Seats ID to unlink
+  responses:
+    '200':
+      description: Saved successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              results:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      format: int64
+                      description: Seat ID from Season Ticket to unlink
+                    result:
+                      type: boolean
+                      description: Result of the operation
+                    reason:
+                      type: string
+                      description: Reason if the operation fails
+                      nullable: true
+                      enum:
+                        - SEAT_ALREADY_NOT_LINKED
+                        - SEAT_SOLD_IN_SEASON_TICKET
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: invalid token
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

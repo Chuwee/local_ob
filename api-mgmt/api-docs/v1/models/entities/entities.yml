@@ -1,0 +1,123 @@
+additionalProperties: false
+type: object
+required:
+  - metadata
+  - data
+properties:
+  metadata:
+    $ref: ../common/responses/metadata.yml
+  data:
+    type: array
+    items:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        short_name:
+          type: string
+        nif:
+          type: string
+        social_reason:
+          type: string
+        notes:
+          type: string
+        status:
+          $ref: 'entity-status.yml'
+        operator:
+          type: object
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+              nullable: true
+        contact:
+          $ref: 'entity-contact.yml'
+        invoice_data:
+          $ref: 'entity-invoice-data.yml'
+        external_reference:
+          type: string
+        settings:
+          type: object
+          required:
+            - types
+            - notifications
+            - enable_multievent_cart
+            - allow_activity_events
+            - allow_avet_integration
+            - allow_secondary_market
+            - enable_B2B
+            - allow_data_protection_fields
+            - allow_members
+            - allow_digital_season_ticket
+            - bi_users
+          properties:
+            types:
+              type: array
+              items:
+                $ref: 'entity-type.yml'
+            languages:
+              type: object
+              required:
+                - default
+                - available
+              properties:
+                default:
+                  type: string
+                  description: IETF language tag standard
+                  example: es-ES
+                available:
+                  type: array
+                  items:
+                    type: string
+                    description: IETF language tag standard
+                    example: es-ES
+            enable_multievent_cart:
+              type: boolean
+            allow_activity_events:
+              type: boolean
+            allow_avet_integration:
+              x-internal: true
+              type: boolean
+            allow_vip_views:
+              type: boolean
+              description: This flag allows vip views for graphic venues
+            allow_members:
+              type: boolean
+            allow_digital_season_ticket:
+              description: Allows entity to generate digital season tickets (allow_avet_integration is required to activate this setting)
+              type: boolean
+            allow_config_multiple_templates:
+              type: boolean
+            notifications:
+              $ref: entity-notifications-settings.yml
+            customization:
+              x-internal: true
+              $ref: entity-customization-settings.yml
+            bi_users:
+              x-internal: true
+              type: object
+              required:
+                - advanced_permissions_limit
+                - basic_permissions_limit
+              properties:
+                advanced_permissions_limit:
+                  description: Number of possible advanced BI users in the entity
+                  type: number
+                basic_permissions_limit:
+                  description: Number of possible basic BI users in the entity
+                  type: number
+            customers:
+              type: object
+              properties:
+                auto_assign_orders:
+                  type: boolean
+                  description: Assign orders automatically to customer after customer creation or commit order using the email on the buyer data

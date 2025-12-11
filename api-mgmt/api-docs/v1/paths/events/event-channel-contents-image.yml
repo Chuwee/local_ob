@@ -1,0 +1,77 @@
+delete:
+  summary: Delete event channel image contents
+  description: Delete based on composed key between language, type and position
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Event channel contents
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: path
+      name: language
+      schema:
+        type: string
+      required: true
+      description: IETF language tag standard
+    - in: path
+      name: type
+      schema:
+        type: string
+      required: true
+      description: Image type code (MAIN, SECONDARY, LANDSCAPE)
+    - in: query
+      name: position
+      schema:
+        type: integer
+      required: false
+      description: Optional param required for LANDSCAPE type
+  responses:
+    '204':
+      description: Deleted successfully
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

@@ -1,0 +1,68 @@
+post:
+  x-internal: true
+  summary: Relocate capacity seats
+  description: Relocate the order of the provided source seats to the provided destination free seats
+  security:
+    - OAuth2: ['ROLE_REC_MGR', 'ROLE_ENT_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Session capacity
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Event ID
+    - in: path
+      name: sessionId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Session ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/session/session-capacity-relocation-request.yml
+  responses:
+    '202':
+      description: Link request accepted and enqueued successfully, will be processed asynchronously.
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Invalid token
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

@@ -1,0 +1,59 @@
+put:
+  x-internal: true
+  summary: Update sale request status
+  tags:
+    - Catalog Sale Requests
+  parameters:
+    - in: path
+      name: saleRequestId
+      description: Sale request ID
+      schema:
+        type: integer
+        format: int64
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+          properties:
+            status:
+              $ref: '../../../models/channels/catalog-sale-requests/sale-request-status.yml'
+  responses:
+    '200':
+      description: Sale request successfully updated
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            properties:
+              status:
+                $ref: '../../../models/channels/catalog-sale-requests/sale-request-status.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '404':
+      description: Sale Request not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'

@@ -1,0 +1,86 @@
+post:
+  x-internal: true
+  summary: Create channel gateway configuration
+  description: Create a channel gateway configuration
+  security:
+    - OAuth2:
+        - 'ROLE_OPR_MGR'
+  tags:
+    - Gateways
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+      required: true
+      description: Channel ID
+    - in: path
+      name: gatewaySid
+      schema:
+        type: string
+      required: true
+      description: Gateway ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/channels/channel-gateway-create.yml
+  responses:
+    '200':
+      description: Configuration sid generated
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              configSid:
+                type: string
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '412':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

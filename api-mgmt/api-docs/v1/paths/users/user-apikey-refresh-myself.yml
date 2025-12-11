@@ -1,0 +1,41 @@
+post:
+  x-internal: true
+  summary: Refresh auth user apikey
+  description: Refresh auth user apikey
+  tags:
+    - Myself
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+  responses:
+    '200':
+      description: Apikey successfully refreshed
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            required:
+              - apikey
+            properties:
+              id:
+                type: integer
+                format: int64
+              apikey:
+                type: string
+    '404':
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

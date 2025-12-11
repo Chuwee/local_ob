@@ -1,0 +1,146 @@
+post:
+  x-internal: true
+  summary: Add channel suggestions
+  security:
+    - OAuth2: [ 'ROLE_CNL_MGR', 'ROLE_OPR_MGR' ]
+  tags:
+    - Suggestions
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      description: Channel ID
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: path
+      name: SOURCE_TYPE
+      schema:
+        $ref: '../../../models/channels/suggestions/suggestion-type.yml'
+      required: true
+    - in: path
+      name: sourceId
+      description: ID of the source
+      schema:
+        type: integer
+        format: int64
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../../models/channels/suggestions/channel-suggestion-post.yml'
+  responses:
+    '201':
+      description: Suggestions added successfully
+    '400':
+      description: Bad parameter
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error-auth.yml'
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '404':
+      description: Channel not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+delete:
+  x-internal: true
+  summary: Delete all channel suggestions of a source
+  description: Delete all channel suggestions by id and type of the source
+  security:
+    - OAuth2: [ 'ROLE_CNL_MGR', 'ROLE_OPR_MGR' ]
+  tags:
+    - Suggestions
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      description: Channel ID
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: path
+      name: SOURCE_TYPE
+      schema:
+        description: The type of the source ID element
+        $ref: '../../../models/channels/suggestions/suggestion-type.yml'
+      required: true
+    - in: path
+      name: sourceId
+      description: The ID of the source element of the suggestion
+      schema:
+        type: integer
+        format: int64
+      required: true
+  responses:
+    '204':
+      description: Suggestion deleted successfully
+    '400':
+      description: Bad parameter
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error-auth.yml'
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '404':
+      description: Channel not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../../models/common/error.yml'

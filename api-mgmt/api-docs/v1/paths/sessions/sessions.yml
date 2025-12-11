@@ -1,0 +1,251 @@
+get:
+  summary: Search sessions
+  description: ''
+  security:
+    - OAuth2: [ 'ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS' ]
+  tags:
+    - Sessions
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Event ID
+    - in: query
+      name: id
+      style: form
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+      description: Id of a session
+    - in: query
+      name: status
+      description: The status of the session
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../models/session/session-status.yml
+    - in: query
+      name: type
+      description: The type of the event
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../models/session/session-type.yml
+    - in: query
+      name: venue_template_id
+      schema:
+        type: integer
+        format: int64
+      description: Venue template ID
+    - in: query
+      name: start_date
+      description: Filter sessions for start_date with date-time format. Optional operators could be used as prefix of value with ':' separator (url encoded as ``%3A``). Supported operators are ``eq``, ``ne``, ``gt``, ``gte``, ``lt``, ``lte``
+      example: eq:2019-01-01T08:00:00Z
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: end_date
+      description: Filter sessions for end_date with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as ``%3A``). Supported operators are ``eq``, ``ne``, ``gt``, ``gte``, ``lt``, ``lte``
+      example: gte:2019-01-01T08:00:00Z
+      schema:
+        type: string
+    - in: query
+      name: day_of_week
+      description: Filter session by the day of week of the session's beggining date.
+      example: TUESDAY,FRIDAY,SUNDAY
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../models/session/day-of-week.yml
+    - in: query
+      name: timezone
+      description: Provides the time zone reference for day_of_week filter.
+      example: Europe/Brussels
+      schema:
+        type: string
+    - in: query
+      name: hour_range
+      description: |
+        Filter sessions by defining a range for the session's beggining date.
+        <p>Hour ranges available with the specific format [time from]::[time to]</p>
+        <ul>
+        <li>  time: The format for the time of day correponds to the ISO 8601. Is mandatory to include the timezone.</li>
+        </ul>
+      example: 10:30:00+01:00::14:50:00+01:00
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: get_queueit_info
+      description: Define whether to get queue-it information
+      schema:
+        type: boolean
+    - in: query
+      name: include_dynamic_price_config
+      description: Define whether to include dynamic price configuration in the response
+      schema:
+        type: boolean
+    - in: query
+      name: q
+      description: Free search for sessions by name
+      schema:
+        type: string
+    - in: query
+      name: fields
+      description: |
+        Response will contain only the id and the selected fields
+        
+        Field:
+          * `status.flags` - returns `sale`and `release` session properties
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../../models/session/session-filter-field.yml
+    - in: query
+      name: sort
+      description: Sorting of enum fields with format field:[asc|desc]. For example 'name:desc'
+      schema:
+        $ref: ../../models/session/session-sort-field.yml
+    - in: query
+      name: limit
+      schema:
+        type: integer
+      description: Limit (default 50, max 1000)
+    - in: query
+      name: offset
+      schema:
+        type: integer
+      description: Offset (default 0)
+  responses:
+    '200':
+      description: Array of sessions
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ./../../models/common/responses/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: ../../models/session/base-session.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  summary: New session
+  description: ''
+  security:
+    - OAuth2: [ 'ROLE_EVN_MGR', 'ROLE_OPR_MGR' ]
+  tags:
+    - Sessions
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Event ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/session/session-create.yml
+  responses:
+    '201':
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+    '400':
+      description: bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Invalid token
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

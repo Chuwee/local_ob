@@ -1,0 +1,90 @@
+additionalProperties: false
+type: object
+required:
+  - id
+  - name
+  - public
+  - status
+  - entity
+  - type
+  - settings
+properties:
+  id:
+    type: integer
+  name:
+    type: string
+  public:
+    type: boolean
+  build:
+    $ref: ./channel-build.yml
+  status:
+    $ref: ./channel-status.yml
+  entity:
+    type: object
+    required:
+      - id
+      - name
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      logo:
+        type: string
+  type:
+    $ref: ./channel-type.yml
+  whitelabel_type:
+    $ref: ../channels/whitelabel-type.yml
+  force_square_pictures:
+    description: Flag that indicates whether it is mandatory to use square images (only for external whitelabels)
+    type: boolean
+  whitelabel_path:
+    type: string
+    description: 'Available for external white label channels'
+  domain:
+    type: string
+  url:
+    type: string
+  languages:
+    type: object
+    properties:
+      default:
+        type: string
+        description: IETF language tag standard
+        example: es-ES
+      selected:
+        type: array
+        items:
+          type: string
+          description: IETF language tag standard
+          example: es-ES
+  virtual_queue:
+    type: object
+    description: Queue configuration for channels type PORTAL_SUBSCRIBERS (with portal build STH) and AVET
+    properties:
+      active:
+        type: boolean
+      alias:
+        type: string
+  contact:
+    $ref: ./channel-contact.yml
+  limits:
+    $ref: channel-limits.yml
+  settings:
+    $ref: channel-settings.yml
+  currencies:
+    type: array
+    items:
+      type: object
+      properties:
+        code:
+          type: string
+          description: ISO 3166 codes
+        name:
+          type: string
+  use_currency_exchange:
+    x-internal: true
+    type: boolean
+  currency_default_exchange:
+    x-internal: true
+    type: string

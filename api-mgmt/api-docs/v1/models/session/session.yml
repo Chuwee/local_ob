@@ -1,0 +1,150 @@
+additionalProperties: false
+type: object
+required:
+  - id
+  - name
+  - type
+  - status
+  - release
+  - sale
+  - event
+  - entity
+  - settings
+  - venue_template
+  - start_date
+  - generation_status
+  - release_enabled
+  - updating_capacity
+  - generating_capacity
+  - archived
+  - has_sales
+properties:
+  id:
+    type: integer
+    format: int64
+  name:
+    type: string
+  status:
+    $ref: 'session-status.yml'
+  generation_status:
+    $ref: 'session-generation-status.yml'
+  release:
+    $ref: 'session-release.yml'
+  sale:
+    $ref: 'session-sale.yml'
+  type:
+    $ref: 'session-type.yml'
+  start_date:
+    type: string
+    format: date-time
+  end_date:
+    type: string
+    format: date-time
+  event:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+  entity:
+    type: object
+    required:
+      - id
+      - name
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+  venue_template:
+    type: object
+    required:
+      - id
+      - name
+      - capacity
+      - graphic
+      - venue
+      - space
+      - type
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      capacity:
+        type: integer
+      graphic:
+        type: boolean
+      type:
+        type: string
+        enum:
+          - NORMAL
+          - AVET
+          - ACTIVITY
+      space:
+        type: object
+        required:
+          - id
+          - name
+        properties:
+          id:
+            type: integer
+          name:
+            type: string
+      venue:
+        type: object
+        required:
+          - id
+          - name
+          - city
+          - country
+          - timezone
+        properties:
+          id:
+            type: integer
+          name:
+            type: string
+          city:
+            type: string
+          country:
+            type: string
+            description: ISO 3166 codes
+          timezone:
+            type: string
+            description: The standard olson id of the timezone
+            example: Europe/Berlin
+  session_ids:
+    type: array
+    items:
+      type: number
+      format: int64
+    description: For type ``SESSION`` return session packs linked to this session, otherwise, for pack session return linked sessions
+    nullable: true
+  settings:
+    $ref: session-settings.yml
+  reference:
+    type: string
+  external_reference:
+    type: string
+  has_sales:
+    type: boolean
+  publication_cancelled_reason:
+    type: string
+  release_enabled:
+    type: boolean
+  updating_capacity:
+    type: boolean
+  generating_capacity:
+    type: boolean
+  archived:
+    type: boolean
+  external_data:
+    type: object
+    properties:
+      match_id:
+        type: integer
+      match_name:
+        type: string
+      smart_booking_contingency:
+        type: boolean

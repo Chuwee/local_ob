@@ -1,0 +1,209 @@
+get:
+  x-internal: true
+  summary: Search Sessions related to Season Tickets
+  description: ''
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Season Ticket Sessions
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Season Ticket ID
+    - in: query
+      name: sort
+      description: Sorting of enum fields with format field:[asc|desc]. For example 'name:desc'
+      schema:
+        type: string
+        enum:
+          - event_name
+          - session_name
+          - session_starting_date
+    - in: query
+      name: event_id
+      description: Filter by an eventId
+      schema:
+        type: integer
+        format: int64
+    - in: query
+      name: q
+      description: Free search field to search by session or event name
+      schema:
+        type: string
+    - in: query
+      name: status
+      description: Filter by the assignation status of a session
+      schema:
+        type: string
+        enum:
+          - ASSIGNED
+          - NOT_ASSIGNED
+    - in: query
+      name: start_date
+      description: Filter events for start_date with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as ``%3A``). Supported operators are ``gte``, ``lte``
+      example: gte:2020-05-09T22:00:00Z,lte:2020-05-12T21:59:59Z
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: limit
+      schema:
+        type: integer
+      description: Limit (default 20, max 1000)
+    - in: query
+      name: offset
+      schema:
+        type: integer
+      description: Offset (default 0)
+  responses:
+    '200':
+      description: Object with pagination description and an array of season ticket sessions
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../models/common/responses/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: ../../models/season-ticket/season-ticket-session.yml
+              summary:
+                type: object
+                properties:
+                  assigned_sessions:
+                    type: integer
+                    description: Number of assigned sessions to this Season Ticket
+                  sessions_on_sale:
+                    type: integer
+                    description: Number of sessions on sale state for unfiltered list
+                  listed_events:
+                    type: integer
+                    description: Number of different events for unfiltered list
+                  total_sessions:
+                    type: integer
+                    description: Number of different sessions for unfiltered list
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  x-internal: true
+  summary: Validate and assign sessions compatible to Season Tickets
+  description: 'Validate and assign sessions compatible to Season Tickets'
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Season Ticket Sessions
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Season Ticket ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            sessions:
+              description: List of session IDs
+              type: array
+              items:
+                 type: integer
+                 format: int64
+            update_barcodes:
+              type: boolean
+              description: If true or null, update sold season ticket barcodes
+  responses:
+    '200':
+      description: Object with an array of session assignation
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              result:
+                type: array
+                items:
+                  $ref: ../../models/season-ticket/season-ticket-session-assign.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

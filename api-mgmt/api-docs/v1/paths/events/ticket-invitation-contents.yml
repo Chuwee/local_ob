@@ -1,0 +1,85 @@
+get:
+  x-internal: true
+  summary: Ticket inivtation contents
+  description: ''
+  tags:
+    - Event invitation contents
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: query
+      name: language
+      description: IETF language tag standard
+      schema:
+        type: string
+      example: es-ES
+    - in: query
+      name: type
+      description: Element type
+      schema:
+        $ref: ../../models/comm-element/element-type.yml
+  responses:
+    '200':
+      description: Array of comm elements
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                type:
+                  $ref: ../../models/comm-element/element-type.yml
+                language:
+                  type: string
+                property_type:
+                  $ref: ../../models/comm-element/property-type.yml
+                property:
+                  type: string
+                  description: 'key identifier'
+                  example: 'TITLE'
+                value:
+                  type: any
+                  description: |
+                    Element value. For `IMAGE` property type, this value is an URL.
+                    For `IMAGE_MULTI` types, this value is an array.
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

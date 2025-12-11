@@ -1,0 +1,115 @@
+get:
+  x-internal: true
+  summary: Get channel CORS settings
+  description: Get channel CORS settings by ID
+  security:
+    - OAuth2: ['ROLE_SYS_MGR', 'ROLE_SYS_ANS']
+  tags:
+    - Domain Settings
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      description: Channel ID
+      schema:
+        type: integer
+        format: int64
+      required: true
+  responses:
+    '200':
+      description: Successfully response
+      content:
+        application/json:
+          schema:
+            $ref: "../../../models/channels/cors-setting.yml"
+    '404':
+      description: Channel or cors settings not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+post:
+  x-internal: true
+  summary: Upsert channel cors settings
+  description: Create or update channel CORS settings by ID
+  security:
+    - OAuth2: ['ROLE_SYS_MGR']
+  tags:
+    - Domain Settings
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      description: Channel ID
+      schema:
+        type: integer
+        format: int64
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../../models/channels/cors-setting.yml"
+  responses:
+    '204':
+      description: Channel cors settings created or updated successfully
+    '400':
+      description: Bad parameter
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Channel not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+delete:
+  x-internal: true
+  summary: Disable cors settings
+  description: Disable channel CORS settings by ID
+  security:
+    - OAuth2: ['ROLE_SYS_MGR']
+  tags:
+    - Domain Settings
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      description: Channel ID
+      schema:
+        type: integer
+        format: int64
+      required: true
+  responses:
+    '204':
+      description: Channel cors settings disabled successfully
+    '400':
+      description: Bad parameter
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml
+    '404':
+      description: Channel not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../../models/common/error.yml

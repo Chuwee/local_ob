@@ -1,0 +1,186 @@
+get:
+  x-internal: true
+  summary: Get packs
+  description: Get packs
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Packs
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: entity_id
+      schema:
+        type: integer
+        format: int64
+      description: Entity ID (only for user ``ROLE_OPR_MGR``)
+    - in: query
+      name: entity_admin_id
+      x-internal: true
+      schema:
+        type: integer
+        format: int64
+      description: Entity Admin Id (only for user ``ROLE_OPR_MGR``)
+    - in: query
+      name: operator_id
+      schema:
+        type: integer
+        format: int64
+      description: Operator ID (only useful for multioperator users)
+    - in: query
+      name: event_id
+      schema:
+        type: integer
+        format: int64
+      description: event ID
+    - in: query
+      name: status
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
+      description: pack status
+    - in: query
+      name: q
+      schema:
+        type: string
+      description: Search the name of the pack (can be partial)
+    - in: query
+      name: sort
+      schema:
+        type: string
+        enum: [id, name]
+      description: Sorting of enum fields with format field:[asc|desc]. For example 'name:desc'
+    - in: query
+      name: offset
+      schema:
+        type: integer
+    - in: query
+      name: limit
+      schema:
+        type: integer
+  responses:
+    '200':
+      description: Packs
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - metadata
+              - data
+            properties:
+              metadata:
+                $ref: ./../../models/common/responses/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: ../../models/packs/packs.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+post:
+  x-internal: true
+  summary: Create pack
+  description: Create pack
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Packs
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/packs/pack-create.yml
+  responses:
+    '201':
+      description: Pack created
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/packs/pack.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

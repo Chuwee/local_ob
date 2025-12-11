@@ -1,0 +1,150 @@
+get:
+  x-internal: true
+  summary: Get channel custom resource assets
+  security:
+    - OAuth2: [ 'ROLE_OPR_MGR' ]
+  tags:
+    - Channel Custom Resources
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      description: Channel ID
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: query
+      name: offset
+      schema:
+        type: integer
+    - in: query
+      name: limit
+      schema:
+        type: integer
+    - in: query
+      name: q
+      schema:
+        type: string
+        description: Search by filename
+  responses:
+    '200':
+      description: 'Successful response'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/channels/channel-custom-resource-assets-response.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error-auth.yml'
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '405':
+      description: Method not allowed
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+post:
+  x-internal: true
+  summary: Add channel custom resource assets
+  description: Add channel custom resources assets to be used in the new portal (channels)
+  security:
+    - OAuth2: [ 'ROLE_OPR_MGR' ]
+  tags:
+    - Channel Custom Resources
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Channel ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../models/channels/channel-custom-resource-assets-post.yml'
+  responses:
+    '201':
+      description: Assets added
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error-auth.yml'
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '405':
+      description: Method not allowed
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'

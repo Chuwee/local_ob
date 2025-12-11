@@ -1,0 +1,77 @@
+additionalProperties: false
+type: object
+required:
+  - name
+  - texts
+properties:
+  id:
+    type: integer
+    format: int64
+  entity_id:
+    type: integer
+  name:
+    type: string
+  texts:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          en-US: Attribute
+          es-ES: Atributo
+      values:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            value:
+              type: object
+              additionalProperties:
+                type: string
+              example:
+                en-US: Attribute value
+                es-ES: Valor atributo
+  code:
+    type: string
+    nullable: true
+  scope:
+    type: string
+    enum:
+      - EVENT
+      - SESSION
+      - GROUP
+      - PROFILE
+  type:
+    type: string
+    enum:
+      - NUMERIC
+      - ALPHANUMERIC
+      - DEFINED
+  selection_type:
+    type: string
+    nullable: true
+    enum:
+      - SINGLE
+      - MULTIPLE
+    description: Only when the attribute type is ``DEFINED``
+  min:
+    type: integer
+  max:
+    type: integer
+  value:
+    type: string
+    nullable: true
+    description: Only when the attribute type are ``NUMERIC`` or ``ALPHANUMERIC``
+  selected:
+    type: array
+    items:
+      type: integer
+    description: Only when the attribute type is ``DEFINED``

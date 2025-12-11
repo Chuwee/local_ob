@@ -1,0 +1,64 @@
+package es.onebox.mgmt.datasources.integration.dispatcher.dto;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.List;
+
+public class AvailabilitySumary implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 4300244960554577372L;
+
+    @JsonProperty("capacity_id")
+    private Integer capacityId;
+
+    @JsonProperty("total_availability")
+    private Integer totalAvailability;
+
+    private List<AvailabilityArea> areas;
+
+    public Integer getCapacityId() {
+        return capacityId;
+    }
+
+    public void setCapacityId(Integer capacityId) {
+        this.capacityId = capacityId;
+    }
+
+    public Integer getTotalAvailability() {
+        return totalAvailability;
+    }
+
+    public void setTotalAvailability(Integer totalAvailability) {
+        this.totalAvailability = totalAvailability;
+    }
+
+    public List<AvailabilityArea> getAreas() {
+        return areas;
+    }
+
+    public void setAreas(List<AvailabilityArea> areas) {
+        this.areas = areas;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return EqualsBuilder.reflectionEquals(this, obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
+    }
+}

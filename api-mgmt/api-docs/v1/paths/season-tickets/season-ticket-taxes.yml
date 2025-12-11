@@ -1,0 +1,70 @@
+get:
+  tags:
+    - Season Ticket Taxes
+  summary: Get season ticket taxes
+  description: Retrieves the tax configuration for a season ticket
+  operationId: getSeasonTicketTaxes
+  security:
+    - OAuth2:
+        - ROLE_EVN_MGR
+        - ROLE_ENT_ANS
+        - ROLE_OPR_MGR
+        - ROLE_OPR_ANS
+  parameters:
+    - name: seasonTicketId
+      in: path
+      description: Season ticket ID
+      required: true
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '200':
+      description: Season ticket taxes retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/season-ticket/season-ticket-tax.yml'
+    '401':
+      description: Unauthorized
+    '403':
+      description: Forbidden
+    '404':
+      description: Season ticket not found
+put:
+  tags:
+    - Season Ticket Taxes
+  summary: Update season ticket taxes
+  description: Updates the tax configuration for a season ticket
+  operationId: updateSeasonTicketTaxes
+  security:
+    - OAuth2:
+        - ROLE_EVN_MGR
+        - ROLE_OPR_MGR
+  parameters:
+    - name: seasonTicketId
+      in: path
+      description: Season ticket ID
+      required: true
+      schema:
+        type: integer
+        format: int64
+  requestBody:
+    description: Tax configuration to update
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../models/season-ticket/season-ticket-tax.yml'
+  responses:
+    '204':
+      description: Season ticket taxes updated successfully
+    '400':
+      description: Invalid tax IDs provided
+    '401':
+      description: Unauthorized
+    '403':
+      description: Forbidden
+    '404':
+      description: Season ticket not found
+

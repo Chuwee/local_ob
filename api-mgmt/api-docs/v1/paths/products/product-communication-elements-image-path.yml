@@ -1,0 +1,73 @@
+delete:
+  x-internal: true
+  summary: Delete a product communication element by product ID, language and type
+  description: Delete a product communication element by product id, language and type
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Products
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: productId
+      schema:
+        type: integer
+      required: true
+      description: Product ID
+    - in: path
+      name: language
+      schema:
+        type: string
+      required: true
+      description: Language code
+    - in: path
+      name: type
+      schema:
+        type: string
+      required: true
+      description: Image type
+    - in: path
+      name: position
+      schema:
+        type: integer
+      required: true
+      description: Image position
+  responses:
+    '204':
+      description: Delete a product communication element
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+

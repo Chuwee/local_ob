@@ -1,0 +1,216 @@
+post:
+  summary: Export publishing seats
+  x-internal: true
+  security:
+    - OAuth2: ['ROLE_ENT_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS', 'ROLE_ENT_ADMIN']
+  tags:
+    - B2B Publishing
+  parameters:
+    - in: query
+      name: operatorId
+      schema:
+        type: integer
+        format: int64
+      description: "Unique identifier for the operator"
+
+    - in: query
+      name: entity_ids
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+      description: "List of entity IDs to filter by"
+
+    - in: query
+      name: channel_ids
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+      description: "List of channel IDs to filter by"
+
+    - in: query
+      name: client_entity_ids
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+      description: "List of client entity IDs to filter by"
+
+    - in: query
+      name: client_ids
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+      description: "List of client IDs to filter by"
+
+    - in: query
+      name: event_ids
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+      description: "List of event IDs to filter by"
+
+    - in: query
+      name: session_ids
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+      description: "List of session IDs to filter by"
+
+    - in: query
+      name: types
+      schema:
+        type: array
+        items:
+          type: string
+      description: "Transaction types to filter by"
+
+    - in: query
+      name: date_from
+      schema:
+        type: string
+        format: date-time
+      description: "Start date for the filter range"
+
+    - in: query
+      name: date_to
+      schema:
+        type: string
+        format: date-time
+      description: "End date for the filter range"
+
+    - in: query
+      name: q
+      schema:
+        type: string
+      description: "Search query to filter results"
+
+    - in: query
+      name: sort
+      schema:
+        type: string
+      description: "Sort order and field"
+
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - fields
+            - format
+          properties:
+            fields:
+              type: array
+              items:
+                type: object
+                required:
+                  - field
+                properties:
+                  field:
+                    type: string
+                    enum:
+                      - event.name
+                      - event.id
+                      - session.name
+                      - session.id
+                      - session.date
+                      - channel.name
+                      - channel.id
+                      - venue.name
+                      - sector.name
+                      - row.name
+                      - seat.name
+                      - transaction.type
+                      - transaction.date
+                      - client.name
+                      - client.id
+                      - client.entityId
+                      - user.name
+                      - user.id
+                      - user.publisherType
+                      - price.base
+                      - price.final
+                      - promo.isAutomatic
+                      - promo.promotion
+                      - promo.discount
+                      - promo.channel.isAutomatic
+                      - promo.channel.collective
+                      - charge.channel
+                      - charge.promoter
+                      - charge.promoterChannel
+                      - charge.reallocation
+                      - fee.ids
+                      - fee.names
+                      - fee.isUnitary
+                      - fee.values
+                      - commission.ids
+                      - commission.names
+                      - commission.values
+                      - order.code
+                      - order.date
+                  name:
+                    type: string
+                    description: Custom header name
+            format:
+              type: string
+              enum:
+                - CSV
+            delivery:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - EMAIL
+                properties:
+                  description: |
+                    Fields required by the delivery type.
+                    
+                    Valid properties to **EMAIL** type:
+                      - address: Email where report will be sent. Optional. Authenticated username will be used if address is not informed.
+                  type: object
+                  additionalProperties: { }
+                  example:
+                    address: 'user@email.com'
+            translations:
+              type: array
+              items:
+                $ref: ../../models/exports/translation.yml
+  responses:
+    '202':
+      $ref: ../../models/exports/export-response.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

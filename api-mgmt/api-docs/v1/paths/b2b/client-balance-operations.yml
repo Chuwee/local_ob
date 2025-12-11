@@ -1,0 +1,70 @@
+post:
+  x-internal: true
+  summary: Perform balance operation
+  description: ''
+  security:
+    - OAuth2: ['ROLE_ENT_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Balance
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: clientId
+      description: The client id
+      schema:
+        type: integer
+      required: true
+    - in: path
+      name: operationType
+      description: Operation to perform
+      schema:
+        type: string
+        enum:
+          - DEPOSIT
+          - CREDIT_LIMIT
+          - CASH_ADJUSTMENT
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/b2b/balance-operation.yml
+  responses:
+    '204':
+      description: Operation performed
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

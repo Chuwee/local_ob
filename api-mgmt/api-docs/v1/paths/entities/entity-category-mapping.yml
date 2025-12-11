@@ -1,0 +1,118 @@
+get:
+  summary: Get entity category mapping
+  description: Get entity category mapping between base categories and custom categories
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_CNL_MGR', 'ROLE_ENT_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Categories
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: entity_id
+      description: The entity of the result categories, only required for operator users
+      schema:
+        type: integer
+  responses:
+    '200':
+      description: A list of categories
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../../models/categories/category-mapping.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+put:
+  summary: Update entity categories mapping
+  description: Update entity category mapping between base categories and custom categories. This PUT acts as a full update
+  security:
+    - OAuth2: ['ROLE_ENT_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Categories
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: entity_id
+      description: The entity of the result categories, only required for operator users
+      schema:
+        type: integer
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: ../../models/categories/category-mapping.yml
+  responses:
+    '204':
+      description: Entity category mapping updated
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

@@ -1,0 +1,79 @@
+get:
+  x-internal: true
+  summary: Get authenticated user notifications
+  description: There are two types of notifications, CHANNEL notification must be used for ROLE_CNL_MGR and EVENT notifications must be used for ROLE_EVN_MGR
+  tags:
+    - Myself
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+  responses:
+    '200':
+      description: Get all notifications of authenticated user
+      content:
+        application/json:
+          schema:
+            $ref: ./../../models/notifications/notifications.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  x-internal: true
+  summary: Enable or disable authenticated user notifications
+  description: There are two types of notifications, CHANNEL notification must be used for ROLE_CNL_MGR and EVENT notifications must be used for ROLE_EVN_MGR
+  tags:
+    - Myself
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ./../../models/notifications/notifications.yml
+  responses:
+    '204':
+      description: User notifications updated successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

@@ -1,0 +1,182 @@
+additionalProperties: false
+type: object
+required:
+  - id
+  - status
+  - date
+  - languages
+  - channel
+  - event
+  - subscription_list
+properties:
+  id:
+    type: integer
+    format: int64
+  status:
+    $ref: sale-request-status.yml
+  date:
+    type: string
+    format: date-time
+  languages:
+    type: object
+    required:
+      - default
+      - selected
+    properties:
+      default:
+        type: string
+        description: Language code
+      selected:
+        type: array
+        items:
+          type: string
+          description: Language code
+  channel:
+    type: object
+    required:
+      - id
+      - name
+      - type
+      - entity
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      type:
+        $ref: ../channel-type.yml
+      entity:
+        type: object
+        required:
+          - id
+          - name
+        properties:
+          id:
+            type: integer
+            format: int64
+          name:
+            type: string
+      category:
+        type: object
+        properties:
+          parent:
+            type: object
+            required:
+              - id
+              - code
+              - description
+            properties:
+              id:
+                type: integer
+                format: int64
+              code:
+                type: string
+              description:
+                type: string
+          custom:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+              code:
+                type: string
+              description:
+                type: string
+  event:
+    type: object
+    required:
+      - id
+      - name
+      - entity
+      - category
+      - event_type
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      start_date:
+        type: string
+        format: date-time
+      entity:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int64
+          name:
+            type: string
+      venues:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+            name:
+              type: string
+            location:
+              type: object
+              properties:
+                city:
+                  type: string
+      contact_person:
+        type: object
+        properties:
+          name:
+            type: string
+          surname:
+            type: string
+          email:
+            type: string
+          phone:
+            type: string
+      category:
+        type: object
+        required:
+          - id
+          - code
+          - description
+        properties:
+          id:
+            type: integer
+            format: int64
+          code:
+            type: string
+          description:
+            type: string
+          parent:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+              code:
+                type: string
+              description:
+                type: string
+          custom:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+              code:
+                type: string
+              description:
+                type: string
+      event_type:
+        $ref: sale-request-event-type.yml
+      currency_code:
+        type: string
+      tax_mode:
+        type: string
+        enum:
+          - INCLUDED
+          - ON_TOP
+  subscription_list:
+    $ref: 'sale-request-subscription-list.yml'

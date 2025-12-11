@@ -1,0 +1,267 @@
+get:
+  x-internal: true
+  summary: Get channel blacklist
+  description: 'Retrieves the channel blacklist'
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Channel Blacklists
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Channel ID
+    - in: path
+      name: type
+      description: Blacklist Type
+      schema:
+        $ref: ../../models/channels/channel-blacklist-type.yml
+      required: true
+    - in: query
+      name: q
+      description: Filter the elements whose values conains the q value
+      schema:
+        type: string
+    - in: query
+      name: date
+      description: Filter by creation date with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as ``%3A``). Supported operators are ``eq``, ``ne``, ``gt``, ``gte``, ``lt``, ``lte``
+      example: eq:2021-01-01T08:00:00Z
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: sort
+      description: Sorting of enum fields with format field:[asc|desc]. For example 'date:desc'
+      schema:
+        type: string
+        enum:
+          - value
+          - date
+    - in: query
+      name: limit
+      schema:
+        type: integer
+        maximum: 50
+        minimum: 0
+        default: 50
+      description: Limit
+    - in: query
+      name: offset
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Offset
+  responses:
+    '200':
+      description: 'Successful response'
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/channels/channel-blacklists-response.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+post:
+  x-internal: true
+  summary: Create channel blacklist
+  description: 'Create channel blacklist elements'
+  security:
+    - OAuth2: ['ROLE_OPR_MGR']
+  tags:
+    - Channel Blacklists
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Channel ID
+    - in: path
+      name: type
+      description: Blacklist Type
+      schema:
+        $ref: ../../models/channels/channel-blacklist-type.yml
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/channels/channel-blacklists.yml
+  responses:
+    '204':
+      description: Create the channel blacklist elements
+    '400':
+      description: bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: invalid token
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+delete:
+  x-internal: true
+  summary: Delete the channel blacklist items
+  description: 'Delete the channel blacklist items'
+  security:
+    - OAuth2: ['ROLE_OPR_MGR']
+  tags:
+    - Channel Blacklists
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Channel ID
+    - in: path
+      name: type
+      description: Blacklist Type
+      schema:
+        $ref: ../../models/channels/channel-blacklist-type.yml
+      required: true
+    - in: query
+      name: keyword
+      description: Filter the elements whose values conains the keyword
+      schema:
+        type: string
+    - in: query
+      name: date
+      description: Filter by creation date with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as ``%3A``). Supported operators are ``eq``, ``ne``, ``gt``, ``gte``, ``lt``, ``lte``
+      example: eq:2021-01-01T08:00:00Z
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: sort
+      description: Sorting of enum fields with format field:[asc|desc]. For example 'date:desc'
+      schema:
+        type: string
+        enum:
+          - value
+          - date
+    - in: query
+      name: limit
+      schema:
+        type: integer
+        maximum: 50
+        minimum: 0
+        default: 50
+      description: Limit
+    - in: query
+      name: offset
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Offset
+  responses:
+    '204':
+      description: Deleted successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

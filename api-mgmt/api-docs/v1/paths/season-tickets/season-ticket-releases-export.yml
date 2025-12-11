@@ -1,0 +1,153 @@
+post:
+  summary: Export a releases list
+  x-internal: true
+  description: 'List of releases'
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Season Ticket Release Seat
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+      description: SeasonTicket id
+      required: true
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            release_status:
+              type: array
+              items:
+                type: string
+                enum:
+                  - RELEASED
+                  - RECOVERED
+                  - SOLD
+            session_id:
+              type: integer
+            fields:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                    enum:
+                      - name
+                      - surname
+                      - email
+                      - gender
+                      - birthday
+                      - id_card
+                      - phone_number
+                      - address
+                      - city
+                      - postal_code
+                      - country_subdivision
+                      - country
+                      - language
+                      - sign_up_date
+                      - member_id
+                      - product_client_id
+                      - manager_email
+                      - release.status
+                      - release.price
+                      - release.percentage
+                      - release.earnings
+                      - order.code
+                      - order.date
+                      - channel
+                      - event_name
+                      - session.name
+                      - session.date
+                      - venue
+                      - promoter
+                  name:
+                    type: string
+            format:
+              type: string
+              enum:
+                - JSON
+                - CSV
+            delivery:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - EMAIL
+                properties:
+                  description: |
+                    Fields required by the delivery type.
+
+                    Valid properties to **EMAIL** type:
+                      - address: Email where report will send. Optional. Authenticated username will be used if address is not informed.
+                  type: object
+                  additionalProperties: {}
+                  example:
+                    address: 'user@email.com'
+            translations:
+              type: array
+              items:
+                $ref: ../../models/exports/translation.yml
+            settings:
+              type: object
+              properties:
+                charset_encoding:
+                  type: string
+                  enum:
+                    - UTF_8
+                    - UTF_8_BOM
+                csv_separator_format:
+                  type: string
+                  enum:
+                    - COMMA
+                    - SEMICOLON
+                csv_fraction_digits_format:
+                  type: string
+                  enum:
+                    - POINT
+                    - COMMA
+  responses:
+    '202':
+      $ref: ../../models/exports/export-response.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

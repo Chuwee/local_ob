@@ -1,0 +1,70 @@
+type: array
+items:
+  type: object
+  properties:
+    price_type:
+      type: object
+      nullable: true
+      description: Price-type or empty if item is not filtered by price-type as TOTAL aggregation, like ``GROUP`` ticket_type that applies to all session
+      properties:
+        id:
+          type: number
+          format: int64
+        name:
+          type: string
+    quota:
+      type: object
+      description: Quota or empty if item is not filtered by quota as TOTAL aggregation for session
+      nullable: true
+      properties:
+        id:
+          type: number
+          format: int64
+        name:
+          type: string
+    ticket_type:
+      nullable: true
+      $ref: ../venue-template/ticket_type.yml
+    availability:
+      type: object
+      properties:
+        total:
+          $ref: ../common/limitless-value.yml
+          description: Total availability for item
+        available:
+          type: number
+          format: int64
+          description: Number of available seats for purchase
+        promoter_blocked:
+          type: number
+          format: int64
+          nullable: true
+          description: Number of seats blocked by promoter. Empty for templates of type ``ACTIVITY``or ``THEME-PARK``
+        kill:
+          type: number
+          format: int64
+          description: Number of seats in status ``KILL``. Empty for templates of type ``ACTIVITY``or ``THEME-PARK``
+        purchase:
+          type: number
+          format: int64
+          description: Number of seats purchased with ticket-type ``GENERAL``
+        invitation:
+          type: number
+          format: int64
+          description: Number of seats purchased with ticket-type ``INVITATION``
+        booking:
+          type: number
+          format: int64
+          description: Number of seats in any alive booking
+        issue:
+          type: number
+          format: int64
+          description: Number of seats issued
+        in_progress:
+          type: number
+          format: int64
+          description: Number of seats in any alive shopping-cart, not purchased or booked yet
+        session_pack:
+          type: number
+          format: int64
+          description: Number of seats linked to any session-pack. Empty for templates of type ``ACTIVITY``or ``THEME-PARK``

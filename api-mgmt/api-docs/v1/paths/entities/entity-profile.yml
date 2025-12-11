@@ -1,0 +1,200 @@
+get:
+  x-internal: true
+  summary: Get entity profile
+  description: Get an entity's profile
+  security:
+    - OAuth2:
+        - 'ROLE_CNL_MGR'
+        - 'ROLE_EVN_MGR'
+        - 'ROLE_ENT_ANS'
+        - 'ROLE_OPR_MGR'
+        - 'ROLE_OPR_ANS'
+  tags:
+    - Entity profiles
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      schema:
+        type: integer
+      required: true
+      description: Entity ID
+    - in: path
+      name: profileId
+      schema:
+        type: integer
+      required: true
+      description: Profile ID
+  responses:
+    '200':
+      description: Get entity profiles
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/entities/entity-profile.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+put:
+  x-internal: true
+  summary: Update entity profile
+  description: Updates an entity profile
+  security:
+    - OAuth2:
+        - 'ROLE_OPR_MGR'
+  tags:
+    - Entity profiles
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      schema:
+        type: integer
+      required: true
+      description: Entity ID
+    - in: path
+      name: profileId
+      schema:
+        type: integer
+      required: true
+      description: Profile ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          description: There must be a range with a from value of 0
+          items:
+            $ref: '../../models/entities/entity-profile-create.yml'
+  responses:
+    '204':
+      description: Profile updated successfuly.
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+delete:
+  x-internal: true
+  summary: Delete entity profile
+  description: Get an entity's profile
+  security:
+    - OAuth2:
+        - 'ROLE_OPR_MGR'
+  tags:
+    - Entity profiles
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      schema:
+        type: integer
+      required: true
+      description: Entity ID
+    - in: path
+      name: profileId
+      schema:
+        type: integer
+      required: true
+      description: Profile ID
+  responses:
+    '204':
+      description: Profile deleted successfuly.
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

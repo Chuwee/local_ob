@@ -1,0 +1,125 @@
+get:
+  summary: Get season ticket channel relations
+  description: ''
+  x-internal: true
+  security:
+    - OAuth2: ['ROLE_EVN_MGR','ROLE_OPR_MGR','ROLE_ENT_ANS', 'ROLE_OPR_ANS']
+  tags:
+    - Season Ticket Channels
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Season Ticket ID
+  responses:
+    '200':
+      description: List of season ticket channels relations
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/season-ticket/season-ticket-channels.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+post:
+  summary: Create season ticket channel relation
+  description: ''
+  x-internal: true
+  security:
+    - OAuth2: ['ROLE_EVN_MGR','ROLE_OPR_MGR']
+  tags:
+    - Season Ticket Channels
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Season Ticket ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - channel_id
+          properties:
+            channel_id:
+              type: integer
+  responses:
+    '201':
+      description: 'Season Ticket channel relation created'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

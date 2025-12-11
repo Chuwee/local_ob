@@ -1,0 +1,56 @@
+additionalProperties: false
+type: object
+required:
+  - enable
+properties:
+  enable:
+    type: boolean
+  expiration:
+    type: object
+    description: Expiration could be defined by booking_order, session or date criterias.
+    properties:
+      booking_order:
+        type: object
+        properties:
+          timespan:
+            type: string
+            enum:
+              - DAY
+              - WEEK
+              - MONTH
+          timespan_amount:
+            type: integer
+          expiration_time:
+            type: integer
+            description: Expiration hour of the day (0-23)
+          expiration_type:
+            type: string
+            enum:
+              - NEVER
+              - AFTER_PURCHASE
+      session:
+        type: object
+        description: If session expiration is defined, date criteria is not applicable
+        properties:
+          timespan:
+            type: string
+            enum:
+              - HOUR
+              - DAY
+              - WEEK
+              - MONTH
+          timespan_amount:
+            type: integer
+            description: Relative amount for selected timespan. Could be negative.
+          expiration_time:
+            type: integer
+            description: Expiration hour of the day (0-23) for timespan different to HOUR
+      date:
+        type: string
+        format: date-time
+      deadline_expiration_type:
+        type: string
+        enum:
+          - NEVER
+          - SESSION
+          - DATE

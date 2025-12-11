@@ -1,0 +1,95 @@
+post:
+  summary: Import a list of external barcodes list
+  description: 'Import a list of external barcodes list'
+  security:
+    - OAuth2: ['ROLE_REC_MGR','ROLE_ENT_MGR','ROLE_OPR_MGR']
+  tags:
+    - External Barcodes
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Event ID
+    - in: path
+      name: sessionId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Session ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+              description: the email where the notification will be sent
+            barcodes:
+              type: array
+              items:
+                type: object
+                required:
+                  - barcode
+                properties:
+                  barcode:
+                    type: string
+                  row:
+                    type: string
+                  seat:
+                    type: string
+                  locator:
+                    type: string
+  responses:
+    '202':
+      description: Content updated
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              id:
+                type: integer
+                description: the id of the import process
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

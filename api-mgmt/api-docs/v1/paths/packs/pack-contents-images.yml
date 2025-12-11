@@ -1,0 +1,197 @@
+get:
+  x-internal: true
+  summary: Get pack image contents
+  description: Get pack image contents
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Pack Contents
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: packId
+      schema:
+        type: integer
+      required: true
+      description: Pack ID
+    - in: query
+      name: language
+      schema:
+        type: string
+    - in: query
+      name: type
+      schema:
+        $ref: ../../models/comm-element/pack-image-type.yml
+  responses:
+    '200':
+      description: Pack text contents
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                language:
+                  type: string
+                  example: 'es-ES'
+                type:
+                  $ref: ../../models/comm-element/pack-image-type.yml
+                value:
+                  type: string
+                  description: Element value
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+post:
+  x-internal: true
+  summary: Create or update pack image contents
+  description: Create or update based on composed key between language, type and position (only for LANDSCAPE type)
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Pack Contents
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: packId
+      schema:
+        type: integer
+      required: true
+      description: Pack ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            type: object
+            required:
+              - language
+              - type
+            properties:
+              language:
+                type: string
+                example: 'es-ES'
+              type:
+                $ref: ../../models/comm-element/pack-image-type.yml
+              position:
+                type: integer
+                description: Numeric value 1-5 required for LANDSCAPE type
+              image:
+                type: string
+                description: |
+                  Base64 binary of image with size constraints
+
+                  Expected specific size based on each type
+
+                    <table style="width:100%">
+                      <tr>
+                        <th>Type</th>
+                        <th>Dimensions</th>
+                        <th>Maximum Size</th>
+                      </tr>
+                      <tr>
+                        <td>MAIN</th>
+                        <td>200x286px</th>
+                        <td>150KB</th>
+                      </tr>
+                      <tr>
+                        <td>SECONDARY</th>
+                        <td>84x120px</th>
+                        <td>150KB</th>
+                      </tr>
+                      <tr>
+                        <td>LANDSCAPE</th>
+                        <td>680x370px</th>
+                        <td>90KB</th>
+                      </tr>
+                      <tr>
+                        <td>PROMOTER_BANNER</th>
+                        <td>300x242px</th>
+                        <td>150KB</th>
+                      </tr>
+                    </table>
+  responses:
+    '204':
+      description: Saved successfully
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

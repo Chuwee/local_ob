@@ -1,0 +1,167 @@
+additionalProperties: false
+type: object
+required:
+  - id
+  - username
+  - email
+  - operator
+  - timezone
+  - currency
+  - status
+  - roles
+  - name
+  - last_name
+  - apikey
+  - language
+  - mfa_type
+properties:
+  id:
+    type: integer
+    format: int64
+  username:
+    type: string
+  email:
+    type: string
+  name:
+    type: string
+  last_name:
+    type: string
+  status:
+    $ref: 'user-status.yml'
+  entity:
+    $ref: 'entity-users.yml'
+  operator:
+    type: object
+    required:
+      - id
+      - name
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+        nullable: true
+      settings:
+        type: object
+        properties:
+          customization:
+            x-internal: true
+            $ref: ../entities/entity-customization-settings.yml
+  producer:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+        nullable: true
+  job_title:
+    type: string
+  language:
+    type: string
+    description: IETF language tag standard
+    example: es-ES
+  timezone:
+    type: string
+    description: Olson timezone ID of the user entity
+    example: Europe/Berlin
+  currency:
+    type: string
+    description: ISO 4217 currency code of the user entity
+    example: EUR
+  use_multicurrency:
+    type: boolean
+    description: flag use_multicurrency from operator
+    example: true
+  notes:
+    type: string
+  contact:
+    type: object
+    properties:
+      primary_phone:
+        type: string
+      secondary_phone:
+        type: string
+      fax:
+        type: string
+  location:
+    type: object
+    properties:
+      address:
+        type: string
+      city:
+        type: string
+      postal_code:
+        type: string
+      country:
+        type: object
+        properties:
+          code:
+            type: string
+            description: ISO 3166 codes
+          name:
+            type: string
+      country_subdivision:
+        type: object
+        properties:
+          code:
+            type: string
+            description: ISO 3166 codes
+          name:
+            type: string
+  roles:
+    type: array
+    items:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string
+        additional_properties:
+          type: object
+          properties:
+            producer_ids:
+              type: array
+              items:
+                type: integer
+  reports:
+    type: object
+    properties:
+      load:
+        type: string
+        description: Url to load reports
+      login:
+        type: string
+        description: Login reports url with valid token
+      logout:
+        type: string
+        description: Logout reports url
+      mstr_user_has_subscriptions:
+        type: boolean
+      can_impersonate:
+        x-internal: true
+        type: boolean
+      superset:
+        type: boolean
+  apikey:
+    type: string
+    description: The user apikey
+  mfa_type:
+    type: string
+    enum:
+      - DISABLED
+      - EMAIL
+  visibility:
+    type: object
+    properties:
+      type:
+        type: string
+        description: The visibility type of the user
+        enum:
+          - ALL
+          - RESTRICTED

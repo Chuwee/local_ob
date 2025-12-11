@@ -1,0 +1,94 @@
+post:
+  x-internal: true
+  summary: Clone a venue template
+  description: Creates a new venue template by copying an existing venue
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Templates
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: venueTemplateId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Venue template ID to create from
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              description: Name of the new template
+            venue_id:
+              type: integer
+              nullable: true
+              description: Optionally indicate a different venue to assign the new template
+            space_id:
+              type: integer
+              nullable: true
+              description: Optionally indicate a different space to assign the new template
+            entity_id:
+              type: integer
+              nullable: true
+              description: Optionally indicate a different entity to assign the new template
+  responses:
+    '201':
+      description: The cloned venue template was added correctly and it's being processed
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            properties:
+              id:
+                type: integer
+                description: the id of the newly created venue template
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml            
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

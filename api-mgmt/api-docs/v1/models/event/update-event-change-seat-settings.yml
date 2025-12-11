@@ -1,0 +1,45 @@
+additionalProperties: false
+type: object
+required:
+  - enable
+  - change_type
+  - ticket_selection
+  - reallocation_channel
+properties:
+  enable:
+    type: boolean
+    description: Allow changing seats
+  event_change_seat_expiry:
+    type: object
+    required:
+      - time_offset_limit_amount
+      - time_offset_limit_unit
+    description: amount time before the event start date time until the seat change is allowed. Example; 3 WEEK before the event starts.
+    properties:
+      time_offset_limit_amount:
+        type: integer
+      time_offset_limit_unit:
+        type: string
+        enum:
+          - HOURS
+          - DAYS
+          - WEEKS
+          - MONTHS
+  change_type:
+    type: string
+    enum:
+      - ALL
+      - PARTIAL
+  ticket_selection:
+    type: object
+    $ref: 'update-change-seat-ticket-selection.yml'
+  reallocation_channel:
+    type: object
+    required:
+      - id
+      - apply_to_all_channel_types
+    properties:
+      id:
+        type: integer
+      apply_to_all_channel_types:
+        type: boolean

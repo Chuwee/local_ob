@@ -1,0 +1,64 @@
+put:
+  x-internal: true
+  summary: Update the whitelabel type of a channel
+  description: Updates the whitelabel type configuration (INTERNAL or EXTERNAL) for a specific channel.
+  security:
+    - OAuth2: ['ROLE_SYS_MGR', 'ROLE_SYS_ANS']
+  tags:
+    - Channels
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Channel Id
+    - in: query
+      name: whitelabel_type
+      schema:
+        type: string
+        enum:
+          - INTERNAL
+          - EXTERNAL
+      required: true
+      description: Whitelabel type to assign to the channel.
+  responses:
+    '200':
+      description: 'Successful request'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

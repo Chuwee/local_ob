@@ -1,0 +1,186 @@
+get:
+  summary: Get event channel relations
+  description: ''
+  x-internal: true
+  security:
+    - OAuth2: ['ROLE_EVN_MGR','ROLE_OPR_MGR','ROLE_ENT_ANS', 'ROLE_OPR_ANS']
+  tags:
+    - Event channels
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Event ID
+    - in: query
+      name: sort
+      description: Sorting by channel name with format field:[asc|desc]. For example 'name:desc'
+      schema:
+        type: string
+        enum:
+          - name
+    - in: query
+      name: type
+      description: Channel types
+      schema:
+        type: array
+        items:
+           $ref: ../../models/channels/channel-type.yml
+    - in: query
+      name: entity_id
+      description: Channel entity id
+      schema:
+        type: integer
+    - in: query
+      name: q
+      description: Free search channel name
+      schema:
+        type: string
+    - in: query
+      name: limit
+      schema:
+        type: integer
+      description: Limit (default 50, max 1000)
+    - in: query
+      name: offset
+      schema:
+        type: integer
+      description: Offset (default 0)
+    -  in: query
+       name: request_status
+       x-internal: true
+       schema:
+        type: array
+        items:
+          $ref: ../../models/channels/channel-request-status.yml
+    -  in: query
+       name: sale_status
+       x-internal: true
+       schema:
+         type: array
+         items:
+           $ref: ../../models/channels/channel-sale-status.yml
+    -  in: query
+       name: release_status
+       x-internal: true
+       schema:
+         type: array
+         items:
+           $ref: ../../models/channels/channel-release-status.yml
+  responses:
+    '200':
+      description: List of event channels relations
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/event/event-channels.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+post:
+  summary: Create event channel relation
+  description: ''
+  x-internal: true
+  security:
+    - OAuth2: ['ROLE_EVN_MGR','ROLE_OPR_MGR']
+  tags:
+    - Event channels
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Event ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - channel_id
+          properties:
+            channel_id:
+              type: integer
+  responses:
+    '201':
+      description: 'Event channel relation created'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

@@ -1,0 +1,58 @@
+get:
+  summary: Get whatsapp templates
+  description: Get entity whatsapp templates available
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS', 'ROLE_CNL_MGR']
+  tags:
+    - Entity Whatsapp templates
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      schema:
+        type: integer
+      required: true
+  responses:
+    '200':
+      description: Array of whatsapp templates
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../../models/entities/whatsapp-templates.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

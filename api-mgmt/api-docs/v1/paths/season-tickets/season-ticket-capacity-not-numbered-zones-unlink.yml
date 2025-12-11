@@ -1,0 +1,63 @@
+post:
+  x-internal: true
+  summary: Unlink not numbered zone seats from a Season Ticket
+  description: Set a subset of seats from a not numbered zone as not linkable.
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Season Ticket Capacity
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Season Ticket ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/season-ticket/season-tickets-nnz-link.yml
+  responses:
+    '200':
+      description: Unlink performed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              unlinked_seats:
+                type: number
+                description: Number of unlinked seats
+    '400':
+      description: bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: invalid token
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

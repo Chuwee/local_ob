@@ -1,0 +1,197 @@
+get:
+  summary: Get PDF ticket template image contents
+  description: Get image contents for templates with ``PDF`` format
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Ticket templates
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: ticketTemplateId
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: query
+      name: language
+      schema:
+        type: string
+    - in: query
+      name: type
+      schema:
+        $ref: ../../models/comm-element/ticket-template-pdf-image-type.yml
+  responses:
+    '200':
+      description: Array of contents
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                language:
+                  type: string
+                  example: 'es-ES'
+                type:
+                  $ref: ../../models/comm-element/ticket-template-pdf-image-type.yml
+                image_url:
+                  type: string
+                  description: URL to image
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  x-internal: true
+  summary: Create or update PDF  ticket template image contents
+  description: Create or update based on composed key between language and type
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Ticket templates
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: ticketTemplateId
+      schema:
+        type: integer
+      required: true
+      description: Ticket template ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            type: object
+            required:
+              - language
+              - type
+            properties:
+              language:
+                type: string
+                example: 'es-ES'
+              type:
+                $ref: ../../models/comm-element/ticket-template-pdf-image-type.yml
+              image:
+                type: string
+                description: |
+                  Base64 binary of image with size constraints
+
+                    <table style="width:100%">
+                      <tr>
+                        <th>Type</th>
+                        <th>Dimensions</th>
+                        <th>Maximum Size</th>
+                      </tr>
+                      <tr>
+                        <td>HEADER</th>
+                        <td>1076x56px</th>
+                        <td>25KB</th>
+                      </tr>
+                      <tr>
+                        <td>EVENT_LOGO</th>
+                        <td>636x430px</th>
+                        <td>37,5KB</th>
+                      </tr>
+                      <tr>
+                        <td>BODY</th>
+                        <td>360x430px</th>
+                        <td>50KB</th>
+                      </tr>
+                      <tr>
+                        <td>BANNER_MAIN</th>
+                        <td>520x856px</th>
+                        <td>85KB</th>
+                      </tr>
+                      <tr>
+                        <td>BANNER_SECONDARY</th>
+                        <td>520x420px</th>
+                        <td>60KB</th>
+                      </tr>
+                      <tr>
+                        <td>BANNER_CHANNEL_LOGO</th>
+                        <td>520x420px</th>
+                        <td>60KB</th>
+                      </tr>
+                    </table>
+  responses:
+    '204':
+      description: Saved successfully
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

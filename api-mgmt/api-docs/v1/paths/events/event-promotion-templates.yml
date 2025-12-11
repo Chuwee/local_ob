@@ -1,0 +1,163 @@
+get:
+  x-internal: true
+  summary: Get event promotion templates
+  description: 'Get event promotion templates'
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_ENT_MGR', 'ROLE_ENT_ANS', 'ROLE_OPR_MGR', 'ROLE_OPR_ANS']
+  tags:
+    - Promotion Templates
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: entity_id
+      schema:
+        type: number
+        format: int64
+    - in: query
+      name: entity_admin_id
+      x-internal: true
+      schema:
+        type: integer
+      description: Entity admin Id
+    - in: query
+      name: name
+      schema:
+        type: string
+    - in: query
+      name: currency_code
+      schema:
+        type: string
+    - in: query
+      name: q
+      description: Free search for event promotion template by name
+      schema:
+        type: string             
+    - in: query
+      name: sort
+      schema:
+        type: string
+        enum: [name, type]
+      description: Sorting of enum fields with format field:[asc|desc]. For example 'name:desc'        
+    - in: query
+      name: type
+      schema:
+        $ref: ../../models/promotions/promotion-type.yml
+      description: Promotion type
+    - in: query
+      name: limit
+      schema:
+        type: number
+        format: int64
+      description: Limit the amount of results
+    - in: query
+      name: offset
+      schema:
+        type: number
+        format: int64
+      description: Offset of the results
+  responses:
+    '200':
+      description: 'Array of promotion templates'
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/promotions/promotion-templates.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+post:
+  x-internal: true
+  summary: Create event promotion template
+  description: ''
+  security:
+    - OAuth2: ['ROLE_EVN_MGR', 'ROLE_OPR_MGR', 'ROLE_ENT_MGR']
+  tags:
+    - Promotion Templates
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          required:
+            - entity_id
+            - name
+            - type
+          type: object
+          properties:
+            entity_id:
+              type: number
+              format: int64
+            name:
+              type: string
+            type:
+              $ref: ../../models/promotions/promotion-type.yml
+  responses:
+    '201':
+      description: Created promotion template
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: number
+                format: int64
+    '400':
+      description: bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '401':
+      description: invalid token
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error-auth.yml'
+    '403':
+      description: unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'

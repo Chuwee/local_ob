@@ -1,0 +1,65 @@
+  additionalProperties: false
+  type: object
+  properties:
+    id:
+      type: integer
+    name:
+      type: string
+    active:
+      type: boolean
+    status:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - PLANNED
+    presale_period:
+      $ref: ./session-presale-period.yml
+    channels:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int64
+          name:
+            type: string
+          selected:
+            type: boolean
+    customer_types:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int64
+          name:
+            type: string
+          selected:
+            type: boolean
+    loyalty_program:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        points:
+          type: number
+    validator_type:
+      type: string
+      enum:
+        - COLLECTIVE
+        - CUSTOMERS
+    validator:
+      $ref: ./session-presale-validator.yml
+    member_tickets_limit_enabled:
+      type: boolean
+    member_tickets_limit:
+      type: integer
+      description: The maximum number of tickets assigned to the current member allowed to buy for this session in this presale period
+    general_tickets_limit:
+      type: integer
+      description: The maximum number of general public tickets allowed to buy to the current member for this session in this presale period
+    settings:
+      $ref: './session-presale-settings.yml'

@@ -1,0 +1,81 @@
+additionalProperties: false
+type: object
+required:
+  - name
+  - venue_template_id
+  - dates
+properties:
+  name:
+    type: string
+  venue_template_id:
+    type: integer
+    format: int64
+  automatic_taxes:
+    type: boolean
+  tax_ticket_id:
+    type: integer
+    format: int64
+  tax_charges_id:
+    type: integer
+    format: int64
+  dates:
+    type: object
+    required:
+      - start
+      - channels
+      - sales_start
+      - sales_end
+    properties:
+      start:
+        type: string
+        format: date-time
+      end:
+        type: string
+        format: date-time
+      channels:
+        type: string
+        format: date-time
+      sales_start:
+        type: string
+        format: date-time
+      sales_end:
+        type: string
+        format: date-time
+      bookings_start:
+        type: string
+        format: date-time
+      bookings_end:
+        type: string
+        format: date-time
+      secondary_market_sale_start:
+        type: string
+        format: date-time
+      secondary_market_sale_end:
+        type: string
+        format: date-time
+  rates:
+    type: array
+    description: All rates on array will be marked as visible. One default rate is `mandatory` except for AVET event.
+    items:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        default:
+          type: boolean
+  activity_sale_type:
+    $ref: session-activity-sale-type.yml
+    description: For ``ACTIVITY`` event type sales-type is required
+  reference:
+    type: string
+  enable_smart_booking:
+    type: boolean
+  loyalty_points_config:
+    $ref: ../../models/loyalty-points/sessions/create-loyalty-points.yml
+  settings:
+    type: object
+    properties:
+      enable_orphan_seats:
+        type: boolean
+        description: Enable protection against orphan seats in a sales channel

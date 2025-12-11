@@ -1,0 +1,146 @@
+get:
+  x-internal: true
+  summary: Get channel text contents 
+  description: 'Obtain a list of key/value pair for channel literals'
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Event channel contents
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: path
+      name: languageId
+      schema:
+        type: string
+      required: true      
+      description: Language ID
+    - in: query
+      x-internal: true
+      name: channelVersion
+      schema:
+        type: string
+        enum:
+          - V1
+          - V2
+      required: false
+      description: In type Portal select old or new literals
+  responses:
+    '200':
+      description: 'Successful response'
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/channels/channel-text-contents.yml      
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+post:
+  x-internal: true
+  summary: Creates or update channel literals text content  
+  description: 'Create or update the list of key/value pair channel literals'
+  security:
+    - OAuth2: ['ROLE_CNL_MGR', 'ROLE_OPR_MGR']
+  tags:
+    - Channel Contents
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Channel ID
+    - in: path
+      name: languageId
+      schema:
+        type: string
+      required: true      
+      description: Language ID
+    - in: query
+      x-internal: true
+      name: channelVersion
+      schema:
+        type: string
+        enum:
+          - V1
+          - V2
+      required: false
+      description: In type Portal select old or new literals
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+           $ref: ../../models/channels/channel-text-contents.yml      
+  responses:
+    '204':
+      description: Text content created or updated
+    '400':
+      description: bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '401':
+      description: invalid token
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error-auth.yml'
+    '403':
+      description: unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'

@@ -1,0 +1,201 @@
+get:
+  summary: Get B2B client user
+  description: 'Get a B2B client user'
+  security:
+    - OAuth2: ['ROLE_OPR_MGR', 'ROLE_ENT_MGR', 'ROLE_EVN_MGR']
+  tags:
+    - Client users
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: clientId
+      description: B2B client id
+      schema:
+        type: number
+      required: true
+    - in: path
+      name: clientUserId
+      description: B2B client user id
+      schema:
+        type: number
+      required: true
+    - in: query
+      name: entity_id
+      required: false
+      description: Entity id. Only required when the token belongs to an operator entity
+      schema:
+        type: number
+  responses:
+    '200':
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/b2b/client-user.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+put:
+  x-internal: true
+  summary: Update B2B client user
+  description: 'Update a B2B client user'
+  security:
+    - OAuth2: ['ROLE_OPR_MGR', 'ROLE_ENT_MGR', 'ROLE_EVN_MGR']
+  tags:
+    - Client users
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: clientId
+      description: B2B client id
+      schema:
+        type: number
+      required: true
+    - in: path
+      name: clientUserId
+      description: B2B client user id. Must belong to the client of the provided client ID.
+      schema:
+        type: number
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/b2b/update-client-user.yml
+  responses:
+    '204':
+      description: Successful response
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+delete:
+  x-internal: true
+  summary: Delete B2B client user
+  description: 'Delete a B2B client user'
+  security:
+    - OAuth2: ['ROLE_OPR_MGR', 'ROLE_ENT_MGR', 'ROLE_EVN_MGR']
+  tags:
+    - Client users
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: clientId
+      description: B2B client id
+      schema:
+        type: number
+      required: true
+    - in: path
+      name: clientUserId
+      description: B2B client user id
+      schema:
+        type: number
+      required: true
+    - in: query
+      name: entity_id
+      required: false
+      description: Entity id. Only required when the token belongs to an operator entity
+      schema:
+        type: number
+  responses:
+    '204':
+      description: Successful response
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
