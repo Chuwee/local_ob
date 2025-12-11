@@ -15,3 +15,4 @@ export * from './event-channel-ticket-template-type.enum';
 export * from './event-channel-ticket-content-format.enum';
 export * from './event-channels-candidates.model';
 export * from './event-channels-request.model';
+export * from './provider-plan-settings.model';

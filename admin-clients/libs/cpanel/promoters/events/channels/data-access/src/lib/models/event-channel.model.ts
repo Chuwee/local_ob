@@ -2,6 +2,7 @@ import { ChannelType, WhitelabelType } from '@admin-clients/cpanel/channels/data
 import { EventChannelReleaseStatus } from './event-channel-release-status.enum';
 import { EventChannelRequestStatus } from './event-channel-request-status.enum';
 import { EventChannelSaleStatus } from './event-channel-sale-status.enum';
+import { ProviderPlanSettings } from './provider-plan-settings.model';
 
 export interface EventChannel {
     channel: {
@@ -68,6 +69,7 @@ export interface EventChannel {
             id: number;
         }[];
     }[];
+    provider_plan_settings?: ProviderPlanSettings;
 }
 
 export interface EventChannelQuota {
