@@ -14,6 +14,7 @@ public class BaseEventChannelDTO implements Serializable, DateConvertible {
     private EventChannelInfoDTO channel;
     private EventChannelStatusInfoDTO status;
     private EventChannelSettingsDTO settings;
+    private ProviderPlanSettingsDTO providerPlanSettings;
 
     public EventChannelInfoDTO getChannel() {
         return channel;
@@ -45,6 +46,14 @@ public class BaseEventChannelDTO implements Serializable, DateConvertible {
 
     public void setEvent(EventInfoDTO event) {
         this.event = event;
+    }
+
+    public ProviderPlanSettingsDTO getProviderPlanSettings() {
+        return providerPlanSettings;
+    }
+
+    public void setProviderPlanSettings(ProviderPlanSettingsDTO providerPlanSettings) {
+        this.providerPlanSettings = providerPlanSettings;
     }
 
     @Override

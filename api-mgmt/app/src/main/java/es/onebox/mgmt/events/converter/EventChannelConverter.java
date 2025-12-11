@@ -131,6 +131,7 @@ public class EventChannelConverter {
         target.setEvent(getEventInfo(eventChannel.getEvent()));
         target.setStatus(getStatusInfo(eventChannel.getStatus()));
         target.setSettings(getSettings(eventChannel.getSettings(), languages));
+        target.setProviderPlanSettings(toDTO(eventChannel.getProviderPlanSettings()));
         return target;
     }
 
@@ -231,6 +232,7 @@ public class EventChannelConverter {
         if (dto.getSettings() != null) {
             updateEventChannel.setSettings(fromDTO(dto.getSettings()));
         }
+        updateEventChannel.setProviderPlanSettings(fromDTO(dto.getProviderPlanSettings()));
         return updateEventChannel;
     }
 
@@ -262,5 +264,41 @@ public class EventChannelConverter {
         }
 
         return out;
+    }
+
+    private static es.onebox.mgmt.events.dto.channel.ProviderPlanSettingsDTO toDTO(
+            es.onebox.mgmt.datasources.ms.event.dto.event.ProviderPlanSettings entity) {
+        if (entity == null) {
+            return null;
+        }
+        es.onebox.mgmt.events.dto.channel.ProviderPlanSettingsDTO dto = new es.onebox.mgmt.events.dto.channel.ProviderPlanSettingsDTO();
+        dto.setSyncSessionsAsHidden(entity.getSyncSessionsAsHidden());
+        dto.setSyncSurcharges(entity.getSyncSurcharges());
+        dto.setSyncSessionLabels(entity.getSyncSessionLabels());
+        dto.setSyncSessionPics(entity.getSyncSessionPics());
+        dto.setSyncSessionTypeOrdering(entity.getSyncSessionTypeOrdering());
+        dto.setSyncSessionTypeDetails(entity.getSyncSessionTypeDetails());
+        dto.setSyncMainPlanTitle(entity.getSyncMainPlanTitle());
+        dto.setSyncMainPlanDescription(entity.getSyncMainPlanDescription());
+        dto.setSyncMainPlanImages(entity.getSyncMainPlanImages());
+        return dto;
+    }
+
+    private static es.onebox.mgmt.datasources.ms.event.dto.event.ProviderPlanSettings fromDTO(
+            es.onebox.mgmt.events.dto.channel.ProviderPlanSettingsDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+        es.onebox.mgmt.datasources.ms.event.dto.event.ProviderPlanSettings entity = new es.onebox.mgmt.datasources.ms.event.dto.event.ProviderPlanSettings();
+        entity.setSyncSessionsAsHidden(dto.getSyncSessionsAsHidden());
+        entity.setSyncSurcharges(dto.getSyncSurcharges());
+        entity.setSyncSessionLabels(dto.getSyncSessionLabels());
+        entity.setSyncSessionPics(dto.getSyncSessionPics());
+        entity.setSyncSessionTypeOrdering(dto.getSyncSessionTypeOrdering());
+        entity.setSyncSessionTypeDetails(dto.getSyncSessionTypeDetails());
+        entity.setSyncMainPlanTitle(dto.getSyncMainPlanTitle());
+        entity.setSyncMainPlanDescription(dto.getSyncMainPlanDescription());
+        entity.setSyncMainPlanImages(dto.getSyncMainPlanImages());
+        return entity;
     }
 }

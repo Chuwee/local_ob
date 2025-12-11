@@ -14,6 +14,8 @@ public class UpdateEventChannelDTO implements Serializable {
     private Boolean useAllQuotas;
     @JsonProperty("quotas")
     private List<Long> quotas;
+    @JsonProperty("provider_plan_settings")
+    private ProviderPlanSettingsDTO providerPlanSettings;
 
     public EventChannelSettingsDTO getSettings() {
         return settings;
@@ -37,5 +39,13 @@ public class UpdateEventChannelDTO implements Serializable {
 
     public void setQuotas(List<Long> quotas) {
         this.quotas = quotas;
+    }
+
+    public ProviderPlanSettingsDTO getProviderPlanSettings() {
+        return providerPlanSettings;
+    }
+
+    public void setProviderPlanSettings(ProviderPlanSettingsDTO providerPlanSettings) {
+        this.providerPlanSettings = providerPlanSettings;
     }
 }

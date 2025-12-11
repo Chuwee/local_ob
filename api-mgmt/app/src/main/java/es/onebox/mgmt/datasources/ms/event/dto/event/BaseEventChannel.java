@@ -11,6 +11,7 @@ public class BaseEventChannel implements Serializable {
     private EventInfo event;
     private EventChannelStatusInfo status;
     private EventChannelSettings settings;
+    private ProviderPlanSettings providerPlanSettings;
 
     public Long getId() {
         return id;
@@ -50,6 +51,14 @@ public class BaseEventChannel implements Serializable {
 
     public void setSettings(EventChannelSettings settings) {
         this.settings = settings;
+    }
+
+    public ProviderPlanSettings getProviderPlanSettings() {
+        return providerPlanSettings;
+    }
+
+    public void setProviderPlanSettings(ProviderPlanSettings providerPlanSettings) {
+        this.providerPlanSettings = providerPlanSettings;
     }
 
 }
