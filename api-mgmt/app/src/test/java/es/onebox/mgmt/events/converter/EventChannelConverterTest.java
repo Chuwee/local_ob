@@ -283,15 +283,15 @@ class EventChannelConverterTest {
         // Then
         assertNotNull(result);
         assertNotNull(result.getProviderPlanSettings());
-        assertEquals(true, result.getProviderPlanSettings().getSyncSessionsAsHidden());
-        assertEquals(false, result.getProviderPlanSettings().getSyncSurcharges());
-        assertEquals(true, result.getProviderPlanSettings().getSyncSessionLabels());
-        assertEquals(false, result.getProviderPlanSettings().getSyncSessionPics());
-        assertEquals(true, result.getProviderPlanSettings().getSyncSessionTypeOrdering());
-        assertEquals(false, result.getProviderPlanSettings().getSyncSessionTypeDetails());
-        assertEquals(true, result.getProviderPlanSettings().getSyncMainPlanTitle());
-        assertEquals(false, result.getProviderPlanSettings().getSyncMainPlanDescription());
-        assertEquals(true, result.getProviderPlanSettings().getSyncMainPlanImages());
+        assertTrue(result.getProviderPlanSettings().getSyncSessionsAsHidden());
+        assertFalse(result.getProviderPlanSettings().getSyncSurcharges());
+        assertTrue(result.getProviderPlanSettings().getSyncSessionLabels());
+        assertFalse(result.getProviderPlanSettings().getSyncSessionPics());
+        assertTrue(result.getProviderPlanSettings().getSyncSessionTypeOrdering());
+        assertFalse(result.getProviderPlanSettings().getSyncSessionTypeDetails());
+        assertTrue(result.getProviderPlanSettings().getSyncMainPlanTitle());
+        assertFalse(result.getProviderPlanSettings().getSyncMainPlanDescription());
+        assertTrue(result.getProviderPlanSettings().getSyncMainPlanImages());
     }
 
     @Test
@@ -333,15 +333,15 @@ class EventChannelConverterTest {
         // Then
         assertNotNull(result);
         assertNotNull(result.getProviderPlanSettings());
-        assertEquals(false, result.getProviderPlanSettings().getSyncSessionsAsHidden());
-        assertEquals(true, result.getProviderPlanSettings().getSyncSurcharges());
-        assertEquals(false, result.getProviderPlanSettings().getSyncSessionLabels());
-        assertEquals(true, result.getProviderPlanSettings().getSyncSessionPics());
-        assertEquals(false, result.getProviderPlanSettings().getSyncSessionTypeOrdering());
-        assertEquals(true, result.getProviderPlanSettings().getSyncSessionTypeDetails());
-        assertEquals(false, result.getProviderPlanSettings().getSyncMainPlanTitle());
-        assertEquals(true, result.getProviderPlanSettings().getSyncMainPlanDescription());
-        assertEquals(false, result.getProviderPlanSettings().getSyncMainPlanImages());
+        assertFalse(result.getProviderPlanSettings().getSyncSessionsAsHidden());
+        assertTrue(result.getProviderPlanSettings().getSyncSurcharges());
+        assertFalse(result.getProviderPlanSettings().getSyncSessionLabels());
+        assertTrue(result.getProviderPlanSettings().getSyncSessionPics());
+        assertFalse(result.getProviderPlanSettings().getSyncSessionTypeOrdering());
+        assertTrue(result.getProviderPlanSettings().getSyncSessionTypeDetails());
+        assertFalse(result.getProviderPlanSettings().getSyncMainPlanTitle());
+        assertTrue(result.getProviderPlanSettings().getSyncMainPlanDescription());
+        assertFalse(result.getProviderPlanSettings().getSyncMainPlanImages());
     }
 
     @Test
