@@ -11,6 +11,7 @@ public class UpdateEventChannel implements Serializable {
     private Boolean useAllSaleGroups;
     private List<Long> saleGroups;
     private EventTicketTemplates ticketTemplates;
+    private ProviderPlanSettings providerPlanSettings;
 
     public Boolean getUseAllSaleGroups() {
         return useAllSaleGroups;
@@ -42,5 +43,13 @@ public class UpdateEventChannel implements Serializable {
 
     public EventTicketTemplates getTicketTemplates() {
         return ticketTemplates;
+    }
+
+    public ProviderPlanSettings getProviderPlanSettings() {
+        return providerPlanSettings;
+    }
+
+    public void setProviderPlanSettings(ProviderPlanSettings providerPlanSettings) {
+        this.providerPlanSettings = providerPlanSettings;
     }
 }
