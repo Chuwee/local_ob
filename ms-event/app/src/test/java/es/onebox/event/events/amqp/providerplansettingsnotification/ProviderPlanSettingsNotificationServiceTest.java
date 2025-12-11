@@ -57,11 +57,18 @@ class ProviderPlanSettingsNotificationServiceTest {
 
     @Test
     void testSendProviderPlanSettingsNotification_NullSettings() throws Exception {
-        // When
+        // When - null settings should still send a notification (to signal clearing)
         service.sendProviderPlanSettingsNotification(eventId, channelId, null);
 
-        // Then
-        verify(providerPlanSettingsNotificationProducer, never()).sendMessage(any());
+        // Then - verify message was sent with null settings
+        ArgumentCaptor<ProviderPlanSettingsNotificationMessage> messageCaptor = 
+            ArgumentCaptor.forClass(ProviderPlanSettingsNotificationMessage.class);
+        verify(providerPlanSettingsNotificationProducer).sendMessage(messageCaptor.capture());
+
+        ProviderPlanSettingsNotificationMessage capturedMessage = messageCaptor.getValue();
+        assertEquals(eventId, capturedMessage.getEventId());
+        assertEquals(channelId, capturedMessage.getChannelId());
+        assertNull(capturedMessage.getProviderPlanSettings());
     }
 
     @Test

@@ -423,14 +423,13 @@ public class EventChannelService {
         if (updateData != null) {
             updateSecondaryMarketEnabled(eventId, channelId, record, updateData.getSettings(), channelEntityRecord);
             
-            // Send notification to MS-NOTIFICATION if provider_plan_settings are updated
-            if (updateData.getProviderPlanSettings() != null) {
-                providerPlanSettingsNotificationService.sendProviderPlanSettingsNotification(
-                    eventId, 
-                    channelId, 
-                    updateData.getProviderPlanSettings()
-                );
-            }
+            // Send notification to MS-NOTIFICATION for provider_plan_settings updates
+            // This includes both setting new values and clearing (null) the settings
+            providerPlanSettingsNotificationService.sendProviderPlanSettingsNotification(
+                eventId, 
+                channelId, 
+                updateData.getProviderPlanSettings()
+            );
         }
         updateSalesGroups(updateData, record);
     }

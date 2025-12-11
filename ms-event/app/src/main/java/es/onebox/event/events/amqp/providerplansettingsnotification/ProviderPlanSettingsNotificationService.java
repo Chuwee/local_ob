@@ -20,21 +20,20 @@ public class ProviderPlanSettingsNotificationService {
     private DefaultProducer providerPlanSettingsNotificationProducer;
 
     public void sendProviderPlanSettingsNotification(Long eventId, Long channelId, ProviderPlanSettings providerPlanSettings) {
-        if (providerPlanSettings == null) {
-            LOGGER.debug("Skipping provider plan settings notification - no settings provided");
-            return;
-        }
-
         ProviderPlanSettingsNotificationMessage message = new ProviderPlanSettingsNotificationMessage();
         message.setEventId(eventId);
         message.setChannelId(channelId);
         
         try {
-            String settingsJson = OBJECT_MAPPER.writeValueAsString(providerPlanSettings);
+            // Serialize settings to JSON, or set to null if settings are null (to signal clearing)
+            String settingsJson = providerPlanSettings != null 
+                ? OBJECT_MAPPER.writeValueAsString(providerPlanSettings) 
+                : null;
             message.setProviderPlanSettings(settingsJson);
             
             providerPlanSettingsNotificationProducer.sendMessage(message);
-            LOGGER.info("Provider plan settings notification sent for event {} and channel {}", eventId, channelId);
+            LOGGER.info("Provider plan settings notification sent for event {} and channel {} (settings={})", 
+                       eventId, channelId, settingsJson != null ? "updated" : "cleared");
         } catch (Exception e) {
             LOGGER.warn("[AMQP CLIENT] ProviderPlanSettingsNotification message could not be sent for event {} and channel {}", 
                        eventId, channelId, e);
