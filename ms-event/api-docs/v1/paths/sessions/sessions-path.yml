@@ -1,0 +1,164 @@
+get:
+  summary: Search sessions
+  description: ''
+  tags:
+    - Sessions
+  parameters:
+    - in: query
+      name: ids
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Session IDs
+    - in: query
+      name: eventId
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Event ID
+    - in: query
+      name: venueId
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Venue ID
+    - in: query
+      name: venueConfigId
+      schema:
+        type: integer
+      description: Venue Config ID
+    - in: query
+      name: offset
+      schema:
+        type: integer
+      description: Offset (default 0)
+    - in: query
+      name: limit
+      schema:
+        type: integer
+      description: Limit (default 10000)
+    - in: query
+      name: admissionDate
+      description: Filter session for admission_start with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as %3A). Supported operators are eq, ne, gt, gte, lt, lte
+      example: eq:2019-01-01T08:00:00Z
+      schema:
+        type: string      
+    - in: query
+      name: startDate
+      description: Filter events for start_date with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as %3A). Supported operators are eq, ne, gt, gte, lt, lte
+      example: eq:2019-01-01T08:00:00Z
+      schema:
+        type: string
+    - in: query
+      name: endDate
+      description: Filter events for end_date with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as %3A). Supported operators are eq, ne, gt, gte, lt, lte
+      example: gte:2019-01-01T08:00:00Z
+      schema:
+        type: string
+    - in: query
+      name: olsonId
+      schema:
+        type: string
+      description: timezone of olson id (Mandatory is hourPeriods or daysOfWeek is set)
+    - in: query
+      name: status
+      schema:
+        $ref: '../../models/sessions/session-status.yml'
+      description: session state array
+    - in: query 
+      name: daysOfWeek
+      schema:
+        $ref: '../../models/sessions/days-of-week.yml'
+      description: Days of week to begin sessions Array
+    - in: query
+      name: startDateFrom
+      schema:
+        type: string
+      description: Session start date from
+    - in: query
+      name: startDateTo
+      schema:
+        type: string
+      description: Session start date to
+    - in: query
+      name: venueEntityId
+      schema:
+        type: integer
+      description: Entity ID of the owner of venues
+    - in: query
+      name: eventStatus
+      schema:
+        type: array
+        items:
+          $ref: '../../models/events/event-status.yml'
+      description: event status
+    - in: query
+      name: eventType
+      schema:
+        type: array
+        items:
+          $ref: '../../models/events/event-type.yml'
+      description: event type
+    - in: query
+      name: sort
+      schema:
+        type: string
+      example:
+        - date.start:asc
+        - date.start:desc
+        - name:asc
+        - name:desc
+      description: 'A string separated by commas with the format [sortableField]:[sortingCriteria]'
+    - in: query
+      name: fields
+      schema:
+        type: array
+        items:
+          $ref: '../../models/sessions/session-fields.yml'
+      description: List of fields that are required to appear in the response (leave blank to retrieve all session fields)
+    - in: query
+      name: includeDynamicPriceConfig
+      schema:
+        type: boolean
+      description: Include dynamic price configuration in the response
+    - in: query
+      name: inventoryProvider
+      schema:
+        type: string
+      description: Event inventory provider
+  responses:
+    '200':
+      description: A JSON array of sessions
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/sessions/sessions.yml'
+    '400':
+      description: A JSON array of sessions
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

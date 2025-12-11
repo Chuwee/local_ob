@@ -1,0 +1,115 @@
+get:
+  summary: Returns an object with the texts of an ticket template.
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: ticketTemplateId
+      schema:
+        type: integer
+      required: true
+      description: Ticket Template ID
+    - in: query
+      name: codes
+      schema:
+        type: array
+        items:
+          type: string
+      description: List of codes
+    - in: query
+      name: languageId
+      schema:
+        type: integer
+      description: Language ID
+  responses:
+    '200':
+      description: A JSON with communication elements of an ticket template
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../../models/tickettemplates/ticket-literals.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  summary: Create or update ticket template literal
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: ticketTemplateId
+      schema:
+        type: integer
+      required: true
+      description: Ticket Template ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: '../../models/tickettemplates/ticket-literals.yml'
+  responses:
+    '200':
+      description: Saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

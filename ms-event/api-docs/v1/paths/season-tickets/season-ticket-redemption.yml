@@ -1,0 +1,88 @@
+get:
+  summary: Get season ticket redemption configuration
+  description: Retrieves the current redemption configuration for a specific season ticket
+  tags:
+    - Season Tickets
+  parameters:
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      required: true
+      description: Season Ticket ID
+  responses:
+    '200':
+      description: Season ticket redemption configuration
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/season-tickets/season-ticket-redemption.yml
+    '400':
+      description: Bad request - Invalid season ticket ID
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found - Season ticket not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  summary: Update season ticket redemption configuration
+  description: |
+    Updates the redemption configuration for a specific season ticket.
+    This includes enabling/disabling the feature, setting excluded sessions,
+    and configuring expiration rules for ticket redemption.
+  tags:
+    - Season Tickets
+  parameters:
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      required: true
+      description: Season Ticket ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/season-tickets/season-ticket-redemption.yml
+  responses:
+    '200':
+      description: Configuration updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/season-tickets/season-ticket-redemption.yml
+    '400':
+      description: Bad request - Invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found - Season ticket not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

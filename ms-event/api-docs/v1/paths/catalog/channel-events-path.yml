@@ -1,0 +1,203 @@
+get:
+  summary: Get events available for a channel
+  tags:
+    - Catalog Search
+  parameters:
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+      required: true
+    - in: query
+      name: forSale
+      schema:
+        type: boolean
+    - in: query
+      name: soldOut
+      schema:
+        type: boolean
+    - in: query
+      name: onCatalog
+      schema:
+        type: boolean
+    - in: query
+      name: onCarousel
+      schema:
+        type: boolean
+    - in: query
+      name: publishDate
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: startDate
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: endDate
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: startSaleDate
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: endSaleDate
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: sessionStartDate
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: price
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: promotedPrice
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: country
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: countrySubdivision
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: city
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: venueId
+      style: form
+      schema:
+        type: array
+        items:
+          type: integer
+    - in: query
+      name: attributesValueId
+      style: form
+      schema:
+        type: array
+        items:
+          type: integer
+    - in: query
+      name: q
+      schema:
+        type: string
+    - in: query
+      name: sort
+      description: |
+        Sorting of enum fields with format field:[asc|desc]
+
+        Valid fields to sort:
+        <ul>
+          <li>custom_order</li>
+          <li>carousel_position</li>
+        </ul>
+
+        For example:
+        <ul>
+          <li>custom_order:desc</li>
+        </ul>
+      schema:
+        type: string
+    - in: query
+      name: categoryCode
+      schema:
+        type: string
+    - in: query
+      name: customCategoryCode
+      schema:
+        type: string
+    - in: query
+      name: limit
+      schema:
+        type: integer
+        maximum: 100
+        minimum: 0
+        default: 100
+    - in: query
+      name: offset
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+  responses:
+    '200':
+      description: Channels found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../models/common/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: ../../models/catalog/channel-event.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

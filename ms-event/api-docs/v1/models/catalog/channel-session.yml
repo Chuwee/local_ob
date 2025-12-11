@@ -1,0 +1,171 @@
+type: object
+properties:
+  id:
+    type: integer
+  name:
+    type: string
+  forSale:
+    type: boolean
+  soldOut:
+    type: boolean
+  reference:
+    type: string
+  mandatoryAttendants:
+    type: boolean
+  publishDate:
+    type: string
+    format: date-time
+  startDate:
+    type: string
+    format: date-time
+  endDate:
+    type: string
+    format: date-time
+  startSaleDate:
+    type: string
+    format: date-time
+  endSaleDate:
+    type: string
+    format: date-time
+  startBookingDate:
+    type: string
+    format: date-time
+  endBookingDate:
+    type: string
+    format: date-time
+  timeZone:
+    type: string
+  venue:
+    $ref: ./venue.yml
+  communicationElements:
+    type: array
+    items:
+      $ref: ./communication-element.yml
+  prices:
+    $ref: ./prices.yml
+  venueConfigId:
+    type: number
+    format: int64
+  eventId:
+    type: integer
+  eventName:
+    type: string
+  eventEntityId:
+    type: number
+    format: int64
+  eventCommunicationElements:
+    type: array
+    items:
+      $ref: ./communication-element.yml
+  rates:
+    type: array
+    items:
+      $ref: ./rate.yml
+  noFinalDate:
+    type: boolean
+  seasonPackSession:
+    type: boolean
+  externalData:
+    type: object
+    properties:
+      capacityId:
+        type: integer
+        description: external data capacity Id
+  priceZonesTemplatesZones:
+    type: object
+    additionalProperties:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        code:
+          type: string
+        contentsTexts:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              tag:
+                type: string
+                enum:
+                  - NAME
+              value:
+                type: string
+    example:
+      1233: [
+        {
+          id: 1,
+          name: "test",
+          code: "test",
+          contentsTexts: {
+            "es_ES" : [
+              {
+                "tag": "NAME",
+                "value": "test"
+              }
+            ],
+            "en_US": [
+              {
+                "tag": "NAME",
+                "value": "test"
+              }
+            ]
+          }
+        }
+      ]
+      1234: [
+        {
+          id: 1,
+          name: "test",
+          code: "test",
+          contentsTexts: {
+            "es_ES": [
+              {
+                "tag": "NAME",
+                "value": "test"
+              }
+            ],
+            "en_US": [
+              {
+                "tag": "NAME",
+                "value": "test"
+              }
+            ]
+          }
+        }
+      ]
+  relatedPacks:
+    type: array
+    items:
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        items:
+          type: array
+          items:
+            properties:
+              itemId:
+                type: integer
+                format: int64
+              name:
+                type: string
+              type:
+                type: string
+                enum:
+                  - EVENT
+                  - SESSION
+                  - PRODUCT
+              main:
+                type: boolean
+                description: Only for `AUTOMATIC` packs
+        suggested:
+          type: boolean
+          description: Indicates if the pack has been set as suggested in the channel
+        onSaleForLoggedUsers:
+          type: boolean
+          description: If true, it indicates that the pack is not for sale to logged-in users

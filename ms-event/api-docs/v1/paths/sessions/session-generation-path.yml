@@ -1,0 +1,124 @@
+get:
+  summary: Session generation status
+  description: Returns an object with status
+  tags:
+    - Sessions
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: path
+      name: sessionId
+      schema:
+        type: integer
+      required: true
+      description: Session ID
+  responses:
+    '200':
+      description: A JSON with session information
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                $ref: '../../models/sessions/session-status.yml'
+                description: Session status
+              generationStatus:
+                $ref: '../../models/sessions/session-generation-status.yml'
+                description: Session status
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+put:
+  summary: Session generation status modification
+  tags:
+    - Sessions
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: path
+      name: sessionId
+      schema:
+        type: integer
+      required: true
+      description: Session ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+          properties:
+            status:
+              $ref: '../../models/sessions/session-generation-status.yml'
+              description: Session generation status
+  responses:
+    '200':
+      description: Saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

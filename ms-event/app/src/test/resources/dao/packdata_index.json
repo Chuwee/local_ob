@@ -1,0 +1,103 @@
+{
+  "settings": {
+    "number_of_shards": 3,
+    "number_of_replicas": 1,
+    "refresh_interval": "5s",
+    "index": {
+      "max_result_window": 10000
+    },
+    "analysis": {
+      "analyzer": {
+        "full_text_index": {
+          "filter": [
+            "trim",
+            "lowercase",
+            "my_ngramar",
+            "asciifolding"
+          ],
+          "tokenizer": "standard"
+        },
+        "full_text_query": {
+          "filter": [
+            "trim",
+            "lowercase",
+            "asciifolding"
+          ],
+          "tokenizer": "standard"
+        }
+      },
+      "filter": {
+        "my_ngramar": {
+          "type": "edge_ngram",
+          "min_gram": "3",
+          "max_gram": "25"
+        }
+      }
+    }
+  },
+  "mappings": {
+    "dynamic": "false",
+    "properties": {
+      "id": {"type": "keyword"},
+      "channelPack": {
+        "properties": {
+          "channelId": {
+            "type": "integer"
+          },
+          "customCategoryCode": {
+            "type": "keyword"
+          },
+          "dates": {
+            "properties": {
+              "start": {
+                "type": "date"
+              }
+            }
+          },
+          "forSale": {
+            "type": "keyword"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "items": {
+            "type": "nested",
+            "properties": {
+              "itemId": {
+                "type": "long"
+              },
+              "main": {
+                "type": "boolean"
+              },
+              "type": {
+                "type": "keyword"
+              }
+            }
+          },
+          "name": {
+            "type": "keyword",
+            "fields": {
+              "fts": {
+                "type": "text",
+                "analyzer": "full_text_index",
+                "search_analyzer": "full_text_query"
+              }
+            }
+          },
+          "onSale": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "keyword"
+          },
+          "type": {
+            "type": "keyword"
+          },
+          "suggested": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

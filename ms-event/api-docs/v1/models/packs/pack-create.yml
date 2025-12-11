@@ -1,0 +1,45 @@
+type: object
+required:
+  - entityId
+  - name
+  - type
+  - taxId
+properties:
+  entityId:
+    type: integer
+  name:
+    type: string
+  mainItem:
+    oneOf:
+      - description: Main item of type EVENT (can have sub_item_ids)
+        type: object
+        required:
+          - type
+          - itemId
+        properties:
+          type:
+            type: string
+            enum: [EVENT]
+          itemId:
+            type: integer
+          venueTemplateId:
+            type: integer
+          subItemIds:
+            type: array
+            items:
+              type: integer
+            maxItems: 50
+            description: The SubItemIds list cannot contain more than 50 items
+      - description: Main item of type SESSION (cannot have sub_item_ids)
+        type: object
+        required:
+          - type
+          - itemId
+        properties:
+          type:
+            type: string
+            enum: [SESSION]
+          itemId:
+            type: integer
+  taxId:
+    type: integer

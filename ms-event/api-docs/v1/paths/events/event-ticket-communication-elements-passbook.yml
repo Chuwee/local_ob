@@ -1,0 +1,115 @@
+get:
+  summary: Returns an object with the ticket communication elements of an event for passbook
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: query
+      name: tags
+      schema:
+        type: array
+        items:
+          $ref: '../../models/events/passbook-comm-element-tag.yml'
+      description: List of tags
+    - in: query
+      name: language
+      schema:
+        type: string
+      description: Language code
+  responses:
+    '200':
+      description: A JSON with communication elements of an event
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../../models/events/event-ticket-communication-elements-passbook.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  summary: Create or update passbook communication elements
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: '../../models/events/event-ticket-communication-elements-passbook.yml'
+  responses:
+    '204':
+      description: Saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

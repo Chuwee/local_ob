@@ -1,0 +1,81 @@
+post:
+  summary: Clone session
+  tags:
+    - Sessions
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: path
+      name: sessionId
+      schema:
+        type: integer
+      required: true
+      description: Session ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - name
+            - startDate
+          properties:
+            name:
+              type: string
+              description: Name of the new session
+            startDate:
+              type: string
+              format: date-time
+            endDate:
+              type: string
+              format: date-time
+            reference:
+              type: string
+            targetFreeStatus:
+              type: boolean
+              description: True if source is linked to session pack and related seats must be changed as FREE status
+            targetBlockingReasonId:
+              type: integer
+              description: Defined if source is linked to session pack and related seats must be changed as BLOCKED for provided id reason
+  responses:
+    '201':
+      description: the id of the newly created session from source to clone
+      content:
+        application/json:
+          schema:
+            type: integer
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

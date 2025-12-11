@@ -1,0 +1,115 @@
+get:
+  summary: Returns an object with the communication elements of an event.
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: query
+      name: tags
+      schema:
+        type: array
+        items:
+          $ref: '../../models/events/comm-element-tag.yml'
+      description: List of tags
+    - in: query
+      name: languageId
+      schema:
+        type: integer
+      description: Language ID
+  responses:
+    '200':
+      description: A JSON with communication elements of an event
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../../models/events/event-communication-elements.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  summary: Create or update Event communication elements
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: '../../models/events/event-communication-elements.yml'
+  responses:
+    '200':
+      description: Saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

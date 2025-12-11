@@ -1,0 +1,157 @@
+get:
+  summary: Returns a list of product value contents list
+  description: ''
+  tags:
+    - Products
+  parameters:
+    - in: path
+      name: productId
+      schema:
+        type: integer
+      required: true
+      description: Product ID
+    - in: path
+      name: attributeId
+      schema:
+        type: integer
+      required: true
+      description: Attribute ID
+    - in: query
+      name: languageCode
+      schema:
+        type: string
+      required: false
+      description: Language code
+  responses:
+    '200':
+      description: A JSON with product value contents
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              additionalProperties: false
+              type: object
+              required:
+                - valueId
+                - key
+                - value
+                - languageCode
+              properties:
+                valueId:
+                  type: integer
+                  format: int64
+                key:
+                  type: string
+                value:
+                  type: string
+                richText:
+                  type: boolean
+                auditable:
+                  type: boolean
+                languageCode:
+                  type: string
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  summary: Update a list of product values contents
+  tags:
+    - Products
+  parameters:
+    - in: path
+      name: productId
+      schema:
+        type: integer
+      required: true
+      description: Product ID
+    - in: path
+      name: attributeId
+      schema:
+        type: integer
+      required: true
+      description: Attribute ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              valueId:
+                type: integer
+                format: int64
+              key:
+                type: string
+              value:
+                type: string
+              richText:
+                type: boolean
+              auditable:
+                type: boolean
+              languageCode:
+                type: string
+  responses:
+    '200':
+      description: Saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+

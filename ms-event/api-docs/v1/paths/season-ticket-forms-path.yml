@@ -1,0 +1,85 @@
+get:
+  summary: Get a season ticket form
+  tags:
+    - Season Ticket Forms
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+      required: true
+    - in: path
+      name: formType
+      schema:
+        type: string
+        enum:
+          - PAYOUT
+      required: true
+  responses:
+    '200':
+      description: Season ticket form
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../models/season-ticket-form.yml
+    '400':
+      description: Bad request
+    '404':
+      description: Not found
+    '409':
+      description: Conflict
+    '412':
+      description: Precondition failed
+    '500':
+      description: Internal server error
+
+put:
+  summary: Update a season ticket form
+  tags:
+    - Season Ticket Forms
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+      required: true
+    - in: path
+      name: formType
+      schema:
+        type: string
+        enum:
+          - PAYOUT
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../models/update-season-ticket-forms.yml
+  responses:
+    '204':
+      description: Season ticket forms updated
+    '400':
+      description: Bad request
+    '404':
+      description: Not found
+    '409':
+      description: Conflict
+    '412':
+      description: Precondition failed
+    '500':
+      description: Internal server error 

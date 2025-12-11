@@ -1,0 +1,66 @@
+type: object
+required:
+  - price
+  - commission
+properties:
+  enabledChannels:
+    type: array
+    items:
+      $ref: enabled-channel.yml
+  enabled:
+    type: boolean
+  isSeasonTicket:
+    type: boolean
+  numSessions:
+    type: number
+  price:
+    type: object
+    required:
+      - type
+    properties:
+      type:
+        type: string
+        enum:
+          - PRICE_WITH_RESTRICTIONS
+          - ORIGINAL_PRICE
+          - UNRESTRICTED
+          - PRORATED
+      restrictions:
+        type: object
+        properties:
+          min:
+            type: number
+            format: double
+          max:
+            type: number
+            format: double
+  commission:
+    type: object
+    properties:
+      percentage:
+        type: number
+        format: double
+  additionalSettings:
+    type: object
+    additionalProperties: false
+    properties:
+      hideBasePrice:
+        type: boolean
+      payToBalance:
+        type: boolean
+  saleType:
+    type: string
+    enum:
+      - FULL
+      - PARTIAL
+  customerLimitsEnabled:
+    type: boolean
+  customerLimits:
+    type: object
+    properties:
+      limit:
+        type: number
+      excludedCustomerTypes:
+        type: array
+        items:
+          type: string

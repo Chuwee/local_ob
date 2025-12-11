@@ -1,0 +1,116 @@
+get:
+  summary: Get season ticket status
+  description: 'Get current status from a season ticket'
+  tags:
+    - Season Tickets
+  parameters:
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Season Ticket ID
+  responses:
+    '200':
+      description: 'Season Ticket status'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              seasonTicketId:
+                type: integer
+                format: int64
+              status:
+                $ref: ../../models/season-tickets/season-ticket-status.yml
+                description: 'Status for this season ticket'
+              generationStatus:
+                $ref: ../../models/season-tickets/season-ticket-generation-status.yml
+                description: 'Status of generation for this season ticket'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  summary: Update season ticket status
+  description: 'Update season ticket status'
+  tags:
+    - Season Tickets
+  parameters:
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+      required: true
+      description: The season ticket ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              $ref: ../../models/season-tickets/season-ticket-status.yml
+              description: 'Status for this season ticket'
+  responses:
+    '200':
+      description: Saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

@@ -1,0 +1,244 @@
+get:
+  summary: Returns an object with an array of events
+  description: ''
+  tags:
+    - Events
+  parameters:
+      - in: query
+        name: entityId
+        schema:
+          type: integer
+        description: Entity ID
+      - in: query
+        name: status
+        schema:
+          $ref: '../../models/events/event-status.yml'
+      - in: query
+        name: type
+        schema:
+          $ref: '../../models/events/event-type.yml'
+        description: Event type
+      - in: query
+        name: avetCompetitions
+        explode: true
+        style: form
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Avet competitions List
+      - in: query
+        name: startDate
+        description: Filter events for start_date with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as %3A). Supported operators are eq, ne, gt, gte, lt, lte
+        example: eq:2019-01-01T08:00:00Z
+        schema:
+          type: string
+      - in: query
+        name: endDate
+        description: Filter events for end_date with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as %3A). Supported operators are eq, ne, gt, gte, lt, lte
+        example: gte:2019-01-01T08:00:00Z
+        schema:
+          type: string
+      - in: query
+        name: producerId
+        schema:
+          type: integer
+        description: Producer ID
+      - in: query
+        name: venueId
+        schema:
+          type: integer
+        description: Venue ID
+      - in: query
+        name: venueEntityId
+        schema:
+          type: integer
+        description: Entity ID of the owner of venues
+      - in: query
+        name: countryId
+        schema:
+          type: integer
+      - in: query
+        name: city
+        schema:
+          type: string
+      - in: query
+        name: includeArchived
+        description: Set to true if want to include in search archived events
+        schema:
+          type: boolean
+      - in: query
+        name: freeSearch
+        description: Free search by name
+        schema:
+          type: string
+      - in: query
+        name: currencyId
+        schema:
+          type: integer
+        description: currency ID of the event
+      - in: query
+        name: offset
+        schema:
+          type: integer
+        description: Offset (default 0)
+      - in: query
+        name: limit
+        schema:
+          type: integer
+        description: Limit (default 100)
+      - in: query
+        name: sort
+        schema:
+          type: string
+        example:
+          - date.start:asc
+          - date.start:desc
+          - name:asc
+          - name:desc
+        description: 'A string separated by commas with the format [sortableField]:[sortingCriteria]'
+      - in: query
+        name: includeSeasonTickets
+        schema:
+          type: boolean
+        description: Search including season tickets
+  responses:
+    '200':
+      description: A JSON array of events
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/events/events.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  summary: create event
+  description: Creates a new event in status PLANNED and returns it's id
+  tags:
+    - Events
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - name
+            - type
+            - entityId
+            - producerId
+            - categoryId
+            - currencyId
+          properties:
+            name:
+              type: string
+              description: the name of the event
+            promoterReference:
+              type: string
+            type:
+              $ref: ../../models/events/event-type.yml
+            entityId:
+              type: integer
+              description: the owner entity of the event
+            producerId:
+              type: integer
+              description: the producer of the event
+            currencyId:
+              type: integer
+              description: the currency of the event
+            invoicePrefixId:
+              type: integer
+              description: the default invoice prefix id
+            categoryId:
+              type: integer
+              description: the id if the category that the event belongs to
+            defaultLangId:
+              type: integer
+            contactPersonName:
+              type: string
+            contactPersonSurname:
+              type: string
+            contactPersonEmail:
+              type: string
+            contactPersonPhone:
+              type: string
+            entityFavoriteChannels:
+              type: array
+              items:
+                type: integer
+                format: int64
+            avetConfig:
+              $ref: '../../models/events/event-avet-config-type.yml'
+              description: Avet Config, if is WS or Socket
+            avetCompetitionId:
+              type: integer
+              description: Avet Competition Id
+            inventoryProvider:
+              type: string
+              description: Defines the integration provider integration connector. It implies that it sessions will be external           
+  responses:
+    '201':
+      description: the id of the newly created event
+      content:
+        application/json:
+          schema:
+            type: integer
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

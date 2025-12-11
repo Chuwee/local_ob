@@ -1,0 +1,118 @@
+get:
+  x-internal: true
+  summary: Get session refund conditions
+  description: 'Returns the rules that will apply for a refund in this session'
+  tags:
+    - Sessions
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Event ID
+    - in: path
+      name: sessionId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Session ID
+  responses:
+    '200':
+      description: ''
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/sessions/session-refund-conditions.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+put:
+  x-internal: true
+  summary: Update session refund conditions
+  description: 'Modifies the rules that will apply for a refund in this session'
+  tags:
+    - Sessions
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Event ID
+    - in: path
+      name: sessionId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Session ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/sessions/session-refund-conditions.yml
+  responses:
+    '204':
+      description: Modified successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '412':
+      description: Precondition failed
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '500':
+      description: Internal error
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'

@@ -1,0 +1,93 @@
+get:
+  summary: 'Get product event sessions published'
+  description: 'Retrieve the sessions published scope and configuration.'
+  tags:
+    - Products
+  parameters:
+    - in: path
+      name: productId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: 'Product ID'
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: 'Event ID'
+  responses:
+    '200':
+      description: Get list of product event sessions published
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/products/product-sessions.yml'
+    '400':
+      description: 'Bad request'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '404':
+      description: 'Not found'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '500':
+      description: 'Internal server error'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+
+put:
+  summary: 'Update product event sessions to publish'
+  description: 'Update the sessions scope and configuration.'
+  tags:
+    - Products
+  parameters:
+    - in: path
+      name: productId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: 'Product ID'
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: 'Event ID'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/products/update-product-sessions.yml
+  responses:
+    '204':
+      description: 'Successful response'
+    '400':
+      description: 'Bad request'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '404':
+      description: 'Not found'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '500':
+      description: 'Internal server error'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'

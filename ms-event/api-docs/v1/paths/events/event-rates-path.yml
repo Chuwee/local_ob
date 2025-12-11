@@ -1,0 +1,232 @@
+get:
+  summary: Returns an object with an array of event rates
+  description: ''
+  tags:
+  - Events
+  parameters:
+  - in: path
+    name: eventId
+    schema:
+      type: integer
+    required: true
+    description: Event ID
+  - in: query
+    name: offset
+    schema:
+      type: integer
+    description: Offset (default 0)
+  - in: query
+    name: limit
+    schema:
+      type: integer
+    description: Limit (default 100)
+  responses:
+    '200':
+      description: A JSON array of events
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/events/event-rates.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  summary: create new rate for event
+  description: creates a new event rate to be used in the given event
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - name
+          properties:
+            id:
+              type: integer
+              description: rate id, ignored for this call, new id must be returned
+            name:
+              type: string
+              description: the name of the rate
+            description:
+              type: string
+              description: rate description
+            restrictive:
+              type: boolean
+              description: restrictive access alert on access controls
+            default:
+              type: boolean
+              description: whether this rate is the new default rate, an event must always has a default rate
+            rateGroupId:
+              type: integer
+              description: Rate group id
+            translations:
+              type: object
+              description: key-value map for translations
+              additionalProperties:
+                type: string
+              example:
+                en-EN: Festive
+                es-ES: Festivo
+            rateGroupIds:
+              type: array
+              description: Rate group IDs
+              items:
+                type:
+                  integer
+  responses:
+    '200':
+      description: the id of the newly created rate
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  summary: Update Event rates
+  description: Modify existing rates of event
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              description:
+                type: string
+              restrictive:
+                type: boolean
+              default:
+                type: boolean
+              rateGroupId:
+                type: integer
+              position:
+                type: integer
+                description: Rate Position
+              translations:
+                type: object
+                description: key-value map for translations
+                additionalProperties:
+                  type: string
+                example:
+                  en-EN: Festive
+                  es-ES: Festivo
+  responses:
+    '200':
+      description: Saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

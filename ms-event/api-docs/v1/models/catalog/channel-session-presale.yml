@@ -1,0 +1,61 @@
+type: object
+properties:
+  numInputs:
+    type: integer
+    description: Number of inputs required for presale access
+  status:
+    type: string
+    description: Current status of the presale session
+    enum:
+      - DELETED
+      - ENABLED
+      - DISABLED
+  validatorId:
+    type: integer
+    description: Identifier for the presale validator
+  validatorType:
+    type: string
+    description: Type of the presale validator
+    enum:
+      - COLLECTIVE
+      - CUSTOMERS
+  memberTicketsLimit:
+    type: integer
+    description: Maximum number of tickets allowed for members during presale
+  generalTicketsLimit:
+    type: integer
+    description: Maximum number of tickets allowed for general public during presale
+  validityPeriod:
+    type: object
+    properties:
+      from:
+        type: string
+        format: date-time
+        description: Start date and time of the presale validity period
+      to:
+        type: string
+        format: date-time
+        description: End date and time of the presale validity period
+      type:
+        type: string
+        description: Type of validity period
+        enum:
+          - ALL
+          - RANGE
+  constraints:
+    type: object
+    properties:
+      customerTypes:
+        type: array
+        description: List of customer types applicable for the presale
+        items:
+          type: integer
+          format: int64
+      points:
+        type: integer
+        format: int64
+        description: Minimum points required for presale access
+  additionalInfo:
+    type: object
+    example: {"provider": "SGA"}
+    description: Additional information regarding the presale session

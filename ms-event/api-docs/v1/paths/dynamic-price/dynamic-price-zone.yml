@@ -1,0 +1,123 @@
+get:
+  x-internal: true
+  summary: Zone dynamic price configuration
+  description: Returns the dynamic price configuration for a specific zone
+  tags:
+    - Session Dynamic Prices
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: path
+      name: sessionId
+      schema:
+        type: integer
+      required: true
+      description: Session ID
+    - in: path
+      name: idPriceZone
+      schema:
+        type: integer
+      required: true
+      description: Price zone ID
+  responses:
+    '200':
+      description: Zone dynamic price configuration
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/dynamic-price/dynamic-price-zone.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  x-internal: true
+  summary: Create or update dynamic price configuration for a specific zone
+  description: ''
+  tags:
+    - Session Dynamic Prices
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: path
+      name: sessionId
+      schema:
+        type: integer
+      required: true
+      description: Session ID
+    - in: path
+      name: idPriceZone
+      schema:
+        type: integer
+      required: true
+      description: Price zone ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: ../../models/dynamic-price/dynamic-prices.yml
+  responses:
+    '200':
+      description: Saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

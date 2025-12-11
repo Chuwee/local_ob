@@ -1,0 +1,205 @@
+{
+  "settings": {
+    "number_of_shards": 3,
+    "number_of_replicas": 0,
+    "index": {
+      "max_inner_result_window": 10000,
+      "max_result_window" : 100000
+    },
+    "analysis": {
+      "analyzer": {
+        "full_text_index": {
+          "filter": [
+            "trim",
+            "lowercase",
+            "my_ngramar",
+            "asciifolding"
+          ],
+          "tokenizer": "standard"
+        },
+        "full_text_query": {
+          "filter": [
+            "trim",
+            "lowercase",
+            "asciifolding"
+          ],
+          "tokenizer": "standard"
+        },
+        "precise_full_text_index": {
+          "filter": [
+            "trim",
+            "lowercase",
+            "precise_my_ngramar",
+            "asciifolding"
+          ],
+          "tokenizer": "standard"
+        },
+        "precise_full_text_query": {
+          "filter": [
+            "trim",
+            "lowercase",
+            "asciifolding"
+          ],
+          "tokenizer": "standard"
+        }
+      },
+      "filter": {
+        "my_ngramar": {
+          "type": "edge_ngram",
+          "min_gram": "3",
+          "max_gram": "25"
+        },
+        "precise_my_ngramar": {
+          "type": "edge_ngram",
+          "min_gram": "1",
+          "max_gram": "25"
+        }
+      }
+    }
+  },
+  "mappings": {
+    "dynamic": "false",
+    "properties": {
+      "id": {"type": "keyword"},
+      "join": {
+        "type": "join",
+        "relations": {
+          "event": ["session","channelEvent"],
+          "session": ["channelSession"]
+        }
+      },
+      "event": {
+        "properties": {
+          "eventId": {"type": "integer"},
+          "eventName": {"type": "keyword", "fields": {"fts": {"type": "text", "analyzer": "full_text_index", "search_analyzer": "full_text_query"}}},
+          "eventType": {"type": "byte"},
+          "eventStatus": {"type": "integer"},
+          "beginEventDate": {"type": "date"},
+          "endEventDate": {"type": "date"},
+          "eventSeasonType": {"type": "byte"},
+          "eventAttributesId": {"type": "integer"},
+          "eventAttributesValueId": {"type": "integer"},
+          "operatorId": {"type": "integer"},
+          "operatorStatus": {"type": "integer"},
+          "entityId": {"type": "integer"},
+          "entityStatus": {"type": "integer"},
+          "taxonomyId": {"type": "integer"},
+          "taxonomyParentId": {"type": "integer"},
+          "tourId": {"type": "integer"},
+          "tourEntityId": {"type": "integer"},
+          "tourOperatorId": {"type": "integer"},
+          "venues":{
+            "type": "nested",
+            "properties": {
+              "id": {"type": "integer"},
+              "entityId": {"type": "integer"},
+              "countryCode": {"type": "keyword"},
+              "provinceCode": {"type": "keyword"},
+              "name": {"type": "text", "analyzer": "full_text_index", "search_analyzer": "full_text_query"},
+              "municipality": {"type": "text", "analyzer": "full_text_index", "search_analyzer": "full_text_query"}
+            }
+          }
+        }
+      },
+      "session": {
+        "properties": {
+          "sessionId": {"type": "integer"},
+          "sessionName": {"type": "keyword", "fields": {"fts": {"type": "text", "analyzer": "precise_full_text_index", "search_analyzer": "precise_full_text_query"}}},
+          "sessionStatus": {"type": "byte"},
+          "eventStatus": {"type": "byte"},
+          "entityId": {"type": "integer"},
+          "eventType": {"type": "byte"},
+          "seasonPackSession": {"type": "boolean"},
+          "venueId": {"type": "integer"},
+          "beginSessionDate": {"type": "date"},
+          "eventId": {"type": "integer"},
+          "eventName": {"type": "keyword", "fields": {"fts": {"type": "text", "analyzer": "precise_full_text_index", "search_analyzer": "precise_full_text_query"}}},
+          "relatedSeasonSessionIds": {"type":  "integer"}
+        }
+      },
+      "channelEvent": {
+        "properties": {
+          "eventId": {"type": "integer"},
+          "channelId": {"type": "integer"},
+          "channelEntityId": {"type": "integer"},
+          "channelName": {"type": "text", "analyzer": "full_text_index", "search_analyzer": "full_text_query"},
+          "channelEventStatus": {"type": "integer"},
+          "publishChannelEvent": {"type": "boolean"},
+          "customCategoryId": {"type": "integer"},
+          "customTaxonomyId": {"type": "integer"},
+          "catalogInfo": {
+            "properties": {
+              "date": {
+                "properties": {
+                  "publish": {"type": "date"},
+                  "saleEnd": {"type": "date"},
+                  "start": {"type": "date"},
+                  "end": {"type": "date"},
+                  "saleStart": {"type": "date"}
+                }
+              },
+              "soldOut": {"type": "boolean"},
+              "forSale": {"type": "boolean"},
+              "prices":{
+                "properties":{
+                  "minPromotedPrice":{
+                    "properties":{
+                      "value": {"type": "double"}
+                    }
+                  },
+                  "minBasePrice": {
+                    "properties": {
+                      "value": {"type": "double"}
+                    }
+                  },
+                  "maxBasePrice": {
+                    "properties": {
+                      "value": {"type": "double"}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "channelSession": {
+        "properties": {
+          "date": {
+            "properties": {
+              "publish": {"type": "date"},
+              "saleEnd": {"type": "date"},
+              "start": {"type": "date"},
+              "end": {"type": "date"},
+              "saleStart": {"type": "date"}
+            }
+          },
+          "eventId": {"type": "integer"},
+          "soldOut": {"type": "boolean"},
+          "forSale": {"type": "boolean"},
+          "sessionId": {"type": "integer"},
+          "channelId": {"type": "integer"},
+          "prices":{
+            "properties":{
+              "minPromotedPrice":{
+                "properties":{
+                  "value": {"type": "double"}
+                }
+              },
+              "minBasePrice": {
+                "properties": {
+                  "value": {"type": "double"}
+                }
+              },
+              "maxBasePrice": {
+                "properties": {
+                  "value": {"type": "double"}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

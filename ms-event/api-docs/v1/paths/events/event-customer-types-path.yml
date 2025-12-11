@@ -1,0 +1,105 @@
+get:
+  summary: Get customer types for an event
+  description: Returns a list of customer types for the specified event
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        minimum: 1
+      required: true
+      description: Event ID (must be greater than 0)
+  responses:
+    '200':
+      description: A list of customer types for the event
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../../models/events/event-customer-type.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  summary: Update customer types for an event
+  description: Updates the customer types configuration for the specified event
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        minimum: 1
+      required: true
+      description: Event ID (must be greater than 0)
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../models/events/update-event-customer-types.yml'
+  responses:
+    '200':
+      description: Customer types updated successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml 

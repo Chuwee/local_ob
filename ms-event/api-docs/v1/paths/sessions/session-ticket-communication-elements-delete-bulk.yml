@@ -1,0 +1,55 @@
+delete:
+  summary: Delete the ticket communication elements of a session for a given ticket type of multiple sessions
+  tags:
+    - Sessions
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: number
+        format: int64
+      required: true
+      description: Event ID
+    - in: path
+      name: type
+      schema:
+        $ref: '../../models/events/ticket-communication-element-category.yml'
+      required: true
+      description: Ticket type
+    - in: path
+      name: language
+      schema:
+        type: string
+      required: true
+      description: Language Code
+    - in: query
+      name: sessionId
+      description: Session ID
+      required: true
+      style: form
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+  responses:
+    '204':
+      description: Deleted successfully
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '412':
+      description: Precondition failed
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'

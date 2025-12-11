@@ -1,0 +1,63 @@
+get:
+  summary: Returns the list of rates with restrictions
+  description: ''
+  tags:
+    - Sessions
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: path
+      name: sessionId
+      schema:
+        type: integer
+      required: true
+      description: Session ID
+  responses:
+    '200':
+      description: A JSON array of rates
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                rate:
+                  $ref: ../../models/common/idname.yml
+                restrictions:
+                  $ref: '../../models/events/event-rate-restrictions.yml'
+
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
