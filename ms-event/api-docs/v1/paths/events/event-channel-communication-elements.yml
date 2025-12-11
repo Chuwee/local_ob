@@ -1,0 +1,113 @@
+get:
+  x-internal: true
+  summary: 'Get communication elements'
+  description: 'Get custom event communication elements for a given channel'
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: 'Event ID'
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: 'Channel ID'
+    - in: query
+      name: tags
+      schema:
+        type: array
+        items:
+          $ref: '../../models/events/comm-element-tag.yml'
+    - in: query
+      name: languageId
+      schema:
+        type: integer
+      description: Language ID
+    - in: query
+      name: language
+      schema:
+        type: string
+      description: Language code
+  responses:
+    '200':
+      description: 'A JSON with custom communication elements of an event for a given channel'
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../../models/events/event-communication-elements.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+post:
+  summary: 'Update communication elements'
+  description: 'Update custom event communication elements for a given channel'
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: 'Event ID'
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: 'Channel ID'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: '../../models/events/event-communication-elements.yml'
+  responses:
+    '204':
+      description: 'Successfully updated'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

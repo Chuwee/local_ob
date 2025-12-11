@@ -1,0 +1,129 @@
+get:
+  summary: get event tiers
+  description: recovers all the tiers belonging to an event
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+    - in: query
+      name: venueTemplateId
+      schema:
+        type: integer
+  responses:
+    '200':
+      description: A JSON array of events
+      content:
+        application/json:
+          schema:
+              $ref: '../../models/events/event-tiers.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  summary: create event tier
+  description: creates a new event tier for the given price type
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - name
+            - priceTypeId
+            - startDate
+            - price
+          properties:
+            name:
+              type: string
+              description: the name of the tier
+            priceTypeId:
+              type: integer
+              description: the id of the price type the tier belongs to
+            startDate:
+              type: string
+              format: date-time
+              description: The date and hour the tier takes effect. Must be unique for a given price zone
+            price:
+              type: number
+              description: The price of the tier
+  responses:
+    '200':
+      description: the id of the newly created tier
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

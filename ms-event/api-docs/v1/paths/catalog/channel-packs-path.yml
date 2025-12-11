@@ -1,0 +1,119 @@
+get:
+  summary: Get catalog packs
+  description: Get catalog packs
+  tags:
+    - Catalog Search
+  parameters:
+    - in: path
+      name: channelId
+      description: Channel Id
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: query
+      name: status
+      schema:
+        type: string
+        enum:
+          - ACTIVE
+          - INACTIVE
+          - DELETED
+    - in: query
+      name: forSale
+      schema:
+        type: boolean
+    - in: query
+      name: onSale
+      schema:
+        type: boolean
+    - in: query
+      name: customCategoryCode
+      schema:
+        type: string
+    - in: query
+      name: q
+      description: Search by name
+      schema:
+        type: string
+    - in: query
+      name: startDate
+      description: Filter pack start time with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as ``%3A``). Supported operators are ``eq``, ``ne``, ``gt``, ``gte``, ``lt``, ``lte``
+      examples:
+        operators:
+          value: gte:2019-01-01T08:00:00Z,lte:2050-01-01T08:00:00Z
+          summary: Filter with operator
+        raw:
+          value: "2019-01-01T08:00:00Z"
+          summary: Raw option
+      explode: true
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: offset
+      schema:
+        type: integer
+    - in: query
+      name: limit
+      schema:
+        type: integer
+    - in: query
+      name: sessionId
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+      required: false
+      description: Filter by session ids
+    - in: query
+      name: eventId
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+      required: false
+      description: Filter by event ids
+    - in: query
+      name: main
+      schema:
+        type: boolean
+        description: Indicates if it is a main item in the pack. Only applies to automatic packs.
+    - in: query
+      name: suggested
+      schema:
+        type: boolean
+        description: Indicates if it is a suggested pack in the channel
+  responses:
+    '200':
+      description: ok response
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - metadata
+              - data
+            properties:
+              metadata:
+                $ref: ../../models/common/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: ../../models/catalog/channel-pack/channel-pack.yml
+    '400':
+      description: Bad parameter
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Channel not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

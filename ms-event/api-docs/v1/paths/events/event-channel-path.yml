@@ -1,0 +1,207 @@
+get:
+  summary: Get an event-channel relation
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: path
+      name: channelId
+      schema:
+        type: number
+        format: int64
+      required: true
+  responses:
+    '200':
+      description: JSON with event-channel relation
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/events/event-channel.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+delete:
+  summary: Delete a event-channel relationship
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+      required: true
+      description: Channel ID
+  responses:
+    '200':
+      description: Deleted successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  summary: Update event channel relationship
+  description: ''
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+      required: true
+      description: Channel ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            useAllSaleGroups:
+              type: boolean
+            saleGroups:
+              type: array
+              items:
+                type: integer
+            settings:
+              type: object
+              properties:
+                useEventDates:
+                  type: boolean
+                  description: When set to true, release, sale and booking dates are ignored
+                releaseEnabled:
+                  type: boolean
+                releaseDate:
+                  type: string
+                  example: 2021-02-19T10:12:54Z
+                saleEnabled:
+                  type: boolean
+                saleStartDate:
+                  type: string
+                  example: 2021-02-19T10:12:54Z
+                saleEndDate:
+                  type: string
+                  example: 2021-02-19T10:12:54Z
+                bookingEnabled:
+                  type: boolean
+                bookingStartDate:
+                  type: string
+                  example: 2021-02-19T10:12:54Z
+                bookingEndDate:
+                  type: string
+                  example: 2021-02-19T10:12:54Z
+                secondaryMarketEnabled:
+                  type: boolean
+                secondaryMarketStartDate:
+                  type: string
+                  format: date-time
+                secondaryMarketEndDate:
+                  type: string
+                  format: date-time
+            ticketTemplates:
+              $ref: "../../models/events/event-ticket-templates.yml"
+  responses:
+    '204':
+      description: Event channel updated successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

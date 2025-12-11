@@ -1,0 +1,64 @@
+get:
+  x-internal: true
+  summary: Get dynamic price rates
+  description: ''
+  tags:
+    - Session Dynamic Prices
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: path
+      name: sessionId
+      schema:
+        type: integer
+      required: true
+      description: Session ID
+    - in: path
+      name: idPriceZone
+      schema:
+        type: integer
+      required: true
+      description: ID Price Zone
+  responses:
+    '200':
+      description: Dynamic price zone rates
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../../models/dynamic-price/dynamic-rates-price.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

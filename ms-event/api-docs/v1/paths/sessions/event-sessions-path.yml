@@ -1,0 +1,259 @@
+get:
+  summary: Returns an object with an array of sessions
+  description: ''
+  tags:
+    - Sessions
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: query
+      name: venueConfigId
+      schema:
+        type: integer
+      description: Venue Config ID
+    - in: query
+      name: offset
+      schema:
+        type: integer
+      description: Offset (default 0)
+    - in: query
+      name: limit
+      schema:
+        type: integer
+      description: Limit (default 10000)
+    - in: query
+      name: admissionDate
+      description: Filter session for admission_start with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as %3A). Supported operators are eq, ne, gt, gte, lt, lte
+      example: eq:2019-01-01T08:00:00Z
+      schema:
+        type: array
+        items:
+          type: string
+    - in: query
+      name: startDate
+      description: Filter events for start_date with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as %3A). Supported operators are eq, ne, gt, gte, lt, lte
+      example: eq:2019-01-01T08:00:00Z
+      schema:
+        type: string
+    - in: query
+      name: endDate
+      description: Filter events for end_date with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as %3A). Supported operators are eq, ne, gt, gte, lt, lte
+      example: gte:2019-01-01T08:00:00Z
+      schema:
+        type: string
+    - in: query
+      name: olsonId
+      schema:
+        type: string
+      description: timezone of olson id (Mandatory is hourPeriods or daysOfWeek is set)
+    - in: query
+      name: status
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: '../../models/sessions/session-status.yml'
+      description: session state array
+    - in: query
+      name: daysOfWeek
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: '../../models/sessions/days-of-week.yml'
+      description: Days of week to begin sessions Array
+    - in: query
+      name: startDateFrom
+      schema:
+        type: string
+      description: Session start date from
+    - in: query
+      name: startDateTo
+      schema:
+        type: string
+      description: Session start date to
+    - in: query
+      name: venueEntityId
+      schema:
+        type: integer
+      description: Entity ID of the owner of venues
+    - in: query
+      name: sort
+      schema:
+        type: string
+      example:
+        - date.start:asc
+        - date.start:desc
+        - name:asc
+        - name:desc
+      description: 'A string separated by commas with the format [sortableField]:[sortingCriteria]'
+    - in: query
+      name: fields
+      schema:
+        type: array
+        items:
+          $ref: '../../models/sessions/session-fields.yml'
+      description: |
+        List of fields that are required to appear in the response (leave blank to retrieve all session fields)
+        
+        Field:
+          * `status.flags` - returns `sale`and `release` session properties
+    - in: query
+      name: getQueueitInfo
+      schema:
+        type: boolean
+      description: Determines if returns the queueit information related to the sessions
+    - in: query
+      name: includeDynamicPriceConfig
+      schema:
+        type: boolean
+      description: Include dynamic price configuration in the response
+  responses:
+    '200':
+      description: A JSON array of sessions
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/sessions/sessions.yml'
+    '400':
+      description: A JSON array of sessions
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  summary: create session
+  description: Creates a new session in status PLANNED and returns it's id
+  tags:
+    - Sessions
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - name
+            - rates
+          properties:
+            name:
+              type: string
+              description: the name of the event
+            eventId:
+              type: integer
+              description: optional eventId. If empty, take from path
+            status:
+              $ref: '../../models/sessions/session-status.yml'
+              description: Session status
+            venueConfigId:
+              type: integer
+              description: venue templete id. This or venueEntityConfigId is mandatory.
+            venueEntityConfigId:
+              type: integer
+              description: venue templete entity relation id. This or venueConfigId is mandatory.
+            rates:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  default:
+                    type: boolean
+            taxId:
+              type: integer
+              description: session ticket tax
+            ticketTaxIds:
+              type: array
+              items:
+                type: integer
+              description: session ticket taxes
+            chargeTaxId:
+              type: integer
+              description: session charge tax
+            chargeTaxIds:
+              type: array
+              items:
+                type: integer
+              description: session charge taxes
+            reference:
+              type: string
+              description: session reference
+            smartBooking:
+              type: boolean
+              description: smartBooking
+            settings:
+              type: object
+              properties:
+                enableOrphanSeats:
+                  type: boolean
+                  description: Enable protection against orphan seats in a sales channel
+  responses:
+    '201':
+      description: the id of the newly created session
+      content:
+        application/json:
+          schema:
+            type: integer
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

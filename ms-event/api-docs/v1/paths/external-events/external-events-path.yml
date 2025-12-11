@@ -1,0 +1,104 @@
+get:
+  summary: Returns a list of external events
+  description: Returns a list of external events
+  tags:
+    - External events
+  parameters:
+    - in: query
+      name: entityId
+      style: form
+      schema:
+        type: array
+        items:
+          type: integer
+      description: List of entity ID
+    - in: query
+      name: eventType
+      schema:
+        $ref: ../../models/external-events/external-event-status.yml
+  responses:
+    '200':
+      description: A JSON array of external events
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../../models/external-events/external-event.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  summary: Create or update a list of external events
+  description: Create or update a list of external events
+  tags:
+    - External events
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: ../../models/external-events/upsert-external-event.yml
+  responses:
+    '200':
+      description: External events saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

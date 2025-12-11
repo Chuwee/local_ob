@@ -1,0 +1,118 @@
+get:
+  summary: Get channel sessions
+  tags:
+    - Catalog Search
+  parameters:
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+      required: true
+    - in: query
+      name: eventId
+      style: form
+      schema:
+        type: array
+        items:
+          type: integer
+    - in: query
+      name: forSale
+      schema:
+        type: boolean
+    - in: query
+      name: soldOut
+      schema:
+        type: boolean
+    - in: query
+      name: publishDate
+      schema:
+        type: string
+    - in: query
+      name: startDate
+      schema:
+        type: string
+    - in: query
+      name: startSaleDate
+      schema:
+        type: string
+    - in: query
+      name: endSaleDate
+      schema:
+        type: string
+    - in: query
+      name: type
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - SESSION
+            - SESSION_PACK
+    - in: query
+      name: limit
+      schema:
+        type: integer
+        minimum: 0
+        default: 100
+    - in: query
+      name: offset
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    - in: query
+      name: sessionId
+      schema:
+        type: array
+        items:
+          type: integer
+    - in: query
+      name: venueConfigId
+      schema:
+        type: array
+        items:
+          type: integer
+  responses:
+    '200':
+      description: List of sessions
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../models/common/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: ../../models/catalog/channel-session.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

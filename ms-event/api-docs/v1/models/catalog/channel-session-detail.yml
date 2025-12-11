@@ -1,0 +1,276 @@
+type: object
+properties:
+  id:
+    type: integer
+  name:
+    type: string
+  forSale:
+    type: boolean
+  soldOut:
+    type: boolean
+  reference:
+    type: string
+  mandatoryAttendants:
+    type: boolean
+  publishDate:
+    type: string
+    format: date-time
+  startDate:
+    type: string
+    format: date-time
+  endDate:
+    type: string
+    format: date-time
+  startSaleDate:
+    type: string
+    format: date-time
+  endSaleDate:
+    type: string
+    format: date-time
+  startBookingDate:
+    type: string
+    format: date-time
+  endBookingDate:
+    type: string
+    format: date-time
+  timeZone:
+    type: string
+  venue:
+    $ref: ./venue.yml
+  communicationElements:
+    type: array
+    items:
+      $ref: ./communication-element.yml
+  prices:
+    $ref: ./prices.yml
+  rates:
+    type: array
+    items:
+      $ref: ./rate.yml
+  promotions:
+    type: array
+    items:
+      $ref: ./promotion.yml
+  seasonPackSession:
+    type: boolean
+  useCaptcha:
+    type: boolean
+  showDate:
+    type: boolean
+  showDateTime:
+    type: boolean
+  checkOrphanSeats:
+    type: boolean
+  isGraphic:
+    type: boolean
+  sessionMaxTickets:
+    type: number
+  orderMaxTickets:
+    type: number
+  ipRestrictedCountries:
+    type: array
+    items:
+      type: string
+  priceZonesRestrictions:
+    type: object
+    additionalProperties:
+      type: object
+      properties:
+        requiredPriceZones:
+          type: array
+          items:
+            type: number
+        required:
+          type: number
+        locked:
+          type: number
+    example:
+      1234:
+        items : [1,34,56]
+        required: 3
+      1223:
+        items: [ 1 ]
+        locked: 2
+  priceTypeTags:
+    type: object
+    additionalProperties: true
+    example:
+      1223: [ "REGULAR" ]
+      1234: [ "VIP", "VIP PREMIUM" ]
+  priceZonesTemplatesZones:
+    type: object
+    additionalProperties:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        code:
+          type: string
+        contentsTexts:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              tag:
+                type: string
+                enum:
+                  - NAME
+              value:
+                type: string
+    example:
+      1233: [
+        {
+          id: 1,
+          name: "test",
+          code: "test",
+          contentsTexts: {
+            "es_ES" : [
+              {
+                "tag": "NAME",
+                "value": "test"
+              }
+            ],
+            "en_US": [
+              {
+                "tag": "NAME",
+                "value": "test"
+              }
+            ]
+          }
+        }
+      ]
+      1234: [
+        {
+          id: 1,
+          name: "test",
+          code: "test",
+          contentsTexts: {
+            "es_ES": [
+              {
+                "tag": "NAME",
+                "value": "test"
+              }
+            ],
+            "en_US": [
+              {
+                "tag": "NAME",
+                "value": "test"
+              }
+            ]
+          }
+        }
+      ]
+  priceZoneLimit:
+    type: object
+    additionalProperties:
+      type: object
+      properties:
+        min:
+          type: number
+        max:
+          type: number
+    example:
+      1234:
+       min: 2,
+       max: 23
+      1223:
+        min: 5,
+        max: 6
+  customersLimits:
+    type: object
+    properties:
+      priceZoneLimit:
+        type: object
+        additionalProperties:
+          type: object
+          properties:
+            min:
+              type: number
+            max:
+              type: number
+        example:
+          1234:
+            min: 2,
+            max: 23
+          1223:
+            min: 5,
+            max: 6
+  virtualQueue:
+    type: object
+    properties:
+      enabled:
+        type: boolean
+      version:
+        type: string
+        enum:
+          - V3
+      alias:
+        type: string
+  promoter:
+    $ref: catalog-entity.yml
+  noFinalDate:
+    type: boolean
+  attendantsConfig:
+    type: object
+    properties:
+      autofill:
+        type: boolean
+      allowEditAutofill:
+        type: boolean
+      editAutofillDisallowedSectors:
+        type: array
+        items:
+          type: number
+  secondaryMarketConfig:
+    $ref: ../sec-mkt/secondary-market-config.yml
+  eventSecondaryMarketConfig:
+    $ref: ../sec-mkt/event-secondary-market-config.yml
+  loyaltyPointsConfig:
+    $ref: './../sessions/session-loyalty-points-config.yml'
+  presalesSettings:
+    $ref: './../sessions/session-presale-settings.yml'
+  smartBooking:
+    type: boolean
+  relatedSessionId:
+    type: number
+  channelSessionPresale:
+    $ref: ./channel-session-presale.yml
+  dynamicPriceTranslations:
+    type: array
+    items:
+      $ref: ../dynamic-price/dynamic-price-translation.yml
+  relatedPacks:
+    type: array
+    items:
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        items:
+          type: array
+          items:
+            properties:
+              itemId:
+                type: integer
+                format: int64
+              name:
+                type: string
+              type:
+                type: string
+                enum:
+                  - EVENT
+                  - SESSION
+                  - PRODUCT
+              main:
+                type: boolean
+                description: Only for `AUTOMATIC` packs
+        suggested:
+          type: boolean
+          description: Indicates if the pack has been set as suggested in the channel
+        onSaleForLoggedUsers:
+          type: boolean
+          description: If true, it indicates that the pack is not for sale to logged-in users

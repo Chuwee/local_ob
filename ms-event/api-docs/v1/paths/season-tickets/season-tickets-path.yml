@@ -1,0 +1,209 @@
+get:
+  summary: Search season tickets
+  tags:
+    - Season Tickets
+  parameters:
+    - in: query
+      name: entityId
+      schema:
+        type: integer
+      description: Entity ID
+    - in: query
+      name: status
+      schema:
+        $ref: '../../models/events/event-status.yml'
+    - in: query
+      name: startDate
+      description: Filter events for start_date with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as %3A). Supported operators are eq, ne, gt, gte, lt, lte
+      example: eq:2019-01-01T08:00:00Z
+      schema:
+        type: string
+    - in: query
+      name: endDate
+      description: Filter events for end_date with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as %3A). Supported operators are eq, ne, gt, gte, lt, lte
+      example: gte:2019-01-01T08:00:00Z
+      schema:
+        type: string
+    - in: query
+      name: producerId
+      schema:
+        type: integer
+      description: Producer ID
+    - in: query
+      name: venueId
+      schema:
+        type: integer
+      description: Venue ID
+    - in: query
+      name: venueEntityId
+      schema:
+        type: integer
+      description: Entity ID of the owner of venues
+    - in: query
+      name: countryId
+      schema:
+        type: integer
+    - in: query
+      name: city
+      schema:
+        type: string
+    - in: query
+      name: includeArchived
+      description: Set to true if want to include in search archived events
+      schema:
+        type: boolean
+    - in: query
+      name: freeSearch
+      description: Free search by name
+      schema:
+        type: string
+    - in: query
+      name: offset
+      schema:
+        type: integer
+      description: Offset (default 0)
+    - in: query
+      name: limit
+      schema:
+        type: integer
+      description: Limit (default 100)
+    - in: query
+      name: sort
+      schema:
+        type: string
+      example:
+        - date.start:asc
+        - date.start:desc
+        - name:asc
+        - name:desc
+      description: 'A string separated by commas with the format [sortableField]:[sortingCriteria]'
+    - in: query
+      name: entityAdminId
+      schema:
+        type: integer
+      description: Entity Admin ID
+    - in: query
+      name: currencyId
+      schema:
+        type: integer
+      description: Currency ID
+  responses:
+    '200':
+      description: A JSON object with an array of season tickets
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/season-tickets/season-tickets.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  summary: create season ticket
+  description: Creates a new season ticket in status PLANNED and returns it's id
+  tags:
+    - Season Tickets
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - name
+            - entityId
+            - producerId
+            - categoryId
+          properties:
+            name:
+              type: string
+              description: the name of the season ticket
+            entityId:
+              type: integer
+              description: the owner entity of the season ticket
+            producerId:
+              type: integer
+              description: the producer of the season ticket
+            categoryId:
+              type: integer
+              description: the id if the category that the season ticket belongs to
+            defaultLangId:
+              type: integer
+            contactPersonName:
+              type: string
+            contactPersonSurname:
+              type: string
+            contactPersonEmail:
+              type: string
+            contactPersonPhone:
+              type: string
+            currencyId:
+              type: integer
+            invoicePrefixId:
+              type: integer
+            customCategoryId:
+              type: integer
+  responses:
+    '201':
+      description: the id of the newly created season ticket
+      content:
+        application/json:
+          schema:
+            type: integer
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

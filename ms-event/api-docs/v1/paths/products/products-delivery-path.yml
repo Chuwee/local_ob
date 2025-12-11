@@ -1,0 +1,147 @@
+get:
+  summary: Returns a product delivery detail
+  description: ''
+  tags:
+    - Products
+  parameters:
+    - in: path
+      name: productId
+      schema:
+        type: integer
+      required: true
+      description: Product ID
+  responses:
+    '200':
+      description: A JSON with the product delivery information
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/products/product-delivery.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  summary: Update product delivery information
+  tags:
+    - Products
+  parameters:
+    - in: path
+      name: productId
+      schema:
+        type: integer
+      required: true
+      description: Product ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - deliveryType
+          properties:
+            deliveryType:
+              type: string
+              enum:
+                - SESSION
+                - PURCHASE
+                - FIXED_DATES
+              description: product delivery type
+            startTimeUnit:
+              type: string
+              enum:
+                - MINUTES
+                - HOURS
+                - DAYS
+                - WEEKS
+                - MONTHS
+              description: Delivery start time unit
+            startTimeValue:
+              type: integer
+              description: Delivery start time value
+            endTimeUnit:
+              type: string
+              enum:
+                - MINUTES
+                - HOURS
+                - DAYS
+                - WEEKS
+                - MONTHS
+              description: Delivery end  time unit
+            endTimeValue:
+              type: integer
+              description: Delivery end time value
+            deliveryDateFrom:
+              format: date-time
+              type: string
+              description: Delivery fixed start date if delivery type is fixed
+            deliveryDateTo:
+              format: date-time
+              type: string
+              description: Delivery fixed end date if delivery type is fixed
+  responses:
+    '200':
+      description: Saved successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/products/product-delivery.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+

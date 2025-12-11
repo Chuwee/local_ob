@@ -1,0 +1,147 @@
+get:
+  summary: Returns an object with event venue prices
+  description: ''
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: path
+      name: templateId
+      schema:
+        type: integer
+      required: true
+      description: Venue template ID
+    - in: query
+      name: sessionId
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+      description: List of Session IDs
+    - in: query
+      name: rateGroupId
+      schema:
+        type: array
+        items:
+          type: integer
+      description: List of rate group IDs
+    - in: query
+      name: rateGroupProductId
+      schema:
+        type: array
+        items:
+          type: integer
+      description: List of rate groups IDs (Product)
+  responses:
+    '200':
+      description: A JSON with the prices of a venue template
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../../models/events/event-venue-template-price.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  summary: update event venue prices
+  description: update event template prices
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+    - in: path
+      name: templateId
+      schema:
+        type: integer
+      required: true
+      description: Venue template ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              price_type_id:
+                type: number
+              rate_id:
+                type: number
+              value:
+                type: number
+              additionalConfig:
+                $ref: ../../models/events/additionalConfig.yml
+  responses:
+    '200':
+      description: Saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

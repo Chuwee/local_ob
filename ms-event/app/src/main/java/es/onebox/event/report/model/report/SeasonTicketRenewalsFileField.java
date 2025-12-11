@@ -1,0 +1,28 @@
+package es.onebox.event.report.model.report;
+
+import es.onebox.core.file.exporter.generator.model.ExportFileField;
+import es.onebox.event.report.enums.SeasonTicketRenewalsField;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+public class SeasonTicketRenewalsFileField extends ExportFileField<SeasonTicketRenewalsField> {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public boolean equals(Object obj) {
+        return EqualsBuilder.reflectionEquals(this, obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
+    }
+}

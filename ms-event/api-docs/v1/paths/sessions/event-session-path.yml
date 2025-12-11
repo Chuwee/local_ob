@@ -1,0 +1,275 @@
+get:
+  summary: Returns an object with session information
+  description: ''
+  tags:
+    - Sessions
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: path
+      name: sessionId
+      schema:
+        type: integer
+      required: true
+      description: Session ID
+  responses:
+    '200':
+      description: A JSON with session information
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/sessions/session.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  summary: Update Session
+  description: ''
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+    - in: path
+      name: sessionId
+      schema:
+        type: integer
+      required: true
+      description: Session ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+              description: Event name
+            status:
+              $ref: '../../models/sessions/session-status.yml'
+              description: Session status
+            date:
+              $ref: '../../models/sessions/session-dates.yml'
+            rates:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  default:
+                    type: boolean
+            ticketTax:
+              type: object
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+            chargesTax:
+              type: object
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+            accessScheduleType:
+              $ref: '../../models/sessions/access-schedule-type.yml'
+              description: Indicates which dates should be used for admission start and admission end
+            space:
+              type: object
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+            useVenueConfigCapacity:
+              type: boolean
+            useTemplateAccess:
+              type: boolean
+            saleType:
+              type: integer
+              description: Activities sale type
+            capacity:
+              type: integer
+            enableChannels:
+              type: boolean
+            enableBookings:
+              type: boolean
+            enableSales:
+              type: boolean
+            enableCaptcha:
+              type: boolean
+            unpublishReason:
+              type: string
+            enableProducerTaxData:
+              type: boolean
+            producerId:
+              type: integer
+            invoicePrefixId:
+              type: integer
+            enableMembersLoginsLimit:
+              type: boolean
+              description: 'Set to <b>true</b> to set the membersLoginsLimit. Set to <b>false</b> to set null membersLoginsLimit'
+            membersLoginsLimit:
+              type: integer
+              description: 'The maximum number of members logged-in simultaneously allowed'
+            streaming:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+                vendor:
+                  $ref: '../../models/sessions/streaming-vendor.yml'
+                value:
+                  type: string
+                sendEmail:
+                  type: boolean
+            color:
+              type: string
+            enableOrphanSeats:
+              type: boolean    
+            enableSessionTicketLimit:
+              type: boolean
+            sessionTicketLimit:
+              type: integer
+            enableShowDateInChannels:
+              type: boolean
+            enableShowTimeInChannels:
+              type: boolean
+            subscriptionListId:
+              type: integer
+            enableSubscriptionList:
+              type: boolean
+            enableCountryFilter:
+              type: boolean
+            externalReference:
+              type: string
+            countries:
+              type: array
+              items:
+                type: string
+            enableQueue:
+              type: boolean
+            queueAlias:
+              type: string
+            queueVersion:
+              type: string
+              enum:
+                - V3
+            deleteData:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - FREE
+                    - LOCKED
+                blockingReasonId:
+                  type: integer
+            reference:
+              type: string
+              description: Session reference
+            external:
+              type: boolean
+            presaleEnabled:
+              type: boolean
+            presalePromotionId:
+              type: number
+            publicationCancelledReason:
+              type: string
+            unconfirmedDate:
+              type: boolean
+            enableSecondaryMarket:
+              type: boolean
+            presalesRedirectionPolicy:
+              type: object
+              properties:
+                mode:
+                  type: string
+                  description: Defines the mode for redirection.
+                  enum:
+                    - CATALOG
+                    - CUSTOM
+                value:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: A map of redirection values with string keys and values.
+            sessionExternalConfig:
+              $ref: '../../models/sessions/session-external-config.yml'
+
+  responses:
+    '200':
+      description: Saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

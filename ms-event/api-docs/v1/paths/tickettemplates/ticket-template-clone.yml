@@ -1,0 +1,69 @@
+post:
+  x-internal: true
+  summary: Clone ticket template
+  description: 'Clone a ticket template'
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: ticketTemplateId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Ticket Template ID      
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - name
+          properties:
+            name:
+              type: string
+            entityId:
+              type: integer
+              format: int64
+  responses:
+    '201':
+      description: The ticket template was added correctly
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: the id of the newly created ticket template
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

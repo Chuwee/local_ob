@@ -1,0 +1,59 @@
+post:
+  summary: Export price simulations
+  tags:
+    - Price Simulation
+  parameters:
+   - in: path
+     name: saleRequestId
+     description: Sale request ID
+     schema:
+      type: integer
+      format: int64
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/price-engine/simulation-report-request.yml
+  responses:
+    "202":
+      description: Export created successfully
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/export/export-info.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    "409":
+      description: Too many exports
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

@@ -1,0 +1,63 @@
+type: object
+properties:
+  id:
+    type: integer
+  name:
+    type: string
+  type:
+    type: string
+    enum:
+      - AUTOMATIC
+      - PROMOTION
+      - DISCOUNT
+  status:
+    type: string
+    enum:
+      - ACTIVE
+      - INACTIVE
+      - DELETED
+  communicationElements:
+    type: object
+    properties:
+      name:
+        type: object
+        additionalProperties:
+          type: string
+      description:
+        type: object
+        additionalProperties:
+          type: string
+  active:
+    type: boolean
+  restrictions:
+    type: object
+    properties:
+      validityPeriod:
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+              - ALL
+              - PERIOD
+              - DAYS_UNTIL_SESSION
+          from:
+            type: string
+            format: date-time
+          to:
+            type: string
+            format: date-time
+  usageConditions:
+    type: object
+    properties:
+      ratesRelationsConditions:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: number
+            name:
+              type: string
+            quantity:
+              type: integer

@@ -1,0 +1,212 @@
+get:
+  summary: Returns an object with event information
+  description: ''
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+  responses:
+    '200':
+      description: A JSON with event information
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/events/event.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+put:
+  summary: Update Event
+  description: ''
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+      required: true
+      description: Event ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+              description: Event name
+            promoterReference:
+              type: string
+            status:
+              $ref: '../../models/events/event-status.yml'
+              description: Event status
+            type:
+              $ref: '../../models/events/event-type.yml'
+              description: Event type
+            contactPersonName:
+              type: string
+            contactPersonSurname:
+              type: string
+            contactPersonEmail:
+              type: string
+            contactPersonPhone:
+              type: string
+            salesGoalTickets:
+              type: integer
+            salesGoalRevenue:
+              type: number
+            category:
+              type: object
+              properties:
+                id:
+                  type: integer
+            customCategory:
+              type: object
+              properties:
+                id:
+                  type: integer
+            languages:
+              type: array
+              items:
+                $ref: '../../models/events/event-language.yml'
+              example:
+                es_ES:
+                  id: 1
+                  isDefault: true
+                en_US:
+                  id: 3
+                  isDefault: false
+            currencyId:
+              type: integer
+            externalReference:
+              type: string
+            subscriptionListId:
+              type: integer
+            enableSubscriptionList:
+              type: boolean
+            tour:
+              type: object
+              properties:
+                id:
+                  type: integer
+            eventVenueViewConfig:
+              $ref: '../../models/events/event-venue-view-config.yml'
+              description: Venue view configuration
+            supraEvent:
+              type: boolean
+            giftTicket:
+              type: boolean
+            sessionPackType:
+              $ref: '../../models/events/session-pack-type.yml'
+              description: Session pack type
+            allowGroups:
+              type: boolean
+            groupPrice:
+              type: integer
+            groupCompanionPayment:
+              type: boolean
+            allowVenueReport:
+              type: boolean
+            useProducerFiscalData:
+              type: boolean
+            booking:
+              $ref: '../../models/events/booking.yml'
+              description: Booking set up
+            useTieredPricing:
+              type: boolean
+            invitationUseTicketTemplate:
+              type: boolean              
+            ticketTemplates:
+              $ref: ../../models/events/event-ticket-templates.yml
+            archived:
+              type: boolean
+            customSelectTemplate:
+              type: string
+            invoicePrefixId:
+              type: integer
+            accommodationsConfig:
+              $ref: ../../models/events/event-accommodations-config.yml
+            whitelabelSettings:
+              $ref: '../../models/events/event-whitelabel-settings.yml'
+            eventExternalConfig:
+              $ref: '../../models/events/event-external-config.yml'
+            allowChangeSeat:
+              type: boolean
+              description: Mandatory if the changeSeat property is updated
+            changeSeat:
+              $ref: '../../models/events/event-change-seat.yml'
+            phoneVerificationRequired:
+              type: boolean
+            attendantVerificationRequired:
+              type: boolean
+  responses:
+    '200':
+      description: Saved successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+

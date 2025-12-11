@@ -1,0 +1,161 @@
+get:
+  summary: Check renewals purge and get info about deleted renewals for a season ticket and the established filter
+  tags:
+    - Season Tickets
+  parameters:
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+      required: true
+      description: The season ticket ID
+    - in: query
+      name: mappingStatus
+      description: The status of the renewal
+      schema:
+        type: string
+        enum:
+          - NOT_MAPPED
+          - MAPPED
+    - in: query
+      name: renewalStatus
+      description: The status of the renewal
+      schema:
+        type: string
+        enum:
+          - NOT_RENEWED
+          - RENEWED
+          - REFUNDED
+          - CANCELED
+    - in: query
+      name: freeSearch
+      description: Free search for renewals by name, surname, email and member id
+      schema:
+        type: string
+    - in: query
+      name: birthday
+      description: Filter renewals for customer bithday with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as ``%3A``). Supported operators are ``eq``, ``ne``, ``gt``, ``gte``, ``lt``, ``lte``
+      example: eq:2019-01-01T08:00:00Z
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+  responses:
+    '200':
+      description: Info about the deleted renewals
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              deletableRenewals:
+                type: integer
+                description: number of renewals that can be deleted with current filter
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  summary: Delete all season ticket renewals for a season ticket and the established filter
+  tags:
+    - Season Tickets
+  parameters:
+    - in: path
+      name: seasonTicketId
+      schema:
+        type: integer
+      required: true
+      description: The season ticket ID
+    - in: query
+      name: mappingStatus
+      description: The status of the renewal
+      schema:
+        type: string
+        enum:
+          - NOT_MAPPED
+          - MAPPED
+    - in: query
+      name: renewalStatus
+      description: The status of the renewal
+      schema:
+        type: string
+        enum:
+          - NOT_RENEWED
+          - RENEWED
+          - REFUNDED
+          - CANCELED
+    - in: query
+      name: freeSearch
+      description: Free search for renewals by name, surname, email and member id
+      schema:
+        type: string
+    - in: query
+      name: birthday
+      description: Filter renewals for customer bithday with date-time format. Optional operator could be used as prefix of value with ':' separator (url encoded as ``%3A``). Supported operators are ``eq``, ``ne``, ``gt``, ``gte``, ``lt``, ``lte``
+      example: eq:2019-01-01T08:00:00Z
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+  responses:
+    '200':
+      description: Renewals purged successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

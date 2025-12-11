@@ -1,0 +1,139 @@
+get:
+  summary: Search channel event promoter surcharges
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      description: Event ID
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: path
+      name: channelId
+      description: Channel ID
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: query
+      name: type
+      description: Type of surcharge.
+      schema:
+        $ref: '../../models/surcharges/surcharge-type.yml'
+  responses:
+    '200':
+      description: Array of promoter surcharges for a channel and an event
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/events/event-channel-surcharges.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  summary: Set event channel promoter surcharges
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      description: Event ID
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: path
+      name: channelId
+      description: Channel ID
+      schema:
+        type: integer
+        format: int64
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            type: object
+            required:
+              - enabledRanges
+              - type
+              - ranges
+            properties:
+              enabledRanges:
+                type: boolean
+              type:
+                $ref: '../../models/surcharges/surcharge-type.yml'
+              limit:
+                $ref: '../../models/surcharges/surcharge-limit.yml'
+              ranges:
+                type: array
+                items:
+                  $ref: '../../models/surcharges/surcharge-post.yml'
+              allowChannelUseAlternativeCharges:
+                type: boolean
+  responses:
+    '204':
+      description: Event channel promoter surcharges created
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

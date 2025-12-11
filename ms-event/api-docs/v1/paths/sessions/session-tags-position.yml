@@ -1,0 +1,158 @@
+put:
+  summary: Update session tag
+  tags:
+    - Tags
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: path
+      name: sessionId
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: path
+      name: positionId
+      schema:
+        type: integer
+        format: int64
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - enabled
+            - backgroundColor
+            - textColor
+            - channels
+            - languages
+          properties:
+            enabled:
+              type: boolean
+            backgroundColor:
+              type: string
+              description: "Hex color code without #"
+            textColor:
+              type: string
+              description: "Hex color code without #"
+            channels:
+              type: object
+              required:
+                - allChannels
+              properties:
+                allChannels:
+                  type: boolean
+                selectedChannels:
+                  type: array
+                  items:
+                    type: integer
+            languages:
+              type: array
+              items:
+                type: object
+                required:
+                  - language
+                  - text
+                properties:
+                  language:
+                    type: string
+                    example: es-ES
+                  text:
+                    type: string
+  responses:
+    '204':
+      description: 'Session tag updated successfully'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+delete:
+  summary: Delete session tag
+  tags:
+    - Tags
+  parameters:
+    - in: path
+      name: eventId
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: path
+      name: sessionId
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: path
+      name: positionId
+      schema:
+        type: integer
+        format: int64
+      required: true
+  responses:
+    '204':
+      description: 'Session tags deleted successfully'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

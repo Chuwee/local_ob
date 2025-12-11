@@ -1,0 +1,130 @@
+get:
+  summary: Search Season Ticket surcharges
+  tags:
+    - Season Tickets
+  parameters:
+    - in: path
+      name: seasonTicketId
+      description: Season Ticket ID
+      schema:
+        type: integer
+        format: int64
+      required: true
+    - in: query
+      name: type
+      description: Type of surcharge
+      schema:
+        $ref: '../../models/season-tickets/season-ticket-surcharge-type.yml'
+  responses:
+    '200':
+      description: Array of Surcharges for a Season Ticket
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              properties:
+                type:
+                  $ref: '../../models/season-tickets/season-ticket-surcharge-type.yml'
+                limit:
+                  $ref: '../../models/surcharges/surcharge-limit.yml'
+                ranges:
+                  type: array
+                  items:
+                    $ref: '../../models/surcharges/surcharge-post.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  summary: Set Season Ticket surcharges
+  tags:
+    - Season Tickets
+  parameters:
+    - in: path
+      name: seasonTicketId
+      description: Season Ticket ID
+      schema:
+        type: integer
+        format: int64
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            type: object
+            required:
+              - type
+              - ranges
+            properties:
+              type:
+                $ref: '../../models/season-tickets/season-ticket-surcharge-type.yml'
+              limit:
+                $ref: '../../models/surcharges/surcharge-limit.yml'
+              ranges:
+                type: array
+                items:
+                  $ref: '../../models/surcharges/surcharge-post.yml'
+  responses:
+    '204':
+      description: Surcharges created
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

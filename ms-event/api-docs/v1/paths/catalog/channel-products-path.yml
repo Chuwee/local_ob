@@ -1,0 +1,117 @@
+get:
+  summary: Get products available for a channel
+  description: WARNING - This is a first approach to a channel product catalog and it is still in development. Avoid its usage until it is finished
+  tags:
+    - Catalog Search
+  parameters:
+    - in: path
+      name: channelId
+      schema:
+        type: integer
+      required: true
+    - in: query
+      name: id
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+    - in: query
+      name: sessionId
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+    - in: query
+      name: eventId
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+    - in: query
+      name: productType
+      schema:
+        type: string
+        enum:
+          - SIMPLE
+          - VARIANT
+    - in: query
+      name: productPublicationType
+      schema:
+        type: string
+        enum:
+          - SESSION_RESTRICTED
+          - STANDALONE
+          - DUAL_MODE
+    - in: query
+      name: currencyId
+      schema:
+        type: integer
+        format: int64
+    - in: query
+      name: deliveryType
+      schema:
+        type: string
+        enum:
+          - SESSION
+          - PURCHASE
+          - FIXED_DATES
+    - in: query
+      name: limit
+      schema:
+        type: integer
+        maximum: 1000
+        minimum: 0
+        default: 50
+    - in: query
+      name: offset
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+  responses:
+    '200':
+      description: List of channel products
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../models/common/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: ../../models/catalog/channel-product.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

@@ -1,0 +1,50 @@
+type: object
+properties:
+  printRefundPrice:
+    type: boolean
+    description: wherher the refund price or the total price is shown in each individual ticket when printing multiple tickets
+  refundedSeatStatus:
+    type: string
+    description: status that a refunded seat will addopt
+  refundedSeatBlockReasonId:
+    type: number
+    format: int64
+    description: the blocking reason that a refunded seat will addopt (only if refunded_seat_block_status is set to blocking)
+  refundedSessionPackSeatBlockReasonId:
+    type: number
+    format: int64
+    description: the blocking reason that a sessionpack seat will addopt when all its individual sessions were partially refunded
+  refundedSeatQuota:
+    description: the quota that a refunded seat will belong to
+    type: object
+    properties:
+      enabled:
+        type: boolean
+      id:
+        type: number
+        format: int64
+  seasonPackAutomaticCalculateConditions:
+    type: boolean
+    description: wherher the refund percentage is calculated automatically or manually
+  sessionPackRefundConditions:
+    type: object
+    additionalProperties:
+      type: object
+      properties:
+        id:
+          type: number
+          format: int64
+          description: id of the session that belongs to the session pack
+        refundPercentages:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              priceTypeId:
+                type: number
+                format: int64
+              rateId:
+                type: number
+                format: int64
+              refundPercentage:
+                type: number

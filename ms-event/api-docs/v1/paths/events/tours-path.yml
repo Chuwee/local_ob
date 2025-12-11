@@ -1,0 +1,134 @@
+get:
+  summary: Returns an object with an array of tours
+  description: ''
+  tags:
+    - Events
+  parameters:
+    - in: query
+      name: operatorId
+      schema:
+        type: integer
+      required: true
+      description: Operator ID
+    - in: query
+      name: entityId
+      schema:
+        type: integer
+      description: Entity ID
+    - in: query
+      name: status
+      schema:
+        $ref: ../../models/events/tour-status.yml
+      required: true
+      description: Status
+    - in: query
+      name: offset
+      schema:
+        type: integer
+      description: Offset (default 0)
+    - in: query
+      name: limit
+      schema:
+        type: integer
+      description: Limit (default 100)
+  responses:
+    '200':
+      description: A JSON array of tours
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/events/tours.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+post:
+  summary: create new tour for entity
+  description: creates a new tourto be used in the given entity
+  tags:
+    - Events
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - name
+            - entity
+          properties:
+            entity:
+              type: object
+              properties:
+                id:
+                  type: integer
+            name:
+              type: string
+              description: the name of the tour
+  responses:
+    '200':
+      description: the id of the newly created tour
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Configuration not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml

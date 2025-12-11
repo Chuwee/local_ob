@@ -1,0 +1,225 @@
+post:
+  summary: create product
+  description: Creates a new product in status INACTIVE and returns it's id
+  tags:
+    - Products
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - entityId
+            - producerId
+            - name
+            - stockType
+            - productType
+            - currencyId
+          properties:
+            entityId:
+              type: integer
+              description: Entity ID
+            producerId:
+              type: integer
+              description: Producer ID
+            name:
+              type: string
+              description: Product name
+            stockType:
+              type: string
+              description: Product stock type name
+              enum:
+                - BOUNDED
+                - UNBOUNDED
+            productType:
+              type: string
+              description: Product type name
+              enum:
+                - SIMPLE
+                - VARIANT
+            currencyId:
+              type: string
+              description: Product currency id
+  responses:
+    '201':
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: integer
+                format: int64
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+
+get:
+  summary: Returns a list of products
+  description: ''
+  tags:
+    - Products
+  parameters:
+    - in: query
+      name: ids
+      description: Product ids
+      schema:
+        type: array
+        items:
+          type: integer
+    - in: query
+      name: entityIds
+      description: The Product entity
+      schema:
+        type: array
+        items:
+          type: integer
+      required: false
+    - in: query
+      name: q
+      description: The Product name
+      schema:
+        type: string
+      required: false
+    - in: query
+      name: stockType
+      description: The Product stock type
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - BOUNDED
+            - UNBOUNDED
+      required: false
+    - in: query
+      name: productState
+      description: The Product state
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
+      required: false
+    - in: query
+      name: productType
+      description: The Product type
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - SIMPLE
+            - VARIANT
+      required: false
+    - in: query
+      name: currencyId
+      description: The Product currency id
+      schema:
+        type: string
+      required: false
+    - in: query
+      name: eventIds
+      description: The events related with the product
+      schema:
+        type: string
+      required: false
+    - in: query
+      name: eventSessionSelectionType
+      description: The session selection type for an event related with the product
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - ALL
+            - RESTRICTED
+      required: false
+    - in: query
+      name: sessionIds
+      description: The sessions related with the product
+      schema:
+        type: string
+      required: false
+    - in: query
+      name: limit
+      description: The pagination limit
+      schema:
+        type: integer
+      required: false
+    - in: query
+      name: offset
+      description: The pagination offset
+      schema:
+        type: integer
+      required: false
+    - in: query
+      name: sort
+      description: Sorting by name with format field:[asc|desc]. For example 'name:asc'
+      schema:
+        type: string
+      required: false
+  responses:
+    '200':
+      description: Search a list of products
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/products/products.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
