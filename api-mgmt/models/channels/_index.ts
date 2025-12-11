@@ -45,7 +45,6 @@ export * from './channel-type.model';
 export * from './destination-channel-type.model';
 export * from './channel-whitelabel-settings.model';
 export * from './channel.model';
-export * from './common-types';
 export * from './email-content-type.enum';
 export * from './email-server-conf.model';
 export * from './email-server-security-type.enum';

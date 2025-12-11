@@ -1,3 +1,5 @@
+import { IdName } from './common-types';
+import { Currency } from './common-types';
 import { ChannelBuild } from './channel-build.model';
 import { ChannelStatus } from './channel-status.model';
 import { ChannelType } from './channel-type.model';
@@ -5,18 +7,6 @@ import { ChannelInvitationsSettings } from './invitations-options';
 import { WhitelabelType } from './whitelabel-type.model';
 
 export type DonationType = 'ROUND_UP' | 'CUSTOM' | 'UNRESTRICTED';
-
-export interface IdName {
-    id?: number;
-    name?: string;
-}
-
-export interface Currency {
-    id?: number;
-    code?: string;
-    name?: string;
-    symbol?: string;
-}
 
 export interface Channel {
     id?: number;

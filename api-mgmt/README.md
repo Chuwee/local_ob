@@ -4,15 +4,26 @@ This directory contains TypeScript models propagated from the admin-clients code
 
 ## Channels
 
-The `channels` directory contains core channel models that define the structure and types used for managing channels across the platform.
+The `channels` directory contains ALL channel-related models that define the structure and types used for managing channels across the platform. This is a complete propagation of all channel models from `admin-clients/libs/cpanel/channels/data-access/src/lib/models/`.
 
-### Files:
+### Key Files:
 - `channel.model.ts` - Core Channel interface with all properties
 - `channel-type.model.ts` - Enum defining different channel types (WEB, BOX_OFFICE, etc.)
 - `channel-status.model.ts` - Enum for channel status (ACTIVE, BLOCKED, etc.)
 - `channel-build.model.ts` - Enum for channel build types
-- `invitations-options.ts` - Settings for channel invitations
-- `whitelabel-type.model.ts` - Type for whitelabel channels
+- `common-types.ts` - Common TypeScript types and interfaces (IdName, Currency, PageableFilter, etc.)
+- Plus 70+ additional model files covering all channel functionality
+
+### Model Categories:
+- **Core Models**: channel.model.ts, channel-list-element.model.ts
+- **Channel Configuration**: channel-booking-settings.model.ts, channel-delivery-settings.model.ts, etc.
+- **Channel Types & Status**: channel-type.model.ts, channel-status.model.ts, channel-build.model.ts
+- **Forms & Rules**: channel-forms.model.ts, channel-forms-rules.model.ts
+- **Gateway & Payment**: channel-gateway.model.ts, channel-gateway-config.model.ts
+- **Surcharges & Commissions**: channel-surcharge.model.ts, channel-commission.model.ts
+- **Events & Sessions**: channel-event.model.ts, channel-session.model.ts
+- **Request/Response Models**: get-channels-request.model.ts, get-channels-response.model.ts, etc.
+- **Email Configuration**: email-server-conf.model.ts, notification-email-template.model.ts
 
 ### Usage:
 ```typescript
@@ -28,5 +39,10 @@ const myChannel: Channel = {
 
 ## Maintenance
 
-These models are derived from `admin-clients/libs/cpanel/channels/data-access/src/lib/models/`.
-When updating, ensure compatibility with the source models.
+These models are a complete copy from `admin-clients/libs/cpanel/channels/data-access/src/lib/models/`.
+
+**Important Notes:**
+- All `@admin-clients` imports have been replaced with local imports from `common-types.ts`
+- The models are framework-agnostic and can be used in any TypeScript project
+- When updating, ensure compatibility with the source models in admin-clients
+
