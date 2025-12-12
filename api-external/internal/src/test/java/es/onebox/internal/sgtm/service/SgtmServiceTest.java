@@ -30,21 +30,21 @@ class SgtmServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Setup common mock behavior
+        // Setup common mock behavior for headers
         when(httpServletRequest.getHeader("ob-action")).thenReturn("PROVIDER_PLAN_SETTINGS_UPDATE");
         when(httpServletRequest.getHeader("ob-event")).thenReturn("EVENT_CHANNEL");
         when(httpServletRequest.getHeader("ob-delivery-id")).thenReturn("delivery-123");
         when(httpServletRequest.getHeader("ob-hook-id")).thenReturn("hook-456");
         when(httpServletRequest.getHeader("ob-signature")).thenReturn("sig-789");
         when(httpServletRequest.getHeader("x-gtm-server-preview")).thenReturn(null);
+        when(httpServletRequest.getHeader("ob-event-id")).thenReturn("123");
+        when(httpServletRequest.getHeader("ob-provider-plan-settings")).thenReturn("{\"sync_sessions_as_hidden\":true}");
     }
 
     @Test
     void processWebhook_withProviderPlanSettings_shouldCallService() {
         // Arrange
         SgtmWebhookRequestDTO request = new SgtmWebhookRequestDTO();
-        request.setEventId(123L);
-        request.setProviderPlanSettings("{\"sync_sessions_as_hidden\":true}");
         List<Long> channelIds = List.of(456L);
 
         doNothing().when(providerPlanSettingsService)
@@ -62,8 +62,6 @@ class SgtmServiceTest {
     void processWebhook_withMultipleChannels_shouldCallServiceForEach() {
         // Arrange
         SgtmWebhookRequestDTO request = new SgtmWebhookRequestDTO();
-        request.setEventId(123L);
-        request.setProviderPlanSettings("{\"sync_sessions_as_hidden\":true}");
         List<Long> channelIds = List.of(456L, 789L);
 
         doNothing().when(providerPlanSettingsService)
@@ -82,9 +80,9 @@ class SgtmServiceTest {
     @Test
     void processWebhook_withNullProviderPlanSettings_shouldStillProcess() {
         // Arrange
+        when(httpServletRequest.getHeader("ob-provider-plan-settings")).thenReturn(null);
+        
         SgtmWebhookRequestDTO request = new SgtmWebhookRequestDTO();
-        request.setEventId(123L);
-        request.setProviderPlanSettings(null);
         List<Long> channelIds = List.of(456L);
 
         doNothing().when(providerPlanSettingsService)
@@ -101,16 +99,33 @@ class SgtmServiceTest {
     @Test
     void processWebhook_withMissingEventId_shouldThrow() {
         // Arrange
+        when(httpServletRequest.getHeader("ob-event-id")).thenReturn(null);
+        
         SgtmWebhookRequestDTO request = new SgtmWebhookRequestDTO();
-        request.setEventId(null);
-        request.setProviderPlanSettings("{\"sync_sessions_as_hidden\":true}");
         List<Long> channelIds = List.of(456L);
 
         // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> sgtmService.processWebhook(request, httpServletRequest, channelIds));
         
-        assertTrue(exception.getMessage().contains("Event ID is required"));
+        assertTrue(exception.getMessage().contains("Event ID"));
+        verify(providerPlanSettingsService, never())
+                .sendProviderPlanSettingsToFever(anyLong(), anyLong(), anyString());
+    }
+
+    @Test
+    void processWebhook_withInvalidEventIdFormat_shouldThrow() {
+        // Arrange
+        when(httpServletRequest.getHeader("ob-event-id")).thenReturn("invalid");
+        
+        SgtmWebhookRequestDTO request = new SgtmWebhookRequestDTO();
+        List<Long> channelIds = List.of(456L);
+
+        // Act & Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> sgtmService.processWebhook(request, httpServletRequest, channelIds));
+        
+        assertTrue(exception.getMessage().contains("Invalid event ID format"));
         verify(providerPlanSettingsService, never())
                 .sendProviderPlanSettingsToFever(anyLong(), anyLong(), anyString());
     }
@@ -119,8 +134,6 @@ class SgtmServiceTest {
     void processWebhook_withEmptyChannelIds_shouldThrow() {
         // Arrange
         SgtmWebhookRequestDTO request = new SgtmWebhookRequestDTO();
-        request.setEventId(123L);
-        request.setProviderPlanSettings("{\"sync_sessions_as_hidden\":true}");
         List<Long> channelIds = Collections.emptyList();
 
         // Act & Assert
@@ -136,8 +149,6 @@ class SgtmServiceTest {
     void processWebhook_withNullChannelIds_shouldThrow() {
         // Arrange
         SgtmWebhookRequestDTO request = new SgtmWebhookRequestDTO();
-        request.setEventId(123L);
-        request.setProviderPlanSettings("{\"sync_sessions_as_hidden\":true}");
 
         // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
@@ -154,8 +165,6 @@ class SgtmServiceTest {
         when(httpServletRequest.getHeader("ob-action")).thenReturn("SOME_OTHER_ACTION");
         
         SgtmWebhookRequestDTO request = new SgtmWebhookRequestDTO();
-        request.setEventId(123L);
-        request.setProviderPlanSettings("{\"sync_sessions_as_hidden\":true}");
         List<Long> channelIds = List.of(456L);
 
         // Act

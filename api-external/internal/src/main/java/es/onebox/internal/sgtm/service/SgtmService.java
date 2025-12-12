@@ -30,7 +30,7 @@ public class SgtmService {
         
         // Handle provider plan settings updates
         if (ACTION_PROVIDER_PLAN_SETTINGS_UPDATE.equals(headers.action) && EVENT_EVENT_CHANNEL.equals(headers.event)) {
-            processProviderPlanSettingsUpdate(webhookRequest, channelIds);
+            processProviderPlanSettingsUpdate(httpServletRequest, channelIds);
             return;
         }
         
@@ -38,14 +38,26 @@ public class SgtmService {
         LOGGER.info("Webhook action {} not specifically handled, processing as standard webhook", headers.action);
     }
     
-    private void processProviderPlanSettingsUpdate(SgtmWebhookRequestDTO webhookRequest, List<Long> channelIds) {
-        LOGGER.info("Processing provider plan settings update for event: {}, channelIds: {}", 
-                   webhookRequest.getEventId(), channelIds);
+    private void processProviderPlanSettingsUpdate(HttpServletRequest httpServletRequest, List<Long> channelIds) {
+        // Extract event ID and provider plan settings from headers
+        String eventIdHeader = extractHeaderValue(httpServletRequest, "ob-event-id");
+        String providerPlanSettings = extractHeaderValue(httpServletRequest, "ob-provider-plan-settings");
         
-        if (webhookRequest.getEventId() == null) {
-            LOGGER.error("Event ID is required for provider plan settings update");
+        if (eventIdHeader == null) {
+            LOGGER.error("Event ID header (ob-event-id) is required for provider plan settings update");
             throw new IllegalArgumentException("Event ID is required");
         }
+        
+        Long eventId;
+        try {
+            eventId = Long.parseLong(eventIdHeader);
+        } catch (NumberFormatException e) {
+            LOGGER.error("Invalid event ID format: {}", eventIdHeader);
+            throw new IllegalArgumentException("Invalid event ID format", e);
+        }
+        
+        LOGGER.info("Processing provider plan settings update for event: {}, channelIds: {}", 
+                   eventId, channelIds);
         
         if (channelIds == null || channelIds.isEmpty()) {
             LOGGER.error("At least one channel ID is required for provider plan settings update");
@@ -55,13 +67,13 @@ public class SgtmService {
         // Forward to fever for each channel
         for (Long channelId : channelIds) {
             providerPlanSettingsService.sendProviderPlanSettingsToFever(
-                webhookRequest.getEventId(),
+                eventId,
                 channelId,
-                webhookRequest.getProviderPlanSettings()
+                providerPlanSettings
             );
         }
         
-        LOGGER.info("Successfully processed provider plan settings update for event: {}", webhookRequest.getEventId());
+        LOGGER.info("Successfully processed provider plan settings update for event: {}", eventId);
     }
     
     WebhookHeaders extractHeaders(HttpServletRequest httpServletRequest) {

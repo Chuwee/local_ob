@@ -17,12 +17,6 @@ public class SgtmWebhookRequestDTO {
     
     @JsonProperty("active_external_tools")
     private List<ChannelExternalToolDTO> activeExternalTools;
-    
-    @JsonProperty("provider_plan_settings")
-    private String providerPlanSettings;
-    
-    @JsonProperty("event_id")
-    private Long eventId;
 
     public String getCode() {
         return code;
@@ -46,21 +40,5 @@ public class SgtmWebhookRequestDTO {
 
     public void setEntityId(Long entityId) {
         this.entityId = entityId;
-    }
-
-    public String getProviderPlanSettings() {
-        return providerPlanSettings;
-    }
-
-    public void setProviderPlanSettings(String providerPlanSettings) {
-        this.providerPlanSettings = providerPlanSettings;
-    }
-
-    public Long getEventId() {
-        return eventId;
-    }
-
-    public void setEventId(Long eventId) {
-        this.eventId = eventId;
     }
 }
