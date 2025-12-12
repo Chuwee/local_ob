@@ -1,0 +1,59 @@
+get:
+  summary: Get user promotions
+  description: get the user promotions
+  security:
+    - OAuth2: ['ROLE_CNL_INT']
+  tags:
+    - Users
+  parameters:
+    - in: path
+      name: userSalesforceId
+      description: salesforce userId
+      schema:
+        type: string
+      required: true
+  responses:
+    '200':
+      description: The list of user promotions
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../models/atm-user-promotions-response.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml

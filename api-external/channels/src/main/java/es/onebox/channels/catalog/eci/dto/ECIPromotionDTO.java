@@ -1,0 +1,61 @@
+package es.onebox.channels.catalog.eci.dto;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.io.Serializable;
+import java.util.Map;
+
+public class ECIPromotionDTO implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private Long id;
+    private String name;
+    private String toDate;
+    @JsonProperty("multilingual_description")
+    private Map<String, String> multilingualDescription;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getToDate() {
+        return toDate;
+    }
+
+    public void setToDate(String toDate) {
+        this.toDate = toDate;
+    }
+
+    public Map<String, String> getMultilingualDescription() {
+        return multilingualDescription;
+    }
+
+    public void setMultilingualDescription(Map<String, String> multilingualDescription) {
+        this.multilingualDescription = multilingualDescription;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return EqualsBuilder.reflectionEquals(this, obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+}
