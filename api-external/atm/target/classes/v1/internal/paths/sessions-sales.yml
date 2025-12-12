@@ -1,0 +1,116 @@
+post:
+  summary: Starts the automatic sales script with the input data
+  description: Starts the automatic sales script with the input data
+  tags:
+    - Automatic sales
+  parameters:
+    - in: header
+      name: Authorization
+      description: access_token
+      required: true
+      schema:
+        type: string
+    - in: path
+      name: sessionId
+      description: Session id
+      schema:
+        type: integer
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../models/automatic-sales-request.yml'
+  responses:
+    '202':
+      description: Accepted
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+
+put:
+  summary: Changes the state of the process, allowing it to be stopped
+  description: Changes the state of the process, allowing it to be stopped
+  tags:
+    - Automatic sales
+  parameters:
+    - in: header
+      name: Authorization
+      description: access_token
+      required: true
+      schema:
+        type: string
+    - in: path
+      name: sessionId
+      description: Session id
+      schema:
+        type: integer
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../models/automatic-sales-put-request.yml'
+  responses:
+    '201':
+      description: 'Status changed successfully'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+

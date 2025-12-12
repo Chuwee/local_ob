@@ -1,0 +1,92 @@
+post:
+  summary: Procesa webhook SGTM
+  description: Recibe un webhook para procesar órdenes y enviar los detalles al servidor Google Tag Manager
+  tags:
+    - SGTM Webhook
+  parameters:
+    - in: header
+      name: ob-action
+      description: Acción del webhook
+      required: false
+      schema:
+        type: string
+        example: "PURCHASE"
+    - in: header
+      name: ob-delivery-id
+      description: ID de entrega del webhook
+      required: false
+      schema:
+        type: string
+        example: "a1l02973-bh4e-4481-1r40-t7b03745186p"
+    - in: header
+      name: ob-event
+      description: Evento del webhook
+      required: false
+      schema:
+        type: string
+        example: "ORDER"
+    - in: header
+      name: ob-hook-id
+      description: ID del webhook
+      required: false
+      schema:
+        type: string
+        example: "b01151b0-66a7-4713-b3cd-a0223cc88c79"
+    - in: header
+      name: ob-signature
+      description: Firma del webhook
+      required: false
+      schema:
+        type: string
+        example: "72eb12583d24db69c586acb1a15e14b3ce301990006d02d5f222be79fc703e94"
+    - in: header
+      name: x-gtm-server-preview
+      description: Preview del servidor de Tag Manager
+      required: false
+      schema:
+        type: string
+        example: "ZW52LTEwfHA1MHVxY3hlZno4WGxUZmJzY3g1MHd8MTk3ZWY1ZDMzMTRhODdiMmY4MWI5"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../models/sgtm-webhook-request.yml
+  responses:
+    '200':
+      description: Webhook procesado correctamente
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '401':
+      description: No autorizado
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error-auth.yml
+    '403':
+      description: Prohibido
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '404':
+      description: No encontrado
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '500':
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml 

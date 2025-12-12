@@ -1,0 +1,82 @@
+post:
+  summary: Get list of previous uploaded files
+  description: Get list of previous uploaded files
+  tags:
+    - File management
+  parameters:
+    - in: header
+      name: Authorization
+      description: access_token
+      required: true
+      schema:
+        type: string
+    - in: path
+      name: sessionId
+      description: Session id
+      schema:
+        type: integer
+      required: true
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - filename
+            - format
+            - delivery
+          properties:
+            filename:
+              type: string
+              description: Automatic sales filename
+            format:
+              type: string
+              enum:
+                - CSV
+            delivery:
+              type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - EMAIL
+                properties:
+                  description: |
+                    Fields required by the delivery type.
+                    
+                    Valid properties to **EMAIL** type:
+                      - address: Email where report will be sent. Mandatory.
+                  type: object
+                  additionalProperties: {}
+                  example:
+                    address: 'user@email.com'
+
+  responses:
+    '202':
+      $ref: ../models/export-response.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml

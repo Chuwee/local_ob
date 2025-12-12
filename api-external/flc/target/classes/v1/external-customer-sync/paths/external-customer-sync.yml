@@ -1,0 +1,51 @@
+post:
+  summary: Return a list of exchanges from source Currency
+  tags:
+    - Exchange
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          $ref: ../models/external-customer-sync-request.yml
+  responses:
+    '204':
+      description: Customer sync completed successfully, no content to return
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml

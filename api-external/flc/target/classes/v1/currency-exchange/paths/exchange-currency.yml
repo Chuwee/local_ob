@@ -1,0 +1,54 @@
+get:
+  summary: Return a list of exchanges from source Currency
+  tags:
+    - Exchange
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: currency_code
+      description: Source currency code
+      schema:
+        type: string
+      required: true
+  responses:
+    '200':
+      description: The exchange rate list for a source currency
+      content:
+        application/json:
+          schema:
+            $ref: ../models/exchange-currency.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml

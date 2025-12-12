@@ -1,0 +1,56 @@
+get:
+  summary: Get Presale session information
+  description: get the presale information given an specific session
+  security:
+    - OAuth2: ['ROLE_CNL_INT']
+  tags:
+    - Events
+  parameters:
+    - in: path
+      name: eventId
+      description: event id
+      schema:
+        type: integer
+      required: true
+    - in: path
+      name: sessionId
+      description: session id
+      schema:
+        type: integer
+      required: true
+  responses:
+    '200':
+      description: The presale information
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            properties:
+              active:
+                type: boolean
+                description: whether the presale is active or not
+              start_date:
+                type: string
+                description: The presale start date
+              end_date:
+                type: string
+                description: The presale end date
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml

@@ -1,0 +1,70 @@
+get:
+  summary: find eci promotions by channel
+  tags:
+    - Promotions
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelId
+      description: Channel id
+      schema:
+        type: integer
+      required: true
+    - in: query
+      name: session_start_date[gte]
+      description: The session start date from filter
+      schema:
+        type: integer
+    - in: query
+      name: session_start_date[lte]
+      description: The session start date to filter
+      schema:
+        type: integer
+    - in: query
+      name: request
+      schema:
+        $ref: ../../common/models/pagination.yml
+  responses:
+    '200':
+      description: A list of promotions
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../models/promotion.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml

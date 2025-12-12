@@ -1,0 +1,67 @@
+get:
+  summary: Check avet availability
+  description: check avet availability
+  security:
+    - OAuth2: ['ROLE_CNL_INT']
+  tags:
+    - AVET
+  responses:
+    '200':
+      description: The avet status
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            properties:
+              status:
+                type: string
+                description: The avet status
+                enum:
+                  - OK
+                  - KO
+              reason:
+                type: string
+                description: The status reason
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '503':
+      description: Service Unavailable
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml

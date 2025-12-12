@@ -1,0 +1,62 @@
+post:
+  summary: Genera el XML SEPA para un abono
+  description: Inicia el proceso de generación del XML SEPA para un abono específico
+  tags:
+    - SEPA Generation
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      required: true
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            season_ticket_id:
+              type: integer
+              description: ID del abono para el que se generará el XML SEPA
+          required:
+            - season_ticket_id
+  responses:
+    '200':
+      description: Proceso iniciado correctamente
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '401':
+      description: No autorizado
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error-auth.yml
+    '403':
+      description: Prohibido
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '404':
+      description: No encontrado
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '500':
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml 

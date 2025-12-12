@@ -1,0 +1,113 @@
+get:
+  summary: Ticket sales by channel
+  tags:
+    - Ticket-sales
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: channelIdentifier
+      description: |
+        <p>You can inform a channel id or a channel brand which can include several channels.</p>
+        <p>If the channel brand is informed, the values that can be selected are:
+        <ul>
+          <li>eci-web</li>
+          <li>eci-viajes</li>
+          <li>eci-cc</li>
+          <li>eci-tpv</li>
+          <li>eci-mb</li>
+          <li>eci-colectivos</li>
+          <li>eci-corporate</li>
+        </ul></p>
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: order_date[gte]
+      schema:
+        type: string
+        format: date-time
+      required: true
+    - in: query
+      name: order_date[lte]
+      schema:
+        type: string
+        format: date-time
+      required: true
+    - in: query
+      name: event_identifier
+      schema:
+        type: string
+      required: false
+    - in: query
+      name: session_start_date[gte]
+      schema:
+        type: string
+        format: date-time
+      required: false
+    - in: query
+      name: session_start_date[lte]
+      schema:
+        type: string
+        format: date-time
+      required: false
+    - in: query
+      name: limit
+      description: Limit results to return
+      schema:
+        type: integer
+        maximum: 500
+        minimum: 0
+        default: 500
+      required: false
+    - in: query
+      name: offset
+      description: Number of offset items
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      required: false
+  responses:
+    '200':
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../models/ticket-sales.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml

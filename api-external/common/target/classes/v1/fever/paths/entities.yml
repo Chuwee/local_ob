@@ -1,0 +1,142 @@
+get:
+  x-internal: true
+  summary: Search entities
+  description: Search entities
+  security:
+    - OAuth2: ['ROLE_FV_REPORTING']
+  tags:
+    - Entities
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: operator_id
+      description: The operator of the entity
+      schema:
+        type: integer
+    - in: query
+      name: type
+      description: The type of the entity
+      schema:
+        $ref: ../models/entities/entity-type.yml
+    - in: query
+      name: allow_avet_integration
+      x-internal: true
+      description: Whether or not the entity allow integration with AVET
+      schema:
+        type: boolean
+    - in: query
+      name: allow_members
+      x-internal: true
+      description: Whether or not the entity allow customers management
+      schema:
+        type: boolean
+    - in: query
+      name: allow_digital_season_ticket
+      description: Whether or not the entity allows digital season tickets
+      schema:
+        type: boolean
+    - in: query
+      name: b2b_enabled
+      description: Whether or not B2B channels are enabled in this entity
+      schema:
+        type: boolean
+    - in: query
+      name: allow_massive_email
+      description: Whether or not the entity allows massive email
+      schema:
+        type: boolean
+    - in: query
+      x-internal: true
+      name: include_entity_admin
+      description: Whether or not the list include entities admin
+      schema:
+        type: boolean
+    - in: query
+      x-internal: true
+      name: allow_config_multiple_templates
+      description: allow configure different pdf templates
+      schema:
+        type: boolean
+    - in: query
+      name: status
+      description: The status of the entity
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - ACTIVE
+            - PENDING
+            - BLOCKED
+            - TEMPORARY_BLOCKED
+    - in: query
+      name: q
+      description: Free search for entities by name
+      schema:
+        type: string
+    - in: query
+      name: fields
+      description: Response will contain only the id and the selected fields
+      style: form
+      schema:
+        type: array
+        items:
+          $ref: ../models/entities/entity-filter-field.yml
+    - in: query
+      name: sort
+      description: Sorting of enum fields with format field:[asc|desc]. For example 'name:desc'
+      schema:
+        $ref: ../models/entities/entity-sort-field.yml
+    - in: query
+      name: limit
+      schema:
+        type: integer
+      description: Limit (default 50, max 1000)
+    - in: query
+      name: offset
+      schema:
+        type: integer
+      description: Offset (default 0)
+  responses:
+    '200':
+      description: Array of entities
+      content:
+        application/json:
+          schema:
+            $ref: ../models/entities/entities.yml
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml

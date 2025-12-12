@@ -1,0 +1,34 @@
+get:
+  x-internal: true
+  summary: Get authenticated user info
+  description: Get authenticated user info
+  security:
+    - OAuth2: [ 'ROLE_FV_REPORTING' ]
+  tags:
+    - Myself
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+  responses:
+    '200':
+      description: Get info of authenticated user
+      content:
+        application/json:
+          schema:
+            $ref: ../models/user-auth.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error-auth.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml

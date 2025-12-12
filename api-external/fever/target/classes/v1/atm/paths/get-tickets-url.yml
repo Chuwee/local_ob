@@ -1,0 +1,71 @@
+get:
+  summary: Get tickets url
+  description: get the url for additional custom tickets
+  security:
+    - OAuth2: ['ROLE_CNL_INT']
+  tags:
+    - Orders
+  parameters:
+    - in: path
+      name: orderCode
+      description: Order code
+      schema:
+        type: string
+      required: true
+  responses:
+    '200':
+      description: Whether the order has additional tickets or not and the url to download them
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            properties:
+              has_additional_tickets:
+                type: boolean
+                description: whether the order has additional tickets or not
+              url:
+                type: string
+                description: the url to download the additional tickets
+              tickets:
+                type: array
+                description: a list of individual link for each ticket
+                items:
+                  type: string
+
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml

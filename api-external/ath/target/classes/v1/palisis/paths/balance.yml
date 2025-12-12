@@ -1,0 +1,58 @@
+get:
+  summary: Entity OTA balance
+  description: Current balance status for agencies (OTAs) by entity
+  tags:
+    - Palisis
+  parameters:
+    - in: header
+      name: Authorization
+      description: Bearer Token
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: entityId
+      description: Entity id
+      schema:
+        type: integer
+      required: true
+  responses:
+    '200':
+      description: 'Map of real-time balance by agency {key: ota-nif, value: balance}'
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: { }
+            nullable: true
+            example:
+              {
+                'ota-id-1': 25.0,
+                'ota-id-2': 1000.0,
+                'ota-id-3': 210.50
+              }
+
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error-auth.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml

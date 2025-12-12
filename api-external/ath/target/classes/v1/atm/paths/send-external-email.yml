@@ -1,0 +1,53 @@
+post:
+  summary: Send an external email with the ticket and/or the invoice
+  description: Send an external email with the ticket and/or the invoice
+  security:
+    - OAuth2: ['ROLE_CNL_INT']
+  tags:
+    - External email
+  parameters:
+    - in: path
+      name: orderCode
+      description: Order code
+      schema:
+        type: string
+      required: true
+  responses:
+    '204':
+      description: The email has tried to be sent
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml

@@ -1,0 +1,90 @@
+post:
+  summary: Send notification to configurated webhook
+  tags:
+    - Webhook
+  parameters:
+    - in: header
+      name: ob-action
+      description: Notification action
+      schema:
+        type: string
+      required: true
+    - in: header
+      name: ob-delivery-id
+      description: Webhook delivery id
+      schema:
+        type: string
+      required: true
+    - in: header
+      name: ob-event
+      description: Notification event
+      schema:
+        type: string
+      required: true
+    - in: header
+      name: ob-hook-id
+      description: Webhook notification id
+      schema:
+        type: string
+      required: true
+    - in: header
+      name: ob-subtype
+      description: Webhook notification id
+      schema:
+        type: string
+      required: true
+    - in: header
+      name: ob-signature
+      description: Notification signature
+      schema:
+        type: string
+      required: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          $ref: '../models/fever-webhook-request.yml'
+  responses:
+    '200':
+      description: 'Webhook notification successfully sent'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/models/error.yml
+
+
+
