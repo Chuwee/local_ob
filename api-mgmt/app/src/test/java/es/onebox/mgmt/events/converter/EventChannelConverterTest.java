@@ -259,5 +259,105 @@ class EventChannelConverterTest {
         assertEquals(testVisibleEntities, result.getVisibleEntities());
         assertNull(result.getOperatorId());
     }
+
+    @Test
+    void fromDTO_withProviderPlanSettingsDTO_shouldConvertToEntity() {
+        // Given
+        es.onebox.mgmt.events.dto.channel.ProviderPlanSettingsDTO dto = new es.onebox.mgmt.events.dto.channel.ProviderPlanSettingsDTO();
+        dto.setSyncSessionsAsHidden(true);
+        dto.setSyncSurcharges(false);
+        dto.setSyncSessionLabels(true);
+        dto.setSyncSessionPics(false);
+        dto.setSyncSessionTypeOrdering(true);
+        dto.setSyncSessionTypeDetails(false);
+        dto.setSyncMainPlanTitle(true);
+        dto.setSyncMainPlanDescription(false);
+        dto.setSyncMainPlanImages(true);
+
+        es.onebox.mgmt.events.dto.channel.UpdateEventChannelDTO updateDTO = new es.onebox.mgmt.events.dto.channel.UpdateEventChannelDTO();
+        updateDTO.setProviderPlanSettings(dto);
+
+        // When
+        es.onebox.mgmt.datasources.ms.event.dto.event.UpdateEventChannel result = EventChannelConverter.fromDTO(updateDTO);
+
+        // Then
+        assertNotNull(result);
+        assertNotNull(result.getProviderPlanSettings());
+        assertTrue(result.getProviderPlanSettings().getSyncSessionsAsHidden());
+        assertFalse(result.getProviderPlanSettings().getSyncSurcharges());
+        assertTrue(result.getProviderPlanSettings().getSyncSessionLabels());
+        assertFalse(result.getProviderPlanSettings().getSyncSessionPics());
+        assertTrue(result.getProviderPlanSettings().getSyncSessionTypeOrdering());
+        assertFalse(result.getProviderPlanSettings().getSyncSessionTypeDetails());
+        assertTrue(result.getProviderPlanSettings().getSyncMainPlanTitle());
+        assertFalse(result.getProviderPlanSettings().getSyncMainPlanDescription());
+        assertTrue(result.getProviderPlanSettings().getSyncMainPlanImages());
+    }
+
+    @Test
+    void fromDTO_withNullProviderPlanSettings_shouldReturnNull() {
+        // Given
+        es.onebox.mgmt.events.dto.channel.UpdateEventChannelDTO updateDTO = new es.onebox.mgmt.events.dto.channel.UpdateEventChannelDTO();
+        updateDTO.setProviderPlanSettings(null);
+
+        // When
+        es.onebox.mgmt.datasources.ms.event.dto.event.UpdateEventChannel result = EventChannelConverter.fromDTO(updateDTO);
+
+        // Then
+        assertNotNull(result);
+        assertNull(result.getProviderPlanSettings());
+    }
+
+    @Test
+    void toDTO_withProviderPlanSettings_shouldConvertToDTO() {
+        // Given
+        es.onebox.mgmt.datasources.ms.event.dto.event.ProviderPlanSettings entity = new es.onebox.mgmt.datasources.ms.event.dto.event.ProviderPlanSettings();
+        entity.setSyncSessionsAsHidden(false);
+        entity.setSyncSurcharges(true);
+        entity.setSyncSessionLabels(false);
+        entity.setSyncSessionPics(true);
+        entity.setSyncSessionTypeOrdering(false);
+        entity.setSyncSessionTypeDetails(true);
+        entity.setSyncMainPlanTitle(false);
+        entity.setSyncMainPlanDescription(true);
+        entity.setSyncMainPlanImages(false);
+
+        es.onebox.mgmt.datasources.ms.event.dto.event.BaseEventChannel eventChannel = new es.onebox.mgmt.datasources.ms.event.dto.event.BaseEventChannel();
+        eventChannel.setProviderPlanSettings(entity);
+
+        // When
+        es.onebox.mgmt.events.dto.channel.BaseEventChannelDTO result = EventChannelConverter.fromEntity(
+            java.util.Collections.singletonList(eventChannel)
+        ).get(0);
+
+        // Then
+        assertNotNull(result);
+        assertNotNull(result.getProviderPlanSettings());
+        assertFalse(result.getProviderPlanSettings().getSyncSessionsAsHidden());
+        assertTrue(result.getProviderPlanSettings().getSyncSurcharges());
+        assertFalse(result.getProviderPlanSettings().getSyncSessionLabels());
+        assertTrue(result.getProviderPlanSettings().getSyncSessionPics());
+        assertFalse(result.getProviderPlanSettings().getSyncSessionTypeOrdering());
+        assertTrue(result.getProviderPlanSettings().getSyncSessionTypeDetails());
+        assertFalse(result.getProviderPlanSettings().getSyncMainPlanTitle());
+        assertTrue(result.getProviderPlanSettings().getSyncMainPlanDescription());
+        assertFalse(result.getProviderPlanSettings().getSyncMainPlanImages());
+    }
+
+    @Test
+    void toDTO_withNullProviderPlanSettings_shouldReturnNullInDTO() {
+        // Given
+        es.onebox.mgmt.datasources.ms.event.dto.event.BaseEventChannel eventChannel = new es.onebox.mgmt.datasources.ms.event.dto.event.BaseEventChannel();
+        eventChannel.setProviderPlanSettings(null);
+
+        // When
+        es.onebox.mgmt.events.dto.channel.BaseEventChannelDTO result = EventChannelConverter.fromEntity(
+            java.util.Collections.singletonList(eventChannel)
+        ).get(0);
+
+        // Then
+        assertNotNull(result);
+        assertNull(result.getProviderPlanSettings());
+    }
 }
 

@@ -15,6 +15,7 @@ import es.onebox.event.datasources.ms.order.repository.OrdersRepository;
 import es.onebox.event.events.amqp.emailnotification.EmailNotificationMessage;
 import es.onebox.event.events.amqp.emailnotification.EmailNotificationService;
 import es.onebox.event.events.amqp.eventnotification.ExternalEventConsumeNotificationMessage;
+import es.onebox.event.events.amqp.providerplansettingsnotification.ProviderPlanSettingsNotificationService;
 import es.onebox.event.events.amqp.requestchannelnotification.RequestChannelNotificationMessage;
 import es.onebox.event.events.converter.EventChannelRecordConverter;
 import es.onebox.event.events.converter.SaleGroupsConverter;
@@ -143,6 +144,8 @@ public class EventChannelService {
     private SeasonTicketService seasonTicketService;
     @Autowired
     private PostBookingQuestionsService postBookingQuestionsService;
+    @Autowired
+    private ProviderPlanSettingsNotificationService providerPlanSettingsNotificationService;
 
     @MySQLWrite
     public void delete(Long eventId, Long channelId) {
@@ -419,6 +422,16 @@ public class EventChannelService {
 
         if (updateData != null) {
             updateSecondaryMarketEnabled(eventId, channelId, record, updateData.getSettings(), channelEntityRecord);
+            
+            // Send notification to MS-NOTIFICATION for provider_plan_settings updates
+            // Note: This is sent on every update to keep MS-NOTIFICATION in sync with the database,
+            // as the converter unconditionally updates the provider_plan_settings field.
+            // This includes both setting new values and clearing (null) the settings.
+            providerPlanSettingsNotificationService.sendProviderPlanSettingsNotification(
+                eventId, 
+                channelId, 
+                updateData.getProviderPlanSettings()
+            );
         }
         updateSalesGroups(updateData, record);
     }

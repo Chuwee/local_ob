@@ -59,6 +59,7 @@ public class EventChannelRecord {
     private Boolean favorite;
     private Boolean allowChannelUseAlternativeCharges;
     private Integer individualTicketTemplate;
+    private String providerPlanSettings;
 
     public Long getChannelId() {
         return channelId;
@@ -418,5 +419,13 @@ public class EventChannelRecord {
 
     public void setIndividualTicketTemplate(Integer individualTicketTemplate) {
         this.individualTicketTemplate = individualTicketTemplate;
+    }
+
+    public String getProviderPlanSettings() {
+        return providerPlanSettings;
+    }
+
+    public void setProviderPlanSettings(String providerPlanSettings) {
+        this.providerPlanSettings = providerPlanSettings;
     }
 }

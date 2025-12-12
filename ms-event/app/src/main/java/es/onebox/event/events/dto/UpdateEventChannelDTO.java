@@ -1,5 +1,7 @@
 package es.onebox.event.events.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -11,6 +13,8 @@ public class UpdateEventChannelDTO implements Serializable {
     private Boolean useAllSaleGroups;
     private List<Long> saleGroups;
     private EventTicketTemplatesDTO ticketTemplates;
+    @JsonProperty("provider_plan_settings")
+    private ProviderPlanSettings providerPlanSettings;
 
     public Boolean getUseAllSaleGroups() {
         return useAllSaleGroups;
@@ -42,5 +46,13 @@ public class UpdateEventChannelDTO implements Serializable {
 
     public void setTicketTemplates(EventTicketTemplatesDTO ticketTemplates) {
         this.ticketTemplates = ticketTemplates;
+    }
+
+    public ProviderPlanSettings getProviderPlanSettings() {
+        return providerPlanSettings;
+    }
+
+    public void setProviderPlanSettings(ProviderPlanSettings providerPlanSettings) {
+        this.providerPlanSettings = providerPlanSettings;
     }
 }
