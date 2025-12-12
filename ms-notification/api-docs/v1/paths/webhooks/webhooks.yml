@@ -1,0 +1,132 @@
+get:
+  summary: Get filtered webhook configurations
+  tags:
+    - Webhook Configurations
+  parameters:
+    - in: query
+      name: entityId
+      schema:
+        type: integer
+        format: int64
+      description: Webhook configurations entity filter (Only required for user ROLE_OPR_MGR)
+    - in: query
+      name: channelId
+      schema:
+        type: integer
+        format: int64
+      description: Webhook configurations channel filter (Only required when scope equals CHANNEL)
+    - in: query
+      name: scope
+      schema:
+        type: array
+        items:
+          $ref: '../../models/webhooks/notification-config-scope-enum.yml'
+      description: Webhook configurations scope filter
+    - in: query
+      name: visible
+      schema:
+        $ref: '../../models/webhooks/notification-config-visible-enum.yml'
+      description: Webhook configurations visible filter
+    - in: query
+      name: limit
+      schema:
+        type: integer
+        format: int64
+      description: Limit results to return
+    - in: query
+      name: offset
+      schema:
+        type: integer
+        format: int64
+      description: Number of offset items
+  responses:
+    '200':
+      description: 'Webhook configurations'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../models/common/responses/metadata.yml
+              data:
+                type: array
+                items:
+                  $ref: '../../models/webhooks/webhook-configuration.yml'
+    '401':
+      description: 'Unauthorized'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error-auth.yml'
+    '403':
+      description: 'Forbidden'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '404':
+      description: 'Not found'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+    '500':
+      description: 'Internal server error'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/common/error.yml'
+post:
+  summary: New webhook configuration
+  tags:
+    - Webhook Configurations
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../models/webhooks/create-webhook-configuration.yml
+  responses:
+    '200':
+      description: 'Webhook configuration detail'
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/webhooks/webhook-configuration.yml'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error-auth.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../models/common/error.yml
