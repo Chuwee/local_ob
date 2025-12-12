@@ -1,5 +1,6 @@
 package es.onebox.event.events.converter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import es.onebox.core.utils.common.CommonUtils;
 import es.onebox.event.common.services.S3URLResolver;
 import es.onebox.event.datasources.ms.channel.dto.ChannelConfigDTO;
@@ -10,6 +11,7 @@ import es.onebox.event.events.dto.EventChannelSettingsDTO;
 import es.onebox.event.events.dto.EventChannelStatusDTO;
 import es.onebox.event.events.dto.EventInfoDTO;
 import es.onebox.event.events.dto.EventTicketTemplatesDTO;
+import es.onebox.event.events.dto.ProviderPlanSettings;
 import es.onebox.event.events.dto.UpdateEventChannelDTO;
 import es.onebox.event.events.enums.ChannelSubtype;
 import es.onebox.event.events.enums.EventChannelStatus;
@@ -23,6 +25,8 @@ import es.onebox.event.secondarymarket.utils.SecondaryMarketUtils;
 import es.onebox.event.sessions.dao.record.SessionRecord;
 import es.onebox.event.sessions.domain.sessionconfig.SessionConfig;
 import es.onebox.jooq.cpanel.tables.records.CpanelCanalEventoRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -32,6 +36,9 @@ import java.util.function.LongFunction;
 import java.util.stream.Collectors;
 
 public class EventChannelRecordConverter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventChannelRecordConverter.class);
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private EventChannelRecordConverter() {
         throw new UnsupportedOperationException("Cannot instantiate utilities class");
@@ -166,6 +173,7 @@ public class EventChannelRecordConverter {
         fillEvent(target, record);
         fillStatus(target, record);
         fillChannel(target, record, s3url, channelConfig);
+        target.setProviderPlanSettings(deserializeProviderPlanSettings(record.getProviderPlanSettings()));
         EventStatusUtil.applyEventChannelFlagStatus(target, sessions);
         return target;
     }
@@ -203,6 +211,8 @@ public class EventChannelRecordConverter {
         if (updateData.getTicketTemplates() != null && updateData.getTicketTemplates().getIndividualTicketPdfTemplateId() != null) {
             record.setIdplantillaticket(updateData.getTicketTemplates().getIndividualTicketPdfTemplateId().intValue());
         }
+        // Always set providerPlanSettings to allow clearing the field (even when null)
+        record.setConfiguracionplanproveedor(serializeProviderPlanSettings(updateData.getProviderPlanSettings()));
         return record;
     }
 
@@ -226,6 +236,30 @@ public class EventChannelRecordConverter {
             if (updateData.getSettings().getBookingEndDate() != null) {
                 record.setFechafinreserva(Timestamp.from(updateData.getSettings().getBookingEndDate().toInstant()));
             }
+        }
+    }
+
+    private static String serializeProviderPlanSettings(ProviderPlanSettings settings) {
+        if (settings == null) {
+            return null;
+        }
+        try {
+            return OBJECT_MAPPER.writeValueAsString(settings);
+        } catch (Exception e) {
+            LOGGER.error("Error serializing ProviderPlanSettings", e);
+            return null;
+        }
+    }
+
+    private static ProviderPlanSettings deserializeProviderPlanSettings(String json) {
+        if (json == null || json.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            return OBJECT_MAPPER.readValue(json, ProviderPlanSettings.class);
+        } catch (Exception e) {
+            LOGGER.error("Error deserializing ProviderPlanSettings from JSON: {}", json, e);
+            return null;
         }
     }
 

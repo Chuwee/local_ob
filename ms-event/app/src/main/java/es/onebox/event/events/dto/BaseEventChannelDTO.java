@@ -1,5 +1,7 @@
 package es.onebox.event.events.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 
 public class BaseEventChannelDTO implements Serializable {
@@ -11,6 +13,8 @@ public class BaseEventChannelDTO implements Serializable {
     private EventInfoDTO event;
     private EventChannelStatusDTO status;
     private EventChannelSettingsDTO settings;
+    @JsonProperty("provider_plan_settings")
+    private ProviderPlanSettings providerPlanSettings;
 
     public Long getId() {
         return id;
@@ -50,5 +54,13 @@ public class BaseEventChannelDTO implements Serializable {
 
     public void setEvent(EventInfoDTO event) {
         this.event = event;
+    }
+
+    public ProviderPlanSettings getProviderPlanSettings() {
+        return providerPlanSettings;
+    }
+
+    public void setProviderPlanSettings(ProviderPlanSettings providerPlanSettings) {
+        this.providerPlanSettings = providerPlanSettings;
     }
 }
