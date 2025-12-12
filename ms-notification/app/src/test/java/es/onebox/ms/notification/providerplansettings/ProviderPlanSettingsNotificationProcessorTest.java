@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -101,8 +100,8 @@ class ProviderPlanSettingsNotificationProcessorTest {
     }
 
     private Exchange createMockedExchange(ProviderPlanSettingsNotificationMessage notificationMessage) {
-        Message message = Mockito.mock(Message.class);
-        Exchange exchange = Mockito.mock(Exchange.class);
+        Message message = mock(Message.class);
+        Exchange exchange = mock(Exchange.class);
         when(exchange.getIn()).thenReturn(message);
         when(message.getBody(ProviderPlanSettingsNotificationMessage.class)).thenReturn(notificationMessage);
         return exchange;
