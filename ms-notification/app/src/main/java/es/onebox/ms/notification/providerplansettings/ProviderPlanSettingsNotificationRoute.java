@@ -14,7 +14,7 @@ public class ProviderPlanSettingsNotificationRoute extends RouteBuilder {
     @Override
     public void configure() {
         from(providerPlanSettingsNotificationConfiguration.getRouteURL())
-                .autoStartup(Boolean.FALSE)
+                .autoStartup(false)
                 .id(providerPlanSettingsNotificationConfiguration.getName())
                 .process(providerPlanSettingsNotificationProcessor);
     }
