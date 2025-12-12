@@ -12,6 +12,10 @@ public class ExternalApiWebhookDto implements Serializable {
     private Long entityId;
     @JsonProperty("active_external_tools")
     private ArrayList<ChannelExternalToolDTO> activeExternalTools;
+    @JsonProperty("provider_plan_settings")
+    private String providerPlanSettings;
+    @JsonProperty("event_id")
+    private Long eventId;
 
     public String getCode() {
         return code;
@@ -35,5 +39,21 @@ public class ExternalApiWebhookDto implements Serializable {
 
     public void setEntityId(Long entityId) {
         this.entityId = entityId;
+    }
+
+    public String getProviderPlanSettings() {
+        return providerPlanSettings;
+    }
+
+    public void setProviderPlanSettings(String providerPlanSettings) {
+        this.providerPlanSettings = providerPlanSettings;
+    }
+
+    public Long getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
     }
 }
