@@ -24,16 +24,21 @@ public class ProviderPlanSettingsNotificationProcessor extends DefaultProcessor 
             LOGGER.info("Processing provider plan settings notification for event {} and channel {}", 
                        message.getEventId(), message.getChannelId());
 
-            // Create the webhook DTO with provider plan settings data
+            // Create empty webhook DTO - we send data via headers instead of body
             ExternalApiWebhookDto externalApiWebhookDto = new ExternalApiWebhookDto();
-            externalApiWebhookDto.setProviderPlanSettings(message.getProviderPlanSettings());
-            externalApiWebhookDto.setEventId(message.getEventId());
 
-            // Create headers for the request
-            RequestHeaders headers = new RequestHeaders.Builder()
+            // Create headers for the request - include provider plan settings and event ID in headers
+            RequestHeaders.Builder headersBuilder = new RequestHeaders.Builder()
                     .addHeader("ob-action", "PROVIDER_PLAN_SETTINGS_UPDATE")
                     .addHeader("ob-event", "EVENT_CHANNEL")
-                    .build();
+                    .addHeader("ob-event-id", String.valueOf(message.getEventId()));
+            
+            // Add provider plan settings header if not null
+            if (message.getProviderPlanSettings() != null) {
+                headersBuilder.addHeader("ob-provider-plan-settings", message.getProviderPlanSettings());
+            }
+            
+            RequestHeaders headers = headersBuilder.build();
 
             // Send notification to api-external
             webhookSendingService.sendNotificationToApiExternal(
